@@ -1199,19 +1199,19 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 34)
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
 
         with current_schema_version_swap:
             question = question_fetchers.get_question_from_model(question_model)
 
-        self.assertEqual(question.question_state_data_schema_version, 34)
+        self.assertEqual(question.question_state_data_schema_version, 35)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id, 'MathEquationInput')
-        self.assertEqual(len(answer_groups[0]['rule_specs']), 1)
+        self.assertEqual(len(answer_groups[0].rule_specs), 1)
         self.assertEqual(
-            answer_groups[0]['rule_specs']['rule_type'], 'MatchesExactlyWith')
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
-            answer_groups[0]['rule_specs']['inputs'], {'x': 'x=y', 'y': 'both'})
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
         

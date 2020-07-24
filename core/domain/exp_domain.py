@@ -2626,81 +2626,81 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        is_valid_algebraic_expression = schema_utils.get_validator(
-            'is_valid_algebraic_expression')
-        is_valid_numeric_expression = schema_utils.get_validator(
-            'is_valid_numeric_expression')
-        is_valid_math_equation = schema_utils.get_validator(
-            'is_valid_math_equation')
-        ltt = latex2text.LatexNodes2Text()
+        # is_valid_algebraic_expression = schema_utils.get_validator(
+        #     'is_valid_algebraic_expression')
+        # is_valid_numeric_expression = schema_utils.get_validator(
+        #     'is_valid_numeric_expression')
+        # is_valid_math_equation = schema_utils.get_validator(
+        #     'is_valid_math_equation')
+        # ltt = latex2text.LatexNodes2Text()
 
-        for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'MathExpressionInput':
-                new_answer_groups = []
-                types_of_inputs = set()
-                for group in state_dict['interaction']['answer_groups']:
-                    new_answer_group = copy.deepcopy(group)
-                    for rule_spec in new_answer_group['rule_specs']:
-                        rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+        # for state_dict in states_dict.values():
+        #     if state_dict['interaction']['id'] == 'MathExpressionInput':
+        #         new_answer_groups = []
+        #         types_of_inputs = set()
+        #         for group in state_dict['interaction']['answer_groups']:
+        #             new_answer_group = copy.deepcopy(group)
+        #             for rule_spec in new_answer_group['rule_specs']:
+        #                 rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
 
-                        rule_input = clean_math_expression(
-                            rule_input)
+        #                 rule_input = clean_math_expression(
+        #                     rule_input)
 
-                        type_of_input = TYPE_INVALID_EXPRESSION
-                        if is_valid_algebraic_expression(rule_input):
-                            type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        elif is_valid_numeric_expression(rule_input):
-                            type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
-                        elif is_valid_math_equation(rule_input):
-                            type_of_input = TYPE_VALID_MATH_EQUATION
+        #                 type_of_input = TYPE_INVALID_EXPRESSION
+        #                 if is_valid_algebraic_expression(rule_input):
+        #                     type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
+        #                 elif is_valid_numeric_expression(rule_input):
+        #                     type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
+        #                 elif is_valid_math_equation(rule_input):
+        #                     type_of_input = TYPE_VALID_MATH_EQUATION
 
-                        types_of_inputs.add(type_of_input)
+        #                 types_of_inputs.add(type_of_input)
 
-                        if type_of_input != TYPE_INVALID_EXPRESSION:
-                            rule_spec['inputs']['x'] = rule_input
-                            if type_of_input == TYPE_VALID_MATH_EQUATION:
-                                rule_spec['inputs']['y'] = 'both'
-                            rule_spec['rule_type'] = 'MatchesExactlyWith'
+        #                 if type_of_input != TYPE_INVALID_EXPRESSION:
+        #                     rule_spec['inputs']['x'] = rule_input
+        #                     if type_of_input == TYPE_VALID_MATH_EQUATION:
+        #                         rule_spec['inputs']['y'] = 'both'
+        #                     rule_spec['rule_type'] = 'MatchesExactlyWith'
 
-                    new_answer_groups.append(new_answer_group)
+        #             new_answer_groups.append(new_answer_group)
 
-                if TYPE_INVALID_EXPRESSION not in types_of_inputs:
-                    # If at least one rule input is an equation, we remove
-                    # all other rule inputs that are expressions.
-                    if TYPE_VALID_MATH_EQUATION in types_of_inputs:
-                        new_interaction_id = TYPE_VALID_MATH_EQUATION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_math_equation(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    # Otherwise, if at least one rule_input is an algebraic
-                    # expression, we remove all other rule inputs that are
-                    # numeric expressions.
-                    elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
-                            types_of_inputs):
-                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_algebraic_expression(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    else:
-                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
+        #         if TYPE_INVALID_EXPRESSION not in types_of_inputs:
+        #             # If at least one rule input is an equation, we remove
+        #             # all other rule inputs that are expressions.
+        #             if TYPE_VALID_MATH_EQUATION in types_of_inputs:
+        #                 new_interaction_id = TYPE_VALID_MATH_EQUATION
+        #                 for group in new_answer_groups:
+        #                     new_rule_specs = []
+        #                     for rule_spec in group['rule_specs']:
+        #                         if is_valid_math_equation(
+        #                                 rule_spec['inputs']['x']):
+        #                             new_rule_specs.append(rule_spec)
+        #                     group['rule_specs'] = new_rule_specs
+        #             # Otherwise, if at least one rule_input is an algebraic
+        #             # expression, we remove all other rule inputs that are
+        #             # numeric expressions.
+        #             elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+        #                     types_of_inputs):
+        #                 new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
+        #                 for group in new_answer_groups:
+        #                     new_rule_specs = []
+        #                     for rule_spec in group['rule_specs']:
+        #                         if is_valid_algebraic_expression(
+        #                                 rule_spec['inputs']['x']):
+        #                             new_rule_specs.append(rule_spec)
+        #                     group['rule_specs'] = new_rule_specs
+        #             else:
+        #                 new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
 
-                    # Removing answer groups that have no rule specs left after
-                    # the filtration done above.
-                    new_answer_groups = [
-                        answer_group for answer_group in new_answer_groups if (
-                            len(answer_group['rule_specs']) != 0)]
+        #             # Removing answer groups that have no rule specs left after
+        #             # the filtration done above.
+        #             new_answer_groups = [
+        #                 answer_group for answer_group in new_answer_groups if (
+        #                     len(answer_group['rule_specs']) != 0)]
 
-                    state_dict['interaction']['id'] = new_interaction_id
-                    state_dict['interaction']['answer_groups'] = (
-                        new_answer_groups)
+        #             state_dict['interaction']['id'] = new_interaction_id
+        #             state_dict['interaction']['answer_groups'] = (
+        #                 new_answer_groups)
 
         return states_dict
 
@@ -3656,6 +3656,7 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
+    @classmethod
     def _convert_v39_dict_to_v40_dict(cls, exploration_dict):
         """Converts a v39 exploration dict into a v40 exploration dict.
         Upgrades all explorations that use the MathExpressionInput interaction
@@ -3674,7 +3675,7 @@ class Exploration(python_utils.OBJECT):
 
         exploration_dict['states'] = cls._convert_states_v34_dict_to_v35_dict(
             exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 34
+        exploration_dict['states_schema_version'] = 35
 
         return exploration_dict
 
