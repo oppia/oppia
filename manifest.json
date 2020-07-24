@@ -396,9 +396,9 @@
         "files": ["math-expressions.js"]
       },
       "mathJax": {
-        "version": "2.7.5",
+        "version": "3.0.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
+        "url": "https://github.com/mathjax/MathJax/archive/3.0.0.zip",
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },

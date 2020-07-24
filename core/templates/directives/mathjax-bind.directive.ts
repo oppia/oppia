@@ -28,12 +28,9 @@ angular.module('oppia').directive('mathjaxBind', [function() {
         var ctrl = this;
         ctrl.$onInit = function() {
           $scope.$watch($attrs.mathjaxData, function(value) {
-            var $script = angular.element(
-              '<script type="math/tex">'
-            ).html(value === undefined ? '' : value);
-            $element.html('');
-            $element.append($script);
-            MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
+            let html = MathJax.tex2svg(value);
+            var svg = html.getElementsByTagName('svg')[0].outerHTML;
+            $element.html(svg);
           });
         };
       }
