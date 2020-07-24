@@ -243,6 +243,10 @@ CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 # dict schema changes.
 CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
+# This value should be updated if the schema of PlatformParameterRule dict
+# schema changes.
+CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
+
 # The default number of exploration tiles to load at a time in the search
 # results page.
 SEARCH_RESULTS_PAGE_SIZE = 20

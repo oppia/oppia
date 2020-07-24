@@ -164,6 +164,13 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.PlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.PseudonymizedUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
