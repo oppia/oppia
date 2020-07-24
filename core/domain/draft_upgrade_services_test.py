@@ -96,6 +96,209 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
+    def test_extract_html_from_draft_change_list(self):
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            html_content,
+                            '<p>4</p>'
+                        ]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'ContainsAtLeastOneOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'IsProperSubsetOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'DoesNotContainAtLeastOneOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 1
+                        }
+                    }, {
+                        'rule_type': 'HasElementXAtPositionY',
+                        'inputs': {
+                            'x': html_content,
+                            'y': 2
+                        }
+                    }, {
+                        'rule_type': 'IsEqualToOrdering',
+                        'inputs': {
+                            'x': [[html_content]]
+                        }
+                    }, {
+                        'rule_type': 'HasElementXBeforeElementY',
+                        'inputs': {
+                            'x': html_content,
+                            'y': html_content
+                        }
+                    }, {
+                        'rule_type': (
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                        'inputs': {
+                            'x': [[html_content]]
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': html_content
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': html_content
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'written_translations',
+                'new_value': {
+                    'translations_mapping': {
+                        'content1': {
+                            'en': {
+                                'html': html_content,
+                                'needs_update': True
+                            },
+                            'hi': {
+                                'html': 'Hey!',
+                                'needs_update': False
+                            }
+                        },
+                        'feedback_1': {
+                            'hi': {
+                                'html': html_content,
+                                'needs_update': False
+                            },
+                            'en': {
+                                'html': 'hello!',
+                                'needs_update': False
+                            }
+                        }
+                    }
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 'helloworld!',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_content
+                    },
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_content],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'default_outcome',
+                'new_value': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_content
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'hints',
+                'new_value': [{
+                    'hint_content': {
+                        'content_id': 'hint1',
+                        'html': html_content
+                    }
+                }]
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Intro',
+                'new_state_name': 'Introduction',
+            })
+        ]
+
+        list_of_html = (
+            draft_upgrade_services.extract_html_from_draft_change_list(
+                draft_change_list))
+        self.assertEqual(len(list_of_html), 27)
+        expected_html_strings = [
+            html_content, '<p>1</p>', '<p>2</p>', '<p>3</p>', '<p>4</p>',
+            '<p>This is solution for state1</p>', 'Hey!', 'hello!']
+        for html in list_of_html:
+            self.assertTrue(html in expected_html_strings)
+
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     """Test the DraftUpgradeUtil module."""
