@@ -95,7 +95,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         """Converts draft change list from state version 34 to 35. State
         version 35 upgrades all explorations that use the MathExpressionInput
         interaction to use one of AlgebraicExpressionInput,
-        NumericExpressionInput, or MathEquationInput interactions.
+        NumericExpressionInput, or MathEquationInput interactions. There should
+        be no changes to the draft for this migration.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
