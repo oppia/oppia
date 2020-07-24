@@ -90,7 +90,7 @@ var ExplorationEditorMainTab = function() {
   var stateEditContent = element(
     by.css('.protractor-test-edit-content'));
   var stateEditButton = element(
-    by.css('.protractor-test-edit-content-pencil-button'))
+    by.css('.protractor-test-edit-content-pencil-button'));
   var stateContentDisplay = element(
     by.css('.protractor-test-state-content-display'));
   var stateNameContainer = element(
