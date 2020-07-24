@@ -15,7 +15,6 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
-import 'mousetrap';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -36,7 +35,7 @@ require('services/search.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/KeyboardShortcutService')
+require('services/KeyboardShortcutService');
 
 require('pages/library-page/library-page.constants.ajs.ts');
 
@@ -51,7 +50,7 @@ angular.module('oppia').directive('libraryPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
-        '$window', 'AlertsService', 'ClassroomBackendApiService', 
+        '$window', 'AlertsService', 'ClassroomBackendApiService',
         'KeyboardShortcutService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
@@ -61,8 +60,8 @@ angular.module('oppia').directive('libraryPage', [
         'LIBRARY_TILE_WIDTH_PX',
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
-            $window, AlertsService, ClassroomBackendApiService, 
-            KeyboardShortcutService, LearnerDashboardActivityIdsObjectFactory, 
+            $window, AlertsService, ClassroomBackendApiService,
+            KeyboardShortcutService, LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,

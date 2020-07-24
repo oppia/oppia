@@ -18,7 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
-import 'mousetrap';
 
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.

@@ -1,9 +1,7 @@
-import 'mousetrap'
+import 'mousetrap';
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-
-import { State } from 'domain/state/StateObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -14,21 +12,21 @@ export class KeyboardShortcutService {
       document.getElementById('searchBar').focus();
       return false;
     });
-  };
+  }
 
   moveFocusToCategory() {
     Mousetrap.bind('c', function() {
       document.getElementById('categoryBar').focus();
       return false;
     });
-  };
+  }
 
   moveFocusToSkipButton() {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
       return false;
     });
-  };
+  }
 
   moveFocusToBackButton = function() {
     Mousetrap.bind('k', function() {
@@ -97,34 +95,34 @@ export class KeyboardShortcutService {
   }
 
   bindNavigationShortcuts() {
-      Mousetrap.bind('ctrl+mod+0', function() {
-        window.location.href = '/get-started';
-      });
+    Mousetrap.bind('ctrl+mod+0', function() {
+      window.location.href = '/get-started';
+    });
 
-      Mousetrap.bind('ctrl+mod+1', function() {
-        window.location.href = '/community-library';
-      });
+    Mousetrap.bind('ctrl+mod+1', function() {
+      window.location.href = '/community-library';
+    });
 
-      Mousetrap.bind('ctrl+mod+2', function() {
-        window.location.href = '/creator-dashboard';
-      });
+    Mousetrap.bind('ctrl+mod+2', function() {
+      window.location.href = '/creator-dashboard';
+    });
 
-      Mousetrap.bind('ctrl+mod+3', function() {
-        window.location.href = '/creator-dashboard';
-      });
+    Mousetrap.bind('ctrl+mod+3', function() {
+      window.location.href = '/creator-dashboard';
+    });
 
-      Mousetrap.bind('ctrl+mod+4', function() {
-        window.location.href = '/';
-      });
-  
-      Mousetrap.bind('ctrl+mod+5', function() {
-        window.location.href = '/notifications';
-      });
+    Mousetrap.bind('ctrl+mod+4', function() {
+      window.location.href = '/';
+    });
 
-      Mousetrap.bind('ctrl+mod+6', function() {
-        window.location.href = '/preferences';
-      });
-  };
+    Mousetrap.bind('ctrl+mod+5', function() {
+      window.location.href = '/notifications';
+    });
+
+    Mousetrap.bind('ctrl+mod+6', function() {
+      window.location.href = '/preferences';
+    });
+  }
 }
 
 angular.module('oppia').factory(

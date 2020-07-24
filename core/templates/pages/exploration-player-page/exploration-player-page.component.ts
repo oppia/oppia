@@ -32,7 +32,7 @@ require(
 
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
-require('services/KeyboardShortcutService')
+require('services/KeyboardShortcutService');
 
 angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
