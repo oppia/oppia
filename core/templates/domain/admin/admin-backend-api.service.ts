@@ -134,6 +134,20 @@ export class AdminBackendApiService {
       };
     });
   }
+  sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
+    let body = new FormData();
+    for (var expId in latexToSvgMapping) {
+      for (var latexValue in latexToSvgMapping[expId]) {
+        body.set(
+          latexToSvgMapping[expId][latexValue].latexId,
+          latexToSvgMapping[expId][latexValue].file);
+        delete latexToSvgMapping[expId][latexValue].file;
+      }
+    }
+    body.append(
+      'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
+    return this.http.post('/adminmathsvghandler', body).toPromise();
+  }
 }
 
 angular.module('oppia').factory(

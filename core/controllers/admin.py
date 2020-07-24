@@ -596,19 +596,19 @@ class AdminMathSvgImageGenerationHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        latex_values_mapping = (
-            exp_services.get_latex_values_and_exp_ids_for_generating_svgs())
+        latex_strings_mapping = (
+            exp_services.get_latex_strings_and_exp_ids_for_generating_svgs())
         self.render_json({
-            'result': latex_values_mapping
+            'result': latex_strings_mapping
         })
 
     @acl_decorators.can_access_admin_page
     def post(self):
         data = self.payload.get('latexMapping')
-        for exp_id, latex_values_dict in data.items():
-            for latex_value in latex_values_dict.keys():
+        for exp_id, latex_strings_dict in data.items():
+            for latex_value in latex_strings_dict.keys():
                 data[exp_id][latex_value]['file'] = (
-                    self.request.get(latex_value))
+                    self.request.get(data[exp_id][latex_value]['latexId']))
         for exp_id in data.keys():
             exp_services.update_explorations_with_math_svgs(
                 self.user_id, exp_id, data[exp_id])

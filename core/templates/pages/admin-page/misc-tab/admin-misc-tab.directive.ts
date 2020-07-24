@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('services/image-upload-helper.service.ts');
@@ -26,12 +27,14 @@ require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'AlertsService',
-  'ImageUploadHelperService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  '$http', '$rootScope', '$window', 'AdminDataService',
+  'AdminTaskManagerService', 'AlertsService', 'ImageUploadHelperService',
+  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window, AdminTaskManagerService, AlertsService,
-      ImageUploadHelperService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      $http, $rootScope, $window, AdminDataService,
+      AdminTaskManagerService, AlertsService, ImageUploadHelperService,
+      UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
@@ -181,9 +184,15 @@ angular.module('oppia').directive('adminMiscTab', [
           if (tags.length === 0 && attrs.length === 0) {
             var resampledFile = (
               ImageUploadHelperService.convertImageDataToImageFile(dataURI));
+            var date = new Date();
+            var now = date.getTime();
+            var latexId = (
+              now.toString(36).substr(2, 6) +
+              Math.random().toString(36).substr(4));
             return ({
               file: resampledFile,
-              dimensions: dimensions
+              dimensions: dimensions,
+              latexId: latexId
             });
           } else {
             AlertsService.addWarning('SVG failed validation.');
@@ -205,22 +214,15 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
         ctrl.saveSvgsToBackend = function() {
-          let body = new FormData();
-          for (var expId in latexMapping) {
-            for (var latexValue in latexMapping[expId]) {
-              body.set(latexValue, latexMapping[expId][latexValue].file);
-              delete latexMapping[expId][latexValue].file;
-            }
-          }
-          body.append(
-            'payload', JSON.stringify({latexMapping: latexMapping}));
-          $http.post(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER, (body), {
-            headers: {
-              'Content-Type': undefined
-            }
-          }).then(function(response) {
-            ctrl.setStatusMessage('Successfully Saved SVGs.');
-          });
+          AdminDataService.sendMathSvgsToBackendAsync(
+            latexMapping).then(
+            function(response) {
+              ctrl.setStatusMessage('Successfully updated the explorations.');
+              $rootScope.$apply();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage('Server error.');
+              $rootScope.$apply();
+            });
         };
 
         ctrl.updateUsername = function() {

@@ -891,7 +891,7 @@ def generate_math_svgs_filename(height, width, vertical_padding):
     return filename
 
 
-def add_svg_filenames_for_latex_values_in_html_string(image_data, html_string):
+def add_svg_filenames_for_latex_strings_in_html_string(image_data, html_string):
     """Adds the filenames for math rich-text components with empty svg_filename
     field based on the given images data.
 

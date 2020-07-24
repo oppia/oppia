@@ -46,6 +46,9 @@ export class AdminDataService {
   getDataAsync(): Promise<AdminPageData> {
     return this._getDataAsync();
   }
+  sendMathSvgsToBackendAsync(latexToSvgMapping): Promise<Object> {
+    return this.adminBackendApiService.sendMathSvgsToBackend(latexToSvgMapping);
+  }
 }
 
 angular.module('oppia').factory(

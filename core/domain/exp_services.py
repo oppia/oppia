@@ -1870,26 +1870,26 @@ def generate_html_change_list_for_state(state_name, state_dict):
     return change_lists_after_application_of_conversion_fn
 
 
-def get_latex_values_and_exp_ids_for_generating_svgs():
+def get_latex_strings_and_exp_ids_for_generating_svgs():
     """Returns the change lists for all the html fields in the state dict.
 
     Returns:
         dict(str, list). The dict having each key as an exp_id and value
-        as a list of latex values.
+        as a list of LaTeX string.
     """
 
-    latex_values_mapping = {}
+    latex_strings_mapping = {}
     exploration_math_rich_text_info_models = (
         exp_models.ExplorationMathRichTextInfoModel.get_all())
     size_of_svgs_in_batch = 0
     for model in exploration_math_rich_text_info_models:
         if model.math_images_generation_required:
-            latex_values_mapping[model.id] = model.latex_values_without_svg
+            latex_strings_mapping[model.id] = model.latex_strings_without_svg
             size_of_svgs_in_batch += (
                 model.estimated_max_size_of_images_in_bytes)
             if size_of_svgs_in_batch > feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES:
-                return latex_values_mapping
-    return latex_values_mapping
+                return latex_strings_mapping
+    return latex_strings_mapping
 
 
 def update_explorations_with_math_svgs(user_id, exp_id, image_data):
@@ -1908,14 +1908,14 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
     html_strings_after_conversion = ''
     change_lists = []
     for state_name, state in exploration.states.items():
-        add_svg_filenames_for_latex_values_in_html_string = (
+        add_svg_filenames_for_latex_strings_in_html_string = (
             functools.partial(
                 html_validation_service.
-                add_svg_filenames_for_latex_values_in_html_string, image_data))
+                add_svg_filenames_for_latex_strings_in_html_string, image_data))
         converted_state_dict = (
             state_domain.State.convert_html_fields_in_state(
                 state.to_dict(),
-                add_svg_filenames_for_latex_values_in_html_string))
+                add_svg_filenames_for_latex_strings_in_html_string))
         converted_state = state_domain.State.from_dict(converted_state_dict)
         html_strings_after_conversion += (
             ''.join(converted_state.get_all_html_content_strings()))
@@ -1973,7 +1973,7 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
                     draft_change_list))
             if len(
                     html_validation_service.
-                    get_latext_values_without_svg_from_html(
+                    get_latex_strings_without_svg_from_html(
                         html_in_draft_change)) == 0:
                 model.draft_change_list_exp_version += 1
                 user_models_to_update.append(model)
