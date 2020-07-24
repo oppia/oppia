@@ -42,6 +42,12 @@ import { SocialButtonsComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
+import { ProfileLinkImageComponent } from
+  'components/profile-link-directives/profile-link-image.component';
+import { ProfileLinkTextComponent } from
+  'components/profile-link-directives/profile-link-text.component';
+import { CircularImageComponent } from
+  'components/profile-link-directives/circular-image.component';
 
 
 @NgModule({
@@ -50,10 +56,12 @@ import { ExplorationSummaryTileDirective } from
     SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent, CircularImageComponent,
     ExplorationSummaryTileDirective],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent, CircularImageComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
   ],
