@@ -1214,4 +1214,3 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
-        

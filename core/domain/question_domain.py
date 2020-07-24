@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import datetime
 
 from constants import constants
@@ -29,7 +30,6 @@ from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
-import copy
 import feconf
 import python_utils
 import schema_utils
@@ -384,7 +384,7 @@ class Question(python_utils.OBJECT):
                         rule_spec['rule_type'] = 'MatchesExactlyWith'
 
                 new_answer_groups.append(new_answer_group)
-            
+
             if exp_domain.TYPE_INVALID_EXPRESSION not in types_of_inputs:
                 # If at least one rule input is an equation, we remove
                 # all other rule inputs that are expressions.
@@ -402,7 +402,8 @@ class Question(python_utils.OBJECT):
                 # numeric expressions.
                 elif exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION in (
                         types_of_inputs):
-                    new_interaction_id = exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
                     for group in new_answer_groups:
                         new_rule_specs = []
                         for rule_spec in group['rule_specs']:
@@ -411,7 +412,8 @@ class Question(python_utils.OBJECT):
                                 new_rule_specs.append(rule_spec)
                         group['rule_specs'] = new_rule_specs
                 else:
-                    new_interaction_id = exp_domain.TYPE_VALID_NUMERIC_EXPRESSION
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
 
                 # Removing answer groups that have no rule specs left after
                 # the filtration done above.
