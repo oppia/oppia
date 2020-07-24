@@ -24,6 +24,7 @@ import logging
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -70,10 +71,12 @@ class TopicEditorStoryHandler(base.BaseHandler):
         for summary in canonical_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
+            summary['completed_node_titles'] = []
 
         for summary in additional_story_summary_dicts:
             summary['story_is_published'] = (
                 story_id_to_publication_status_map[summary['id']])
+            summary['completed_node_titles'] = []
 
         self.values.update({
             'canonical_story_summary_dicts': canonical_story_summary_dicts,
@@ -199,9 +202,16 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
+        skill_question_count_dict = {}
+        for skill_id in topic.get_all_skill_ids():
+            skill_question_count_dict[skill_id] = (
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]))
+
         self.values.update({
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
+            'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
             'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })

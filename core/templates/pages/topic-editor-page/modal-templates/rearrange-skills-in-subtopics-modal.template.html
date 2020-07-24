@@ -6,52 +6,68 @@
   </div>
   <div class="modal-body subtopics">
     <div class="subtopics-container">
-      <md-card class="item-container uncategorized-skill-ids protractor-test-uncategorized-skills-container"
-               ng-class="{'skills-valid': !uncategorizedSkillSummaries.length, 'skills-invalid': uncategorizedSkillSummaries.length}"
-               dnd-list="uncategorizedSkillSummaries"
-               dnd-drop="onMoveSkillEnd(null)">
-        <strong>Uncategorized Skills</strong>
-        <div class="uncategorized-skills-container">
-          <md-card class="skill-id"
-                   ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
-                   dnd-draggable="skillSummary"
-                   dnd-effect-allowed="move"
-                   dnd-dragstart="onMoveSkillStart(null, skillSummary)">
-            <div class="skill-card">
-              <a ng-if="!isSkillDeleted(skillSummary)"
-                 class="protractor-test-uncategorized-skill-card"
-                 ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                 <[skillSummary.getDescription()]>
-              </a>
+      <div class="empty-placeholder"></div>
+      <div class="item-flex-container">
+        <md-card class="item-container uncategorized-skill-ids protractor-test-uncategorized-skills-container"
+                 ng-class="{'skills-valid': !$ctrl.uncategorizedSkillSummaries.length, 'skills-invalid': $ctrl.uncategorizedSkillSummaries.length}"
+                 dnd-list="$ctrl.uncategorizedSkillSummaries"
+                 dnd-drop="$ctrl.onMoveSkillEnd(null)">
+          <strong>Uncategorized Skills</strong>
+          <div class="number-skills-container">
+            <span class="number-skills-text">(<[$ctrl.uncategorizedSkillSummaries.length]> Skills)</span>
+          </div>
+          <div class="uncategorized-skills-container">
+            <md-card class="skill-id"
+                     ng-repeat="skillSummary in $ctrl.uncategorizedSkillSummaries track by $index"
+                     dnd-draggable="skillSummary"
+                     dnd-effect-allowed="move"
+                     dnd-dragstart="$ctrl.onMoveSkillStart(null, skillSummary)">
+              <div class="skill-card">
+                <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
+                   class="skill-name protractor-test-uncategorized-skill-card"
+                   ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+                   <[skillSummary.getDescription()]>
+                </a>
+              </div>
+            </md-card>
+            <p class="intro-card-message protractor-test-no-uncategorized-skills" ng-if="$ctrl.uncategorizedSkillSummaries.length === 0">
+              There are no unassigned skills left in the topic.
+            </p>
+          </div>
+        </md-card>
+      </div>
+      <div ng-repeat="(subtopicIndex, subtopic) in $ctrl.subtopics"
+           dnd-list="subtopic.getSkillSummaries()"
+           dnd-drop="$ctrl.onMoveSkillEnd(subtopic.getId())"
+           class="item-flex-container">
+        <md-card class="subtopic item-container protractor-test-subtopic-column">
+          <div class="subtopic-header" ng-click="$ctrl.editNameOfSubtopicWithId(subtopic.getId())">
+            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
+            <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
+            <div class="number-skills-container">
+              <span class="number-skills-text">(<[subtopic.getSkillSummaries().length]> Skills)</span>
             </div>
-          </md-card>
-          <p class="intro-card-message protractor-test-no-uncategorized-skills" ng-if="uncategorizedSkillSummaries.length === 0">
-            There are no unassigned skills left in the topic.
-          </p>
-        </div>
-      </md-card>
-      <md-card class="subtopic item-container protractor-test-subtopic-column"
-               ng-repeat="(subtopicIndex, subtopic) in subtopics"
-               dnd-list="subtopic.getSkillSummaries()"
-               dnd-drop="onMoveSkillEnd(subtopic.getId())">
-        <div class="subtopic-header">
-          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
-          <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
-        </div>
-        <div class="subtopic-container">
-          <md-card class="skill-id"
-                   ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
-                   dnd-draggable="skillSummary"
-                   dnd-dragstart="onMoveSkillStart(subtopic.getId(), skillSummary)"
-                   dnd-effect-allowed="move">
-            <div class="skill-card">
-              <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" class="protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
-                 <[skillSummary.getDescription()]>
-              </a>
-            </div>
-          </md-card>
-        </div>
-      </md-card>
+          </div>
+          <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicId">
+            <input type="text" ng-model="$ctrl.editableName">
+            <button class="btn btn-secondary" ng-click="$ctrl.editNameOfSubtopicWithId(null)">Cancel</button>
+            <button class="btn btn-primary" ng-click="$ctrl.updateSubtopicTitle(subtopic.getId())">Save</button>
+          </div>
+          <div class="subtopic-container">
+            <md-card class="skill-id"
+                     ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
+                     dnd-draggable="skillSummary"
+                     dnd-dragstart="$ctrl.onMoveSkillStart(subtopic.getId(), skillSummary)"
+                     dnd-effect-allowed="move">
+              <div class="skill-card">
+                <a ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" class="skill-name protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
+                   <[skillSummary.getDescription()]>
+                </a>
+              </div>
+            </md-card>
+          </div>
+        </md-card>
+      </div>
     </div>
   </div>
   <div class="modal-footer">
@@ -65,7 +81,8 @@
     width: 80vw;
   }
   .rearrange-skills-modal .modal-body {
-    padding: 40px;
+    height: 55vh;
+    padding: 40px 0 0 0;
   }
   .rearrange-skills-modal a {
     color: #666;
@@ -81,7 +98,6 @@
   .rearrange-skills-modal .item-container {
     background-color: #eee;
     max-height: 200px;
-    min-height: 200px;
     padding: 5px 10px;
     width: 15vw;
   }
@@ -102,13 +118,15 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    margin: 0 auto;
+    height: 100%;
     max-height: 350px;
-    max-width: 90%;
     overflow-x: auto;
   }
   .rearrange-skills-modal .subtopic-header {
     text-align: left;
+  }
+  .rearrange-skills-modal .item-flex-container {
+    min-height: 200px;
   }
   .rearrange-skills-modal .skill-id {
     background-color: #FFF;
@@ -131,5 +149,24 @@
   .rearrange-skills-modal .skills-invalid {
     background-color: #C55F4533;
     border: 2px solid #C55F45;
+  }
+  .rearrange-skills-modal .dndDragover .subtopic {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    padding-bottom: 40px;
+  }
+  .rearrange-skills-modal .number-skills-container {
+    bottom: 3px;
+    position: relative;
+  }
+  .rearrange-skills-modal .number-skills-text {
+    color: #666;
+    font-size: 14px;
+  }
+  .rearrange-skills-modal .empty-placeholder {
+    height: 100%;
+    width: 60px;
+  }
+  .rearrange-skills-modal .skill-name {
+    margin-left: 12px;
   }
 </style>

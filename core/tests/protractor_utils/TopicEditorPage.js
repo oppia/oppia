@@ -18,6 +18,7 @@
  */
 
 var dragAndDropScript = require('html-dnd').code;
+var general = require('../protractor_utils/general.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -204,6 +205,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeSubtopicPageContents = async function(content) {
+    await general.scrollToTop();
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-edit-html-content'));
     await waitFor.elementToBeClickable(subtopicPageContentButton,
@@ -435,7 +437,8 @@ var TopicEditorPage = function() {
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
     await closeSaveModalButton.click();
-    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for saving topic takes too long to appear.');
   };
 };
 

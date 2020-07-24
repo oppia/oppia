@@ -19,13 +19,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationFeaturesService, IExplorationDataDict,
-  IFeatureDataDict, IParamChanges } from
+import { ExplorationFeaturesService, IExplorationDataDict, IParamChanges } from
   'services/exploration-features.service';
 
 describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService = null;
-  let featureData: IFeatureDataDict = null;
+  let featureData = null;
   let explorationData: IExplorationDataDict = null;
   let explorationData2: IExplorationDataDict = null;
   let testParamChanges: IParamChanges = null;
@@ -33,13 +32,11 @@ describe('ExplorationFeatureService', () => {
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
     ExplorationFeaturesService.settings.areParametersEnabled = false;
-    ExplorationFeaturesService.settings.isImprovementsTabEnabled = false;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
     ExplorationFeaturesService.serviceIsInitialized = false;
 
     featureData = {
-      is_improvements_tab_enabled: true,
-      is_exploration_whitelisted: true,
+      isExplorationWhitelisted: true,
     };
     explorationData = {
       param_changes: [testParamChanges],
@@ -67,7 +64,6 @@ describe('ExplorationFeatureService', () => {
     explorationFeatureService.init(explorationData, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
-    expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(true);
   });
@@ -76,7 +72,6 @@ describe('ExplorationFeatureService', () => {
     explorationFeatureService.init(explorationData2, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
-    expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(true);
   });
@@ -87,8 +82,6 @@ describe('ExplorationFeatureService', () => {
       explorationFeatureService.init(explorationData, featureData);
       expect(explorationFeatureService.isInitialized()).toEqual(true);
       expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
-      expect(explorationFeatureService.isImprovementsTabEnabled())
-        .toEqual(false);
       expect(explorationFeatureService.isPlaythroughRecordingEnabled())
         .toEqual(false);
     });
