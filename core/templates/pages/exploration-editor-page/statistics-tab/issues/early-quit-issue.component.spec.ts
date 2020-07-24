@@ -44,25 +44,26 @@ describe('Early Quit Issue Component', function() {
     playthroughIssuesService.initSession(explorationId, explorationVersion);
 
     $scope = $rootScope.$new();
-    $scope.index = () => 1;
-    $scope.issue = () => (playthroughIssueObjectFactory.createFromBackendDict({
-      issue_type: 'EarlyQuit',
-      issue_customization_args: {
-        state_name: {
-          value: 'State1'
-        },
-        time_spent_in_exp_in_msecs: {
-          value: 0
-        }
-      },
-      playthrough_ids: ['1', '2', '3'],
-      schema_version: 1,
-      is_valid: true
-    }));
     var ctrl = $componentController('earlyQuitIssue', {
       $scope: $scope,
       AlertsService: alertsService,
       PlaythroughIssuesService: playthroughIssuesService
+    }, {
+      index: () => 1,
+      issue: () => (playthroughIssueObjectFactory.createFromBackendDict({
+        issue_type: 'EarlyQuit',
+        issue_customization_args: {
+          state_name: {
+            value: 'State1'
+          },
+          time_spent_in_exp_in_msecs: {
+            value: 0
+          }
+        },
+        playthrough_ids: ['1', '2', '3'],
+        schema_version: 1,
+        is_valid: true
+      }))
     });
     ctrl.$onInit();
   }));

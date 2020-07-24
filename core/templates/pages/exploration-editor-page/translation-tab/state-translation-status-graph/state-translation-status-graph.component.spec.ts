@@ -76,12 +76,13 @@ describe('State Translation Status Graph Component', function() {
       spyOn(explorationStatesService, 'getState').and.returnValue(state);
 
       $scope = $rootScope.$new();
-      $scope.isTranslationTabBusy = false;
       $componentController('stateTranslationStatusGraph', {
         $scope: $scope,
         StateEditorService: stateEditorService,
         StateRecordedVoiceoversService: stateRecordedVoiceoversService,
         StateWrittenTranslationsService: stateWrittenTranslationsService
+      }, {
+        isTranslationTabBusy: false
       });
     }));
 
@@ -138,6 +139,8 @@ describe('State Translation Status Graph Component', function() {
         StateEditorService: stateEditorService,
         StateRecordedVoiceoversService: stateRecordedVoiceoversService,
         StateWrittenTranslationsService: stateWrittenTranslationsService
+      }, {
+        isTranslationTabBusy: true
       });
     }));
 

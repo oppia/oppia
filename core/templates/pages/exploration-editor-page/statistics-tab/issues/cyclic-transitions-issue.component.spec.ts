@@ -44,22 +44,23 @@ describe('Cyclic Transitions Issue Component', function() {
     playthroughIssuesService.initSession(explorationId, explorationVersion);
 
     $scope = $rootScope.$new();
-    $scope.index = () => 1;
-    $scope.issue = () => (playthroughIssueObjectFactory.createFromBackendDict({
-      issue_type: 'CyclicStateTransitions',
-      issue_customization_args: {
-        state_names: {
-          value: ['State1', 'State2']
-        }
-      },
-      playthrough_ids: ['1', '2', '3'],
-      schema_version: 1,
-      is_valid: true
-    }));
     var ctrl = $componentController('cyclicTransitionsIssue', {
       $scope: $scope,
       AlertsService: alertsService,
       PlaythroughIssuesService: playthroughIssuesService
+    }, {
+      index: () => 1,
+      issue: () => (playthroughIssueObjectFactory.createFromBackendDict({
+        issue_type: 'CyclicStateTransitions',
+        issue_customization_args: {
+          state_names: {
+            value: ['State1', 'State2']
+          }
+        },
+        playthrough_ids: ['1', '2', '3'],
+        schema_version: 1,
+        is_valid: true
+      }))
     });
     ctrl.$onInit();
   }));

@@ -31,7 +31,7 @@ angular.module('oppia').component('cyclicTransitionsIssue', {
     '$scope', 'AlertsService', 'PlaythroughIssuesService',
     function($scope, AlertsService, PlaythroughIssuesService) {
       var ctrl = this;
-      var issue = $scope.issue();
+      var issue = null;
       var getPlaythroughIndex = function(playthroughId) {
         return $scope.playthroughIds.indexOf(playthroughId);
       };
@@ -59,7 +59,8 @@ angular.module('oppia').component('cyclicTransitionsIssue', {
         PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
       };
       ctrl.$onInit = function() {
-        $scope.currentIssueIdentifier = $scope.index() + 1;
+        issue = ctrl.issue();
+        $scope.currentIssueIdentifier = ctrl.index() + 1;
         $scope.issueStatement =
           PlaythroughIssuesService.renderIssueStatement(issue);
         $scope.suggestions =

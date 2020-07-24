@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for multipleIncorrectIssue.
+ */
+
 import { TestBed } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 
-/**
- * @fileoverview Unit tests for multipleIncorrectIssue.
- */
-
 describe('Multiple Incorrect Issue Component', function() {
+  var ctrl = null;
   var $scope = null;
   var alertsService = null;
   var playthroughIssueObjectFactory = null;
@@ -44,31 +45,33 @@ describe('Multiple Incorrect Issue Component', function() {
     playthroughIssuesService.initSession(explorationId, explorationVersion);
 
     $scope = $rootScope.$new();
-    $scope.index = () => 1;
-    $scope.issue = () => (playthroughIssueObjectFactory.createFromBackendDict({
-      issue_type: 'MultipleIncorrectSubmissions',
-      issue_customization_args: {
-        state_name: {
-          value: 'State1'
-        },
-        time_spent_in_exp_in_msecs: {
-          value: 0
-        }
-      },
-      playthrough_ids: ['1', '2', '3'],
-      schema_version: 1,
-      is_valid: true
-    }));
-    var ctrl = $componentController('multipleIncorrectIssue', {
+    ctrl = $componentController('multipleIncorrectIssue', {
       $scope: $scope,
       AlertsService: alertsService,
       PlaythroughIssuesService: playthroughIssuesService
+    }, {
+      index: () => 1,
+      issue: () => (playthroughIssueObjectFactory.createFromBackendDict({
+        issue_type: 'MultipleIncorrectSubmissions',
+        issue_customization_args: {
+          state_name: {
+            value: 'State1'
+          },
+          time_spent_in_exp_in_msecs: {
+            value: 0
+          }
+        },
+        playthrough_ids: ['1', '2', '3'],
+        schema_version: 1,
+        is_valid: true
+      }))
     });
     ctrl.$onInit();
   }));
 
   it('should evaluate controller properties after its initialization',
     function() {
+      expect(true).toBe(true);
       expect($scope.currentIssueIdentifier).toBe(2);
       expect($scope.issueStatement).toBe(
         'Several learners submitted answers to card "State1" several times,' +

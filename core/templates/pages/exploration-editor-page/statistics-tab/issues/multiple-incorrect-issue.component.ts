@@ -32,7 +32,7 @@ angular.module('oppia').component('multipleIncorrectIssue', {
     '$scope', 'AlertsService', 'PlaythroughIssuesService',
     function($scope, AlertsService, PlaythroughIssuesService) {
       var ctrl = this;
-      var issue = $scope.issue();
+      var issue = null;
       var getPlaythroughIndex = function(playthroughId) {
         return $scope.playthroughIds.indexOf(playthroughId);
       };
@@ -59,8 +59,10 @@ angular.module('oppia').component('multipleIncorrectIssue', {
         var index = $scope.playthroughIds.indexOf(playthroughId);
         PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
       };
+
       ctrl.$onInit = function() {
-        $scope.currentIssueIdentifier = $scope.index() + 1;
+        issue = ctrl.issue();
+        $scope.currentIssueIdentifier = ctrl.index() + 1;
         $scope.issueStatement =
           PlaythroughIssuesService.renderIssueStatement(issue);
         $scope.suggestions =
