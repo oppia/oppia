@@ -91,4 +91,27 @@ describe('Topic editor routing service', function() {
     expect($window.open).toHaveBeenCalled();
     expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
   });
+
+  it('should return last tab visited', function() {
+    TopicEditorRoutingService.navigateToSubtopicEditorWithId(1);
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('subtopic');
+    TopicEditorRoutingService.navigateToMainTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('topic');
+  });
+
+  it('should return last visited subtopic id', function() {
+    TopicEditorRoutingService.navigateToSubtopicPreviewTab(1);
+    $rootScope.$apply();
+    TopicEditorRoutingService.navigateToQuestionsTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(1);
+
+    TopicEditorRoutingService.navigateToSubtopicPreviewTab(5);
+    $rootScope.$apply();
+    TopicEditorRoutingService.navigateToQuestionsTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(5);
+  });
 });

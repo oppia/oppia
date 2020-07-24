@@ -32,6 +32,7 @@ describe('Subtopic editor tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var ContextService = null;
+  var skillSummary = null;
   var ImageUploadHelperService = null;
   var directive = null;
   var TopicEditorStateService = null;
@@ -71,6 +72,9 @@ describe('Subtopic editor tab', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
+    skillSummary = ShortSkillSummaryObjectFactory.create(
+      'skill_1', 'Description 1');
+    topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
 
@@ -217,6 +221,29 @@ describe('Subtopic editor tab', function() {
       ctrl.updateHtmlData();
       expect(updateSubtopicSpy).toHaveBeenCalled();
     });
+
+  it('should call the TopicUpdateService if skill is removed from subtopic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromSubtopic(0, null);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if skill is removed from topic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromTopic(skillSummary);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should set skill edit options index', function() {
+    ctrl.showSkillEditOptions(10);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(10);
+    ctrl.showSkillEditOptions(20);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(20);
+  });
 
   it('should toggle skills list preview', function() {
     expect(ctrl.skillsListIsShown).toEqual(true);

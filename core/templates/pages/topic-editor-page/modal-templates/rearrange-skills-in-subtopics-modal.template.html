@@ -6,12 +6,16 @@
   </div>
   <div class="modal-body subtopics">
     <div class="subtopics-container">
+      <div class="empty-placeholder"></div>
       <div class="item-flex-container">
         <md-card class="item-container uncategorized-skill-ids protractor-test-uncategorized-skills-container"
                  ng-class="{'skills-valid': !$ctrl.uncategorizedSkillSummaries.length, 'skills-invalid': $ctrl.uncategorizedSkillSummaries.length}"
                  dnd-list="$ctrl.uncategorizedSkillSummaries"
                  dnd-drop="$ctrl.onMoveSkillEnd(null)">
           <strong>Uncategorized Skills</strong>
+          <div class="number-skills-container">
+            <span class="number-skills-text">(<[$ctrl.uncategorizedSkillSummaries.length]> Skills)</span>
+          </div>
           <div class="uncategorized-skills-container">
             <md-card class="skill-id"
                      ng-repeat="skillSummary in $ctrl.uncategorizedSkillSummaries track by $index"
@@ -20,7 +24,7 @@
                      dnd-dragstart="$ctrl.onMoveSkillStart(null, skillSummary)">
               <div class="skill-card">
                 <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
-                   class="protractor-test-uncategorized-skill-card"
+                   class="skill-name protractor-test-uncategorized-skill-card"
                    ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
                    <[skillSummary.getDescription()]>
                 </a>
@@ -40,6 +44,9 @@
           <div class="subtopic-header" ng-click="$ctrl.editNameOfSubtopicWithId(subtopic.getId())">
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
+            <div class="number-skills-container">
+              <span class="number-skills-text">(<[subtopic.getSkillSummaries().length]> Skills)</span>
+            </div>
           </div>
           <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicId">
             <input type="text" ng-model="$ctrl.editableName">
@@ -53,7 +60,7 @@
                      dnd-dragstart="$ctrl.onMoveSkillStart(subtopic.getId(), skillSummary)"
                      dnd-effect-allowed="move">
               <div class="skill-card">
-                <a ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" class="protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
+                <a ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" class="skill-name protractor-test-subtopic-skill-description" target="_blank" rel="noopener">
                    <[skillSummary.getDescription()]>
                 </a>
               </div>
@@ -75,7 +82,7 @@
   }
   .rearrange-skills-modal .modal-body {
     height: 55vh;
-    padding: 40px;
+    padding: 40px 0 0 0;
   }
   .rearrange-skills-modal a {
     color: #666;
@@ -111,9 +118,8 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    margin: 0 auto;
+    height: 100%;
     max-height: 350px;
-    max-width: 90%;
     overflow-x: auto;
   }
   .rearrange-skills-modal .subtopic-header {
@@ -143,5 +149,24 @@
   .rearrange-skills-modal .skills-invalid {
     background-color: #C55F4533;
     border: 2px solid #C55F45;
+  }
+  .rearrange-skills-modal .dndDragover .subtopic {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    padding-bottom: 40px;
+  }
+  .rearrange-skills-modal .number-skills-container {
+    bottom: 3px;
+    position: relative;
+  }
+  .rearrange-skills-modal .number-skills-text {
+    color: #666;
+    font-size: 14px;
+  }
+  .rearrange-skills-modal .empty-placeholder {
+    height: 100%;
+    width: 60px;
+  }
+  .rearrange-skills-modal .skill-name {
+    margin-left: 12px;
   }
 </style>

@@ -4,10 +4,12 @@
       <[$ctrl.getNavbarText()]>
     </div>
     <div class="navbar-icons">
-      <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getTotalWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>" class="nav-item icon">
+      <li ng-class="{'navbar-tab-active': $ctrl.isMainEditorTabSelected(), 'uib-dropdown': $ctrl.getTotalWarningsCount()}"
+          ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>"
+          class="nav-item icon nav-list-item">
         <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="$ctrl.selectMainTab()"
-           class="nav-link navbar-tab protractor-test-edit-topic-tab">
-          <i class="material-icons">&#xE254;</i> <span>Topic</span>
+           class="nav-link navbar-tab">
+          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected() }">&#xE254;</i>
         </a>
         <div ng-show="$ctrl.getTotalWarningsCount()"
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
@@ -17,7 +19,7 @@
           <span class="oppia-editor-warnings-count">
             <[$ctrl.getTotalWarningsCount()]>
           </span>
-          <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu oppia-editor-warnings-box oppia-editor-warnings-box-block">
+          <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu topic-warning-container oppia-editor-warnings-box">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text"
                 ng-repeat="issue in $ctrl.validationIssues track by $index">
@@ -33,15 +35,15 @@
         </div>
       </li>
 
-      <li ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon nav-list-item">
         <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="$ctrl.selectQuestionsTab()">
-          <i class="material-icons">&#xE254;</i><span>Questions</span>
+          <i class="fa fa-book navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}">&#xE254;</i>
         </a>
       </li>
 
-      <li class="nav-item icon">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'subtopic_preview'}" class="nav-item icon nav-list-item">
         <a ng-click="$ctrl.openTopicViewer()" class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
-          <i class="material-icons">&#xE037;</i><span>Preview</span>
+          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'subtopic_preview'}">&#xE037;</i>
         </a>
       </li>
     </div>
@@ -70,12 +72,8 @@
     margin-bottom: 50px;
     margin-top: 110px;
   }
-  .topic-editor-main .oppia-editor-warnings-box-block {
-    display: block;
-  }
   topic-editor-page .navbar-helper {
     background-color: #00609C;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     height: 70px;
     margin-bottom: 20px;
     position: fixed;
@@ -91,10 +89,7 @@
     justify-content: flex-start;
     text-align: center;
   }
-  topic-editor-page .navbar-tab {
-    margin: 8px 25px 0;
-  }
-  topic-editor-page .navbar-tab i {
+  topic-editor-page .navbar-tab-icon {
     color: #FFFFFF;
     display: block;
     font-size: 30px;
@@ -107,18 +102,41 @@
   topic-editor-page .oppia-editor-warnings-box {
     max-width: none;
   }
+  topic-editor-page .navbar-tab-active {
+    background-color: #e6e6e6;
+  }
+  topic-editor-page .navbar-tab-active-icon {
+    color: #00609C;
+  }
+  topic-editor-page .topic-warning-container {
+    display: block;
+  }
+
+  @media screen and (max-width: 768px) {
+    .navbar-helper {
+      display: none;
+    }
+  }
   topic-editor-page .navbar-text {
     align-items: center;
     color: #FFF;
     display: flex;
     font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 20px;
-    justify-content: center;
-    text-align: center;
-    width: 40%;
+    margin-left: 4%;
+    width: 35%;
   }
   topic-editor-page .navbar-icons {
     display: flex;
+  }
+  topic-editor-page .nav-list-item {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    width: 90px;
+  }
+  topic-editor-page .navbar-icons li:hover {
+    background-color: #4eb0c0;
   }
 
   @media screen and (max-width: 800px) {
