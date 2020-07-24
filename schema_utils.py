@@ -93,8 +93,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         else:
             normalized_obj = obj_class.normalize(obj)
     elif (schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT or
-                schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_HTML or
-                schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_UNICODE):
+          schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_HTML or
+          schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_UNICODE):
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
             p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
