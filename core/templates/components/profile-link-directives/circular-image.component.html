@@ -1,0 +1,5 @@
+<a *ngIf="isLinkAvailable()" [href]="link">
+  <img [src]="src" alt="" class="rounded-circle">
+</a>
+
+<img *ngIf="!isLinkAvailable()" class="rounded-circle" [src]="src">
