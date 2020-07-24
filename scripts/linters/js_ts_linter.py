@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import json
 import os
 import re
 import shutil
@@ -42,12 +41,7 @@ ESPRIMA_PATH = os.path.join(
 
 sys.path.insert(1, ESPRIMA_PATH)
 
-import esprima  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
-    CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')
-
-FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
-    FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
+import esprima  # isort:skip pylint: disable=wrong-import-order, wrong-import-position
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 
@@ -233,72 +227,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             COMPILED_TYPESCRIPT_TMP_PATH,
             os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
-
-    def _check_any_type(self):
-        """Checks if the type of any variable is declared as 'any'
-        in TypeScript files.
-        """
-        summary_messages = []
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting any type check')
-            python_utils.PRINT('----------------------------------------')
-
-        # This pattern is used to match cases like ': any'.
-        any_type_pattern = r':\ *any'
-
-        # This pattern is used to match cases where the previous line ended
-        # with a ':', so we know this line begins with a type.
-        starts_with_any_pattern = r'^\ *any'
-
-        with linter_utils.redirect_stdout(sys.stdout):
-            failed = False
-
-            for file_path in self.all_filepaths:
-                if file_path in FILES_EXCLUDED_FROM_ANY_TYPE_CHECK:
-                    continue
-
-                file_content = self.file_cache.read(file_path)
-                starts_with_type = False
-
-                for line_number, line in enumerate(file_content.split('\n')):
-                    if starts_with_type and re.findall(
-                            starts_with_any_pattern, line):
-                        failed = True
-                        summary_message = (
-                            '%s --> \'any\' type found at line %s. Please do '
-                            'not declare variable as \'any\' type' % (
-                                file_path, line_number + 1))
-                        python_utils.PRINT(summary_message)
-                        summary_messages.append(summary_message)
-                        python_utils.PRINT('')
-
-                    if re.findall(any_type_pattern, line):
-                        failed = True
-                        summary_message = (
-                            '%s --> \'any\' type found at line %s. Please do '
-                            'not declare variable as \'any\' type' % (
-                                file_path, line_number + 1))
-                        python_utils.PRINT(summary_message)
-                        summary_messages.append(summary_message)
-                        python_utils.PRINT('')
-
-                    if line:
-                        starts_with_type = line[len(line) - 1] == ':'
-
-            if failed:
-                summary_message = (
-                    '%s \'any\' type check failed' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s \'any\' type check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
-            python_utils.PRINT('')
-
-        return summary_messages
 
     def _check_http_requests(self):
         """Checks if the http requests are made only by
@@ -1066,7 +994,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
-        any_type_messages = self._check_any_type()
         extra_js_files_messages = self._check_extra_js_files()
         http_requests_messages = self._check_http_requests()
         js_and_ts_component_messages = (
@@ -1082,7 +1009,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         all_messages = (
-            any_type_messages + extra_js_files_messages +
+            extra_js_files_messages +
             http_requests_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
             controller_dependency_messages + constant_declaration_messages +
