@@ -228,6 +228,8 @@ describe('Story editor page', function() {
       () => false);
     MockStoryEditorNavigationService.checkIfPresentInStoryPreviewTab = (
       () => true);
+    MockStoryEditorNavigationService.getActiveTab = (
+      () => 'story_preview');
     ctrl.$onInit();
     expect(ctrl.isMainEditorTabSelected()).toEqual(false);
 

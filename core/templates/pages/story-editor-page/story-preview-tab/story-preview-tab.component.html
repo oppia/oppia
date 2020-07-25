@@ -5,94 +5,92 @@
   <div class="oppia-story-viewer-description">
     <[$ctrl.story.getDescription()]>
   </div>
-<div class="d-md-block oppia-story-viewer-card-container">
-  <div ng-repeat="node in $ctrl.storyContents.getNodes() track by $index;"
-     target="_blank" rel="noopener"
-     ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+  <div class="d-md-block oppia-story-viewer-card-container">
+    <div ng-repeat="node in $ctrl.storyContents.getNodes() track by $index;"
+         target="_blank" rel="noopener"
+         ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+      <div>
+        <div ng-style="($index > 0 && !$ctrl.nodes[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
+          <div class="oppia-story-viewer-card">
+            <span class="oppia-chapter-title" aria-live="assertive">
+              <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
+            </span>
+            <div class="oppia-story-viewer-card-content">
+              <svg width="240"
+                   height="180"
+                   xmlns="http://www.w3.org/1600/svg"
+                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                   version="1.1"
+                   style="margin-right: 10px; margin-bottom: 10px;">
+                <defs>
+                  <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
+                    <rect width="240"
+                          height="180"
+                          ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                    </rect>
 
-    <div>
-      <div ng-style="($index > 0 && !$ctrl.nodes[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
-        <div class="oppia-story-viewer-card">
-                  <span class="oppia-chapter-title" aria-live="assertive">
-                    <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
-                  </span>
-
-          <div class="oppia-story-viewer-card-content">
-            <svg width="240"
-                 height="180"
-                 xmlns="http://www.w3.org/1600/svg"
-                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                 version="1.1"
-                 style="margin-right: 10px; margin-bottom: 10px;">
-              <defs>
-                <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
+                    <image x="0"
+                           y="0"
+                           height="180"
+                           width="240"
+                           ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
+                           xlink:href="">
+                    </image>
+                  </pattern>
+                </defs>
+                <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}" target="_blank" rel="noopener">
                   <rect width="240"
                         height="180"
-                        ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                        fill="url(#image<[$index]>)"
+                        rx="4">
                   </rect>
+                </a>
+              </svg>
 
-                  <image x="0"
-                         y="0"
-                         height="180"
-                         width="240"
-                         ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
-                         xlink:href="">
-                  </image>
-                </pattern>
-              </defs>
-              <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}" target="_blank" rel="noopener">
-                <rect width="240"
-                      height="180"
-                      fill="url(#image<[$index]>)"
-                      rx="4">
-                </rect>
-              </a>
-            </svg>
-
-            <div class="oppia-story-viewer-card-description-box">
-              <p style="font-size: 20px;"><[node.getDescription()]></p>
+              <div class="oppia-story-viewer-card-description-box">
+                <p style="font-size: 20px;"><[node.getDescription()]></p>
+              </div>
             </div>
-          </div>
 
-          <div class="oppia-story-viewer-mobile-card-content" style="display: none">
-            <svg width="185"
-                 height="150"
-                 xmlns="http://www.w3.org/1600/svg"
-                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                 version="1.1">
-              <defs>
-                <pattern id="image2<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
+            <div class="oppia-story-viewer-mobile-card-content" style="display: none">
+              <svg width="185"
+                   height="150"
+                   xmlns="http://www.w3.org/1600/svg"
+                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                   version="1.1">
+                <defs>
+                  <pattern id="image2<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
+                    <rect width="185"
+                          height="150"
+                          ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                    </rect>
+
+                    <image x="0"
+                           y="0"
+                           width="185"
+                           height="150"
+                           ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
+                           xlink:href="">
+                    </image>
+                  </pattern>
+                </defs>
+                <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
                   <rect width="185"
                         height="150"
-                        ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                        fill="url(#image2<[$index]>)">
                   </rect>
+                </a>
+              </svg>
 
-                  <image x="0"
-                         y="0"
-                         width="185"
-                         height="150"
-                         ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
-                         xlink:href="">
-                  </image>
-                </pattern>
-              </defs>
-              <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
-                <rect width="185"
-                      height="150"
-                      fill="url(#image2<[$index]>)"
-                ></rect>
-              </a>
-            </svg>
-
-            <div class="oppia-story-viewer-mobile-card-description-box">
-              <p><[node.getDescription()]></p>
+              <div class="oppia-story-viewer-mobile-card-description-box">
+                <p><[node.getDescription()]></p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 <style>
   .parent-container {
