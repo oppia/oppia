@@ -43,7 +43,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     var EC = browser.ExpectedConditions;
     // Checks that the current URL contains the expected text.
     await browser.wait(EC.urlContains(url), timeout);
-  }
+  };
 
   var testNavigationShortcuts = async function(url) {
     await browser.get(url);
