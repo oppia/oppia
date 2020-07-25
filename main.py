@@ -14,6 +14,7 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
+#pylint: disable=bad-option-value,wrong-import-position,invalid-name
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -116,6 +117,7 @@ from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
+#pylint: enable=bad-option-value,wrong-import-position,invalid-name
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
