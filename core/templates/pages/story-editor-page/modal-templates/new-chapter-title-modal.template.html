@@ -1,29 +1,79 @@
 <div class="modal-header">
   <h3>
-    Enter Chapter Title
+    New Chapter
   </h3>
 </div>
 <form ng-submit="save(nodeTitle)">
-  <div class="modal-body new-chapter-title-editor">
-    <p>
-      Enter the title for the chapter
-    </p>
-    <input class="form-control protractor-test-new-chapter-title-field" style="font-size: 12px;"
-           placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
-           ng-model="nodeTitle" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" autofocus>
-    <span class="oppia-input-box-subtitle">
-      <i>
-        Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
-      </i>
-    </span>
-    <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
-      <em><[errorMsg]></em>
-    </span>
+  <div class="modal-body create-new-chapter">
+    <div class="chapter-input">
+      <div class="chapter-input-header">
+        <span>Title*</span>
+        <div class="oppia-input-box-subtitle">
+          <i>
+            This will be shown to the learner. It overrides the title of the exploration.
+          </i>
+        </div>
+      </div>
+      <input class="form-control protractor-test-new-chapter-title-field" style="font-size: 12px;"
+             placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
+             ng-model="title" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" autofocus>
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
+        </i>
+      </span>
+      <span class="new-chapter-error-msg" ng-if="errorMsg">
+        <span><[errorMsg]></span>
+      </span>
+    </div>
+
+    <div class="chapter-input story-input-description">
+      <div class="chapter-input-header">
+        <span>Exploration ID*</span>
+      </div>
+      <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control protractor-test-chapter-exploration-input">
+      <span class="new-chapter-error-msg" ng-if="invalidExpId">
+        <span>Please enter a valid exploration id.</span>
+      </span>
+    </div>
+    <div class="chapter-input chapter-input-thumbnail">
+      <div class="chapter-input-header">
+        <span>Thumbnail Image*</span>
+      </div>
+      <thumbnail-uploader filename="editableThumbnailFilename"
+                          update-filename="updateThumbnailFilename"
+                          bg-color="editableThumbnailBgColor"
+                          update-bg-color="updateThumbnailBgColor"
+                          allowed-bg-colors="allowedBgColors"
+                          aspect-ratio="'16:9'"
+                          preview-title="title"
+                          preview-description=""
+                          preview-description-bg-color="'#BE563C'"
+                          preview-footer="">
+      </thumbnail-uploader>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-chapter-creation-button" type="submit" ng-disabled="isNodeTitleEmpty(nodeTitle)">
+    <button class="btn btn-success protractor-test-confirm-chapter-creation-button" type="submit" ng-disabled="!isValid()">
       <span>Create Chapter</span>
     </button>
   </div>
 </form>
+
+<style>
+  .create-new-chapter .chapter-input-header span {
+    font-weight: bold;
+  }
+  .create-new-chapter .chapter-input {
+    padding-bottom: 15px;
+  }
+  .create-new-chapter .chapter-input-thumbnail {
+    padding-bottom: 0;
+    padding-top: 10px;
+  }
+  .create-new-chapter .new-chapter-error-msg {
+    color: #FF0000;
+    font-size: small;
+  }
+</style>

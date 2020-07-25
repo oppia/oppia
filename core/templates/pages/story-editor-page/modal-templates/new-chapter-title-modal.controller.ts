@@ -20,35 +20,104 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('NewChapterTitleModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'nodeTitles',
-  'MAX_CHARS_IN_CHAPTER_TITLE',
+require('domain/story/story-update.service.ts');
+require('pages/story-editor-page/services/story-editor-state.service.ts');
+require('domain/exploration/exploration-id-validation.service.ts');
+
+const newChapterConstants = require('constants.ts');
+
+angular.module('oppia').controller('CreateNewChapterModalController', [
+  '$controller', '$scope', '$uibModalInstance',
+  'ExplorationIdValidationService', 'StoryEditorStateService',
+  'StoryUpdateService', 'nodeTitles', 'MAX_CHARS_IN_CHAPTER_TITLE',
   function(
-      $controller, $scope, $uibModalInstance, nodeTitles,
-      MAX_CHARS_IN_CHAPTER_TITLE) {
+      $controller, $scope, $uibModalInstance,
+      ExplorationIdValidationService, StoryEditorStateService,
+      StoryUpdateService, nodeTitles, MAX_CHARS_IN_CHAPTER_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
 
-    $scope.nodeTitle = '';
-    $scope.nodeTitles = nodeTitles;
-    $scope.errorMsg = null;
-    $scope.MAX_CHARS_IN_CHAPTER_TITLE =
-      MAX_CHARS_IN_CHAPTER_TITLE;
+    $scope.init = function() {
+      $scope.title = '';
+      $scope.explorationId = '';
+      $scope.invalidExpId = '';
+      $scope.nodeTitles = nodeTitles;
+      $scope.errorMsg = null;
+      $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
+      $scope.story = StoryEditorStateService.getStory();
+      $scope.nodeId = $scope.story.getStoryContents().getNextNodeId();
+      $scope.editableThumbnailFilename = '';
+      $scope.editableThumbnailBgColor = '';
+      $scope.allowedBgColors = (
+        newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
+      StoryUpdateService.addStoryNode($scope.story, $scope.title);
+    };
+
+    $scope.init();
+
+    $scope.updateThumbnailFilename = function(
+        newThumbnailFilename) {
+      StoryUpdateService.setStoryNodeThumbnailFilename(
+        $scope.story, $scope.nodeId, newThumbnailFilename);
+      $scope.editableThumbnailFilename = newThumbnailFilename;
+    };
+
+    $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
+      StoryUpdateService.setStoryNodeThumbnailBgColor(
+        $scope.story, $scope.nodeId, newThumbnailBgColor);
+      $scope.editableThumbnailBgColor = newThumbnailBgColor;
+    };
+
+    $scope.updateTitle = function() {
+      StoryUpdateService.setStoryNodeTitle(
+        $scope.story, $scope.nodeId, $scope.title);
+    };
+
+    $scope.cancel = function() {
+      StoryUpdateService.deleteStoryNode($scope.story, $scope.nodeId);
+      $uibModalInstance.close();
+    };
+
+    $scope.updateExplorationId = function() {
+      if (StoryEditorStateService.isStoryPublished()) {
+        ExplorationIdValidationService.isExpPublished(
+          $scope.explorationId).then(function(expIdIsValid) {
+          $scope.expIdIsValid = expIdIsValid;
+          if ($scope.expIdIsValid) {
+            StoryUpdateService.setStoryNodeExplorationId(
+              $scope.story, $scope.nodeId, $scope.explorationId);
+            $uibModalInstance.close();
+          } else {
+            $scope.invalidExpId = true;
+          }
+        });
+      } else {
+        StoryUpdateService.setStoryNodeExplorationId(
+          $scope.story, $scope.nodeId, $scope.explorationId);
+        $uibModalInstance.close();
+      }
+    };
 
     $scope.resetErrorMsg = function() {
       $scope.errorMsg = null;
+      $scope.invalidExpId = false;
     };
-    $scope.isNodeTitleEmpty = function(nodeTitle) {
-      return (nodeTitle === '');
+
+    $scope.isValid = function() {
+      return Boolean(
+        $scope.title && $scope.explorationId &&
+          $scope.editableThumbnailFilename);
     };
-    $scope.save = function(title) {
-      if ($scope.nodeTitles.indexOf(title) !== -1) {
+
+    $scope.save = function() {
+      if ($scope.nodeTitles.indexOf($scope.title) !== -1) {
         $scope.errorMsg = 'A chapter with this title already exists';
         return;
       }
-      $uibModalInstance.close(title);
+      $scope.updateTitle();
+      $scope.updateExplorationId();
     };
   }
 ]);

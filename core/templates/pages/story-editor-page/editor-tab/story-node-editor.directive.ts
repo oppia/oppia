@@ -340,11 +340,11 @@ angular.module('oppia').directive('storyNodeEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 nodeTitles: () => nodeTitles
               },
-              controller: 'NewChapterTitleModalController'
+              controller: 'CreateNewChapterModalController'
             }).result.then(function(title) {
               var nextNodeId =
                 $scope.story.getStoryContents().getNextNodeId();
