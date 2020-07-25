@@ -107,6 +107,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'six-1.15.0'),
     os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.5'),
     os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'redis-3.5.3'),
 ]
 
 for lib_path in THIRD_PARTY_LIBS:
