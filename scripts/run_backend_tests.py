@@ -13,27 +13,19 @@
 # limitations under the License.
 
 """Script for running backend tests in parallel.
-
 This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
-
     python -m scripts.run_backend_tests
-
 You can also append the following options to the above command:
-
     --verbose prints the output of the tests to the console.
-
     --test_target=core.controllers.editor_test runs only the tests in the
         core.controllers.editor_test module. (You can change
         "core.controllers.editor_test" to any valid module path.)
-
     --test_path=core/controllers runs all tests in test files in the
         core/controllers directory. (You can change "core/controllers" to any
         valid subdirectory path.)
-
     --generate_coverage_report generates a coverage report as part of the final
         test output (but it makes the tests slower).
-
 Note: If you've made some changes and tests are failing to run at all, this
 might mean that you have introduced a circular dependency (e.g. module A
 imports module B, which imports module C, which imports module A). This needs
@@ -74,23 +66,22 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     common.CURR_DIR,
-    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
-    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.5'),
-    os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(THIRD_PARTY_DIR, 'future-0.17.1'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
-    os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.1'),
-    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.43.0'),
-    os.path.join(THIRD_PARTY_DIR, 'packaging-20.4'),
-    os.path.join(THIRD_PARTY_DIR, 'pylatexenc-2.6'),
-    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.17.0'),
-    os.path.join(THIRD_PARTY_DIR, 'six-1.15.0'),
-    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
-    os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.5'),
+    os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.43.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.4'),
+    os.path.join(common.THIRD_PARTY_DIR, 'pylatexenc-2.6'),
+    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.17.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'six-1.15.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
+    os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
 COVERAGE_DIR = os.path.join(
@@ -137,7 +128,6 @@ _PARSER.add_argument(
 
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """Runs a shell command and captures the stdout and stderr output.
-
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
@@ -190,11 +180,9 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     """
     def _get_test_target_classes(path):
         """Returns a list of all test classes in a given test file path.
-
         Args:
             path: str. The path of the test file from which all test classes
                 are to be extracted.
-
         Returns:
             list. A list of all test classes in a given test file path.
         """

@@ -24,7 +24,6 @@ import os
 import sys
 import time
 
-logging.info("Executing appengine_config.py!!!!!")
 # Whether to calculate costs for RPCs, in addition to time taken.
 appstats_CALC_RPC_COSTS = True
 # The number of lines to record for an RPC stacktrace.

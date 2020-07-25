@@ -20,9 +20,24 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import sys
 
+# Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 oppia_tools_path = os.path.join(_PARENT_DIR, 'oppia_tools')
+
+# oppia_tools/ is available locally (in both dev and prod mode). However,
+# on the GAE production server, oppia_tools/ is not available, and the default
+# PIL third-party library is used instead.
+#
+# We cannot special-case this using DEV_MODE because it is possible to run
+# Oppia in production mode locally, where a built-in PIL won't be available.
+# Hence the check for oppia_tools instead.
+if os.path.isdir(oppia_tools_path):
+    pil_path = os.path.join(
+        oppia_tools_path, 'Pillow-6.2.2')
+    if not os.path.isdir(pil_path):
+        raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
+    sys.path.insert(0, pil_path)
 
 THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.6.1'),
@@ -51,7 +66,6 @@ for lib_path in THIRD_PARTY_LIBS:
 
 import logging
 
-logging.info("Executing main.py!!!!!!! ")
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
