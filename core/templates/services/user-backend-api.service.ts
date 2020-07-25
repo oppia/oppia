@@ -65,16 +65,17 @@ interface UserCommunityRightsDataBackendDict {
 export class UserBackendApiService {
   constructor(
     private http: HttpClient,
-    private windowRef: WindowRef,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private userInfoObjectFactory: UserInfoObjectFactory) {}
+    private userInfoObjectFactory: UserInfoObjectFactory,
+    private windowRef: WindowRef
+  ) {}
 
     private PREFERENCES_DATA_URL = '/preferenceshandler/data';
     private USER_COMMUNITY_RIGHTS_DATA_URL = '/usercommunityrightsdatahandler';
-
-    private userInfo = null;
+    
     private userCommunityRightsInfo = null;
+    private userInfo = null;
 
     getUserInfoAsync(): Promise<UserInfo> {
       return new Promise((resolve, reject) => {
@@ -123,14 +124,14 @@ export class UserBackendApiService {
           }
         });
     }
-    setProfileImageDataUrlAsync(newProfileImageDataUrl: string):
-      Promise<PreferencesBackendDict> {
-      const putData = {
+    setProfileImageDataUrlAsync(
+      newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
+      const profileImageUpdateUrlData = {
         update_type: 'profile_picture_data_url',
         data: newProfileImageDataUrl
       };
       return this.http.put<PreferencesBackendDict>(
-        this.PREFERENCES_DATA_URL, putData).toPromise();
+        this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
     }
     getLoginUrlAsync(): Promise<string> {
       const urlParameters = {
