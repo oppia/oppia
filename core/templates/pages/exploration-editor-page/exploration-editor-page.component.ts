@@ -19,6 +19,7 @@
 
 import { State } from 'domain/state/StateObjectFactory';
 
+require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');

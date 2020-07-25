@@ -33,8 +33,10 @@ class GuppyObject {
 })
 export class GuppyInitializationService {
   private guppyInstances: Array<GuppyObject> = [];
+  private onScreenKeyboardShown = false;
 
   init(guppyDivClassName: string): void {
+    this.onScreenKeyboardShown = false;
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
     let divId, guppyInstance;
     for (let i = 0; i < guppyDivs.length; i++) {
@@ -54,6 +56,14 @@ export class GuppyInitializationService {
         return guppyObject;
       }
     }
+  }
+
+  getShowOSK(): boolean {
+    return this.onScreenKeyboardShown;
+  }
+
+  setShowOSK(value: boolean): void {
+    this.onScreenKeyboardShown = value;
   }
 }
 
