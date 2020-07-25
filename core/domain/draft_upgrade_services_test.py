@@ -307,8 +307,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     USER_ID = 'user_id'
     EXP_MIGRATION_CHANGE_LIST = [exp_domain.ExplorationChange({
         'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-        'from_version': '33',
-        'to_version': '34'
+        'from_version': '34',
+        'to_version': '35'
     })]
 
     # EXP_ID and USER_ID used to create default explorations.
@@ -374,7 +374,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
     def test_convert_states_v34_dict_to_v35_dict(self):
-        draft_change_list_v34 = [
+        draft_change_list_1_v34 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
@@ -386,14 +386,63 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Intro',
                 'property_name': 'widget_id',
                 'new_value': 'MathExpressionInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'IsMathematicallyEquivalentTo',
+                        'inputs': {
+                            'x': 'x+y/2'
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Content</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            })
+        ]
+        draft_change_list_2_v34 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
             })
         ]
         # Migrate exploration to state schema version 35.
         self.create_and_migrate_new_exploration('34', '35')
-        with self.assertRaisesRegexp(
-            Exception, 'Conversion cannot be completed.'):
+        migrated_draft_change_list_1_v35 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list_v34, 1, 2, self.EXP_ID)
+                draft_change_list_1_v34, 1, 2, self.EXP_ID))
+        self.assertIsNone(migrated_draft_change_list_1_v35)
+
+        migrated_draft_change_list_2_v35 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_2_v34, 1, 2, self.EXP_ID))
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_2_v34_dict_list = [
+            change.to_dict() for change in draft_change_list_2_v34
+        ]
+        migrated_draft_change_list_2_v35_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_2_v35
+        ]
+        self.assertEqual(
+            draft_change_list_2_v34_dict_list,
+            migrated_draft_change_list_2_v35_dict_list)
 
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (
