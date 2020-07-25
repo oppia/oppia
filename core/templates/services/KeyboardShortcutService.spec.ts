@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for loader service.
+ * @fileoverview Unit tests for the keyboard shortcut service.
  */
 import 'mousetrap';
 
@@ -41,7 +41,7 @@ describe('KeyboardShortcutService', () => {
     spyOn(document, 'getElementById').and.callFake(function() {
       return document.createElement('button1');
     });
-  
+
     spyOn(document, 'querySelector').and.callFake(function() {
       return document.createElement('button2');
     });
@@ -55,7 +55,7 @@ describe('KeyboardShortcutService', () => {
     spyOn(document, 'getElementById').and.callFake(function() {
       return document.createElement('button1');
     });
-  
+
     spyOn(document, 'querySelector').and.callFake(function() {
       return document.createElement('button2');
     });

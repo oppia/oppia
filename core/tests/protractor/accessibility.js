@@ -27,9 +27,10 @@ describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
 
   var triggerKeys = async function(key) {
-    await browser.actions().sendKeys(protractor.Key.chord(protractor.Key.CONTROL, key)).perform();
+    await browser.actions().sendKeys(
+      protractor.Key.chord(protractor.Key.CONTROL, key)).perform();
     await waitFor.pageToFullyLoad();
-  }
+  };
 
   var testNavigationShortcuts = async function(url) {
     await browser.get(url);
@@ -48,7 +49,8 @@ describe('screenreader and keyboard user accessibility features', function() {
     expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/notifications');
     await triggerKeys('6');
     expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/preferences');
-  }
+  };
+
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
@@ -66,26 +68,26 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   it('should test navigation shortcuts for static webpages',
-  async function() {
-    // Should Create a user and login.
-    await users.createUser('user11@accessibility.com', 'user11accessibility');
-    await users.login('user11@accessibility.com', true);
+    async function() {
+      // Should Create a user and login.
+      await users.createUser('user11@accessibility.com', 'user11accessibility');
+      await users.login('user11@accessibility.com', true);
 
-    // Should load into the library page and press keyboard shortcut
-    await testNavigationShortcuts('community-library');
-    await testNavigationShortcuts('creator-dashboard');
-    await testNavigationShortcuts('get-started');
-    await testNavigationShortcuts('about');
-    await testNavigationShortcuts('privacy-policy');
-    await testNavigationShortcuts('donate');
-    await testNavigationShortcuts('preferences');
-    await testNavigationShortcuts('learner-dashboard');
-    await testNavigationShortcuts('notifications');
-  });
+      // Should test navigation shortcuts.
+      await testNavigationShortcuts('community-library');
+      await testNavigationShortcuts('creator-dashboard');
+      await testNavigationShortcuts('get-started');
+      await testNavigationShortcuts('about');
+      await testNavigationShortcuts('privacy-policy');
+      await testNavigationShortcuts('donate');
+      await testNavigationShortcuts('preferences');
+      await testNavigationShortcuts('learner-dashboard');
+      await testNavigationShortcuts('notifications');
+    });
 
-  afterEach(async function() {
-    await general.checkForConsoleErrors([]);
-  });
+    afterEach(async function() {
+      await general.checkForConsoleErrors([]);
+    });
 });
 
 describe('Cache Slugs', function() {

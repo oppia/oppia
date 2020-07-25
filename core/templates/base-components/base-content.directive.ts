@@ -22,7 +22,7 @@ require('pages/OppiaFooterDirective.ts');
 
 require('services/bottom-navbar-status.service.ts');
 require('services/contextual/url.service.ts');
-require('services/KeyboardShortcutService.ts')
+require('services/KeyboardShortcutService.ts');
 require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
@@ -44,7 +44,7 @@ angular.module('oppia').directive('baseContent', [
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'BottomNavbarStatusService', 'KeyboardShortcutService', 
+        'BottomNavbarStatusService', 'KeyboardShortcutService',
         'SidebarStatusService', 'LoaderService', 'UrlService',
         function($rootScope, $window, BackgroundMaskService,
             BottomNavbarStatusService, KeyboardShortcutService,

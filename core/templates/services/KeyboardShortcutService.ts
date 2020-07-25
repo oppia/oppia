@@ -24,7 +24,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-
   bindExplorationPlayerShortcuts() {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
