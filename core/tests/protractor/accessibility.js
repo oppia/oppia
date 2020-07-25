@@ -19,12 +19,52 @@
 
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
+var users = require('../protractor_utils/users.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
 
+  var testNavigationShortcuts = async function(url) {
+    await browser.get(url);
+    await waitFor.pageToFullyLoad();
+    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('0').perform();
+    await waitFor.pageToFullyLoad();
+    browser.navigate().back();
+    await waitFor.pageToFullyLoad();
+    expect(browser.getCurrentUrl()).toEqual('get-started');
+    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('1').perform();
+    await waitFor.pageToFullyLoad();
+    browser.navigate().back();
+    await waitFor.pageToFullyLoad();
+    expect(browser.getCurrentUrl()).toEqual('community-library');
+    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('2').perform();
+    await waitFor.pageToFullyLoad();
+    browser.navigate().back();
+    await waitFor.pageToFullyLoad();
+    expect(browser.getCurrentUrl()).toEqual('learner-dashboard');
+    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('3').perform();
+    await waitFor.pageToFullyLoad();
+    browser.navigate().back();
+    await waitFor.pageToFullyLoad();
+    expect(browser.getCurrentUrl()).toEqual('creator-dashboard');
+    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('4').perform();
+    await waitFor.pageToFullyLoad();
+    browser.navigate().back();
+    await waitFor.pageToFullyLoad();
+    expect(browser.getCurrentUrl()).toEqual('/');
+    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('5').perform();
+    await waitFor.pageToFullyLoad();
+    browser.navigate().back();
+    await waitFor.pageToFullyLoad();
+    expect(browser.getCurrentUrl()).toEqual('notifications');
+    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('6').perform();
+    await waitFor.pageToFullyLoad();
+    browser.navigate().back();
+    await waitFor.pageToFullyLoad();
+    expect(browser.getCurrentUrl()).toEqual('preferences');
+  }
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
@@ -39,6 +79,26 @@ describe('screenreader and keyboard user accessibility features', function() {
     expect(await mainContent.getAttribute('id')).toEqual(
       await (await browser.driver.switchTo().activeElement())
         .getAttribute('id'));
+  });
+
+  it('should test navigation shortcuts for static webpages',
+  async function() {
+    // browser.ignoreSynchronization = true;
+    // await browser.waitForAngularEnabled(false);
+    // Should Create a user and login.
+    await users.createUser('user11@accessibility.com', 'user11accessibility');
+    await users.login('user11@accessibility.com', true);
+
+    // Should load into the library page and press keyboard shortcut
+    await testNavigationShortcuts('community-library');
+    await testNavigationShortcuts('creator-dashboard');
+    await testNavigationShortcuts('get-started');
+    await testNavigationShortcuts('/');
+    await testNavigationShortcuts('privacy-policy');
+    await testNavigationShortcuts('donate');
+    await testNavigationShortcuts('preferences');
+    await testNavigationShortcuts('learner-dashboard');
+    await testNavigationShortcuts('notifications');
   });
 
   afterEach(async function() {

@@ -22,6 +22,7 @@ require('pages/OppiaFooterDirective.ts');
 
 require('services/bottom-navbar-status.service.ts');
 require('services/contextual/url.service.ts');
+require('services/KeyboardShortcutService.ts')
 require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
@@ -43,11 +44,11 @@ angular.module('oppia').directive('baseContent', [
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'BottomNavbarStatusService', 'SidebarStatusService', 'LoaderService',
-        'UrlService',
+        'BottomNavbarStatusService', 'KeyboardShortcutService', 
+        'SidebarStatusService', 'LoaderService', 'UrlService',
         function($rootScope, $window, BackgroundMaskService,
-            BottomNavbarStatusService, SidebarStatusService, LoaderService,
-            UrlService) {
+            BottomNavbarStatusService, KeyboardShortcutService,
+            SidebarStatusService, LoaderService, UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {
@@ -91,6 +92,8 @@ angular.module('oppia').directive('baseContent', [
               (message: string) => this.loadingMessage = message
             );
           };
+
+          KeyboardShortcutService.bindNavigationShortcuts();
         }
       ]
     };
