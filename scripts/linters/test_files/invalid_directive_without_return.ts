@@ -14,9 +14,23 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file use any type which is not allowed.
+ * js_ts_linter_test.py. This file has directive without a return statement.
  */
 
-declare const require: any; // Use of any type is not allowed.
-declare const require:
-  any;
+const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
+Object.defineProperty(window, 'CodeMirror', {
+  value: CodeMirror,
+  writable: false
+});
+
+require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
+require('static/code-mirror-5.17.0/mode/python/python.js');
+require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
+require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
+require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+
+angular.module('oppia').directive('baseContent', {}, [{},
+  function() {
+    return browser.wait()
+  }
+]);

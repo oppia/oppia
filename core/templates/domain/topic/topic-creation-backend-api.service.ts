@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { IImageData } from 'domain/skill/skill-creation-backend-api.service';
+import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 
@@ -37,8 +37,8 @@ export class TopicCreationBackendApiService {
 
   _createTopic(
       successCallback: (value?: TopicCreationResponse) => void,
-      errorCallback:(reason?: any) => void,
-      topic: NewlyCreatedTopic, imagesData: IImageData[],
+      errorCallback:(reason?: string) => void,
+      topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): void {
     let postData = {
       name: topic.name,
@@ -68,7 +68,7 @@ export class TopicCreationBackendApiService {
   }
 
   createTopic(
-      topic: NewlyCreatedTopic, imagesData: IImageData[],
+      topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): Promise<TopicCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createTopic(resolve, reject, topic, imagesData, bgColor);

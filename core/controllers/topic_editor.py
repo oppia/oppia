@@ -26,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import email_manager
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -208,11 +209,17 @@ class EditableTopicDataHandler(base.BaseHandler):
             if topic_id in classroom_dict['topic_ids']:
                 classroom_name = classroom_dict['name']
                 break
+        skill_question_count_dict = {}
+        for skill_id in topic.get_all_skill_ids():
+            skill_question_count_dict[skill_id] = (
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]))
 
         self.values.update({
             'classroom_name': classroom_name,
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
+            'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
             'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })

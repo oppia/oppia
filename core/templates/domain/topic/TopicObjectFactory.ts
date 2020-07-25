@@ -25,18 +25,18 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import {
-  IStoryReferenceBackendDict,
+  StoryReferenceBackendDict,
   StoryReference,
   StoryReferenceObjectFactory
 } from 'domain/topic/StoryReferenceObjectFactory';
 import {
-  ISkillIdToDescriptionMap,
+  SkillIdToDescriptionMap,
   Subtopic,
-  ISubtopicBackendDict,
+  SubtopicBackendDict,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
 
-interface ITopicBackendDict {
+interface TopicBackendDict {
   'id': string;
   'name': string;
   'abbreviated_name': string;
@@ -47,9 +47,9 @@ interface ITopicBackendDict {
   'version': number;
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
-  'subtopics': ISubtopicBackendDict[];
-  'canonical_story_references': IStoryReferenceBackendDict[];
-  'additional_story_references': IStoryReferenceBackendDict[];
+  'subtopics': SubtopicBackendDict[];
+  'canonical_story_references': StoryReferenceBackendDict[];
+  'additional_story_references': StoryReferenceBackendDict[];
 }
 
 export class Topic {
@@ -78,7 +78,7 @@ export class Topic {
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
       thumbnailFilename: string,
       thumbnailBgColor: string,
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap,
       skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory) {
@@ -497,22 +497,22 @@ export class TopicObjectFactory {
       private storyReferenceObjectFactory: StoryReferenceObjectFactory,
       private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
   create(
-      topicBackendDict: ITopicBackendDict,
-      skillIdToDescriptionDict: ISkillIdToDescriptionMap): Topic {
+      topicBackendDict: TopicBackendDict,
+      skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {
     let subtopics = topicBackendDict.subtopics.map((
-        subtopic: ISubtopicBackendDict) => {
+        subtopic: SubtopicBackendDict) => {
       return this.subtopicObjectFactory.create(
         subtopic, skillIdToDescriptionDict);
     });
     let canonicalStoryReferences =
         topicBackendDict.canonical_story_references.map(
-          (reference: IStoryReferenceBackendDict) => {
+          (reference: StoryReferenceBackendDict) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
     let additionalStoryReferences =
         topicBackendDict.additional_story_references.map(
-          (reference: IStoryReferenceBackendDict) => {
+          (reference: StoryReferenceBackendDict) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
