@@ -74,6 +74,10 @@ describe('Editor Navigation Component', function() {
     $scope.$apply();
   }));
 
+  afterEach(function() {
+    ctrl.$onDestroy();
+  });
+
   it('should evaluate $scope properties after controller initialization',
     function() {
       expect($scope.isPostTutorialHelpPopoverShown())
@@ -202,33 +206,27 @@ describe('Editor Navigation Component', function() {
     expect($scope.getOpenThreadsCount()).toBe(5);
   });
 
-  it('should change isScreenLarge variable to true when resizing page',
-    function() {
-      widthSpy.and.returnValue(1200);
+  it('should hide post tutorial help popover when resizing page to greater' +
+    ' than 1024px', function() {
+    widthSpy.and.returnValue(1200);
 
-      expect($scope.isPostTutorialHelpPopoverShown())
-        .toBe(false);
+    window.dispatchEvent(new Event('resize'));
+    $rootScope.$broadcast('openPostTutorialHelpPopover');
 
-      window.dispatchEvent(new Event('resize'));
-      $rootScope.$broadcast('openPostTutorialHelpPopover');
+    expect($scope.isPostTutorialHelpPopoverShown())
+      .toBe(true);
+    expect($scope.isScreenLarge()).toBe(true);
 
-      expect($scope.isPostTutorialHelpPopoverShown())
-        .toBe(true);
-      expect($scope.isScreenLarge()).toBe(true);
+    $flushPendingTasks();
+    $verifyNoPendingTasks('timeout');
 
-      $flushPendingTasks();
-      $verifyNoPendingTasks('timeout');
-
-      expect($scope.isPostTutorialHelpPopoverShown())
-        .toBe(false);
-    });
+    expect($scope.isPostTutorialHelpPopoverShown())
+      .toBe(false);
+  });
 
   it('should hide post tutorial help popover when resizing page to less than' +
     ' 1024px', function() {
     widthSpy.and.returnValue(768);
-
-    expect($scope.isPostTutorialHelpPopoverShown())
-      .toBe(false);
 
     window.dispatchEvent(new Event('resize'));
     $rootScope.$broadcast('openPostTutorialHelpPopover');
