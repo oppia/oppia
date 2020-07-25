@@ -16,16 +16,16 @@
  * @fileoverview Factory for creating frontend skills
  */
 
-export interface ISkillBackendDict {
+export interface SkillBackendDict {
   'all_questions_merged': boolean;
   description: string;
   id: string;
   'language_code': string;
-  misconceptions: IMisconceptionBackendDict[];
+  misconceptions: MisconceptionBackendDict[];
   'next_misconception_id': number;
   'prerequisite_skill_ids': string[];
-  rubrics: IRubricBackendDict[];
-  'skill_contents': IConceptCardBackendDict;
+  rubrics: RubricBackendDict[];
+  'skill_contents': ConceptCardBackendDict;
   'superseding_skill_id': string;
   version: number;
 }
@@ -33,11 +33,11 @@ export interface ISkillBackendDict {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ConceptCardObjectFactory, ConceptCard, IConceptCardBackendDict } from
+import { ConceptCardObjectFactory, ConceptCard, ConceptCardBackendDict } from
   'domain/skill/ConceptCardObjectFactory';
-import { MisconceptionObjectFactory, Misconception, IMisconceptionBackendDict }
+import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
   from 'domain/skill/MisconceptionObjectFactory';
-import { RubricObjectFactory, Rubric, IRubricBackendDict } from
+import { RubricObjectFactory, Rubric, RubricBackendDict } from
   'domain/skill/RubricObjectFactory';
 import { ValidatorsService } from 'services/validators.service.ts';
 const constants = require('constants.ts');
@@ -203,7 +203,7 @@ export class Skill {
     this._rubrics.push(rubricObjectFactory.create(difficulty, explanations));
   }
 
-  toBackendDict(): ISkillBackendDict {
+  toBackendDict(): SkillBackendDict {
     return {
       id: this._id,
       description: this._description,
@@ -259,7 +259,7 @@ export class SkillObjectFactory {
       description, false, allowDescriptionToBeBlank);
   }
 
-  createFromBackendDict(skillBackendDict: ISkillBackendDict): Skill {
+  createFromBackendDict(skillBackendDict: SkillBackendDict): Skill {
     return new Skill(
       skillBackendDict.id,
       skillBackendDict.description,
@@ -277,7 +277,7 @@ export class SkillObjectFactory {
   }
 
   generateMisconceptionsFromBackendDict(
-      misconceptionsBackendDicts: IMisconceptionBackendDict[]) {
+      misconceptionsBackendDicts: MisconceptionBackendDict[]) {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
       return this.misconceptionObjectFactory.createFromBackendDict(
         misconceptionsBackendDict);
@@ -285,7 +285,7 @@ export class SkillObjectFactory {
   }
 
   generateRubricsFromBackendDict(
-      rubricBackendDicts: IRubricBackendDict[]) {
+      rubricBackendDicts: RubricBackendDict[]) {
     return rubricBackendDicts.map((rubricBackendDict) => {
       return this.rubricObjectFactory.createFromBackendDict(rubricBackendDict);
     });

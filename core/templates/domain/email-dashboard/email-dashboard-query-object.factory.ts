@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IEmailDashboardQuery {
+export interface EmailDashboardQueryDict {
   'id': string;
   'status': string;
   'num_qualified_users'?: number;
@@ -27,8 +27,8 @@ export interface IEmailDashboardQuery {
   'created_on'?: string;
 }
 
-export interface IEmailDashboardQueryBackendDict {
-  query: IEmailDashboardQuery;
+export interface EmailDashboardQueryBackendDict {
+  query: EmailDashboardQueryDict;
 }
 
 export class EmailDashboardQuery {
@@ -53,14 +53,14 @@ export class EmailDashboardQuery {
   providedIn: 'root'
 })
 export class EmailDashboardQueryObjectFactory {
-  createFromQueryDict(queryDict: IEmailDashboardQuery): EmailDashboardQuery {
+  createFromQueryDict(queryDict: EmailDashboardQueryDict): EmailDashboardQuery {
     return new EmailDashboardQuery(
       queryDict.id, queryDict.status, queryDict.num_qualified_users,
       queryDict.submitter_username, queryDict.created_on);
   }
 
   createFromBackendDict(
-      backendDict: IEmailDashboardQueryBackendDict): EmailDashboardQuery {
+      backendDict: EmailDashboardQueryBackendDict): EmailDashboardQuery {
     return new EmailDashboardQuery(
       backendDict.query.id, backendDict.query.status,
       backendDict.query.num_qualified_users,

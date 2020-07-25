@@ -2047,6 +2047,23 @@ tags: []
             self.logout()
             os.environ.update(initial_user_env)
 
+    def assertRaises(self, exc, fun, *args, **kwds):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
+            self, expected_exception, expected_regexp, callable_obj=None,
+            *args, **kwargs):
+        if expected_regexp == '':
+            raise Exception(
+                'Please provide a sufficiently strong regexp string to '
+                'validate that the correct error is being raised.')
+
+        return super(TestBase, self).assertRaisesRegexp(
+            expected_exception, expected_regexp,
+            callable_obj=callable_obj, *args, **kwargs)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""

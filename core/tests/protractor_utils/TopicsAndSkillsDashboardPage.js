@@ -169,6 +169,8 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.assignSkillWithIndexToTopic = async function(index, topicIndex) {
+    await waitFor.invisibilityOf(
+      noSkillsPresentMessage, 'Skills list takes too long to appear.');
     var assignSkillButton = await assignSkillToTopicButtons.get(index);
     await waitFor.elementToBeClickable(
       assignSkillButton,
