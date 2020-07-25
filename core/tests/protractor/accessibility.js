@@ -25,30 +25,51 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
+  var timeout = 15000;
+  var getStartedUrl = 'http://localhost:9001/get-started';
+  var communityLibraryUrl = 'http://localhost:9001/community-library';
+  var learnerDashboardUrl = 'http://localhost:9001/learner-dashboard';
+  var creatorDashboardUrl = 'http://localhost:9001/creator-dashboard';
+  var aboutUrl = 'http://localhost:9001/about';
+  var notificationsUrl = 'http://localhost:9001/notifications';
+  var preferencesUrl = 'http://localhost:9001/preferences';
 
   var triggerKeys = async function(key) {
     await browser.actions().sendKeys(
       protractor.Key.chord(protractor.Key.CONTROL, key)).perform();
-    await waitFor.pageToFullyLoad();
   };
+
+  var waitForUrlRedirection = async function(url) {
+    var EC = browser.ExpectedConditions;
+    // Checks that the current URL contains the expected text.
+    await browser.wait(EC.urlContains(url), timeout);
+  }
 
   var testNavigationShortcuts = async function(url) {
     await browser.get(url);
-    await waitFor.pageToFullyLoad();
+    await waitForUrlRedirection(url);
+    // Should trigger keyboard shortcuts.
     await triggerKeys('0');
-    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/get-started');
+    await waitForUrlRedirection(getStartedUrl);
+    expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
     await triggerKeys('1');
-    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/community-library');
+    await waitForUrlRedirection(communityLibraryUrl);
+    expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
     await triggerKeys('2');
-    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/learner-dashboard');
+    await waitForUrlRedirection(learnerDashboardUrl);
+    expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
     await triggerKeys('3');
-    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/creator-dashboard');
+    await waitForUrlRedirection(creatorDashboardUrl);
+    expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
     await triggerKeys('4');
-    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/about');
+    await waitForUrlRedirection(aboutUrl);
+    expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
     await triggerKeys('5');
-    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/notifications');
+    await waitForUrlRedirection(notificationsUrl);
+    expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
     await triggerKeys('6');
-    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/preferences');
+    await waitForUrlRedirection(preferencesUrl);
+    expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
   };
 
   beforeEach(function() {
@@ -69,7 +90,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should test navigation shortcuts for static webpages',
     async function() {
-      // Should Create a user and login.
+      // Should create a user and login.
       await users.createUser('user11@accessibility.com', 'user11accessibility');
       await users.login('user11@accessibility.com', true);
 
