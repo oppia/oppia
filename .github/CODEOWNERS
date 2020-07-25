@@ -150,7 +150,6 @@
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
-/scripts/linters/excluded_any_type_files.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
 
 
@@ -299,6 +298,7 @@
 /core/templates/domain/improvements/ @seanlip
 /core/templates/pages/exploration-editor-page/improvements-tab/ @seanlip
 /core/templates/pages/exploration-editor-page/statistics-tab/ @seanlip
+/core/templates/services/exploration-improvements.service*.ts @seanlip
 /core/templates/services/exploration-improvements-backend-api.service*.ts @seanlip
 /core/templates/services/exploration-improvements-task-registry.service*.ts @seanlip
 /core/templates/services/exploration-stats.service*.ts @seanlip
@@ -542,7 +542,7 @@
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
 /puppeteer-login-script.js @jimbyo
-/scripts/run_lighthouse_tests.py @jameesjohn @jimbyo @vojtechjelinek
+/scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
@@ -568,6 +568,12 @@
 
 /core/templates/services/services.constants.ajs.ts @vojtechjelinek
 /core/templates/services/services.constants.ts @vojtechjelinek
+
+
+# Dynamic Feature Gating project
+/core/storage/config/ @BenHenning @vinitamurthi
+/core/domain/platform_parameter_domain*.py @BenHenning @vinitamurthi
+
 
 # Frontend unit tests
 /core/templates/**/*.spec.ts @nithusha21
