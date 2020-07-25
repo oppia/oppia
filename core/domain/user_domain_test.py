@@ -430,28 +430,28 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
             self.user_contribution_rights.can_review_questions, True)
 
     def test_can_review_translation_for_language_codes_incorrect_type(self):
-        self.user_contribution_rights.can_review_translation_for_language_codes = 5
+        self.user_contribution_rights.can_review_translation_for_language_codes = 5 # pylint: disable=line-too-long
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
 
     def test_can_review_voiceover_for_language_codes_incorrect_type(self):
-        self.user_contribution_rights.can_review_voiceover_for_language_codes = 5
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = 5 # pylint: disable=line-too-long
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes to be a list'):
             self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_voiceover_raise_error(self):
-        self.user_contribution_rights.can_review_voiceover_for_language_codes = [
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_translation_raise_error(self):
-        self.user_contribution_rights.can_review_translation_for_language_codes = [
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
@@ -459,11 +459,11 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
     def test_can_review_voiceover_for_language_codes_with_duplicate_values(
             self):
-        self.user_contribution_rights.can_review_voiceover_for_language_codes = [
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi']
         self.user_contribution_rights.validate()
 
-        self.user_contribution_rights.can_review_voiceover_for_language_codes = [
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -473,11 +473,11 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
     def test_can_review_translation_for_language_codes_with_duplicate_values(
             self):
-        self.user_contribution_rights.can_review_translation_for_language_codes = [
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi']
         self.user_contribution_rights.validate()
 
-        self.user_contribution_rights.can_review_translation_for_language_codes = [
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
         with self.assertRaisesRegexp(
             utils.ValidationError,

@@ -1682,7 +1682,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_contribution_reviewer_usernames(
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
-    def test_get_contribution_reviewer_usernames_in_invalid_category_raise_error(
+    def test_get_contribution_reviewer_usernames_in_invalid_category_raise_error( # pylint: disable=line-too-long
             self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid review category: invalid_category'):

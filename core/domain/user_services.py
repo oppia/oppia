@@ -588,8 +588,8 @@ def _save_user_contribution_rights(user_contribution_rights):
     """Saves the UserContributionRights object into the datastore.
 
     Args:
-        user_contribution_rights: UserContributionRights. The UserContributionRights
-            object of the user.
+        user_contribution_rights: UserContributionRights. The
+            UserContributionRights object of the user.
     """
     # TODO(#8794): Add limitation on number of reviewers allowed in any
     # category.
@@ -600,7 +600,8 @@ def _save_user_contribution_rights(user_contribution_rights):
             user_contribution_rights.can_review_translation_for_language_codes),
         can_review_voiceover_for_language_codes=(
             user_contribution_rights.can_review_voiceover_for_language_codes),
-        can_review_questions=user_contribution_rights.can_review_questions).put()
+        can_review_questions=(
+            user_contribution_rights.can_review_questions)).put()
 
 
 def _update_user_contribution_rights(user_contribution_rights):
@@ -1974,7 +1975,8 @@ def remove_question_review_rights(user_id):
 
 
 def remove_contribution_reviewer(user_id):
-    """Deletes the UserContributionRightsModel corresponding to the given user_id.
+    """Deletes the UserContributionRightsModel corresponding to the given
+    user_id.
 
     Args:
         user_id: str. The unique ID of the user.
