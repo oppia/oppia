@@ -22,6 +22,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { ProfileLinkImageBackendApiService } from
   'components/profile-link-directives/profile-link-image-backend-api.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 
 interface ProfileDict {
@@ -40,8 +41,13 @@ export class ProfileLinkImageComponent implements OnInit {
   constructor(
     private profileLinkImageBackendApiService:
       ProfileLinkImageBackendApiService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private sanitizer: DomSanitizer
   ) {}
+
+  getSanitizedUrl(url: string): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
 
   isUsernameLinkable(username: string): boolean {
     return ['admin', 'OppiaMigrationBot'].indexOf(username) === -1;
