@@ -27,6 +27,7 @@ import { ReviewTestBackendDict, ReviewTest, ReviewTestObjectFactory } from
   'domain/review_test/review-test-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,14 +36,20 @@ export class ReviewTestBackendApiService {
   constructor(
     private http: HttpClient,
     private reviewTestObjectFactory: ReviewTestObjectFactory,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
   ) {}
 
   _fetchReviewTestData(storyId: string): Promise<ReviewTest> {
     return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
-        {story_id: storyId}
+        {
+          abbrev_topic_name: (
+            this.urlService.getAbbrevTopicNameFromLearnerUrl()),
+          classroom_name: this.urlService.getClassroomNameFromLearnerUrl(),
+          story_id: storyId
+        }
       )
     ).toPromise().then(backendResponse => {
       return this.reviewTestObjectFactory.createFromBackendDict(

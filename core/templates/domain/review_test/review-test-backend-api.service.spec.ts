@@ -23,11 +23,13 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
 
 describe('Review test backend API service', () => {
   let reviewTestBackendApiService:
     ReviewTestBackendApiService = null;
   let httpTestingController: HttpTestingController;
+  let urlService: UrlService = null;
 
   var ERROR_STATUS_CODE = 500;
 
@@ -44,6 +46,13 @@ describe('Review test backend API service', () => {
     reviewTestBackendApiService = TestBed.get(
       ReviewTestBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
+    urlService = TestBed.get(UrlService);
+    spyOn(urlService, 'getAbbrevTopicNameFromLearnerUrl').and.callFake(() => {
+      return 'abbrev-topic';
+    });
+    spyOn(urlService, 'getClassroomNameFromLearnerUrl').and.callFake(() => {
+      return 'math';
+    });
   });
 
   afterEach(() => {
@@ -58,7 +67,8 @@ describe('Review test backend API service', () => {
       reviewTestBackendApiService.fetchReviewTestData('0').then(
         successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/review_test_handler/data/0');
+      var req = httpTestingController.expectOne(
+        '/review_test_handler/data/abbrev-topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -77,7 +87,8 @@ describe('Review test backend API service', () => {
       reviewTestBackendApiService.fetchReviewTestData('0').then(
         successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/review_test_handler/data/0');
+      var req = httpTestingController.expectOne(
+        '/review_test_handler/data/abbrev-topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading data.', {
         status: ERROR_STATUS_CODE, statusText: 'Invalid Request'

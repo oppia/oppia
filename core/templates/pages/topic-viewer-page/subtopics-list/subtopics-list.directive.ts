@@ -26,9 +26,10 @@ angular.module('oppia').directive('subtopicsList', [
       restrict: 'E',
       scope: {},
       bindToController: {
+        getAbbreviatedTopicName: '&abbreviatedTopicName',
+        getClassroomName: '&classroomName',
         getSubtopics: '&subtopicsList',
         getTopicId: '&topicId',
-        getTopicName: '&topicName'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/subtopics-list/' +

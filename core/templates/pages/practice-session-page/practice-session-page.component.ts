@@ -48,17 +48,19 @@ angular.module('oppia').component('practiceSessionPage', {
         var practiceSessionsDataUrl = UrlInterpolationService
           .interpolateUrl(
             PRACTICE_SESSIONS_DATA_URL, {
-              topic_name: ctrl.topicName,
+              abbrev_topic_name: UrlService.getAbbrevTopicNameFromLearnerUrl(),
               comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
             });
         var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
           PRACTICE_SESSIONS_URL, {
-            topic_name: ctrl.topicName,
+            abbrev_topic_name: UrlService.getAbbrevTopicNameFromLearnerUrl(),
+            classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
             comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
           });
         var topicViewerUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_PAGE, {
-            topic_name: ctrl.topicName
+            abbrev_topic_name: UrlService.getAbbrevTopicNameFromLearnerUrl(),
+            classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
           });
         $http.get(practiceSessionsDataUrl).then(function(result) {
           var skillList = [];
@@ -91,15 +93,16 @@ angular.module('oppia').component('practiceSessionPage', {
             questionsSortedByDifficulty: false
           };
           ctrl.questionPlayerConfig = questionPlayerConfig;
+          ctrl.topicName = result.data.topic_name;
+          PageTitleService.setPageTitle(
+            'Practice Session: ' + ctrl.topicName + ' - Oppia');
         });
       };
       ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+        ctrl.topicName = UrlService.getAbbrevTopicNameFromLearnerUrl();
         ctrl.commaSeparatedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
-        PageTitleService.setPageTitle(
-          'Practice Session: ' + ctrl.topicName + ' - Oppia');
       };
     }
   ]

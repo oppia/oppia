@@ -36,6 +36,7 @@ describe('Subtopic viewer page', function() {
   var ContextService = null;
 
   var topicName = 'Topic Name';
+  var abbreviatedTopicName = 'abbrev';
   var topicId = '1';
   var subtopicId = '1';
   var subtopicTitle = 'Subtopic Title';
@@ -67,11 +68,15 @@ describe('Subtopic viewer page', function() {
   }));
 
   it('should succesfully get subtopic data and set context', function() {
-    spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(topicName);
+    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      abbreviatedTopicName);
+    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      'math');
     spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
     var subtopicDataObject = (
       ReadOnlySubtopicPageObjectFactory.createFromBackendDict({
         topic_id: topicId,
+        topic_name: topicName,
         subtopic_title: subtopicTitle,
         page_contents: {
           subtitled_html: {
@@ -118,8 +123,10 @@ describe('Subtopic viewer page', function() {
 
   it('should use reject handler when fetching subtopic data fails',
     function() {
-      spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(
-        topicName);
+      spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+        abbreviatedTopicName);
+      spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+        'math');
       spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
       spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and
         .returnValue(

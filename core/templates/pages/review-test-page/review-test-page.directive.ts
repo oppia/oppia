@@ -59,14 +59,22 @@ angular.module('oppia').directive('reviewTestPage', [
           var _fetchSkillDetails = function() {
             var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
               REVIEW_TEST_DATA_URL, {
+                abbrev_topic_name: (
+                  UrlService.getAbbrevTopicNameFromLearnerUrl()),
                 story_id: ctrl.storyId
               });
             var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
               REVIEW_TESTS_URL, {
+                abbrev_topic_name: (
+                  UrlService.getAbbrevTopicNameFromLearnerUrl()),
+                classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
                 story_id: ctrl.storyId
               });
             var storyViewerUrl = UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_PAGE, {
+                abbrev_topic_name: (
+                  UrlService.getAbbrevTopicNameFromLearnerUrl()),
+                classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
                 story_id: ctrl.storyId
               });
             ReviewTestBackendApiService.fetchReviewTestData(ctrl.storyId).then(

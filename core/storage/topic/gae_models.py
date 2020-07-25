@@ -152,6 +152,22 @@ class TopicModel(base_models.VersionedModel):
             cls.canonical_name == topic_name.lower()).filter(
                 cls.deleted == False).get() #pylint: disable=singleton-comparison
 
+    @classmethod
+    def get_by_abbreviated_name(cls, abbreviated_name):
+        """Gets TopicModel by topic_name. Returns None if the topic with
+        name topic_name doesn't exist.
+
+        Args:
+            abbreviated_name: str. The abbreviated name of the topic.
+
+        Returns:
+            TopicModel|None. The topic model of the topic or None if not
+            found.
+        """
+        return TopicModel.query().filter(
+            cls.abbreviated_name == abbreviated_name.lower()).filter(
+                cls.deleted == False).get() #pylint: disable=singleton-comparison
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -207,7 +223,8 @@ class TopicSummaryModel(base_models.BaseModel):
 
     A TopicSummaryModel instance stores the following information:
 
-        id, description, language_code, last_updated, created_on, version.
+        id, description, language_code, last_updated, created_on, version,
+        abbreviated_name.
 
     The key of each instance is the topic id.
     """
@@ -220,6 +237,8 @@ class TopicSummaryModel(base_models.BaseModel):
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
+    # The abbreviated name of the topic.
+    abbreviated_name = ndb.StringProperty(indexed=True, default='')
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the

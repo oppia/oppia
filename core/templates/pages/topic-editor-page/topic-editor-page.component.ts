@@ -92,11 +92,15 @@ angular.module('oppia').directive('topicEditorPage', [
                     'with the changes', 2000);
                 return;
               }
-              var topicName = ctrl.topic.getName();
+              var abbrevTopicName = ctrl.topic.getAbbreviatedName();
+              var classroomName = TopicEditorStateService.getClassroomName();
               $window.open(
                 UrlInterpolationService.interpolateUrl(
                   TOPIC_VIEWER_URL_TEMPLATE, {
-                    topic_name: topicName
+                    abbrev_topic_name: (
+                      abbrevTopicName.toLowerCase().replace(/ /g, '-')),
+                    classroom_name: (
+                      classroomName.toLowerCase().replace(/ /g, '-'))
                   }
                 ), 'blank');
             } else {

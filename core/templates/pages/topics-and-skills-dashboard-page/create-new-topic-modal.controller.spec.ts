@@ -74,6 +74,7 @@ describe('Create new topic modal', function() {
     var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
     expect($scope.isValid()).toEqual(false);
     newlyCreatedTopic.name = 'name';
+    newlyCreatedTopic.abbreviatedName = 'abrbev';
     newlyCreatedTopic.description = 'description';
     $scope.newlyCreatedTopic = newlyCreatedTopic;
     expect($scope.isValid()).toEqual(true);

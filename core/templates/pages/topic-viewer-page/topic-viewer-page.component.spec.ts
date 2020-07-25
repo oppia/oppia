@@ -60,8 +60,11 @@ describe('Topic viewer page', function() {
     });
   }));
 
-  it('should succesfully get topic data', function() {
-    spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(topicName);
+  it('should successfully get topic data', function() {
+    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      topicName);
+    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      'math');
     var topicDataObject = (
       ReadOnlyTopicObjectFactory.createFromBackendDict({
         topic_id: '1',
@@ -91,14 +94,13 @@ describe('Topic viewer page', function() {
 
     expect(ctrl.canonicalStorySummaries).toEqual([]);
     expect(ctrl.activeTab).toBe('info');
-    expect(ctrl.topicName).toBe('Topic Name');
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-      topicName + ' - Oppia');
     expect(ctrl.topicIsLoading).toBe(true);
     $scope.$apply();
 
     expect(ctrl.topicId).toBe('1');
     expect(ctrl.topicName).toBe('Topic Name');
+    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
+      topicName + ' - Oppia');
     expect(ctrl.topicDescription).toBe('Topic Description');
     expect(ctrl.canonicalStorySummaries.length).toBe(1);
     expect(ctrl.chapterCount).toBe(2);
@@ -109,10 +111,87 @@ describe('Topic viewer page', function() {
     expect(ctrl.trainTabShouldBeDisplayed).toBe(true);
   });
 
+  it('should set story tab correctly', function() {
+    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      topicName);
+    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      'math');
+    spyOn(UrlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicName}/story`);
+    ctrl.$onInit();
+    expect(ctrl.activeTab).toBe('story');
+  });
+
+  it('should set revision tab correctly', function() {
+    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      topicName);
+    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      'math');
+    spyOn(UrlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicName}/revision`);
+    ctrl.$onInit();
+    expect(ctrl.activeTab).toBe('subtopics');
+  });
+
+  it('should set practice tab correctly', function() {
+    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      topicName);
+    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      'math');
+    spyOn(UrlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicName}/practice`);
+    ctrl.$onInit();
+    expect(ctrl.activeTab).toBe('practice');
+  });
+
+  it('should switch to info tab if practice tab is hidden', function() {
+    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      topicName);
+    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      'math');
+    spyOn(UrlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicName}/practice`);
+    var topicDataObject = (
+      ReadOnlyTopicObjectFactory.createFromBackendDict({
+        topic_id: '1',
+        topic_name: 'Topic Name',
+        topic_description: 'Topic Description',
+        canonical_story_dicts: [{
+          id: '2',
+          title: 'Story Title',
+          node_titles: ['Node title 1', 'Node title 2'],
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+          description: 'Story Description',
+          story_is_published: true
+        }],
+        additional_story_dicts: [],
+        uncategorized_skill_ids: [],
+        subtopics: [],
+        degrees_of_mastery: {},
+        skill_descriptions: {},
+        train_tab_should_be_displayed: false
+      }));
+    spyOn(TopicViewerBackendApiService, 'fetchTopicData').and.returnValue(
+      $q.resolve(topicDataObject));
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+
+    ctrl.$onInit();
+
+    expect(ctrl.canonicalStorySummaries).toEqual([]);
+    expect(ctrl.activeTab).toBe('practice');
+    $scope.$apply();
+
+    expect(ctrl.trainTabShouldBeDisplayed).toBe(false);
+    expect(ctrl.activeTab).toBe('info');
+  });
+
   it('should use reject handler when fetching subtopic data fails',
     function() {
-      spyOn(UrlService, 'getTopicNameFromLearnerUrl').and.returnValue(
+      spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
         topicName);
+      spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+        'math');
       spyOn(TopicViewerBackendApiService, 'fetchTopicData').and
         .returnValue(
           $q.reject({

@@ -34,6 +34,8 @@ from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
+import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -110,7 +112,8 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.subtopic_count,
         topic_summary_model.total_skill_count,
         topic_summary_model.topic_model_created_on,
-        topic_summary_model.topic_model_last_updated
+        topic_summary_model.topic_model_last_updated,
+        topic_summary_model.abbreviated_name
     )
 
 
@@ -156,6 +159,8 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
             represent change commands made to the given topic.
     """
     topic.validate()
+    _check_topic_name_uniqueness(topic.name)
+    _check_abbrev_topic_name_uniqueness(topic.abbreviated_name)
     create_new_topic_rights(topic.id, committer_id)
     model = topic_models.TopicModel(
         id=topic.id,
@@ -184,20 +189,49 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
     generate_topic_summary(topic.id)
 
 
+def _check_topic_name_uniqueness(topic_name):
+    """Checks if the topic name provided is unique.
+
+    Args:
+        topic_name: str. The topic name.
+
+    Raises:
+        Exception. Topic with same name already exists.
+    """
+    if not isinstance(topic_name, python_utils.BASESTRING):
+        raise utils.ValidationError('Name should be a string.')
+    existing_topic = topic_fetchers.get_topic_by_name(topic_name)
+    if existing_topic is not None:
+        raise utils.ValidationError(
+            'Topic with name \'%s\' already exists' % topic_name)
+
+
+def _check_abbrev_topic_name_uniqueness(abbrev_topic_name):
+    """Checks if the abbreviated topic name provided is unique.
+
+    Args:
+        abbrev_topic_name: str. The abbreviated topic name.
+
+    Raises:
+        Exception. Topic with same abbreviated name already exists.
+    """
+    if not isinstance(abbrev_topic_name, python_utils.BASESTRING):
+        raise utils.ValidationError('Abbreviated name should be a string.')
+    existing_topic = (
+        topic_fetchers.get_topic_by_abbreviated_name(abbrev_topic_name))
+    if existing_topic is not None:
+        raise utils.ValidationError(
+            'Topic with abbreviated name \'%s\' already exists'
+            % abbrev_topic_name)
+
+
 def save_new_topic(committer_id, topic):
     """Saves a new topic.
 
     Args:
         committer_id: str. ID of the committer.
         topic: Topic. Topic to be saved.
-
-    Raises:
-        Exception. Topic with same name already exists.
     """
-    existing_topic = topic_fetchers.get_topic_by_name(topic.name)
-    if existing_topic is not None:
-        raise Exception('Topic with name \'%s\' already exists' % topic.name)
-
     commit_message = (
         'New topic created with name \'%s\'.' % topic.name)
     _create_topic(
@@ -310,9 +344,11 @@ def apply_change_list(topic_id, change_list):
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
+                    _check_topic_name_uniqueness(change.new_value)
                     topic.update_name(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
+                    _check_abbrev_topic_name_uniqueness(change.new_value)
                     topic.update_abbreviated_name(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
@@ -811,7 +847,8 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic.created_on, topic.last_updated
+        total_skill_count, topic.created_on, topic.last_updated,
+        topic.abbreviated_name
     )
 
     return topic_summary
@@ -837,7 +874,8 @@ def save_topic_summary(topic_summary):
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
-        'topic_model_created_on': topic_summary.topic_model_created_on
+        'topic_model_created_on': topic_summary.topic_model_created_on,
+        'abbreviated_name': topic_summary.abbreviated_name
     }
 
     topic_summary_model = (

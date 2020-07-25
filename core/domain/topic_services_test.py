@@ -243,6 +243,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, name='Name 2', description='Description',
+            abbreviated_name='random',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
             subtopics=[], next_subtopic_id=1)
@@ -1281,6 +1282,23 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 canonical_story_ids=[], additional_story_ids=[],
                 uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
+    def test_cannot_save_new_topic_with_existing_abbreviated_name(self):
+        self.save_new_topic(
+            'topic_2', self.user_id, name='newtopic',
+            abbreviated_name='abbrev',
+            description='Description 2',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+        with self.assertRaisesRegexp(
+            Exception,
+            'Topic with abbreviated name \'abbrev\' already exists'):
+            self.save_new_topic(
+                'topic_2', self.user_id, name='original',
+                abbreviated_name='abbrev',
+                description='Description 2',
+                canonical_story_ids=[], additional_story_ids=[],
+                uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'en')
@@ -1393,11 +1411,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
             'topic_2', self.user_id, name='Name 2',
+            abbreviated_name='name2',
             description='Description 2',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             'topic_3', self.user_id, name='Name 3',
+            abbreviated_name='name3',
             description='Description 3',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)

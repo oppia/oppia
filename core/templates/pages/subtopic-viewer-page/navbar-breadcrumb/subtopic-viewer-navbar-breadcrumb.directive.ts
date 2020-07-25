@@ -29,23 +29,28 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
         '/pages/subtopic-viewer-page/navbar-breadcrumb/' +
         'subtopic-viewer-navbar-breadcrumb.directive.html'),
       controller: [
-        '$rootScope', '$scope', 'SubtopicViewerBackendApiService', 'UrlService',
-        'TOPIC_VIEWER_URL_TEMPLATE', function(
-            $rootScope, $scope, SubtopicViewerBackendApiService, UrlService,
-            TOPIC_VIEWER_URL_TEMPLATE) {
+        '$rootScope', '$scope', 'SubtopicViewerBackendApiService',
+        'UrlService', 'TOPIC_VIEWER_REVISION_URL_TEMPLATE', function(
+            $rootScope, $scope, SubtopicViewerBackendApiService,
+            UrlService, TOPIC_VIEWER_REVISION_URL_TEMPLATE) {
           var ctrl = this;
           $scope.getTopicUrl = function() {
             return UrlInterpolationService.interpolateUrl(
-              TOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: $scope.topicName
+              TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
+                abbrev_topic_name: (
+                  UrlService.getAbbrevTopicNameFromLearnerUrl()),
+                classroom_name: UrlService.getClassroomNameFromLearnerUrl()
               });
           };
           ctrl.$onInit = function() {
-            $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+            $scope.abbreviatedTopicName = (
+              UrlService.getAbbrevTopicNameFromLearnerUrl());
             SubtopicViewerBackendApiService.fetchSubtopicData(
-              $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
+              $scope.abbreviatedTopicName,
+              UrlService.getSubtopicIdFromUrl()).then(
               function(subtopicDataObject) {
                 $scope.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+                $scope.topicName = subtopicDataObject.getParentTopicName();
                 $rootScope.$apply();
               });
           };

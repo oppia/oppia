@@ -62,6 +62,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         subtopic.skill_ids = [self.subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.linked_skill_id],
@@ -183,6 +184,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
         topic_id_2 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Topic1',
+            abbreviated_name='topic1',
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
@@ -196,6 +198,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
         })
         self.save_new_topic(
             topic_id_2, self.admin_id, name='Topic2',
+            abbreviated_name='topic2',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
@@ -490,7 +493,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviated_name': 'name',
+            'abbreviatedName': 'name1',
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
@@ -515,7 +518,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name that is too long for validation.',
-            'abbreviated_name': 'name'
+            'abbreviatedName': 'name2'
         }
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
@@ -526,7 +529,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviated_name': 'name',
+            'abbreviatedName': 'name3',
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',

@@ -18,13 +18,14 @@
 
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('practiceTab', [
-  '$window', 'UrlInterpolationService',
+  '$window', 'UrlInterpolationService', 'UrlService',
   'PRACTICE_SESSIONS_URL',
   function(
-      $window, UrlInterpolationService,
+      $window, UrlInterpolationService, UrlService,
       PRACTICE_SESSIONS_URL) {
     return {
       restrict: 'E',
@@ -52,7 +53,9 @@ angular.module('oppia').directive('practiceTab', [
             }
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
-                topic_name: ctrl.getTopicName(),
+                abbrev_topic_name: (
+                  UrlService.getAbbrevTopicNameFromLearnerUrl()),
+                classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
                 comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
               });
             $window.location.href = practiceSessionsUrl;

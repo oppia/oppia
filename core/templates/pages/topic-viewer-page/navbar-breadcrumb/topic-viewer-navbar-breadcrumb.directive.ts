@@ -36,7 +36,7 @@ angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [
           var ctrl = this;
           ctrl.$onInit = function() {
             TopicViewerBackendApiService.fetchTopicData(
-              UrlService.getTopicNameFromLearnerUrl()).then(
+              UrlService.getAbbrevTopicNameFromLearnerUrl()).then(
               function(readOnlyTopic) {
                 $scope.topicName = readOnlyTopic.getTopicName();
                 // TODO(#8521): Remove the use of $rootScope.$apply()

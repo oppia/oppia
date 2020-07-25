@@ -105,6 +105,10 @@ export class TopicSummary {
   getTopicModelLastUpdated(): number {
     return this.topicModelLastUpdated;
   }
+
+  getClassroom(): string {
+    return this.classroom;
+  }
 }
 
 @Injectable({

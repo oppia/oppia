@@ -16,6 +16,15 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Abbreviated Topic Name</span></div>
+      <input class="protractor-test-new-topic-short-name-field" ng-model="newlyCreatedTopic.abbreviatedName" maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>">
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Abbreviated topic name should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
+        </i>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Description</span></div>
       <textarea class="protractor-test-new-topic-description-field"
                 rows="4" cols="50" placeholder="Enter description"

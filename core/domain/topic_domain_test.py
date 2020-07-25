@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -587,6 +588,39 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
 
+    def test_validation_fails_with_invalid_abbreviated_name(self):
+        self.topic.abbreviated_name = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Abbreviated name should be a string.'):
+            self.topic.validate()
+
+    def test_validation_fails_with_empty_abbreviated_name(self):
+        self.topic.abbreviated_name = ''
+        validation_message = 'Abbreviated name field should not be empty'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
+    def test_validation_fails_with_hyphenated_abbreviated_name(self):
+        self.topic.abbreviated_name = 'a-b-c'
+        validation_message = (
+            'Abbreviated name field should not contain hyphens.')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
+    def test_validation_fails_with_lenghty_abbreviated_name(self):
+        self.topic.abbreviated_name = 'a' * 25
+        abbreviated_name_limit = (
+            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
+        validation_message = (
+            'Abbreviated name field should not exceed %d characters, '
+            'received %s.' % (
+                abbreviated_name_limit, self.topic.abbreviated_name))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
         self._assert_validation_error(
@@ -1150,6 +1184,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
+            'abbreviated_name': 'abbrev',
             'id': 'topic_id',
             'name': 'name',
             'description': 'topic description',
@@ -1161,12 +1196,12 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'subtopic_count': 1,
             'total_skill_count': 1,
             'topic_model_created_on': time_in_millisecs,
-            'topic_model_last_updated': time_in_millisecs
+            'topic_model_last_updated': time_in_millisecs,
         }
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, current_time, current_time)
+            1, 1, 1, 1, 1, 1, current_time, current_time, 'abbrev')
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(
@@ -1185,6 +1220,39 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary.name = ''
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Name field should not be empty'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_abbreviated_name(self):
+        self.topic_summary.abbreviated_name = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Abbreviated name should be a string.'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_empty_abbreviated_name(self):
+        self.topic_summary.abbreviated_name = ''
+        validation_message = 'Abbreviated name field should not be empty'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_hyphenated_abbreviated_name(self):
+        self.topic_summary.abbreviated_name = 'a-b-c'
+        validation_message = (
+            'Abbreviated name field should not contain hyphens.')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_lenghty_abbreviated_name(self):
+        self.topic_summary.abbreviated_name = 'a' * 25
+        abbreviated_name_limit = (
+            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
+        validation_message = (
+            'Abbreviated name field should not exceed %d characters, '
+            'received %s.' % (
+                abbreviated_name_limit, self.topic_summary.abbreviated_name))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_description(self):

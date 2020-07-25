@@ -77,18 +77,26 @@ export class UrlService {
     throw new Error('Invalid topic id url');
   }
 
-  getTopicNameFromLearnerUrl(): string {
+  getAbbrevTopicNameFromLearnerUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
-      return decodeURIComponent(pathname.split('/')[2]);
+    if (pathname.startsWith('/learn')) {
+      return decodeURIComponent(pathname.split('/')[3]);
     }
     throw new Error('Invalid URL for topic');
+  }
+
+  getClassroomNameFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (pathname.startsWith('/learn')) {
+      return decodeURIComponent(pathname.split('/')[2]);
+    }
+    throw new Error('Invalid URL for classroom');
   }
 
   getSelectedSubtopicsFromUrl(): string {
     let pathname = this.getPathname();
     let queryStrings = this.getCurrentQueryString().split('=');
-    if (pathname.match(/\/practice_session/g) && queryStrings.length === 2) {
+    if (pathname.match(/\/practice/g) && queryStrings.length === 2) {
       return decodeURIComponent(queryStrings[1]);
     }
     throw new Error('Invalid URL for practice session');
@@ -106,16 +114,18 @@ export class UrlService {
   getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
-    if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
-      return decodeURIComponent(argumentsArray[3]);
+    if (pathname.match(/\/revision/g) && argumentsArray.length === 6) {
+      return decodeURIComponent(argumentsArray[5]);
     }
     throw new Error('Invalid URL for subtopic');
   }
 
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
-      return pathname.split('/')[2];
+    var matchedPath = pathname.match(
+      /\/(story_editor|review-test)\/(\w|-){12}/g);
+    if (matchedPath) {
+      return matchedPath[0].split('/')[2];
     }
     throw new Error('Invalid story id url');
   }
@@ -123,7 +133,7 @@ export class UrlService {
   getStoryIdFromViewerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/story\/(\w|-){12}/g)) {
-      return pathname.split('/')[2];
+      return pathname.split('/')[5];
     }
     throw new Error('Invalid story id url');
   }

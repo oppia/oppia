@@ -17,6 +17,8 @@ export = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
+  "CLASSROOM_STATUS_STAGING": "staging",
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -5228,6 +5230,7 @@ export = {
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
   "MAX_CHARS_IN_TOPIC_NAME": 39,
+  "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,

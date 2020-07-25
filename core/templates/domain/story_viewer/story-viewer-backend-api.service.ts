@@ -59,11 +59,14 @@ export class StoryViewerBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  _fetchStoryData(storyId: string,
+  _fetchStoryData(
+      abbreviatedTopicName: string,
+      storyId: string,
       successCallback: (value?: StoryPlaythrough) => void,
       errorCallback: (reason?: Object) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
+        abbrev_topic_name: abbreviatedTopicName,
         story_id: storyId
       });
 
@@ -81,11 +84,13 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  _recordChapterCompletion(storyId: string, nodeId: string,
+  _recordChapterCompletion(
+      abbreviatedTopicName: string, storyId: string, nodeId: string,
       successCallback: (value?: StoryChapterCompletionResponse) => void,
       errorCallback: (reason?: Object) => void): void {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
+        abbrev_topic_name: abbreviatedTopicName,
         story_id: storyId,
         node_id: nodeId
       });
@@ -101,17 +106,21 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  fetchStoryData(storyId: string): Promise<StoryPlaythrough> {
+  fetchStoryData(
+      abbreviatedTopicName:string,
+      storyId: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
-      this._fetchStoryData(storyId, resolve, reject);
+      this._fetchStoryData(abbreviatedTopicName, storyId, resolve, reject);
     });
   }
 
   recordChapterCompletion(
+      abbreviatedTopicName: string,
       storyId: string,
       nodeId: string): Promise<StoryChapterCompletionResponse> {
     return new Promise((resolve, reject) => {
-      this._recordChapterCompletion(storyId, nodeId, resolve, reject);
+      this._recordChapterCompletion(
+        abbreviatedTopicName, storyId, nodeId, resolve, reject);
     });
   }
 }

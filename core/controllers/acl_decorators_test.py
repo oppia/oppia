@@ -2133,7 +2133,11 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.set_banned_users([self.banned_user])
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_story/<story_id>', self.MockHandler)],
+            [
+                webapp2.Route(
+                    '/mock_story/<abbrev_topic_name>/<story_id>',
+                    self.MockHandler)
+            ],
             debug=feconf.DEBUG,
         ))
 
@@ -2150,18 +2154,21 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
     def test_cannot_access_non_existent_story(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_story/story_id', expected_status_int=404)
+            self.get_json(
+                '/mock_story/topic/story_id', expected_status_int=404)
 
     def test_cannot_access_story_when_topic_is_not_published(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story/%s' % self.story_id, expected_status_int=404)
+                '/mock_story/topic/%s' % self.story_id,
+                expected_status_int=404)
 
     def test_cannot_access_story_when_story_is_not_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story/%s' % self.story_id, expected_status_int=404)
+                '/mock_story/topic/%s' % self.story_id,
+                expected_status_int=404)
 
     def test_can_access_story_when_story_and_topic_are_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -2169,7 +2176,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.topic_id, self.story_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story/%s' % self.story_id, expected_status_int=200)
+                '/mock_story/topic/%s' % self.story_id,
+                expected_status_int=200)
 
 
 class CreateSkillTests(test_utils.GenericTestBase):

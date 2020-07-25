@@ -26,7 +26,9 @@ angular.module('oppia').directive('storiesList', ['UrlInterpolationService',
       restrict: 'E',
       scope: {},
       bindToController: {
+        getAbbreviatedTopicName: '&abbreviatedTopicName',
         getCanonicalStorySummaries: '&canonicalStorySummaries',
+        getClassroomName: '&classroomName'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/stories-list/' +

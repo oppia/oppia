@@ -50,12 +50,14 @@ angular.module('oppia').component('subtopicViewerPage', {
         return (WindowDimensionsService.getWidth() < 500);
       };
       ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+        ctrl.abbreviatedTopicName = (
+          UrlService.getAbbrevTopicNameFromLearnerUrl());
+        ctrl.classroomName = UrlService.getClassroomNameFromLearnerUrl();
         ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
 
         LoaderService.showLoadingScreen('Loading');
         SubtopicViewerBackendApiService.fetchSubtopicData(
-          ctrl.topicName, ctrl.subtopicId).then(
+          ctrl.abbreviatedTopicName, ctrl.subtopicId).then(
           function(subtopicDataObject) {
             ctrl.pageContents = (
               subtopicDataObject.getPageContents().getSubtitledHtml());

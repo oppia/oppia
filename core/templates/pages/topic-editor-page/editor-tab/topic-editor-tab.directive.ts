@@ -66,6 +66,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'EntityCreationService', 'TopicEditorRoutingService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+        'MAX_CHARS_IN_ABBREV_TOPIC_NAME',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
@@ -77,10 +78,13 @@ angular.module('oppia').directive('topicEditorTab', [
             EntityCreationService, TopicEditorRoutingService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+            MAX_CHARS_IN_ABBREV_TOPIC_NAME,
             MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
+          $scope.MAX_CHARS_IN_ABBREV_TOPIC_NAME = (
+            MAX_CHARS_IN_ABBREV_TOPIC_NAME);
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
@@ -201,6 +205,14 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicName($scope.topic, newName);
             $scope.topicNameEditorIsShown = false;
+          };
+
+          $scope.updateAbbreviatedTopicName = function(newAbbrevName) {
+            if (newAbbrevName === $scope.topic.getAbbreviatedName()) {
+              return;
+            }
+            TopicUpdateService.setAbbreviatedTopicName(
+              $scope.topic, newAbbrevName);
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {

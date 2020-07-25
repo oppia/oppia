@@ -28,8 +28,10 @@ describe('subtopic viewer pre logo action', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getTopicNameFromLearnerUrl')
-      .and.returnValue('Topic Name');
+    spyOn(urlService, 'getAbbrevTopicNameFromLearnerUrl')
+      .and.returnValue('abbrev');
+    spyOn(urlService, 'getClassroomNameFromLearnerUrl')
+      .and.returnValue('math');
   });
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController(
@@ -39,11 +41,11 @@ describe('subtopic viewer pre logo action', function() {
 
   it('should set the topic name from the URL correctly', function() {
     ctrl.$onInit();
-    expect(ctrl.topicName).toEqual('Topic Name');
+    expect(ctrl.abbreviatedTopicName).toEqual('abbrev');
   });
 
   it('should set the topic url from the topic name correctly', function() {
     ctrl.$onInit();
-    expect(ctrl.topicUrl).toEqual('/topic/Topic%20Name');
+    expect(ctrl.topicUrl).toEqual('/learn/math/abbrev/revision');
   });
 });

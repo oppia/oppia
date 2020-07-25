@@ -107,6 +107,19 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID
         )
 
+    def test_get_by_abbreviated_name(self):
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, self.TOPIC_NAME, 'abbrev2', 'description')
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+        self.assertEqual(
+            topic_models.TopicModel.get_by_abbreviated_name('abbrev2').name,
+            self.TOPIC_NAME
+        )
+        self.assertEqual(
+            topic_models.TopicModel.get_by_abbreviated_name('abbrev2').id,
+            self.TOPIC_ID
+        )
+
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the TopicCommitLogEntryModel class."""

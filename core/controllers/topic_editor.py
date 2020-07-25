@@ -21,8 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import email_manager
 from core.domain import role_services
 from core.domain import skill_services
@@ -201,7 +203,14 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
+        classroom_name = constants.CLASSROOM_STATUS_STAGING
+        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
+            if topic_id in classroom_dict['topic_ids']:
+                classroom_name = classroom_dict['name']
+                break
+
         self.values.update({
+            'classroom_name': classroom_name,
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_id_to_description_dict': skill_id_to_description_dict,

@@ -36,7 +36,9 @@ angular.module('oppia').directive('topicSummaryTile', [
           ctrl.getTopicLink = function() {
             return UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.getTopicSummary().getName()
+                abbrev_topic_name: ctrl.getTopicSummary().getName().replace(
+                  / /g, '-'),
+                classroom_name: ctrl.getTopicSummary().getClassroom()
               });
           };
 

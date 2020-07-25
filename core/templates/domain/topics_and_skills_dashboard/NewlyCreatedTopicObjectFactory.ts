@@ -23,19 +23,22 @@ import { Injectable } from '@angular/core';
 export class NewlyCreatedTopic {
   name: string;
   description: string;
+  abbreviatedName: string;
   /**
    * @param {String} name - name of the topic.
    * @param {String} description - description of the topic.
+   * @param {String} abbreviatedName - abbreviated name of the topic.
    */
-  constructor(name, description) {
+  constructor(name, description, abbreviatedName) {
     this.name = name;
     this.description = description;
+    this.abbreviatedName = abbreviatedName;
   }
   /**
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */
   isValid(): boolean {
-    return Boolean(this.name && this.description);
+    return Boolean(this.name && this.description && this.abbreviatedName);
   }
 }
 
@@ -47,7 +50,7 @@ export class NewlyCreatedTopicObjectFactory {
    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance.
    */
   createDefault(): NewlyCreatedTopic {
-    return new NewlyCreatedTopic('', '');
+    return new NewlyCreatedTopic('', '', '');
   }
 }
 

@@ -234,6 +234,25 @@ def get_topic_by_name(topic_name):
     return topic
 
 
+def get_topic_by_abbreviated_name(abbrev_topic_name):
+    """Returns a domain object representing a topic.
+
+    Args:
+        abbrev_topic_name: str. The abbreviated name of the topic.
+
+    Returns:
+        Topic or None. The domain object representing a topic with the
+        given id, or None if it does not exist.
+    """
+    topic_model = (
+        topic_models.TopicModel.get_by_abbreviated_name(abbrev_topic_name))
+    if topic_model is None:
+        return None
+
+    topic = get_topic_from_model(topic_model)
+    return topic
+
+
 def get_all_topics_with_skills():
     """Returns a list of topics with linked skills.
 

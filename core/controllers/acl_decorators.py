@@ -21,7 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
+from constants import constants
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
@@ -43,6 +45,24 @@ import python_utils
 current_user_services = models.Registry.import_current_user_services()
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
+
+def handle_redirection(handler, redirection_url, expected_return_type):
+    """Redirects to the provided URL if the handler type is not JSON.
+
+    Args:
+        handler: function. The function to be decorated.
+        redirection_url: str. The URL to redirect to.
+        expected_return_type: str. The type of the response to be returned
+            in case of errors eg. html, json.
+
+    Raises:
+        PageNotFoundException: The page is not found.
+    """
+    if expected_return_type == feconf.HANDLER_TYPE_JSON:
+        raise handler.PageNotFoundException
+    else:
+        handler.redirect(redirection_url, permanent=True)
 
 
 def open_access(handler):
@@ -2305,11 +2325,11 @@ def can_access_topic_viewer_page(handler):
         if the user can access the given topic viewer page.
     """
 
-    def test_can_access(self, topic_name, **kwargs):
+    def test_can_access(self, abbrev_topic_name, **kwargs):
         """Checks if the user can access topic viewer page.
 
         Args:
-            topic_name: str. The name of the topic.
+            abbrev_topic_name: str. The abbreviated name of the topic.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2318,11 +2338,47 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = python_utils.url_unquote_plus(topic_name)
-        topic = topic_fetchers.get_topic_by_name(topic_name)
+        lowercase_abbrev_topic_name = (
+            python_utils.url_unquote_plus(abbrev_topic_name).replace('-', ' '))
+        topic = topic_fetchers.get_topic_by_abbreviated_name(
+            lowercase_abbrev_topic_name)
+        classroom_name = kwargs.pop('classroom_name', None)
 
         if topic is None:
-            raise self.PageNotFoundException
+            handle_redirection(
+                self, '/%s' % classroom_name,
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+        if classroom_name not in [None, constants.CLASSROOM_STATUS_STAGING]:
+            lowercase_classroom_name = (
+                python_utils.url_unquote_plus(
+                    classroom_name).replace('-', ' '))
+            topic_ids_from_classroom_pages = (
+                config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value)
+            topic_is_assigned_classroom = False
+            for classroom_dict in topic_ids_from_classroom_pages:
+                if topic.id in classroom_dict['topic_ids']:
+                    if (
+                            lowercase_classroom_name ==
+                            classroom_dict['name'].lower()):
+                        topic_is_assigned_classroom = True
+                        break
+                    else:
+                        handle_redirection(
+                            self,
+                            '/learn/%s/%s' % (
+                                classroom_dict['name'].lower().replace(
+                                    ' ', '-'),
+                                abbrev_topic_name),
+                            self.GET_HANDLER_ERROR_RETURN_TYPE)
+                        return
+            if not topic_is_assigned_classroom:
+                handle_redirection(
+                    self,
+                    '/learn/%s/%s' % (
+                        constants.CLASSROOM_STATUS_STAGING, abbrev_topic_name),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return
 
         topic_id = topic.id
         topic_rights = topic_services.get_topic_rights(
@@ -2333,7 +2389,7 @@ def can_access_topic_viewer_page(handler):
                 topic_rights.topic_is_published or
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
                 user_actions_info.actions):
-            return handler(self, topic_name, **kwargs)
+            return handler(self, topic.name, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_access.__wrapped__ = True
@@ -2352,10 +2408,13 @@ def can_access_story_viewer_page(handler):
         if the user can access the given story viewer page.
     """
 
-    def test_can_access(self, story_id, *args, **kwargs):
+    def test_can_access(
+            self, story_id, abbrev_topic_name, *args, **kwargs):
         """Checks if the user can access story viewer page.
 
         Args:
+            abbrev_topic_name: str. The abbreviated name of the topic
+                associated to the story.
             story_id: str. The unique id of the story.
             *args: *. Arguments.
             **kwargs: *. Keyword arguments.
@@ -2367,9 +2426,16 @@ def can_access_story_viewer_page(handler):
             PageNotFoundException: The given page cannot be found.
         """
         story = story_fetchers.get_story_by_id(story_id, strict=False)
+        lowercase_abbrev_topic_name = (
+            python_utils.url_unquote_plus(abbrev_topic_name).replace('-', ' '))
+        classroom_name = kwargs.pop('classroom_name', None)
 
         if story is None:
-            raise self.PageNotFoundException
+            handle_redirection(
+                self,
+                '/learn/%s/%s/story' % (classroom_name, abbrev_topic_name),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         story_is_published = False
         topic_is_published = False
@@ -2377,6 +2443,48 @@ def can_access_story_viewer_page(handler):
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
+            if topic.abbreviated_name.lower() != lowercase_abbrev_topic_name:
+                handle_redirection(
+                    self,
+                    '/learn/%s/%s/story/%s' % (
+                        classroom_name,
+                        topic.abbreviated_name.lower().replace(' ', '-'),
+                        story_id),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return
+            if classroom_name not in [None, constants.CLASSROOM_STATUS_STAGING]:
+                lowercase_classroom_name = (
+                    python_utils.url_unquote_plus(
+                        classroom_name).replace('-', ' '))
+                topic_ids_from_classroom_pages = (
+                    config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value)
+                topic_is_assigned_classroom = False
+                for classroom_dict in topic_ids_from_classroom_pages:
+                    if topic.id in classroom_dict['topic_ids']:
+                        if (
+                                lowercase_classroom_name ==
+                                classroom_dict['name'].lower()):
+                            topic_is_assigned_classroom = True
+                            break
+                        else:
+                            handle_redirection(
+                                self,
+                                '/learn/%s/%s/story/%s' % (
+                                    classroom_dict['name'].lower().replace(
+                                        ' ', '-'),
+                                    topic.abbreviated_name,
+                                    story_id),
+                                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                            return
+                if not topic_is_assigned_classroom:
+                    handle_redirection(
+                        self,
+                        '/learn/%s/%s/story/%s' % (
+                            constants.CLASSROOM_STATUS_STAGING,
+                            abbrev_topic_name,
+                            story_id),
+                        self.GET_HANDLER_ERROR_RETURN_TYPE)
+                    return
             topic_rights = topic_services.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
             all_story_references = topic.get_all_story_references()
@@ -2407,23 +2515,29 @@ def can_access_subtopic_viewer_page(handler):
         if the user can access the give subtopic viewer page.
     """
 
-    def test_can_access(self, topic_name, subtopic_id, **kwargs):
+    def test_can_access(self, subtopic_id, abbrev_topic_name, **kwargs):
         """Checks if the user can access subtopic viewer page.
 
         Args:
-            topic_name: str. The name of the topic.
+            abbrev_topic_name: str. The abbreviated name of the topic
+                associated to the subtopic.
             subtopic_id: str. The id of the Subtopic.
             **kwargs: *. Keyword arguments.
 
         Returns:
             *. The return value of decorated function.
-
-        Raises:
-            PageNotFoundException: The given page cannot be found.
         """
-        topic = topic_fetchers.get_topic_by_name(topic_name)
+        lowercase_abbrev_topic_name = (
+            python_utils.url_unquote_plus(abbrev_topic_name).replace('-', ' '))
+        topic = topic_fetchers.get_topic_by_abbreviated_name(
+            lowercase_abbrev_topic_name)
+        classroom_name = kwargs.pop('classroom_name', None)
+
         if topic is None:
-            raise self.PageNotFoundException
+            handle_redirection(
+                self, '/%s' % classroom_name,
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         topic_rights = topic_services.get_topic_rights(topic.id)
@@ -2432,20 +2546,65 @@ def can_access_subtopic_viewer_page(handler):
                 (topic_rights is None or not topic_rights.topic_is_published)
                 and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
                 user_actions_info.actions):
-            raise self.PageNotFoundException
+            handle_redirection(
+                self, '/%s' % classroom_name,
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         subtopic_is_present = any(
             subtopic.id == int(subtopic_id) for subtopic in topic.subtopics)
 
         if not subtopic_is_present:
-            raise self.PageNotFoundException
+            handle_redirection(
+                self,
+                '/learn/%s/%s/revision' % (classroom_name, abbrev_topic_name),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
+        if classroom_name not in [None, constants.CLASSROOM_STATUS_STAGING]:
+            lowercase_classroom_name = (
+                python_utils.url_unquote_plus(
+                    classroom_name).replace('-', ' '))
+            topic_ids_from_classroom_pages = (
+                config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value)
+            topic_is_assigned_classroom = False
+            for classroom_dict in topic_ids_from_classroom_pages:
+                if topic.id in classroom_dict['topic_ids']:
+                    if (
+                            lowercase_classroom_name ==
+                            classroom_dict['name'].lower()):
+                        topic_is_assigned_classroom = True
+                        break
+                    else:
+                        handle_redirection(
+                            self,
+                            '/learn/%s/%s/revision/%s' % (
+                                classroom_dict['name'].lower().replace(
+                                    ' ', '-'),
+                                abbrev_topic_name,
+                                subtopic_id),
+                            self.GET_HANDLER_ERROR_RETURN_TYPE)
+                        return
+            if not topic_is_assigned_classroom:
+                handle_redirection(
+                    self,
+                    '/learn/%s/%s/revision/%s' % (
+                        constants.CLASSROOM_STATUS_STAGING,
+                        abbrev_topic_name,
+                        subtopic_id),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return
 
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic.id, int(subtopic_id), strict=False)
         if subtopic_page is None:
-            raise self.PageNotFoundException
+            handle_redirection(
+                self,
+                '/learn/%s/%s/revision' % (
+                    classroom_name, abbrev_topic_name),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
         else:
-            return handler(self, topic_name, subtopic_id, **kwargs)
+            return handler(self, topic.name, subtopic_id, **kwargs)
     test_can_access.__wrapped__ = True
 
     return test_can_access

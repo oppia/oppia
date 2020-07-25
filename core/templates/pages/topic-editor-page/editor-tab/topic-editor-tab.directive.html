@@ -26,10 +26,22 @@
           <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
                  ng-disabled="!topicRights.canEditTopic()"
                  ng-model="editableName" ng-blur="updateTopicName(editableName)"
-                 placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
+                 placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="true">
           <span class="oppia-input-box-subtitle">
             <i>
               Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+            </i>
+          </span>
+        </div>
+        <div class="topic-name">
+          <label for="abbreviatedTopicName" class="form-heading protractor-test-abbrev-topic-name-heading">Abbreviated Topic Name</label>
+          <input id="abbreviatedTopicName" type="text" class="form-control protractor-test-abbrev-topic-name-field"
+                 ng-disabled="!topicRights.canEditTopic()"
+                 ng-model="editableAbbreviatedName" ng-blur="updateAbbreviatedTopicName(editableAbbreviatedName)"
+                 placeholder="Enter an abbreviated name for the topic." maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>" ng-trim="true">
+          <span class="oppia-input-box-subtitle">
+            <i>
+              Abbreviated Topic name should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
             </i>
           </span>
         </div>

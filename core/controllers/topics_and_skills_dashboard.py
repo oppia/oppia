@@ -250,7 +250,7 @@ class NewTopicHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         name = self.payload.get('name')
-        abbreviated_name = self.payload.get('abbreviated_name')
+        abbreviated_name = self.payload.get('abbreviatedName')
         description = self.payload.get('description')
         thumbnail_filename = self.payload.get('filename')
         thumbnail_bg_color = self.payload.get('thumbnailBgColor')

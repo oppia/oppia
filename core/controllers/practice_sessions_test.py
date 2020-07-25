@@ -46,7 +46,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
             self.skill_id2, self.admin_id, description='Skill 2')
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name', 'abbrev', 'description')
+            self.topic_id, 'public_topic_name', 'public', 'description')
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id1], 'image.svg',
             constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
@@ -60,7 +60,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name', 'abbrev', 'description')
+            self.topic_id_1, 'private_topic_name', 'private', 'description')
         self.topic.thumbnail_filename = 'Topic.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -74,34 +74,31 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
     def test_any_user_can_access_practice_sessions_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s?selected_subtopic_ids=1,2' % (
-                    feconf.PRACTICE_SESSION_URL_PREFIX,
-                    'public_topic_name'))
+                '/learn/staging/public/practice/session?'
+                'selected_subtopic_ids=1,2')
 
 
     def test_no_user_can_access_unpublished_topic_practice_session_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s?selected_subtopic_ids=1,2' % (
-                    feconf.PRACTICE_SESSION_URL_PREFIX, 'private_topic_name'),
+                '/learn/staging/private/practice/session?'
+                'selected_subtopic_ids=1,2',
                 expected_status_int=404)
 
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '%s/%s?selected_subtopic_ids=1,2' % (
-                    feconf.PRACTICE_SESSION_URL_PREFIX,
-                    'public_topic_name'),
+                '/learn/staging/public/practice/session?'
+                'selected_subtopic_ids=1,2',
                 expected_status_int=404)
 
     def test_get_fails_when_topic_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '%s/%s?selected_subtopic_ids=1,2' % (
-                    feconf.PRACTICE_SESSION_URL_PREFIX,
-                    'non_existent_topic_name'),
-                expected_status_int=404)
+                '/learn/staging/invalid/practice/session?'
+                'selected_subtopic_ids=1,2',
+                expected_status_int=301)
 
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
@@ -111,12 +108,12 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             self.get_json(
                 '%s/%s?selected_subtopic_ids=1,2' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
-                    'public_topic_name'),
+                    'public'),
                 expected_status_int=404)
 
     def test_get_fails_when_skill_ids_dont_exist(self):
         topic = topic_domain.Topic.create_default_topic(
-            'topic_id_3', 'topic_without_skills', 'abbrev', 'description')
+            'topic_id_3', 'topic_without_skills', 'noskills', 'description')
         topic.thumbnail_filename = 'Topic.svg'
         topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -130,7 +127,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             self.get_json(
                 '%s/%s?selected_subtopic_ids=1' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
-                    'topic_without_skills'),
+                    'noskills'),
                 expected_status_int=404)
 
     def test_any_user_can_access_practice_sessions_data(self):
@@ -139,7 +136,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             json_response = self.get_json(
                 '%s/%s?selected_subtopic_ids=1,2,3,4' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
-                    'public_topic_name'))
+                    'public'))
             self.assertEqual(json_response['topic_name'], 'public_topic_name')
             self.assertEqual(
                 len(json_response['skill_ids_to_descriptions_map']), 2)
@@ -155,7 +152,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             self.get_json(
                 '%s/%s?selected_subtopic_ids=1,2' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
-                    'private_topic_name'),
+                    'private'),
                 expected_status_int=404)
 
     def test_get_fails_when_topic_doesnt_exist(self):
@@ -163,5 +160,5 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             self.get_json(
                 '%s/%s?selected_subtopic_ids=1,2' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
-                    'non_existent_topic_name'),
+                    'invalid'),
                 expected_status_int=404)

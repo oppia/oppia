@@ -61,7 +61,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.story_2.node_titles = []
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name', 'abbrev', 'description')
+            self.topic_id, 'public_topic_name', 'public', 'description')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
@@ -86,6 +86,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.abbreviated_name = 'private'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -108,27 +109,23 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
 
     def test_any_user_can_access_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
+            self.get_html_response('/learn/staging/%s' % 'public')
 
 
     def test_accessibility_of_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s' % (
-                    feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
+                '/learn/staging/%s' % 'private',
                 expected_status_int=404)
             self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'))
+            self.get_html_response('/learn/staging/%s' % 'private')
             self.logout()
 
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'),
+                '/learn/staging/%s' % 'public',
                 expected_status_int=404)
 
 
@@ -137,7 +134,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
     def test_get_with_no_user_logged_in(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
             expected_dict = {
                 'topic_name': 'public_topic_name',
                 'topic_id': self.topic_id,
@@ -189,7 +186,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
                 json_response = self.get_json(
-                    '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
+                    '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
                 messages = self.mail_stub.get_sent_messages(
                     to=feconf.ADMIN_EMAIL_ADDRESS)
                 expected_email_html_body = (
@@ -247,17 +244,17 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'),
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'),
                 expected_status_int=404)
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_with_no_skills', 'abbrev', 'description')
+            self.topic_id, 'topic_with_no_skills', 'abbrev3', 'description')
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic_with_no_skills'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'abbrev3'))
             expected_dict = {
                 'topic_name': 'topic_with_no_skills',
                 'topic_id': self.topic_id,
@@ -276,7 +273,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
         self.topic_id = 'new_topic'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'abbrev', 'description')
+            self.topic_id, 'new_topic', 'abbrev0', 'description')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -294,7 +291,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'abbrev0'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,

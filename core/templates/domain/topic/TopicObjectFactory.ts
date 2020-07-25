@@ -70,8 +70,9 @@ export class Topic {
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string, name: string, abbreviatedName: string, description: string,
-      languageCode: string, canonicalStoryReferences: Array<StoryReference>,
+      id: string, name: string, abbreviatedName: string,
+      description: string, languageCode: string,
+      canonicalStoryReferences: Array<StoryReference>,
       additionalStoryReferences: Array<StoryReference>,
       uncategorizedSkillIds: Array<string>,
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
@@ -533,7 +534,7 @@ export class TopicObjectFactory {
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(
-      null, 'Topic name loading', 'Topic abbreviated name loading',
+      null, 'Topic name loading', 'Abbrev. name loading',
       'Topic description loading', 'en', [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
       this.storyReferenceObjectFactory

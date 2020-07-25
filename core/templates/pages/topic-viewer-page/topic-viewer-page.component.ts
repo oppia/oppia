@@ -57,17 +57,27 @@ angular.module('oppia').component('topicViewerPage', {
       };
       ctrl.$onInit = function() {
         ctrl.canonicalStorySummaries = [];
-        ctrl.setActiveTab('info');
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-
-        PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
+        if (UrlService.getPathname().endsWith('revision')) {
+          ctrl.setActiveTab('subtopics');
+        } else if (UrlService.getPathname().endsWith('practice')) {
+          ctrl.setActiveTab('practice');
+        } else if (UrlService.getPathname().endsWith('story')) {
+          ctrl.setActiveTab('story');
+        } else {
+          ctrl.setActiveTab('info');
+        }
+        ctrl.abbreviatedTopicName = (
+          UrlService.getAbbrevTopicNameFromLearnerUrl());
+        ctrl.classroomName = UrlService.getClassroomNameFromLearnerUrl();
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.topicIsLoading = true;
-        TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
+        TopicViewerBackendApiService.fetchTopicData(
+          ctrl.abbreviatedTopicName).then(
           function(readOnlyTopic) {
             ctrl.topicId = readOnlyTopic.getTopicId();
             ctrl.topicName = readOnlyTopic.getTopicName();
+            PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
             ctrl.topicDescription = readOnlyTopic.getTopicDescription();
             ctrl.canonicalStorySummaries = (
               readOnlyTopic.getCanonicalStorySummaries());
@@ -83,6 +93,11 @@ angular.module('oppia').component('topicViewerPage', {
             LoaderService.hideLoadingScreen();
             ctrl.trainTabShouldBeDisplayed = (
               readOnlyTopic.getTrainTabShouldBeDisplayed());
+            if (
+              !ctrl.trainTabShouldBeDisplayed &&
+              ctrl.activeTab === 'practice') {
+              ctrl.setActiveTab('info');
+            }
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$apply();

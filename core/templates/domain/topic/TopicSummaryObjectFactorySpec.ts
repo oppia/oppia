@@ -38,7 +38,8 @@ describe('Topic summary object factory', () => {
       version: 1,
       additional_story_count: 0,
       topic_model_created_on: 231241343,
-      topic_model_last_updated: 3454354354
+      topic_model_last_updated: 3454354354,
+      classroom: 'math'
     };
     _sampleTopicSummary = topicSummaryObjectFactory.createFromBackendDict(
       sampleTopicSummaryBackendDict);
@@ -57,5 +58,6 @@ describe('Topic summary object factory', () => {
     expect(_sampleTopicSummary.getAdditionalStoryCount()).toEqual(0);
     expect(_sampleTopicSummary.getTopicModelCreatedOn()).toEqual(231241343);
     expect(_sampleTopicSummary.getTopicModelLastUpdated()).toEqual(3454354354);
+    expect(_sampleTopicSummary.getClassroom()).toEqual('math');
   });
 });

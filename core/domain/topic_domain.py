@@ -581,6 +581,30 @@ class Topic(python_utils.OBJECT):
                 % (name_limit, name))
 
     @classmethod
+    def require_valid_abbreviated_name(cls, name):
+        """Checks whether the abbreviated name of the topic is a valid one.
+
+        Args:
+            name: str. The abbreviated name to validate.
+        """
+        if not isinstance(name, python_utils.BASESTRING):
+            raise utils.ValidationError('Abbreviated name should be a string.')
+
+        if name == '':
+            raise utils.ValidationError(
+                'Abbreviated name field should not be empty.')
+        if '-' in name:
+            raise utils.ValidationError(
+                'Abbreviated name field should not contain hyphens.')
+
+        abbreviated_name_limit = (
+            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
+        if len(name) > abbreviated_name_limit:
+            raise utils.ValidationError(
+                'Abbreviated name field should not exceed %d characters, '
+                'received %s.' % (abbreviated_name_limit, name))
+
+    @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
         """Checks whether the thumbnail filename of the topic is a valid
             one.
@@ -823,6 +847,7 @@ class Topic(python_utils.OBJECT):
                 valid.
         """
         self.require_valid_name(self.name)
+        self.require_valid_abbreviated_name(self.abbreviated_name)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
@@ -1045,8 +1070,6 @@ class Topic(python_utils.OBJECT):
         Raises:
             ValidationError: Name should be a string.
         """
-        if not isinstance(new_name, python_utils.BASESTRING):
-            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
         self.canonical_name = new_name.lower()
 
@@ -1412,7 +1435,8 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
-            topic_model_created_on, topic_model_last_updated):
+            topic_model_created_on, topic_model_last_updated,
+            abbreviated_name):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -1435,6 +1459,7 @@ class TopicSummary(python_utils.OBJECT):
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
                 when the topic model was last updated.
+            abbreviated_name: str. The abbreviated name of the topic.
         """
         self.id = topic_id
         self.name = name
@@ -1449,6 +1474,31 @@ class TopicSummary(python_utils.OBJECT):
         self.total_skill_count = total_skill_count
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
+        self.abbreviated_name = abbreviated_name
+
+    @classmethod
+    def require_valid_abbreviated_name(cls, name):
+        """Checks whether the abbreviated name of the topic is a valid one.
+
+        Args:
+            name: str. The abbreviated name to validate.
+        """
+        if not isinstance(name, python_utils.BASESTRING):
+            raise utils.ValidationError('Abbreviated name should be a string.')
+
+        if name == '':
+            raise utils.ValidationError(
+                'Abbreviated name field should not be empty.')
+        if '-' in name:
+            raise utils.ValidationError(
+                'Abbreviated name field should not contain hyphens.')
+
+        abbreviated_name_limit = (
+            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
+        if len(name) > abbreviated_name_limit:
+            raise utils.ValidationError(
+                'Abbreviated name field should not exceed %d characters, '
+                'received %s.' % (abbreviated_name_limit, name))
 
     def validate(self):
         """Validates all properties of this topic summary.
@@ -1457,6 +1507,7 @@ class TopicSummary(python_utils.OBJECT):
             ValidationError: One or more attributes of the Topic summary
                 are not valid.
         """
+        self.require_valid_abbreviated_name(self.abbreviated_name)
         if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
@@ -1546,6 +1597,7 @@ class TopicSummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'name': self.name,
+            'abbreviated_name': self.abbreviated_name,
             'language_code': self.language_code,
             'description': self.description,
             'version': self.version,

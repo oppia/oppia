@@ -17,5 +17,6 @@
  */
 
 export class ReviewTestDomainConstants {
-  public static REVIEW_TEST_DATA_URL = '/review_test_handler/data/<story_id>';
+  public static REVIEW_TEST_DATA_URL = (
+    '/review_test_handler/data/<abbrev_topic_name>/<story_id>');
 }
