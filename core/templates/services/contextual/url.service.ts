@@ -34,7 +34,7 @@ interface UrlParamsType {
 export class UrlService {
   constructor(private windowRef: WindowRef) {}
 
-   /**
+  /**
    * Returns the current location.
    * @return {boolean} the current location.
    */
@@ -42,7 +42,7 @@ export class UrlService {
     return this.windowRef.nativeWindow.location;
   }
 
-   /**
+  /**
    * Returns the current query string.
    * @return {boolean} the current query string.
    */
@@ -117,14 +117,14 @@ export class UrlService {
    * @return {string} the subtopic name.
    * @throws Will throw an error if the url for practice session is invalid.
    */
-  getSelectedSubtopicsFromUrl(): string {	 
-    let pathname = this.getPathname();	   
-    let queryStrings = this.getCurrentQueryString().split('=');	   
-    if (pathname.match(/\/practice_session/g) && queryStrings.length === 2) {	   
-      return decodeURIComponent(queryStrings[1]);	   
-    }	
-    throw new Error('Invalid URL for practice session');	
-  }	
+  getSelectedSubtopicsFromUrl(): string {
+    let pathname = this.getPathname();
+    let queryStrings = this.getCurrentQueryString().split('=');
+    if (pathname.match(/\/practice_session/g) && queryStrings.length === 2) {
+      return decodeURIComponent(queryStrings[1]);
+    }
+    throw new Error('Invalid URL for practice session');
+  }
 
 
   /**
@@ -266,7 +266,8 @@ export class UrlService {
 
   /**
    * Gets the collection id from the exploration url.
-   * @return {string} a collection id if the url parameter doesn't have a 'parent' property  
+   * @return {string} a collection id if
+   * the url parameter doesn't have a 'parent' property
    * but have a 'collection_id' property; @return {null} if otherwise.
    */
   getCollectionIdFromExplorationUrl(): string | null {
@@ -321,7 +322,8 @@ export class UrlService {
 
   /**
    * Gets the exploration version id from the url.
-   * @return {number} the exploration version from Url if an exploration version can be extracted;
+   * @return {number} the exploration version from Url
+   * if an exploration version can be extracted;
    * {null} if otherwise.
    */
   getExplorationVersionFromUrl(): number | null {

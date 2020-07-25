@@ -39,7 +39,7 @@ export class HtmlEscaperService {
 
   /**
    * Converts a escaped JSON string to its object counterpart.
-   * @param {string} json - A JSON string. 
+   * @param {string} json - A JSON string.
    * @return {object} an unescaped non-JSON version of the original string.
    * @throws Will throw error if empty string is passed to JSON decoder.
    */
