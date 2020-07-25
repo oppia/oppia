@@ -79,7 +79,7 @@ export class PlayerPositionService {
 
   /**
    * Get the index of the displayed card.
-   * @return {object} a number which represents the index of displayed card.
+   * @return {number} The index of the displayed card.
    */
   getDisplayedCardIndex(): number {
     return this.displayedCardIndex;
