@@ -771,6 +771,19 @@ class Skill(python_utils.OBJECT):
     def from_dict(
         cls, skill_dict, skill_created_on=None,
         skill_last_updated=None):
+        """Returns a Skill domain object from a dict.
+
+        Args:
+            skill_dict: dict. The dict representation of Skill
+                object.
+            skill_created_on: datetime.datetime. Date and time when the
+                skill is created.
+            skill_last_updated: datetime.datetime. Date and time when the
+                skill was last updated.
+
+        Returns:
+            Skill. The corresponding Skill domain object.
+        """
         skill = cls(
             skill_dict['id'], skill_dict['description'],
             [
@@ -792,6 +805,7 @@ class Skill(python_utils.OBJECT):
             skill_dict['all_questions_merged'],
             skill_dict['prerequisite_skill_ids'], skill_created_on,
             skill_last_updated)
+
         return skill
 
     @classmethod
