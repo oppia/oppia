@@ -1061,6 +1061,12 @@ class AdminMathSvgImageGenerationHandlerTest(test_utils.GenericTestBase):
             'exp_id1', title='title1', category='category')
 
         exp_services.save_new_exploration(editor_id, exploration1)
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
         response_dict = self.post_json(
             feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
             {'latexMapping': post_data},

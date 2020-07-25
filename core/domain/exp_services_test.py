@@ -4548,6 +4548,7 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
     """
 
     DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+
     def setUp(self):
         super(ExplorationUpdationWithMathSvgsUnitTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
