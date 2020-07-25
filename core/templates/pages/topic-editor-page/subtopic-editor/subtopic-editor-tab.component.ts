@@ -208,6 +208,10 @@ angular.module('oppia').component('subtopicEditorTab', {
         _initEditor();
       };
 
+      ctrl.navigateToTopicEditor = function() {
+        TopicEditorRoutingService.navigateToMainTab();
+      };
+
       ctrl.$onInit = function() {
         ctrl.SUBTOPIC_PAGE_SCHEMA = {
           type: 'html',

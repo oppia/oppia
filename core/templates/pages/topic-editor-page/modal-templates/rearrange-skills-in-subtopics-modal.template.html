@@ -1,7 +1,7 @@
 <div>
   <div class="modal-header">
     <h3>
-      Drag and drop skills to assign them to subtopic
+      Subtopics & Skills
     </h3>
   </div>
   <div class="modal-body subtopics">
@@ -14,7 +14,8 @@
                  dnd-drop="$ctrl.onMoveSkillEnd(null)">
           <strong>Uncategorized Skills</strong>
           <div class="number-skills-container">
-            <span class="number-skills-text">(<[$ctrl.uncategorizedSkillSummaries.length]> Skills)</span>
+            <span ng-if="$ctrl.uncategorizedSkillSummaries.length === 1" class="number-skills-text"><[$ctrl.uncategorizedSkillSummaries.length]> Skill</span>
+            <span ng-if="!($ctrl.uncategorizedSkillSummaries.length === 1)" class="number-skills-text"><[$ctrl.uncategorizedSkillSummaries.length]> Skills</span>
           </div>
           <div class="uncategorized-skills-container">
             <md-card class="skill-id"
@@ -45,7 +46,8 @@
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
             <div class="number-skills-container">
-              <span class="number-skills-text">(<[subtopic.getSkillSummaries().length]> Skills)</span>
+              <span ng-if="subtopic.getSkillSummaries().length === 1" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skill</span>
+              <span ng-if="!(subtopic.getSkillSummaries().length === 1)" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skills</span>
             </div>
           </div>
           <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicId">
