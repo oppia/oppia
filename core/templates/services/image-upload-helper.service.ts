@@ -115,6 +115,12 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             node.removeAttribute('aria-hidden');
             node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
           }
+          // Remove the custom data attributes added by MathJax.
+          for (var i = 0; i < node.attributes.length; i++) {
+            if (node.attributes[i].name.toLowerCase().startsWith('data-')) {
+              node.removeAttribute(node.attributes[i].name.toLowerCase());
+            }
+          }
         });
         return doc.documentElement.outerHTML;
       },
@@ -147,7 +153,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             if (styleValue) {
               dimensions.verticalPadding = styleValue[0].replace('.', 'd');
             } else {
-              dimensions.verticalPadding = '0';
+              dimensions.verticalPadding = 0;
             }
           }
         });
