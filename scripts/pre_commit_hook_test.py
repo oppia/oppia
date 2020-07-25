@@ -102,8 +102,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             mock_start_subprocess_for_result)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
-        with (islink_swap, exists_swap, subprocess_swap, symlink_swap, 
-            self.print_swap):
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap, (
+            symlink_swap):
             pre_commit_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue(
@@ -172,8 +172,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         unlink_swap = self.swap(os, 'unlink', mock_unlink)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
-        with (islink_swap, exists_swap, subprocess_swap, unlink_swap,
-            symlink_swap, self.print_swap):
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap, (
+            symlink_swap, unlink_swap):
             pre_commit_hook.install_hook()
         self.assertTrue(check_function_calls['unlink_is_called'])
         self.assertTrue(check_function_calls['symlink_is_called'])
