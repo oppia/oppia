@@ -714,7 +714,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         def get_content_html(self, state_name, content_id):
             """Used to mock the get_content_html method for explorations."""
-            return '<p>Content html for test.</p>'
+            return '<p>State name: %s, Content id: %s</p>' % (
+                state_name, content_id
+            )
 
     # All mock explorations created for testing.
     explorations = [
@@ -834,7 +836,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state_1',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': '<p>Content html for test.</p>',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
             'translation_html': '<p>This is translated html.</p>'
         }
         # Create the translation suggestion associated with exploration id
@@ -864,7 +866,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state_1',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': '<p>Content html for test.</p>',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
             'translation_html': '<p>This is translated html.</p>'
         }
         # Create the translation suggestion associated with exploration id
