@@ -1005,7 +1005,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
-    
+
     def test_get_translation_suggestions_with_exp_ids(self):
         # Create translation suggestion associated with the exploration
         # that was created during set up.

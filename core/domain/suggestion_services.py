@@ -150,6 +150,7 @@ def query_suggestions(query_fields_and_values):
             for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
                 query_fields_and_values)]
 
+
 def get_translation_suggestions_with_exp_ids(exp_ids):
     """Gets all translation suggestions corresponding to explorations with
     the given exploration ids.
@@ -166,6 +167,7 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
             for s in suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_with_exp_ids(
                 exp_ids)]
+
 
 def get_all_stale_suggestions():
     """Gets a list of suggestions without any activity on them for
@@ -304,8 +306,9 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     Raises:
         Exception: The suggestion is already handled.
     """
-    
+
     reject_suggestions([suggestion], reviewer_id, review_message)
+
 
 def reject_suggestions(suggestions, reviewer_id, review_message):
     """Rejects the suggestions.
@@ -323,17 +326,19 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
     for suggestion in suggestions:
         if suggestion.is_handled:
             raise Exception(
-        'The suggestion has already been accepted/rejected.')
+                'The suggestion has already been accepted/rejected.')
     if not review_message:
         raise Exception('Review message cannot be empty.')
 
     suggestion_ids = [suggestion.suggestion_id for suggestion in suggestions]
-    suggestion_models_to_reject = suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
-    
+    suggestion_models_to_reject = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
+    )
+
     for suggestion_model in suggestion_models_to_reject:
         suggestion_model.status = suggestion_models.STATUS_REJECTED
         suggestion_model.final_reviewer_id = reviewer_id
-    
+
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_reject)
 
@@ -362,7 +367,7 @@ def reject_question_suggestions_with_skill_target_id(skill_id):
     )
     reject_suggestions(
         suggestions, feconf.SUGGESTION_BOT_USER_ID,
-            suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
+        suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
 def reject_translation_suggestions_with_exp_target_ids(exp_ids):
@@ -372,7 +377,7 @@ def reject_translation_suggestions_with_exp_target_ids(exp_ids):
     deleted. Reviewer ID is set to Oppia Bot.
 
     Args:
-        exp_id: The exploration ID corresponding to the target ID of the
+        exp_ids: The exploration ID corresponding to the target ID of the
             translation suggestion.
     """
     suggestions = get_translation_suggestions_with_exp_ids(exp_ids)

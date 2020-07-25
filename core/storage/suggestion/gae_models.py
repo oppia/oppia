@@ -234,7 +234,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             query = query.filter(getattr(cls, field) == value)
 
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
-    
+
     @classmethod
     def get_translation_suggestions_with_exp_ids(cls, exp_ids):
         """Gets all translation suggestions corresponding to explorations with
@@ -250,8 +250,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT).filter(
-            cls.target_id.IN(exp_ids)).fetch(
-                    feconf.DEFAULT_QUERY_LIMIT)
+                cls.target_id.IN(exp_ids)).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
 
     @classmethod

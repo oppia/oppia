@@ -316,7 +316,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_8')
-        
+
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_with_exp_ids(
