@@ -26,7 +26,7 @@ import { AppConstants } from 'app.constants';
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary-object.factory';
 
-export interface ICollectionNodeBackendDict {
+export interface CollectionNodeBackendDict {
   'exploration_id'?: string;
   'exploration_summary'?: LearnerExplorationSummaryBackendDict;
 }
@@ -35,7 +35,7 @@ export class CollectionNode {
   _explorationId: string;
   _explorationSummaryObject: LearnerExplorationSummaryBackendDict;
 
-  constructor(collectionNodeBackendObject: ICollectionNodeBackendDict) {
+  constructor(collectionNodeBackendObject: CollectionNodeBackendDict) {
     this._explorationId = collectionNodeBackendObject.exploration_id;
     this._explorationSummaryObject = cloneDeep(
       collectionNodeBackendObject.exploration_summary);
@@ -110,7 +110,7 @@ export class CollectionNodeObjectFactory {
   // contexts. This function takes a JSON object which represents a backend
   // collection node python dict.
   create(
-      collectionNodeBackendObject: ICollectionNodeBackendDict):
+      collectionNodeBackendObject: CollectionNodeBackendDict):
       CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }

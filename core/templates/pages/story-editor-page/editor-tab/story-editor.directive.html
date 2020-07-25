@@ -111,26 +111,25 @@
       </md-card>
     </div>
 
-    <div class="chapter-list-container" ng-if="linearNodesList.length > 0">
+    <div class="chapter-list-container">
       <md-card class="oppia-page-card oppia-long-text content-card">
-        <div class="story-nodes-title">
-          <label for="storyNodes" class="form-heading">Chapters</label>
-          <div ng-if="nodes.length > 0">
-            Select Initial Chapter
-            <select class="form-control protractor-test-initial-chapter-select"
-                    ng-model="initialNodeId"
-                    ng-if="nodes.length > 0"
-                    ng-options="node.getId() as node.getTitle() for node in nodes"
-                    ng-click="markAsInitialNode(initialNodeId)">
-            </select>
-          </div>
-        </div>
         <div class="story-node-editor">
+          <div class="chapter-list-card-header">
+            <span>Chapters</span>
+            <button ng-click="createNode()" class="btn add-chapter-btn protractor-test-add-chapter-button">
+              Add Chapter
+            </button>
+          </div>
           <div class="story-nodes-container">
             <div ng-repeat="node in linearNodesList track by $index">
               <md-card class="story-editor-node"
                        ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       ng-click="navigateToChapterWithId(node.getId(), $index)">
+                       ng-click="navigateToChapterWithId(node.getId(), $index)"
+                       dnd-draggable="node"
+                       dnd-list="linearNodesList"
+                       dnd-effect-allowed="move"
+                       dnd-dragstart="onMoveChapterStart($index, node.getId())"
+                       dnd-drop="rearrangeNodeInStory($index)">
                 <div class="story-editor-node-title">
                   <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
                 </div>
@@ -143,26 +142,6 @@
               <div ng-if="$index < linearNodesList.length - 1">
                 <i class="material-icons"> arrow_downward </i>
               </div>
-            </div>
-            <h3 class="protractor-test-disconnected-node-warning" ng-if="disconnectedNodes.length > 0">
-              The following chapters are disconnected from the graph
-            </h3>
-            <em ng-if="disconnectedNodes.length > 0">
-              (Please fix this before saving changes)
-            </em>
-            <div ng-repeat="node in disconnectedNodes" style="padding-top: 2vh;">
-              <md-card class="story-editor-node"
-                       ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       ng-click="setNodeToEdit(node.getId())">
-                <div class="story-editor-node-title">
-                  <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
-                </div>
-                <span class="story-editor-delete-node">
-                  <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
-                    <i class="material-icons md-18">&#xE14C;</i>
-                  </span>
-                </span>
-              </md-card>
             </div>
           </div>
         </div>
@@ -312,6 +291,19 @@
   }
   story-editor .story-contain-text {
     font-size: smaller;
+  }
+  story-editor .add-chapter-btn {
+    background-color: #008098;
+    color: #FFF;
+    text-align: left;
+  }
+  story-editor .chapter-list-card-header {
+    align-items: center;
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
   }
   story-editor .topic-story-name {
     font-size: 15px;

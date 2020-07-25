@@ -48,32 +48,15 @@ class MockProcessClass(python_utils.OBJECT):
     # pylint: enable=missing-docstring
 
 
-class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
+class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
     """Tests for ThirdPartyCSSLintChecksManager class."""
 
-    def setUp(self):
-        super(ThirdPartyCSSLintChecksManagerTests, self).setUp()
-        self.filepaths = [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH]
-        self.linter_stdout = []
-
-        def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
-            linter_stdout list.
-
-            Args:
-                *args: str. Variable length argument list of values to print in
-                    the same line of output.
-            """
-            self.linter_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
-
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
-
     def test_all_filepaths_with_success(self):
+        filepaths = [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH]
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, self.filepaths, True)
+            CONFIG_PATH, filepaths, True)
         returned_filepaths = third_party_linter.all_filepaths
-        self.assertEqual(returned_filepaths, self.filepaths)
+        self.assertEqual(returned_filepaths, filepaths)
 
     def test_perform_all_lint_checks_with_invalid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
@@ -84,6 +67,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
             '19:16',
             'Unexpected whitespace before \":\"   declaration-colon-space-'
             'before'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_perform_all_lint_checks_with_invalid_stylelint_path(self):
         def mock_join(*unused_args):
@@ -93,9 +77,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [INVALID_CSS_FILEPATH], False)
-        with self.print_swap, join_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, join_swap, self.assertRaisesRegexp(
+            SystemExit, '1'):
             third_party_linter.perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_perform_all_lint_checks_with_stderr(self):
         # pylint: disable=unused-argument
@@ -113,9 +97,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH], True)
-        with self.print_swap, popen_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, popen_swap, self.assertRaisesRegexp(
+            SystemExit, '1'):
             third_party_linter.perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_perform_all_lint_checks_with_no_files(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
@@ -125,6 +109,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
         self.assert_same_list_elements(
             ['There are no HTML or CSS files to lint.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_perform_all_lint_checks_with_valid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
@@ -134,10 +119,12 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.GenericTestBase):
         self.assert_same_list_elements(
             ['SUCCESS  1 CSS file linted'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_get_linters(self):
         custom_linter, third_party_linter = css_linter.get_linters(
-            CONFIG_PATH, self.filepaths, verbose_mode_enabled=True)
+            CONFIG_PATH, [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH],
+            verbose_mode_enabled=True)
         self.assertEqual(custom_linter, None)
         self.assertTrue(
             isinstance(
