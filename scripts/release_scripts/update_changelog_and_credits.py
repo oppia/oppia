@@ -162,7 +162,8 @@ def get_previous_release_version(branch_type, current_release_version_number):
         previous_release_version = all_tags[-2][1:]
     else:
         raise Exception('Invalid branch type: %s.' % branch_type)
-    assert previous_release_version != current_release_version_number
+    assert previous_release_version != current_release_version_number, (
+        'Previous release version is same as current release version.')
     return previous_release_version
 
 

@@ -289,7 +289,9 @@ class BaseModelValidator(python_utils.OBJECT):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_external_id_relationships() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_external_id_relationships(cls, item):
@@ -441,7 +443,9 @@ class BaseSummaryModelValidator(BaseModelValidator):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_external_model_properties() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_external_model_properties(
@@ -655,7 +659,9 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_change_domain_class() method is missing from the derived '
+            'class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_commit_cmds_schema(cls, item):
@@ -6582,8 +6588,14 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        raise NotImplementedError
+        """Return a list of datastore class references to map over.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
+        """
+        raise NotImplementedError(
+            'The entity_classes_to_map_over() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def map(model_instance):

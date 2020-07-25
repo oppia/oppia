@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
-interface IThreadMessageBackendDict {
+interface ThreadMessageBackendDict {
   'author_username': string;
   'created_on_msecs': number;
   'entity_type': string;
@@ -80,7 +80,7 @@ export class ThreadMessageObjectFactory {
       ThreadMessageSummaryObjectFactory) {}
 
   createFromBackendDict(
-      threadMessageBackendDict: IThreadMessageBackendDict): ThreadMessage {
+      threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.created_on_msecs,

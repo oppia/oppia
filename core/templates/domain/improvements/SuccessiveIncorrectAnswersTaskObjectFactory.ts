@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ITaskEntryBackendDict, TaskEntry } from
+import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
@@ -28,7 +28,7 @@ import { ImprovementsConstants } from
 export class SuccessiveIncorrectAnswersTask extends TaskEntry<
     'successive_incorrect_answers'> {
   constructor(
-      backendDict: ITaskEntryBackendDict<'successive_incorrect_answers'>) {
+      backendDict: TaskEntryBackendDict<'successive_incorrect_answers'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -103,7 +103,7 @@ export class SuccessiveIncorrectAnswersTaskObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict<'successive_incorrect_answers'>
+      backendDict: TaskEntryBackendDict<'successive_incorrect_answers'>
   ): SuccessiveIncorrectAnswersTask {
     return new SuccessiveIncorrectAnswersTask(backendDict);
   }
