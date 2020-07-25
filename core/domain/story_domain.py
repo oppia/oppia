@@ -50,6 +50,7 @@ STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
 
 INITIAL_NODE_ID = 'initial_node_id'
+NODE = 'node'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -113,9 +114,9 @@ class StoryChange(change_domain.BaseChange):
         STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
         STORY_NODE_PROPERTY_THUMBNAIL_FILENAME)
 
-    # The allowed list of story contente properties which can be used in
+    # The allowed list of story content properties which can be used in
     # update_story_contents_property command.
-    STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
+    STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID, NODE, )
 
     ALLOWED_COMMANDS = [{
         'name': CMD_UPDATE_STORY_PROPERTY,
@@ -564,12 +565,6 @@ class StoryContents(python_utils.OBJECT):
                             ' were not completed before the node with id %s'
                             ' was unlocked.' % node_id)
                     nodes_queue.append(node_id)
-
-            for index, node_visited in enumerate(is_node_visited):
-                if not node_visited:
-                    raise utils.ValidationError(
-                        'The node with id %s is disconnected from the '
-                        'story graph.' % self.nodes[index].id)
 
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
@@ -1293,6 +1288,41 @@ class Story(python_utils.OBJECT):
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].destination_node_ids = (
             new_destination_node_ids)
+
+    def rearrange_node_in_story(self, from_index, to_index):
+        """Rearranges or moves a node in the story content.
+
+        Args:
+            from_index: int. The index of the node to move.
+            to_index: int. The index at which to insert the moved node.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception('Expected from_index value to be a number, '
+                            'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception('Expected to_index value to be a number, '
+                            'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception('Expected from_index and to_index values '
+                            'to be different.')
+
+        story_content_nodes = self.story_contents.nodes
+        if (from_index >= len(story_content_nodes) or
+                from_index < 0):
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if (to_index >= len(story_content_nodes) or
+                to_index < 0):
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
+        del story_content_nodes[from_index]
+        story_content_nodes.insert(to_index, story_node_to_move)
 
     def update_node_exploration_id(
             self, node_id, new_exploration_id):

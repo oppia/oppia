@@ -262,4 +262,11 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
     ctrl.toggleSubtopicPreview();
   });
+
+  it('should call TopicEditorRoutingService to navigate To Topic Editor',
+    function() {
+      var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
+      ctrl.navigateToTopicEditor();
+      expect(navigateSpy).toHaveBeenCalled();
+    });
 });
