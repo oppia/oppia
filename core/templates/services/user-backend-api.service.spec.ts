@@ -196,34 +196,51 @@ fdescribe('User Backend Api Service', () => {
       expect(dataUrl).toBe('image data');
     });
 
-    var req1 = httpTestingController.expectOne('/userinfohandler');
+    const req1 = httpTestingController.expectOne('/userinfohandler');
     expect(req1.request.method).toEqual('GET');
     req1.flush(sampleUserInfoBackendObject);
 
     flushMicrotasks();
 
-    var req2 = httpTestingController.expectOne(requestUrl);
+    const req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');
     req2.flush({profile_picture_data_url: 'image data'});
 
     flushMicrotasks();
+  }));
 
-    userBackendApiService.getProfileImageDataUrlAsync().then((dataUrl) => {
-      expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.webp'));
-    });
+  it('should return image data when second GET request returns 404',
+    fakeAsync(() => {
+      var requestUrl = '/preferenceshandler/profile_picture';
+      // Creating a test user for checking profile picture of user.
+      var sampleUserInfoBackendObject = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: true,
+        preferred_site_language_code: null,
+        username: 'tester',
+        email: 'test@test.com',
+        user_is_logged_in: true
+      };
 
-    var req3 = httpTestingController.expectOne('/userinfohandler');
-    expect(req3.request.method).toEqual('GET');
-    req3.flush(sampleUserInfoBackendObject);
+      userBackendApiService.getProfileImageDataUrlAsync().then((dataUrl) => {
+        expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.webp'));
+      });
 
-    flushMicrotasks();
+      const req1 = httpTestingController.expectOne('/userinfohandler');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(sampleUserInfoBackendObject);
 
-    var req4 = httpTestingController.expectOne(requestUrl);
-    expect(req4.request.method).toEqual('GET');
-    req4.flush(404);
+      flushMicrotasks();
 
-    flushMicrotasks();
+      const req2 = httpTestingController.expectOne(requestUrl);
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(404);
+
+      flushMicrotasks();
   }));
 
   it('should return the default profile image path when user is not logged',
