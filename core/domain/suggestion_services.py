@@ -163,6 +163,9 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
         correspond to the given exploration ids, up to a maximum of
         feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
+    if len(exp_ids) == 0:
+        return []
+
     return [get_suggestion_from_model(s)
             for s in suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_with_exp_ids(exp_ids)]

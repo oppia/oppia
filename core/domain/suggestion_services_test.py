@@ -1028,6 +1028,17 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(suggestion_services.get_translation_suggestions_with_exp_ids(
                 ['exp2', self.EXP_ID])), 2)
+        self.create_translation_suggestion_associated_with_exp(
+            'exp2', self.author_id)
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [self.EXP_ID])), 1)
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                ['bad_exp_id'])), 0)
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [])), 0)
 
     def test_create_and_accept_suggestion(self):
         with self.swap(
