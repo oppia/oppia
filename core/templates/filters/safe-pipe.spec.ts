@@ -64,4 +64,13 @@ describe('Safe pipe', () => {
     expect(sanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith(
       'ResourceUrl');
   });
+
+  it('should give an error with incorrect type', () => {
+    try {
+      pipe.transform('ErrorTest', 'wrongtype');
+    } catch (error) {
+      expect(error.name).toBe('Error');
+      expect(error.message).toBe('Invalid safe type specified: wrongtype');
+    }
+  });
 });
