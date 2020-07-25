@@ -184,9 +184,6 @@ def apply_change_list(story_id, change_list):
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
-                if change.property_name == story_domain.NODE:
-                    story.rearrange_node_in_story(
-                        change.old_value, change.new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):

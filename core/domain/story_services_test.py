@@ -1234,32 +1234,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list,
                 'Updated story initial_node_id.')
 
-    def test_rearrange_node_in_story(self):
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_2,
-                'title': 'Title 2'
-            })
-        ]
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.nodes[0].id, self.NODE_ID_1)
-        self.assertEqual(story.story_contents.nodes[1].id, self.NODE_ID_2)
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
-            'property_name': story_domain.NODE,
-            'old_value': 1,
-            'new_value': 0
-        })]
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_list, 'Added story node.')
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.nodes[0].id, self.NODE_ID_2)
-        self.assertEqual(story.story_contents.nodes[1].id, self.NODE_ID_1)
-
     def test_cannot_update_node_exploration_id_with_invalid_node_id(self):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
