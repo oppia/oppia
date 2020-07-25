@@ -6541,7 +6541,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
         UserContributionScoringModelValidator),
-    user_models.UserContributionRightsModel: UserContributionRightsModelValidator,
+    user_models.UserContributionRightsModel: (
+        UserContributionRightsModelValidator),
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator),
     stats_models.PlaythroughModel: PlaythroughModelValidator,

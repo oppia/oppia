@@ -1842,7 +1842,7 @@ class ContributionReviewersListHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Invalid language_code: invalid')
         self.logout()
 
-    def test_check_contribution_reviewer_with_invalid_review_category_raise_error(
+    def test_check_contribution_reviewer_with_invalid_review_category_raise_error( # pylint: disable=line-too-long
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(

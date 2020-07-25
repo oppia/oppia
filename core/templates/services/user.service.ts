@@ -25,7 +25,7 @@ angular.module('oppia').factory('UserService', [
   function($http, $q, $window, UrlInterpolationService, UrlService,
       UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler';
+    var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
 
     var userInfo = null;
     var userContributionRightsInfo = null;

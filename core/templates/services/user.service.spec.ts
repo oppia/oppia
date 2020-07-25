@@ -293,7 +293,8 @@ describe('User Service', function() {
 
       UserService.getUserContributionRightsData().then(
         function(userContributionRights) {
-          expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
+          expect(userContributionRights).toEqual(
+            sampleUserContributionRightsDict);
           // Fetch userContributionRightsInfo again.
           UserService.getUserContributionRightsData().then(function(
               sameUserContributionRights) {

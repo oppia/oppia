@@ -423,9 +423,11 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
             self.user_contribution_rights
             .can_review_translation_for_language_codes, ['hi'])
         self.assertEqual(
-            self.user_contribution_rights.can_review_voiceover_for_language_codes,
+            self.user_contribution_rights
+            .can_review_voiceover_for_language_codes,
             [])
-        self.assertEqual(self.user_contribution_rights.can_review_questions, True)
+        self.assertEqual(
+            self.user_contribution_rights.can_review_questions, True)
 
     def test_can_review_translation_for_language_codes_incorrect_type(self):
         self.user_contribution_rights.can_review_translation_for_language_codes = 5
