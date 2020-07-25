@@ -6,9 +6,9 @@
     <div class="navbar-icons">
       <li ng-class="{'navbar-tab-active': $ctrl.isMainEditorTabSelected(), 'uib-dropdown': $ctrl.getTotalWarningsCount()}"
           ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>"
-          class="nav-item icon nav-list-item">
-        <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="$ctrl.selectMainTab()"
-           class="nav-link navbar-tab">
+          class="nav-item icon nav-list-item"
+          ng-click="$ctrl.selectMainTab()">
+        <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected() }">&#xE254;</i>
         </a>
         <div ng-show="$ctrl.getTotalWarningsCount()"
@@ -35,14 +35,14 @@
         </div>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon nav-list-item">
-        <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="$ctrl.selectQuestionsTab()">
-          <i class="fa fa-book navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}">&#xE254;</i>
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectQuestionsTab()">
+        <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom">
+          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}">import_contacts</i>
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'subtopic_preview'}" class="nav-item icon nav-list-item">
-        <a ng-click="$ctrl.openTopicViewer()" class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'subtopic_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.openTopicViewer()">
+        <a class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'subtopic_preview'}">&#xE037;</i>
         </a>
       </li>
@@ -74,6 +74,7 @@
   }
   topic-editor-page .navbar-helper {
     background-color: #00609C;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
     height: 70px;
     margin-bottom: 20px;
     position: fixed;
@@ -131,6 +132,7 @@
   }
   topic-editor-page .nav-list-item {
     align-items: center;
+    cursor: pointer;
     display: flex;
     justify-content: center;
     width: 90px;
@@ -150,7 +152,7 @@
       display: none;
     }
     topic-editor-page .topic-editor-main {
-      margin-top: 40px;
+      margin-top: 16px;
     }
   }
 </style>
