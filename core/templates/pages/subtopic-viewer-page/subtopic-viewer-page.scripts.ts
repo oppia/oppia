@@ -23,9 +23,6 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require(
-  'pages/subtopic-viewer-page/navbar-breadcrumb/' +
-  'subtopic-viewer-navbar-breadcrumb.component.ts');
-require(
   'pages/subtopic-viewer-page/navbar-pre-logo-action/' +
   'subtopic-viewer-navbar-pre-logo-action.component.ts');
 
