@@ -43,25 +43,11 @@ export class PlayerPositionService {
   /**
    * Get the name of the current state.
    * @return {string} a string that shows the name of the current state.
-   * @throws Will throw error if the index of card
-   *  is out of the range of the transcript.
    */
   getCurrentStateName(): string {
-    try {
-      return (
-        this.playerTranscriptService.getCard(
-          this.displayedCardIndex).getStateName());
-    } catch (e) {
-      let additionalInfo = ('\nUndefined card error debug logs:' +
-          '\nRequested card index: ' + this.displayedCardIndex +
-          '\nExploration ID: ' + this.contextService.getExplorationId() +
-          '\nTotal cards: ' + this.playerTranscriptService.getNumCards() +
-          '\nLast state name: ' +
-          this.playerTranscriptService.getLastStateName()
-      );
-      e.message += additionalInfo;
-      throw e;
-    }
+    return (
+      this.playerTranscriptService.getCard(
+        this.displayedCardIndex).getStateName());
   }
 
   /**
