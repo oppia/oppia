@@ -48,6 +48,8 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-add-chapter-button'));
   var newChapterTitleField = element(
     by.css('.protractor-test-new-chapter-title-field'));
+  var newChapterExplorationField = element(
+    by.css('.protractor-test-chapter-exploration-input'));
   var confirmChapterCreationButton = element(
     by.css('.protractor-test-confirm-chapter-creation-button'));
   var destinationSelect = element(
@@ -110,6 +112,8 @@ var StoryEditorPage = function() {
     by.css('.story-node-thumbnail .protractor-test-custom-photo'));
   var chapterThumbnailButton = element(
     by.css('.story-node-thumbnail .protractor-test-photo-button'));
+  var createChapterThumbnailButton = element(
+    by.css('.chapter-input-thumbnail .protractor-test-photo-button'));
   this.get = async function(storyId) {
     await browser.get(EDITOR_URL_PREFIX + storyId);
     await waitFor.pageToFullyLoad();
@@ -147,13 +151,18 @@ var StoryEditorPage = function() {
     await confirmDeleteChapterButton.click();
   };
 
-  this.createNewChapter = async function(title) {
+  this.createNewChapter = async function(title, explorationId, imgPath) {
     await general.scrollToTop();
     await action.click(
       'Create chapter button takes too long to be clickable.',
       createChapterButton);
     await action.sendKeys(
       'New chapter title field', newChapterTitleField, title);
+    await action.sendKeys(
+      'New chapter exploration ID', newChapterExplorationField, explorationId);
+    await workflow.submitImage(
+      createChapterThumbnailButton, thumbnailContainer, imgPath, false);
+
     await confirmChapterCreationButton.click();
     await general.scrollToTop();
   };

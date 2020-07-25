@@ -158,8 +158,7 @@ angular.module('oppia').directive('storyEditor', [
                 nodeTitles: () => nodeTitles
               },
               controller: 'CreateNewChapterModalController'
-            }).result.then(function(title) {
-              StoryUpdateService.addStoryNode($scope.story, title);
+            }).result.then(function() {
               _initEditor();
               // If the first node is added, open it just after creation.
               if ($scope.story.getStoryContents().getNodes().length === 1) {
