@@ -24,26 +24,26 @@ var AdminPage = require('../protractor_utils/AdminPage.js');
 var ContributorDashboardPage = require(
   '../protractor_utils/ContributorDashboardPage.js');
 
-describe('Community dashboard page', function() {
-  var communityDashboardPage = null;
-  var communityDashboardTranslateTextTab = null;
+describe('Contributor Dashboard page', function() {
+  var contributorDashboardPage = null;
+  var contributorDashboardTranslateTextTab = null;
 
   beforeAll(async function() {
-    communityDashboardPage = (
+    contributorDashboardPage = (
       new ContributorDashboardPage.ContributorDashboardPage());
-    communityDashboardTranslateTextTab = (
-      communityDashboardPage.getTranslateTextTab());
+    contributorDashboardTranslateTextTab = (
+      contributorDashboardPage.getTranslateTextTab());
   });
 
   beforeEach(async function() {
     await browser.get('/contributor-dashboard');
     await waitFor.pageToFullyLoad();
-    await communityDashboardPage.navigateToTranslateTextTab();
+    await contributorDashboardPage.navigateToTranslateTextTab();
   });
 
   it('should allow user to switch to translate text tab', async function() {
-    await communityDashboardTranslateTextTab.changeLanguage('Hindi');
-    await communityDashboardTranslateTextTab.expectSelectedLanguageToBe(
+    await contributorDashboardTranslateTextTab.changeLanguage('Hindi');
+    await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
       'Hindi');
   });
 
@@ -65,14 +65,14 @@ describe('Community dashboard page', function() {
     });
 
     it('should show correct featured languages', async function() {
-      await communityDashboardTranslateTextTab
+      await contributorDashboardTranslateTextTab
         .expectFeaturedLanguagesToBe(['French']);
     });
 
     it('should show correct explanation', async function() {
-      await communityDashboardTranslateTextTab
+      await contributorDashboardTranslateTextTab
         .mouseoverFeaturedLanguageTooltip(0);
-      await communityDashboardTranslateTextTab
+      await contributorDashboardTranslateTextTab
         .expectFeaturedLanguageExplanationToBe('Partnership with ABC');
     });
   });

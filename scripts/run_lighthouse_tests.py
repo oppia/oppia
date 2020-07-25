@@ -74,8 +74,8 @@ def run_lighthouse_checks():
 def enable_webpages():
     """Enables deactivated webpages for testing."""
 
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = True'
+    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
+    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = True'
     common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
 
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'

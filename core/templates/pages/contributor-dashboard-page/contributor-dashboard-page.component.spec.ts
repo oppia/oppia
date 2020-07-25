@@ -52,7 +52,7 @@ describe('Contributor dashboard page', function() {
     UserService = $injector.get('UserService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    ctrl = $componentController('communityDashboardPage');
+    ctrl = $componentController('contributorDashboardPage');
 
     spyOn(LocalStorageService, 'getLastSelectedTranslationLanguageCode').and
       .returnValue('');
