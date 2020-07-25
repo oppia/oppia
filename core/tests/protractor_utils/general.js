@@ -20,6 +20,11 @@
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
+var dragAndDropScript = require('html-dnd').code;
+
+var dragAndDrop = async function(fromElement, toElement) {
+  await browser.executeScript(dragAndDropScript, fromElement, toElement);
+};
 
 var scrollToTop = async function() {
   await browser.executeScript('window.scrollTo(0,0);');
@@ -211,6 +216,7 @@ exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
+exports.dragAndDrop = dragAndDrop;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 
