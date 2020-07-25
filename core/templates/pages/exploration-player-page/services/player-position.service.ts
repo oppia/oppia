@@ -66,7 +66,7 @@ export class PlayerPositionService {
 
   /**
    * Set the index of the displayed card.
-   * @param {object} index - A number which represents the index of card.
+   * @param {number} index - The new index of the card.
    */
   setDisplayedCardIndex(index: number): void {
     let oldIndex = this.displayedCardIndex;
