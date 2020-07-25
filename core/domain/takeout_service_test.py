@@ -947,7 +947,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
