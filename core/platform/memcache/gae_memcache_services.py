@@ -14,21 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides memcache services."""
+"""Provides redis cache services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import python_utils
-from simplejson import JSONDecodeError
 from core.domain import cache_services
-from pydoc import locate
-import sys
 import json
 
 from google.appengine.api import memcache
 import redis
 import logging
+
 redis_client = redis.Redis(host='localhost', port=6379)
 
 def get_multi(keys):
@@ -44,8 +42,6 @@ def get_multi(keys):
     assert isinstance(keys, list)
     result = redis_client.mget(keys)
     if result and (result != [None]):
-        logging.info("We got a hit! : " + str(result))
-        logging.info(result)
         dct = {}
         for key, value in zip(keys, result):
             correct_type_of_dict = cache_services.get_correct_dict_type_of_key(
@@ -58,10 +54,6 @@ def get_multi(keys):
         return dct
     else:
         return {}
-    # result = memcache.get_multi(keys)
-    # logging.info(type(result))
-    # logging.info(result)
-    # return result
 
 
 def set_multi(key_value_mapping):
@@ -81,10 +73,9 @@ def set_multi(key_value_mapping):
         if hasattr(value, 'to_dict'):
             key_value_mapping[key] = json.dumps(value.to_dict())
     added = redis_client.mset(key_value_mapping)
-    if not added:
+    if added != len(key_value_mapping):
         logging.error('Redis set failed.')
-    #unset_keys = memcache.set_multi(key_value_mapping)
-    return None
+    return []
 
 
 def delete(key):
@@ -94,15 +85,14 @@ def delete(key):
         key: str. A key (string) to delete.
 
     Returns:
-        int. 0 on network failure, 1 if the item does not exist, and
-        2 for a successful delete.
+        int. 1 if the delete failed, and 2 for a successful delete.
     """
     assert isinstance(key, python_utils.BASESTRING)
     return_code = redis_client.delete(key)
-    if not return_code:
+    if return_code != 1:
         logging.error('Redis delete failed.')
-    #return_code = memcache.delete(key)
-    return return_code
+        return 1
+    return 2
 
 
 def delete_multi(keys):
@@ -118,7 +108,6 @@ def delete_multi(keys):
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)
     return_value = redis_client.delete(*keys)
-    if not return_value:
+    if return_value != len(keys):
         logging.error('Redis delete failed.')
-    #return_value = memcache.delete_multi(keys)
-    return return_value
+    return True

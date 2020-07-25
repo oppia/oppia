@@ -37,8 +37,9 @@ def get_correct_dict_type_of_key(key):
         key: str. The key string used in the memory cache.
 
     Returns:
-        type. Returns the original type of the object that got converted to a
-        dictionary.
+        type|None. Returns the original type of the object that got converted
+        to a dictionary or if this key does not correspond to a class that
+        requires deserialization, None.
     """
     if key.startswith('collection'):
         return collection_domain.Collection

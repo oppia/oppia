@@ -864,6 +864,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
 
+    def test_topic_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        topic during export and import.
+        """
+        topic_dict = self.topic.to_dict()
+        topic_from_dict = topic_domain.Topic.from_dict(topic_dict)
+        self.assertEqual(topic_from_dict.to_dict(), topic_dict)
 
 class TopicChangeTests(test_utils.GenericTestBase):
 
@@ -1304,14 +1311,6 @@ class TopicSummaryTests(test_utils.GenericTestBase):
                 'Expected subtopic_count to be non-negative, '
                 'received \'-1\'')):
             self.topic_summary.validate()
-
-    def test_topic_export_import_returns_original_object(self):
-        """Checks that to_dict and from_dict preserves all the data within a
-        topic during export and import.
-        """
-        topic_dict = self.topic.to_dict()
-        topic_from_dict = topic_domain.Topic.from_dict(topic_dict)
-        self.assertEqual(topic_from_dict.to_dict(), topic_dict)
 
 
 class TopicRightsTests(test_utils.GenericTestBase):

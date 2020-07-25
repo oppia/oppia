@@ -29,12 +29,17 @@ class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(GaeMemcacheServicesUnitTests, self).setUp()
         self.keys = ['a', 'b', 'c']
-        self.key_value_mapping = {'a': 1, 'b': 2, 'c': 3}
+        self.non_existent_keys = ['d', 'e']
+        # Redis can only store strings so integers must be casted to correct
+        # values.
+        self.key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         self.exp_list = gae_memcache_services.set_multi(self.key_value_mapping)
 
     def test_get_multi(self):
         exp_dict = gae_memcache_services.get_multi(self.keys)
         self.assertEqual(exp_dict, self.key_value_mapping)
+        exp_dict = gae_memcache_services.get_multi(self.non_existent_keys)
+        self.assertEqual(exp_dict, {})
 
     def test_set_multi(self):
         self.assertEqual(self.exp_list, [])
