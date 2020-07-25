@@ -24,52 +24,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-  moveFocusToSearch() {
-    Mousetrap.bind('/', function() {
-      document.getElementById('searchBar').focus();
-      return false;
-    });
-  }
-
-  moveFocusToCategory() {
-    Mousetrap.bind('c', function() {
-      document.getElementById('categoryBar').focus();
-      return false;
-    });
-  }
-
-  moveFocusToSkipButton() {
-    Mousetrap.bind('s', function() {
-      document.getElementById('skipToMainContentId').focus();
-      return false;
-    });
-  }
-
-  moveFocusToBackButton = function() {
-    Mousetrap.bind('k', function() {
-      var previousButton = document.getElementById('backButtonId');
-
-      if (previousButton !== null) {
-        previousButton.focus();
-      }
-
-      return false;
-    });
-  };
-
-  moveFocusToNextButton = function() {
-    Mousetrap.bind('j', function() {
-      var nextButton = <HTMLElement>document.querySelector(
-        '.protractor-test-next-button');
-
-      if (nextButton !== null) {
-        nextButton.focus();
-      }
-
-      return false;
-    });
-  };
-
   bindExplorationPlayerShortcuts() {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
