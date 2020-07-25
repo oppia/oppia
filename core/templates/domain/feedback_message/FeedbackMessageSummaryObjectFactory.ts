@@ -20,7 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface IFeedbackMessageSummaryBackendDict {
+interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
   'text': string;
   'updated_status': string;
@@ -75,7 +75,7 @@ export class FeedbackMessageSummaryObjectFactory {
   }
 
   createFromBackendDict(
-      feedbackMessageSummaryBackendDict: IFeedbackMessageSummaryBackendDict):
+      feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict):
       FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
