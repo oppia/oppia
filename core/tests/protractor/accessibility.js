@@ -85,9 +85,9 @@ describe('screenreader and keyboard user accessibility features', function() {
       await testNavigationShortcuts('notifications');
     });
 
-    afterEach(async function() {
-      await general.checkForConsoleErrors([]);
-    });
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+  });
 });
 
 describe('Cache Slugs', function() {
