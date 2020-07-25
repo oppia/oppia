@@ -20,9 +20,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
-from core.domain import rights_manager
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
@@ -40,7 +40,7 @@ import feconf
     story_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.improvements,models.NAMES.question, models.NAMES.skill,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
     models.NAMES.story, models.NAMES.user
 ])
 
@@ -277,27 +277,31 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceDeleteImprovementsModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.improvements_model_1_id =improvements_models.TaskEntryModel.create(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
-            entity_id=self.EXP_1_ID,
-            entity_version=1,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
-            target_id='State',
-            issue_description=None,
-            status=constants.TASK_STATUS_RESOLVED,
-            resolver_id=self.user_1_id
+        self.improvements_model_1_id = (
+            improvements_models.TaskEntryModel.create(
+                entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_1_ID,
+                entity_version=1,
+                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                target_type=constants.TASK_TARGET_TYPE_STATE,
+                target_id='State',
+                issue_description=None,
+                status=constants.TASK_STATUS_RESOLVED,
+                resolver_id=self.user_1_id
+            )
         )
-        self.improvements_model_2_id = improvements_models.TaskEntryModel.create(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
-            entity_id=self.EXP_2_ID,
-            entity_version=1,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
-            target_id='State',
-            issue_description=None,
-            status=constants.TASK_STATUS_RESOLVED,
-            resolver_id=self.user_1_id
+        self.improvements_model_2_id = (
+            improvements_models.TaskEntryModel.create(
+                entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+                entity_id=self.EXP_2_ID,
+                entity_version=1,
+                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                target_type=constants.TASK_TARGET_TYPE_STATE,
+                target_id='State',
+                issue_description=None,
+                status=constants.TASK_STATUS_RESOLVED,
+                resolver_id=self.user_1_id
+            )
         )
 
     def test_delete_improvements_simple(self):
@@ -430,14 +434,18 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         # Verify user is deleted.
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_1_ID)
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_1_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_1_ID)
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
@@ -475,20 +483,29 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         # Verify user is deleted.
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model_1 = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_1_ID)
+        commit_log_model_1 = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model_2 = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_2_ID)
+        commit_log_model_2 = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_2_ID
+            )
+        )
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model
@@ -499,8 +516,11 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         # Return metadata model to the original user ID.
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_1_ID
+            )
+        )
         metadata_model.committer_id = self.user_1_id
         metadata_model.put()
 
@@ -512,14 +532,20 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         # pseudonymous user ID.
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_1_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
@@ -538,26 +564,38 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
 
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_1_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_2_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_2_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_2_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_2_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_2_ID
+            )
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
@@ -577,25 +615,37 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         # Verify first user is deleted.
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_1_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
 
         # Verify second user is not yet deleted.
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_2_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_2_ID
+            )
+        )
         self.assertEqual(metadata_model.committer_id, self.user_2_id)
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_2_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_2_ID
+            )
+        )
         self.assertEqual(commit_log_model.user_id, self.user_2_id)
 
         wipeout_service.delete_user(
@@ -604,14 +654,20 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         # Verify second user is deleted.
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_2_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_2_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_2_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_2_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_2_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_2_ID
+            )
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
@@ -637,25 +693,37 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         # Verify first user is deleted.
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-1' % self.QUESTION_1_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-1' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
 
         # Verify second user is not yet deleted.
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-2' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-2' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(metadata_model.committer_id, self.user_2_id)
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-2' % self.QUESTION_1_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-2' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(commit_log_model.user_id, self.user_2_id)
 
         wipeout_service.delete_user(
@@ -664,14 +732,20 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         # Verify second user is deleted.
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_2_id))
-        metadata_model = question_models.QuestionSnapshotMetadataModel.get_by_id(
-            '%s-2' % self.QUESTION_1_ID)
+        metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '%s-2' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
             .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
-        commit_log_model = question_models.QuestionCommitLogEntryModel.get_by_id(
-            'question-%s-2' % self.QUESTION_1_ID)
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-2' % self.QUESTION_1_ID
+            )
+        )
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model

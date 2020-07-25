@@ -173,10 +173,16 @@ def verify_user_deleted(pending_deletion_request):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    return _verify_models_deleted(pending_deletion_request.user_id, [
-        models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-        models.NAMES.story, models.NAMES.user
-    ])
+    return _verify_models_deleted(
+        pending_deletion_request.user_id,
+        [
+            models.NAMES.improvements,
+            models.NAMES.question,
+            models.NAMES.skill,
+            models.NAMES.story,
+            models.NAMES.user
+        ]
+    )
 
 
 def _hard_delete_explorations_and_collections(pending_deletion_request):
@@ -465,7 +471,7 @@ def _verify_models_deleted(user_id, model_categories):
 
     Args:
         user_id: str. The id of the user to be deleted.
-        model_categories:
+        model_categories: list(enum). Categories of models to check.
 
     Returns:
         bool. True if all the user models were correctly deleted, False
@@ -475,12 +481,11 @@ def _verify_models_deleted(user_id, model_categories):
             model_categories):
         try:
             if (
-                model_class.get_deletion_policy() not in
-                [base_models.DELETION_POLICY.KEEP,
-                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
-                model_class.has_reference_to_user_id(user_id)
+                    model_class.get_deletion_policy() not in
+                    [base_models.DELETION_POLICY.KEEP,
+                     base_models.DELETION_POLICY.NOT_APPLICABLE] and
+                    model_class.has_reference_to_user_id(user_id)
             ):
-                print(model_class.__name__)
                 return False
         except NotImplementedError:
             continue
