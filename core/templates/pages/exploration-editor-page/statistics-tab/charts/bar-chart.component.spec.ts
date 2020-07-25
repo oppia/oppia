@@ -33,7 +33,7 @@ describe('Bar Chart component', function() {
     });
   }));
 
-  afterEach(function() {
+  afterAll(function() {
     // Resetting google global property.
     window.google = undefined;
     Object.defineProperty(window, 'google', {

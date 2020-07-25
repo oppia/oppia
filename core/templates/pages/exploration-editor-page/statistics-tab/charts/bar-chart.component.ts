@@ -70,10 +70,12 @@ angular.module('oppia').component('barChart', {
       };
 
       $scope.$watch('data()', redrawChart);
-      $(window).resize(redrawChart);
 
       ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-        subscribe(() => redrawChart());
+        subscribe(evt => {
+          redrawChart();
+          $scope.$applyAsync();
+        });
     };
 
     ctrl.$onDestroy = function() {
