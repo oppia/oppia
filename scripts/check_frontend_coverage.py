@@ -444,7 +444,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'unicode-string-editor.directive.ts',
     'unresolved-answers-overview.directive.ts',
     'url-interpolation.service.ts',
-    'user-backend-api.service.ts',
     'utils.service.ts',
     'value-generator-editor.directive.ts',
     'version-diff-visualization.directive.ts',
