@@ -32,7 +32,7 @@ describe('Pie Chart component', function() {
     });
   }));
 
-  afterAll(function() {
+  afterEach(function() {
     // Resetting google global property.
     window.google = undefined;
     Object.defineProperty(window, 'google', {

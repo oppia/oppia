@@ -71,8 +71,8 @@ angular.module('oppia').component('barChart', {
 
       $scope.$watch('data()', redrawChart);
 
-      ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-        subscribe(evt => {
+      ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
+        .subscribe(evt => {
           redrawChart();
           $scope.$applyAsync();
         });
