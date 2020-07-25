@@ -90,7 +90,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -103,7 +105,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The has_reference_to_user_id() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def export_data(user_id):
@@ -116,7 +120,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The export_data() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def get_export_policy():
@@ -126,7 +132,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The get_export_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -307,7 +315,7 @@ class BaseModel(ndb.Model):
 
         Args:
             entity_name: The name of the entity. Coerced to a utf-8 encoded
-                string. Defaults to ''.
+                string.
 
         Returns:
             str. New unique id for this entity class.
@@ -457,7 +465,9 @@ class BaseCommitLogEntryModel(BaseModel):
             NotImplementedError: The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_instance_id() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
@@ -730,7 +740,8 @@ class VersionedModel(BaseModel):
         Raises:
             Exception: This model instance has been already deleted.
         """
-        versioned_models = cls.get_multi(entity_ids)
+        versioned_models = cls.get_multi(
+            entity_ids, include_deleted=force_deletion)
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []
@@ -782,7 +793,9 @@ class VersionedModel(BaseModel):
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The put() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     def commit(self, committer_id, commit_message, commit_cmds):
         """Saves a version snapshot and updates the model.

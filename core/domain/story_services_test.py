@@ -63,9 +63,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
-        self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+        self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         self.save_new_valid_exploration(
@@ -290,9 +288,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_update_story_with_invalid_corresponding_topic_id_value(self):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
-        self.save_new_story(
-            story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
-
+        self.save_new_story(story_id, self.USER_ID, topic_id)
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -315,8 +311,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             description='A new topic description.',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
-        self.save_new_story(
-            story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
+        self.save_new_story(story_id, self.USER_ID, topic_id)
 
         changelist = [
             story_domain.StoryChange({
@@ -591,9 +586,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('2'))
 
-        self.save_new_story(
-            'story_id_2', self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+        self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
 
@@ -697,9 +690,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             exp_services.get_story_id_linked_to_exploration('2'))
 
     def test_exploration_story_link_collision(self):
-        self.save_new_story(
-            'story_id_2', self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+        self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
         self.save_new_valid_exploration(
@@ -1208,8 +1199,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=0)
         self.save_new_story(
-            story_id, self.USER_ID, 'new title', 'Description', 'Notes',
-            topic_id)
+            story_id, self.USER_ID, topic_id, title='new title')
         topic_services.add_canonical_story(self.USER_ID, topic_id, story_id)
 
         change_list = [story_domain.StoryChange({
@@ -1746,10 +1736,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
 
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
-        self.save_new_story(
-            self.STORY_ID_1, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID
-        )
+        self.save_new_story(self.STORY_ID_1, self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID_1)
         story_services.record_completed_node_in_story_context(

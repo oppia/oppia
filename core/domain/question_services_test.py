@@ -259,7 +259,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            r'Entity for class QuestionModel with id %s not found' % (
+                question_id_2)):
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id_2, 'skill_1', 0.5)
 
@@ -498,7 +501,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaises(Exception)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception, '\'unicode\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             question_services.update_question(

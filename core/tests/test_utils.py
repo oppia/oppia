@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import contextlib
 import copy
 import datetime
@@ -64,6 +65,7 @@ import webtest
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
+email_services = models.Registry.import_email_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -1425,8 +1427,8 @@ tags: []
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
-            self, story_id, owner_id, title, description, notes,
-            corresponding_topic_id,
+            self, story_id, owner_id, corresponding_topic_id,
+            title='Title', description='Description', notes='Notes',
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
@@ -2045,6 +2047,23 @@ tags: []
             self.logout()
             os.environ.update(initial_user_env)
 
+    def assertRaises(self, exc, fun, *args, **kwds):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
+            self, expected_exception, expected_regexp, callable_obj=None,
+            *args, **kwargs):
+        if expected_regexp == '':
+            raise Exception(
+                'Please provide a sufficiently strong regexp string to '
+                'validate that the correct error is being raised.')
+
+        return super(TestBase, self).assertRaisesRegexp(
+            expected_exception, expected_regexp,
+            callable_obj=callable_obj, *args, **kwargs)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
@@ -2083,9 +2102,6 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
-
-        self.testbed.init_mail_stub()
-        self.mail_stub = self.testbed.get_stub(testbed.MAIL_SERVICE_NAME)
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
@@ -2280,6 +2296,153 @@ class AppEngineTestBase(TestBase):
 
 
 GenericTestBase = AppEngineTestBase
+
+
+class EmailMessageMock(python_utils.OBJECT):
+    """Mock for core.platform.models email services messages."""
+
+    def __init__(
+            self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Inits a mock email message with all the necessary data.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
+            recipient_email: str. The email address of the recipient.
+                Must be utf-8.
+            subject: str. The subject line of the email, Must be utf-8.
+            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity. Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Emails must be utf-8.
+            reply_to: str|None. Optional argument. Reply address formatted like
+                “reply+<reply_id>@<incoming_email_domain_name>
+                reply_id is the unique id of the sender.
+            recipient_variables: dict|None. Optional argument. If batch sending
+                requires differentiating each email based on the recipient, we
+                assign a unique id to each recipient, including info relevant to
+                that recipient so that we can reference it when composing the
+                email like so:
+                    recipient_variables =
+                        {"bob@example.com": {"first":"Bob", "id":1},
+                        "alice@example.com": {"first":"Alice", "id":2}}
+                    subject = 'Hey, %recipient.first%’
+                More info about this format at:
+                https://documentation.mailgun.com/en/
+                    latest/user_manual.html#batch-sending.
+        """
+        self.sender = sender_email
+        self.to = recipient_email
+        self.subject = subject
+        self.body = plaintext_body
+        self.html = html_body
+        self.bcc = bcc
+        self.reply_to = reply_to
+        self.recipient_variables = recipient_variables
+
+
+class GenericEmailTestBase(GenericTestBase):
+    """Base class for tests requiring email services."""
+
+    emails_dict = collections.defaultdict(list)
+
+    def run(self, result=None):
+        """Adds a context swap on top of the test_utils.run() method so that
+        test classes extending GenericEmailTestBase will automatically have
+        a mailgun api key, mailgun domain name and mocked version of
+        send_email_to_recipients().
+        """
+        with self.swap(
+            email_services, 'send_email_to_recipients',
+            self._send_email_to_recipients):
+            super(EmailTestBase, self).run(result=result)
+
+    def setUp(self):
+        super(GenericEmailTestBase, self).setUp()
+        self._wipe_emails_dict()
+
+    def _wipe_emails_dict(self):
+        """Reset email dictionary for a new test."""
+        self.emails_dict = collections.defaultdict(list)
+
+    def _send_email_to_recipients(
+            self, sender_email, recipient_emails, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Mocks sending an email to each email in recipient_emails.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
+            recipient_emails: list(str). The email addresses of the recipients.
+                Must be utf-8.
+            subject: str. The subject line of the email, Must be utf-8.
+            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity. Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Must be utf-8.
+            reply_to: str|None. Optional Argument. Reply address formatted like
+                “reply+<reply_id>@<incoming_email_domain_name>
+                reply_id is the unique id of the sender.
+            recipient_variables: dict|None. Optional Argument.
+                If batch sending requires differentiating each email based on
+                the recipient, we assign a unique id to each recipient,
+                including info relevant to that recipient so that we can
+                reference it when composing the email like so:
+                    recipient_variables =
+                        {"bob@example.com": {"first":"Bob", "id":1},
+                        "alice@example.com": {"first":"Alice", "id":2}}
+                    subject = 'Hey, %recipient.first%’
+                More info about this format at:
+                https://documentation.mailgun.com/en/
+                    latest/user_manual.html#batch-sending
+
+        Returns:
+            bool. Whether the emails are sent successfully.
+        """
+        bcc_emails = None
+
+        if bcc:
+            bcc_emails = bcc[0] if len(bcc) == 1 else bcc
+
+        new_email = EmailMessageMock(
+            sender_email, recipient_emails, subject, plaintext_body, html_body,
+            bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
+            recipient_variables=(
+                recipient_variables if (recipient_variables) else None))
+        for recipient_email in recipient_emails:
+            self.emails_dict[recipient_email].append(new_email)
+        return True
+
+    def _get_sent_email_messages(self, to):
+        """Gets messages to a single recipient email.
+
+        Args:
+            to: str. The recipient email address.
+
+        Returns:
+            list(EmailMessageMock). The list of email messages corresponding to
+            that recipient email.
+        """
+        return self.emails_dict[to] if to in self.emails_dict else []
+
+    def _get_all_sent_email_messages(self):
+        """Gets the entire messages dictionary.
+
+        Returns:
+            dict(str, (list(EmailMessageMock))). The dict keyed by recipient
+            email. Each value contains a list of EmailMessageMock objects
+            corresponding to that recipient email; in other words, all
+            individual emails sent to that specific recipient email.
+        """
+        return self.emails_dict
+
+
+EmailTestBase = GenericEmailTestBase
 
 
 class FunctionWrapper(python_utils.OBJECT):
