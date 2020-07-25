@@ -263,7 +263,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         stats_models.StartExplorationEventLogEntryModel,
                         stats_models.StateHitEventLogEntryModel))):
             event_dict = {
-                'event_type': class_name_to_event_type[type(item).__name__],
+                'event_type': class_name_to_event_type[
+                    item.__class__.__name__],
                 'version': item.exploration_version,
                 'state_name': item.state_name,
                 'id': item.id,
@@ -277,7 +278,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     stats_models.SolutionHitEventLogEntryModel,
                     stats_models.ExplorationActualStartEventLogEntryModel))):
             event_dict = {
-                'event_type': class_name_to_event_type[type(item).__name__],
+                'event_type': class_name_to_event_type[
+                    item.__class__.__name__],
                 'version': item.exp_version,
                 'state_name': item.state_name,
                 'id': item.id,

@@ -52,7 +52,6 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_model = user_models.UserQueryModel.get(query_id)
         user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)
-        query_criteria_satisfied = True
 
         if (user_id == query_model.submitter_id or
                 user_services.is_at_least_moderator(user_id)):
@@ -82,24 +81,25 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             else:
                 return
 
+        query_criteria_satisfied = True
         if query_model.created_at_least_n_exps is not None:
-            query_criteria_satisfied &= not (
-                len(user_contributions.created_exploration_ids) <
+            query_criteria_satisfied &= (
+                len(user_contributions.created_exploration_ids) >=
                 query_model.created_at_least_n_exps)
 
         if query_model.created_fewer_than_n_exps is not None:
-            query_criteria_satisfied &= not (
-                len(user_contributions.created_exploration_ids) >=
+            query_criteria_satisfied &= (
+                len(user_contributions.created_exploration_ids) <
                 query_model.created_fewer_than_n_exps)
 
         if query_model.edited_at_least_n_exps is not None:
-            query_criteria_satisfied &= not (
-                len(user_contributions.edited_exploration_ids) <
+            query_criteria_satisfied &= (
+                len(user_contributions.edited_exploration_ids) >=
                 query_model.edited_at_least_n_exps)
 
         if query_model.edited_fewer_than_n_exps is not None:
-            query_criteria_satisfied &= not (
-                len(user_contributions.edited_exploration_ids) >=
+            query_criteria_satisfied &= (
+                len(user_contributions.edited_exploration_ids) <
                 query_model.edited_fewer_than_n_exps)
 
         if not query_criteria_satisfied:

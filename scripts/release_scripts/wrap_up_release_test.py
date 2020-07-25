@@ -23,11 +23,10 @@ import getpass
 import os
 
 from core.tests import test_utils
+import github
 import release_constants
 from scripts import common
 from scripts.release_scripts import wrap_up_release
-
-import github  # isort:skip  pylint: disable=wrong-import-position
 
 
 class WrapReleaseTests(test_utils.GenericTestBase):

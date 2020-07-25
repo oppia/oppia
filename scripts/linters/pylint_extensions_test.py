@@ -2856,7 +2856,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
             pylint_extensions.SingleLinePragmaChecker)
         self.checker_test_object.setup_method()
 
-    def test_pragma_for_muliline(self):
+    def test_pragma_for_multiline(self):
         node_pragma_for_multiline = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -2890,8 +2890,8 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
             message1, message2):
             temp_file.close()
 
-    def test_enable_single_line_pragma_for_muliline(self):
-        node_enable_single_line_pragma_for_muliline = (
+    def test_enable_single_line_pragma_for_multiline(self):
+        node_enable_single_line_pragma_for_multiline = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
@@ -2907,11 +2907,11 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
                         pass
                     # pylint: enable=single-line-pragma
                 """)
-        node_enable_single_line_pragma_for_muliline.file = filename
-        node_enable_single_line_pragma_for_muliline.path = filename
+        node_enable_single_line_pragma_for_multiline.file = filename
+        node_enable_single_line_pragma_for_multiline.path = filename
 
         self.checker_test_object.checker.process_tokens(
-            utils.tokenize_module(node_enable_single_line_pragma_for_muliline))
+            utils.tokenize_module(node_enable_single_line_pragma_for_multiline))
 
         message = testutils.Message(
             msg_id='single-line-pragma',

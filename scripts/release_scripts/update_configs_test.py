@@ -24,11 +24,10 @@ import os
 import tempfile
 
 from core.tests import test_utils
+import github
 import python_utils
 from scripts import common
 from scripts.release_scripts import update_configs
-
-import github  # isort:skip  pylint: disable=wrong-import-position
 
 INVALID_FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',

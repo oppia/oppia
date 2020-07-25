@@ -27,14 +27,13 @@ import re
 import subprocess
 import time
 
-# Install third party libraries before importing other files.
+import python_utils
+
+from . import build
+from . import common
 from . import install_third_party_libs
+# Install third party libraries before importing other files.
 install_third_party_libs.main()
-
-import python_utils  # isort:skip  pylint: disable=wrong-import-position
-
-from . import build  # isort:skip  pylint: disable=wrong-import-position
-from . import common  # isort:skip  pylint: disable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser(description="""
 Run the script from the oppia root folder:
