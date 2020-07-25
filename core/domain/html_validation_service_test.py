@@ -1375,7 +1375,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaises(Exception)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception, 'No JSON object could be decoded')
 
         html_content = (
             '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'

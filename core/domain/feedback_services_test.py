@@ -80,9 +80,10 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         self.assertEqual(datastore_id, '%s.%s' % (thread_id, message_id))
 
     def test_create_message_fails_if_invalid_thread_id(self):
-        with self.assertRaises(
-            feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError
-            ):
+        with self.assertRaisesRegexp(
+            feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError,
+            'Entity for class GeneralFeedbackThreadModel with id '
+            'invalid_thread_id not found'):
             feedback_services.create_message(
                 'invalid_thread_id', self.user_id, None, None, 'Hello')
 
