@@ -1939,14 +1939,24 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         exp_domain.Exploration.from_untitled_yaml(
             'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: mapping '
+            'values are not allowed here'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: while '
+            'scanning a simple key'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'State1:\n(\nInvalid yaml')
 
@@ -8371,6 +8381,67 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
+
+
+class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
+
+    def test_create_html_math_rich_text_info(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.to_dict(), {
+                'exp_id': 'exp_id1',
+                'math_images_generation_required': True,
+                'latex_strings_without_svg': ['abc', 'x']
+            })
+
+    def test_validate_when_latex_strings_not_list(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected latex_strings to be a list, received '
+            'invalid_latex_format'):
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, 'invalid_latex_format')
+
+    def test_validate_when_each_latex_expressions_are_not_strings(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected each element in the list of latex strings to be a str, '
+            'received 3'):
+            exp_domain.ExplorationMathRichTextInfo('exp_id1', True, ['x^2', 3])
+
+    def test_validate_exp_id_is_string(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected exp_id to be a str, received 0'):
+            exp_domain.ExplorationMathRichTextInfo(0, True, ['x^2', 3])
+
+    def test_validate_math_images_generation_required_is_bool(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected math_images_generation_required to be an bool, '
+            'received invalid'):
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', 'invalid', ['x^2', 3])
+
+    def test_get_svg_size_in_bytes(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_svg_size_in_bytes(), 10000)
+
+    def test_get_longest_latex_expression(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_longest_latex_expression(),
+            'x^2 + 2ax')
 
 
 class HtmlCollectionTests(test_utils.GenericTestBase):

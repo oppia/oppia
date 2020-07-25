@@ -60,8 +60,6 @@ VALID_CONSTANT_OUTSIDE_CLASS_AJS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_constant_outside_class.constants.ajs.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
-INVALID_ANY_TYPE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_any_type.ts')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_COMPONENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_two_component.ts')
@@ -105,46 +103,16 @@ class JsTsLintTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_validate_and_parse_js_and_ts_files_with_exception(self):
-        def mock_parse_script(unused_file_content):
-            raise Exception()
+        def mock_parse_script(unused_file_content, comment):  # pylint: disable=unused-argument
+            raise Exception('Exception raised from parse_script()')
 
         esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
 
-        with self.print_swap, esprima_swap, self.assertRaises(Exception):
+        with self.print_swap, esprima_swap, self.assertRaisesRegexp(
+            Exception, r'Exception raised from parse_script\(\)'):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
-
-    def test_invalid_use_of_any_type(self):
-        def mock_compile_all_ts_files():
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_ANY_TYPE_FILEPATH)
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-        excluded_files_swap = self.swap(
-            js_ts_linter, 'FILES_EXCLUDED_FROM_ANY_TYPE_CHECK',
-            [VALID_TS_FILEPATH])
-
-        with self.print_swap, excluded_files_swap, compile_all_ts_files_swap:
-            js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_ANY_TYPE_FILEPATH, VALID_TS_FILEPATH], FILE_CACHE,
-                True).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        self.assert_same_list_elements([
-            '\'any\' type found at line 20. Please do not declare variable'
-            ' as \'any\' type'], self.linter_stdout)
-        self.assert_same_list_elements([
-            '\'any\' type found at line 22. Please do not declare variable'
-            ' as \'any\' type'], self.linter_stdout)
 
     def test_check_extra_js_file_found(self):
         def mock_readlines(unused_self, unused_filepath):
@@ -457,11 +425,11 @@ class JsTsLintTests(test_utils.GenericTestBase):
             ], self.linter_stdout)
 
     def test_third_party_linter_with_stderr(self):
-        with self.print_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, self.assertRaisesRegexp(
+            SystemExit, '1'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 INVALID_SORTED_DEPENDENCIES_FILEPATH,
                 True).perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_third_party_linter_with_invalid_eslint_path(self):
         def mock_exists(unused_path):
@@ -469,11 +437,11 @@ class JsTsLintTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with self.print_swap, exists_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, exists_swap, self.assertRaisesRegexp(
+            SystemExit, '1'):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_SORTED_DEPENDENCIES_FILEPATH],
                 True).perform_all_lint_checks()
-        self.assertEqual(e.exception.code, 1)
 
     def test_third_party_linter_with_success_message(self):
         with self.print_swap:
