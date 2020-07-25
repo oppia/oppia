@@ -1036,6 +1036,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_well_formed_one_line_yield_file.file = filename
         node_well_formed_one_line_yield_file.path = filename
+        node_well_formed_one_line_yield_file.fromlineno = 3
 
         self.checker_test_object.checker.visit_yield(
             node_well_formed_one_line_yield_file)
@@ -1058,6 +1059,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_well_formed_mult_lines_file.file = filename
         node_well_formed_mult_lines_file.path = filename
+        node_well_formed_mult_lines_file.fromlineno = 2
 
         self.checker_test_object.checker.visit_yield(
             node_well_formed_mult_lines_file)
@@ -1079,6 +1081,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         yield_nothing_file.file = filename
         yield_nothing_file.path = filename
+        yield_nothing_file.fromlineno = 2
 
         self.checker_test_object.checker.visit_yield(
             yield_nothing_file)
@@ -1137,6 +1140,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_too_many_spaces_after_yield_file.file = filename
         node_too_many_spaces_after_yield_file.path = filename
+        node_too_many_spaces_after_yield_file.fromlineno = 2
 
         self.checker_test_object.checker.visit_yield(
             node_too_many_spaces_after_yield_file)
@@ -1162,6 +1166,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_no_spaces_after_yield_file.file = filename
         node_no_spaces_after_yield_file.path = filename
+        node_no_spaces_after_yield_file.fromlineno = 2
 
         self.checker_test_object.checker.visit_yield(
             node_no_spaces_after_yield_file)
