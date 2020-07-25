@@ -180,8 +180,9 @@ describe('State Translation Editor Component', function() {
           }));
       });
 
-    it('should update state\'s recorded voiceovers after broadcasting' +
-      ' externalSave event when closing modal', function() {
+    it('should not update state\'s recorded voiceovers after broadcasting' +
+      ' externalSave when written translation doesn\'t need udpdate',
+    function() {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       stateWrittenTranslationsService.displayed = {
@@ -367,8 +368,7 @@ describe('State Translation Editor Component', function() {
         expect($scope.activeWrittenTranslation).toBe(null);
       });
 
-    it('should update state\'s recorded voiceovers after broadcasting' +
-      ' externalSave event when closing modal', function() {
+    it('should open translation editor when is editable', function() {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(

@@ -94,8 +94,8 @@ describe('Unresolved Answers Overview Component', function() {
       .not.toHaveBeenCalled();
   });
 
-  it('should check when unresolved answers overview are not shown because' +
-    ' there is no state foced to resolve', function() {
+  it('should check that unresolved answers overview are not shown because' +
+    ' the state is not forced to resolved unaddressed answers', function() {
     spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
     spyOn(
       improvementsService,
@@ -105,7 +105,7 @@ describe('Unresolved Answers Overview Component', function() {
     expect($scope.isUnresolvedAnswersOverviewShown()).toBe(false);
   });
 
-  it('should check when current interaction is trainable or not', function() {
+  it('should check if the current interaction is trainable or not', function() {
     stateInteractionIdService.init(stateName, 'CodeRepl');
     expect($scope.getCurrentInteractionId()).toBe('CodeRepl');
     expect($scope.isCurrentInteractionTrainable()).toBe(true);
@@ -115,7 +115,7 @@ describe('Unresolved Answers Overview Component', function() {
     expect($scope.isCurrentInteractionTrainable()).toBe(false);
   });
 
-  it('should check when current interaction is linear or not', function() {
+  it('should check if the current interaction is linear or not', function() {
     stateInteractionIdService.init(stateName, 'Continue');
     expect($scope.getCurrentInteractionId()).toBe('Continue');
     expect($scope.isCurrentInteractionLinear()).toBe(true);

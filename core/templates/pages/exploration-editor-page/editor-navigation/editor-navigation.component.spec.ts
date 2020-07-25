@@ -223,19 +223,19 @@ describe('Editor Navigation Component', function() {
         .toBe(false);
     });
 
-  it('should change isScreenLarge variable to false when resizing page',
-    function() {
-      widthSpy.and.returnValue(768);
+  it('should hide post tutorial help popover when resizing page to less than' +
+    ' 1024px', function() {
+    widthSpy.and.returnValue(768);
 
-      expect($scope.isPostTutorialHelpPopoverShown())
-        .toBe(false);
+    expect($scope.isPostTutorialHelpPopoverShown())
+      .toBe(false);
 
-      window.dispatchEvent(new Event('resize'));
-      $rootScope.$broadcast('openPostTutorialHelpPopover');
+    window.dispatchEvent(new Event('resize'));
+    $rootScope.$broadcast('openPostTutorialHelpPopover');
 
-      expect($scope.isPostTutorialHelpPopoverShown())
-        .toBe(false);
-    });
+    expect($scope.isPostTutorialHelpPopoverShown())
+      .toBe(false);
+  });
 
   it('should unsubscribe resize subscription on destroy hook', function() {
     expect(ctrl.resizeSubscription.closed).toBe(false);
