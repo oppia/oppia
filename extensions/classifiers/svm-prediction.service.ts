@@ -39,7 +39,7 @@ export class SVMPredictionService {
   constructor(
       private predictionResultObjectFactory: PredictionResultObjectFactory) {}
   kernel(
-      kernelParams: IKernelParams, supportVectors: Array<number[]>,
+      kernelParams: KernelParams, supportVectors: Array<number[]>,
       input: number[]): number[] {
     var kernel = kernelParams.kernel;
     var kvalues = [];
@@ -154,7 +154,7 @@ export class SVMPredictionService {
   }
 
   predict(
-      classifierData: ISVM, input: number[]): PredictionResult {
+      classifierData: SVM, input: number[]): PredictionResult {
     var nSupport = classifierData.n_support;
     var supportVectors = classifierData.support_vectors;
     var dualCoef = classifierData.dual_coef;
