@@ -71,8 +71,9 @@ def install_hook():
         # file instead of the .py file.
         this_file = __file__.replace('pyc', 'py')
         # If its a broken symlink, delete it.
-        if os.path.islink(pre_commit_file) and (
-            not os.path.exists(pre_commit_file)):
+        is_link = os.path.islink(pre_commit_file)
+        exists = os.path.exists(pre_commit_file)
+        if is_link and not exists:
             os.unlink(pre_commit_file)
             python_utils.PRINT('Removing broken symlink')
         try:
