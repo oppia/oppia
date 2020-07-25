@@ -1,5 +1,5 @@
 <a *ngIf="isUsernameLinkable(username)" [href]="'/profile/' + username">
-  <img [src]="getSanitizedUrl(profilePicture)" alt="User Avatar" class="rounded-circle">
+  <img [src]="profilePicture | safe:'url'" alt="User Avatar" class="rounded-circle">
 </a>
 
-<img *ngIf="!isUsernameLinkable(username)" [src]="getSanitizedUrl(profilePicture)" alt="">
+<img *ngIf="!isUsernameLinkable(username)" [src]="profilePicture | safe:'url'" alt="">

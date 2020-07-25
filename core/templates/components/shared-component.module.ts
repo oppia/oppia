@@ -31,6 +31,7 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SafePipe } from 'filters/safe-pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { SharingLinksComponent } from
@@ -53,7 +54,7 @@ import { CircularImageComponent } from
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule],
   declarations: [BackgroundBannerComponent, TranslatePipe,
-    SharingLinksComponent, ExplorationEmbedButtonModalComponent,
+    SafePipe, SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent, CircularImageComponent,
@@ -66,7 +67,7 @@ import { CircularImageComponent } from
     ExplorationEmbedButtonModalComponent,
   ],
   exports: [
-    BackgroundBannerComponent, TranslatePipe,
+    BackgroundBannerComponent, TranslatePipe, SafePipe,
     SharingLinksComponent, MaterialModule, ExplorationSummaryTileDirective
   ],
 })

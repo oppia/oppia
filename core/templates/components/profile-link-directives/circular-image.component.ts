@@ -18,7 +18,6 @@
 
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'circular-image',
@@ -28,13 +27,7 @@ import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
 export class CircularImageComponent {
   @Input() src: string;
   @Input() link?: string;
-  constructor(
-    private sanitizer: DomSanitizer
-  ) {}
-
-  getSanitizedUrl(url: string): SafeUrl {
-    return this.sanitizer.bypassSecurityTrustUrl(url);
-  }
+  constructor( ) {}
 
   isLinkAvailable() {
     return this.link ? true : false;

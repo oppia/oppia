@@ -1,5 +1,5 @@
 <a *ngIf="isLinkAvailable()" [href]="link">
-  <img [src]="getSanitizedUrl(src)" alt="" class="rounded-circle">
+  <img [src]="src | safe:'url'" alt="" class="rounded-circle">
 </a>
 
-<img *ngIf="!isLinkAvailable()" class="rounded-circle" [src]="getSanitizedUrl(src)">
+<img *ngIf="!isLinkAvailable()" class="rounded-circle" [src]="src | safe:'url'">
