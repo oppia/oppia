@@ -22,7 +22,7 @@ require('pages/OppiaFooterDirective.ts');
 
 require('services/bottom-navbar-status.service.ts');
 require('services/contextual/url.service.ts');
-require('services/KeyboardShortcutService.ts');
+require('services/keyboard-shortcut.service.ts');
 require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
