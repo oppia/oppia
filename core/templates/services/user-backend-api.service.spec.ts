@@ -66,7 +66,7 @@ describe('User Backend Api Service', () => {
       () =>{
         return new Promise((resolve, reject) => {
           resolve('sample-csrf-token');
-        })
+        });
       });
   });
 
@@ -241,7 +241,7 @@ describe('User Backend Api Service', () => {
       req2.flush(404);
 
       flushMicrotasks();
-  }));
+    }));
 
   it('should return the default profile image path when user is not logged',
     fakeAsync(() => {

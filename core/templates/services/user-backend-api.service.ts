@@ -73,7 +73,7 @@ export class UserBackendApiService {
 
     private PREFERENCES_DATA_URL = '/preferenceshandler/data';
     private USER_COMMUNITY_RIGHTS_DATA_URL = '/usercommunityrightsdatahandler';
-    
+
     private userCommunityRightsInfo = null;
     private userInfo = null;
 
@@ -125,7 +125,7 @@ export class UserBackendApiService {
         });
     }
     setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
+        newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
       const profileImageUpdateUrlData = {
         update_type: 'profile_picture_data_url',
         data: newProfileImageDataUrl
