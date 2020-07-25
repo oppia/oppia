@@ -993,6 +993,40 @@ def get_filename_with_dimensions(old_filename, exp_id):
     return new_filename
 
 
+def validate_svg_filenames_in_math_rich_text(
+        entity_type, entity_id, html_string):
+    """Validates the SVG filenames for each math rich-text components and
+    returns a list of all invalid math tags in the given HTML.
+
+    Args:
+        entity_type: str. The type of the entity.
+        entity_id: str. The ID of the entity.
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of invalid math tags in the HTML string.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    error_list = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        svg_filename = (
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+        if svg_filename == '':
+            error_list.append(python_utils.UNICODE(math_tag))
+        else:
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(
+                file_system_class(entity_type, entity_id))
+            filepath = 'image/%s' % svg_filename
+            if not fs.isfile(filepath.encode('utf-8')):
+                error_list.append(python_utils.UNICODE(math_tag))
+    return error_list
+
+
 def get_invalid_svg_tags_and_attrs(svg_string):
     """Returns a set of all invalid tags and attributes for the provided SVG.
 

@@ -440,9 +440,10 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks the html content of an exploration and validates all the
-    Math tags in the HTML.
+class ExplorationMathSvgFilenameValidationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates the
+    svg_filename fields in each math rich-text components.
     """
 
     @classmethod
@@ -461,7 +462,9 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for state_name, state in exploration.states.items():
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
-                html_validation_service.validate_math_tags_in_html(html_string))
+                html_validation_service.
+                validate_svg_filenames_in_math_rich_text(
+                    feconf.ENTITY_TYPE_EXPLORATION, item.id, html_string))
             if len(error_list) > 0:
                 key = (
                     'exp_id: %s, exp_status: %s failed validation.' % (

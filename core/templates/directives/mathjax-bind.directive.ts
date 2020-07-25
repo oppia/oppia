@@ -33,10 +33,7 @@ angular.module('oppia').directive('mathjaxBind', [function() {
             ).html(value === undefined ? '' : value);
             $element.html('');
             $element.append($script);
-            // @ts-ignore
-            let html = MathJax.tex2svg(value);
-            var svg = html.getElementsByTagName('svg')[0].outerHTML;
-            $element.append(svg);
+            MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
           });
         };
       }

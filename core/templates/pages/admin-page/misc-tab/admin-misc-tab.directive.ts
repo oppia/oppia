@@ -167,55 +167,88 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
-        var convertLatexToSvgFile = function(latexValue) {
-          // @ts-ignore
-          let html = MathJax.tex2svg(latexValue);
-          var svg = html.getElementsByTagName('svg')[0].outerHTML;
-          var cleanedSvgString = (
-            ImageUploadHelperService.cleanMathExpressionSvgString(
-              svg));
-          var dimensions = (
-            ImageUploadHelperService.
-              extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
-          var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
-          var invalidTagsAndAttributes = (
-            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
-          var tags = invalidTagsAndAttributes.tags;
-          var attrs = invalidTagsAndAttributes.attrs;
-          if (tags.length === 0 && attrs.length === 0) {
-            var resampledFile = (
-              ImageUploadHelperService.convertImageDataToImageFile(dataURI));
-            var date = new Date();
-            var now = date.getTime();
-            // This is temporary Id will be used for adding and retrieving the
-            // raw image for each LaTeX string from the request body. For more
-            // details refer to the docstring in sendMathSvgsToBackend() in
-            // AdminBackendApiService.
-            var latexId = (
-              now.toString(36).substr(2, 6) +
-              Math.random().toString(36).substr(4));
-            return ({
-              file: resampledFile,
-              dimensions: dimensions,
-              latexId: latexId
+        var convertLatexToSvgString = function(inputLatexString) {
+          return new Promise((resolve, reject) => {
+            var emptyDiv = document.createElement('div');
+            var outputElement = angular.element(emptyDiv);
+            // We need to append the element with a script tag so that Mathjax
+            // can typeset and convert this element. The typesetting is not
+            // possible if we don't add a script tag. The code below is similar
+            // to how the math equations are rendered in the mathjaxBind
+            // directive (see mathjax-bind.directive.ts).
+            var $script = angular.element(
+              '<script type="math/tex">'
+            ).html(inputLatexString === undefined ? '' : inputLatexString);
+            outputElement.html('');
+            outputElement.append($script);
+            // Naturally MathJax works asynchronously, but we can add processes
+            // which we want to happen synchronously into the MathJax Hub Queue.
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
+            MathJax.Hub.Queue(function() {
+              if (
+                outputElement[0].getElementsByTagName('svg')[0] !== (
+                  undefined)) {
+                var svgString = (
+                  outputElement[0].getElementsByTagName('svg')[0].outerHTML);
+                resolve(svgString);
+              }
             });
-          } else {
-            AlertsService.addWarning('SVG failed validation.');
-          }
+          });
+        };
+        var convertLatexToSvgFile = async function(latexValue) {
+          let html = await convertLatexToSvgString(latexValue);
+          return new Promise((resolve, reject) => {
+            var cleanedSvgString = (
+              ImageUploadHelperService.cleanMathExpressionSvgString(
+                html));
+            var dimensions = (
+              ImageUploadHelperService.
+                extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
+            var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
+            var invalidTagsAndAttributes = (
+              ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+            var tags = invalidTagsAndAttributes.tags;
+            var attrs = invalidTagsAndAttributes.attrs;
+            if (tags.length === 0 && attrs.length === 0) {
+              var resampledFile = (
+                ImageUploadHelperService.convertImageDataToImageFile(dataURI));
+              var date = new Date();
+              var now = date.getTime();
+              // This is temporary Id will be used for adding and retrieving the
+              // raw image for each LaTeX string from the request body. For more
+              // details refer to the docstring in sendMathSvgsToBackend() in
+              // AdminBackendApiService.
+              var latexId = (
+                now.toString(36).substr(2, 6) +
+                Math.random().toString(36).substr(4));
+              resolve ({
+                file: resampledFile,
+                dimensions: dimensions,
+                latexId: latexId
+              });
+            } else {
+              AlertsService.addWarning('SVG failed validation.');
+            }
+          });
         };
         var latexMapping = {};
+        var expIdToLatexMapping = null;
+        ctrl.generateSVG = async function() {
+          for (var expId in expIdToLatexMapping) {
+            var latexValues = expIdToLatexMapping[expId];
+            latexMapping[expId] = {};
+            for (var i = 0; i < latexValues.length; i++) {
+              var svgFile = await convertLatexToSvgFile(latexValues[i]);
+              latexMapping[expId][latexValues[i]] = svgFile;
+            }
+            ctrl.setStatusMessage('Latex values Generated.');
+          }
+        };
         ctrl.generateSvgsForExplorations = function() {
           $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
             function(response) {
-              for (var expId in response.data.result) {
-                var latexValues = response.data.result[expId];
-                latexMapping[expId] = {};
-                for (var i = 0; i < latexValues.length; i++) {
-                  var svgFile = convertLatexToSvgFile(latexValues[i]);
-                  latexMapping[expId][latexValues[i]] = svgFile;
-                }
-              }
-              ctrl.setStatusMessage('Latex values loaded.');
+              expIdToLatexMapping = response.data.result;
+              ctrl.setStatusMessage('Latex values Fetched.');
             });
         };
         ctrl.saveSvgsToBackend = function() {

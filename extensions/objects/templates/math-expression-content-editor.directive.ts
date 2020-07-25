@@ -41,9 +41,29 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controller: ['$scope', function($scope) {
         var ctrl = this;
         var convertLatexStringToSvg = function(inputLatexString) {
-          // @ts-ignore
-          let html = MathJax.tex2svg(inputLatexString);
-          ctrl.svgString = html.getElementsByTagName('svg')[0].outerHTML;
+          var emptyDiv = document.createElement('div');
+          var outputElement = angular.element(emptyDiv);
+          // We need to append the element with a script tag so that Mathjax
+          // can typeset and convert this element. The typesetting is not
+          // possible if we don't add a script tag. The code below is similar
+          // to how the math equations are rendered in the mathjaxBind
+          // directive (see mathjax-bind.directive.ts).
+          var $script = angular.element(
+            '<script type="math/tex">'
+          ).html(inputLatexString === undefined ? '' : inputLatexString);
+          outputElement.html('');
+          outputElement.append($script);
+          // Naturally MathJax works asynchronously, but we can add processes
+          // which we want to happen synchronously into the MathJax Hub Queue.
+          MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
+          MathJax.Hub.Queue(function() {
+            if (outputElement[0].getElementsByTagName('svg')[0] !== undefined) {
+              ctrl.svgString = (
+                outputElement[0].getElementsByTagName('svg')[0].outerHTML);
+            }
+            ctrl.value.mathExpressionSvgIsBeingProcessed = false;
+            $scope.$apply();
+          });
         };
         // This method cleans the SVG string and generates a filename before
         // the SVG can be saved to the backend in the RteHelperModalController.
@@ -99,6 +119,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
 
           if (ctrl.alwaysEditable) {
             $scope.$watch('$ctrl.localValue.label', function(newValue) {
+              ctrl.value.mathExpressionSvgIsBeingProcessed = true;
               ctrl.value.raw_latex = newValue;
               convertLatexStringToSvg(ctrl.localValue.label);
             });
