@@ -17,7 +17,7 @@
  */
 import 'mousetrap';
 
-import { KeyboardShortcutService } from 'services/KeyboardShortcutService';
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
 describe('KeyboardShortcutService', () => {
   jasmine.getEnv().allowRespy(true);

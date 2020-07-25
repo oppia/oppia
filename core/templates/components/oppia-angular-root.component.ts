@@ -327,7 +327,7 @@ import { JobDataObjectFactory } from
 import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
 import { KeyboardShortcutService } from
-  'services/KeyboardShortcutService.ts';
+  'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
