@@ -23,145 +23,162 @@ import {WindowRef} from 'services/contextual/window-ref.service.ts';
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 
 @Injectable({providedIn: 'root'})
-export class CommandExecutorService{
+export class CommandExecutorService {
   private commandToFunctionMap = {
-    'CONTINUE': this.continueClick,
-    'ENTER_TEXT_NUMBER_UNITS' : this.fillTextBox,
-    'ADD_SET' : this.addSet,
-    'REMOVE_SET' : this.removeSet,
-    'ENTER_FRACTION' : this.enterFraction,
-    'SELECT_ITEM_BULLET' : this.selectItemBullet,
-    'SUBMIT' : this.submit,
-    'HOST_NAME' : this.setHostname
-  } //add more command/function pairs as we develop
+    CONTINUE: this.continueClick,
+    ENTER_TEXT_NUMBER_UNITS: this.fillTextBox,
+    ADD_SET: this.addSet,
+    REMOVE_SET: this.removeSet,
+    ENTER_FRACTION: this.enterFraction,
+    SELECT_ITEM_BULLET: this.selectItemBullet,
+    SUBMIT: this.submit,
+    HOST_NAME: this.setHostname
+  }; 
   setElementsOnPage = 0;
-  hostname = ''
-  cachedOuterFrameMessage = ''
+  hostname = '';
+  cachedOuterFrameMessage = '';
   constructor(private windowRef: WindowRef) {
-    this.getOuterFrameEvents(windowRef)
+    this.getOuterFrameEvents(windowRef);
   }
-  
+
   getOuterFrameEvents(windowRef) {
     windowRef.nativeWindow.addEventListener('message', (event) => {
-      var messageArray = event.data.split(" ");
+      var messageArray = event.data.split(' ');
       var command = messageArray[0];
 
       var message = '';
       for (var i = 1; i < messageArray.length; i++) {
-        message = message + messageArray[i] + ' '
+        message = message + messageArray[i] + ' ';
       }
-      message = message.substr(0, message.length-1)
-     if (command == 'CONTINUE' || command == 'SUBMIT') {
-            this.commandToFunctionMap[command](windowRef)
-        } else {
-          this.commandToFunctionMap[command](windowRef, message)
-        }
-    })
+      message = message.substr(0, message.length - 1);
+      if (command === 'CONTINUE' || command === 'SUBMIT') {
+        this.commandToFunctionMap[command](windowRef);
+      } else {
+        this.commandToFunctionMap[command](windowRef, message);
+      }
+    });
   }
 
   sendStateToOuterFrame(id) {
     var stateToCommand = {
-      'Continue' : 'CONTINUE',
-      'FractionInput' : 'ENTER_FRACTION',
-      'ItemSelectionInput' : 'SELECT_ITEM_CHECKPOINT',
-      'MultipleChoiceInput' : 'SELECT_ITEM_BULLET',
-      'NumberWithUnits' : 'ENTER_TEXT_NUMBER_UNITS',
-      'NumericExpressionInput' : 'ENTER_TEXT_NUMBER_UNITS',
-      'SetInput' : 'SET_OPERATION',
-      'TextInput' : 'ENTER_TEXT_NUMBER_UNITS',
-      default: ''
-    }
+      Continue: 'CONTINUE',
+      FractionInput: 'ENTER_FRACTION',
+      ItemSelectionInput: 'SELECT_ITEM_CHECKPOINT',
+      MultipleChoiceInput: 'SELECT_ITEM_BULLET',
+      NumberWithUnits: 'ENTER_TEXT_NUMBER_UNITS',
+      NumericExpressionInput: 'ENTER_TEXT_NUMBER_UNITS',
+      SetInput: 'SET_OPERATION',
+      TextInput: 'ENTER_TEXT_NUMBER_UNITS',
+      'default': ''
+    };
     this.setElementsOnPage = 0
-    if (stateToCommand[id] == '') {
-      return
+    if (stateToCommand[id] === '') {
+      return;
     }
-    if (this.hostname == '') {
-      this.cachedOuterFrameMessage = stateToCommand[id]
+    if (this.hostname === '') {
+      this.cachedOuterFrameMessage = stateToCommand[id];
     } else {
-      this.windowRef.nativeWindow.parent.postMessage(stateToCommand[id], this.hostname)
+      this.windowRef.nativeWindow.parent.postMessage(stateToCommand[id], 
+        this.hostname)
     }
   }
 
   setHostname(windowRef, hostname) {
     this.hostname = hostname;
-    if (this.cachedOuterFrameMessage != '') {
-      windowRef.nativeWindow.parent.postMessage(this.cachedOuterFrameMessage, this.hostname)
+    if (this.cachedOuterFrameMessage !== '') {
+      windowRef.nativeWindow.parent.postMessage(this.cachedOuterFrameMessage, 
+        this.hostname);
     }
   }
-   
+
   continueClick(windowRef) {
-    //select DOM element for continue, and click this element. 
     try {
-      var button = windowRef.nativeWindow.document.getElementsByClassName("oppia-learner-confirm-button protractor-test-continue-button md-button md-ink-ripple")[0] as HTMLElement
-      button.click()
+      var button = windowRef.nativeWindow.document.getElementsByClassName(
+        'oppia-learner-confirm-button protractor-test-continue-button \
+        md-button md-ink-ripple')[0] as HTMLElement;
+      button.click();
     } catch {
-      var button = windowRef.nativeWindow.document.getElementsByClassName("protractor-test-next-card-button")[0] as HTMLElement
-      button.click()
+      var button = windowRef.nativeWindow.document.getElementsByClassName(
+        'protractor-test-next-card-button')[0] as HTMLElement;
+      button.click();
     }
     this.setElementsOnPage = 0
   }
 
   fillTextBox(windowRef, text) {
-    var box = windowRef.nativeWindow.document.getElementsByClassName('form-control ng-pristine ng-untouched ng-valid ng-empty')[0]
+    var box = windowRef.nativeWindow.document.getElementsByClassName(
+      'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
     box.value = text;
     var evt = document.createEvent("HTMLEvents"); 
-    evt.initEvent("change", false, true); // adding this created a magic and passes it as if keypressed
+    evt.initEvent("change", false, true); 
     box.dispatchEvent(evt);
-    var button = windowRef.nativeWindow.document.getElementsByClassName('oppia-learner-confirm-button protractor-test-submit-answer-button md-button md-ink-ripple')[0] as HTMLElement
-    button.click()
+    var button = windowRef.nativeWindow.document.getElementsByClassName(
+      'oppia-learner-confirm-button protractor-test-submit-answer-button \
+      md-button md-ink-ripple')[0] as HTMLElement;
+    button.click();
   }
 
   addSet(windowRef, elements) {
     for (var i = 0; i < elements.length; i++) {
       var box;
       if (this.setElementsOnPage === 0) {
-        var box = windowRef.nativeWindow.document.getElementsByClassName('form-control ng-pristine ng-untouched ng-valid ng-empty')[0]
-        box.value = elements[i]
-        this.setElementsOnPage += 1
-      } else {
-        var addButton = windowRef.nativeWindow.document.getElementsByClassName('btn btn-secondary btn-sm protractor-test-add-list-entry')[this.setElementsOnPage-1] as HTMLElement
-        addButton.click()
+        var box = windowRef.nativeWindow.document.getElementsByClassName(
+          'form-control ng-pristine ng-untouched ng-valid ng-empty')[0]
+        box.value = elements[i];
         this.setElementsOnPage += 1;
-        var box = windowRef.nativeWindow.document.getElementsByClassName('form-control ng-pristine ng-untouched ng-valid ng-empty')[0]
-        box.value = elements[i]
+      } else {
+        var addButton = windowRef.nativeWindow.document.getElementsByClassName(
+          'btn btn-secondary btn-sm protractor-test-add-list-entry')
+          [this.setElementsOnPage-1] as HTMLElement;
+        addButton.click();
+        this.setElementsOnPage += 1;
+        var box = windowRef.nativeWindow.document.getElementsByClassName(
+          'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
+        box.value = elements[i];
 
       }
       var evt = document.createEvent("HTMLEvents"); 
-      evt.initEvent("change", false, true); // adding this created a magic and passes it as if keypressed
+      evt.initEvent("change", false, true); 
       box.dispatchEvent(evt);
     }
   }
 
   removeSet(windowRef, element) {
-    var boxes = windowRef.nativeWindow.document.getElementsByClassName('form-control ng-pristine ng-untouched ng-valid ng-empty')
+    var boxes = windowRef.nativeWindow.document.getElementsByClassName(
+      'form-control ng-pristine ng-untouched ng-valid ng-empty');
     for (var i = 0; i < boxes.length; i++) {
       if (boxes[i].value == element) {
-        var deleteButton = windowRef.nativeWindow.document.getElementsByClassName('material-icons md-18')
-        deleteButton[i].click()
+        var deleteButton = windowRef.nativeWindow.document.getElementsByClassName(
+          'material-icons md-18');
+        deleteButton[i].click();
       }
     }
     this.setElementsOnPage -= 1;
   }
 
   enterFraction(windowRef, fraction) {
-    var fractionBox = windowRef.nativeWindow.document.getElementsByClassName('form-control ng-pristine ng-untouched ng-valid ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty')[0]
-    fractionBox.value = fraction
+    var fractionBox = windowRef.nativeWindow.document.getElementsByClassName(
+      'form-control ng-pristine ng-untouched ng-valid \
+      ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty')[0];
+    fractionBox.value = fraction;
   }
 
   submit(windowRef) {
-    var button = windowRef.nativeWindow.document.getElementsByClassName('oppia-learner-confirm-button protractor-test-submit-answer-button md-button md-ink-ripple')[0] as HTMLElement
-    button.click()
-    this.setElementsOnPage = 0
+    var button = windowRef.nativeWindow.document.getElementsByClassName(
+      'oppia-learner-confirm-button protractor-test-submit-answer-button \
+      md-button md-ink-ripple')[0] as HTMLElement;
+    button.click();
+    this.setElementsOnPage = 0;
   }
 
   selectItemBullet(windowRef, message) {
     message = Number(message)
-    var button = windowRef.nativeWindow.document.getElementsByClassName("multiple-choice-outer-radio-button")[message-1] as HTMLElement
-    button.click()
+    var button = windowRef.nativeWindow.document.getElementsByClassName(
+      "multiple-choice-outer-radio-button")[message-1] as HTMLElement;
+    button.click();
   }
 }
 
 angular.module('oppia').factory(
   'CommandExecutorService',
   downgradeInjectable(CommandExecutorService));
-  
