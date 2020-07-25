@@ -46,6 +46,7 @@ export class StoryDomainConstants {
   public static STORY_PROPERTY_LANGUAGE_CODE = 'language_code';
 
   public static INITIAL_NODE_ID = 'initial_node_id';
+  public static NODE = 'node';
 
   public static STORY_NODE_PROPERTY_TITLE = 'title';
   public static STORY_NODE_PROPERTY_DESCRIPTION = 'description';
