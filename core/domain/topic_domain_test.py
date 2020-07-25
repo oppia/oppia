@@ -1305,6 +1305,14 @@ class TopicSummaryTests(test_utils.GenericTestBase):
                 'received \'-1\'')):
             self.topic_summary.validate()
 
+    def test_topic_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        topic during export and import.
+        """
+        topic_dict = self.topic.to_dict()
+        topic_from_dict = topic_domain.Topic.from_dict(topic_dict)
+        self.assertEqual(topic_from_dict.to_dict(), topic_dict)
+
 
 class TopicRightsTests(test_utils.GenericTestBase):
 

@@ -548,6 +548,47 @@ class Topic(python_utils.OBJECT):
         }
 
     @classmethod
+    def from_dict(
+        cls, topic_dict, topic_created_on=None, topic_last_updated=None):
+        """Returns a Topic domain object from a dict.
+
+        Args:
+            topic_dict: dict. The dict representation of Topic
+                object.
+            topic_created_on: datetime.datetime. Date and time when the
+                topic is created.
+            topic_last_updated: datetime.datetime. Date and time when the
+                topic was last updated.
+
+        Returns:
+            Topic. The corresponding Topic domain object.
+        """
+        topic = cls(
+            topic_dict['id'], topic_dict['name'],
+            topic_dict['abbreviated_name'], topic_dict['thumbnail_filename'],
+            topic_dict['thumbnail_bg_color'], topic_dict['description'],
+            [
+                StoryReference.from_dict(reference_dict)
+                for reference_dict in topic_dict['canonical_story_references']
+            ],
+            [
+                StoryReference.from_dict(reference_dict)
+                for reference_dict in topic_dict['additional_story_references']
+            ],
+            topic_dict['uncategorized_skill_ids'],
+            [
+                Subtopic.from_dict(subtopic_dict)
+                for subtopic_dict in topic_dict['subtopics']
+            ],
+            topic_dict['subtopic_schema_version'],
+            topic_dict['next_subtopic_id'],
+            topic_dict['language_code'], topic_dict['version'],
+            topic_dict['story_reference_schema_version'], topic_created_on,
+            topic_last_updated)
+
+        return topic
+
+    @classmethod
     def require_valid_topic_id(cls, topic_id):
         """Checks whether the topic id is a valid one.
 
