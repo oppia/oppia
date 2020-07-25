@@ -13,19 +13,27 @@
 # limitations under the License.
 
 """Script for running backend tests in parallel.
+
 This should not be run directly. Instead, navigate to the oppia/ folder and
 execute:
+
     python -m scripts.run_backend_tests
+
 You can also append the following options to the above command:
+
     --verbose prints the output of the tests to the console.
+
     --test_target=core.controllers.editor_test runs only the tests in the
         core.controllers.editor_test module. (You can change
         "core.controllers.editor_test" to any valid module path.)
+
     --test_path=core/controllers runs all tests in test files in the
         core/controllers directory. (You can change "core/controllers" to any
         valid subdirectory path.)
+
     --generate_coverage_report generates a coverage report as part of the final
         test output (but it makes the tests slower).
+
 Note: If you've made some changes and tests are failing to run at all, this
 might mean that you have introduced a circular dependency (e.g. module A
 imports module B, which imports module C, which imports module A). This needs
@@ -128,6 +136,7 @@ _PARSER.add_argument(
 
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """Runs a shell command and captures the stdout and stderr output.
+
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
@@ -180,9 +189,11 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     """
     def _get_test_target_classes(path):
         """Returns a list of all test classes in a given test file path.
+
         Args:
             path: str. The path of the test file from which all test classes
                 are to be extracted.
+
         Returns:
             list. A list of all test classes in a given test file path.
         """

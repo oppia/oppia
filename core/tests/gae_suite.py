@@ -13,9 +13,12 @@
 # limitations under the License.
 
 """Oppia test suite.
+
 In general, this script should not be run directly. Instead, invoke
 it from the command line by running
+
     python -m scripts.run_backend_tests
+
 from the oppia/ root folder.
 """
 
