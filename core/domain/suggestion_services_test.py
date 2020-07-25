@@ -713,8 +713,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.category = 'Algebra'
 
         def get_content_html(self, state_name, content_id):
+            """Used to mock the get_content_html method for explorations."""
             return '<p>Content html for test.</p>'
-        
+
     # All mock explorations created for testing.
     explorations = [
         MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
@@ -830,7 +831,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'State 1',
+            'state_name': 'state_1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>Content html for test.</p>',
@@ -854,13 +855,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # exploration id found.
         self.assertEqual(
             len(suggestion_services.get_translation_suggestions_with_exp_ids(
-            [self.target_id_1])), 1)
-        
+                [self.target_id_1])), 1)
+
     def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
-        self):
+            self):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'State 1',
+            'state_name': 'state_1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>Content html for test.</p>',
@@ -896,24 +897,24 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Assert that there are two translation suggestions with the given
         # exploration ids found.
         self.assertEqual(
-        len(suggestion_services.get_translation_suggestions_with_exp_ids(
-        [self.target_id_2, self.target_id_3])), 2)
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [self.target_id_2, self.target_id_3])), 2)
 
     def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
-        self):
+            self):
         # Assert that there are no translation suggestions with an invalid
         # exploration id found.
         self.assertEqual(
             len(suggestion_services.get_translation_suggestions_with_exp_ids(
-            ['invalid_exp_id'])), 0)
-    
+                ['invalid_exp_id'])), 0)
+
     def test_get_translation_suggestions_with_exp_ids_with_empty_exp_list(
-        self):
+            self):
         # Assert that there are no translation suggestions found when we
         # use an empty exp_ids list.
         self.assertEqual(
             len(suggestion_services.get_translation_suggestions_with_exp_ids(
-            [])), 0)
+                [])), 0)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         suggestion_services.create_new_user_contribution_scoring_model(
@@ -1093,8 +1094,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             exp_id, 1, author_id, add_translation_change_dict,
             'test description')
-    
-    def assertCreatedSuggestionIsValid(self, target_id, author_id):
+
+    def assert_created_suggestion_is_valid(self, target_id, author_id):
         """Assert that the created suggestion is in review and that only one
         suggestion with the given target_id and author_id exists.
         """
@@ -1207,7 +1208,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
-        self.assertCreatedSuggestionIsValid(skill_id, self.author_id)
+        self.assert_created_suggestion_is_valid(skill_id, self.author_id)
 
         skill_services.delete_skill(self.author_id, skill_id)
 
@@ -1221,7 +1222,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_delete_topic_rejects_translation_suggestion(self):
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id)
-        self.assertCreatedSuggestionIsValid(self.EXP_ID, self.author_id)
+        self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
 
         topic_services.delete_topic(self.author_id, self.TOPIC_ID)
 

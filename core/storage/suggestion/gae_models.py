@@ -248,10 +248,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
             correspond to the given exploration ids, up to a maximum of
             feconf.DEFAULT_QUERY_LIMIT suggestions.
         """
-        return (cls.get_all()
+        return (
+            cls.get_all()
             .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id.IN(exp_ids))
-            .fetch(feconf.DEFAULT_QUERY_LIMIT))
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+            )
 
 
     @classmethod
