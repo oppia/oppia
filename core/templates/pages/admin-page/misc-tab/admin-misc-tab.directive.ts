@@ -168,6 +168,7 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         var convertLatexToSvgFile = function(latexValue) {
+          // @ts-ignore
           let html = MathJax.tex2svg(latexValue);
           var svg = html.getElementsByTagName('svg')[0].outerHTML;
           var cleanedSvgString = (

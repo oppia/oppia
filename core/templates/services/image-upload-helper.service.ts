@@ -153,7 +153,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             if (styleValue) {
               dimensions.verticalPadding = styleValue[0].replace('.', 'd');
             } else {
-              dimensions.verticalPadding = 0;
+              dimensions.verticalPadding = '0';
             }
           }
         });

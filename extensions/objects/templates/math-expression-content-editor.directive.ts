@@ -41,6 +41,7 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controller: ['$scope', function($scope) {
         var ctrl = this;
         var convertLatexStringToSvg = function(inputLatexString) {
+          // @ts-ignore
           let html = MathJax.tex2svg(inputLatexString);
           ctrl.svgString = html.getElementsByTagName('svg')[0].outerHTML;
         };
