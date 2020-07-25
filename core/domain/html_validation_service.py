@@ -891,14 +891,17 @@ def generate_math_svgs_filename(height, width, vertical_padding):
     return filename
 
 
-def add_svg_filenames_for_latex_strings_in_html_string(image_data, html_string):
+def add_svg_filenames_for_latex_strings_in_html_string(
+        raw_latex_to_dimensions_dict, html_string):
     """Adds the filenames for math rich-text components with empty svg_filename
     field based on the given images data.
 
     Args:
-        image_data: dict. The dictionary having all the image data like latex
-            value and dimensions which will be used for generating and assigning
-            filenames.
+        raw_latex_to_dimensions_dict: dict. The dictionary having the dimensions
+            for each LaTeX string which will be used for generating and
+            assigning filenames. The image data has key as the raw_latex string
+            and value for each key, has the dimensions for the corresponding key
+            (raw_latex).
         html_string: str. HTML string to modify.
 
     Returns:
@@ -916,7 +919,7 @@ def add_svg_filenames_for_latex_strings_in_html_string(image_data, html_string):
         svg_filename = (
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
-            dimensions = image_data[raw_latex]['dimensions']
+            dimensions = raw_latex_to_dimensions_dict[raw_latex]['dimensions']
             filename = (
                 generate_math_svgs_filename(
                     dimensions['height'], dimensions['width'],
@@ -931,7 +934,7 @@ def add_svg_filenames_for_latex_strings_in_html_string(image_data, html_string):
                 escape_html(
                     json.dumps(normalized_math_content_dict, sort_keys=True)))
 
-    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+    return python_utils.UNICODE(soup)
 
 
 def extract_svg_filename_latex_mapping_in_math_rte_components(html_string):
@@ -942,7 +945,8 @@ def extract_svg_filename_latex_mapping_in_math_rte_components(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        list(tuple(str, str)).
+        list(tuple(str, str)). A list whose each element is a tuple, having the
+        filename and its corresponding raw_latex string.
     """
 
     soup = bs4.BeautifulSoup(
@@ -958,7 +962,6 @@ def extract_svg_filename_latex_mapping_in_math_rte_components(html_string):
                 objects.UnicodeString.normalize(svg_filename))
             normalized_raw_latex = (
                 objects.UnicodeString.normalize(math_content_dict['raw_latex']))
-
             filenames_mapping.append(
                 (normalized_svg_filename, normalized_raw_latex))
     return filenames_mapping

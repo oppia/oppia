@@ -138,6 +138,15 @@ export class AdminBackendApiService {
     let body = new FormData();
     for (var expId in latexToSvgMapping) {
       for (var latexValue in latexToSvgMapping[expId]) {
+        // We need to append each file to the body with the key as the temporary
+        // latexId. In the backend, the image for each LaTeX string will be
+        // retrieved from the request body using this latexId. We cannot
+        // directly append the LaTeX strings in the request body as a key for
+        // file, because the LaTeX strings won't be always encoded properly
+        // this happens especially when the LaTeX strings has multiple back
+        // slashes. This problem of improper encoding doesn't happend if we
+        // add the LaTeX strings and its latexId in the payload and use latexId
+        // as a key for adding and retrieving raw images from the request body.
         body.set(
           latexToSvgMapping[expId][latexValue].latexId,
           latexToSvgMapping[expId][latexValue].file);

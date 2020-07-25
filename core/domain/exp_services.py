@@ -1801,12 +1801,14 @@ def save_multi_exploration_math_rich_text_info_model(
         exploration_math_rich_text_info_models)
 
 
-def generate_html_change_list_for_state(state_name, state_dict, old_state_dict):
-    """Returns the change lists for all the html fields in the state dict.
+def generate_html_change_list_for_state(
+        state_name, new_state_dict, old_state_dict):
+    """Returns the change lists for all the html fields in a converted state
+    dict by comparing it with the corresponding old state dict.
 
     Args:
         state_name: str. The name of the state.
-        state_dict: dict. The dict representation of the nenw State object.
+        new_state_dict: dict. The dict representation of the nenw State object.
         old_state_dict: dict. The dict representation of the old State object
 
     Returns:
@@ -1816,46 +1818,46 @@ def generate_html_change_list_for_state(state_name, state_dict, old_state_dict):
     change_lists = []
     property_name_to_new_value_mapping = []
     if old_state_dict['interaction']['customization_args'] != (
-            state_dict['interaction']['customization_args']):
+            new_state_dict['interaction']['customization_args']):
         property_name_to_new_value_mapping.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                state_dict['interaction']['customization_args']))
+                new_state_dict['interaction']['customization_args']))
     if old_state_dict['content'] != (
-            state_dict['content']):
+            new_state_dict['content']):
         property_name_to_new_value_mapping.append(
-            (exp_domain.STATE_PROPERTY_CONTENT, state_dict['content']))
+            (exp_domain.STATE_PROPERTY_CONTENT, new_state_dict['content']))
 
     if old_state_dict['written_translations'] != (
-            state_dict['written_translations']):
+            new_state_dict['written_translations']):
         property_name_to_new_value_mapping.append(
             (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
-                state_dict['written_translations']))
+                new_state_dict['written_translations']))
     if old_state_dict['interaction']['default_outcome'] != (
-            state_dict['interaction']['default_outcome']):
+            new_state_dict['interaction']['default_outcome']):
         property_name_to_new_value_mapping.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                state_dict['interaction']['default_outcome']))
+                new_state_dict['interaction']['default_outcome']))
     if old_state_dict['interaction']['hints'] != (
-            state_dict['interaction']['hints']):
+            new_state_dict['interaction']['hints']):
         property_name_to_new_value_mapping.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                state_dict['interaction']['hints']))
+                new_state_dict['interaction']['hints']))
     if old_state_dict['interaction']['solution'] != (
-            state_dict['interaction']['solution']):
+            new_state_dict['interaction']['solution']):
         property_name_to_new_value_mapping.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                state_dict['interaction']['solution']))
+                new_state_dict['interaction']['solution']))
     if old_state_dict['interaction']['answer_groups'] != (
-            state_dict['interaction']['answer_groups']):
+            new_state_dict['interaction']['answer_groups']):
         property_name_to_new_value_mapping.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-                state_dict['interaction']['answer_groups']))
+                new_state_dict['interaction']['answer_groups']))
 
     for property_name, new_value in property_name_to_new_value_mapping:
         change_lists.append(
@@ -1869,7 +1871,8 @@ def generate_html_change_list_for_state(state_name, state_dict, old_state_dict):
 
 
 def get_latex_strings_and_exp_ids_for_generating_svgs():
-    """Returns the change lists for all the html fields in the state dict.
+    """Returns a batch of LaTeX strings from explorations which have LaTeX
+    strings without SVGs.
 
     Returns:
         dict(str, list). The dict having each key as an exp_id and value
@@ -1901,15 +1904,27 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
             filenames.
         user_id: str. The ID of the commiter.
         exp_id: str. The ID of the exploration to update.
+
+    Raises:
+        Exception: If any of the SVG images provided fail validation.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     html_strings_after_conversion = ''
     change_lists = []
+    # Create a dict with dimensions for each LaTeX string. This dict will be
+    # used for generating a filename for each raw_latex string in the HTML.
+    raw_latex_to_dimensions_dict = {}
+    for raw_latex, raw_latex_dict in image_data.items():
+        raw_latex_to_dimensions_dict[raw_latex] = {}
+        raw_latex_to_dimensions_dict[raw_latex]['dimensions'] = (
+            raw_latex_dict['dimensions'])
+
     for state_name, state in exploration.states.items():
         add_svg_filenames_for_latex_strings_in_html_string = (
             functools.partial(
                 html_validation_service.
-                add_svg_filenames_for_latex_strings_in_html_string, image_data))
+                add_svg_filenames_for_latex_strings_in_html_string,
+                raw_latex_to_dimensions_dict))
         old_state_dict = copy.deepcopy(state.to_dict())
         converted_state_dict = (
             state_domain.State.convert_html_fields_in_state(

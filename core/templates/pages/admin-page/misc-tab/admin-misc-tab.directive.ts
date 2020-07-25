@@ -186,6 +186,10 @@ angular.module('oppia').directive('adminMiscTab', [
               ImageUploadHelperService.convertImageDataToImageFile(dataURI));
             var date = new Date();
             var now = date.getTime();
+            // This is temporary Id will be used for adding and retrieving the
+            // raw image for each LaTeX string from the request body. For more
+            // details refer to the docstring in sendMathSvgsToBackend() in
+            // AdminBackendApiService.
             var latexId = (
               now.toString(36).substr(2, 6) +
               Math.random().toString(36).substr(4));
