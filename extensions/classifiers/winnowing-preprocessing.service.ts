@@ -24,7 +24,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ITokenToId {
+export interface TokenToId {
   [x: string]: number;
 }
 
@@ -32,7 +32,7 @@ export interface ITokenToId {
   providedIn: 'root'
 })
 export class WinnowingPreprocessingService {
-  static generateHashValue(tokens: string[], tokenToId: ITokenToId): number {
+  static generateHashValue(tokens: string[], tokenToId: TokenToId): number {
     var hashVal = 0;
     var n = tokens.length - 1;
     var base = Math.pow(Object.keys(tokenToId).length, n);
@@ -46,7 +46,7 @@ export class WinnowingPreprocessingService {
   }
 
   getKGramHashes(
-      tokens: string[], tokenToId: ITokenToId, K: number): number[] {
+      tokens: string[], tokenToId: TokenToId, K: number): number[] {
     // Generate all possible k-gram hashes from tokens.
     var kGramHashes = [];
     var kTokens;

@@ -704,7 +704,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
              '--capabilities.maxInstances=3'], result)
 
     def test_get_parameter_for_negative_sharding_instances(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError, 'Sharding instance should be larger than 0'):
             run_e2e_tests.get_parameter_for_sharding(-3)
 
     def test_get_parameter_for_dev_mode(self):

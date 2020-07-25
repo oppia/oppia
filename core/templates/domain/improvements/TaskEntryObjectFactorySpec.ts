@@ -19,7 +19,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ITaskEntryBackendDict, TaskEntry, TaskEntryObjectFactory } from
+import { TaskEntryBackendDict, TaskEntry, TaskEntryObjectFactory } from
   'domain/improvements/TaskEntryObjectFactory';
 
 describe('Task entry', function() {
@@ -30,7 +30,7 @@ describe('Task entry', function() {
   });
 
   it('should use same values from backend dict', () => {
-    const taskBackendDict: ITaskEntryBackendDict = {
+    const taskBackendDict: TaskEntryBackendDict = {
       entity_type: 'exploration',
       entity_id: 'eid',
       entity_version: 1,

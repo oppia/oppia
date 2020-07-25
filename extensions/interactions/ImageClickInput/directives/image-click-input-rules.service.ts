@@ -19,15 +19,15 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IImageClickAnswer } from 'interactions/answer-defs';
-import { IImageClickRuleInputs } from 'interactions/rule-input-defs';
+import { ImageClickAnswer } from 'interactions/answer-defs';
+import { ImageClickRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageClickInputRulesService {
   IsInRegion(
-      answer: IImageClickAnswer, inputs: IImageClickRuleInputs): boolean {
+      answer: ImageClickAnswer, inputs: ImageClickRuleInputs): boolean {
     return answer.clickedRegions.indexOf(inputs.x) !== -1;
   }
 }
