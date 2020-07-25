@@ -44,6 +44,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
             $scope, $uibModal, AlertsService, UndoRedoService,
             SkillEditorStateService, SkillEditorRoutingService) {
           var ctrl = this;
+          var ACTIVE_TAB_EDITOR = 'Editor';
+          var ACTIVE_TAB_QUESTIONS = 'Questions';
+          var ACTIVE_TAB_PREVIEW = 'Preview';
           $scope.getActiveTabName = function() {
             return SkillEditorRoutingService.getActiveTabName();
           };
@@ -96,11 +99,11 @@ angular.module('oppia').directive('skillEditorNavbar', [
             $scope.showNavigationOptions = !$scope.showNavigationOptions;
           };
           $scope.selectMainTab = function() {
-            $scope.activeTab = 'Editor';
+            $scope.activeTab = ACTIVE_TAB_EDITOR;
             SkillEditorRoutingService.navigateToMainTab();
           };
           $scope.selectPreviewTab = function() {
-            $scope.activeTab = 'Preview';
+            $scope.activeTab = ACTIVE_TAB_PREVIEW;
             SkillEditorRoutingService.navigateToPreviewTab();
           };
           $scope.toggleSkillEditOptions = function() {
@@ -125,13 +128,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 // No further action is needed.
               });
             } else {
-              $scope.activeTab = 'Questions';
+              $scope.activeTab = ACTIVE_TAB_QUESTIONS;
               SkillEditorRoutingService.navigateToQuestionsTab();
             }
           };
 
           ctrl.$onInit = function() {
-            $scope.activeTab = 'Editor';
+            $scope.activeTab = ACTIVE_TAB_EDITOR;
             ctrl.skill = SkillEditorStateService.getSkill();
           };
         }]
