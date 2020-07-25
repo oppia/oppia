@@ -20,7 +20,7 @@ import { async, TestBed } from '@angular/core/testing';
 import { SafePipe } from 'filters/safe-pipe';
 import { DomSanitizer } from '@angular/platform-browser';
 
-fdescribe('Safe pipe', () => {
+describe('Safe pipe', () => {
   let pipe: SafePipe;
   let sanitizer: DomSanitizer;
 
