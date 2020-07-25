@@ -40,7 +40,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('User Backend Api Service', () => {
+describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService = null;
   let urlInterpolationService: UrlInterpolationService = null;
   let userInfoObjectFactory: UserInfoObjectFactory = null;
