@@ -2143,10 +2143,15 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # A dict mapping model IDs to pseudonymous user IDs. For each activity,
+    # A dict mapping model IDs to pseudonymous user IDs. Each typeof activity
+    # isgrouped under different key (story, skill, question). For each activity,
     # we use a different pseudonymous user ID. Note that all these pseudonymous
     # user IDs originate from the same about-to-be-deleted user.
-    model_mappings = ndb.JsonProperty(default={})
+    # Example structure: {
+    #   'skill': {'skill_id': 'pseudo_user_id_1'},
+    #   'story': {'story_id': 'pseudo_user_id_2'}
+    # }
+    activity_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():

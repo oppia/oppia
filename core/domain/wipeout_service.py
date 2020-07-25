@@ -156,6 +156,9 @@ def delete_user(pending_deletion_request):
     """
     _delete_user_models(pending_deletion_request.user_id)
     _hard_delete_explorations_and_collections(pending_deletion_request)
+    _delete_improvements_models(pending_deletion_request.user_id)
+    _delete_question_models(pending_deletion_request)
+    _delete_skill_models(pending_deletion_request)
     _delete_story_models(pending_deletion_request)
 
 
@@ -171,7 +174,8 @@ def verify_user_deleted(pending_deletion_request):
         bool. True if all the models were correctly deleted, False otherwise.
     """
     return _verify_models_deleted(pending_deletion_request.user_id, [
-        models.NAMES.question, models.NAMES.story, models.NAMES.user
+        models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+        models.NAMES.story, models.NAMES.user
     ])
 
 
@@ -253,8 +257,8 @@ def _delete_question_models(pending_deletion_request):
             list(commit_log_ids - question_ids))
 
     question_ids |= commit_log_ids
-    if not pending_deletion_request.activity_mappings['question']:
-        pending_deletion_request.activity_mappings['question'] = (
+    if models.NAMES.question not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[models.NAMES.question] = (
             _generate_activity_to_pseudonymized_ids_mapping(question_ids))
         save_pending_deletion_request(pending_deletion_request)
 
@@ -281,7 +285,8 @@ def _delete_question_models(pending_deletion_request):
             commit_log_model.user_id = pseudonymized_user_id
         question_models.QuestionCommitLogEntryModel.put_multi(commit_log_models)
 
-    question_mappings = pending_deletion_request.activity_mappings['question']
+    question_mappings = (
+        pending_deletion_request.activity_mappings[models.NAMES.question])
     for question_id, pseudonymized_user_id in question_mappings.items():
         question_related_models = [
             model for model in metadata_models
@@ -316,18 +321,18 @@ def _delete_skill_models(pending_deletion_request):
     commit_log_models = skill_models.SkillCommitLogEntryModel.query(
         skill_models.SkillCommitLogEntryModel.user_id == user_id
     ).fetch()
-    commit_log_ids = set(model.story_id for model in commit_log_models)
+    commit_log_ids = set(model.skill_id for model in commit_log_models)
     if skill_ids != commit_log_ids:
         logging.error(
-            'The commit log and snapshot story IDs differ. '
+            'The commit log and snapshot skill IDs differ. '
             'Snapshots without commit logs: %s, '
             'Commit logs without snapshots: %s.',
             list(skill_ids - commit_log_ids),
             list(commit_log_ids - skill_ids))
 
     skill_ids |= commit_log_ids
-    if not pending_deletion_request.activity_mappings['skill']:
-        pending_deletion_request.activity_mappings['skill'] = (
+    if models.NAMES.skill not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[models.NAMES.skill] = (
             _generate_activity_to_pseudonymized_ids_mapping(skill_ids))
         save_pending_deletion_request(pending_deletion_request)
 
@@ -354,7 +359,8 @@ def _delete_skill_models(pending_deletion_request):
             commit_log_model.user_id = pseudonymized_user_id
         skill_models.SkillCommitLogEntryModel.put_multi(commit_log_models)
 
-    skill_mappings = pending_deletion_request.activity_mappings['skill']
+    skill_mappings = (
+        pending_deletion_request.activity_mappings[models.NAMES.skill])
     for skill_id, pseudonymized_user_id in skill_mappings.items():
         skill_related_models = [
             model for model in metadata_models
@@ -396,8 +402,8 @@ def _delete_story_models(pending_deletion_request):
             list(commit_log_ids - story_ids))
 
     story_ids |= commit_log_ids
-    if not pending_deletion_request.activity_mappings['story']:
-        pending_deletion_request.activity_mappings['story'] = (
+    if models.NAMES.story not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[models.NAMES.story] = (
             _generate_activity_to_pseudonymized_ids_mapping(story_ids))
         save_pending_deletion_request(pending_deletion_request)
 
@@ -424,7 +430,8 @@ def _delete_story_models(pending_deletion_request):
             commit_log_model.user_id = pseudonymized_user_id
         story_models.StoryCommitLogEntryModel.put_multi(commit_log_models)
 
-    story_mappings = pending_deletion_request.activity_mappings['story']
+    story_mappings = (
+        pending_deletion_request.activity_mappings[models.NAMES.story])
     for story_id, pseudonymized_user_id in story_mappings.items():
         story_related_models = [
             model for model in metadata_models
@@ -466,9 +473,15 @@ def _verify_models_deleted(user_id, model_categories):
     """
     for model_class in models.Registry.get_storage_model_classes(
             model_categories):
-        if (model_class.get_deletion_policy() not in
+        try:
+            if (
+                model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE] and
-                model_class.has_reference_to_user_id(user_id)):
-            return False
+                model_class.has_reference_to_user_id(user_id)
+            ):
+                print(model_class.__name__)
+                return False
+        except NotImplementedError:
+            continue
     return True
