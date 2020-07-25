@@ -26,44 +26,28 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
 
+  var triggerKeys = async function(key) {
+    await browser.actions().sendKeys(protractor.Key.chord(protractor.Key.CONTROL, key)).perform();
+    await waitFor.pageToFullyLoad();
+  }
+
   var testNavigationShortcuts = async function(url) {
     await browser.get(url);
     await waitFor.pageToFullyLoad();
-    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('0').perform();
-    await waitFor.pageToFullyLoad();
-    browser.navigate().back();
-    await waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toEqual('get-started');
-    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('1').perform();
-    await waitFor.pageToFullyLoad();
-    browser.navigate().back();
-    await waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toEqual('community-library');
-    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('2').perform();
-    await waitFor.pageToFullyLoad();
-    browser.navigate().back();
-    await waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toEqual('learner-dashboard');
-    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('3').perform();
-    await waitFor.pageToFullyLoad();
-    browser.navigate().back();
-    await waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toEqual('creator-dashboard');
-    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('4').perform();
-    await waitFor.pageToFullyLoad();
-    browser.navigate().back();
-    await waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toEqual('/');
-    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('5').perform();
-    await waitFor.pageToFullyLoad();
-    browser.navigate().back();
-    await waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toEqual('notifications');
-    await browser.actions().keyDown(protractor.Key.CONTROL).sendKeys('6').perform();
-    await waitFor.pageToFullyLoad();
-    browser.navigate().back();
-    await waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toEqual('preferences');
+    await triggerKeys('0');
+    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/get-started');
+    await triggerKeys('1');
+    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/community-library');
+    await triggerKeys('2');
+    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/learner-dashboard');
+    await triggerKeys('3');
+    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/creator-dashboard');
+    await triggerKeys('4');
+    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/about');
+    await triggerKeys('5');
+    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/notifications');
+    await triggerKeys('6');
+    expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/preferences');
   }
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
@@ -83,8 +67,6 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should test navigation shortcuts for static webpages',
   async function() {
-    // browser.ignoreSynchronization = true;
-    // await browser.waitForAngularEnabled(false);
     // Should Create a user and login.
     await users.createUser('user11@accessibility.com', 'user11accessibility');
     await users.login('user11@accessibility.com', true);
@@ -93,7 +75,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     await testNavigationShortcuts('community-library');
     await testNavigationShortcuts('creator-dashboard');
     await testNavigationShortcuts('get-started');
-    await testNavigationShortcuts('/');
+    await testNavigationShortcuts('about');
     await testNavigationShortcuts('privacy-policy');
     await testNavigationShortcuts('donate');
     await testNavigationShortcuts('preferences');

@@ -24,6 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
+
   bindExplorationPlayerShortcuts() {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
@@ -65,33 +66,37 @@ export class KeyboardShortcutService {
     });
   }
 
+  setHref(Href) {
+    window.location.href = Href;
+  }
+
   bindNavigationShortcuts() {
-    Mousetrap.bind('ctrl+0', function() {
-      window.location.href = '/get-started';
+    Mousetrap.bind('ctrl+0', () => {
+      this.setHref('/get-started');
     });
 
-    Mousetrap.bind('ctrl+1', function() {
-      window.location.href = '/community-library';
+    Mousetrap.bind('ctrl+1', () => {
+      this.setHref('/community-library');
     });
 
-    Mousetrap.bind('ctrl+2', function() {
-      window.location.href = '/learner-dashboard';
+    Mousetrap.bind('ctrl+2', () => {
+      this.setHref('/learner-dashboard');
     });
 
-    Mousetrap.bind('ctrl+3', function() {
-      window.location.href = '/creator-dashboard';
+    Mousetrap.bind('ctrl+3', () => {
+      this.setHref('/creator-dashboard');
     });
 
-    Mousetrap.bind('ctrl+4', function() {
-      window.location.href = '/';
+    Mousetrap.bind('ctrl+4', () => {
+      this.setHref('/about');
     });
 
-    Mousetrap.bind('ctrl+5', function() {
-      window.location.href = '/notifications';
+    Mousetrap.bind('ctrl+5', () => {
+      this.setHref('/notifications');
     });
 
-    Mousetrap.bind('ctrl+6', function() {
-      window.location.href = '/preferences';
+    Mousetrap.bind('ctrl+6', () => {
+      this.setHref('/preferences');
     });
   }
 }
