@@ -294,6 +294,46 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
                 queries)), 1)
 
+    def test_get_translation_suggestions_with_exp_ids(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_8')
+
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['exp'])), 0)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['exp2'])), 2)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['exp1'])), 1)
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['exp2', 'exp1'])), 3)
+
     def test_get_all_stale_suggestions(self):
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):

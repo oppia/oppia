@@ -1761,3 +1761,37 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def save_multi_exploration_math_rich_text_info_model(
+        exploration_math_rich_text_info_list):
+    """Saves multiple instances of ExplorationMathRichTextInfoModel to the
+    datastore.
+
+    Args:
+        exploration_math_rich_text_info_list:
+        list(ExplorationMathRichTextInfoModel). A list of
+            ExplorationMathRichTextInfoModel domain objects.
+    """
+
+    exploration_math_rich_text_info_models = []
+    for exploration_math_rich_text_info in (
+            exploration_math_rich_text_info_list):
+        latex_strings_without_svg = (
+            exploration_math_rich_text_info.latex_strings_without_svg)
+        math_images_generation_required = (
+            exploration_math_rich_text_info.math_images_generation_required)
+        exp_id = (
+            exploration_math_rich_text_info.exp_id)
+        estimated_max_size_of_images_in_bytes = (
+            exploration_math_rich_text_info.get_svg_size_in_bytes())
+        exploration_math_rich_text_info_models.append(
+            exp_models.ExplorationMathRichTextInfoModel(
+                id=exp_id,
+                math_images_generation_required=math_images_generation_required,
+                latex_strings_without_svg=latex_strings_without_svg,
+                estimated_max_size_of_images_in_bytes=(
+                    estimated_max_size_of_images_in_bytes)))
+
+    exp_models.ExplorationMathRichTextInfoModel.put_multi(
+        exploration_math_rich_text_info_models)

@@ -601,6 +601,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id)
         suggestion_services.reject_suggestion(
             suggestion, self.reviewer_id, 'reject review message')
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
         suggestion_services.resubmit_rejected_suggestion(
             suggestion, 'resubmit summary message', self.author_id)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -694,7 +696,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'state_name': 'state_1',
         'new_value': 'new suggestion content'
     }
-
 
     AUTHOR_EMAIL_1 = 'author1@example.com'
     REVIEWER_EMAIL_1 = 'reviewer1@example.com'
@@ -1005,6 +1006,29 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
 
+    def test_get_translation_suggestions_with_exp_ids(self):
+        # Create translation suggestion associated with the exploration
+        # that was created during set up.
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
+
+        # Create another exploration.
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'exp2', self.editor_id, ['State 1', 'State 2'],
+            ['TextInput'], category='Algebra')
+
+        self.create_translation_suggestion_associated_with_exp(
+            'exp2', self.author_id)
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [self.EXP_ID])), 1)
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                ['bad_exp_id'])), 0)
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                ['exp2', self.EXP_ID])), 2)
+
     def test_create_and_accept_suggestion(self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -1054,6 +1078,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             exploration.states['State 1'].content.html,
             '<p>old content</p>')
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
     def test_create_and_accept_suggestion_with_message(self):

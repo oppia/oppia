@@ -298,6 +298,7 @@
 /core/templates/domain/improvements/ @seanlip
 /core/templates/pages/exploration-editor-page/improvements-tab/ @seanlip
 /core/templates/pages/exploration-editor-page/statistics-tab/ @seanlip
+/core/templates/services/exploration-improvements.service*.ts @seanlip
 /core/templates/services/exploration-improvements-backend-api.service*.ts @seanlip
 /core/templates/services/exploration-improvements-task-registry.service*.ts @seanlip
 /core/templates/services/exploration-stats.service*.ts @seanlip
@@ -567,6 +568,12 @@
 
 /core/templates/services/services.constants.ajs.ts @vojtechjelinek
 /core/templates/services/services.constants.ts @vojtechjelinek
+
+
+# Dynamic Feature Gating project
+/core/storage/config/ @BenHenning @vinitamurthi
+/core/domain/platform_parameter_domain*.py @BenHenning @vinitamurthi
+
 
 # Frontend unit tests
 /core/templates/**/*.spec.ts @nithusha21
