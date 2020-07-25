@@ -906,6 +906,33 @@ class Story(python_utils.OBJECT):
         }
 
     @classmethod
+    def from_dict(
+        cls, story_dict, story_created_on=None, story_last_updated=None):
+        """Returns a Story domain object from a dict.
+        Args:
+            story_dict: dict. The dict representation of Story
+                object.
+            story_version: int. The version of the story.
+            story_created_on: datetime.datetime. Date and time when the
+                story is created.
+            story_last_updated: datetime.datetime. Date and time when the
+                story was last updated.
+
+        Returns:
+            Story. The corresponding Story domain object.
+        """
+        story = cls(
+            story_dict['id'], story_dict['title'],
+            story_dict['thumbnail_filename'], story_dict['thumbnail_bg_color'],
+            story_dict['description'], story_dict['notes'],
+            StoryContents.from_dict(story_dict['story_contents']),
+            story_dict['story_contents_schema_version'],
+            story_dict['language_code'], story_dict['corresponding_topic_id'],
+            story_dict['version'], story_created_on, story_last_updated)
+
+        return story
+
+    @classmethod
     def create_default_story(cls, story_id, title, corresponding_topic_id):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
