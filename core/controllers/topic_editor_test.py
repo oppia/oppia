@@ -29,6 +29,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -161,15 +162,15 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         }
 
         with python_utils.open_file(
-                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-                mode='rb', encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            mode='rb', encoding=None) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
             csrf_token=csrf_token,
-            upload_files=(('image', 'unused_filename', raw_image),)
-        )
+            upload_files=(('image', 'unused_filename', raw_image),))
+
         story_id = json_response['storyId']
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
