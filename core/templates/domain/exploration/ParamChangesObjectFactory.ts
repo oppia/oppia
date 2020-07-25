@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
-  IParamChangeBackendDict,
+  ParamChangeBackendDict,
   ParamChange,
   ParamChangeObjectFactory
 } from 'domain/exploration/ParamChangeObjectFactory.ts';
@@ -32,7 +32,7 @@ import {
 export class ParamChangesObjectFactory {
   constructor(private paramChangeObjectFactory: ParamChangeObjectFactory) {}
   createFromBackendList(
-      paramChangeBackendList: IParamChangeBackendDict[]): ParamChange[] {
+      paramChangeBackendList: ParamChangeBackendDict[]): ParamChange[] {
     return paramChangeBackendList.map((paramChangeBackendDict) => {
       return this.paramChangeObjectFactory.createFromBackendDict(
         paramChangeBackendDict);

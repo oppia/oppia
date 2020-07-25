@@ -26,7 +26,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CollectionRights, CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
-import { ICollectionRightsBackendDict } from
+import { CollectionRightsBackendDict } from
   'domain/collection/CollectionRightsObjectFactory';
 
 @Injectable({
@@ -43,14 +43,14 @@ export class CollectionRightsBackendApiService {
 
   private _fetchCollectionRights(collectionId: string,
       successCallback: (value?: CollectionRights) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: string) => void): void {
     let collectionRightsUrl = this.urlInterpolationService
       .interpolateUrl(
         CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE, {
           collection_id: collectionId
         });
 
-    this.http.get<ICollectionRightsBackendDict>(collectionRightsUrl).toPromise()
+    this.http.get<CollectionRightsBackendDict>(collectionRightsUrl).toPromise()
       .then(response => {
         if (successCallback) {
           successCallback(
@@ -70,7 +70,7 @@ export class CollectionRightsBackendApiService {
       collectionVersion: number,
       isPublic: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: Object) => void): void {
     let collectionPublishUrl = this.urlInterpolationService
       .interpolateUrl('/collection_editor_handler/publish/<collection_id>', {
         collection_id: collectionId
@@ -88,20 +88,21 @@ export class CollectionRightsBackendApiService {
     let requestUrl = (
       isPublic ? collectionPublishUrl : collectionUnpublishUrl);
 
-    this.http.put(requestUrl, putParams).toPromise().then((response: any) => {
-      let collectionRights =
-        this.collectionRightsObjectFactory.create(response);
-      this.collectionRightsCache[collectionId] = collectionRights;
+    this.http.put<CollectionRightsBackendDict>(requestUrl, putParams)
+      .toPromise().then(response => {
+        let collectionRights =
+          this.collectionRightsObjectFactory.create(response);
+        this.collectionRightsCache[collectionId] = collectionRights;
 
-      if (successCallback) {
-        successCallback(collectionRights);
-      }
-    },
-    (error) => {
-      if (errorCallback) {
-        errorCallback(error);
-      }
-    });
+        if (successCallback) {
+          successCallback(collectionRights);
+        }
+      },
+      (error) => {
+        if (errorCallback) {
+          errorCallback(error);
+        }
+      });
   }
 
   private _isCached(collectionId: string): boolean {

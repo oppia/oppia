@@ -44,7 +44,8 @@ describe('Select Skill Modal Controller', function() {
       allowSkillsFromOtherTopics: allowSkillsFromOtherTopics,
       categorizedSkills: categorizedSkills,
       skillsInSameTopicCount: skillsInSameTopicCount,
-      sortedSkillSummaries: sortedSkillSummaries
+      sortedSkillSummaries: sortedSkillSummaries,
+      untriagedSkillSummaries: []
     });
   }));
 

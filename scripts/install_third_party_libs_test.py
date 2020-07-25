@@ -127,7 +127,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_exception_handling(self):
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesRegexp(
+            Exception, 'Error installing package') as context:
             install_third_party_libs.pip_install('package', 'version', 'path')
         self.assertTrue('Error installing package' in context.exception)
 
@@ -138,7 +139,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaises(Exception):
+                with self.assertRaisesRegexp(
+                    ImportError, 'Error importing pip: No module named pip'):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
         finally:
@@ -155,7 +157,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaises(Exception):
+                with self.assertRaisesRegexp(
+                    Exception, 'Error importing pip: No module named pip'):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
         finally:
@@ -171,7 +174,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         try:
             sys.modules['pip'] = None
             with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaises(Exception):
+                with self.assertRaisesRegexp(
+                    Exception, 'Error importing pip: No module named pip'):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
         finally:
