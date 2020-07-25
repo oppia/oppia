@@ -125,6 +125,15 @@ describe('Story contents object factory', () => {
     ]);
   });
 
+  it('should correctly correctly validate the case where the story graph is' +
+    ' disconnected.', () => {
+    _sampleStoryContents.addNode('Title 3');
+    expect(_sampleStoryContents.validate()).toEqual([
+      'There is no way to get to the chapter with title Title 3 from any ' +
+      'other chapter'
+    ]);
+  });
+
   it('should correctly throw error when node id is invalid for any function',
     () => {
       expect(() => {
