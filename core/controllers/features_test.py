@@ -74,23 +74,3 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
         self.assertFalse(json_response['is_exploration_whitelisted'])
-
-
-class ExplorationImprovementsTabFeatureTest(ExplorationFeaturesTestBase):
-    """Tests for fetching whether the improvements tab is enabled."""
-
-    def test_improvements_tab_is_enabled(self):
-        self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=True)
-
-        json_response = self.get_json(exploration_features_url(self.EXP_ID))
-
-        self.assertTrue(json_response['is_improvements_tab_enabled'])
-
-    def test_improvements_tab_is_disabled(self):
-        self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=False)
-
-        json_response = self.get_json(exploration_features_url(self.EXP_ID))
-
-        self.assertFalse(json_response['is_improvements_tab_enabled'])
