@@ -71,6 +71,14 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             None, False, ['skill_id_2']
         )
 
+    def test_skill_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        skill during export and import.
+        """
+        skill_dict = self.skill.to_dict()
+        skill_from_dict = skill_domain.Skill.from_dict(skill_dict)
+        self.assertEqual(skill_from_dict.to_dict(), skill_dict)
+
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the skill passes strict validation."""
         with self.assertRaisesRegexp(

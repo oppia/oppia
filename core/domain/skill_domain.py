@@ -768,6 +768,33 @@ class Skill(python_utils.OBJECT):
         }
 
     @classmethod
+    def from_dict(
+        cls, skill_dict, skill_created_on=None,
+        skill_last_updated=None):
+        skill = cls(
+            skill_dict['id'], skill_dict['description'],
+            [
+                Misconception.from_dict(misconception_dict)
+                for misconception_dict in skill_dict['misconceptions']
+            ],
+            [
+                Rubric.from_dict(rubric_dict)
+                for rubric_dict in skill_dict['rubrics']
+            ],
+            SkillContents.from_dict(
+                skill_dict['skill_contents']),
+            skill_dict['misconceptions_schema_version'],
+            skill_dict['rubric_schema_version'],
+            skill_dict['skill_contents_schema_version'],
+            skill_dict['language_code'], skill_dict['version'],
+            skill_dict['next_misconception_id'],
+            skill_dict['superseding_skill_id'],
+            skill_dict['all_questions_merged'],
+            skill_dict['prerequisite_skill_ids'], skill_created_on,
+            skill_last_updated)
+        return skill
+
+    @classmethod
     def create_default_skill(cls, skill_id, description, rubrics):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
