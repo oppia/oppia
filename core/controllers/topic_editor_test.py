@@ -177,6 +177,30 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
 
+    def test_story_creation_fails_with_invalid_image(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'cafe.flac',
+            'thumbnailBgColor': '#F8BF74'
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'], 'Image exceeds file size limit of 100 KB.')
+
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
