@@ -42,7 +42,7 @@ export class PlayerPositionService {
 
   /**
    * Get the name of the current state.
-   * @return {object} a string that shows the name of the current state.
+   * @return {string} a string that shows the name of the current state.
    * @throws Will throw error if the index of card
    *  is out of the range of the transcript.
    */
