@@ -32,7 +32,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import collections
-import errno
 import os
 import pprint
 import shutil
