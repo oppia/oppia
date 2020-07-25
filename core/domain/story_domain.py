@@ -909,10 +909,10 @@ class Story(python_utils.OBJECT):
     def from_dict(
         cls, story_dict, story_created_on=None, story_last_updated=None):
         """Returns a Story domain object from a dict.
+
         Args:
             story_dict: dict. The dict representation of Story
                 object.
-            story_version: int. The version of the story.
             story_created_on: datetime.datetime. Date and time when the
                 story is created.
             story_last_updated: datetime.datetime. Date and time when the

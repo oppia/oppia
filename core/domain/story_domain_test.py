@@ -229,33 +229,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.signup('user@example.com', 'user')
         self.signup('user1@example.com', 'user1')
 
-
-    def test_story_export_import_returns_original_object(self):
-        topic_id = utils.generate_random_string(12)
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', topic_id)
-        expected_story_dict = {
-            'id': self.STORY_ID,
-            'title': 'Title',
-            'thumbnail_filename': None,
-            'thumbnail_bg_color': None,
-            'description': feconf.DEFAULT_STORY_DESCRIPTION,
-            'notes': feconf.DEFAULT_STORY_NOTES,
-            'story_contents': {
-                'nodes': [],
-                'initial_node_id': None,
-                'next_node_id': self.NODE_ID_1
-            },
-            'story_contents_schema_version': (
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'corresponding_topic_id': topic_id,
-            'version': 0
-        }
-        story_dict = self.story.to_dict()
-        story_from_dict = story_domain.Story.from_dict(story_dict)
-        self.assertEqual(story_from_dict.to_dict(), story_dict)
-
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the story passes validation.
 
@@ -1313,3 +1286,32 @@ class StorySummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.story_summary.validate()
+
+    def test_story_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        story during export and import.
+        """
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Title', topic_id)
+        expected_story_dict = {
+            'id': self.STORY_ID,
+            'title': 'Title',
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'description': feconf.DEFAULT_STORY_DESCRIPTION,
+            'notes': feconf.DEFAULT_STORY_NOTES,
+            'story_contents': {
+                'nodes': [],
+                'initial_node_id': None,
+                'next_node_id': self.NODE_ID_1
+            },
+            'story_contents_schema_version': (
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'corresponding_topic_id': topic_id,
+            'version': 0
+        }
+        story_dict = self.story.to_dict()
+        story_from_dict = story_domain.Story.from_dict(story_dict)
+        self.assertEqual(story_from_dict.to_dict(), story_dict)
