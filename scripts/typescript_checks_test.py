@@ -114,7 +114,6 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         def mock_popen_for_errors(unused_cmd, stdout):  # pylint: disable=unused-argument
             return process
 
-        with self.swap(
-            subprocess, 'Popen', mock_popen_for_errors), self.assertRaises(
-                SystemExit):
-            typescript_checks.compile_and_check_typescript()
+        with self.swap(subprocess, 'Popen', mock_popen_for_errors):
+            with self.assertRaisesRegexp(SystemExit, '1'):
+                typescript_checks.compile_and_check_typescript()

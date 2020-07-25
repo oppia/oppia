@@ -22,16 +22,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IInteractionAnswer } from
+import { InteractionAnswer } from
   'interactions/answer-defs';
 
 export interface AnswerStatsBackendDict {
-  answer: IInteractionAnswer;
+  answer: InteractionAnswer;
   frequency: number;
 }
 
 export class AnswerStats {
-  answer: IInteractionAnswer;
+  answer: InteractionAnswer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
@@ -45,7 +45,7 @@ export class AnswerStats {
    *    associated state's answer groups.
    */
   constructor(
-      answer: IInteractionAnswer, answerHtml: string, frequency: number,
+      answer: InteractionAnswer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
     this.answer = cloneDeep(answer);

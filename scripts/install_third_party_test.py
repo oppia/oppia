@@ -76,7 +76,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             zipfile.ZipFile, 'extractall', mock_extractall)
 
     def test_download_files_with_invalid_source_filenames(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesRegexp(
+            AssertionError,
+            'Expected list of filenames, got \'invalid source filename\''):
             install_third_party.download_files(
                 'source_url', 'target_dir', 'invalid source filename')
 
@@ -211,7 +213,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaises(SystemExit):
+        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             install_third_party.test_manifest_syntax(
                 'files', {
                     'files': ['yuicompressor-2.4.8.jar'],
@@ -226,7 +228,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaises(SystemExit):
+        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             install_third_party.test_manifest_syntax(
                 'zip', {
                     'url': 'https://github.com/jsocol/bleach/v3.1.0.zip',
@@ -244,7 +246,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaises(SystemExit):
+        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             install_third_party.test_manifest_syntax(
                 'tar', {
                     'version': '4.7.1',

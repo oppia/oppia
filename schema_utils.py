@@ -128,7 +128,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
         if SCHEMA_KEY_LEN in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LEN]
+            assert len(obj) == schema[SCHEMA_KEY_LEN], (
+                'Expected length of %s got %s' % (
+                    schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(item, item_schema) for item in obj
         ]

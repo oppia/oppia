@@ -33,6 +33,7 @@ import python_utils
 import utils
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
+email_services = models.Registry.import_email_services()
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -187,10 +188,11 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         function = lambda x: x ** 2
 
         failing_func = test_utils.FailingFunction(
-            function, MockError, test_utils.FailingFunction.INFINITY)
+            function, MockError('Dummy Exception'),
+            test_utils.FailingFunction.INFINITY)
 
         for i in python_utils.RANGE(20):
-            with self.assertRaises(MockError):
+            with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 
     def test_failing_function_raises_error_with_invalid_num_tries(self):
@@ -411,14 +413,82 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_capature_exception_raised_by_tested_function(
             self):
         def mock_getcwd():
-            raise ValueError()
+            raise ValueError('Exception raised from getcwd()')
 
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError, r'Exception raised from getcwd\(\)'):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
+
+    def test_assert_raises_with_error_message(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.'):
+            self.assertRaises(Exception, mock_exception_func)
+
+    def test_assert_raises_regexp_with_empty_string(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please provide a sufficiently strong regexp string to '
+            'validate that the correct error is being raised.'):
+            self.assertRaisesRegexp(Exception, '', mock_exception_func)
+
+
+class EmailMockTests(test_utils.EmailTestBase):
+    """Class for testing EmailTestBase."""
+
+    def test_override_run_swaps_contexts(self):
+        """Test that the current_function
+        email_services.send_email_to_recipients() is correctly swapped to its
+        mock version when the testbase extends EmailTestBase.
+        """
+        referenced_function = getattr(
+            email_services, 'send_email_to_recipients')
+        correct_function = getattr(self, '_send_email_to_recipients')
+        self.assertEqual(referenced_function, correct_function)
+
+    def test_mock_send_email_to_recipients_sends_correct_emails(self):
+        """Test sending email to recipients using mock adds the correct objects
+        to emails_dict.
+        """
+        self._send_email_to_recipients(
+            sender_email='a@a.com',
+            recipient_emails=['b@b.com'],
+            subject=(
+                'Hola 😂 - invitation to collaborate'
+                .encode(encoding='utf-8')),
+            plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
+            html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+            bcc=['c@c.com'],
+            reply_to='abc',
+            recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
+        messages = self._get_sent_email_messages(
+            to='b@b.com')
+        all_messages = self._get_all_sent_email_messages()
+
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(len(all_messages), 1)
+        self.assertEqual(all_messages['b@b.com'], messages)
+        self.assertEqual(
+            messages[0].subject,
+            'Hola 😂 - invitation to collaborate'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].body,
+            'plaintext_body 😂'.encode(encoding='utf-8'))
+        self.assertEqual(
+            messages[0].html,
+            'Hi abc,<br> 😂'.encode(encoding='utf-8'))
+        self.assertEqual(messages[0].bcc, 'c@c.com')
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):

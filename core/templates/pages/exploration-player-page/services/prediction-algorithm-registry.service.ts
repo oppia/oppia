@@ -24,12 +24,12 @@ import { CodeReplPredictionService } from
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 
-interface IPredictionService {
+interface PredictionService {
   predict(classifierData, answer): number;
 }
 
 type AlgorithmIdPredictionServiceMap = (
-  Map<string, Map<number, IPredictionService>>);
+  Map<string, Map<number, PredictionService>>);
 
 @Injectable({providedIn: 'root'})
 export class PredictionAlgorithmRegistryService {
@@ -49,7 +49,7 @@ export class PredictionAlgorithmRegistryService {
   }
 
   getPredictionService(
-      algorithmId: string, dataSchemaVersion: number): IPredictionService {
+      algorithmId: string, dataSchemaVersion: number): PredictionService {
     if (this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
       const predictionServicesByDataSchemaVersion = (
         this.algorithmIdPredictionServiceMapping.get(algorithmId));
@@ -62,7 +62,7 @@ export class PredictionAlgorithmRegistryService {
 
   testOnlySetPredictionService(
       algorithmId: string, dataSchemaVersion: number,
-      service: IPredictionService): void {
+      service: PredictionService): void {
     if (!this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
       this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
     }

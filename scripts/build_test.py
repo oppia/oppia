@@ -62,14 +62,18 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify(self):
         """Tests _minify with an invalid filepath."""
-        with self.assertRaises(subprocess.CalledProcessError) as called_process:
+        with self.assertRaisesRegexp(
+            subprocess.CalledProcessError,
+            'returned non-zero exit status 1') as called_process:
             build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)  # pylint: disable=protected-access
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
     def test_minify_and_create_sourcemap(self):
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaises(subprocess.CalledProcessError) as called_process:
+        with self.assertRaisesRegexp(
+            subprocess.CalledProcessError,
+            'returned non-zero exit status 1') as called_process:
             build._minify_and_create_sourcemap(  # pylint: disable=protected-access
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
         # `returncode` is the exit status of the child process.

@@ -255,8 +255,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap, self.print_swap, self.assertRaises(
-                SystemExit):
+            with check_config_swap, self.print_swap, self.assertRaisesRegexp(
+                SystemExit, '1'):
                 pre_commit_hook.main(args=[])
         self.assertTrue(
             '-----------COMMIT ABORTED-----------' in self.print_arr)

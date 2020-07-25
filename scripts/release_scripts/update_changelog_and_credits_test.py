@@ -144,7 +144,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             return 'v2.0.7\nv2.0.8\n'
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaises(AssertionError):
+        with check_output_swap, self.assertRaisesRegexp(
+            AssertionError,
+            'Previous release version is same as current release version.'):
             update_changelog_and_credits.get_previous_release_version(
                 'release', '2.0.8')
 

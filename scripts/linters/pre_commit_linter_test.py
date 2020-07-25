@@ -177,18 +177,16 @@ class PreCommitLinterTests(LintTests):
             'before'], self.linter_stdout)
 
     def test_main_with_invalid_filepath_with_path_arg(self):
-        with self.print_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             pre_commit_linter.main(args=['--path=invalid_file.py'])
         self.assert_same_list_elements(
             ['Could not locate file or directory'], self.linter_stdout)
-        self.assertEqual(e.exception.code, 1)
 
     def test_main_with_invalid_filepath_with_file_arg(self):
-        with self.print_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             pre_commit_linter.main(args=['--files=invalid_file.py'])
         self.assert_same_list_elements(
             ['The following file(s) do not exist'], self.linter_stdout)
-        self.assertEqual(e.exception.code, 1)
 
     def test_path_arg_with_directory_name(self):
         def mock_get_all_files_in_directory(
@@ -214,7 +212,7 @@ class PreCommitLinterTests(LintTests):
         self.assertTrue(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg_with_js_ts_options(self):
-        with self.print_swap, self.assertRaises(SystemExit) as e:
+        with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             pre_commit_linter.main(
                 args=['--path=%s' % VALID_TS_FILEPATH,
                       '--only-check-file-extensions', 'ts', 'js'])
@@ -223,7 +221,6 @@ class PreCommitLinterTests(LintTests):
             'separate linters for JS and TS files. If both these options '
             'are used together, then the JS/TS linter will be run twice.'
             ], self.linter_stdout)
-        self.assertEqual(e.exception.code, 1)
 
     def test_get_all_files_in_directory(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
