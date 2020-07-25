@@ -101,8 +101,7 @@ export class PlayerPositionService {
 
   /**
    * Gets whether the learner has just submitted an answer.
-   * @return {boolean} a boolean that shows if the learner
-   * has just submitted an answer.
+   * @return {boolean} Whether the learner has just submitted an answer.
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
