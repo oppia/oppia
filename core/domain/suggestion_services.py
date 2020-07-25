@@ -165,8 +165,7 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
     """
     return [get_suggestion_from_model(s)
             for s in suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_with_exp_ids(
-                exp_ids)]
+            .get_translation_suggestions_with_exp_ids(exp_ids)]
 
 
 def get_all_stale_suggestions():
