@@ -510,7 +510,8 @@ class DeployTests(test_utils.GenericTestBase):
             'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_DEV_MODE)
         with self.exists_swap, self.copyfile_swap, constants_swap:
-            with self.listdir_swap, self.assertRaises(AssertionError):
+            with self.listdir_swap, self.assertRaisesRegexp(
+                AssertionError, 'Invalid DEV_MODE'):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_invalid_bucket_name(self):
@@ -519,7 +520,10 @@ class DeployTests(test_utils.GenericTestBase):
             'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
         with self.exists_swap, self.copyfile_swap, constants_swap:
-            with self.listdir_swap, self.assertRaises(AssertionError):
+            with self.listdir_swap, self.assertRaisesRegexp(
+                AssertionError,
+                'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+                    common.CONSTANTS_FILE_PATH)):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_constants_are_updated_correctly(self):

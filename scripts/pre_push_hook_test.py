@@ -518,7 +518,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, uncommitted_files_swap:
-                with self.assertRaises(SystemExit):
+                with self.assertRaisesRegexp(SystemExit, '1'):
                     pre_push_hook.main(args=[])
         self.assertTrue(
             'Your repo is in a dirty state which prevents the linting from'
@@ -534,7 +534,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
-                with check_output_swap, self.assertRaises(SystemExit):
+                with check_output_swap, self.assertRaisesRegexp(
+                    SystemExit, '1'):
                     pre_push_hook.main(args=[])
         self.assertTrue(
             '\nCould not change branch to branch2. This is most probably '
@@ -546,7 +547,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.assertRaises(SystemExit):
+                    with self.assertRaisesRegexp(SystemExit, '1'):
                         pre_push_hook.main(args=[])
         self.assertTrue(
             'Push failed, please correct the linting issues above.'
@@ -563,7 +564,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
-                        with self.assertRaises(SystemExit):
+                        with self.assertRaisesRegexp(SystemExit, '1'):
                             pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing typescript checks.' in self.print_arr)
@@ -579,7 +580,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap, run_script_and_get_returncode_swap:
-                        with self.assertRaises(SystemExit):
+                        with self.assertRaisesRegexp(SystemExit, '1'):
                             pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
@@ -597,7 +598,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with run_script_and_get_returncode_swap:
                         with self.travis_yml_or_js_files_swap:
-                            with self.assertRaises(SystemExit):
+                            with self.assertRaisesRegexp(SystemExit, '1'):
                                 pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing e2e test configuration check.'

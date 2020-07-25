@@ -770,10 +770,11 @@ class CommonTests(test_utils.GenericTestBase):
             origin_content = f.readlines()
 
         def mock_compile(unused_arg):
-            raise ValueError
+            raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaises(ValueError), compile_swap:
+        with self.assertRaisesRegexp(
+            ValueError, r'Exception raised from compile\(\)'), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))

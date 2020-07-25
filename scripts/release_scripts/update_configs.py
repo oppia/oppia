@@ -159,7 +159,7 @@ def add_mailgun_api_key():
     with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
         feconf_lines = f.readlines()
 
-    assert 'MAILGUN_API_KEY = None\n' in feconf_lines
+    assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
 
     with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
         for line in feconf_lines:
@@ -178,7 +178,8 @@ def main(personal_access_token):
     """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
-    assert common.is_current_branch_a_release_branch()
+    assert common.is_current_branch_a_release_branch(), (
+        'Current branch is not a release branch_name')
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     try:
         python_utils.url_open(TERMS_PAGE_URL)
