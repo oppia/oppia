@@ -23,7 +23,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
   'stateName', 'suggestionIsHandled', 'suggestionStatus',
   'suggestionType', 'IMPORT_STATEMENT',
   function(
-      $scope, SuggestionModalService, $uibModalInstance,
+      $uibModalInstance, $scope, SuggestionModalService,
       canReviewActiveThread, description, newContent, oldContent,
       stateName, suggestionIsHandled, suggestionStatus,
       suggestionType, IMPORT_STATEMENT

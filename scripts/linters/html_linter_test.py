@@ -23,7 +23,6 @@ import multiprocessing
 import os
 
 from core.tests import test_utils
-import python_utils
 
 from . import html_linter
 from . import pre_commit_linter
@@ -53,25 +52,8 @@ INVALID_MISMATCHED_TAGS_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_mismatched_tags.html')
 
 
-class CustomHTMLParserTests(test_utils.GenericTestBase):
+class CustomHTMLParserTests(test_utils.LinterTestBase):
     """Tests for CustomHTMLParser class."""
-
-    def setUp(self):
-        super(CustomHTMLParserTests, self).setUp()
-        self.linter_stdout = []
-
-        def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
-            linter_stdout list.
-
-            Args:
-                *args: str. Variable length argument list of values to print in
-                    the same line of output.
-            """
-            self.linter_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
-
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_custom_linter_with_invalid_style_indentation(self):
         with self.print_swap:
@@ -82,6 +64,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
             'invalid_style_indentation.html --> Expected indentation of 6,'
             ' found indentation of 4 for content of style tag on line 7'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_custom_linter_with_invalid_indentation(self):
         with self.print_swap:
@@ -91,6 +74,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assert_same_list_elements([
             'Expected indentation of 10, found indentation of 12 for '
             'classroom-page tag on line 14'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_custom_linter_with_invalid_quotes(self):
         with self.print_swap:
@@ -101,6 +85,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
             'The value color:white; of attribute '
             'style for the tag content on line 12 should be enclosed '
             'within double quotes.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_custom_linter_with_invalid_alignment(self):
         with self.print_swap:
@@ -110,6 +95,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assert_same_list_elements([
             'Attribute for tag content on line 13 should align with the '
             'leftmost attribute on line 12'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_custom_linter_with_invalid_tags(self):
         with self.print_swap:
@@ -136,6 +122,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
             'Indentation for end tag content on line 18 does not match the'
             ' indentation of the start tag content on line 12'
             ], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_custom_without_html_end_tag(self):
         with self.print_swap:
@@ -152,6 +139,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 debug=True).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['SUCCESS'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_custom_linter_with_no_files(self):
         with self.print_swap:
@@ -160,6 +148,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
                 debug=True).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['There are no HTML files to lint.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_third_party_linter_with_no_files(self):
         with self.print_swap:
@@ -168,6 +157,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assert_same_list_elements(
             ['There are no HTML files to lint.'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_third_party_linter_with_verbose_mode_enabled(self):
         with self.print_swap:
@@ -176,6 +166,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assert_same_list_elements(
             ['SUCCESS  HTML linting passed'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_third_party_linter_with_verbose_mode_disabled(self):
         with self.print_swap:
@@ -184,6 +175,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assert_same_list_elements(
             ['SUCCESS  HTML linting passed'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_third_party_linter_with_lint_errors(self):
         with self.print_swap:
@@ -192,6 +184,7 @@ class CustomHTMLParserTests(test_utils.GenericTestBase):
         self.assert_same_list_elements(
             ['line 10, col 20, line contains trailing whitespace'],
             self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = html_linter.get_linters(

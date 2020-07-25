@@ -15,22 +15,28 @@
 # limitations under the License.
 
 """Python file with invalid syntax, used by scripts/linters/
-python_linter_test. This file contain non alphabetical import order.
+python_linter_test.py. This file contain valid python syntax.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import python_utils  # pylint: disable=unused-import
-import argparse  # pylint: disable=unused-import
-import fnmatch  # pylint: disable=unused-import
-import multiprocessing  # pylint: disable=unused-import
-import os  # pylint: disable=unused-import
-import subprocess  # pylint: disable=unused-import
-import sys  # pylint: disable=unused-import
-import threading  # pylint: disable=unused-import
+import python_utils
 
 
-def fun():
-    """Function docstring."""
-    python_utils.PRINT('hello')
+class FakeClass(python_utils.OBJECT):
+    """This is a fake docstring for valid syntax purposes."""
+
+    def __init__(self, fake_arg):
+        self.fake_arg = fake_arg
+
+    def fake_method(self, name):
+        """This doesn't do anything.
+
+        Args:
+            name: str. Means nothing.
+
+        Yields:
+            tuple(str, str). The argument passed in but twice in a tuple.
+        """
+        yield (name, name)
