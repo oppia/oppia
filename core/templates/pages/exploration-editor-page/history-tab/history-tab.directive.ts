@@ -16,7 +16,6 @@
  * @fileoverview Directive for the exploration history tab.
  */
 
-require('components/profile-link-directives/profile-link-text.component.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
