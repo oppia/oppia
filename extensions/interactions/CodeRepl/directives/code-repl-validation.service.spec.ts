@@ -27,13 +27,13 @@ import { Outcome, OutcomeObjectFactory } from
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { ICodeReplCustomizationArgs } from
+import { CodeReplCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('CodeReplValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
   let validatorService: CodeReplValidationService;
-  let currentState: string, customizationArguments: ICodeReplCustomizationArgs;
+  let currentState: string, customizationArguments: CodeReplCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 

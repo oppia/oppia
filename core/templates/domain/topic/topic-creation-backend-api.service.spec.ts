@@ -22,7 +22,7 @@ import { HttpClientTestingModule, HttpTestingController }
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { IImageData } from 'domain/skill/skill-creation-backend-api.service';
+import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { TopicCreationBackendApiService } from
@@ -34,7 +34,7 @@ describe('Topic creation backend api service', () => {
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
   let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
   let topic: NewlyCreatedTopic = null;
-  let imagesData: IImageData[] = null;
+  let imagesData: ImageData[] = null;
   const thumbnailBgColor = '#e3e3e3';
   let postData = {
     name: 'topic-name',

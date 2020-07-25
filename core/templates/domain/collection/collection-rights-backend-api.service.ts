@@ -26,7 +26,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CollectionRights, CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
-import { ICollectionRightsBackendDict } from
+import { CollectionRightsBackendDict } from
   'domain/collection/CollectionRightsObjectFactory';
 
 @Injectable({
@@ -50,7 +50,7 @@ export class CollectionRightsBackendApiService {
           collection_id: collectionId
         });
 
-    this.http.get<ICollectionRightsBackendDict>(collectionRightsUrl).toPromise()
+    this.http.get<CollectionRightsBackendDict>(collectionRightsUrl).toPromise()
       .then(response => {
         if (successCallback) {
           successCallback(
@@ -88,7 +88,7 @@ export class CollectionRightsBackendApiService {
     let requestUrl = (
       isPublic ? collectionPublishUrl : collectionUnpublishUrl);
 
-    this.http.put<ICollectionRightsBackendDict>(requestUrl, putParams)
+    this.http.put<CollectionRightsBackendDict>(requestUrl, putParams)
       .toPromise().then(response => {
         let collectionRights =
           this.collectionRightsObjectFactory.create(response);

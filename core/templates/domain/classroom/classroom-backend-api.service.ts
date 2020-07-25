@@ -30,11 +30,11 @@ import {
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface IClassroomTopicSummaryBackendDict {
+interface ClassroomTopicSummaryBackendDict {
   'topic_summary_dicts': TopicSummaryBackendDict[];
 }
 
-interface IClassroomStatusBackendDict {
+interface ClassroomStatusBackendDict {
   'classroom_page_is_shown': boolean;
 }
 
@@ -57,7 +57,7 @@ export class ClassroomBackendApiService {
         classroom_name: classroomName
       });
 
-    this.http.get<IClassroomTopicSummaryBackendDict>(
+    this.http.get<ClassroomTopicSummaryBackendDict>(
       classroomDataUrl).toPromise().then(data => {
       this.topicSummaryObjects = data.topic_summary_dicts.map(
         (summaryDict) => {
@@ -80,7 +80,7 @@ export class ClassroomBackendApiService {
       errorCallback: (reason?: string) => void): void {
     const classroomStatusHandlerUrl = '/classroom_page_status_handler';
 
-    this.http.get<IClassroomStatusBackendDict>(
+    this.http.get<ClassroomStatusBackendDict>(
       classroomStatusHandlerUrl).toPromise().then(data => {
       if (successCallback) {
         successCallback(data.classroom_page_is_shown);

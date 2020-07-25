@@ -22,10 +22,10 @@ import { Injectable } from '@angular/core';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { UtilsService } from 'services/utils.service';
-import { IGraphAnswer } from 'interactions/answer-defs';
+import { GraphAnswer } from 'interactions/answer-defs';
 import {
-  IGraphIsomorphicRuleInputs,
-  IGraphPropertyRuleInputs
+  GraphIsomorphicRuleInputs,
+  GraphPropertyRuleInputs
 } from 'interactions/rule-input-defs';
 
 @Injectable({
@@ -38,7 +38,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is strongly connected.
    */
-  private isStronglyConnected(graph: IGraphAnswer): boolean {
+  private isStronglyConnected(graph: GraphAnswer): boolean {
     // Uses depth first search on each vertex to try and visit every other
     // vertex in both the normal and inverted adjacency lists.
     if (graph.vertices.length === 0) {
@@ -75,7 +75,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is weakly connected.
    */
-  private isWeaklyConnected(graph: IGraphAnswer): boolean {
+  private isWeaklyConnected(graph: GraphAnswer): boolean {
     // Generates adjacency lists assuming graph is undirected, then uses depth
     // first search on node 0 to try to reach every other vertex.
     if (graph.vertices.length === 0) {
@@ -97,7 +97,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
-  private isAcyclic(graph: IGraphAnswer): boolean {
+  private isAcyclic(graph: GraphAnswer): boolean {
     // Uses depth first search to ensure that we never have an edge to an
     // ancestor in the search tree.
     var nodeStatus = graph.vertices.map(() => {
@@ -122,7 +122,7 @@ export class GraphInputRulesService {
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is acyclic.
    */
-  private isRegular(graph: IGraphAnswer): boolean {
+  private isRegular(graph: GraphAnswer): boolean {
     // Checks that every vertex has outdegree and indegree equal to the first.
     if (graph.vertices.length === 0) {
       return true;
@@ -151,7 +151,7 @@ export class GraphInputRulesService {
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   }
 
-  private isIsomorphic(graph1: IGraphAnswer, graph2: IGraphAnswer): boolean {
+  private isIsomorphic(graph1: GraphAnswer, graph2: GraphAnswer): boolean {
     if (graph1.vertices.length !== graph2.vertices.length) {
       return false;
     }
@@ -199,8 +199,8 @@ export class GraphInputRulesService {
   }
 
   HasGraphProperty(
-      answer: IGraphAnswer,
-      inputs: IGraphPropertyRuleInputs): boolean {
+      answer: GraphAnswer,
+      inputs: GraphPropertyRuleInputs): boolean {
     if (inputs.p === 'strongly_connected') {
       return this.isStronglyConnected(answer);
     } else if (inputs.p === 'weakly_connected') {
@@ -215,8 +215,8 @@ export class GraphInputRulesService {
   }
 
   IsIsomorphicTo(
-      answer: IGraphAnswer,
-      inputs: IGraphIsomorphicRuleInputs): boolean {
+      answer: GraphAnswer,
+      inputs: GraphIsomorphicRuleInputs): boolean {
     return this.isIsomorphic(answer, inputs.g);
   }
 }

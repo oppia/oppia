@@ -22,8 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-import { ICodeReplAnswer } from 'interactions/answer-defs';
-import { ICodeReplRuleInputs } from 'interactions/rule-input-defs';
+import { CodeReplAnswer } from 'interactions/answer-defs';
+import { CodeReplRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -34,8 +34,8 @@ export class CodeReplRulesService {
     private codeNormalizer: CodeNormalizerService) {}
 
   CodeEquals(
-      answer: ICodeReplAnswer,
-      inputs: ICodeReplRuleInputs): boolean {
+      answer: CodeReplAnswer,
+      inputs: CodeReplRuleInputs): boolean {
     var normalizedCode =
       this.codeNormalizer.getNormalizedCode(answer.code);
     var normalizedExpectedCode =
@@ -43,8 +43,8 @@ export class CodeReplRulesService {
     return normalizedCode === normalizedExpectedCode;
   }
   CodeContains(
-      answer: ICodeReplAnswer,
-      inputs: ICodeReplRuleInputs): boolean {
+      answer: CodeReplAnswer,
+      inputs: CodeReplRuleInputs): boolean {
     var normalizedCode =
       this.codeNormalizer.getNormalizedCode(answer.code);
     var normalizedSnippet =
@@ -52,8 +52,8 @@ export class CodeReplRulesService {
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
   CodeDoesNotContain(
-      answer: ICodeReplAnswer,
-      inputs: ICodeReplRuleInputs): boolean {
+      answer: CodeReplAnswer,
+      inputs: CodeReplRuleInputs): boolean {
     var normalizedCode =
       this.codeNormalizer.getNormalizedCode(answer.code);
     var normalizedSnippet =
@@ -61,26 +61,26 @@ export class CodeReplRulesService {
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
   OutputContains(
-      answer: ICodeReplAnswer,
-      inputs: ICodeReplRuleInputs): boolean {
+      answer: CodeReplAnswer,
+      inputs: CodeReplRuleInputs): boolean {
     var normalizedOutput = this.normalizeWhitespace.transform(answer.output);
     var normalizedSnippet = this.normalizeWhitespace.transform(inputs.x);
     return normalizedOutput.indexOf(normalizedSnippet) !== -1;
   }
   OutputEquals(
-      answer: ICodeReplAnswer,
-      inputs: ICodeReplRuleInputs): boolean {
+      answer: CodeReplAnswer,
+      inputs: CodeReplRuleInputs): boolean {
     var normalizedOutput = this.normalizeWhitespace.transform(answer.output);
     var normalizedExpectedOutput =
       this.normalizeWhitespace.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
-  ResultsInError(answer: ICodeReplAnswer): boolean {
+  ResultsInError(answer: CodeReplAnswer): boolean {
     return !!(answer.error.trim());
   }
   ErrorContains(
-      answer: ICodeReplAnswer,
-      inputs: ICodeReplRuleInputs): boolean {
+      answer: CodeReplAnswer,
+      inputs: CodeReplRuleInputs): boolean {
     var normalizedError = this.normalizeWhitespace.transform(answer.error);
     var normalizedSnippet = this.normalizeWhitespace.transform(inputs.x);
     return normalizedError.indexOf(normalizedSnippet) !== -1;

@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 
-export interface ISubtopicBackendDict {
+export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
@@ -31,7 +31,7 @@ export interface ISubtopicBackendDict {
   'thumbnail_bg_color': string;
 }
 
-export interface ISkillIdToDescriptionMap {
+export interface SkillIdToDescriptionMap {
   [skillId: string]: string;
 }
 
@@ -45,7 +45,7 @@ export class Subtopic {
   _thumbnailBgColor: string;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap,
       skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
       thumbnailFilename: string, thumbnailBgColor: string) {
     this._id = subtopicId;
@@ -169,8 +169,8 @@ export class SubtopicObjectFactory {
     private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
 
   create(
-      subtopicBackendDict: ISubtopicBackendDict,
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap) {
+      subtopicBackendDict: SubtopicBackendDict,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap) {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,

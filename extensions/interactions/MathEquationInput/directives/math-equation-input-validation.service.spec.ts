@@ -27,7 +27,7 @@ import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
-import { IMathEquationInputCustomizationArgs } from
+import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 
 import { AppConstants } from 'app.constants';
@@ -40,7 +40,7 @@ describe('MathEquationInputValidationService', () => {
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
-  let customizationArgs: IMathEquationInputCustomizationArgs;
+  let customizationArgs: MathEquationInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
   let warnings;

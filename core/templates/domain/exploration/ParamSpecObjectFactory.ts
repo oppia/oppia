@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { ParamType, ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
 
-export interface IParamSpecBackendDict {
+export interface ParamSpecBackendDict {
   'obj_type': string;
 }
 
@@ -44,7 +44,7 @@ export class ParamSpec {
   }
 
   /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
-  toBackendDict(): IParamSpecBackendDict {
+  toBackendDict(): ParamSpecBackendDict {
     return {
       obj_type: this._objType.getName(),
     };
@@ -62,7 +62,7 @@ export class ParamSpecObjectFactory {
    * @returns {ParamSpec} - A new ParamSpec instance.
    */
   createFromBackendDict(
-      paramSpecBackendDict: IParamSpecBackendDict): ParamSpec {
+      paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
     return new ParamSpec(this.paramTypeObjectFactory.getTypeFromBackendName(
       paramSpecBackendDict.obj_type));
   }

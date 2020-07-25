@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IDragAndDropSortInputCustomizationArgs } from
+import { DragAndDropSortInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +39,7 @@ export class DragAndDropSortInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IDragAndDropSortInputCustomizationArgs): IWarning[] {
+      customizationArgs: DragAndDropSortInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -87,8 +87,8 @@ export class DragAndDropSortInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IDragAndDropSortInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      customizationArgs: DragAndDropSortInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
     var seenItems = [];
     var ranges = [];

@@ -22,13 +22,13 @@ import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
-import { IStoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
+import { StoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 
-export interface IStoryContentsBackendDict {
+export interface StoryContentsBackendDict {
   'initial_node_id': string;
   'next_node_id': string;
-  'nodes': IStoryNodeBackendDict[];
+  'nodes': StoryNodeBackendDict[];
 }
 
 export class StoryContents {
@@ -404,7 +404,7 @@ export class StoryContents {
 export class StoryContentsObjectFactory {
   constructor(private storyNodeObjectFactory: StoryNodeObjectFactory) {}
   createFromBackendDict(
-      storyContentsBackendObject: IStoryContentsBackendDict): StoryContents {
+      storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
       nodes.push(

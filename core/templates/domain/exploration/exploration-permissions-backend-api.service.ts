@@ -24,7 +24,7 @@ import { ContextService } from 'services/context.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
-  IExplorationPermissionsBackendDict,
+  ExplorationPermissionsBackendDict,
   ExplorationPermissions,
   ExplorationPermissionsObjectFactory
 } from 'domain/exploration/exploration-permissions-object.factory';
@@ -46,7 +46,7 @@ export class ExplorationPermissionsBackendApiService {
         exploration_id: this.contextService.getExplorationId()
       });
 
-    return this.http.get<IExplorationPermissionsBackendDict>(
+    return this.http.get<ExplorationPermissionsBackendDict>(
       explorationPermissionsUrl).toPromise().then(response => {
       let permissionsObject = (
         this.explorationPermissionsObjectFactory.createFromBackendDict(

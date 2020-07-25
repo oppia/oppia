@@ -22,31 +22,31 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { IGraphLink, IGraphNodes } from 'services/compute-graph.service';
+import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 
-export interface IGraphBoundaries {
+export interface GraphBoundaries {
   bottom: number;
   left: number;
   right: number;
   top: number;
 }
 
-interface INodePositionToId {
+interface NodePositionToId {
   nodeId: string;
   offset: number;
 }
 
-interface IGraphAdjacencyLists {
+interface GraphAdjacencyLists {
   [node: string]: string[];
 }
 
-interface IAugmentedLink {
-  source: INodeData;
-  target: INodeData;
+interface AugmentedLink {
+  source: NodeData;
+  target: NodeData;
   d?: string;
 }
 
-interface INodeData {
+interface NodeData {
   depth: number;
   offset: number;
   reachable: boolean;
@@ -61,8 +61,8 @@ interface INodeData {
   reachableFromEnd: boolean;
 }
 
-interface INodeDataDict {
-  [nodeId: string]: INodeData;
+interface NodeDataDict {
+  [nodeId: string]: NodeData;
 }
 
 @Injectable({
@@ -73,10 +73,10 @@ export class StateGraphLayoutService {
 
   // The last result of a call to computeLayout(). Used for determining the
   // order in which to specify states in rules.
-  lastComputedArrangement: INodeDataDict = null;
+  lastComputedArrangement: NodeDataDict = null;
 
   getGraphAsAdjacencyLists(
-      nodes: IGraphNodes, links: IGraphLink[]): IGraphAdjacencyLists {
+      nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
     var adjacencyLists = {};
 
     for (var nodeId in nodes) {
@@ -93,7 +93,7 @@ export class StateGraphLayoutService {
   }
 
   getIndentationLevels(
-      adjacencyLists: IGraphAdjacencyLists, trunkNodeIds: string[]): number[] {
+      adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
     var indentationLevels = [];
 
     // Recursively find and indent the longest shortcut for the segment of
@@ -170,8 +170,8 @@ export class StateGraphLayoutService {
   //   - id: a unique id for the node.
   //   - label: the full label of the node.
   computeLayout(
-      nodes: IGraphNodes, links: IGraphLink[], initNodeId: string,
-      finalNodeIds: string[]): INodeDataDict {
+      nodes: GraphNodes, links: GraphLink[], initNodeId: string,
+      finalNodeIds: string[]): NodeDataDict {
     var adjacencyLists = this.getGraphAsAdjacencyLists(nodes, links);
 
     // Find a long path through the graph from the initial state to a
@@ -236,7 +236,7 @@ export class StateGraphLayoutService {
     var SENTINEL_DEPTH = -1;
     var SENTINEL_OFFSET = -1;
 
-    var nodeData: INodeDataDict = {};
+    var nodeData: NodeDataDict = {};
     for (var nodeId in nodes) {
       nodeData[nodeId] = {
         depth: SENTINEL_DEPTH,
@@ -336,7 +336,7 @@ export class StateGraphLayoutService {
 
     // Build the 'inverse index' -- for each row, store the (offset, nodeId)
     // pairs in ascending order of offset.
-    var nodePositionsToIds: INodePositionToId[][] = [];
+    var nodePositionsToIds: NodePositionToId[][] = [];
     for (var i = 0; i <= maxDepth; i++) {
       nodePositionsToIds.push([]);
     }
@@ -489,11 +489,11 @@ export class StateGraphLayoutService {
     return nodeData;
   }
 
-  getLastComputedArrangement(): INodeDataDict {
+  getLastComputedArrangement(): NodeDataDict {
     return cloneDeep(this.lastComputedArrangement);
   }
 
-  getGraphBoundaries(nodeData: INodeDataDict): IGraphBoundaries {
+  getGraphBoundaries(nodeData: NodeDataDict): GraphBoundaries {
     var INFINITY = 1e30;
     var BORDER_PADDING = 5;
 
@@ -524,9 +524,9 @@ export class StateGraphLayoutService {
   }
 
   getAugmentedLinks(
-      nodeData: INodeDataDict, nodeLinks: IGraphLink[]): IAugmentedLink[] {
+      nodeData: NodeDataDict, nodeLinks: GraphLink[]): AugmentedLink[] {
     var links = cloneDeep(nodeLinks);
-    var augmentedLinks: IAugmentedLink[] = links.map(link => {
+    var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
         source: cloneDeep(nodeData[link.source]),
         target: cloneDeep(nodeData[link.target])
@@ -590,8 +590,8 @@ export class StateGraphLayoutService {
   }
 
   modifyPositionValues(
-      nodeData: INodeDataDict, graphWidth: number,
-      graphHeight: number): INodeDataDict {
+      nodeData: NodeDataDict, graphWidth: number,
+      graphHeight: number): NodeDataDict {
     var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
     var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
 
@@ -618,7 +618,7 @@ export class StateGraphLayoutService {
     return maxNodesPerRow * maxNodeLabelLength * letterWidthInPixels;
   }
 
-  getGraphHeight(nodeData: INodeDataDict): number {
+  getGraphHeight(nodeData: NodeDataDict): number {
     var maxDepth = 0;
     for (var nodeId in nodeData) {
       maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);

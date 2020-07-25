@@ -41,7 +41,7 @@ export class TextInputPredictionService {
       private textInputTokenizer: TextInputTokenizer) {
   }
 
-  predict(classifierData: ITextInputClassifierData, textInput: string): number {
+  predict(classifierData: TextInputClassifierData, textInput: string): number {
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 

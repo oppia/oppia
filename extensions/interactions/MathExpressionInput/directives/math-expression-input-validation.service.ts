@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IMathExpressionCustomizationArgs } from
+import { MathExpressionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -39,15 +39,15 @@ export class MathExpressionInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IMathExpressionCustomizationArgs): IWarning[] {
+      customizationArgs: MathExpressionCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IMathExpressionCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      customizationArgs: MathExpressionCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(

@@ -17,7 +17,7 @@
  */
 
 import {
-  IPlaythroughIssueBackendDict,
+  PlaythroughIssueBackendDict,
   PlaythroughIssueObjectFactory,
   EarlyQuitPlaythroughIssue
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
@@ -85,7 +85,7 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should convert exploration issue to backend dict', () => {
-    const playthroughDict: IPlaythroughIssueBackendDict = {
+    const playthroughDict: PlaythroughIssueBackendDict = {
       issue_type: 'EarlyQuit',
       issue_customization_args: {
         state_name: {

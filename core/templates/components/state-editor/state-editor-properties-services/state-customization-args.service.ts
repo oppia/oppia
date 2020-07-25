@@ -25,7 +25,7 @@ import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
 import { UtilsService } from 'services/utils.service';
-import { IInteractionCustomizationArgs } from
+import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 
 @Injectable({
@@ -33,7 +33,7 @@ import { IInteractionCustomizationArgs } from
 })
 // TODO(sll): Add validation.
 export class StateCustomizationArgsService extends
-  StatePropertyService<IInteractionCustomizationArgs> {
+  StatePropertyService<InteractionCustomizationArgs> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionCustomizationArgs';

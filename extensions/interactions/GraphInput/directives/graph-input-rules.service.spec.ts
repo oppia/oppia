@@ -21,7 +21,7 @@ import { GraphInputRulesService } from
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { TestBed } from '@angular/core/testing';
-import { IGraphAnswer } from 'interactions/answer-defs';
+import { GraphAnswer } from 'interactions/answer-defs';
 
 describe('Graph Input service', () => {
   let girs: GraphInputRulesService = null;
@@ -183,7 +183,7 @@ describe('Graph Input service', () => {
     });
   });
 
-  let undirectedEmptyGraph = (): IGraphAnswer => {
+  let undirectedEmptyGraph = (): GraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -193,7 +193,7 @@ describe('Graph Input service', () => {
     };
   };
 
-  let undirectedNullGraph = (numVertices: number): IGraphAnswer => {
+  let undirectedNullGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -205,7 +205,7 @@ describe('Graph Input service', () => {
     return graph;
   };
 
-  let undirectedCycleGraph = (numVertices: number): IGraphAnswer => {
+  let undirectedCycleGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;
@@ -220,7 +220,7 @@ describe('Graph Input service', () => {
     return graph;
   };
 
-  let undirectedCompleteGraph = (numVertices: number): IGraphAnswer => {
+  let undirectedCompleteGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 0; i < numVertices; i++) {
       for (var j = i + 1; j < numVertices; j++) {
@@ -234,7 +234,7 @@ describe('Graph Input service', () => {
     return graph;
   };
 
-  let undirectedStarGraph = (numVertices: number): IGraphAnswer => {
+  let undirectedStarGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 1; i < numVertices; i++) {
       graph.edges.push({
@@ -246,7 +246,7 @@ describe('Graph Input service', () => {
     return graph;
   };
 
-  let directedEmptyGraph = (): IGraphAnswer => {
+  let directedEmptyGraph = (): GraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -256,7 +256,7 @@ describe('Graph Input service', () => {
     };
   };
 
-  let directedNullGraph = (numVertices: number): IGraphAnswer => {
+  let directedNullGraph = (numVertices: number): GraphAnswer => {
     var graph = directedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -268,7 +268,7 @@ describe('Graph Input service', () => {
     return graph;
   };
 
-  let directedCycleGraph = (numVertices: number): IGraphAnswer => {
+  let directedCycleGraph = (numVertices: number): GraphAnswer => {
     var graph = directedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;

@@ -20,11 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { IFractionAnswer } from 'interactions/answer-defs';
+import { FractionAnswer } from 'interactions/answer-defs';
 import { UtilsService } from 'services/utils.service';
 import {
-  IFractionEquivalentRuleInputs,
-  IFractionIntegerPartRuleInputs
+  FractionEquivalentRuleInputs,
+  FractionIntegerPartRuleInputs
 } from 'interactions/rule-input-defs';
 
 @Injectable({
@@ -34,60 +34,60 @@ export class FractionInputRulesService {
   constructor(private fractionObjectFactory: FractionObjectFactory,
     private utilsService: UtilsService) {}
 
-  toFloat(fractionDict: IFractionAnswer) {
+  toFloat(fractionDict: FractionAnswer) {
     return this.fractionObjectFactory.fromDict(fractionDict).toFloat();
   }
   IsEquivalentTo(
-      answer: IFractionAnswer,
-      inputs: IFractionEquivalentRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionEquivalentRuleInputs): boolean {
     return this.toFloat(answer) === this.toFloat(inputs.f);
   }
   IsEquivalentToAndInSimplestForm(
-      answer: IFractionAnswer,
-      inputs: IFractionEquivalentRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionEquivalentRuleInputs): boolean {
     var simplestForm =
       this.fractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
     return this.toFloat(answer) === this.toFloat(inputs.f) &&
       this.utilsService.isEquivalent(answer, simplestForm);
   }
   IsExactlyEqualTo(
-      answer: IFractionAnswer,
-      inputs: IFractionEquivalentRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionEquivalentRuleInputs): boolean {
     // Only returns true if both answers are structurally equal.
     return this.utilsService.isEquivalent(answer, inputs.f);
   }
   IsLessThan(
-      answer: IFractionAnswer,
-      inputs: IFractionEquivalentRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionEquivalentRuleInputs): boolean {
     return this.toFloat(answer) < this.toFloat(inputs.f);
   }
   IsGreaterThan(
-      answer: IFractionAnswer,
-      inputs: IFractionEquivalentRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionEquivalentRuleInputs): boolean {
     return this.toFloat(answer) > this.toFloat(inputs.f);
   }
   HasIntegerPartEqualTo(
-      answer: IFractionAnswer,
-      inputs: IFractionIntegerPartRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionIntegerPartRuleInputs): boolean {
     var answerFraction = this.fractionObjectFactory.fromDict(answer);
     return answerFraction.getIntegerPart() === inputs.x;
   }
   HasNumeratorEqualTo(
-      answer: IFractionAnswer,
-      inputs: IFractionIntegerPartRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionIntegerPartRuleInputs): boolean {
     return answer.numerator === inputs.x;
   }
   HasDenominatorEqualTo(
-      answer: IFractionAnswer,
-      inputs: IFractionIntegerPartRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionIntegerPartRuleInputs): boolean {
     return answer.denominator === inputs.x;
   }
-  HasNoFractionalPart(answer: IFractionAnswer): boolean {
+  HasNoFractionalPart(answer: FractionAnswer): boolean {
     return answer.numerator === 0;
   }
   HasFractionalPartExactlyEqualTo(
-      answer: IFractionAnswer,
-      inputs: IFractionEquivalentRuleInputs): boolean {
+      answer: FractionAnswer,
+      inputs: FractionEquivalentRuleInputs): boolean {
     return (
       answer.numerator === inputs.f.numerator &&
       answer.denominator === inputs.f.denominator);

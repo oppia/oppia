@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IEndExplorationCustomizationArgs } from
+import { EndExplorationCustomizationArgs } from
   'interactions/customization-args-defs';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
@@ -36,7 +36,7 @@ describe('EndExplorationValidationService', () => {
 
   let currentState: string;
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
-  let customizationArguments: IEndExplorationCustomizationArgs;
+  let customizationArguments: EndExplorationCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {

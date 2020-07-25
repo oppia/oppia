@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { HighBounceRateTask, HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { ITaskEntryBackendDict } from
+import { TaskEntryBackendDict } from
   'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
@@ -45,10 +45,10 @@ export type ExplorationTaskType = (
   'successive_incorrect_answers');
 
 export type ExplorationTaskBackendDict = (
-  ITaskEntryBackendDict<'high_bounce_rate'> |
-  ITaskEntryBackendDict<'ineffective_feedback_loop'> |
-  ITaskEntryBackendDict<'needs_guiding_responses'> |
-  ITaskEntryBackendDict<'successive_incorrect_answers'>);
+  TaskEntryBackendDict<'high_bounce_rate'> |
+  TaskEntryBackendDict<'ineffective_feedback_loop'> |
+  TaskEntryBackendDict<'needs_guiding_responses'> |
+  TaskEntryBackendDict<'successive_incorrect_answers'>);
 
 export type ExplorationTask = (
   HighBounceRateTask |

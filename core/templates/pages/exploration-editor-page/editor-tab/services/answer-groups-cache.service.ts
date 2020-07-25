@@ -24,7 +24,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IAnswerGroupBackendDict } from
+import { AnswerGroupBackendDict } from
   'domain/exploration/AnswerGroupObjectFactory';
 
 @Injectable({
@@ -41,7 +41,7 @@ export class AnswerGroupsCacheService {
     return AnswerGroupsCacheService._cache.hasOwnProperty(interactionId);
   }
 
-  set(interactionId: string, answerGroups: IAnswerGroupBackendDict): void {
+  set(interactionId: string, answerGroups: AnswerGroupBackendDict): void {
     AnswerGroupsCacheService._cache[interactionId] = cloneDeep(answerGroups);
   }
 

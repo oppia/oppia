@@ -1,4 +1,4 @@
-interface IKNN {
+interface KNN {
   'occurrence': number;
   'K': number;
   'T': number;
@@ -14,16 +14,16 @@ interface IKNN {
   };
 }
 
-interface IKernelParams {
+interface KernelParams {
   kernel: string;
   coef0: number;
   degree: number;
   gamma: number;
 }
 
-interface ISVM {
+interface SVM {
   'classes': number[];
-  'kernel_params': IKernelParams;
+  'kernel_params': KernelParams;
   'intercept': number[];
   'n_support': number[];
   'probA': number[];
@@ -32,22 +32,22 @@ interface ISVM {
   'dual_coef': number[][];
 }
 
-interface IClassifierData {
-  'KNN': IKNN;
-  'SVM': ISVM;
+interface ClassifierData {
+  'KNN': KNN;
+  'SVM': SVM;
   'cv_vocabulary': {
     [key: string]: number;
   };
 }
 
-type IClassifierAccuracyTest = {
+type ClassifierAccuracyTest = {
   'answer_group_index': number;
   'answers': {
     code: string
   }[];
 }[];
 
-interface IHashes {
+interface Hashes {
   '/hash_test.html': string;
   '/path_test/hash_test.html': string;
   '/hash_test.min.js': string;
@@ -58,14 +58,14 @@ interface IHashes {
   '/interactions/interTest/static/interTest.png': string;
 }
 
-interface IInplaceReplaceTest {
+interface InplaceReplaceTest {
   RANDMON1: string;
   '312RANDOM': string;
   DEV_MODE: boolean;
   RAN213DOM: string;
 }
 
-interface ITestCasesRTE {
+interface TestCasesRTE {
   RTE_TYPE_TEXTANGULAR: {
     TEST_CASES: {
       'html_content': string;
@@ -75,28 +75,28 @@ interface ITestCasesRTE {
   };
 }
 
-type ITextClassifierResults = {
+type TextClassifierResults = {
   'answer_group_index': number;
   'answers': string[];
 }[];
 
-interface ITextInputClassifierData {
+interface TextInputClassifierData {
   'best_params': {
     kernel: string;
     C: number;
   };
   'best_score': number;
-  'SVM': ISVM;
+  'SVM': SVM;
   'cv_vocabulary': {
     [key: string]: number;
   };
 }
 
-interface IRuleDescription {
+interface RuleDescription {
   description: string;
 }
 
-interface IRuleTemplates {
+interface RuleTemplates {
   AlgebraicExpressionInput: {
     MatchesExactlyWith: IRuleDescription;
     IsEquivalentTo: IRuleDescription;
@@ -216,8 +216,8 @@ interface IRuleTemplates {
 }
 
 interface KarmaFixtures {
-  'extensions/interactions/rule_templates': IRuleTemplates;
-  'core/tests/data/code_classifier_data': IClassifierData;
+  'extensions/interactions/rule_templates': RuleTemplates;
+  'core/tests/data/code_classifier_data': ClassifierData;
   'core/tests/data/code_classifier_accuracy_test': IClassifierAccuracyTest;
   'core/tests/data/code_classifier_test_knn': IClassifierAccuracyTest;
   'core/tests/data/code_classifier_test_svm': IClassifierAccuracyTest;
@@ -225,6 +225,6 @@ interface KarmaFixtures {
   'core/tests/data/inplace_replace_test': IInplaceReplaceTest;
   'core/tests/data/test_cases_for_rte': ITestCasesRTE;
   'core/tests/data/text_classifier_results': ITextClassifierResults;
-  'core/tests/data/text_input_classifier_data': ITextInputClassifierData;
+  'core/tests/data/text_input_classifier_data': TextInputClassifierData;
   'core/tests/data/text_input_training_data': ITextClassifierResults;
 }

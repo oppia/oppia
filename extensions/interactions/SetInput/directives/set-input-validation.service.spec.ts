@@ -28,7 +28,7 @@ import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { AppConstants } from 'app.constants';
-import { ISetInputCustomizationArgs } from
+import { SetInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('SetInputValidationService', () => {
@@ -40,7 +40,7 @@ describe('SetInputValidationService', () => {
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
-  let goodCustomizationArgs: ISetInputCustomizationArgs;
+  let goodCustomizationArgs: SetInputCustomizationArgs;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 

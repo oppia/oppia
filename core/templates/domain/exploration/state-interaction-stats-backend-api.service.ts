@@ -21,15 +21,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  IVisualizationInfoBackendDict,
+  VisualizationInfoBackendDict,
   VisualizationInfo,
   VisualizationInfoObjectFactory
 } from 'domain/exploration/visualization-info-object.factory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface IStateInteractionStatsBackendDict {
-  'visualizations_info': IVisualizationInfoBackendDict[];
+interface StateInteractionStatsBackendDict {
+  'visualizations_info': VisualizationInfoBackendDict[];
 }
 
 @Injectable({
@@ -45,7 +45,7 @@ export class StateInteractionStatsBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   getStats(explorationId: string, name: string): Promise<VisualizationInfo[]> {
-    return this.http.get<IStateInteractionStatsBackendDict>(
+    return this.http.get<StateInteractionStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         this.STATE_INTERACTION_STATS_URL_TEMPLATE, {
           exploration_id: explorationId,

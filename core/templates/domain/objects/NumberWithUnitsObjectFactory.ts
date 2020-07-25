@@ -26,7 +26,7 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory.ts';
-import { IUnit, INumberWithUnitsAnswer } from
+import { Unit, NumberWithUnitsAnswer } from
   'interactions/answer-defs';
 
 /* Guidelines for adding new custom currency units in Number with Units
@@ -44,7 +44,7 @@ export class NumberWithUnits {
   type: string;
   real: number;
   fraction: Fraction;
-  units: IUnit[];
+  units: Unit[];
 
   constructor(
       type: string, real: number, fractionObj: Fraction,
@@ -250,7 +250,7 @@ export class NumberWithUnitsObjectFactory {
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
-  fromDict(numberWithUnitsDict: INumberWithUnitsAnswer): NumberWithUnits {
+  fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,

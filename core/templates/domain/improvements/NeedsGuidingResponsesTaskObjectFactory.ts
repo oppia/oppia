@@ -20,14 +20,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import { ITaskEntryBackendDict, TaskEntry } from
+import { TaskEntryBackendDict, TaskEntry } from
   'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 
 export class NeedsGuidingResponsesTask extends TaskEntry<
     'needs_guiding_responses'> {
-  constructor(backendDict: ITaskEntryBackendDict<'needs_guiding_responses'>) {
+  constructor(backendDict: TaskEntryBackendDict<'needs_guiding_responses'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -103,7 +103,7 @@ export class NeedsGuidingResponsesTaskObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict<'needs_guiding_responses'>
+      backendDict: TaskEntryBackendDict<'needs_guiding_responses'>
   ): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask(backendDict);
   }

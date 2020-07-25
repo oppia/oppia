@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import {
   ExplorationStats,
   ExplorationStatsObjectFactory,
-  IExplorationStatsBackendDict
+  ExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
 
@@ -33,7 +33,7 @@ describe('Exploration stats', function() {
   });
 
   it('should derive values from the backend dict', () => {
-    const explorationStatsBackendDict: IExplorationStatsBackendDict = {
+    const explorationStatsBackendDict: ExplorationStatsBackendDict = {
       exp_id: 'eid',
       exp_version: 1,
       num_starts: 1,

@@ -22,7 +22,7 @@ import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
-import { IPlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
+import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('PlaythroughIssuesBackendApiService', () => {
@@ -31,7 +31,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
     PlaythroughIssuesBackendApiService = null;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory = null;
 
-  let backendIssues: IPlaythroughIssueBackendDict[] = [{
+  let backendIssues: PlaythroughIssueBackendDict[] = [{
     issue_type: 'MultipleIncorrectSubmissions',
     issue_customization_args: {
       state_name: { value: 'state_name1' },
@@ -107,7 +107,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
     it('should return the playthrough data provided by the backend', fakeAsync(
       () => {
-        let backendPlaythrough: IPlaythroughIssueBackendDict = {
+        let backendPlaythrough: PlaythroughIssueBackendDict = {
           issue_type: 'EarlyQuit',
           issue_customization_args: {
             state_name: { value: 'state_name1' },

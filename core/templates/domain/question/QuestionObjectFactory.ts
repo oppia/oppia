@@ -19,11 +19,11 @@
 
 require('domain/state/StateObjectFactory.ts');
 
-import { IStateBackendDict } from 'domain/state/StateObjectFactory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
 
 export interface QuestionBackendDict {
   'id': string;
-  'question_state_data': IStateBackendDict,
+  'question_state_data': StateBackendDict,
   'question_state_data_schema_version': number;
   'language_code': string;
   'version': number;

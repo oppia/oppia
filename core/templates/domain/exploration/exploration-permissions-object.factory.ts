@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IExplorationPermissionsBackendDict {
+export interface ExplorationPermissionsBackendDict {
   'can_unpublish'?: boolean;
   'can_release_ownership'?: boolean;
   'can_publish'?: boolean;
@@ -59,7 +59,7 @@ export class ExplorationPermissions {
 })
 export class ExplorationPermissionsObjectFactory {
   createFromBackendDict(
-      backendDict: IExplorationPermissionsBackendDict): ExplorationPermissions {
+      backendDict: ExplorationPermissionsBackendDict): ExplorationPermissions {
     return new ExplorationPermissions(
       backendDict.can_unpublish, backendDict.can_release_ownership,
       backendDict.can_publish, backendDict.can_voiceover,

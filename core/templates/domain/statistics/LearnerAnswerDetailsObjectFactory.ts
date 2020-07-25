@@ -22,19 +22,19 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { LearnerAnswerInfo } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
-import { IInteractionCustomizationArgs } from
+import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 
 export class LearnerAnswerDetails {
   expId: string;
   stateName: string;
   interactionId: string;
-  customizationArgs: IInteractionCustomizationArgs;
+  customizationArgs: InteractionCustomizationArgs;
   learnerAnswerInfoData: LearnerAnswerInfo[];
 
   constructor(
       expId: string, stateName: string, interactionId: string,
-      customizationArgs: IInteractionCustomizationArgs,
+      customizationArgs: InteractionCustomizationArgs,
       learnerAnswerInfoData: LearnerAnswerInfo[]) {
     this.expId = expId;
     this.stateName = stateName;
@@ -68,7 +68,7 @@ export class LearnerAnswerDetails {
 export class LearnerAnswerDetailsObjectFactory {
   createDefaultLearnerAnswerDetails(
       expId: string, stateName: string, interactionId: string,
-      customizationArgs: IInteractionCustomizationArgs,
+      customizationArgs: InteractionCustomizationArgs,
       learnerAnswerInfoData: LearnerAnswerInfo[]): LearnerAnswerDetails {
     return new LearnerAnswerDetails(
       expId, stateName, interactionId, customizationArgs,
