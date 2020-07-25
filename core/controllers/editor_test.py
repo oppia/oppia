@@ -1809,7 +1809,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
             # Check that an email was sent with the correct content.
             messages = self._get_sent_email_messages(
-                to=self.EDITOR_EMAIL)
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             self.assertEqual(
