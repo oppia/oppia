@@ -181,6 +181,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+        Raises:
+            Exception: Conversion cannot be completed.
         """
         for change in draft_change_list:
             # We don't want to migrate any changes that involve the
