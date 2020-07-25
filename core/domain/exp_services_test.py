@@ -4547,12 +4547,290 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
     components in explorations.
     """
 
+    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
     def setUp(self):
         super(ExplorationUpdationWithMathSvgsUnitTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.set_admins([self.ADMIN_USERNAME])
+
+    def test_generate_html_change_list_for_state(self):
+        old_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        new_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;file1.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        old_written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': old_html,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': old_html,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        new_written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': new_html,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': new_html,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        old_answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': old_html
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        new_answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': new_html
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        old_state_dict = {
+            'content': {
+                'content_id': 'content', 'html': old_html
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [old_answer_group_dict],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': old_html
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            old_html,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': old_html
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': old_html
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [old_html],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': old_html
+                    }
+                }
+
+            },
+            'written_translations': (
+                old_written_translations_dict)
+        }
+        new_state_dict = {
+            'content': {
+                'content_id': 'content', 'html': new_html
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [new_answer_group_dict],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': new_html
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            new_html,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': new_html
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': new_html
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [new_html],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': new_html
+                    }
+                }
+
+            },
+            'written_translations': (
+                new_written_translations_dict)
+        }
+        state_name = 'state1'
+        expected_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+                'new_value': new_written_translations_dict
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                'new_value': new_state_dict['interaction']['default_outcome']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'new_value': new_state_dict['interaction']['hints']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'new_value': new_state_dict['interaction']['solution']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                'new_value': new_state_dict['interaction']['answer_groups']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': new_state_dict['content']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': new_state_dict['interaction']['customization_args']
+            }).to_dict()]
+        change_lists = exp_services.generate_html_change_list_for_state(
+            state_name, new_state_dict, old_state_dict)
+        change_dict_lists = [
+            change_list.to_dict() for change_list in change_lists]
+        self.assertEqual(
+            sorted(change_dict_lists), sorted(expected_change_list))
 
     def test_exploration_is_updated_with_math_svgs_when_image_data_is_valid(
             self):
@@ -4595,6 +4873,24 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             customization_args_dict)
 
         exp_services.save_new_exploration(self.admin_id, exploration1)
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'New title'})]
+        change_list_dict = [change_list[0].to_dict()]
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        user_models.ExplorationUserDataModel(
+            id='user_id1.exp_id1', user_id='user_id1',
+            exploration_id='exp_id1',
+            draft_change_list=change_list_dict,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=10).put()
+
         svg_file_1 = (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
             '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
@@ -4652,7 +4948,14 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
             filepath = 'image/%s' % filename
             self.assertTrue(fs.isfile(filepath))
-
+        user_exp_model = (
+            user_models.ExplorationUserDataModel.get_by_id('user_id1.exp_id1'))
+        self.assertEqual(user_exp_model.draft_change_list_exp_version, 2)
+        exploration_math_rich_text_info_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
+        self.assertFalse(
+            exploration_math_rich_text_info_model.
+            math_images_generation_required)
 
     def test_updation_fails_when_image_file_is_not_provided(self):
         exploration1 = exp_domain.Exploration.create_default_exploration(

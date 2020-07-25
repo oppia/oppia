@@ -114,11 +114,6 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             node.removeAttribute('role');
             node.removeAttribute('aria-hidden');
             node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-          } else if (node.tagName.toLowerCase() === 'g') {
-            node.removeAttribute('data-mml-node');
-            node.removeAttribute('data-mjx-texclass');
-          } else if (node.tagName.toLowerCase() === 'path') {
-            node.removeAttribute('data-c');
           }
         });
         return doc.documentElement.outerHTML;

@@ -26,6 +26,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import copy
 import datetime
 import functools
 import logging
@@ -1800,74 +1801,71 @@ def save_multi_exploration_math_rich_text_info_model(
         exploration_math_rich_text_info_models)
 
 
-def generate_html_change_list_for_state(state_name, state_dict):
+def generate_html_change_list_for_state(state_name, state_dict, old_state_dict):
     """Returns the change lists for all the html fields in the state dict.
 
     Args:
         state_name: str. The name of the state.
-        state_dict: dict. The dict representation of State object.
+        state_dict: dict. The dict representation of the nenw State object.
+        old_state_dict: dict. The dict representation of the old State object
 
     Returns:
         list(ExplorationChange). The generated change list.
     """
-    change_lists_after_application_of_conversion_fn = []
-    change_lists_after_application_of_conversion_fn.append(
-        exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-            'new_value': state_dict['interaction']['customization_args']
-        }))
-    change_lists_after_application_of_conversion_fn.append(
-        exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'new_value': state_dict['content']
-        }))
 
-    change_lists_after_application_of_conversion_fn.append(
-        exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
-            'new_value': state_dict['written_translations']
-        }))
+    change_lists = []
+    property_name_to_new_value_mapping = []
+    if old_state_dict['interaction']['customization_args'] != (
+            state_dict['interaction']['customization_args']):
+        property_name_to_new_value_mapping.append(
+            (
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                state_dict['interaction']['customization_args']))
+    if old_state_dict['content'] != (
+            state_dict['content']):
+        property_name_to_new_value_mapping.append(
+            (exp_domain.STATE_PROPERTY_CONTENT, state_dict['content']))
 
-    change_lists_after_application_of_conversion_fn.append(
-        exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-            'new_value': state_dict['interaction']['default_outcome']
-        }))
-    change_lists_after_application_of_conversion_fn.append(
-        exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-            'new_value': state_dict['interaction']['hints']
-        }))
+    if old_state_dict['written_translations'] != (
+            state_dict['written_translations']):
+        property_name_to_new_value_mapping.append(
+            (
+                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+                state_dict['written_translations']))
+    if old_state_dict['interaction']['default_outcome'] != (
+            state_dict['interaction']['default_outcome']):
+        property_name_to_new_value_mapping.append(
+            (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+                state_dict['interaction']['default_outcome']))
+    if old_state_dict['interaction']['hints'] != (
+            state_dict['interaction']['hints']):
+        property_name_to_new_value_mapping.append(
+            (
+                exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                state_dict['interaction']['hints']))
+    if old_state_dict['interaction']['solution'] != (
+            state_dict['interaction']['solution']):
+        property_name_to_new_value_mapping.append(
+            (
+                exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                state_dict['interaction']['solution']))
+    if old_state_dict['interaction']['answer_groups'] != (
+            state_dict['interaction']['answer_groups']):
+        property_name_to_new_value_mapping.append(
+            (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+                state_dict['interaction']['answer_groups']))
 
-    change_lists_after_application_of_conversion_fn.append(
-        exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-            'new_value': state_dict['interaction']['solution']
-        }))
-
-    change_lists_after_application_of_conversion_fn.append(
-        exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': state_dict['interaction']['answer_groups']
-        }))
-
-    return change_lists_after_application_of_conversion_fn
+    for property_name, new_value in property_name_to_new_value_mapping:
+        change_lists.append(
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': property_name,
+                'new_value': new_value
+            }))
+    return change_lists
 
 
 def get_latex_strings_and_exp_ids_for_generating_svgs():
@@ -1912,6 +1910,7 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
             functools.partial(
                 html_validation_service.
                 add_svg_filenames_for_latex_strings_in_html_string, image_data))
+        old_state_dict = copy.deepcopy(state.to_dict())
         converted_state_dict = (
             state_domain.State.convert_html_fields_in_state(
                 state.to_dict(),
@@ -1921,7 +1920,7 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
             ''.join(converted_state.get_all_html_content_strings()))
         change_lists.extend(
             generate_html_change_list_for_state(
-                state_name, converted_state_dict))
+                state_name, converted_state_dict, old_state_dict))
 
     filenames_mapping = (
         html_validation_service.
@@ -1954,21 +1953,27 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
 
     update_exploration(
         user_id, exp_id, change_lists, 'added SVG images for math tags.')
-
+    exploration_math_rich_text_info_model = (
+        exp_models.ExplorationMathRichTextInfoModel.get_by_id(exp_id))
+    exploration_math_rich_text_info_model.math_images_generation_required = (
+        False)
+    exploration_math_rich_text_info_model.put()
     exploration_user_data_model = (
         user_models.ExplorationUserDataModel.get_all().filter(
             user_models.ExplorationUserDataModel.exploration_id == exp_id))
     exploration_version_before_update = exploration.version
     user_models_to_update = []
     for model in exploration_user_data_model:
-        if model.draft_change_list:
+        if model.draft_change_list is None:
             continue
         if model.draft_change_list_exp_version is None:
             continue
-        draft_change_list = model.draft_changes
+        draft_change_list = [
+            exp_domain.ExplorationChange(change)
+            for change in model.draft_change_list]
         if model.draft_change_list_exp_version == (
                 exploration_version_before_update):
-            html_in_draft_change = (
+            html_in_draft_change = ''.join(
                 draft_upgrade_services.extract_html_from_draft_change_list(
                     draft_change_list))
             if len(
