@@ -389,15 +389,18 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_install_hook_with_existing_symlink(self):
         def mock_islink(unused_file):
             return True
+        def mock_exists(unused_file):
+            return True
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', None)
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with islink_swap, subprocess_swap, self.print_swap:
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertTrue(
@@ -406,15 +409,18 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_install_hook_with_error_in_making_pre_push_executable(self):
         def mock_islink(unused_file):
             return True
+        def mock_exists(unused_file):
+            return True
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', 'Error')
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with islink_swap, subprocess_swap, self.print_swap:
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             with self.assertRaisesRegexp(ValueError, 'Error'):
                 pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
@@ -427,18 +433,21 @@ class PrePushHookTests(test_utils.GenericTestBase):
         }
         def mock_islink(unused_file):
             return False
+        def mock_exists(unused_file):
+            return False
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', None)
         def mock_symlink(unused_path, unused_file):
             check_function_calls['symlink_is_called'] = True
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
-        with islink_swap, subprocess_swap, symlink_swap, self.print_swap:
+        with islink_swap, exists_swap, subprocess_swap, symlink_swap, self.print_swap:
             pre_push_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue(
@@ -457,6 +466,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         }
         def mock_islink(unused_file):
             return False
+        def mock_exists(unused_file):
+            return False
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             return ('Output', None)
         def mock_symlink(unused_path, unused_file):
@@ -466,6 +477,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             check_function_calls['copy_is_called'] = True
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
@@ -479,6 +491,38 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue('Copied file to .git/hooks directory' in self.print_arr)
         self.assertTrue(
             'pre-push hook file is now executable!' in self.print_arr)
+
+    def test_install_hook_with_broken_symlink(self):
+        check_function_calls = {
+            'unlink_is_called': False,
+            'symlink_is_called': False
+        }
+        def mock_islink(unused_file):
+            return True
+        def mock_exists(unused_file):
+            return False
+        def mock_start_subprocess_for_result(unused_cmd_tokens):
+            return ('Output', None)
+        def mock_unlink(unused_file):
+            check_function_calls['unlink_is_called'] = True
+        def mock_symlink(unused_path, unused_file):
+            check_function_calls['symlink_is_called'] = True
+
+        islink_swap = self.swap(os.path, 'islink', mock_islink)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        subprocess_swap = self.swap(
+            pre_push_hook, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+        unlink_swap = self.swap(os, 'unlink', mock_unlink)
+        symlink_swap = self.swap(os, 'symlink', mock_symlink)
+
+        with islink_swap, exists_swap, subprocess_swap, unlink_swap, symlink_swap, self.print_swap:
+            pre_push_hook.install_hook()
+        self.assertTrue(check_function_calls['unlink_is_called'])
+        self.assertTrue(check_function_calls['symlink_is_called'])
+        self.assertTrue('Removing broken symlink' in self.print_arr)
+        self.assertTrue(
+            'pre-push hook file is now executable!'in self.print_arr)
 
     def test_does_diff_include_js_or_ts_files_with_js_file(self):
         self.assertTrue(

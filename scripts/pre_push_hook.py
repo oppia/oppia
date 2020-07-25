@@ -335,22 +335,15 @@ def install_hook():
     if os.path.islink(pre_push_file) and os.path.exists(pre_push_file):
         python_utils.PRINT('Symlink already exists')
     else:
+        # If its a broken symlink, delete it.
+        if os.path.islink(pre_push_file) and not os.path.exists(pre_push_file):
+            os.unlink(pre_push_file)
+            python_utils.PRINT('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(__file__), pre_push_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
-        # Raises OSError when the symlink already exists but is broken.
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                os.unlink(pre_push_file)
-                os.symlink(os.path.abspath(__file__), pre_push_file)
-                python_utils.PRINT(
-                    'Unlinked and created symlink in .git/hooks directory'
-                )
-            else:       # Fail safe.
-                shutil.copy(__file__, pre_push_file)
-                python_utils.PRINT('Copied file to .git/hooks directory')
-        # Raises AttributeError on windows.
-        except AttributeError:
+        # Raises AttributeError on windows, OSError added as failsafe.
+        except (OSError, AttributeError):
             shutil.copy(__file__, pre_push_file)
             python_utils.PRINT('Copied file to .git/hooks directory')
 

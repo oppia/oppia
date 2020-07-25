@@ -71,22 +71,15 @@ def install_hook():
         # This is needed, because otherwise some systems symlink/copy the .pyc
         # file instead of the .py file.
         this_file = __file__.replace('pyc', 'py')
+        # If its a broken symlink, delete it.
+        if os.path.islink(pre_commit_file) and not os.path.exists(pre_commit_file):
+            os.unlink(pre_commit_file)
+            python_utils.PRINT('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(this_file), pre_commit_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
-        # Raises OSError when the symlink already exists but is broken.
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                os.unlink(pre_commit_file)
-                os.symlink(os.path.abspath(this_file), pre_commit_file)
-                python_utils.PRINT(
-                    'Unlinked and created symlink in .git/hooks directory'
-                )
-            else:       # Fail safe.
-                shutil.copy(this_file, pre_commit_file)
-                python_utils.PRINT('Copied file to .git/hooks directory')
-        # Raises AttributeError on windows.
-        except AttributeError:
+        # Raises AttributeError on windows, OSError added as failsafe.
+        except (OSError, AttributeError):
             shutil.copy(this_file, pre_commit_file)
             python_utils.PRINT('Copied file to .git/hooks directory')
 
