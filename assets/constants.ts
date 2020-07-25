@@ -5306,6 +5306,10 @@ export = {
     "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
 
+  "OSK_MAIN_TAB": "mainTab",
+  "OSK_FUNCTIONS_TAB": "functionsTab",
+  "OSK_LETTERS_TAB": "lettersTab",
+
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
