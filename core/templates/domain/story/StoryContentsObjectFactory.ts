@@ -45,8 +45,6 @@ export class StoryContents {
     this._storyNodeObjectFactoryInstance = storyNodeObjectFactoryInstance;
   }
 
-  _disconnectedNodes: StoryNode[] = [];
-
   getIncrementedNodeId(nodeId: string): string {
     var index = parseInt(
       nodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
@@ -59,22 +57,7 @@ export class StoryContents {
   }
 
   getLinearNodesList(): StoryNode[] {
-    var linearList = [];
-    var currentIndex = this.getNodeIndex(this._initialNodeId);
-    while (true) {
-      var node = this._nodes[currentIndex];
-      linearList.push(node);
-      if (node.getDestinationNodeIds().length === 0) {
-        break;
-      } else {
-        currentIndex = this.getNodeIndex(node.getDestinationNodeIds()[0]);
-      }
-    }
-    return linearList;
-  }
-
-  getDisconnectedNodes(): StoryNode[] {
-    return this._disconnectedNodes;
+    return this._nodes.slice();
   }
 
   getNextNodeId(): string {
@@ -93,6 +76,12 @@ export class StoryContents {
       }
     }
     return null;
+  }
+
+  rearrangeNodeInStory(fromIndex, toIndex) {
+    const nodeToMove = this._nodes[fromIndex];
+    this._nodes.splice(fromIndex, 1);
+    this._nodes.splice(toIndex, 0, nodeToMove);
   }
 
   getNodeIdsToTitleMap(nodeIds: string[]): {} {
@@ -129,7 +118,6 @@ export class StoryContents {
   }
 
   validate(): string[] {
-    this._disconnectedNodes = [];
     var issues: string[] = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
@@ -237,14 +225,6 @@ export class StoryContents {
             }
           );
           nodesQueue.push(nodeId);
-        }
-      }
-      for (var i = 0; i < nodeIsVisited.length; i++) {
-        if (!nodeIsVisited[i]) {
-          this._disconnectedNodes.push(nodes[i]);
-          issues.push(
-            'There is no way to get to the chapter with title ' +
-            nodeTitles[i] + ' from any other chapter');
         }
       }
     }

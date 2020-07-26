@@ -204,16 +204,14 @@ class SetupTests(test_utils.GenericTestBase):
             'close_is_called': True,
             'remove_is_called': True
         }
-        # pylint: disable=unused-argument
-        def mock_url_retrieve(unused_url, filename):
+        def mock_url_retrieve(unused_url, filename):  # pylint: disable=unused-argument
             check_function_calls['url_retrieve_is_called'] = True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name):
+        def mock_open(name):  # pylint: disable=unused-argument
             check_function_calls['open_is_called'] = True
             return temp_file
-        def mock_extractall(unused_self, path):
+        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
             check_function_calls['extractall_is_called'] = True
-        # pylint: enable=unused-argument
         def mock_close(unused_self):
             check_function_calls['close_is_called'] = True
         def mock_remove(unused_path):
@@ -375,7 +373,7 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
 
-        def mock_url_retrieve(url, unused_filename):
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
             self.urls.append(url)
 
         def mock_check_call(commands):
@@ -418,7 +416,7 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
 
-        def mock_url_retrieve(url, unused_filename):
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
             self.urls.append(url)
 
         def mock_check_call(commands):

@@ -45,18 +45,14 @@ for package_name, version_number, target_path in PREREQUISITES:
             subprocess.check_call(command_text + uextention_text)
 
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import python_utils  # isort:skip
+import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
-from . import common  # isort:skip
-from . import install_third_party  # isort:skip
-from . import pre_commit_hook  # isort:skip
-from . import pre_push_hook  # isort:skip
-from . import setup  # isort:skip
-from . import setup_gae  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""

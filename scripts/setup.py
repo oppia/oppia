@@ -115,7 +115,7 @@ def download_and_install_node():
             common.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
             common.NODE_VERSION, node_file_name, extension)
-        python_utils.url_retrieve(url_to_retrieve, outfile_name)
+        python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',

@@ -7457,7 +7457,6 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
     YAML_CONTENT_V35_IMAGE_DIMENSIONS = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -7602,12 +7601,16 @@ states:
       hints:
       - hint_content:
           content_id: hint_1
-          html: <p>Hello, this is</p><p> html1<strong> for </strong></p><p>state2</p>
+          html: <p>Hello, this is</p><p> html1<strong> for </strong></p>
+          <p>state2</p>
       - hint_content:
           content_id: hint_2
-          html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
-            forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
-            forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
+          html: <p>Here is link 2 <oppia-noninteractive-link
+            text-with-value="&amp;quot;discussion
+            forum&amp;quot;"
+            url-with-value="&amp;quot;https://groups.google.com/
+            forum/?fromgroups#!forum/oppia&amp;quot;">
+            </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
     param_changes: []
@@ -7639,11 +7642,17 @@ states:
           dest: state1
           feedback:
             content_id: feedback_1
-            html: <p>Here is the image1 </p><oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
-              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
-              alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
+            html: <p>Here is the image1 </p><oppia-noninteractive-image
+              alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;"
+              filepath-with-value=
+              "&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
+              </oppia-noninteractive-image><p>Here is the image2 </p>
+              <oppia-noninteractive-image
+              alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;"
+              filepath-with-value=
+              "&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
               </oppia-noninteractive-image>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -7700,7 +7709,6 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
     YAML_CONTENT_V39_IMAGE_DIMENSIONS = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -8321,8 +8329,6 @@ states_schema_version: 34
 tags: []
 title: Title
 """)
-
-# pylint: enable=line-too-long
 
 
     def test_load_from_v26_textangular(self):
