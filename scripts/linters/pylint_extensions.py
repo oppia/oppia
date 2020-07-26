@@ -25,6 +25,7 @@ import linecache
 import os
 import re
 import sys
+import tokenize
 
 import python_utils
 from .. import docstrings_checker
@@ -43,15 +44,11 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid  # isort:skip
-from pylint import checkers  # isort:skip
-from pylint import interfaces  # isort:skip
-from pylint.checkers import typecheck  # isort:skip
-from pylint.checkers import utils as checker_utils  # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
+import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import typecheck  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def read_from_node(node):
@@ -1782,6 +1779,50 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
             self.add_message('newline-below-class-docstring', node=node)
 
 
+class SingleLinePragmaChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks if pylint pragma is used to disable
+    a rule for a single line only.
+    """
+
+    __implements__ = interfaces.ITokenChecker
+
+    name = 'single-line-pragma'
+    priority = -1
+    msgs = {
+        'C0027': (
+            'Pylint pragmas should be used to disable a rule '
+            'for a single line only',
+            'single-line-pragma',
+            'Please use pylint pragmas to disable a rule for a single line only'
+        )
+    }
+
+    def process_tokens(self, tokens):
+        """Custom pylint checker which allows paramas to disable a rule for a
+        single line only.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT:
+                line = line.lstrip()
+                # Ignore line that is enabling this check.
+                # Example:
+                # # pylint: disable=import-only-modules, single-line-pragma
+                # def func(a, b):
+                # # pylint: enable=import-only-modules, single-line-pragma
+                # Now if do not ignore the line with 'enable' statement
+                # pylint will raise the error of single-line-pragma because
+                # from here on all this lint check is enabled. So we need to
+                # ignore this line.
+                if line.startswith(b'# pylint:'):
+                    if 'enable' in line and 'single-line-pragma' in line:
+                        continue
+                    self.add_message(
+                        'single-line-pragma', line=line_num)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1804,3 +1845,4 @@ def register(linter):
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(NewlineBelowClassDocstring(linter))
+    linter.register_checker(SingleLinePragmaChecker(linter))
