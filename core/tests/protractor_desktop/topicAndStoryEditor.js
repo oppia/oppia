@@ -336,12 +336,9 @@ describe('Chapter editor functionality', function() {
 
   it('should fail to add one more chapter with existing exploration',
     async function() {
-      await storyEditorPage.navigateToChapterByIndex(1);
       await storyEditorPage.createNewChapter(
-        'Chapter 3', dummyExplorationIds[2], '../data/test_svg.svg');
-      await storyEditorPage.navigateToChapterByIndex(2);
-      await storyEditorPage.expectExplorationIdAlreadyExistWarningAndCloseIt();
-      allowedErrors.push('The given exploration already exists in the story.');
+        'Chapter 3', dummyExplorationIds[1], '../data/test_svg.svg');
+      await storyEditorPage.expectExplorationIdAlreadyExistWarning();
     }
   );
 

@@ -45,6 +45,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.invalidExpId = '';
       $scope.nodeTitles = nodeTitles;
       $scope.errorMsg = null;
+      $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
       $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
       $scope.story = StoryEditorStateService.getStory();
       $scope.nodeId = $scope.story.getStoryContents().getNextNodeId();
@@ -81,6 +82,15 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
     };
 
     $scope.updateExplorationId = function() {
+      var nodes = $scope.story.getStoryContents().getNodes();
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].getExplorationId() === $scope.explorationId) {
+          $scope.invalidExpErrorString = (
+            'The given exploration already exists in the story.');
+          $scope.invalidExpId = true;
+          return;
+        }
+      }
       if (StoryEditorStateService.isStoryPublished()) {
         ExplorationIdValidationService.isExpPublished(
           $scope.explorationId).then(function(expIdIsValid) {
@@ -103,6 +113,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
     $scope.resetErrorMsg = function() {
       $scope.errorMsg = null;
       $scope.invalidExpId = false;
+      $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
     };
 
     $scope.isValid = function() {

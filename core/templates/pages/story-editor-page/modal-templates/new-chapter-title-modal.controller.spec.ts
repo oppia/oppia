@@ -173,6 +173,15 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.invalidExpId).toEqual(true);
   });
 
+  it('should show the error message if explorationId is already present',
+    function() {
+      $scope.explorationId = 'exp_1';
+      $scope.updateExplorationId();
+      expect($scope.invalidExpErrorString).toEqual(
+        'The given exploration already exists in the story.');
+      expect($scope.invalidExpId).toEqual(true);
+    });
+
   it('should show the close the modal if expId is valid', function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();

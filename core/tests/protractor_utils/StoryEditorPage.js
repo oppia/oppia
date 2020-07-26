@@ -114,6 +114,9 @@ var StoryEditorPage = function() {
     by.css('.story-node-thumbnail .protractor-test-photo-button'));
   var createChapterThumbnailButton = element(
     by.css('.chapter-input-thumbnail .protractor-test-photo-button'));
+  var explorationAlreadyPresentMsg = element(
+    by.css('.protractor-test-invalid-exp-id'));
+
   this.get = async function(storyId) {
     await browser.get(EDITOR_URL_PREFIX + storyId);
     await waitFor.pageToFullyLoad();
@@ -332,20 +335,11 @@ var StoryEditorPage = function() {
       nodeOutlineEditorRteContent.first().getText()).toEqual(nodeOutline);
   };
 
-  this.expectExplorationIdAlreadyExistWarningAndCloseIt = async function() {
-    var warningToast = element(
-      by.css('.protractor-test-toast-warning-message'));
-    await waitFor.visibilityOf(
-      warningToast,
-      'warningToast takes too long to be visible.');
-    expect(await warningToast.getText()).toEqual(
+  this.expectExplorationIdAlreadyExistWarning = async function() {
+    expect(await explorationAlreadyPresentMsg.isDisplayed()).toBe(true);
+    expect(
+      await explorationAlreadyPresentMsg.getText()).toEqual(
       'The given exploration already exists in the story.');
-    var closeToastButton = element(
-      by.css('.protractor-test-close-toast-warning'));
-    await waitFor.elementToBeClickable(
-      closeToastButton,
-      'closeToastButton takes too long to be clickable.');
-    await closeToastButton.click();
   };
 
   this.getSelectSkillModal = async function() {
