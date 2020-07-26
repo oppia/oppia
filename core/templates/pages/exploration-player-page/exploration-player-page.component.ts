@@ -93,8 +93,6 @@ angular.module('oppia').component('explorationPlayerPage', {
           });
         };
         bindExplorationPlayerShortcuts();
-
-
       };
     }
   ]
