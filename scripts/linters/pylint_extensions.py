@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0028.
+presubmit checks. Next message id would be C0029.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1808,7 +1808,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
     name = 'single-line-pragma'
     priority = -1
     msgs = {
-        'C0027': (
+        'C0028': (
             'Pylint pragmas should be used to disable a rule '
             'for a single line only',
             'single-line-pragma',
