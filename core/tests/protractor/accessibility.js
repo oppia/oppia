@@ -130,9 +130,9 @@ describe('screenreader and keyboard user accessibility features', function() {
     });
 
   it('should test navigation shortcuts for the donate learner-dashboard page',
-  async function() {
-    await testNavigationShortcuts('learner-dashboard');
-  });
+    async function() {
+      await testNavigationShortcuts('learner-dashboard');
+    });
 
   it('should test navigation shortcuts for the notifications page',
     async function() {
