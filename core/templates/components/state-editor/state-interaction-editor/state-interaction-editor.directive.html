@@ -25,7 +25,8 @@
               <div class="oppia-interaction-preview oppia-transition-200"
                    ng-click="openInteractionCustomizerModal()"
                    ng-if="EditabilityService.isEditable()"
-                   style="position: absolute; width: 100%; height: 100%;">
+                   style="position: absolute; width: 100%; height: 100%;"
+                   aria-label="edit interaction">
               </div>
               <div>
                 <angular-html-bind html-data="interactionPreviewHtml" style="padding: 5px; pointer-events: none;">

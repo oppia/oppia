@@ -94,7 +94,6 @@ describe('Topic editor functionality', function() {
     expect(defaultThumbnailSrc).not.toEqual(updatedTopicThumbnailSrc);
     await topicEditorPage.changeTopicDescription('Topic Description');
     await topicEditorPage.saveTopic('Changed topic name and description.');
-    await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.addSubtopic(
       'Subtopic 1', '../data/test_svg.svg', 'Subtopic1 content');
     await topicEditorPage.navigateToTopicEditorTab();
@@ -219,8 +218,7 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg');
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
-    await storyEditorPage.createInitialChapter('Chapter 1');
-    await storyEditorPage.selectInitialChapterByName('Chapter 1');
+    await storyEditorPage.createNewChapter('Chapter 1');
     await storyEditorPage.submitChapterThumbnail(
       '../data/test2_svg.svg', false);
     expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import html.parser
 import os
 import subprocess
 import sys
@@ -28,10 +29,6 @@ import python_utils
 from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
-
-# pylint: disable=wrong-import-position
-import html.parser # isort:skip
-# pylint: enable=wrong-import-position
 
 
 class TagMismatchException(Exception):
