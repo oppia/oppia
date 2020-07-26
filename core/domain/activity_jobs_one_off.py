@@ -216,13 +216,15 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         class_name = commit_model.__class__.__name__
         last_updated = commit_model.last_updated
         created_on = commit_model.created_on
-        if (FixCommitLastUpdatedOneOffJob.MIGRATION_START < last_updated <
+        if (
+                FixCommitLastUpdatedOneOffJob.MIGRATION_START < last_updated <
                 FixCommitLastUpdatedOneOffJob.MIGRATION_END):
             commit_model.last_updated = commit_model.created_on
             commit_model.put(update_last_updated_time=False)
             yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
-        elif (datetime.timedelta(0) < last_updated - created_on <
-              datetime.timedelta(hours=1)):
+        elif (
+                datetime.timedelta(0) < last_updated - created_on <
+                datetime.timedelta(hours=1)):
             yield ('SUCCESS_NEWLY_CREATED - %s' % class_name, commit_model.id)
         elif commit_model.user_id in feconf.SYSTEM_USERS.keys():
             yield ('SUCCESS_ADMIN - %s' % class_name, commit_model.id)

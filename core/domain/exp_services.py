@@ -159,7 +159,8 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
+        if (len(
+                returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
                 or search_cursor is None):
             break
         else:
@@ -167,7 +168,8 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
+    if (len(
+            returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -356,7 +358,8 @@ def apply_change_list(exploration_id, change_list):
                 exploration.delete_state(change.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state = exploration.states[change.state_name]
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(
                         list(python_utils.MAP(
@@ -400,8 +403,9 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if not isinstance(change.new_value, list):
-                        raise Exception('Expected hints_list to be a list,'
-                                        ' received %s' % change.new_value)
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
                     new_hints_list = [state_domain.Hint.from_dict(hint_dict)
                                       for hint_dict in change.new_value]
                     state.update_interaction_hints(new_hints_list)
@@ -1280,7 +1284,8 @@ def save_new_exploration_from_yaml_and_assets(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(asset_filename, asset_content)
 
-    if (exp_schema_version <=
+    if (
+            exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
         # The schema of the YAML file for older explorations did not include
         # a title and a category; these need to be manually specified.
@@ -1324,8 +1329,9 @@ def delete_demo(exploration_id):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if not exploration:
-        logging.info('Exploration with id %s was not deleted, because it '
-                     'does not exist.' % exploration_id)
+        logging.info(
+            'Exploration with id %s was not deleted, because it '
+            'does not exist.' % exploration_id)
     else:
         delete_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
@@ -1524,7 +1530,8 @@ def is_voiceover_change_list(change_list):
         allowed for voice artist to do.
     """
     for change in change_list:
-        if (change.property_name !=
+        if (
+                change.property_name !=
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
@@ -1573,10 +1580,11 @@ def get_user_exploration_data(
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                     and exp_user_data.draft_change_list else None)
-    draft_change_list_id = (exp_user_data.draft_change_list_id
-                            if exp_user_data else 0)
+    draft_changes = (
+        exp_user_data.draft_change_list if exp_user_data
+        and exp_user_data.draft_change_list else None)
+    draft_change_list_id = (
+        exp_user_data.draft_change_list_id if exp_user_data else 0)
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
@@ -1646,7 +1654,8 @@ def create_or_update_draft(
             'changes in the change list.')
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    if (exp_user_data and exp_user_data.draft_change_list and
+    if (
+            exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
 
@@ -1704,7 +1713,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_change_list_exp_version = exploration.version
     updated_exploration = None
 
-    if (exp_user_data and exp_user_data.draft_change_list and
+    if (
+            exp_user_data and exp_user_data.draft_change_list and
             is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
         updated_exploration = apply_change_list(exp_id, draft_change_list)
         updated_exploration_has_no_invalid_math_tags = True

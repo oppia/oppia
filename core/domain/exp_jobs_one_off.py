@@ -378,7 +378,8 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         # If the exploration model being stored in the datastore is not the
         # most up-to-date states schema version, then update it.
-        if (item.states_schema_version !=
+        if (
+                item.states_schema_version !=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
@@ -661,7 +662,8 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_rights is None:
             return
 
-        if (exploration_rights.status == constants.ACTIVITY_STATUS_PRIVATE
+        if (
+                exploration_rights.status == constants.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
 

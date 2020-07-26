@@ -167,9 +167,10 @@ def _update_linked_skill_ids_of_question(
     change_list = [question_domain.QuestionChange(change_dict)]
     update_question(
         user_id, question_id, change_list, 'Updated linked skill ids')
-    (opportunity_services
-     .update_skill_opportunities_on_question_linked_skills_change(
-         old_linked_skill_ids, new_linked_skill_ids))
+    (
+        opportunity_services
+        .update_skill_opportunities_on_question_linked_skills_change(
+            old_linked_skill_ids, new_linked_skill_ids))
 
 
 def delete_question_skill_link(user_id, question_id, skill_id):
@@ -250,13 +251,14 @@ def get_questions_by_skill_ids(
 
     if require_medium_difficulty:
         question_skill_link_models = (
-            question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
+            question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
                 total_question_count, skill_ids,
                 constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
                     constants.SKILL_DIFFICULTY_MEDIUM]))
     else:
         question_skill_link_models = (
-            question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_equidistributed_by_skill(
                 total_question_count, skill_ids))
 
     question_ids = [model.question_id for model in question_skill_link_models]
@@ -454,7 +456,8 @@ def get_displayable_question_skill_link_details(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
     question_skill_link_models, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
+        question_models.QuestionSkillLinkModel.
+        get_question_skill_links_by_skill_ids(
             question_count, skill_ids, start_cursor))
 
     # Deduplicate question_ids and group skill_descriptions that are linked to
@@ -524,16 +527,19 @@ def apply_change_list(question_id, change_list):
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
                     question.update_language_code(change.new_value)
-                elif (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
+                elif (
+                        change.property_name ==
+                        question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
                     state_domain_object = state_domain.State.from_dict(
                         change.new_value)
                     question.update_question_state_data(state_domain_object)
-                elif (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
+                elif (
+                        change.property_name ==
+                        question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
                     question.update_linked_skill_ids(change.new_value)
 
         return question

@@ -532,7 +532,7 @@ def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
     return (any(
         filepath.startswith(bad_pattern)
         for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
-        or filepath in BAD_PATTERNS[pattern]['excluded_files'])
+            or filepath in BAD_PATTERNS[pattern]['excluded_files'])
 
 
 def check_bad_pattern_in_file(filepath, file_content, pattern):
@@ -558,10 +558,10 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
     regexp = pattern['regexp']
     if not (any(
             filepath.startswith(excluded_dir)
-                for excluded_dir in pattern['excluded_dirs'])
+            for excluded_dir in pattern['excluded_dirs'])
             or any(
-                    filepath.endswith(excluded_file)
-                    for excluded_file in pattern['excluded_files'])):
+                filepath.endswith(excluded_file)
+                for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content, 1):
             if line.endswith('\n'):

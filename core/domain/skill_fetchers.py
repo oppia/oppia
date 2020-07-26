@@ -128,15 +128,18 @@ def get_skill_from_model(skill_model):
     }
 
     # Migrate the skill if it is not using the latest schema version.
-    if (skill_model.skill_contents_schema_version !=
+    if (
+            skill_model.skill_contents_schema_version !=
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
         _migrate_skill_contents_to_latest_schema(versioned_skill_contents)
 
-    if (skill_model.misconceptions_schema_version !=
+    if (
+            skill_model.misconceptions_schema_version !=
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 
-    if (skill_model.rubric_schema_version !=
+    if (
+            skill_model.rubric_schema_version !=
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
         _migrate_rubrics_to_latest_schema(versioned_rubrics)
 
@@ -178,14 +181,16 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
             is supported at present.
     """
     skill_contents_schema_version = versioned_skill_contents['schema_version']
-    if not (1 <= skill_contents_schema_version
+    if not (
+            1 <= skill_contents_schema_version
             <= feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d skill schemas at '
             'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
 
-    while (skill_contents_schema_version <
-           feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+    while (
+            skill_contents_schema_version <
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
         skill_domain.Skill.update_skill_contents_from_model(
             versioned_skill_contents, skill_contents_schema_version)
         skill_contents_schema_version += 1
@@ -210,14 +215,16 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
             is supported at present.
     """
     misconception_schema_version = versioned_misconceptions['schema_version']
-    if not (1 <= misconception_schema_version
+    if not (
+            1 <= misconception_schema_version
             <= feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
 
-    while (misconception_schema_version <
-           feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+    while (
+            misconception_schema_version <
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         skill_domain.Skill.update_misconceptions_from_model(
             versioned_misconceptions, misconception_schema_version)
         misconception_schema_version += 1
@@ -241,14 +248,16 @@ def _migrate_rubrics_to_latest_schema(versioned_rubrics):
             at present.
     """
     rubric_schema_version = versioned_rubrics['schema_version']
-    if not (1 <= rubric_schema_version
+    if not (
+            1 <= rubric_schema_version
             <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d rubric schemas at '
             'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
 
-    while (rubric_schema_version <
-           feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+    while (
+            rubric_schema_version <
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
         skill_domain.Skill.update_rubrics_from_model(
             versioned_rubrics, rubric_schema_version)
         rubric_schema_version += 1

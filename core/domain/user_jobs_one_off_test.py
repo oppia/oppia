@@ -1221,11 +1221,12 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
                     'value': [
                         '<p>1</p>',
                         '<p>2</p>',
-                        ('<p>Value</p><oppia-noninteractive-math math_content-'
-                         'with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot'
-                         ';+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;'
-                         ': &amp;quot;&amp;quot;}"></oppia-noninteractive-mat'
-                         'h>'),
+                        (
+                            '<p>Value</p><oppia-noninteractive-math math_conten'
+                            't-with-value="{&amp;quot;raw_latex&amp;quot;: &amp'
+                            ';quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&am'
+                            'p;quot;'': &amp;quot;&amp;quot;}"></oppia-noninter'
+                            'active-math>'),
                         '<p>4</p>'
                     ]
                 },
@@ -1243,11 +1244,12 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
             'property_name': 'content',
             'new_value': {
                 'content_id': 'content',
-                'html': ('<p>Value</p><oppia-noninteractive-math math_content-'
-                         'with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot'
-                         ';++++&amp;quot;, &amp;quot;svg_filename&amp;quot;'
-                         ': &amp;quot;&amp;quot;}"></oppia-noninteractive-mat'
-                         'h>')
+                'html': (
+                    '<p>Value</p><oppia-noninteractive-math math_content-'
+                    'with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot'
+                    ';++++&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                    ': &amp;quot;&amp;quot;}"></oppia-noninteractive-mat'
+                    'h>')
             }
         }).to_dict()]
 
@@ -1326,11 +1328,12 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
                     'value': [
                         '<p>1</p>',
                         '<p>2</p>',
-                        ('<p>Value</p><oppia-noninteractive-math math_content-'
-                         'with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot'
-                         ';+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;'
-                         ': &amp;quot;&amp;quot;}"></oppia-noninteractive-mat'
-                         'h>'),
+                        (
+                            '<p>Value</p><oppia-noninteractive-math math_conten'
+                            't-with-value="{&amp;quot;raw_latex&amp;quot;: &amp'
+                            ';quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&am'
+                            'p;quot;: &amp;quot;&amp;quot;}"></oppia-noninterac'
+                            'tive-math>'),
                         '<p>4</p>'
                     ]
                 },
@@ -1418,9 +1421,10 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
                     'value': [
                         '<p>1</p>',
                         '<p>2</p>',
-                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>'),
+                        (
+                            '<oppia-noninteractive-math raw_latex-with-value="&'
+                            'amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&a'
+                            'mp;q''uot;"></oppia-noninteractive-math>'),
                         '<p>4</p>'
                     ]
                 },
@@ -1881,12 +1885,12 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 3)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 3)
+        self.assertEqual(len(
+            user_models.UserSubscriptionsModel.get(self.owner_id)
+            .activity_ids), 3)
+        self.assertEqual(len(
+            user_models.UserSubscriptionsModel.get(self.user_id)
+            .activity_ids), 3)
 
         job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
         job_id = job.create_new()
@@ -1896,12 +1900,12 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 0)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 0)
+        self.assertEqual(len(
+            user_models.UserSubscriptionsModel.get(self.owner_id)
+            .activity_ids), 0)
+        self.assertEqual(len(
+            user_models.UserSubscriptionsModel.get(self.user_id)
+            .activity_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
             u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '

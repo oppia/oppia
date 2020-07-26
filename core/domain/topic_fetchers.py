@@ -48,14 +48,16 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
             is supported at present.
     """
     subtopic_schema_version = versioned_subtopics['schema_version']
-    if not (1 <= subtopic_schema_version
+    if not (
+            1 <= subtopic_schema_version
             <= feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
-    while (subtopic_schema_version <
-           feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+    while (
+            subtopic_schema_version <
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         topic_domain.Topic.update_subtopics_from_model(
             versioned_subtopics, subtopic_schema_version)
         subtopic_schema_version += 1
@@ -81,14 +83,16 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
     """
     story_reference_schema_version = (
         versioned_story_references['schema_version'])
-    if not (1 <= story_reference_schema_version
+    if not (
+            1 <= story_reference_schema_version
             <= feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d story reference schemas at '
             'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
 
-    while (story_reference_schema_version <
-           feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
+    while (
+            story_reference_schema_version <
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
         topic_domain.Topic.update_story_references_from_model(
             versioned_story_references, story_reference_schema_version)
         story_reference_schema_version += 1
@@ -134,10 +138,12 @@ def get_topic_from_model(topic_model):
         'schema_version': topic_model.story_reference_schema_version,
         'story_references': topic_model.additional_story_references
     }
-    if (topic_model.subtopic_schema_version !=
+    if (
+            topic_model.subtopic_schema_version !=
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         _migrate_subtopics_to_latest_schema(versioned_subtopics)
-    if (topic_model.story_reference_schema_version !=
+    if (
+            topic_model.story_reference_schema_version !=
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
         _migrate_story_references_to_latest_schema(
             versioned_canonical_story_references)

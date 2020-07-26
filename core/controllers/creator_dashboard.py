@@ -351,7 +351,8 @@ class NotificationsHandler(base.BaseHandler):
             user_jobs_continuous.DashboardRecentUpdatesAggregator
             .get_recent_user_changes(self.user_id))
         for notification in recent_notifications:
-            if (notification['last_updated_ms'] > last_seen_msec and
+            if (
+                    notification['last_updated_ms'] > last_seen_msec and
                     notification['author_id'] != self.user_id):
                 num_unseen_notifications += 1
 

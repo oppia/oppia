@@ -363,8 +363,9 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(user_bio_response['status_code'], 400)
-        self.assertIn('User bio exceeds maximum character limit: 2000',
-                      user_bio_response['error'])
+        self.assertIn(
+            'User bio exceeds maximum character limit: 2000',
+            user_bio_response['error'])
         self.logout()
 
 
@@ -861,8 +862,9 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 
             # Check downloaded zip file.
             filename = 'oppia_takeout_data.zip'
-            self.assertEqual(data.headers['Content-Disposition'],
-                             'attachment; filename=%s' % filename)
+            self.assertEqual(
+                data.headers['Content-Disposition'],
+                'attachment; filename=%s' % filename)
             zf_saved = zipfile.ZipFile(
                 python_utils.string_io(buffer_value=data.body))
             self.assertEqual(
@@ -917,8 +919,8 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response('/pending-account-deletion',
-                                   expected_status_int=404)
+            self.get_html_response(
+                '/pending-account-deletion', expected_status_int=404)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

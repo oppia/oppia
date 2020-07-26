@@ -82,7 +82,8 @@ def validate_image_and_filename(raw_image, filename):
 
     dot_index = filename.rfind('.')
     extension = filename[dot_index + 1:].lower()
-    if (extension not in
+    if (
+            extension not in
             feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
         raise utils.ValidationError(
             'Expected a filename ending in .%s, received %s' %

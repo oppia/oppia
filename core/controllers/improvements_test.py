@@ -617,8 +617,9 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_custom_high_bounce_rate_creation_threshold(self):
         self.set_config_property(
-            (config_domain
-             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD),
+            (
+                config_domain
+                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD),
             new_config_value=0.35)
 
         with self.login_context(self.OWNER_EMAIL):
@@ -631,8 +632,9 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_custom_high_bounce_rate_obsoletion_threshold(self):
         self.set_config_property(
-            (config_domain
-             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
+            (
+                config_domain
+                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
             new_config_value=0.05)
 
         with self.login_context(self.OWNER_EMAIL):

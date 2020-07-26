@@ -70,7 +70,8 @@ class SkillMasteryDataHandler(base.BaseHandler):
         """Handles PUT requests."""
         mastery_change_per_skill = (
             self.payload.get('mastery_change_per_skill'))
-        if (not mastery_change_per_skill or
+        if (
+                not mastery_change_per_skill or
                 not isinstance(mastery_change_per_skill, dict)):
             raise self.InvalidInputException(
                 'Expected payload to contain mastery_change_per_skill '

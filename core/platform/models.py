@@ -231,14 +231,15 @@ class _Gae(Platform):
         if constants.DEV_MODE:
             from core.platform.email import dev_mode_email_services
             return dev_mode_email_services
-        elif (feconf.EMAIL_SERVICE_PROVIDER ==
-              feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+        elif (
+                feconf.EMAIL_SERVICE_PROVIDER ==
+                feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:
-            raise Exception(
-                ('Invalid email service provider: %s'
-                 % feconf.EMAIL_SERVICE_PROVIDER))
+            raise Exception((
+                'Invalid email service provider: %s' % (
+                    feconf.EMAIL_SERVICE_PROVIDER)))
 
     @classmethod
     def import_memcache_services(cls):

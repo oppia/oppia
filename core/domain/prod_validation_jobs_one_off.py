@@ -3095,7 +3095,8 @@ class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
                     'Entity id %s: latex strings in the model does not match '
                     'latex strings in the exploration model' % (
                         item.id))
-            if (approx_size_of_math_svgs_bytes !=
+            if (
+                    approx_size_of_math_svgs_bytes !=
                     item.estimated_max_size_of_images_in_bytes):
                 cls._add_error(
                     'svg size check',

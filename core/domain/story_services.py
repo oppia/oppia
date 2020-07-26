@@ -120,68 +120,86 @@ def apply_change_list(story_id, change_list):
                 story.add_node(change.node_id, change.title)
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
                 story.delete_node(change.node_id)
-            elif (change.cmd ==
-                  story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
+            elif (
+                    change.cmd ==
+                    story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
                 if change.new_value:
                     story.mark_node_outline_as_finalized(change.node_id)
                 else:
                     story.mark_node_outline_as_unfinalized(change.node_id)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
                     story.update_node_outline(change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_TITLE):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_TITLE):
                     story.update_node_title(change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
                     story.update_node_description(
                         change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
                     story.update_node_thumbnail_filename(
                         change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
                     story.update_node_thumbnail_bg_color(
                         change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
                     story.update_node_acquired_skill_ids(
                         change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
+                elif (
+                        change.property_name ==
+                        story_domain.
+                        STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
                     story.update_node_prerequisite_skill_ids(
                         change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
                     story.update_node_destination_node_ids(
                         change.node_id, change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
                     story.update_node_exploration_id(
                         change.node_id, change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
                     story.update_title(change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
                     story.update_thumbnail_filename(change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
                     story.update_thumbnail_bg_color(change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_PROPERTY_DESCRIPTION):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_PROPERTY_DESCRIPTION):
                     story.update_description(change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_PROPERTY_NOTES):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_PROPERTY_NOTES):
                     story.update_notes(change.new_value)
-                elif (change.property_name ==
-                      story_domain.STORY_PROPERTY_LANGUAGE_CODE):
+                elif (
+                        change.property_name ==
+                        story_domain.STORY_PROPERTY_LANGUAGE_CODE):
                     story.update_language_code(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
-                if (change.property_name ==
+                if (
+                        change.property_name ==
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
             elif (

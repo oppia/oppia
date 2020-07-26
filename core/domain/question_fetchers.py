@@ -113,7 +113,8 @@ def get_question_from_model(question_model):
     }
 
     # Migrate the question if it is not using the latest schema version.
-    if (question_model.question_state_data_schema_version !=
+    if (
+            question_model.question_state_data_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 
@@ -148,7 +149,8 @@ def _migrate_state_schema(versioned_question_state):
     if state_schema_version is None or state_schema_version < 1:
         state_schema_version = 0
 
-    if not (25 <= state_schema_version
+    if not (
+            25 <= state_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v25-v%d state schemas at present.' %

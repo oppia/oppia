@@ -197,15 +197,15 @@ def _validate_validator(obj_type, validator):
     customization_keys = list(validator.keys())
     customization_keys.remove('id')
     assert (
-            set(customization_keys) ==
-            set(reference_dict[validator['id']].keys())), (
-                'Missing keys: %s, Extra keys: %s' % (
-                    list(
-                        set(reference_dict[validator['id']].keys()) -
-                        set(customization_keys)),
-                    list(
-                        set(customization_keys) -
-                        set(reference_dict[validator['id']].keys()))))
+        set(customization_keys) ==
+        set(reference_dict[validator['id']].keys())), (
+            'Missing keys: %s, Extra keys: %s' % (
+                list(
+                    set(reference_dict[validator['id']].keys()) -
+                    set(customization_keys)),
+                list(
+                    set(customization_keys) -
+                    set(reference_dict[validator['id']].keys()))))
     for key in customization_keys:
         value = validator[key]
         schema = reference_dict[validator['id']][key]

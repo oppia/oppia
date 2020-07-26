@@ -644,9 +644,9 @@ class Exploration(python_utils.OBJECT):
 
             for pc in state.param_changes:
                 if pc.name not in exploration.param_specs:
-                    raise Exception('Parameter %s was used in a state but not '
-                                    'declared in the exploration param_specs.'
-                                    % pc.name)
+                    raise Exception(
+                        'Parameter %s was used in a state but not '
+                        'declared in the exploration param_specs.' % pc.name)
 
             idict = sdict['interaction']
             interaction_answer_groups = [
@@ -753,7 +753,8 @@ class Exploration(python_utils.OBJECT):
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
 
-            if (tag[0] not in string.ascii_lowercase or
+            if (
+                    tag[0] not in string.ascii_lowercase or
                     tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
@@ -903,7 +904,8 @@ class Exploration(python_utils.OBJECT):
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (default_outcome.refresher_exploration_id is not None and
+                if (
+                        default_outcome.refresher_exploration_id is not None and
                         default_outcome.dest != state_name):
                     raise utils.ValidationError(
                         'The default outcome for state %s has a refresher '
@@ -918,7 +920,8 @@ class Exploration(python_utils.OBJECT):
 
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (group.outcome.refresher_exploration_id is not None and
+                if (
+                        group.outcome.refresher_exploration_id is not None and
                         group.outcome.dest != state_name):
                     raise utils.ValidationError(
                         'The outcome for an answer group in state %s has a '
@@ -967,7 +970,8 @@ class Exploration(python_utils.OBJECT):
                 if default_outcome is not None:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (default_outcome.dest == state_name and
+                    if (
+                            default_outcome.dest == state_name and
                             default_outcome.labelled_as_correct):
                         raise utils.ValidationError(
                             'The default outcome for state %s is labelled '
@@ -976,7 +980,8 @@ class Exploration(python_utils.OBJECT):
                 for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (group.outcome.dest == state_name and
+                    if (
+                            group.outcome.dest == state_name and
                             group.outcome.labelled_as_correct):
                         raise utils.ValidationError(
                             'The outcome for an answer group in state %s is '
@@ -1014,7 +1019,8 @@ class Exploration(python_utils.OBJECT):
                     all_outcomes = curr_state.interaction.get_all_outcomes()
                     for outcome in all_outcomes:
                         dest_state = outcome.dest
-                        if (dest_state not in curr_queue and
+                        if (
+                                dest_state not in curr_queue and
                                 dest_state not in processed_queue):
                             curr_queue.append(dest_state)
 
@@ -1048,7 +1054,8 @@ class Exploration(python_utils.OBJECT):
                 processed_queue.append(curr_state_name)
 
                 for (state_name, state) in self.states.items():
-                    if (state_name not in curr_queue
+                    if (
+                            state_name not in curr_queue
                             and state_name not in processed_queue):
                         all_outcomes = (
                             state.interaction.get_all_outcomes())
@@ -1296,7 +1303,8 @@ class Exploration(python_utils.OBJECT):
         """
         if old_state_name not in self.states:
             raise ValueError('State %s does not exist' % old_state_name)
-        if (old_state_name != new_state_name and
+        if (
+                old_state_name != new_state_name and
                 new_state_name in self.states):
             raise ValueError('Duplicate state name: %s' % new_state_name)
 
@@ -1653,7 +1661,8 @@ class Exploration(python_utils.OBJECT):
                                 'Encountered rule of type: %s' % rule_type)
 
                     # Ensure the subject is answer.
-                    if ('subject' in rule_spec['definition'] and
+                    if (
+                            'subject' in rule_spec['definition'] and
                             rule_spec['definition']['subject'] != 'answer'):
                         raise utils.ExplorationConversionError(
                             'Error: Can only convert rules with an \'answer\' '
@@ -2445,8 +2454,8 @@ class Exploration(python_utils.OBJECT):
         """
         for state_dict in states_dict.values():
             # Get the voiceovers_mapping metadata.
-            voiceovers_mapping = (state_dict['recorded_voiceovers']
-                                  ['voiceovers_mapping'])
+            voiceovers_mapping = (
+                state_dict['recorded_voiceovers']['voiceovers_mapping'])
             language_codes_to_audio_metadata = voiceovers_mapping.values()
             for language_codes in language_codes_to_audio_metadata:
                 for audio_metadata in language_codes.values():
@@ -3514,7 +3523,8 @@ class Exploration(python_utils.OBJECT):
         initial_schema_version = exploration_schema_version
         if exploration_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
-        if not (1 <= exploration_schema_version
+        if not (
+                1 <= exploration_schema_version
                 <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(
                 'Sorry, we can only process v1 to v%s exploration YAML files '
@@ -3732,7 +3742,8 @@ class Exploration(python_utils.OBJECT):
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 
-        if (initial_schema_version <=
+        if (
+                initial_schema_version <=
                 cls.LAST_UNTITLED_SCHEMA_VERSION):
             raise Exception(
                 'Expected a YAML version >= 10, received: %d' % (
@@ -3764,7 +3775,8 @@ class Exploration(python_utils.OBJECT):
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 
-        if (initial_schema_version >
+        if (
+                initial_schema_version >
                 cls.LAST_UNTITLED_SCHEMA_VERSION):
             raise Exception(
                 'Expected a YAML version <= 9, received: %d' % (
@@ -3986,7 +3998,8 @@ class ExplorationSummary(python_utils.OBJECT):
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
 
-            if (tag[0] not in string.ascii_lowercase or
+            if (
+                    tag[0] not in string.ascii_lowercase or
                     tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '

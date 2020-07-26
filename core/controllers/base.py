@@ -198,8 +198,9 @@ class BaseHandler(webapp2.RequestHandler):
 
             if user_settings.deleted:
                 self.user_is_scheduled_for_deletion = user_settings.deleted
-            elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                  user_services.has_fully_registered(user_settings.user_id)):
+            elif (
+                    self.REDIRECT_UNFINISHED_SIGNUPS and not
+                    user_services.has_fully_registered(user_settings.user_id)):
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
@@ -207,7 +208,8 @@ class BaseHandler(webapp2.RequestHandler):
                 # In order to avoid too many datastore writes, we do not bother
                 # recording a log-in if the current time is sufficiently close
                 # to the last log-in time.
-                if (user_settings.last_logged_in is None or
+                if (
+                        user_settings.last_logged_in is None or
                         not utils.are_datetimes_close(
                             datetime.datetime.utcnow(),
                             user_settings.last_logged_in)):
@@ -409,8 +411,8 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
-                logging.warning('Not a recognized return type: '
-                                'defaulting to render JSON.')
+                logging.warning(
+                    'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):
@@ -456,7 +458,8 @@ class BaseHandler(webapp2.RequestHandler):
             # For GET requests, there is no payload, so we check against
             # GET_HANDLER_ERROR_RETURN_TYPE.
             # Otherwise, we check whether self.payload exists.
-            if (self.payload is not None or
+            if (
+                    self.payload is not None or
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
                     feconf.HANDLER_TYPE_JSON):
                 self.error(401)
