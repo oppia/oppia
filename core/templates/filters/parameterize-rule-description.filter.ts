@@ -26,7 +26,7 @@ require('filters/format-rte-preview.filter.ts');
 angular.module('oppia').filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
   'NumberWithUnitsObjectFactory', 'POSITION_OF_TERMS_MAPPING',
-    function( $filter, INTERACTION_SPECS, FractionObjectFactory,
+  function( $filter, INTERACTION_SPECS, FractionObjectFactory,
       NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING) {
     return function(rule, interactionId, choices) {
       if (!rule) {

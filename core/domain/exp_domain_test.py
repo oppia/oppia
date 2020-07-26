@@ -7770,7 +7770,6 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
     YAML_CONTENT_V40_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''

@@ -34,10 +34,10 @@ class MockGuppy {
 
   engine = {
     end: () => {}
-  }
+  };
 
-  render(_): void {};
-  'import_text'(): void {};
+  render(_): void {}
+  'import_text'(): void {}
   asciimath(): string {
     return 'Dummy value';
   }

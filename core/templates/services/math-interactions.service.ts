@@ -197,7 +197,7 @@ export class MathInteractionsService {
     // be treated as 5*sqrt(x).
     // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
     // rid of the TS2339 error on AppConstants.
-    let mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES
+    let mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
     for (let functionName of mathFunctionNames) {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
