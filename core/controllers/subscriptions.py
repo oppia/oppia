@@ -32,8 +32,6 @@ class SubscribeHandler(base.BaseHandler):
             self.payload.get('creator_username'))
         subscription_services.subscribe_to_creator(self.user_id, creator_id)
 
-        raise Exception('Can\'t subscribe. Sorry:(')
-
         self.render_json(self.values)
 
 
