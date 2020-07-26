@@ -534,8 +534,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
     skill.version += 1
     create_skill_summary(skill.id)
     opportunity_services.create_skill_opportunity(
-        skill_id=skill.id,
-        skill_description=skill.description)
+        skill.id,
+        skill.description)
 
 
 def save_new_skill(committer_id, skill):
