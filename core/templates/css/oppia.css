@@ -545,6 +545,11 @@ p:last-child {
   font-size: 1em !important;
 }
 
+.oppia-rte-editor {
+  border: none;
+  outline: none;
+}
+
 .oppia-rte-editor p span {
   font-size: 1em !important;
 }
@@ -1513,7 +1518,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-placeholder {
-  color: #888;
+  color: #707070;
   font-style: italic;
 }
 
