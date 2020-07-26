@@ -1040,7 +1040,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
     when applicable ('yield' is acceptable).
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'single-space-after-yield'
     priority = -1
@@ -1052,46 +1052,21 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that yield keywords are followed by
-        exactly one space, so matching 'yield *' where * is not a
+    def visit_yield(self, node):
+        """Visit every yield statement to ensure that yield keywords are
+        followed by exactly one space, so matching 'yield *' where * is not a
         whitespace character. Note that 'yield' is also acceptable in
         cases where the user wants to yield nothing.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module
+            node: astroid.nodes.Yield. Nodes to access yield statements.
                 content.
         """
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        for (line_num, line) in enumerate(file_content):
-            bare_line = line.strip()
-
-            # Single multi-line comment, ignore it.
-            if bare_line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in bare_line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            # Whitespace to right of yield keyword is important for regex.
-            # Allows alphabet characters and underscore for cases where 'yield'
-            # is used at the start of a variable name.
-            source_line = line.lstrip()
-            if (source_line.startswith(b'yield') and
-                    not re.search(br'^(yield)( \S|$|\w)', source_line)):
-                self.add_message('single-space-after-yield', line=line_num + 1)
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number).lstrip()
+        if (line.startswith(b'yield') and
+                not re.search(br'^(yield)( \S|$|\w)', line)):
+            self.add_message('single-space-after-yield', node=node)
 
 
 class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
@@ -1234,7 +1209,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'division-operator-used'
     priority = -1
     msgs = {
@@ -1245,52 +1220,16 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that the division operator('/') is not
-        used and python_utils.divide() is used instead.
+    def visit_binop(self, node):
+        """Visit assign statements to ensure that the division operator('/')
+        is not used and python_utils.divide() is used instead.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.node.BinOp. Node to access module content.
         """
-
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        string_indicator = b'\''
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-
-            # Single line comment, ignore it.
-            if line.startswith(b'#'):
-                continue
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            # Ignore anything inside a string.
-            if line.count(string_indicator) >= 2:
-                continue
-
-            if (re.search(br'[^/]/[^/]', line) and
-                    not line.endswith(multi_line_indicator)):
-                self.add_message(
-                    'division-operator-used', line=line_num + 1)
+        if node.op == b'/':
+            self.add_message(
+                'division-operator-used', node=node)
 
 
 class SingleLineCommentChecker(checkers.BaseChecker):
