@@ -46,6 +46,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
+    # To be Deprecated. Moved to UserAuthModel now.
     gae_id = ndb.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
@@ -59,6 +60,14 @@ class UserSettingsModel(base_models.BaseModel):
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
     normalized_username = ndb.StringProperty(indexed=True)
+    # Display name for users.
+    name = ndb.StringProperty(default=None, indexed=True)
+    # List of profile user ids associated with this user. None for profiles.
+    profiles_list = ndb.StringProperty(default=None, repeated=True)
+    # Pin assocaited with the user profile.
+    pin = ndb.StringProperty(default=None)
+    # Date created timestamp. Used on android. May be None.
+    date_created_timestamp = ndb.DateTimeProperty(default=None)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
