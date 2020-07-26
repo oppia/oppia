@@ -19,6 +19,7 @@
 import { async, TestBed } from '@angular/core/testing';
 import { SafePipe } from 'filters/safe-pipe';
 import { DomSanitizer } from '@angular/platform-browser';
+import { SecurityContext } from '@angular/core';
 
 describe('Safe pipe', () => {
   let pipe: SafePipe;
@@ -33,36 +34,49 @@ describe('Safe pipe', () => {
   }));
 
   it('should return a safe html object', () => {
-    spyOn(sanitizer, 'bypassSecurityTrustHtml');
-    pipe.transform('HTMLTest', 'html');
-    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith('HTMLTest');
+    spyOn(sanitizer, 'bypassSecurityTrustHtml').and.callThrough();
+    let data = '<script>suspicious code</script>';
+    let req = pipe.transform(data, 'html');
+    let sanitizedbypassedvalue = sanitizer.sanitize(SecurityContext.HTML, req);
+    expect(sanitizedbypassedvalue).toBe(data);
+    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledWith(data);
   });
 
   it('should return a safe style object', () => {
-    spyOn(sanitizer, 'bypassSecurityTrustStyle');
-    pipe.transform('StyleTest', 'style');
-    expect(sanitizer.bypassSecurityTrustStyle).toHaveBeenCalledWith(
-      'StyleTest');
+    spyOn(sanitizer, 'bypassSecurityTrustStyle').and.callThrough();
+    let data = '<script>suspicious code</script>';
+    let req = pipe.transform(data, 'style');
+    let sanitizedbypassedvalue = sanitizer.sanitize(SecurityContext.STYLE, req);
+    expect(sanitizedbypassedvalue).toBe(data);
+    expect(sanitizer.bypassSecurityTrustStyle).toHaveBeenCalledWith(data);
   });
 
   it('should return a safe url object', () => {
-    spyOn(sanitizer, 'bypassSecurityTrustUrl');
-    pipe.transform('UrlTest', 'url');
-    expect(sanitizer.bypassSecurityTrustUrl).toHaveBeenCalledWith('UrlTest');
+    spyOn(sanitizer, 'bypassSecurityTrustUrl').and.callThrough();
+    let data = 'javascript:alert(Suspicious)';
+    let req = pipe.transform(data, 'url');
+    let sanitizedbypassedvalue = sanitizer.sanitize(SecurityContext.URL, req);
+    expect(sanitizedbypassedvalue).toBe(data);
   });
 
   it('should return a safe script object', () => {
-    spyOn(sanitizer, 'bypassSecurityTrustScript');
-    pipe.transform('ScriptTest', 'script');
-    expect(sanitizer.bypassSecurityTrustScript).toHaveBeenCalledWith(
-      'ScriptTest');
+    spyOn(sanitizer, 'bypassSecurityTrustScript').and.callThrough();
+    let data = '<script src="suspicious code"></script>';
+    let req = pipe.transform(data, 'script');
+    let sanitizedbypassedvalue = sanitizer.sanitize(
+      SecurityContext.SCRIPT, req);
+    expect(sanitizedbypassedvalue).toBe(data);
+    expect(sanitizer.bypassSecurityTrustScript).toHaveBeenCalledWith(data);
   });
 
   it('should return a safe resourceUrl object', () => {
-    spyOn(sanitizer, 'bypassSecurityTrustResourceUrl');
-    pipe.transform('ResourceUrl', 'resourceUrl');
-    expect(sanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith(
-      'ResourceUrl');
+    spyOn(sanitizer, 'bypassSecurityTrustResourceUrl').and.callThrough();
+    let data = 'malicious.htm';
+    let req = pipe.transform(data, 'resourceUrl');
+    let sanitizedbypassedvalue = sanitizer.sanitize(
+      SecurityContext.RESOURCE_URL, req);
+    expect(sanitizedbypassedvalue).toBe(data);
+    expect(sanitizer.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith(data);
   });
 
   it('should give an error with incorrect type', () => {
