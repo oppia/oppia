@@ -112,13 +112,6 @@ describe('Exploration player page', function() {
     Mousetrap.trigger('k');
     Mousetrap.trigger('j');
     Mousetrap.trigger('s');
-    Mousetrap.trigger('ctrl+mod+0');
-    Mousetrap.trigger('ctrl+mod+1');
-    Mousetrap.trigger('ctrl+mod+2');
-    Mousetrap.trigger('ctrl+mod+3');
-    Mousetrap.trigger('ctrl+mod+4');
-    Mousetrap.trigger('ctrl+mod+5');
-    Mousetrap.trigger('ctrl+mod+6');
 
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
       'Exploration Title - Oppia');

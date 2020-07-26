@@ -450,7 +450,6 @@
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
 /core/templates/Polyfills.ts @ankita240796
-/core/templates/services/KeyboardShortcutService.ts @jimbyo
 /schema_utils*.py @seanlip
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep

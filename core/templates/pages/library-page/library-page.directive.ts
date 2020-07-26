@@ -15,6 +15,7 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
+import 'mousetrap';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -35,7 +36,6 @@ require('services/search.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/KeyboardShortcutService');
 
 require('pages/library-page/library-page.constants.ajs.ts');
 
@@ -51,7 +51,7 @@ angular.module('oppia').directive('libraryPage', [
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
         '$window', 'AlertsService', 'ClassroomBackendApiService',
-        'KeyboardShortcutService', 'LearnerDashboardActivityIdsObjectFactory',
+        'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
@@ -61,7 +61,7 @@ angular.module('oppia').directive('libraryPage', [
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
             $window, AlertsService, ClassroomBackendApiService,
-            KeyboardShortcutService, LearnerDashboardActivityIdsObjectFactory,
+            LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,
@@ -193,6 +193,23 @@ angular.module('oppia').directive('libraryPage', [
               });
             }
           };
+
+          var bindLibraryPageShortcuts = function(){
+            Mousetrap.bind('/', function() {
+              document.getElementById('searchBar').focus();
+              return false;
+            });
+        
+            Mousetrap.bind('c', function() {
+              document.getElementById('categoryBar').focus();
+              return false;
+            });
+        
+            Mousetrap.bind('s', function() {
+              document.getElementById('skipToMainContentId').focus();
+              return false;
+            });
+          }
 
           // The following loads explorations belonging to a particular group.
           // If fullResultsUrl is given it loads the page corresponding to
@@ -331,8 +348,7 @@ angular.module('oppia').directive('libraryPage', [
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
                 $timeout(initCarousels, 390);
-                $timeout(KeyboardShortcutService.bindLibraryPageShortcuts);
-                $timeout(KeyboardShortcutService.bindNavigationShortcuts);
+                bindLibraryPageShortcuts();
 
 
 
