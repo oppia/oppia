@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks.
+presubmit checks. Next message id would be C0029.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -25,6 +25,7 @@ import linecache
 import os
 import re
 import sys
+import tokenize
 
 import python_utils
 from .. import docstrings_checker
@@ -43,15 +44,11 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid  # isort:skip
-from pylint import checkers  # isort:skip
-from pylint import interfaces  # isort:skip
-from pylint.checkers import typecheck  # isort:skip
-from pylint.checkers import utils as checker_utils  # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
+import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import typecheck  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def read_from_node(node):
@@ -81,7 +78,97 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'non-explicit-keyword-args',
             'All keyword arguments should be explicitly named in function call.'
         ),
+        'C0027': (
+            'Keyword argument %s used for a non keyword argument in %s '
+            'call of %s.',
+            'arg-name-for-non-keyword-arg',
+            'Position arguments should not be used as keyword arguments '
+            'in function call.'
+        ),
     }
+
+    def _check_non_explicit_keyword_args(
+            self, node, name, callable_name, keyword_args,
+            num_positional_args_unused, num_mandatory_parameters):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            name: str. Name of the keyword argument.
+            callable_name: str. Name of method type.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            num_positional_args_unused: int. Number of unused positional
+                arguments.
+            num_mandatory_parameters: int. Number of mandatory parameters.
+
+        Returns:
+            int. Number of unused positional arguments.
+        """
+        display_name = repr(name)
+
+        if name not in keyword_args and (
+                num_positional_args_unused > (
+                    num_mandatory_parameters)) and (
+                        callable_name != 'constructor'):
+            # This try/except block tries to get the function
+            # name. Since each node may differ, multiple
+            # blocks have been used.
+            try:
+                func_name = node.func.attrname
+            except AttributeError:
+                func_name = node.func.name
+
+            self.add_message(
+                'non-explicit-keyword-args', node=node,
+                args=(
+                    display_name,
+                    callable_name,
+                    func_name))
+            num_positional_args_unused -= 1
+        return num_positional_args_unused
+
+    def _check_argname_for_nonkeyword_arg(
+            self, node, called, callable_name, keyword_args,
+            keyword_args_in_funcdef):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            called: astroid.Call. The function call object.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            callable_name: str. Name of method type.
+            keyword_args_in_funcdef: list(str). Name of all keyword arguments in
+                function definition.
+        """
+        for arg in keyword_args:
+            # TODO(Hudda): Fix the check to cover below case as well. Relevant
+            # issue: https://github.com/oppia/oppia/issues/10038
+            # If there is *args and **kwargs in the function definition skip the
+            # check because we can use keywords arguments in function call even
+            # if **kwargs is present in the function definition. See Example:
+            # Function def -> def func(entity_id, *args, **kwargs):
+            # Function call -> func(entity_id='1', a=1, b=2, c=3)
+            # By parsing calling method we get
+            # keyword_arguments = entity_id, a, b, c.
+            # From the function definition, we will get keyword_arguments = []
+            # Now we do not have a way to identify which one is a keyword
+            # argument and which one is not.
+            if not called.args.kwarg and callable_name != 'constructor':
+                if not arg in keyword_args_in_funcdef:
+                    # This try/except block tries to get the function
+                    # name.
+                    try:
+                        func_name = node.func.attrname
+                    except AttributeError:
+                        func_name = node.func.name
+
+                    self.add_message(
+                        'arg-name-for-non-keyword-arg', node=node,
+                        args=(repr(arg), callable_name, func_name))
 
     def visit_call(self, node):
         """Visits each function call in a lint check.
@@ -139,31 +226,21 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             parameters.append([(name, defval), False])
 
         num_positional_args_unused = num_positional_args
+        # The list below will store all the keyword arguments present in the
+        # function definition.
+        keyword_args_in_funcdef = []
         # Check that all parameters with a default value have
         # been called explicitly.
         for [(name, defval), _] in parameters:
             if defval:
-                display_name = repr(name)
+                keyword_args_in_funcdef.append(name)
+                num_positional_args_unused = (
+                    self._check_non_explicit_keyword_args(
+                        node, name, callable_name, keyword_args,
+                        num_positional_args_unused, num_mandatory_parameters))
 
-                if name not in keyword_args and (
-                        num_positional_args_unused > (
-                            num_mandatory_parameters)) and (
-                                callable_name != 'constructor'):
-                    # This try/except block tries to get the function
-                    # name. Since each node may differ, multiple
-                    # blocks have been used.
-                    try:
-                        func_name = node.func.attrname
-                    except AttributeError:
-                        func_name = node.func.name
-
-                    self.add_message(
-                        'non-explicit-keyword-args', node=node,
-                        args=(
-                            display_name,
-                            callable_name,
-                            func_name))
-                    num_positional_args_unused -= 1
+        self._check_argname_for_nonkeyword_arg(
+            node, called, callable_name, keyword_args, keyword_args_in_funcdef)
 
 
 class HangingIndentChecker(checkers.BaseChecker):
@@ -1043,7 +1120,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
     when applicable ('yield' is acceptable).
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'single-space-after-yield'
     priority = -1
@@ -1055,46 +1132,21 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that yield keywords are followed by
-        exactly one space, so matching 'yield *' where * is not a
+    def visit_yield(self, node):
+        """Visit every yield statement to ensure that yield keywords are
+        followed by exactly one space, so matching 'yield *' where * is not a
         whitespace character. Note that 'yield' is also acceptable in
         cases where the user wants to yield nothing.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module
+            node: astroid.nodes.Yield. Nodes to access yield statements.
                 content.
         """
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        for (line_num, line) in enumerate(file_content):
-            bare_line = line.strip()
-
-            # Single multi-line comment, ignore it.
-            if bare_line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in bare_line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            # Whitespace to right of yield keyword is important for regex.
-            # Allows alphabet characters and underscore for cases where 'yield'
-            # is used at the start of a variable name.
-            source_line = line.lstrip()
-            if (source_line.startswith(b'yield') and
-                    not re.search(br'^(yield)( \S|$|\w)', source_line)):
-                self.add_message('single-space-after-yield', line=line_num + 1)
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number).lstrip()
+        if (line.startswith(b'yield') and
+                not re.search(br'^(yield)( \S|$|\w)', line)):
+            self.add_message('single-space-after-yield', node=node)
 
 
 class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
@@ -1237,7 +1289,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'division-operator-used'
     priority = -1
     msgs = {
@@ -1248,52 +1300,16 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that the division operator('/') is not
-        used and python_utils.divide() is used instead.
+    def visit_binop(self, node):
+        """Visit assign statements to ensure that the division operator('/')
+        is not used and python_utils.divide() is used instead.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.node.BinOp. Node to access module content.
         """
-
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        string_indicator = b'\''
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-
-            # Single line comment, ignore it.
-            if line.startswith(b'#'):
-                continue
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            # Ignore anything inside a string.
-            if line.count(string_indicator) >= 2:
-                continue
-
-            if (re.search(br'[^/]/[^/]', line) and
-                    not line.endswith(multi_line_indicator)):
-                self.add_message(
-                    'division-operator-used', line=line_num + 1)
+        if node.op == b'/':
+            self.add_message(
+                'division-operator-used', node=node)
 
 
 class SingleLineCommentChecker(checkers.BaseChecker):
@@ -1782,6 +1798,50 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
             self.add_message('newline-below-class-docstring', node=node)
 
 
+class SingleLinePragmaChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks if pylint pragma is used to disable
+    a rule for a single line only.
+    """
+
+    __implements__ = interfaces.ITokenChecker
+
+    name = 'single-line-pragma'
+    priority = -1
+    msgs = {
+        'C0028': (
+            'Pylint pragmas should be used to disable a rule '
+            'for a single line only',
+            'single-line-pragma',
+            'Please use pylint pragmas to disable a rule for a single line only'
+        )
+    }
+
+    def process_tokens(self, tokens):
+        """Custom pylint checker which allows paramas to disable a rule for a
+        single line only.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT:
+                line = line.lstrip()
+                # Ignore line that is enabling this check.
+                # Example:
+                # # pylint: disable=import-only-modules, single-line-pragma
+                # def func(a, b):
+                # # pylint: enable=import-only-modules, single-line-pragma
+                # Now if do not ignore the line with 'enable' statement
+                # pylint will raise the error of single-line-pragma because
+                # from here on all this lint check is enabled. So we need to
+                # ignore this line.
+                if line.startswith(b'# pylint:'):
+                    if 'enable' in line and 'single-line-pragma' in line:
+                        continue
+                    self.add_message(
+                        'single-line-pragma', line=line_num)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1804,3 +1864,4 @@ def register(linter):
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(NewlineBelowClassDocstring(linter))
+    linter.register_checker(SingleLinePragmaChecker(linter))

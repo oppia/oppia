@@ -13,21 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the history tab of the collection editor.
+ * @fileoverview Component for the history tab of the collection editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').directive('collectionHistoryTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/history-tab/' +
-        'collection-history-tab.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+@Component({
+  selector: 'collection-history-tab',
+  templateUrl: './collection-history-tab.component.html',
+  styleUrls: []
+})
+export class CollectionHistoryTabComponent {
+  constructor() {}
+}
+
+angular.module('oppia').directive('collectionHistoryTab', downgradeComponent(
+  {component: CollectionHistoryTabComponent}));

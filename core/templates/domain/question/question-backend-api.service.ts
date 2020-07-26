@@ -25,7 +25,7 @@ import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 import { QuestionBackendDict } from
   'domain/question/QuestionObjectFactory';
-import { IQuestionSummaryBackendDict } from
+import { QuestionSummaryBackendDict } from
   'domain/question/QuestionSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -39,7 +39,7 @@ interface QuestionsBackendResponse {
 }
 
 interface AugmentedQuestionSummaryBackendDict {
-  'summary': IQuestionSummaryBackendDict[];
+  'summary': QuestionSummaryBackendDict[];
   'skill_ids': string[];
   'skill_descriptions': string[];
   'skill_difficulties': number[];

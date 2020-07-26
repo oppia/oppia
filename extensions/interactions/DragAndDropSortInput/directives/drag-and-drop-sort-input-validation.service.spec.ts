@@ -31,7 +31,7 @@ import { Rule, RuleObjectFactory } from
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { IDragAndDropSortInputCustomizationArgs } from
+import { DragAndDropSortInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('DragAndDropSortInputValidationService', () => {
@@ -45,7 +45,7 @@ describe('DragAndDropSortInputValidationService', () => {
     equalsListWithAllowedValuesRule: Rule, equalsListWithValuesRule: Rule,
     goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule,
     hasElementXAtPositionYRule: Rule;
-  let customizationArgs: IDragAndDropSortInputCustomizationArgs;
+  let customizationArgs: DragAndDropSortInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
