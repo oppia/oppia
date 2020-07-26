@@ -23,13 +23,10 @@ import getpass
 import os
 
 from core.tests import test_utils
+import github
 import release_constants
 from scripts import common
 from scripts.release_scripts import wrap_up_release
-
-# pylint: disable=wrong-import-position
-import github  # isort:skip
-# pylint: enable=wrong-import-position
 
 
 class WrapReleaseTests(test_utils.GenericTestBase):
@@ -70,10 +67,8 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                 wrap_up_release.main()
 
     def test_missing_personal_access_token(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return None
-        # pylint: enable=unused-argument
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with self.branch_name_swap, self.exists_swap:
             with getpass_swap, self.assertRaisesRegexp(
@@ -124,12 +119,10 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_closed_blocking_bugs_milestone_results_in_exception(self):
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'state': 'closed'}, completed='')
-        # pylint: enable=unused-argument
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         with get_milestone_swap, self.assertRaisesRegexp(
@@ -138,12 +131,10 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                 self.mock_repo)
 
     def test_non_zero_blocking_bugs_count_results_in_exception(self):
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'open_issues': 10, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
         def mock_open_tab(unused_url):
             pass
         get_milestone_swap = self.swap(
@@ -171,14 +162,12 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             'edit_gets_called': True
         }
 
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return blocking_bug_milestone
-        def mock_get_issues(unused_self, milestone, state):
+        def mock_get_issues(unused_self, milestone, state):  # pylint: disable=unused-argument
             return [issue]
-        def mock_edit(unused_self, milestone):
+        def mock_edit(unused_self, milestone):  # pylint: disable=unused-argument
             check_function_calls['edit_gets_called'] = True
-        # pylint: enable=unused-argument
 
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
@@ -218,14 +207,12 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                 return label_for_released_prs
             else:
                 return label_for_current_release_prs
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             if labels[0].name == (
                     release_constants.LABEL_FOR_CURRENT_RELEASE_PRS):
                 return [pr_for_current_release_1, pr_for_current_release_2]
             else:
                 return [released_pr]
-        # pylint: enable=unused-argument
 
         get_label_swap = self.swap(
             github.Repository.Repository, 'get_label', mock_get_label)
@@ -270,13 +257,11 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                 return label_for_released_prs
             else:
                 return label_for_current_release_prs
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             if state == 'closed':
                 return [released_pr]
             else:
                 return [pr_for_current_release]
-        # pylint: enable=unused-argument
         def mock_remove_from_labels(unused_self, name):
             if name == release_constants.LABEL_FOR_RELEASED_PRS: # pylint: disable=simplifiable-if-statement
                 check_function_calls[
@@ -327,10 +312,8 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                 requester='', headers='', attributes={}, completed='')
         def mock_get_repo(unused_self, unused_org):
             return self.mock_repo
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'test-token'
-        # pylint: enable=unused-argument
 
         remove_blocking_bugs_milestone_from_issues_swap = self.swap(
             wrap_up_release, 'remove_blocking_bugs_milestone_from_issues',
