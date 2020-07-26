@@ -44,11 +44,11 @@ angular.module('oppia').directive('baseContent', [
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'BottomNavbarStatusService', 'KeyboardShortcutService',
-        'SidebarStatusService', 'LoaderService', 'UrlService',
+        'BottomNavbarStatusService','KeyboardShortcutService',
+        'LoaderService', 'SidebarStatusService', 'UrlService',
         function($rootScope, $window, BackgroundMaskService,
             BottomNavbarStatusService, KeyboardShortcutService,
-            SidebarStatusService, LoaderService, UrlService) {
+            LoaderService, SidebarStatusService, UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {
