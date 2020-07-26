@@ -319,7 +319,7 @@ class HangingIndentChecker(checkers.BaseChecker):
                     content = line[position + 1:]
                     # Skip check if there is nothing after the bracket.
                     split_content = content.split()
-                    # Skip check if there is a comment at the end of line
+                    # Skip check if there is a comment at the end of line.
                     if '#' in split_content:
                         comment_index = split_content.index('#')
                         if comment_index == 0:

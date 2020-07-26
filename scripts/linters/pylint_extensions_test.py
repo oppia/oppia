@@ -205,10 +205,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         self.checker_test_object.checker.process_tokens(
             utils.tokenize_module(node_break_after_hanging_indent))
-        
+
         message = testutils.Message(
-                msg_id='no-break-after-hanging-indent',
-                line=1)
+            msg_id='no-break-after-hanging-indent', line=1)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -229,10 +228,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         self.checker_test_object.checker.process_tokens(
             utils.tokenize_module(node_break_after_hanging_indent))
-        
+
         message = testutils.Message(
-                msg_id='no-break-after-hanging-indent',
-                line=1)
+            msg_id='no-break-after-hanging-indent', line=1)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()

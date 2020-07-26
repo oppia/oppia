@@ -40,7 +40,7 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
             (None, 'null'),
             ([
                 'a', {'b': 'c', 'd': ['e', None]}],
-            '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
+             '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
         ]
 
         for tup in expected_values:
