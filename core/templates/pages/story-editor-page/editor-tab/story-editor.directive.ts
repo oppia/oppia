@@ -157,6 +157,7 @@ angular.module('oppia').directive('storyEditor', [
               resolve: {
                 nodeTitles: () => nodeTitles
               },
+              windowClass: 'create-new-chapter',
               controller: 'CreateNewChapterModalController'
             }).result.then(function() {
               _initEditor();
