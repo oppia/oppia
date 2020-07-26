@@ -36,7 +36,7 @@ describe('Preferences Controller', function() {
   var UserBackendApiService = null;
   var userInfo = {
     getUsername: () => 'myUsername',
-    email: () => 'myusername@email.com'
+    getEmail: () => 'myusername@email.com'
   };
   var mockWindow = {
     location: {
