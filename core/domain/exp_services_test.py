@@ -524,7 +524,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -578,9 +581,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -648,7 +657,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -669,9 +681,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted explorations does not show up in any queries.
@@ -698,7 +716,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration summary does not show up in any queries.
@@ -1645,7 +1666,6 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             self.assertIn(filename, filenames)
 
 
-# pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
@@ -1917,7 +1937,7 @@ title: A title
         # Audio files should not be included in asset downloads.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_audio = f.read()
         fs.commit('audio/cafe.mp3', raw_audio)
 
@@ -2344,17 +2364,17 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         param_changes = exploration.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_update_invalid_param_changes(self):
@@ -2390,7 +2410,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegexp(
@@ -2905,7 +2925,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 second_committer_id, v1_exploration, '', [])
 
         # Another person modifies the exploration.
@@ -2959,7 +2979,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id)
 
         exploration.title = 'First title'
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.owner_id, exploration, 'Changed title.', [])
         commit_dict_2 = {
             'committer_id': self.owner_id,
@@ -3041,7 +3061,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # In version 1, the title was 'A title'.
         # In version 2, the title becomes 'V2 title'.
         exploration.title = 'V2 title'
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.owner_id, exploration, 'Changed title.', [])
 
         # In version 3, a new state is added.
@@ -3216,19 +3236,19 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, self.albert_id)
 
             exploration_1.title = 'Exploration 1 title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.bob_id, exploration_1, 'Changed title.', [])
 
             exploration_2 = self.save_new_valid_exploration(
                 self.EXP_ID_2, self.albert_id)
 
             exploration_1.title = 'Exploration 1 Albert title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.albert_id, exploration_1,
                 'Changed title to Albert1 title.', [])
 
             exploration_2.title = 'Exploration 2 Albert title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.albert_id, exploration_2, 'Changed title to Albert2.', [])
 
             exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
@@ -3979,7 +3999,7 @@ title: Old Title
 
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.albert_id, exploration, '', [])
+        exp_services._save_exploration(self.albert_id, exploration, '', [])  # pylint: disable=protected-access
 
         param_changes = [{
             'customization_args': {
@@ -4251,7 +4271,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.USER_ID, exploration, '', [])
+        exp_services._save_exploration(self.USER_ID, exploration, '', [])  # pylint: disable=protected-access
         self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
         self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
         self.init_state_name = exploration.init_state_name
@@ -4362,10 +4382,10 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
         param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_get_exp_with_draft_applied_when_draft_does_not_exist(self):
@@ -4520,21 +4540,21 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             'from_version': '0',
             'to_version': '1'
         })]
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.USER_ID, exploration, 'Migrate state schema.',
             migration_change_list)
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
-        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long
+        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long, protected-access
             classmethod(lambda cls, changelist: changelist))
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
         param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
