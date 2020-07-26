@@ -237,13 +237,13 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.generateSvgs = async function() {
           var countOfSvgsGenerated = 0;
           for (var expId in expIdToLatexMapping) {
-            var latexValues = expIdToLatexMapping[expId];
+            var latexStrings = expIdToLatexMapping[expId];
             latexMapping[expId] = {};
-            for (var i = 0; i < latexValues.length; i++) {
-              var svgFile = await convertLatexToSvgFile(latexValues[i]);
+            for (var i = 0; i < latexStrings.length; i++) {
+              var svgFile = await convertLatexToSvgFile(latexStrings[i]);
               latexMapping[expId][latexValues[i]] = svgFile;
             }
-            ctrl.setStatusMessage('Latex values Generated.');
+            ctrl.setStatusMessage('LaTeX strings Generated.');
             $rootScope.$apply();
           }
         };
@@ -256,7 +256,7 @@ angular.module('oppia').directive('adminMiscTab', [
             function(response) {
               expIdToLatexMapping = (
                 response.data.latex_strings_to_exp_id_mapping);
-              ctrl.setStatusMessage('Latex values Fetched.');
+              ctrl.setStatusMessage('LaTeX strings fetched from backend.');
               ctrl.generateSvgs();
             });
         };

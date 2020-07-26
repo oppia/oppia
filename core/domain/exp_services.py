@@ -1879,7 +1879,7 @@ def get_batch_of_exps_for_latex_svg_generation():
 
     Returns:
         dict(str, list(str)). The dict having each key as an exp_id and value
-        as a list of LaTeX string. Each list has all the LaTeX stringss in that
+        as a list of LaTeX string. Each list has all the LaTeX strings in that
         particular exploration ID.
     """
 
