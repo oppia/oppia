@@ -145,8 +145,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                 function definition.
         """
         for arg in keyword_args:
-            # TODO(Hudda): Fix the check to cover below case as well. Relevant
-            # issue: https://github.com/oppia/oppia/issues/10038
+            # TODO(#10038): Fix the check to cover below case as well.
             # If there is *args and **kwargs in the function definition skip the
             # check because we can use keywords arguments in function call even
             # if **kwargs is present in the function definition. See Example:
