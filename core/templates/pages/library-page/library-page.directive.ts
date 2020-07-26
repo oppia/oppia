@@ -353,7 +353,6 @@ angular.module('oppia').directive('libraryPage', [
                 bindLibraryPageShortcuts();
 
 
-
                 // Check if actual and expected widths are the same.
                 // If not produce an error that would be caught by e2e tests.
                 $timeout(function() {
