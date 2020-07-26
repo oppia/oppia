@@ -26,9 +26,8 @@ import { DomSanitizer, SafeHtml, SafeStyle, SafeScript, SafeUrl,
 export class SafePipe implements PipeTransform {
   constructor(protected sanitizer: DomSanitizer) {}
 
-  public transform(value: any, type: string):
+  public transform(value: string, type: string):
     SafeHtml | SafeStyle | SafeScript | SafeUrl | SafeResourceUrl {
-    console.log(this.sanitizer.bypassSecurityTrustUrl(value));
     switch (type) {
       case 'html': return this.sanitizer.bypassSecurityTrustHtml(value);
       case 'style': return this.sanitizer.bypassSecurityTrustStyle(value);
