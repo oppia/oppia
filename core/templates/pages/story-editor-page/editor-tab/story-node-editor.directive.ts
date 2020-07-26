@@ -36,6 +36,8 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('services/contextual/window-dimensions.service.ts');
+
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -63,14 +65,16 @@ angular.module('oppia').directive('storyNodeEditor', [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'StoryEditorStateService', 'ExplorationIdValidationService',
         'TopicsAndSkillsDashboardBackendApiService',
-        'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
+        'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
+        'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             StoryEditorStateService, ExplorationIdValidationService,
             TopicsAndSkillsDashboardBackendApiService,
-            StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
+            StoryUpdateService, UndoRedoService, WindowDimensionsService,
+            EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
@@ -359,12 +363,28 @@ angular.module('oppia').directive('storyNodeEditor', [
               !$scope.chapterPreviewCardIsShown);
           };
 
+          $scope.togglePrerequisiteSkillsList = function() {
+            $scope.prerequisiteSkillIsShown = !$scope.prerequisiteSkillIsShown;
+          };
+          $scope.toggleChapterOutline = function() {
+            $scope.chapterOutlineIsShown = !$scope.chapterOutlineIsShown;
+          };
+          $scope.toggleAcquiredSkillsList = function() {
+            $scope.acquiredSkillIsShown = !$scope.acquiredSkillIsShown;
+          };
+
           ctrl.$onInit = function() {
             // Regex pattern for exploration id,
             // EXPLORATION_AND_SKILL_ID_PATTERN
             // is not being used here, as the chapter of the story can be saved
             // with empty exploration id.
             $scope.chapterPreviewCardIsShown = false;
+            $scope.chapterOutlineIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
+            $scope.prerequisiteSkillIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
+            $scope.acquiredSkillIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.expIdCanBeSaved = true;
             $scope.$on(EVENT_STORY_INITIALIZED, _init);

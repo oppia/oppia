@@ -116,40 +116,54 @@
         <div class="story-node-editor">
           <div class="chapter-list-card-header">
             <span>Chapters</span>
-            <button ng-click="createNode()" class="btn add-chapter-btn protractor-test-add-chapter-button">
-             + ADD CHAPTER
-            </button>
-          </div>
-          <div ng-if="!linearNodesList.length">
-            <p class="no-chapters-message" style="padding-top: 6px;">
-              This story has no chapters.
-            </p>
-          </div>
-          <div ng-if="linearNodesList.length">
-            <div class="chapter-list-card-heading">
-              <span>Name</span>
+            <i ng-click="toggleChapterLists()"
+               class="fa fa-angle-down"
+               ng-if="!chaptersListIsShown"
+               aria-hidden="true">
+            </i>
+            <i ng-click="toggleChapterLists()"
+               class="fa fa-angle-up"
+               ng-if="chaptersListIsShown"
+               aria-hidden="true">
+            </i>
+            <div ng-if="chaptersListIsShown">
+              <button ng-click="createNode()" class="btn add-chapter-btn protractor-test-add-chapter-button">
+               + ADD CHAPTER
+              </button>
             </div>
-            <div class="story-nodes-container">
-              <div ng-repeat="node in linearNodesList track by $index">
-                <div class="story-editor-node"
-                     ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                     ng-click="navigateToChapterWithId(node.getId(), $index)"
-                     dnd-draggable="node"
-                     dnd-list="linearNodesList"
-                     dnd-effect-allowed="move"
-                     dnd-dragstart="onMoveChapterStart($index, node.getId())"
-                     dnd-drop="rearrangeNodeInStory($index)">
-                  <div class="story-editor-node-title">
-                    <span> <[$index+1]>. </span>
-                    <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
-                  </div>
-                  <div class="edit-options-container">
-                    <i class="fa fa-ellipsis-v chapter-edit-toggle-button protractor-test-edit-options" ng-click="toggleChapterEditOptions($index);$event.stopPropagation()"></i>
-                  </div>
-                  <div class="chapter-option-box" ng-if="selectedChapterIndex === $index" ng-mouseleave="toggleChapterEditOptions(-1)" ng-click="toggleChapterEditOptions(-1);$event.stopPropagation()">
-                    <div class="chapter-edit-option protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())">
-                      <i class="fa fa-trash"></i>
-                      <span>Delete</span>
+          </div>
+          <div ng-if="chaptersListIsShown">
+            <div ng-if="!linearNodesList.length">
+              <p class="no-chapters-message" style="padding-top: 6px;">
+                This story has no chapters.
+              </p>
+            </div>
+            <div ng-if="linearNodesList.length">
+              <div class="chapter-list-card-heading">
+                <span>Name</span>
+              </div>
+              <div class="story-nodes-container">
+                <div ng-repeat="node in linearNodesList track by $index">
+                  <div class="story-editor-node"
+                       ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                       ng-click="navigateToChapterWithId(node.getId(), $index)"
+                       dnd-draggable="node"
+                       dnd-list="linearNodesList"
+                       dnd-effect-allowed="move"
+                       dnd-dragstart="onMoveChapterStart($index, node.getId())"
+                       dnd-drop="rearrangeNodeInStory($index)">
+                    <div class="story-editor-node-title">
+                      <span> <[$index+1]>. </span>
+                      <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
+                    </div>
+                    <div class="edit-options-container">
+                      <i class="fa fa-ellipsis-v chapter-edit-toggle-button protractor-test-edit-options" ng-click="toggleChapterEditOptions($index);$event.stopPropagation()"></i>
+                    </div>
+                    <div class="chapter-option-box" ng-if="selectedChapterIndex === $index" ng-mouseleave="toggleChapterEditOptions(-1)" ng-click="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                      <div class="chapter-edit-option protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())">
+                        <i class="fa fa-trash"></i>
+                        <span>Delete</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -160,18 +174,6 @@
       </md-card>
     </div>
   </div>
-  <md-card ng-if="linearNodesList.length === 0"  class="oppia-page-card oppia-long-text chapter-editor-card">
-    <div>
-      <p class="no-chapters-message" style="padding-top: 6px;">
-        This story has no chapters.
-      </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-chapter-button"
-              style="color: white; text-decoration: none;"
-              ng-click="createNode()">
-        Create Chapter
-      </button>
-    </div>
-  </md-card>
 </div>
 
 <style>
@@ -191,10 +193,14 @@
     padding: 15px 0;
     position: relative;
   }
-  .story-editor-node-title {
+
+  story-editor .story-editor-node-title {
     cursor: pointer;
+    text-align: left;
+    width: 95%;
   }
-  story-editor .story-editor-node:hover {
+
+  story-editor story-editor-node:hover {
     cursor: grab;
   }
 
@@ -203,28 +209,19 @@
     margin-bottom: 35px;
     margin-left: 4%;
   }
+
   story-editor .topic-name {
     color: #666;
     cursor: pointer;
   }
 
-  story-editor .story-editor-node:active {
+  story-editor story-editor-node:active {
     cursor: move;
-  }
-
-  story-editor .story-editor-delete-node {
-    color: #ef5350;
-  }
-
-  story-editor .story-editor-initial-node {
-    left: 0;
-    position: absolute;
-    top: 0;
   }
 
   story-editor .story-nodes-container {
     background-color: #FFF;
-    text-align: center;
+    text-align: left;
     white-space: initial;
   }
 
@@ -314,6 +311,7 @@
   story-editor .chapter-list-card-header {
     align-items: center;
     display: flex;
+    flex-wrap: wrap;
     font-size: 20px;
     font-weight: bold;
     justify-content: space-between;
@@ -345,9 +343,71 @@
   story-editor .chapter-edit-option span {
     margin-left: 5%;
   }
-
   story-editor .chapter-edit-toggle-button {
     cursor: pointer;
     position: relative;
+  }
+  .chapter-list-card-header i {
+    display: none;
+  }
+  @media screen and (max-width: 1150px) {
+    story-editor .content-container {
+        width: 55%;
+    }
+    story-editor .chapter-list-container {
+      margin-right: 2%;
+      width: 35%;
+    }
+  }
+  @media screen and (max-width: 1000px) {
+    story-editor .parent-container {
+        width: 100%;
+    }
+    story-editor .chapter-list-container {
+      margin-right: 0;
+      width: 40%;
+    }
+  }
+  @media screen and (max-width: 800px) {
+    story-editor .story-content {
+      padding: 0;
+    }
+    story-editor .chapter-list-container .content-card {
+      padding: 5px 12px;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    story-editor .content-container,
+    story-editor .chapter-list-container {
+      width: 98%;
+    }
+
+    story-editor .story-content {
+      padding: 30px 12px;
+    }
+
+    story-editor .chapter-list-container {
+      margin-top: 30px;
+    }
+
+    story-editor .story-notes {
+      width: 95%;
+    }
+
+    story-editor .story-card-header {
+      margin: 24px 0;
+    }
+
+    story-editor .chapter-option-box {
+      right: 20px;
+    }
+
+    story-editor .chapter-list-card-header i {
+      display: block;
+    }
+    story-editor .chapter-list-card-header div {
+      margin-top: 16px;
+      width: 100%;
+    }
   }
 </style>
