@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { HighBounceRateTask, HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { ITaskEntryBackendDict } from
+import { TaskEntryBackendDict } from
   'domain/improvements/TaskEntryObjectFactory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
@@ -44,9 +44,11 @@ export type ExplorationTaskType = (
   'needs_guiding_responses' |
   'successive_incorrect_answers');
 
-export interface IExplorationTaskBackendDict extends ITaskEntryBackendDict {
-  'task_type': ExplorationTaskType;
-}
+export type ExplorationTaskBackendDict = (
+  TaskEntryBackendDict<'high_bounce_rate'> |
+  TaskEntryBackendDict<'ineffective_feedback_loop'> |
+  TaskEntryBackendDict<'needs_guiding_responses'> |
+  TaskEntryBackendDict<'successive_incorrect_answers'>);
 
 export type ExplorationTask = (
   HighBounceRateTask |
@@ -102,7 +104,8 @@ export class ExplorationTaskObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: IExplorationTaskBackendDict): ExplorationTask {
+      backendDict: ExplorationTaskBackendDict): ExplorationTask {
+    const taskType = backendDict.task_type;
     switch (backendDict.task_type) {
       case 'high_bounce_rate':
         return this.hbrTaskObjectFactory.createFromBackendDict(backendDict);
@@ -113,8 +116,10 @@ export class ExplorationTaskObjectFactory {
       case 'successive_incorrect_answers':
         return this.siaTaskObjectFactory.createFromBackendDict(backendDict);
       default: {
-        const invalidTaskType: never = backendDict.task_type;
-        throw new Error('unsupported task type: ' + invalidTaskType);
+        const invalidBackendDict: never = backendDict;
+        throw new Error(
+          `Unsupported task type "${taskType}" for backend dict: ` +
+          JSON.stringify(invalidBackendDict));
       }
     }
   }

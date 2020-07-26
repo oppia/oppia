@@ -17,164 +17,124 @@
  * in editor.
  */
 
+require('domain/utilities/url-interpolation.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
   'pages/exploration-editor-page/modal-templates/help-modal.controller.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'state-tutorial-first-time.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require('services/context.service.ts');
-require('services/exploration-features.service.ts');
+require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user-backend-api.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
-angular.module('oppia').directive('editorNavigation', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/editor-navigation/' +
-        'editor-navigation.directive.html'),
-      controller: [
-        '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
-        'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
-        'StateTutorialFirstTimeService', 'ThreadDataService',
-        'UserBackendApiService', 'WindowDimensionsService',
-        function(
-            $rootScope, $scope, $timeout, $uibModal, ContextService,
-            ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, RouterService, SiteAnalyticsService,
-            StateTutorialFirstTimeService, ThreadDataService,
-            UserBackendApiService, WindowDimensionsService) {
-          var ctrl = this;
-          var taskCount = 0;
-          $scope.getOpenTaskCount = function() {
-            return taskCount;
-          };
+angular.module('oppia').directive('editorNavigation', () => ({
+  restrict: 'E',
+  template: require('./editor-navigation.directive.html'),
+  controller: [
+    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
+    'ExplorationImprovementsService', 'ExplorationRightsService',
+    'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+    'ThreadDataService', 'UrlInterpolationService', 'UserService',
+    'WindowDimensionsService',
+    function(
+        $q, $rootScope, $scope, $timeout, $uibModal, ContextService,
+        ExplorationImprovementsService, ExplorationRightsService,
+        ExplorationWarningsService, RouterService, SiteAnalyticsService,
+        ThreadDataService, UrlInterpolationService, UserService,
+        WindowDimensionsService) {
+      $scope.showUserHelpModal = () => {
+        var explorationId = ContextService.getExplorationId();
+        SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+        var EDITOR_TUTORIAL_MODE = 'editor';
+        var TRANSLATION_TUTORIAL_MODE = 'translation';
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/modal-templates/' +
+            'help-modal.template.html'),
+          backdrop: true,
+          controller: 'HelpModalController',
+          windowClass: 'oppia-help-modal'
+        }).result.then(mode => {
+          if (mode === EDITOR_TUTORIAL_MODE) {
+            $rootScope.$broadcast('openEditorTutorial');
+          } else if (mode === TRANSLATION_TUTORIAL_MODE) {
+            $rootScope.$broadcast('openTranslationTutorial');
+          }
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
+      };
 
-          $scope.isImprovementsTabEnabled = function() {
-            return ExplorationFeaturesService.isInitialized() &&
-              ExplorationFeaturesService.isImprovementsTabEnabled();
-          };
+      $scope.countWarnings = () => ExplorationWarningsService.countWarnings();
+      $scope.getWarnings = () => ExplorationWarningsService.getWarnings();
+      $scope.hasCriticalWarnings = (
+        () => ExplorationWarningsService.hasCriticalWarnings);
+      $scope.getActiveTabName = () => RouterService.getActiveTabName();
+      $scope.selectMainTab = () => RouterService.navigateToMainTab();
+      $scope.selectTranslationTab = (
+        () => RouterService.navigateToTranslationTab());
+      $scope.selectPreviewTab = () => RouterService.navigateToPreviewTab();
+      $scope.selectSettingsTab = () => RouterService.navigateToSettingsTab();
+      $scope.selectStatsTab = () => RouterService.navigateToStatsTab();
+      $scope.selectImprovementsTab = (
+        () => RouterService.navigateToImprovementsTab());
+      $scope.selectHistoryTab = () => RouterService.navigateToHistoryTab();
+      $scope.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
+      $scope.getOpenThreadsCount = (
+        () => ThreadDataService.getOpenThreadsCount());
 
-          $scope.showUserHelpModal = function() {
-            var explorationId = ContextService.getExplorationId();
-            SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
-            var EDITOR_TUTORIAL_MODE = 'editor';
-            var TRANSLATION_TUTORIAL_MODE = 'translation';
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/modal-templates/' +
-                'help-modal.template.html'),
-              backdrop: true,
-              controller: 'HelpModalController',
-              windowClass: 'oppia-help-modal'
-            }).result.then(function(mode) {
-              if (mode === EDITOR_TUTORIAL_MODE) {
-                $rootScope.$broadcast('openEditorTutorial');
-              } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-                $rootScope.$broadcast('openTranslationTutorial');
-              }
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
+      this.$onInit = () => {
+        $scope.ExplorationRightsService = ExplorationRightsService;
 
-          $scope.countWarnings = function() {
-            return ExplorationWarningsService.countWarnings();
-          };
-          $scope.getWarnings = function() {
-            return ExplorationWarningsService.getWarnings();
-          };
-          $scope.hasCriticalWarnings = function() {
-            return ExplorationWarningsService.hasCriticalWarnings;
-          };
+        this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
+        this.resizeSubscription = (
+          WindowDimensionsService.getResizeEvent().subscribe(evt => {
+            this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
+            $scope.$applyAsync();
+          }));
+        $scope.isScreenLarge = () => this.screenIsLarge;
 
-          $scope.getActiveTabName = function() {
-            return RouterService.getActiveTabName();
-          };
-          $scope.selectMainTab = function() {
-            RouterService.navigateToMainTab();
-          };
-          $scope.selectTranslationTab = function() {
-            RouterService.navigateToTranslationTab();
-          };
-          $scope.selectPreviewTab = function() {
-            RouterService.navigateToPreviewTab();
-          };
-          $scope.selectSettingsTab = function() {
-            RouterService.navigateToSettingsTab();
-          };
-          $scope.selectStatsTab = function() {
-            RouterService.navigateToStatsTab();
-          };
-          $scope.selectImprovementsTab = function() {
-            RouterService.navigateToImprovementsTab();
-          };
-          $scope.selectHistoryTab = function() {
-            RouterService.navigateToHistoryTab();
-          };
-          $scope.selectFeedbackTab = function() {
-            RouterService.navigateToFeedbackTab();
-          };
-          $scope.getOpenThreadsCount = function() {
-            return ThreadDataService.getOpenThreadsCount();
-          };
+        this.postTutorialHelpPopoverIsShown = false;
+        $scope.$on('openPostTutorialHelpPopover', () => {
+          if (this.screenIsLarge) {
+            this.postTutorialHelpPopoverIsShown = true;
+            $timeout(() => {
+              this.postTutorialHelpPopoverIsShown = false;
+            }, 4000);
+          } else {
+            this.postTutorialHelpPopoverIsShown = false;
+          }
+        });
+        $scope.isPostTutorialHelpPopoverShown = (
+          () => this.postTutorialHelpPopoverIsShown);
 
-          ctrl.$onInit = function() {
-            $scope.popoverControlObject = {
-              postTutorialHelpPopoverIsShown: false
-            };
-            $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-            $scope.$on('openPostTutorialHelpPopover', function() {
-              if ($scope.isLargeScreen) {
-                $scope.popoverControlObject.postTutorialHelpPopoverIsShown = (
-                  true);
-                $timeout(function() {
-                  $scope.popoverControlObject
-                    .postTutorialHelpPopoverIsShown = false;
-                }, 4000);
-              } else {
-                $scope.popoverControlObject
-                  .postTutorialHelpPopoverIsShown = false;
-              }
-            });
+        this.improvementsTabIsEnabled = false;
+        $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
+          .then(improvementsTabIsEnabled => {
+            this.improvementsTabIsEnabled = improvementsTabIsEnabled;
+          });
+        $scope.isImprovementsTabEnabled = () => this.improvementsTabIsEnabled;
 
-            $scope.userIsLoggedIn = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
-              $scope.userIsLoggedIn = userInfo.isLoggedIn();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$apply();
-            });
-            $scope.ExplorationRightsService = ExplorationRightsService;
+        this.userIsLoggedIn = false;
+        $q.when(UserService.getUserInfoAsync())
+          .then(userInfo => {
+            this.userIsLoggedIn = userInfo.isLoggedIn();
+          });
+        $scope.isUserLoggedIn = () => this.userIsLoggedIn;
+      };
 
-            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-              subscribe(evt => {
-                $scope.isLargeScreen = (
-                  WindowDimensionsService.getWidth() >= 1024);
-
-                $scope.$applyAsync();
-              });
-          };
-
-          ctrl.$onDestroy = function() {
-            if (ctrl.resizeSubscription) {
-              ctrl.resizeSubscription.unsubscribe();
-            }
-          };
+      this.$onDestroy = () => {
+        if (this.resizeSubscription) {
+          this.resizeSubscription.unsubscribe();
         }
-      ]
-    };
-  }]);
+      };
+    }
+  ],
+}));

@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IStorySummaryBackendDict {
+export interface StorySummaryBackendDict {
   'id': string;
   'title': string;
   'node_titles': string[];
@@ -81,7 +81,7 @@ export class StorySummary {
 })
 export class StorySummaryObjectFactory {
   createFromBackendDict(
-      storySummaryBackendDict: IStorySummaryBackendDict): StorySummary {
+      storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
