@@ -523,7 +523,6 @@ def main(args=None):
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    # ADD FUNCTION BACK LATER ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
         commands.append('--inspect-brk')
