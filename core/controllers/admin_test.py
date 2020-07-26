@@ -1132,7 +1132,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
                 ('latex_id1', 'latex_id1', svg_file_1),),
             expected_status_int=400)
         self.assertIn(
-            'SVG for LaTeX value \\frac{x}{y} in exploration exp_id1 is not '
+            'SVG for LaTeX string \\frac{x}{y} in exploration exp_id1 is not '
             'supplied.', response_dict['error'])
         self.logout()
 

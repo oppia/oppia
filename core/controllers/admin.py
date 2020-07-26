@@ -613,7 +613,7 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
                     latex_to_svg_mappings[exp_id][latex_string]['latexId'])
                 if not svg_image:
                     raise self.InvalidInputException(
-                        'SVG for LaTeX value %s in exploration %s is not '
+                        'SVG for LaTeX string %s in exploration %s is not '
                         'supplied.' % (latex_string, exp_id))
                 latex_to_svg_mappings[exp_id][latex_string]['svg_file'] = (
                     svg_image)

@@ -1901,7 +1901,7 @@ def get_batch_of_exps_for_latex_svg_generation():
 
 
 def update_exploration_with_math_svgs(exp_id, image_data):
-    """Saves an SVG for each LaTeX value without an SVG in an exploration
+    """Saves an SVG for each LaTeX string without an SVG in an exploration
     and updates the exploration. Also the corresponding valid draft changes are
     updated.
 
