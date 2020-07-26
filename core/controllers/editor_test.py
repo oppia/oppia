@@ -1582,8 +1582,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
     def test_put_with_long_commit_message_raises_error(self):
         # Create several users.
-        self.signup(
-            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+        self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
 
         # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
