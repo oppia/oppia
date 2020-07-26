@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. eslint @typescript-eslint/no-explicit-any
+ * js_ts_linter_test.py. eslint @typescript-eslint no explicit any
  * is not allowed to use.
  */
 
