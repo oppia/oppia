@@ -86,12 +86,12 @@ describe('screenreader and keyboard user accessibility features', function() {
     // Should move the focus away from the elementToFocus.
     await browser.actions().sendKeys(protractor.Key.TAB).perform();
 
-   // Should move the focus back to the elementToFocus.
+    // Should move the focus back to the elementToFocus.
     await browser.actions().sendKeys(key).perform();
     expect(await elementToFocus.getAttribute('id')).toEqual(
       await (await browser.driver.switchTo().activeElement())
         .getAttribute('id'));
-  }
+  };
 
   it('should skip to the main content element', async function() {
     await libraryPage.get();
