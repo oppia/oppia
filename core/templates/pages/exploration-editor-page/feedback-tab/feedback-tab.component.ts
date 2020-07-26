@@ -28,6 +28,9 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
 require(
+  'pages/exploration-editor-page/feedback-tab/thread-table/' +
+  'thread-table.component.ts');
+require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
 require('services/alerts.service.ts');
@@ -136,7 +139,6 @@ angular.module('oppia').component('feedbackTab', {
           throw new Error(
             'Trying to show suggestion of a non-existent thread');
         }
-
         SuggestionModalForExplorationEditorService.showSuggestionModal(
           ctrl.activeThread.suggestion.suggestionType, {
             activeThread: ctrl.activeThread,

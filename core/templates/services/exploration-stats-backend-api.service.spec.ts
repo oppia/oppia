@@ -23,11 +23,11 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
   ExplorationStats,
   ExplorationStatsObjectFactory,
-  IExplorationStatsBackendDict
+  ExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
-import { IStateStatsBackendDict } from
+import { StateStatsBackendDict } from
   'domain/statistics/StateStatsObjectFactory';
 
 describe('Exploration stats backend api service', () => {
@@ -46,7 +46,7 @@ describe('Exploration stats backend api service', () => {
   });
 
   it('should return an ExplorationStats domain object', fakeAsync(() => {
-    let explorationStatsBackendDict: IExplorationStatsBackendDict = {
+    let explorationStatsBackendDict: ExplorationStatsBackendDict = {
       exp_id: 'eid',
       exp_version: 1,
       num_starts: 0,
@@ -54,7 +54,7 @@ describe('Exploration stats backend api service', () => {
       num_completions: 0,
       state_stats_mapping: {
         Introduction: (
-          <IStateStatsBackendDict>{
+          <StateStatsBackendDict>{
             total_answers_count: 0,
             useful_feedback_count: 0,
             total_hit_count: 0,
