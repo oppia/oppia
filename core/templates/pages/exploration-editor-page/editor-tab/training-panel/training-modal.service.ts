@@ -19,7 +19,7 @@
 
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-panel.directive.ts');
+  'training-panel.component.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
