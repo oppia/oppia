@@ -45,11 +45,12 @@ describe('Exploration player page', function() {
   };
 
   beforeEach(() => {
-    skipButton.setAttribute("id", "skipToMainContentId");
-    backButton.setAttribute("id", "backButtonId");
-    nextButton.setAttribute("class", "protractor-test-next-button");
-    continueButton.setAttribute("class", "protractor-test-continue-button");
-    continueToNextCardButton.setAttribute("class", "protractor-test-continue-to-next-card-button");
+    skipButton.setAttribute('id', 'skipToMainContentId');
+    backButton.setAttribute('id', 'backButtonId');
+    nextButton.setAttribute('class', 'protractor-test-next-button');
+    continueButton.setAttribute('class', 'protractor-test-continue-button');
+    continueToNextCardButton.setAttribute(
+      'class', 'protractor-test-continue-to-next-card-button');
     document.body.append(skipButton);
     document.body.append(continueButton);
     document.body.append(backButton);
@@ -118,21 +119,21 @@ describe('Exploration player page', function() {
     $scope.$apply();
 
     Mousetrap.trigger('s');
-    expect(document.getElementById('skipToMainContentId').isEqualNode(document.activeElement));
+    expect(skipButton.isEqualNode(document.activeElement));
 
     Mousetrap.trigger('k');
-    expect(document.getElementById('backButtonId').isEqualNode(document.activeElement));
+    expect(backButton.isEqualNode(document.activeElement));
 
     Mousetrap.trigger('j');
-    expect(document.getElementsByClassName('protractor-test-continue-button')[0].isEqualNode(document.activeElement));
-   
+    expect(continueButton.isEqualNode(document.activeElement));
+
     document.body.append(continueToNextCardButton);
     Mousetrap.trigger('j');
-    expect(document.getElementsByClassName('protractor-test-continue-to-next-card-button')[0].isEqualNode(document.activeElement));
-    
+    expect(continueToNextCardButton.isEqualNode(document.activeElement));
+
     document.body.append(nextButton);
     Mousetrap.trigger('j');
-    expect(document.getElementsByClassName('protractor-test-next-button')[0].isEqualNode(document.activeElement));
+    expect(nextButton.isEqualNode(document.activeElement));
 
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
       'Exploration Title - Oppia');
