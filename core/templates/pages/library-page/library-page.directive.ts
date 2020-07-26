@@ -194,22 +194,22 @@ angular.module('oppia').directive('libraryPage', [
             }
           };
 
-          var bindLibraryPageShortcuts = function(){
+          var bindLibraryPageShortcuts = function() {
             Mousetrap.bind('/', function() {
               document.getElementById('searchBar').focus();
               return false;
             });
-        
+
             Mousetrap.bind('c', function() {
               document.getElementById('categoryBar').focus();
               return false;
             });
-        
+
             Mousetrap.bind('s', function() {
               document.getElementById('skipToMainContentId').focus();
               return false;
             });
-          }
+          };
 
           // The following loads explorations belonging to a particular group.
           // If fullResultsUrl is given it loads the page corresponding to

@@ -64,7 +64,7 @@ angular.module('oppia').component('explorationPlayerPage', {
             document.getElementById('skipToMainContentId').focus();
             return false;
           });
-      
+
           Mousetrap.bind('k', function() {
             var previousButton = document.getElementById('backButtonId');
             if (previousButton !== null) {
@@ -72,7 +72,7 @@ angular.module('oppia').component('explorationPlayerPage', {
             }
             return false;
           });
-      
+
           Mousetrap.bind('j', function() {
             var nextButton = <HTMLElement>document.querySelector(
               '.protractor-test-next-button');
@@ -91,8 +91,7 @@ angular.module('oppia').component('explorationPlayerPage', {
             }
             return false;
           });
-        }
-
+        };
         bindExplorationPlayerShortcuts();
 
 
