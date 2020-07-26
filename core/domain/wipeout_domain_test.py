@@ -42,4 +42,4 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         self.assertEqual(default_pending_deletion.deletion_complete, False)
         self.assertEqual(default_pending_deletion.exploration_ids, [])
         self.assertEqual(default_pending_deletion.collection_ids, [])
-        self.assertEqual(default_pending_deletion.story_mappings, None)
+        self.assertEqual(default_pending_deletion.activity_mappings, {})
