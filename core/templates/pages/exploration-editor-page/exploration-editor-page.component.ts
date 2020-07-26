@@ -50,7 +50,7 @@ require(
   'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
-  'param-changes-editor.directive.ts');
+  'param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.directive.ts');
