@@ -68,7 +68,8 @@ class BaseValueGenerator(python_utils.OBJECT):
 
         The first arg should be context_params.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'generate_value() method has not yet been implemented')
 
 
 class Registry(python_utils.OBJECT):

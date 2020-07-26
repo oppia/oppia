@@ -526,7 +526,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -580,9 +583,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -650,7 +659,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -671,9 +683,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted explorations does not show up in any queries.
@@ -700,7 +718,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration summary does not show up in any queries.
