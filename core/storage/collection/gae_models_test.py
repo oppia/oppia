@@ -213,8 +213,9 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0
-            ).save(self.USER_ID_COMMITTER, 'Created new collection',
-                   [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            ).save(
+                self.USER_ID_COMMITTER, 'Created new collection',
+                [{'cmd': rights_manager.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
         self.assertEqual('id', collection_model.id)
 
