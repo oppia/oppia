@@ -462,18 +462,18 @@ class EmailMockTests(test_utils.EmailTestBase):
         to emails_dict.
         """
         self._send_email_to_recipients(
-            sender_email='a@a.com',
-            recipient_emails=['b@b.com'],
-            subject=(
+            'a@a.com',
+            ['b@b.com'],
+            (
                 'Hola 😂 - invitation to collaborate'
                 .encode(encoding='utf-8')),
-            plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-            html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+            'plaintext_body 😂'.encode(encoding='utf-8'),
+            'Hi abc,<br> 😂'.encode(encoding='utf-8'),
             bcc=['c@c.com'],
             reply_to='abc',
             recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
         messages = self._get_sent_email_messages(
-            to='b@b.com')
+            'b@b.com')
         all_messages = self._get_all_sent_email_messages()
 
         self.assertEqual(len(messages), 1)
@@ -516,5 +516,5 @@ class SwapWithCheckTestClass(python_utils.OBJECT):
     @classmethod
     def functions_with_kwargs(cls):
         """Run a few functions with kwargs."""
-        os.getenv(key='123', default='456')
-        os.getenv(key='678', default='900')
+        os.getenv('123', default='456')
+        os.getenv('678', default='900')
