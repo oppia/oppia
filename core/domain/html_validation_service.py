@@ -881,13 +881,11 @@ def generate_math_svgs_filename(height, width, vertical_padding):
     hour = python_utils.UNICODE(date_object.hour)[-2:]
     minute = python_utils.UNICODE(date_object.minute)[-2:]
     second = python_utils.UNICODE(date_object.second)[-2:]
-    date_time_string = (
-        year + month + day + hour + minute + second + random_string)
 
-    filename = (
-        'mathImg_' + date_time_string + '_height_' + height + '_width_' +
-        width + '_vertical_' + python_utils.UNICODE(vertical_padding) + '.' +
-        'svg')
+    date_time_string = '%s%s%s%s%s%s%s' % (
+        year, month, day, hour, minute, second, random_string)
+    filename = 'mathImg_%s_height_%s_width_%s_vertical_%s.svg' % (
+        date_time_string, height, width, python_utils.UNICODE(vertical_padding))
     return filename
 
 

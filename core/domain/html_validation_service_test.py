@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import os
+import re
 
 import bs4
 from core.domain import fs_domain
@@ -1907,6 +1908,118 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                  'amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;qu'
                  'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
                  '&amp;quot;}"></oppia-noninteractive-math>')])
+
+    def test_generate_math_svgs_filename(self):
+        """Test that the generate_math_svgs_filename method generates the
+        filenames in the expected pattern.
+        """
+        filename_pattern_regex = (
+            r'mathImg_[0-9]+\S{10}_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d'
+            ']+.svg')
+        filenames = []
+        filenames.append(
+            html_validation_service.generate_math_svgs_filename(
+                '4d123', '2d145', '0d124'))
+        filenames.append(
+            html_validation_service.generate_math_svgs_filename(
+                '4d123', '2d145', '0'))
+        filenames.append(
+            html_validation_service.generate_math_svgs_filename(
+                '43d12', '12d14', '0d124'))
+        for filename in filenames:
+            self.assertTrue(re.match(filename_pattern_regex, filename))
+
+    def test_add_svg_filenames_for_latex_strings_in_html_string(self):
+        """Test that the add_svg_filenames_for_latex_strings_in_html_string
+        method adds a filename if empty for each math rich-text component.
+        """
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;qu'
+            'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}'
+            '"></oppia-noninteractive-math>')
+        raw_latex_to_dimensions_dict = {
+            '+,-,-,+': {
+                'dimensions': {
+                    'height': '1d345',
+                    'width': '3d124',
+                    'verticalPadding': '0d124'
+                }
+            },
+            '+,+,+,+': {
+                'dimensions': {
+                    'height': '2d456',
+                    'width': '6d124',
+                    'verticalPadding': '0d231'
+                }
+            },
+            '(x - a_1)(x - a_2)': {
+                'dimensions': {
+                    'height': '4d123',
+                    'width': '23d122',
+                    'verticalPadding': '2d123'
+                }
+            }
+        }
+        converted_html_string = (
+            html_validation_service.
+            add_svg_filenames_for_latex_strings_in_html_string(
+                raw_latex_to_dimensions_dict, html_string))
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(converted_html_string))
+        self.assertEqual(len(filenames), 3)
+        filename_pattern_regex = (
+            r'mathImg_[0-9]+\S{10}_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d'
+            ']+.svg')
+        for filename in filenames:
+            self.assertTrue(re.match(filename_pattern_regex, filename))
+
+    def test_extract_svg_filename_latex_mapping_in_math_rte_components(self):
+        """Test that extract_svg_filename_latex_mapping_in_math_rte_components
+        returns all the raw_latex to svg_filename mappings in the HTML.
+        """
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathIm'
+            'g_20207261338jhi1j6rvob_height_1d345_width_3d124_vertical_0d124'
+            '.svg&amp;quot;}"></oppia-noninteractive-math><oppia-noninteract'
+            'ive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
+            ': &amp;quot;+,+,+,+&amp;quot;, &amp;quot;svg_filename&amp;quot;:'
+            ' &amp;quot;mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124'
+            '_vertical_0d231.svg&amp;quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;qu'
+            'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20207'
+            '261338imzlvnf23a_height_4d123_width_23d122_vertical_2d123.svg&a'
+            'mp;quot;}"></oppia-noninteractive-math>')
+
+        filename1 = (
+            'mathImg_20207261338jhi1j6rvob_height_1d345_width_3d124_vertical_0'
+            'd124.svg')
+        filename2 = (
+            'mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124_vertical_0'
+            'd231.svg')
+        filename3 = (
+            'mathImg_20207261338imzlvnf23a_height_4d123_width_23d122_vertical_'
+            '2d123.svg')
+        expected_output = [
+            (filename1, '+,-,-,+'), (filename2, '+,+,+,+'),
+            (filename3, '(x - a_1)(x - a_2)')]
+
+        self.assertEqual(
+            html_validation_service.
+            extract_svg_filename_latex_mapping_in_math_rte_components(
+                html_string), expected_output)
 
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for
