@@ -107,7 +107,7 @@ def memoize(func):
         func_kwargs = default_func_kwargs.copy()
         func_kwargs.update(kwargs)
         key = (tuple(args), tuple(sorted(func_kwargs.items())))
-        return get_from_cache(key, factory=lambda: func(*args, **kwargs))
+        return get_from_cache(key, lambda: func(*args, **kwargs))
 
     return memoized_func
 
