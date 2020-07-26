@@ -601,7 +601,7 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
         latex_strings_to_exp_id_mapping = (
             exp_services.get_batch_of_exps_for_latex_svg_generation())
         self.render_json({
-            'result': latex_strings_to_exp_id_mapping
+            'latex_strings_to_exp_id_mapping': latex_strings_to_exp_id_mapping
         })
 
     @acl_decorators.can_access_admin_page

@@ -1004,7 +1004,8 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             'exp_id3': ['abc3', 'xyz3']
         }
         self.assertEqual(
-            response_dict, {'result': expected_response})
+            response_dict,
+            {'latex_strings_to_exp_id_mapping': expected_response})
 
     def test_post_svgs_when_all_values_are_valid(self):
         user_email = 'user1@example.com'

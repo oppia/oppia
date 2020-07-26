@@ -254,7 +254,8 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.fetchAndGenerateSvgsForExplorations = function() {
           $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
             function(response) {
-              expIdToLatexMapping = response.data.result;
+              expIdToLatexMapping = (
+                response.data.latex_strings_to_exp_id_mapping);
               ctrl.setStatusMessage('Latex values Fetched.');
               ctrl.generateSvgs();
             });
