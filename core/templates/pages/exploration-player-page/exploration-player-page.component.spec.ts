@@ -32,12 +32,28 @@ describe('Exploration player page', function() {
   var ContextService = null;
   var PageTitleService = null;
   var ReadOnlyExplorationBackendApiService = null;
+  var skipButton = document.createElement('button');
+  var nextButton = document.createElement('button');
+  var continueToNextCardButton = document.createElement('button');
+  var continueButton = document.createElement('button');
+  var backButton = document.createElement('button');
 
   var explorationId = 'exp1';
   var exploration = {
     title: 'Exploration Title',
     objective: 'Exploration Objective',
   };
+
+  beforeEach(() => {
+    skipButton.setAttribute("id", "skipToMainContentId");
+    backButton.setAttribute("id", "backButtonId");
+    nextButton.setAttribute("class", "protractor-test-next-button");
+    continueButton.setAttribute("class", "protractor-test-continue-button");
+    continueToNextCardButton.setAttribute("class", "protractor-test-continue-to-next-card-button");
+    document.body.append(skipButton);
+    document.body.append(continueButton);
+    document.body.append(backButton);
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -63,21 +79,12 @@ describe('Exploration player page', function() {
   it('should load skill based on its id on url when component is initialized' +
     ' and set angular element content property based on the exploration',
   function() {
-    jasmine.getEnv().allowRespy(true);
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(ReadOnlyExplorationBackendApiService, 'fetchExploration').and
       .returnValue($q.resolve({
         exploration: exploration
       }));
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
-    spyOn(document, 'getElementById').and.callFake(function() {
-      return document.createElement('button1');
-    });
-
-    spyOn(document, 'querySelector').and.callFake(function() {
-      return document.createElement('button2');
-    });
 
     var angularElementSpy = spyOn(angular, 'element');
 
@@ -109,9 +116,23 @@ describe('Exploration player page', function() {
 
     ctrl.$onInit();
     $scope.$apply();
-    Mousetrap.trigger('k');
-    Mousetrap.trigger('j');
+
     Mousetrap.trigger('s');
+    expect(document.getElementById('skipToMainContentId').isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('k');
+    expect(document.getElementById('backButtonId').isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('j');
+    expect(document.getElementsByClassName('protractor-test-continue-button')[0].isEqualNode(document.activeElement));
+   
+    document.body.append(continueToNextCardButton);
+    Mousetrap.trigger('j');
+    expect(document.getElementsByClassName('protractor-test-continue-to-next-card-button')[0].isEqualNode(document.activeElement));
+    
+    document.body.append(nextButton);
+    Mousetrap.trigger('j');
+    expect(document.getElementsByClassName('protractor-test-next-button')[0].isEqualNode(document.activeElement));
 
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
       'Exploration Title - Oppia');

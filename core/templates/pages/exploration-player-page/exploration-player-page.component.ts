@@ -61,7 +61,7 @@ angular.module('oppia').component('explorationPlayerPage', {
           });
 
         var bindExplorationPlayerShortcuts = function() {
-          Mousetrap.bind('s', function() {
+            Mousetrap.bind('s', function() {
             document.getElementById('skipToMainContentId').focus();
             return false;
           });
@@ -77,18 +77,18 @@ angular.module('oppia').component('explorationPlayerPage', {
           Mousetrap.bind('j', function() {
             var nextButton = <HTMLElement>document.querySelector(
               '.protractor-test-next-button');
-            var continueButton1 = <HTMLElement>document.querySelector(
+            var continueToNextCardButton = <HTMLElement>document.querySelector(
               '.protractor-test-continue-to-next-card-button');
-            var continueButton2 = <HTMLElement>document.querySelector(
+            var continueButton = <HTMLElement>document.querySelector(
               '.protractor-test-continue-button');
             if (nextButton !== null) {
               nextButton.focus();
             }
-            if (continueButton1 !== null) {
-              continueButton1.focus();
+            else if (continueToNextCardButton !== null) {
+              continueToNextCardButton.focus();
             }
-            if (continueButton2 !== null) {
-              continueButton2.focus();
+            else if (continueButton !== null) {
+              continueButton.focus();
             }
             return false;
           });

@@ -196,7 +196,9 @@ angular.module('oppia').directive('libraryPage', [
 
           var bindLibraryPageShortcuts = function() {
             Mousetrap.bind('/', function() {
-              document.getElementById('searchBar').focus();
+              var searchBar = <HTMLElement>document.querySelector(
+                '.protractor-test-search-input');
+              searchBar.focus();
               return false;
             });
 
