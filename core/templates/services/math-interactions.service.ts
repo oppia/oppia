@@ -30,7 +30,7 @@ export class MathInteractionsService {
   private warningText = '';
 
   private cleanErrorMessage(
-    errorMessage: string, expressionString: string): string {
+      errorMessage: string, expressionString: string): string {
     // The error thrown by nerdamer includes the index of the violation which
     // starts with a colon. That part needs to be removed before displaying
     // the error to the end user. Same rationale applies for stripping the
@@ -56,7 +56,7 @@ export class MathInteractionsService {
     }
     if (errorMessage === 'Division by zero not allowed.') {
       errorMessage = 'Your answer includes a division by zero, which is ' +
-        'not valid.'
+        'not valid.';
     }
     if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
       errorMessage = (
@@ -67,12 +67,12 @@ export class MathInteractionsService {
       let symbol1, symbol2;
       for (let s1 of '/*^') {
         for (let s2 of '+-/*^') {
-          if (expressionString.indexOf(s1+s2) !== -1) {
+          if (expressionString.indexOf(s1 + s2) !== -1) {
             symbol1 = s1;
             symbol2 = s2;
           }
         }
-      } 
+      }
       errorMessage = (
         'Your answer has two symbols next to each other: "' + symbol1 +
         '" and "' + symbol2 + '".');
@@ -197,7 +197,8 @@ export class MathInteractionsService {
     // be treated as 5*sqrt(x).
     // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
     // rid of the TS2339 error on AppConstants.
-    for (let functionName of AppConstants.MATH_FUNCTION_NAMES) {
+    let math_function_names = AppConstants.MATH_FUNCTION_NAMES
+    for (let functionName of math_function_names) {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
     }
@@ -209,9 +210,8 @@ export class MathInteractionsService {
     // sqrt*(4).
     let removeExtraMultiSymbol = expressionString[0] === '(';
     expressionString = expressionString.replace(new RegExp(
-      // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
-      // rid of the TS2339 error on AppConstants.
-      '(?<!\\*|\\+|\\/|\\-|\\^|\\(|' + AppConstants.MATH_FUNCTION_NAMES.join('|') + ')\\(', 'g'), '*(');
+      '(?<!\\*|\\+|\\/|\\-|\\^|\\(|' + math_function_names.join(
+        '|') + ')\\(', 'g'), '*(');
     if (removeExtraMultiSymbol) {
       expressionString = expressionString.slice(1);
     }
