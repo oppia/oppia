@@ -44,9 +44,7 @@ _PY_GITHUB_PATH = os.path.join(
     _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github # isort:skip  pylint: disable=wrong-import-position
 
 
 class MockPsutilProcess(python_utils.OBJECT):
@@ -372,10 +370,8 @@ class CommonTests(test_utils.GenericTestBase):
             return False
         def mock_chdir(unused_dirpath):
             pass
-        # pylint: disable=unused-argument
-        def mock_popen(unused_cmd, stdin, stdout, stderr):
+        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
             return process
-        # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'Invalid')
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
@@ -399,10 +395,8 @@ class CommonTests(test_utils.GenericTestBase):
             return False
         def mock_chdir(unused_dirpath):
             pass
-        # pylint: disable=unused-argument
-        def mock_popen(unused_cmd, stdin, stdout, stderr):
+        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
             return process
-        # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'You\'ve successfully authenticated!')
         def mock_check_call(unused_cmd_tokens):
@@ -528,18 +522,14 @@ class CommonTests(test_utils.GenericTestBase):
             common.ask_user_to_confirm('Testing')
 
     def test_get_personal_access_token_with_valid_token(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'token'
-        # pylint: enable=unused-argument
         with self.swap(getpass, 'getpass', mock_getpass):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
     def test_get_personal_access_token_with_token_as_none(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return None
-        # pylint: enable=unused-argument
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegexp(
             Exception,
@@ -551,12 +541,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_closed_blocking_bugs_milestone_results_in_exception(self):
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'state': 'closed'}, completed='')
-        # pylint: enable=unused-argument
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         with get_milestone_swap, self.assertRaisesRegexp(
@@ -568,12 +556,10 @@ class CommonTests(test_utils.GenericTestBase):
             requester='', headers='', attributes={}, completed='')
         def mock_open_tab(unused_url):
             pass
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'open_issues': 10, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         open_tab_swap = self.swap(
@@ -588,12 +574,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_zero_blocking_bug_issue_count_results_in_no_exception(self):
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'open_issues': 0, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
         with self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone):
             common.check_blocking_bug_issue_count(mock_repo)
@@ -621,10 +605,8 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
-        # pylint: enable=unused-argument
         def mock_get_label(unused_self, unused_name):
             return [label]
 
@@ -659,10 +641,8 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
-        # pylint: enable=unused-argument
         def mock_get_label(unused_self, unused_name):
             return [label]
 

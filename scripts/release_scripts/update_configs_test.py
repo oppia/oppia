@@ -24,13 +24,10 @@ import os
 import tempfile
 
 from core.tests import test_utils
+import github
 import python_utils
 from scripts import common
 from scripts.release_scripts import update_configs
-
-# pylint: disable=wrong-import-position
-import github  # isort:skip
-# pylint: enable=wrong-import-position
 
 INVALID_FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
@@ -64,10 +61,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             return self.mock_repo
         def mock_open_tab(unused_url):
             pass
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'test-token'
-        # pylint: enable=unused-argument
         def mock_url_open(unused_url):
             pass
 
@@ -161,21 +156,17 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             self.assertEqual(f.read(), expected_feconf_text)
 
     def test_invalid_mailgun_api_key(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'invalid'
-        # pylint: enable=unused-argument
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegexp(
             Exception, 'Invalid mailgun api key.'):
             update_configs.add_mailgun_api_key()
 
     def test_missing_mailgun_api_key_line(self):
-        # pylint: disable=unused-argument
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return mailgun_api_key
-        # pylint: enable=unused-argument
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
         temp_feconf_path = tempfile.NamedTemporaryFile().name
@@ -197,11 +188,9 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs.add_mailgun_api_key()
 
     def test_addition_of_mailgun_api_key(self):
-        # pylint: disable=unused-argument
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return mailgun_api_key
-        # pylint: enable=unused-argument
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
         temp_feconf_path = tempfile.NamedTemporaryFile().name

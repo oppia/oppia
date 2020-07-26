@@ -575,10 +575,9 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
             )
             original_commit_model.put()
 
-            # pylint: disable=protected-access
             self.assertIsNotNone(original_commit_model.username)
-            self.assertIn('username', original_commit_model._values)
-            self.assertIn('username', original_commit_model._properties)
+            self.assertIn('username', original_commit_model._values)  # pylint: disable=protected-access
+            self.assertIn('username', original_commit_model._properties)  # pylint: disable=protected-access
 
             output = self._run_one_off_job()
             self.assertItemsEqual(
@@ -588,12 +587,11 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
             migrated_commit_model = (
                 collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
             self.assertIsNone(migrated_commit_model.username)
-            self.assertNotIn('username', migrated_commit_model._values)
-            self.assertNotIn('username', migrated_commit_model._properties)
+            self.assertNotIn('username', migrated_commit_model._values)  # pylint: disable=protected-access
+            self.assertNotIn('username', migrated_commit_model._properties)  # pylint: disable=protected-access
             self.assertEqual(
                 original_commit_model.last_updated,
                 migrated_commit_model.last_updated)
-            # pylint: enable=protected-access
 
     def test_one_commit_model_without_username(self):
         original_commit_model = (
@@ -612,9 +610,8 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
         )
         original_commit_model.put()
 
-        # pylint: disable=protected-access
-        self.assertNotIn('username', original_commit_model._values)
-        self.assertNotIn('username', original_commit_model._properties)
+        self.assertNotIn('username', original_commit_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('username', original_commit_model._properties)  # pylint: disable=protected-access
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -623,8 +620,8 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
 
         migrated_commit_model = (
             collection_models.CollectionCommitLogEntryModel.get_by_id('id'))
-        self.assertNotIn('username', migrated_commit_model._values)
-        self.assertNotIn('username', migrated_commit_model._properties)
+        self.assertNotIn('username', migrated_commit_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('username', migrated_commit_model._properties)  # pylint: disable=protected-access
         self.assertEqual(
             original_commit_model.last_updated,
             migrated_commit_model.last_updated)

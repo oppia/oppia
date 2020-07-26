@@ -30,6 +30,7 @@ import time
 import python_utils
 
 from . import linter_utils
+from .. import build
 from .. import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -40,12 +41,7 @@ ESPRIMA_PATH = os.path.join(
 
 sys.path.insert(1, ESPRIMA_PATH)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import esprima  # isort:skip
-from .. import build  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import esprima  # isort:skip pylint: disable=wrong-import-order, wrong-import-position
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
 

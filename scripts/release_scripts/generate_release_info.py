@@ -34,9 +34,7 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github # isort:skip  pylint: disable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'

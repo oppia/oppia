@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# pylint: disable=invalid-name
 import collections
 import os
 import random
@@ -52,10 +51,6 @@ INVALID_OUTPUT_FILEPATH = os.path.join(
 
 EMPTY_DIR = os.path.join(TEST_DIR, 'empty', '')
 
-# Override Pylint's protected access rule due to multiple private functions in
-# the file.
-# pylint: disable=protected-access
-
 
 class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
@@ -70,7 +65,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
-            build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
+            build._minify(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)  # pylint: disable=protected-access
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
 
@@ -79,7 +74,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
-            build._minify_and_create_sourcemap(
+            build._minify_and_create_sourcemap(  # pylint: disable=protected-access
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)
@@ -98,7 +93,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Exception will be raised at first file determined to be non-existent.
         with self.assertRaisesRegexp(
             OSError, error_message):
-            build._ensure_files_exist(non_existent_filepaths)
+            build._ensure_files_exist(non_existent_filepaths)  # pylint: disable=protected-access
 
     def test_join_files(self):
         """Determine third_party.js contains the content of the first 10 JS
@@ -109,12 +104,12 @@ class BuildTests(test_utils.GenericTestBase):
         # Get all filepaths from manifest.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
-        build._join_files(dependency_filepaths['js'], third_party_js_stream)
+        build._join_files(dependency_filepaths['js'], third_party_js_stream)  # pylint: disable=protected-access
         counter = 0
         # Only checking first 10 files.
-        JS_FILE_COUNT = 10
+        js_file_count = 10
         for js_filepath in dependency_filepaths['js']:
-            if counter == JS_FILE_COUNT:
+            if counter == js_file_count:
                 break
             with python_utils.open_file(js_filepath, 'r') as js_file:
                 # Assert that each line is copied over to file_stream object.
@@ -133,7 +128,7 @@ class BuildTests(test_utils.GenericTestBase):
         test_target = os.path.join('target', 'fonts', '')
 
         self.assertEqual(len(copy_tasks), 0)
-        copy_tasks += build._generate_copy_tasks_for_fonts(
+        copy_tasks += build._generate_copy_tasks_for_fonts(  # pylint: disable=protected-access
             dependency_filepaths['fonts'], test_target)
         # Asserting the same number of copy tasks and number of font files.
         self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
@@ -141,14 +136,14 @@ class BuildTests(test_utils.GenericTestBase):
     def test_insert_hash(self):
         """Test _insert_hash returns correct filenames with provided hashes."""
         self.assertEqual(
-            build._insert_hash('file.js', '123456'), 'file.123456.js')
+            build._insert_hash('file.js', '123456'), 'file.123456.js')  # pylint: disable=protected-access
         self.assertEqual(
-            build._insert_hash(
+            build._insert_hash(  # pylint: disable=protected-access
                 'path/to/file.js', '654321'), 'path/to/file.654321.js')
         self.assertEqual(
-            build._insert_hash('file.min.js', 'abcdef'), 'file.min.abcdef.js')
+            build._insert_hash('file.min.js', 'abcdef'), 'file.min.abcdef.js')  # pylint: disable=protected-access
         self.assertEqual(
-            build._insert_hash(
+            build._insert_hash(  # pylint: disable=protected-access
                 'path/to/file.min.js', 'fedcba'), 'path/to/file.min.fedcba.js')
 
     def test_get_file_count(self):
@@ -186,10 +181,10 @@ class BuildTests(test_utils.GenericTestBase):
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
-            build._compare_file_count([EMPTY_DIR], [MOCK_ASSETS_DEV_DIR])
+            build._compare_file_count([EMPTY_DIR], [MOCK_ASSETS_DEV_DIR])  # pylint: disable=protected-access
 
         # Test when one of the lists contain multiple directories.
-        MOCK_EXTENSIONS_DIR_LIST = [MOCK_EXTENSIONS_DEV_DIR]
+        mock_extensions_dir_list = [MOCK_EXTENSIONS_DEV_DIR]
         target_dir_file_count = build.get_file_count(MOCK_EXTENSIONS_DEV_DIR)
 
         # Ensure that MOCK_EXTENSIONS_DIR has at least 1 file.
@@ -198,7 +193,7 @@ class BuildTests(test_utils.GenericTestBase):
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
-            build._compare_file_count([EMPTY_DIR], MOCK_EXTENSIONS_DIR_LIST)
+            build._compare_file_count([EMPTY_DIR], mock_extensions_dir_list)  # pylint: disable=protected-access
 
         # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
@@ -214,59 +209,59 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes = dict()
         base_filename = 'base.html'
         with self.assertRaisesRegexp(ValueError, 'Hash dict is empty'):
-            build._verify_filepath_hash(base_filename, file_hashes)
+            build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
         # Generate a random hash dict for base.html.
         file_hashes = {base_filename: random.getrandbits(128)}
         with self.assertRaisesRegexp(
             ValueError, '%s is expected to contain MD5 hash' % base_filename):
-            build._verify_filepath_hash(base_filename, file_hashes)
+            build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
         base_without_hash_filename = 'base_without_hash.html'
-        self.assertIsNone(build._verify_filepath_hash(
+        self.assertIsNone(build._verify_filepath_hash(  # pylint: disable=protected-access
             base_without_hash_filename, file_hashes))
 
         bad_filepath = 'README'
         with self.assertRaisesRegexp(
             ValueError, 'Filepath has less than 2 partitions after splitting'):
-            build._verify_filepath_hash(bad_filepath, file_hashes)
+            build._verify_filepath_hash(bad_filepath, file_hashes)  # pylint: disable=protected-access
 
-        hashed_base_filename = build._insert_hash(
+        hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
             base_filename, random.getrandbits(128))
         with self.assertRaisesRegexp(
             KeyError,
             'Hash from file named %s does not match hash dict values' %
             hashed_base_filename):
-            build._verify_filepath_hash(hashed_base_filename, file_hashes)
+            build._verify_filepath_hash(hashed_base_filename, file_hashes)  # pylint: disable=protected-access
 
     def test_process_html(self):
         """Test process_html removes whitespaces."""
-        BASE_HTML_SOURCE_PATH = (
+        base_html_source_path = (
             os.path.join(MOCK_TEMPLATES_DEV_DIR, 'base.html'))
 
-        build._ensure_files_exist([BASE_HTML_SOURCE_PATH])
+        build._ensure_files_exist([base_html_source_path])  # pylint: disable=protected-access
         # Prepare a file_stream object from python_utils.string_io().
         minified_html_file_stream = python_utils.string_io()
 
         # Assert that base.html has white spaces and has original filepaths.
         with python_utils.open_file(
-            BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
+            base_html_source_path, 'r') as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegexpMatches(
                 source_base_file_content, r'\s{2,}',
                 msg='No white spaces detected in %s unexpectedly'
-                % BASE_HTML_SOURCE_PATH)
+                % base_html_source_path)
 
         # Build base.html file.
         with python_utils.open_file(
-            BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
+            base_html_source_path, 'r') as source_base_file:
             build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegexpMatches(
             minified_html_file_content, r'\s{2,}',
             msg='All white spaces must be removed from %s' %
-            BASE_HTML_SOURCE_PATH)
+            base_html_source_path)
 
     def test_should_file_be_built(self):
         """Test should_file_be_built returns the correct boolean value for
@@ -460,20 +455,20 @@ class BuildTests(test_utils.GenericTestBase):
     def test_execute_tasks(self):
         """Test _execute_tasks joins all threads after executing all tasks."""
         build_tasks = collections.deque()
-        TASK_COUNT = 2
-        count = TASK_COUNT
+        task_count = 2
+        count = task_count
         while count:
             task = threading.Thread(
-                target=build._minify,
+                target=build._minify,  # pylint: disable=protected-access
                 args=(INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH))
             build_tasks.append(task)
             count -= 1
 
         self.assertEqual(threading.active_count(), 1)
-        build._execute_tasks(build_tasks)
+        build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         with self.assertRaisesRegexp(
             OSError, 'threads can only be started once'):
-            build._execute_tasks(build_tasks)
+            build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         # Assert that all threads are joined.
         self.assertEqual(threading.active_count(), 1)
 
@@ -521,7 +516,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test generate_build_tasks_to_build_directory queues up a
         corresponding number of build tasks according to the given scenario.
         """
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
+        extensions_dirnames_to_dirpaths = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
             'staging_dir': os.path.join(
                 TEST_DIR, 'backend_prod_files', 'extensions', ''),
@@ -532,13 +527,13 @@ class BuildTests(test_utils.GenericTestBase):
         build_all_files_tasks = (
             build.generate_build_tasks_to_build_all_files_in_directory(
                 MOCK_EXTENSIONS_DEV_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']))
+                extensions_dirnames_to_dirpaths['out_dir']))
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
+            extensions_dirnames_to_dirpaths)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -546,31 +541,31 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Test for building only new files when staging dir exists.
         build.ensure_directory_exists(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
+            extensions_dirnames_to_dirpaths['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
+            extensions_dirnames_to_dirpaths)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
 
         # Build all files and save to final directory.
         build.ensure_directory_exists(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
-        build._execute_tasks(build_dir_tasks)
+            extensions_dirnames_to_dirpaths['staging_dir'])
+        build._execute_tasks(build_dir_tasks)  # pylint: disable=protected-access
         self.assertEqual(threading.active_count(), 1)
-        build._execute_tasks(
+        build._execute_tasks(  # pylint: disable=protected-access
             build.generate_copy_tasks_to_copy_from_source_to_target(
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'], file_hashes))
+                extensions_dirnames_to_dirpaths['staging_dir'],
+                extensions_dirnames_to_dirpaths['out_dir'], file_hashes))
 
         build_dir_tasks.clear()
 
         # Test for only building files that need to be rebuilt.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
+            extensions_dirnames_to_dirpaths)
         file_extensions_to_always_rebuild = ('.html', '.py',)
         always_rebuilt_filepaths = build.get_filepaths_by_extensions(
             MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
@@ -587,7 +582,7 @@ class BuildTests(test_utils.GenericTestBase):
             '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
             tmp.write(u'Some content.')
 
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
+        extensions_dirnames_to_dirpaths = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
             'staging_dir': os.path.join(
                 TEST_DIR, 'backend_prod_files', 'extensions', ''),
@@ -598,13 +593,13 @@ class BuildTests(test_utils.GenericTestBase):
         build_all_files_tasks = (
             build.generate_build_tasks_to_build_all_files_in_directory(
                 MOCK_EXTENSIONS_DEV_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']))
+                extensions_dirnames_to_dirpaths['out_dir']))
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
+            extensions_dirnames_to_dirpaths)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -612,11 +607,11 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Test for building only new files when staging dir exists.
         build.ensure_directory_exists(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
+            extensions_dirnames_to_dirpaths['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
         build_dir_tasks = build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
+            extensions_dirnames_to_dirpaths)
         file_extensions_to_always_rebuild = ('.py', '.js', '.html')
         always_rebuilt_filepaths = build.get_filepaths_by_extensions(
             MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
@@ -1084,5 +1079,3 @@ class BuildTests(test_utils.GenericTestBase):
 
         with self.swap(subprocess, 'check_call', mock_check_call):
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
-
-# pylint: enable=protected-access

@@ -223,11 +223,7 @@ class Normalizers(python_utils.OBJECT):
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-# TODO(ankita240796): The disable comment is required since the lint tests
-# fail on circleci with the multiple-statements error on the line even though
-# the line is empty. This is a temporary fix to unblock PRs.
-# Relevant issue: https://github.com/oppia/oppia/issues/7307.
-# pylint: disable=multiple-statements
+
     @staticmethod
     def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.
