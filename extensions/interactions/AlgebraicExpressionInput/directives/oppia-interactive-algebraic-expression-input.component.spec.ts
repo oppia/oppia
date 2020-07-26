@@ -105,7 +105,8 @@ describe('AlgebraicExpressionInputInteractive', function() {
     spyOn(mockCurrentInteractionService, 'onSubmit');
     ctrl.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
-    expect(ctrl.warningText).toBe('/ is not a valid postfix operator.');
+    expect(ctrl.warningText).toBe(
+      'Your answer seems to be missing a variable/number after the "/".');
   });
 
   it('should correctly validate current answer', function() {
