@@ -15,9 +15,9 @@
            ng-style="{background: $ctrl.storySummary.getThumbnailBgColor()}">
     </div>
     <div class="chapter-details">
-      <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'unavailable-chapter': !$ctrl.isPreviousChapterCompleted($index)}" class="chapter-title" ng-repeat="title in $ctrl.getStorySummary().getNodeTitles()">
+      <div ng-class="{'border-bottom': $index < $ctrl.chaptersDisplayed, 'unavailable-chapter': !$ctrl.isPreviousChapterCompleted($index)}" class="chapter-title" ng-repeat="title in $ctrl.storySummary.getNodeTitles()">
         <span ng-if="$index < $ctrl.chaptersDisplayed">
-          <span ng-if="$ctrl.getStorySummary().isNodeCompleted(title)" class="material-icons completed-icon">
+          <span ng-if="$ctrl.storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
             done
           </span>
           <span ng-class="{'incomplete-chapter': !$ctrl.isChapterCompleted(title)}"

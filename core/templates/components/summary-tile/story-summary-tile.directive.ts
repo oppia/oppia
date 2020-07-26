@@ -46,7 +46,7 @@ angular.module('oppia').directive('storySummaryTile', [
           };
 
           ctrl.isChapterCompleted = function(title) {
-            return ctrl.getStorySummary().isNodeCompleted(title);
+            return ctrl.storySummary.isNodeCompleted(title);
           };
 
           ctrl.isPreviousChapterCompleted = function(index) {
@@ -54,8 +54,8 @@ angular.module('oppia').directive('storySummaryTile', [
               return true;
             }
             var previousNodeTitle = (
-              ctrl.getStorySummary().getNodeTitles()[index - 1]);
-            return ctrl.getStorySummary().isNodeCompleted(previousNodeTitle);
+              ctrl.storySummary.getNodeTitles()[index - 1]);
+            return ctrl.storySummary.isNodeCompleted(previousNodeTitle);
           };
 
           ctrl.showAllChapters = function() {
