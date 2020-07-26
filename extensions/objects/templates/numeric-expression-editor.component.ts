@@ -41,23 +41,24 @@ angular.module('oppia').component('numericExpressionEditor', {
       ctrl.hasBeenTouched = false;
 
       ctrl.isCurrentAnswerValid = function() {
-        if (ctrl.hasBeenTouched) {
-          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
-          // is not compatible with nerdamer or with the backend validations.
-          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
+        // Replacing 'absolutevalue(x)' with 'abs(x)', 'neg(x)' with '-(x)'
+        // and 'squareroot(x)' with 'sqrt(x)' for compatibility with nerdamer
+        // and backend validators.
+        ctrl.value = ctrl.value.replace(/absolutevalue\(/g, 'abs(');
+        ctrl.value = ctrl.value.replace(/neg\(/g, '-(');
+        ctrl.value = ctrl.value.replace(/squareroot\(/g, 'sqrt(');
+        var answerIsValid = MathInteractionsService.validateExpression(
+          ctrl.value, false);
+        ctrl.warningText = MathInteractionsService.getWarningText();
+        if (answerIsValid) {
+          // Explicitly inserting '*' signs wherever necessary.
+          ctrl.value = MathInteractionsService.insertMultiplicationSigns(
             ctrl.value);
-          var answerIsValid = MathInteractionsService.validateExpression(
-            ctrl.value, false);
-          if (answerIsValid) {
-            // Explicitly inserting '*' signs wherever necessary.
-            ctrl.value = MathInteractionsService.insertMultiplicationSigns(
-              ctrl.value);
-          }
-          ctrl.warningText = MathInteractionsService.getWarningText();
-          return answerIsValid;
         }
-        ctrl.warningText = '';
-        return true;
+        if (!ctrl.hasBeenTouched) {
+          ctrl.warningText = '';
+        }
+        return answerIsValid;
       };
 
       ctrl.showOSK = function() {
@@ -71,7 +72,7 @@ angular.module('oppia').component('numericExpressionEditor', {
           ctrl.value = '';
         }
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-creator');
+        GuppyInitializationService.init('guppy-div-creator', ctrl.value);
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

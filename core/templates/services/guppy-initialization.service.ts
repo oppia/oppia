@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { MathInteractionsService } from 'services/math-interactions.service';
+
 class GuppyObject {
   divId = null;
   guppyInstance = null;
@@ -39,6 +41,7 @@ export class GuppyInitializationService {
     this.onScreenKeyboardShown = false;
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
     let divId, guppyInstance;
+    let mathInteractionsService = new MathInteractionsService();
     for (let i = 0; i < guppyDivs.length; i++) {
       divId = 'guppy_' + Math.floor(Math.random() * 100000000);
       // Dynamically assigns a unique id to the guppy div.
@@ -48,9 +51,15 @@ export class GuppyInitializationService {
 
       // Initialize if with a value for the creator's view.
       if (guppyDivClassName === 'guppy-div-creator') {
-        guppyInstance.import_xml(initialValue);
+        initialValue = initialValue.replace(/abs\(/g, 'absolutevalue(');
+        initialValue = initialValue.replace(/sqrt\(/g, 'squareroot(');
+        if (initialValue.length !== 0) {
+          initialValue = mathInteractionsService.insertMultiplicationSigns(
+            initialValue);
+          guppyInstance.import_text(initialValue);
+        }
         guppyInstance.engine.end();
-        guppyInstance.activate();
+        guppyInstance.render(true);
       }
       this.guppyInstances.push(new GuppyObject(divId, guppyInstance));
     }

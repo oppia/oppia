@@ -82,16 +82,20 @@ describe('AlgebraicExpressionEditor', function() {
   });
 
   it('should correctly validate current answer', function() {
-    // This should be validated as true if the editor hasn't been touched.
+    // This should not show warnings if the editor hasn't been touched.
     ctrl.value = '';
-    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    ctrl.isCurrentAnswerValid();
     expect(ctrl.warningText).toBe('');
 
     ctrl.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+    expect(ctrl.warningText).toBe('Your answer seems to be empty.');
+
+    ctrl.value = 'x/2';
+    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    expect(ctrl.warningText).toBe('');
   });
 
   it('should set the value of showOSK to true', function() {

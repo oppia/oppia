@@ -2,7 +2,7 @@
 
 <span ng-model="$ctrl.value" ui-validate="'$ctrl.isCurrentAnswerValid()'"></span>
 
-<div ng-show="!$ctrl.isCurrentAnswerValid()" class="alert alert-danger mt-2 mb-4">
+<div ng-show="$ctrl.warningText.length !== 0" class="alert alert-danger mt-2 mb-4">
   <[$ctrl.warningText]>
 </div>
 

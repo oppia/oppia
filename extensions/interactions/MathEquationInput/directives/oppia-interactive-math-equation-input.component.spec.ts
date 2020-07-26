@@ -129,7 +129,7 @@ describe('MathEquationInputInteractive', function() {
     // This should be validated as false if the editor has been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+    expect(ctrl.warningText).toBe('Your answer seems to be empty.');
   });
 
   it('should set the value of showOSK to true', function() {

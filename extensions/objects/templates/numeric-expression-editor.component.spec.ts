@@ -24,7 +24,7 @@ import { GuppyInitializationService } from
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
-describe('NumericExpressionEditor', function() {
+fdescribe('NumericExpressionEditor', function() {
   var ctrl = null, $window = null;
   var mockGuppyObject = {
     guppyInstance: {
@@ -82,16 +82,16 @@ describe('NumericExpressionEditor', function() {
   });
 
   it('should correctly validate current answer', function() {
-    // This should be validated as true if the editor hasn't been touched.
+    // This should not show warnings if the editor hasn't been touched.
     ctrl.value = '';
-    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    ctrl.isCurrentAnswerValid();
     expect(ctrl.warningText).toBe('');
 
     ctrl.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+    expect(ctrl.warningText).toBe('Your answer seems to be empty.');
 
     ctrl.value = '45/2';
     expect(ctrl.isCurrentAnswerValid()).toBeTrue();
