@@ -58,19 +58,22 @@ angular.module('oppia').component('subtopicEditorTab', {
       var _initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
-        ctrl.subtopic = ctrl.topic.getSubtopicById(
-          parseInt(ctrl.subtopicId));
+        ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
           ctrl.skillIds = ctrl.subtopic.getSkillIds();
+          ctrl.questionCount = 0;
           if (ctrl.skillIds.length) {
             QuestionBackendApiService.fetchTotalQuestionCountForSkillIds(
               ctrl.skillIds).then((questionCount) => {
               ctrl.questionCount = questionCount;
+              $scope.$applyAsync();
             });
           }
+          ctrl.skillQuestionCountDict = (
+            TopicEditorStateService.getSkillQuestionCountDict());
           ctrl.editableTitle = ctrl.subtopic.getTitle();
           ctrl.editableThumbnailFilename = (
             ctrl.subtopic.getThumbnailFilename());
@@ -182,6 +185,31 @@ angular.module('oppia').component('subtopicEditorTab', {
 
       ctrl.togglePreviewSkillCard = function() {
         ctrl.skillsListIsShown = !ctrl.skillsListIsShown;
+      };
+
+      ctrl.showSkillEditOptions = function(index) {
+        ctrl.selectedSkillEditOptionsIndex = (
+            (ctrl.selectedSkillEditOptionsIndex === index) ? -1 : index);
+      };
+
+      ctrl.removeSkillFromSubtopic = function(skillSummary) {
+        ctrl.selectedSkillEditOptionsIndex = -1;
+        TopicUpdateService.removeSkillFromSubtopic(
+          ctrl.topic, ctrl.subtopicId, skillSummary);
+        _initEditor();
+      };
+
+      ctrl.removeSkillFromTopic = function(skillSummary) {
+        ctrl.selectedSkillEditOptionsIndex = -1;
+        TopicUpdateService.removeSkillFromSubtopic(
+          ctrl.topic, ctrl.subtopicId, skillSummary);
+        TopicUpdateService.removeUncategorizedSkill(
+          ctrl.topic, skillSummary);
+        _initEditor();
+      };
+
+      ctrl.navigateToTopicEditor = function() {
+        TopicEditorRoutingService.navigateToMainTab();
       };
 
       ctrl.$onInit = function() {
