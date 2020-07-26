@@ -16,34 +16,41 @@
  * @fileoverview Unit tests for CreateNewChapterModalController.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { AlertsService } from 'services/alerts.service';
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
+import { LoggerService } from 'services/contextual/logger.service';
+import { StoryContentsObjectFactory } from
+  'domain/story/StoryContentsObjectFactory';
+import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
   var $q = null;
   var $rootScope = null;
   var $uibModalInstance = null;
-  var StoryUpdateService = null;
   var StoryEditorStateService = null;
-  var StoryContentsObjectFactory = null;
-  var StoryObjectFactory = null;
   var ExplorationIdValidationService = null;
+  var StoryUpdateService = null;
+  var storyObjectFactory = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
 
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+    $provide.value('StoryObjectFactory',
+      new StoryObjectFactory(new StoryContentsObjectFactory(
+        new StoryNodeObjectFactory())));
+    $provide.value('AlertsService', new AlertsService(new LoggerService()));
+    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
     StoryUpdateService = $injector.get('StoryUpdateService');
-    StoryObjectFactory = $injector.get('StoryObjectFactory');
-    StoryContentsObjectFactory = $injector.get('StoryContentsObjectFactory');
+    storyObjectFactory = $injector.get('StoryObjectFactory');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     ExplorationIdValidationService = $injector.get(
       'ExplorationIdValidationService');
@@ -88,7 +95,7 @@ describe('Create New Chapter Modal Controller', function() {
       },
       language_code: 'en'
     };
-    var story = StoryObjectFactory.createFromBackendDict(
+    var story = storyObjectFactory.createFromBackendDict(
       sampleStoryBackendObject);
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
 
