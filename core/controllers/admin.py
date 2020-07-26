@@ -591,6 +591,9 @@ class AdminHandler(base.BaseHandler):
 class ExplorationsLatexSvgHandler(base.BaseHandler):
     """Handler updating Explorations having math rich-text components with
     math SVGs.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
     """
 
     @acl_decorators.can_access_admin_page
@@ -615,11 +618,9 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
                 latex_to_svg_mappings[exp_id][latex_string]['svg_file'] = (
                     svg_image)
 
-        no_of_explorations_updated = 0
         for exp_id in latex_to_svg_mappings.keys():
             exp_services.update_exploration_with_math_svgs(
                 exp_id, latex_to_svg_mappings[exp_id])
-            no_of_explorations_updated += 1
         self.render_json({
             'number_of_explorations_updated': '%d' % (
                 len(latex_to_svg_mappings.keys()))

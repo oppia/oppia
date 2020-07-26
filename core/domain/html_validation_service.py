@@ -861,6 +861,9 @@ def generate_math_svgs_filename(
     """Generates a random filename for a math SVG based on the given
     dimensions.
 
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
+
     Args:
         encoded_height_string: str. The string from which the actual height
             can be derived. The actual height for math SVGs are in unit ex.
@@ -897,6 +900,9 @@ def add_svg_filenames_for_latex_strings_in_html_string(
         raw_latex_to_dimensions_dict, html_string):
     """Adds the filenames for math rich-text components with empty svg_filename
     field based on the given images data.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
 
     Args:
         raw_latex_to_dimensions_dict: dict. The dictionary having the dimensions
@@ -943,6 +949,9 @@ def add_svg_filenames_for_latex_strings_in_html_string(
 def extract_svg_filename_latex_mapping_in_math_rte_components(html_string):
     """Extracts the svg_filenames along with the corresponding raw_latex
     value from all the math-rich text components in an HTML string.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
 
     Args:
         html_string: str. The HTML string.

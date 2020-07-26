@@ -134,6 +134,10 @@ export class AdminBackendApiService {
       };
     });
   }
+
+  // TODO(#10045): Remove this function once all the math-rich text
+  // components in explorations have a valid math SVG stored in the
+  // datastore.
   sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
     let body = new FormData();
     for (var expId in latexToSvgMapping) {

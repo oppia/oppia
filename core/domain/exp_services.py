@@ -1804,6 +1804,9 @@ def generate_html_change_list_for_state(
     """Returns the change lists for all the html fields in a converted state
     dict by comparing it with the corresponding old state dict.
 
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
+
     Args:
         state_name: str. The name of the state.
         new_state_dict: dict. The dict representation of the new State object.
@@ -1871,6 +1874,9 @@ def get_batch_of_exps_for_latex_svg_generation():
     """Returns a batch of LaTeX strings from explorations which have LaTeX
     strings without SVGs.
 
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
+
     Returns:
         dict(str, list(str)). The dict having each key as an exp_id and value
         as a list of LaTeX string. Each list has all the LaTeX stringss in that
@@ -1879,16 +1885,18 @@ def get_batch_of_exps_for_latex_svg_generation():
 
     latex_strings_mapping = {}
     exploration_math_rich_text_info_models = (
-        exp_models.ExplorationMathRichTextInfoModel.get_all())
+        exp_models.ExplorationMathRichTextInfoModel.get_all().filter(
+            exp_models. # pylint: disable=singleton-comparison
+            ExplorationMathRichTextInfoModel.
+            math_images_generation_required == True))
     size_of_svgs_in_batch_bytes = 0
     for model in exploration_math_rich_text_info_models:
-        if model.math_images_generation_required:
-            if size_of_svgs_in_batch_bytes > (
-                    feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
-                break
-            latex_strings_mapping[model.id] = model.latex_strings_without_svg
-            size_of_svgs_in_batch_bytes += (
-                model.estimated_max_size_of_images_in_bytes)
+        if size_of_svgs_in_batch_bytes > (
+                feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
+            break
+        latex_strings_mapping[model.id] = model.latex_strings_without_svg
+        size_of_svgs_in_batch_bytes += (
+            model.estimated_max_size_of_images_in_bytes)
     return latex_strings_mapping
 
 
@@ -1896,6 +1904,9 @@ def update_exploration_with_math_svgs(exp_id, image_data):
     """Saves an SVG for each LaTeX value without an SVG in an exploration
     and updates the exploration. Also the corresponding valid draft changes are
     updated.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
 
     Args:
         image_data: dict. The dictionary having all the image data like LaTeX

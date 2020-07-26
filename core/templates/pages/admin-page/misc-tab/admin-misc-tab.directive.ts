@@ -167,7 +167,10 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
-        var convertLatexToSvgString = function(inputLatexString) {
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in explorations have a valid math SVG stored in the
+        // datastore.
+        var convertLatexToSvgFile = function(inputLatexString) {
           return new Promise((resolve, reject) => {
             var emptyDiv = document.createElement('div');
             var outputElement = angular.element(emptyDiv);
@@ -185,59 +188,54 @@ angular.module('oppia').directive('adminMiscTab', [
             // which we want to happen synchronously into the MathJax Hub Queue.
             MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
             MathJax.Hub.Queue(function() {
-              if (
-                outputElement[0].getElementsByTagName('svg')[0] !== (
-                  undefined)) {
-                var svgString = (
-                  outputElement[0].getElementsByTagName('svg')[0].outerHTML);
-                resolve(svgString);
+              var svgString = (
+                outputElement[0].getElementsByTagName('svg')[0].outerHTML);
+              var cleanedSvgString = (
+                ImageUploadHelperService.cleanMathExpressionSvgString(
+                  svgString));
+              var dimensions = (
+                ImageUploadHelperService.
+                  extractDimensionsFromMathExpressionSvgString(
+                    cleanedSvgString));
+              var dataURI = (
+                'data:image/svg+xml;base64,' + btoa(cleanedSvgString));
+              var invalidTagsAndAttributes = (
+                ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+              var tags = invalidTagsAndAttributes.tags;
+              var attrs = invalidTagsAndAttributes.attrs;
+              if (tags.length === 0 && attrs.length === 0) {
+                var resampledFile = (
+                  ImageUploadHelperService.convertImageDataToImageFile(
+                    dataURI));
+                var date = new Date();
+                var now = date.getTime();
+                // This temporary Id will be used for adding and retrieving the
+                // raw image for each LaTeX string from the request body. For
+                // more details refer to the docstring in
+                // sendMathSvgsToBackend() in AdminBackendApiService.
+                var latexId = (
+                  now.toString(36).substr(2, 6) +
+                  Math.random().toString(36).substr(4));
+                resolve ({
+                  file: resampledFile,
+                  dimensions: {
+                    encoded_height_string: dimensions.height,
+                    encoded_width_string: dimensions.width,
+                    encoded_vertical_padding_string: dimensions.verticalPadding
+                  },
+                  latexId: latexId
+                });
+              } else {
+                AlertsService.addWarning('SVG failed validation.');
               }
             });
           });
         };
-        var convertLatexToSvgFile = async function(latexValue) {
-          let html = await convertLatexToSvgString(latexValue);
-          return new Promise((resolve, reject) => {
-            var cleanedSvgString = (
-              ImageUploadHelperService.cleanMathExpressionSvgString(
-                html));
-            var dimensions = (
-              ImageUploadHelperService.
-                extractDimensionsFromMathExpressionSvgString(cleanedSvgString));
-            var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
-            var invalidTagsAndAttributes = (
-              ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
-            var tags = invalidTagsAndAttributes.tags;
-            var attrs = invalidTagsAndAttributes.attrs;
-            if (tags.length === 0 && attrs.length === 0) {
-              var resampledFile = (
-                ImageUploadHelperService.convertImageDataToImageFile(dataURI));
-              var date = new Date();
-              var now = date.getTime();
-              // This temporary Id will be used for adding and retrieving the
-              // raw image for each LaTeX string from the request body. For more
-              // details refer to the docstring in sendMathSvgsToBackend() in
-              // AdminBackendApiService.
-              var latexId = (
-                now.toString(36).substr(2, 6) +
-                Math.random().toString(36).substr(4));
-              resolve ({
-                file: resampledFile,
-                dimensions: {
-                  encoded_height_string: dimensions.height,
-                  encoded_width_string: dimensions.width,
-                  encoded_vertical_padding_string: dimensions.verticalPadding
-                },
-                latexId: latexId
-              });
-            } else {
-              AlertsService.addWarning('SVG failed validation.');
-            }
-          });
-        };
+
         var latexMapping = {};
         var expIdToLatexMapping = null;
-        ctrl.generateSVG = async function() {
+        ctrl.generateSvgs = async function() {
+          var countOfSvgsGenerated = 0;
           for (var expId in expIdToLatexMapping) {
             var latexValues = expIdToLatexMapping[expId];
             latexMapping[expId] = {};
@@ -246,22 +244,30 @@ angular.module('oppia').directive('adminMiscTab', [
               latexMapping[expId][latexValues[i]] = svgFile;
             }
             ctrl.setStatusMessage('Latex values Generated.');
+            $rootScope.$apply();
           }
         };
-        ctrl.generateSvgsForExplorations = function() {
+
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in explorations have a valid math SVG stored in the
+        // datastore.
+        ctrl.fetchAndGenerateSvgsForExplorations = function() {
           $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
             function(response) {
               expIdToLatexMapping = response.data.result;
               ctrl.setStatusMessage('Latex values Fetched.');
-              ctrl.generateSVG();
+              ctrl.generateSvgs();
             });
         };
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in explorations have a valid math SVG stored in the
+        // datastore.
         ctrl.saveSvgsToBackend = function() {
           AdminDataService.sendMathSvgsToBackendAsync(
             latexMapping).then(
             function(response) {
               var numberOfExplorationsUpdated = (
-                response.data.number_of_explorations_updated);
+                response.number_of_explorations_updated);
               ctrl.setStatusMessage(
                 'Successfully updated ' + numberOfExplorationsUpdated +
                 ' explorations.');
