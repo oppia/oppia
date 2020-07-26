@@ -91,7 +91,8 @@ with the same id on the page. -->
                     ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                     ng-class="{'clickable': canNavigateToNode(node.id)}"
                     ng-attr-style="<[node.style]>"
-                    ng-click="onClickFunction(node.id)">
+                    ng-click="onClickFunction(node.id)"
+                    aria-label="Switch to <[getNodeTitle(node)]> Card">
               </rect>
               <title><[getNodeTitle(node)]></title>
               <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
@@ -105,7 +106,8 @@ with the same id on the page. -->
                       ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>"
                       uib-tooltip="<[getNodeErrorMessage(node.label)]>"
                       tooltip-placement="top" tooltip-animation="true"
-                      tooltip-append-to-body="true">
+                      tooltip-append-to-body="true"
+                      aria-label="<[getNodeErrorMessage(node.label)]>">
                 </rect>
                 <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
                       ng-attr-y="<[node.y0 + 9]>"
@@ -120,7 +122,8 @@ with the same id on the page. -->
                       transform="translate(0, -15)"
                       class="clickable"
                       style="fill: pink; cursor: pointer;"
-                      ng-click="onNodeDeletionClick(node.id)">
+                      ng-click="onNodeDeletionClick(node.id)"
+                      aria-label="Delete <[getNodeTitle(node)]> card">
                 </rect>
                 <text ng-attr-dx="<[node.x0 + node.width]>" ng-attr-dy="<[node.y0]>" text-anchor="right">
                   x
