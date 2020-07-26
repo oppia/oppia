@@ -1937,7 +1937,7 @@ title: A title
         # Audio files should not be included in asset downloads.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_audio = f.read()
         fs.commit('audio/cafe.mp3', raw_audio)
 

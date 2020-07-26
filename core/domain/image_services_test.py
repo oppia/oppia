@@ -40,11 +40,11 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         super(ImageServicesUnitTests, self).setUp()
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             self.jpeg_raw_image = f.read()
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             self.png_raw_image = f.read()
 
     def test_image_dimensions_are_output_correctly(self):
@@ -95,7 +95,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         with python_utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, 'compressed_image.jpg'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             correct_compressed_image = f.read()
         correct_height, correct_width = (
             image_services.get_image_dimensions(correct_compressed_image))

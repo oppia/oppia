@@ -82,7 +82,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=False)
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, 'subject')
             self.assertEqual(messages[0].body, 'body')
@@ -99,7 +99,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
                 'subject', 'body', 'html', bcc_admin=True)
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
 
@@ -114,7 +114,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 'subject', 'body', 'html',
                 bcc_admin=False, reply_to_id=reply_id)
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].reply_to,
@@ -146,7 +146,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 feconf.SYSTEM_EMAIL_ADDRESS, recipients,
                 'subject', 'body', 'html')
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, recipients)
 

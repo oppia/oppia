@@ -37,11 +37,14 @@ from pylint import utils  # isort:skip
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
-    def test_finds_non_explicit_keyword_args(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(ExplicitKeywordArgsCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.ExplicitKeywordArgsChecker)
-        checker_test_object.setup_method()
+        self.checker_test_object.setup_method()
+
+    def test_finds_non_explicit_keyword_args(self):
         (
             func_call_node_one, func_call_node_two, func_call_node_three,
             func_call_node_four, func_call_node_five, func_call_node_six,
@@ -68,7 +71,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
         TestClass() #@
         """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_one,
@@ -79,14 +82,14 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
                 )
             ),
         ):
-            checker_test_object.checker.visit_call(
+            self.checker_test_object.checker.visit_call(
                 func_call_node_one)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_call(
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(
                 func_call_node_two)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_three,
@@ -97,20 +100,78 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
                 )
             )
         ):
-            checker_test_object.checker.visit_call(
+            self.checker_test_object.checker.visit_call(
                 func_call_node_three)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_call(class_call_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(class_call_node)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_call(func_call_node_four)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(func_call_node_four)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_call(func_call_node_five)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(func_call_node_five)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_call(func_call_node_six)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(func_call_node_six)
+
+    def test_finds_arg_name_for_non_keyword_arg(self):
+        node_arg_name_for_non_keyword_arg = astroid.extract_node(
+            """
+            def test(test_var_one, test_var_two=4, test_var_three=5):
+                test_var_five = test_var_two + test_var_three
+                return test_var_five
+
+            test(test_var_one=2, test_var_two=5) #@
+            """)
+        message = testutils.Message(
+            msg_id='arg-name-for-non-keyword-arg',
+            node=node_arg_name_for_non_keyword_arg,
+            args=('\'test_var_one\'', 'function', 'test'))
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_call(
+                node_arg_name_for_non_keyword_arg)
+
+    def test_correct_use_of_keyword_args(self):
+        node_with_no_error_message = astroid.extract_node(
+            """
+            def test(test_var_one, test_var_two=4, test_var_three=5):
+                test_var_five = test_var_two + test_var_three
+                return test_var_five
+
+            test(2, test_var_two=2) #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(
+                node_with_no_error_message)
+
+    def test_function_with_args_and_kwargs(self):
+        node_with_args_and_kwargs = astroid.extract_node(
+            """
+            def test_1(*args, **kwargs):
+                pass
+
+            test_1(first=1, second=2) #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(
+                node_with_args_and_kwargs)
+
+    def test_constructor_call_with_keyword_arguments(self):
+        node_with_no_error_message = astroid.extract_node(
+            """
+            class TestClass():
+                def __init__(self, first, second):
+                    pass
+
+            TestClass(first=1, second=2) #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(
+                node_with_no_error_message)
 
     def test_register(self):
         pylinter_instance = lint.PyLinter()

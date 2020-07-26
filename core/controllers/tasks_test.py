@@ -82,13 +82,13 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Check that there are no feedback emails sent to Editor.
             messages = self._get_sent_email_messages(
-                to=self.EDITOR_EMAIL)
+                self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
-                to=self.EDITOR_EMAIL)
+                self.EDITOR_EMAIL)
             expected_message = (
                 'Hi editor,\n\nYou\'ve received 2 new messages on your'
                 ' Oppia explorations:\n- Title:\n- some text\n- user b message'
@@ -113,7 +113,7 @@ class TasksTests(test_utils.EmailTestBase):
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
-                to=self.EDITOR_EMAIL)
+                self.EDITOR_EMAIL)
 
             # What is expected in the email body.
             expected_message = (
@@ -186,7 +186,7 @@ class TasksTests(test_utils.EmailTestBase):
 
                 # Check that user B received message.
                 messages = self._get_sent_email_messages(
-                    to=self.USER_B_EMAIL)
+                    self.USER_B_EMAIL)
                 self.assertEqual(len(messages), 1)
 
                 # Check that user B received correct message.
@@ -218,7 +218,7 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Ensure that user A has no emails sent yet.
             messages = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Invoke InstantFeedbackMessageEmail which sends
@@ -227,7 +227,7 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Ensure that user A has an email sent now.
             messages = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 1)
 
             # Ensure that user A has right email sent to them.
@@ -259,7 +259,7 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Ensure user A has no messages sent to him yet.
             messages = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Invoke feedback status change email handler.
@@ -268,7 +268,7 @@ class TasksTests(test_utils.EmailTestBase):
             # Check that user A has 2 emails sent to him.
             # 1 instant feedback message email and 1 status change.
             messages = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 2)
 
             # Check that user A has right email sent to him.
@@ -310,7 +310,7 @@ class TasksTests(test_utils.EmailTestBase):
                     payload, 0)
                 # Ensure moderator has no messages sent to him yet.
                 messages = self._get_sent_email_messages(
-                    to=self.MODERATOR_EMAIL)
+                    self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 0)
 
                 # Invoke Flag Exploration Email Handler.
@@ -318,7 +318,7 @@ class TasksTests(test_utils.EmailTestBase):
 
                 # Ensure moderator has 1 email now.
                 messages = self._get_sent_email_messages(
-                    to=self.MODERATOR_EMAIL)
+                    self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 1)
 
                 # Ensure moderator has received correct email.

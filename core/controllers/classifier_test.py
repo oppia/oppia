@@ -169,10 +169,10 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 # Check that there are no sent emails to either
                 # email address before posting json.
                 messages = self._get_sent_email_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
                 messages = self._get_sent_email_messages(
-                    to='moderator@example.com')
+                    'moderator@example.com')
                 self.assertEqual(len(messages), 0)
 
                 # Post ML Job.
@@ -182,12 +182,12 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
                 # Check that there are now emails sent.
                 messages = self._get_sent_email_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
                 messages = self._get_sent_email_messages(
-                    to='moderator@example.com')
+                    'moderator@example.com')
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
 

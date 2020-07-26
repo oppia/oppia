@@ -34,7 +34,7 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
             r'Subclasses of BaseCalculation should implement the '
             r'calculate_from_state_answers_dict\(state_answers_dict\) method.'):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
-                state_answers_dict={})
+                {})
 
     def test_equality_of_hashable_answers(self):
         hashable_answer_1 = answer_models.HashableAnswer('answer_1')

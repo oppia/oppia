@@ -66,7 +66,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # job.
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'A name', 'abbrev', 'description')
-        topic.add_subtopic(1, title='A subtitle')
+        topic.add_subtopic(1, 'A subtitle')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
             topic.subtopic_schema_version,
@@ -235,11 +235,11 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         deleted uncategorized skills ids from the topic.
         """
         valid_skill_1 = skill_domain.Skill.create_default_skill(
-            'valid_skill_1', description='A description', rubrics=self.rubrics)
+            'valid_skill_1', 'A description', self.rubrics)
         valid_skill_2 = skill_domain.Skill.create_default_skill(
-            'valid_skill_2', description='A description', rubrics=self.rubrics)
+            'valid_skill_2', 'A description', self.rubrics)
         valid_skill_3 = skill_domain.Skill.create_default_skill(
-            'valid_skill_3', description='A description', rubrics=self.rubrics)
+            'valid_skill_3', 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, valid_skill_1)
         skill_services.save_new_skill(self.albert_id, valid_skill_2)
         skill_services.save_new_skill(self.albert_id, valid_skill_3)
@@ -247,7 +247,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         # job.
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'A name', 'abbrev', 'description')
-        topic.add_subtopic(1, title='A subtitle')
+        topic.add_subtopic(1, 'A subtitle')
         topic.add_uncategorized_skill_id('valid_skill_1')
         topic.add_uncategorized_skill_id('valid_skill_2')
         topic.add_uncategorized_skill_id('valid_skill_3')

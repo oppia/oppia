@@ -591,7 +591,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        exp_versions_diff, None)
 
     stats_services.create_stats_model(new_exp_stats)
 
@@ -616,8 +616,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff=exp_versions_diff,
-        revert_to_version=None)
+        exploration, exp_versions_diff, None)
 
 
 def _create_exploration(
@@ -1197,14 +1196,13 @@ def revert_exploration(
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
+        None, revert_to_version)
     stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
     stats_services.update_exp_issues_for_new_exp_version(
-        current_exploration, exp_versions_diff=None,
-        revert_to_version=revert_to_version)
+        current_exploration, None, revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(

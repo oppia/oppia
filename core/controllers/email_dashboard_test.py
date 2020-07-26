@@ -541,7 +541,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
             # Check that query completion email is sent to submitter.
             messages = self._get_sent_email_messages(
-                to=self.SUBMITTER_EMAIL)
+                self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             # Send email from email dashboard result page.
@@ -559,7 +559,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
             # Check that emails are sent to qualified users.
             messages_a = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 1)
             self.assertEqual(
                 messages_a[0].html.decode(), 'body')
@@ -567,7 +567,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 messages_a[0].body.decode(), 'body')
 
             messages_b = self._get_sent_email_messages(
-                to=self.USER_B_EMAIL)
+                self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 1)
             self.assertEqual(
                 messages_b[0].html.decode(), 'body')
@@ -723,13 +723,13 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             # One email is sent to submitter for query completion and second
             # is sent to one of the 2 qualified users.
             messages = self._get_sent_email_messages(
-                to=self.SUBMITTER_EMAIL)
+                self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].to, [self.SUBMITTER_EMAIL])
             messages_a = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             messages_b = self._get_sent_email_messages(
-                to=self.USER_B_EMAIL)
+                self.USER_B_EMAIL)
             self.assertEqual(sorted([len(messages_a), len(messages_b)]), [0, 1])
 
     def test_that_no_emails_are_sent_if_query_is_canceled(self):
@@ -765,10 +765,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
             # Check that no email is sent to qualified users.
             messages_a = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 0)
             messages_b = self._get_sent_email_messages(
-                to=self.USER_B_EMAIL)
+                self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 0)
 
     def test_that_test_email_for_bulk_emails_is_sent(self):
@@ -811,7 +811,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             test_email_text_body = '[This is a test email.]\n\n %s' % email_body
 
             messages = self._get_sent_email_messages(
-                to=self.SUBMITTER_EMAIL)
+                self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
             self.assertEqual(
                 messages[1].html.decode(), test_email_html_body)
@@ -865,7 +865,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             # Check that test email is sent to submitter of query.
             # One email is sent when query is completed and other is test email.
             messages = self._get_sent_email_messages(
-                to=self.SUBMITTER_EMAIL)
+                self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 2)
 
             # Check that no emails are sent to query recipients.
@@ -877,8 +877,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 sorted([self.user_a_id, self.user_b_id]))
             # Check that no emails are sent to user A or user B.
             messages_a = self._get_sent_email_messages(
-                to=self.USER_A_EMAIL)
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 0)
             messages_b = self._get_sent_email_messages(
-                to=self.USER_B_EMAIL)
+                self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 0)

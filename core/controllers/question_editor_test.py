@@ -311,7 +311,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
         self.post_json(
             feconf.NEW_QUESTION_URL, post_data,

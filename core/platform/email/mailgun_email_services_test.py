@@ -62,13 +62,13 @@ class EmailTests(test_utils.GenericTestBase):
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com'],
-                subject=(
+                'a@a.com',
+                ['b@b.com'],
+                (
                     'Hola 😂 - invitation to collaborate'
                     .encode(encoding='utf-8')),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'plaintext_body 😂'.encode(encoding='utf-8'),
+                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
             self.assertTrue(resp)
 
         # Test sending email with single bcc and single recipient email.
@@ -89,13 +89,13 @@ class EmailTests(test_utils.GenericTestBase):
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com'],
-                subject=(
+                'a@a.com',
+                ['b@b.com'],
+                (
                     'Hola 😂 - invitation to collaborate'
                     .encode(encoding='utf-8')),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+                'plaintext_body 😂'.encode(encoding='utf-8'),
+                'Hi abc,<br> 😂'.encode(encoding='utf-8'),
                 bcc=['c@c.com'],
                 reply_to='abc',
                 recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
@@ -121,13 +121,13 @@ class EmailTests(test_utils.GenericTestBase):
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com'],
-                subject=(
+                'a@a.com',
+                ['b@b.com'],
+                (
                     'Hola 😂 - invitation to collaborate'
                     .encode(encoding='utf-8')),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+                'plaintext_body 😂'.encode(encoding='utf-8'),
+                'Hi abc,<br> 😂'.encode(encoding='utf-8'),
                 bcc=['c@c.com', 'd@d.com'],
                 reply_to='abc',
                 recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))
@@ -152,12 +152,12 @@ class EmailTests(test_utils.GenericTestBase):
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com', 'c@c.com', 'd@d.com'],
-                subject='Hola 😂 - invitation to collaborate'.encode(
+                'a@a.com',
+                ['b@b.com', 'c@c.com', 'd@d.com'],
+                'Hola 😂 - invitation to collaborate'.encode(
                     encoding='utf-8'),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'plaintext_body 😂'.encode(encoding='utf-8'),
+                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
             self.assertTrue(resp)
 
     def test_mailgun_key_or_domain_name_not_set_raises_exception(self):
@@ -169,12 +169,12 @@ class EmailTests(test_utils.GenericTestBase):
             Exception, 'Mailgun API key is not available.')
         with mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com', 'c@c.com', 'd@d.com'],
-                subject='Hola 😂 - invitation to collaborate'.encode(
+                'a@a.com',
+                ['b@b.com', 'c@c.com', 'd@d.com'],
+                'Hola 😂 - invitation to collaborate'.encode(
                     encoding='utf-8'),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'plaintext_body 😂'.encode(encoding='utf-8'),
+                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
 
         # Testing no mailgun domain name.
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
@@ -182,12 +182,12 @@ class EmailTests(test_utils.GenericTestBase):
             Exception, 'Mailgun domain name is not set.')
         with swap_api, mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com', 'c@c.com', 'd@d.com'],
-                subject='Hola 😂 - invitation to collaborate'.encode(
+                'a@a.com',
+                ['b@b.com', 'c@c.com', 'd@d.com'],
+                'Hola 😂 - invitation to collaborate'.encode(
                     encoding='utf-8'),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'))
+                'plaintext_body 😂'.encode(encoding='utf-8'),
+                'Hi abc,<br> 😂'.encode(encoding='utf-8'))
 
     def test_invalid_status_code_returns_false(self):
         expected_query_url = (
@@ -209,13 +209,13 @@ class EmailTests(test_utils.GenericTestBase):
         swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
         with swap_urlopen_context, swap_request_context, swap_api, swap_domain:
             resp = mailgun_email_services.send_email_to_recipients(
-                sender_email='a@a.com',
-                recipient_emails=['b@b.com'],
-                subject=(
+                'a@a.com',
+                ['b@b.com'],
+                (
                     'Hola 😂 - invitation to collaborate'
                     .encode(encoding='utf-8')),
-                plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-                html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+                'plaintext_body 😂'.encode(encoding='utf-8'),
+                'Hi abc,<br> 😂'.encode(encoding='utf-8'),
                 bcc=['c@c.com', 'd@d.com'],
                 reply_to='abc',
                 recipient_variables=({'b@b.com': {'first': 'Bob', 'id': 1}}))

@@ -88,7 +88,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(
-                to=self.MODERATOR_EMAIL)
+                self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),

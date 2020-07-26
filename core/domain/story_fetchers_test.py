@@ -63,7 +63,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')

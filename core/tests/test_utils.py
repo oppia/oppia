@@ -844,7 +844,7 @@ tags: []
             expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=expect_errors,
+            expect_errors,
             expected_status_int=expected_status_int,
             upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
@@ -950,8 +950,8 @@ tags: []
         incoming_email_url = '/_ah/mail/%s' % recipient_email
 
         return self._send_post_request(
-            app, incoming_email_url, data, headers=headers,
-            expect_errors=expect_errors,
+            app, incoming_email_url, data,
+            expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):

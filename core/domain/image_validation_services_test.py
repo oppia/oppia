@@ -33,7 +33,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
         super(ImageValidationServiceTests, self).setUp()
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             self.raw_image = f.read()
 
     def _assert_validation_error(

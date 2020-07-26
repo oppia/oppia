@@ -324,7 +324,7 @@ class TopicEditorTests(
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.get_json(
                 '%s/%s' % (
@@ -343,7 +343,7 @@ class TopicEditorTests(
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -454,7 +454,7 @@ class TopicEditorTests(
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.put_json(
                 '%s/%s' % (
@@ -468,7 +468,7 @@ class TopicEditorTests(
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -717,7 +717,7 @@ class TopicPublishSendMailHandlerTests(
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
                 {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
         messages = self._get_sent_email_messages(
-            to=feconf.ADMIN_EMAIL_ADDRESS)
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s, please review'
             ' and publish if it looks good.'
