@@ -340,7 +340,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            corresponding_topic_id='0'
+            '0'
         ) for i in python_utils.RANGE(2)]
 
         for index, story in enumerate(stories):
