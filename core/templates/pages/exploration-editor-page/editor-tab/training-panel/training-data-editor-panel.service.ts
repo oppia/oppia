@@ -20,7 +20,7 @@
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
-  'test-interaction-panel.directive.ts');
+  'test-interaction-panel.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
@@ -48,7 +48,7 @@ require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-data-editor-panel-modal.controller');
+  'training-data-editor-panel-modal.controller.ts');
 
 angular.module('oppia').factory('TrainingDataEditorPanelService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',

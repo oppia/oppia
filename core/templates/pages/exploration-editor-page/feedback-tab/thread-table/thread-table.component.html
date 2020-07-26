@@ -8,14 +8,14 @@
 </style>
 <table class="table">
   <thead>
-    <tr ng-if="getThreads().length > 0">
+    <tr ng-if="$ctrl.getThreads().length > 0">
       <th>Status</th>
       <th>Subject</th>
       <th>Original author</th>
       <th>Last updated</th>
     </tr>
   </thead>
-  <tr ng-repeat="thread in getThreads()|orderBy:'-lastUpdatedMsecs'" ng-click="onClickRow(thread.threadId)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row">
+  <tr ng-repeat="thread in $ctrl.getThreads()|orderBy:'-lastUpdatedMsecs'" ng-click="$ctrl.onClickRow(thread.threadId)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row">
     <td width="15%">
       <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
     </td>
