@@ -102,11 +102,21 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             subtopics=[], next_subtopic_id=1)
 
         self.save_new_story(
-            canonical_story_id, self.admin_id, 'title', 'description',
-            'note', topic_id)
+            canonical_story_id,
+            self.admin_id,
+            topic_id,
+            title='title',
+            description='description',
+            notes='note'
+        )
         self.save_new_story(
-            additional_story_id, self.admin_id, 'another title',
-            'another description', 'another note', topic_id)
+            additional_story_id,
+            self.admin_id,
+            topic_id,
+            title='another title',
+            description='another description',
+            notes='another note'
+        )
 
         topic_services.publish_story(
             topic_id, canonical_story_id, self.admin_id)
@@ -253,7 +263,8 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicEditorTests(BaseTopicEditorControllerTests):
+class TopicEditorTests(
+        BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -299,7 +310,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
         self.logout()
 
-
     def test_editable_topic_handler_get(self):
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
         # Check that non-admins cannot access the editable topic data.
@@ -313,19 +323,27 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         # Check that admins can access the editable topic data.
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
             self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertTrue(
+                self.skill_id in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id], 0)
+            self.assertTrue(
+                self.skill_id_2 in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id_2], 0)
             self.assertEqual(
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -435,8 +453,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.put_json(
                 '%s/%s' % (
@@ -449,8 +467,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -687,7 +705,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
+class TopicPublishSendMailHandlerTests(
+        BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     def test_send_mail(self):
         self.login(self.ADMIN_EMAIL)
@@ -697,8 +716,8 @@ class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
                 '%s/%s' % (
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
                 {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        messages = self.mail_stub.get_sent_messages(
-            to=feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s, please review'
             ' and publish if it looks good.'

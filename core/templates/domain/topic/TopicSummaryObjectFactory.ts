@@ -35,6 +35,11 @@ export interface TopicSummaryBackendDict {
   'thumbnail_bg_color': string;
   'topic_model_created_on': number;
   'topic_model_last_updated': number;
+  // These properties are optional because they are only present in the
+  // topic summary dict of topic dashboard page.
+  'can_edit_topic'?: boolean;
+  'is_published'?: boolean;
+  'classroom'?: string;
 }
 
 export class TopicSummary {
@@ -51,6 +56,9 @@ export class TopicSummary {
       public additionalStoryCount: number,
       public topicModelCreatedOn: number,
       public topicModelLastUpdated: number,
+      public canEditTopic: boolean,
+      public isPublished: boolean,
+      public classroom: string,
       public thumbnailFilename: string,
       public thumbnailBgColor: string) { }
 
@@ -130,6 +138,9 @@ export class TopicSummaryObjectFactory {
       topicSummaryBackendDict.additional_story_count,
       topicSummaryBackendDict.topic_model_created_on,
       topicSummaryBackendDict.topic_model_last_updated,
+      topicSummaryBackendDict.can_edit_topic,
+      topicSummaryBackendDict.is_published,
+      topicSummaryBackendDict.classroom,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color);
   }

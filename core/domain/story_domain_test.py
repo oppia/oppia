@@ -222,9 +222,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID
-        )
+            self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.story.add_node(self.NODE_ID_2, 'Node title 2')
         self.story.update_node_destination_node_ids(
@@ -932,8 +930,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_3)
         ]
-        self._assert_validation_error(
-            'The node with id node_3 is disconnected from the story graph.')
 
         # Case 4: Graph with duplicate nodes.
         node_1 = {
@@ -1101,6 +1097,153 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_4)
         ]
         self.story.validate()
+
+    def test_rearrange_node_in_story_fail_with_invalid_from_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.story.rearrange_node_in_story(None, 2)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received a'):
+            self.story.rearrange_node_in_story('a', 2)
+
+    def test_rearrange_node_in_story_fail_with_invalid_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.story.rearrange_node_in_story(1, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received a'):
+            self.story.rearrange_node_in_story(1, 'a')
+
+    def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(self):
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1', 'skill_0'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_4', 'node_3'],
+            'acquired_skill_ids': ['skill_3', 'skill_4'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2)
+        ]
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(10, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(-1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(0, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(0, -1)
+
+    def test_rearrange_node_in_story_fail_with_identical_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index and to_index values to be '
+                       'different.'):
+            self.story.rearrange_node_in_story(1, 1)
+
+    def test_rearrange_node_in_story(self):
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1', 'skill_0'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_4', 'node_3'],
+            'acquired_skill_ids': ['skill_3', 'skill_4'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': ['skill_4'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+
+        nodes = self.story.story_contents.nodes
+
+        self.assertEqual(nodes[0].id, 'node_1')
+        self.assertEqual(nodes[1].id, 'node_2')
+        self.assertEqual(nodes[2].id, 'node_3')
+
+        self.story.rearrange_node_in_story(1, 0)
+        self.assertEqual(nodes[0].id, 'node_2')
+        self.assertEqual(nodes[1].id, 'node_1')
+        self.assertEqual(nodes[2].id, 'node_3')
+
+        self.story.rearrange_node_in_story(2, 1)
+        self.assertEqual(nodes[0].id, 'node_2')
+        self.assertEqual(nodes[1].id, 'node_3')
+        self.assertEqual(nodes[2].id, 'node_1')
+
+        self.story.rearrange_node_in_story(2, 0)
+        self.assertEqual(nodes[0].id, 'node_1')
+        self.assertEqual(nodes[1].id, 'node_2')
+        self.assertEqual(nodes[2].id, 'node_3')
 
     def test_story_contents_export_import(self):
         """Test that to_dict and from_dict preserve all data within a
