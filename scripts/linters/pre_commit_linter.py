@@ -326,11 +326,11 @@ def _get_file_extensions(file_extensions_to_lint):
             'ts' in file_extensions_to_lint)
 
         if js_and_ts_is_present:
-            concurrent_task_utils.log(
+            python_utils.PRINT(
                 'Please use only one of "js" or "ts", as we do not have '
                 'separate linters for JS and TS files. If both these options '
                 'are used together, then the JS/TS linter will be run twice.')
-            concurrent_task_utils.log('Exiting...')
+            python_utils.PRINT('Exiting...')
             sys.exit(1)
 
         return set(file_extensions_to_lint)
@@ -355,10 +355,9 @@ def _get_all_filepaths(input_path, input_filenames):
     if input_path:
         input_path = os.path.join(os.getcwd(), input_path)
         if not os.path.exists(input_path):
-            concurrent_task_utils.log(
+            python_utils.PRINT(
                 'Could not locate file or directory %s. Exiting.' % input_path)
-            concurrent_task_utils.log(
-                '----------------------------------------')
+            python_utils.PRINT('----------------------------------------')
             sys.exit(1)
         if os.path.isfile(input_path):
             all_filepaths = [input_path]
@@ -375,7 +374,7 @@ def _get_all_filepaths(input_path, input_filenames):
             else:
                 invalid_filepaths.append(filename)
         if invalid_filepaths:
-            concurrent_task_utils.log(
+            python_utils.PRINT(
                 'The following file(s) do not exist: %s\n'
                 'Exiting.' % invalid_filepaths)
             sys.exit(1)
@@ -424,13 +423,13 @@ def _print_summary_of_error_messages(lint_messages):
         lint_messages: list(str). List of linter error messages.
     """
     if lint_messages != '':
-        concurrent_task_utils.log('Please fix the errors below:')
-        concurrent_task_utils.log('----------------------------------------')
+        python_utils.PRINT('Please fix the errors below:')
+        python_utils.PRINT('----------------------------------------')
         for message in lint_messages:
             if message.startswith(('SUCCESS', 'FAILED')):
                 continue
             else:
-                concurrent_task_utils.log(message)
+                python_utils.PRINT(message)
 
 
 def _get_task_output(lint_messages, task, semaphore):
@@ -454,19 +453,17 @@ def _print_errors_stacktrace(errors_stacktrace):
         errors_stacktrace: list(str). List of error stacktrace of lint
             execution failure.
     """
-    concurrent_task_utils.log('')
-    concurrent_task_utils.log(
+    python_utils.PRINT('')
+    python_utils.PRINT(
         'Unable to run the complete lint test, please check '
         'the following stack trace and fix the errors:')
-    concurrent_task_utils.log('+--------------------------+')
+    python_utils.PRINT('+--------------------------+')
     for stacktrace in errors_stacktrace:
-        concurrent_task_utils.log(stacktrace)
-        concurrent_task_utils.log(
-            '--------------------------------------------------')
-        concurrent_task_utils.log('')
-    concurrent_task_utils.log(
-        '--------------------------------------------------')
-    concurrent_task_utils.log(
+        python_utils.PRINT(stacktrace)
+        python_utils.PRINT('--------------------------------------------------')
+        python_utils.PRINT('')
+    python_utils.PRINT('--------------------------------------------------')
+    python_utils.PRINT(
         'Some of the linting functions may not run until the'
         ' above errors gets fixed')
 
@@ -486,12 +483,12 @@ def main(args=None):
 
     install_third_party_libs.main()
 
-    concurrent_task_utils.log('Starting Linter....')
+    python_utils.PRINT('Starting Linter....')
 
     if len(all_filepaths) == 0:
-        concurrent_task_utils.log('---------------------------')
-        concurrent_task_utils.log('No files to check.')
-        concurrent_task_utils.log('---------------------------')
+        python_utils.PRINT('---------------------------')
+        python_utils.PRINT('No files to check.')
+        python_utils.PRINT('---------------------------')
         return
 
     read_files(all_filepaths)
@@ -523,12 +520,13 @@ def main(args=None):
 
     for linter in custom_linters:
         task_custom = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks, custom_semaphore, name='custom')
+            linter.perform_all_lint_checks, verbose_mode_enabled,
+            custom_semaphore, name='custom')
         tasks_custom.append(task_custom)
 
     for linter in third_party_linters:
         task_third_party = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks,
+            linter.perform_all_lint_checks, verbose_mode_enabled,
             third_party_semaphore, name='third_party')
         tasks_third_party.append(task_third_party)
 
@@ -579,14 +577,14 @@ def main(args=None):
     if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
             message in lint_messages]) or errors_stacktrace:
         _print_summary_of_error_messages(lint_messages)
-        concurrent_task_utils.log('---------------------------')
-        concurrent_task_utils.log('Checks Not Passed.')
-        concurrent_task_utils.log('---------------------------')
+        python_utils.PRINT('---------------------------')
+        python_utils.PRINT('Checks Not Passed.')
+        python_utils.PRINT('---------------------------')
         sys.exit(1)
     else:
-        concurrent_task_utils.log('---------------------------')
-        concurrent_task_utils.log('All Checks Passed.')
-        concurrent_task_utils.log('---------------------------')
+        python_utils.PRINT('---------------------------')
+        python_utils.PRINT('All Checks Passed.')
+        python_utils.PRINT('---------------------------')
 
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
