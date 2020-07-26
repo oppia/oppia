@@ -264,7 +264,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'outcome-destination-editor.directive.ts',
     'outcome-editor.directive.ts',
     'outcome-feedback-editor.directive.ts',
-    'param-changes-editor.directive.ts',
     'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
     'pencil-code-editor-validation.service.ts',
