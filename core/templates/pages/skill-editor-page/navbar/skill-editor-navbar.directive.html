@@ -36,22 +36,49 @@
 </ul>
 
 <div class="skill-editor-nav-mobile">
-  <div class="skill-editor-navbar-mobile-tabs">
-    <div class="discard-changes-btn-container">
-      <button class="btn discard-changes-btn"
-              ng-click="discardChanges()">
-        Discard Changes
-        <span ng-if="getChangeListCount() > 0">
+  <div class="skill-nav-mobile">
+    <div class="skill-navbar-mobile-tabs">
+      <div class="skill-nav-dropdown-container">
+        <div class="skill-nav-skill-nav-dropdown-options" ng-if="showNavigationOptions">
+          <div class="skill-nav-dropdown-option" ng-click="selectMainTab()">
+            <i class="material-icons">&#xE254;</i><span>Editor</span>
+          </div>
+          <div class="skill-nav-dropdown-option" ng-click="selectQuestionsTab()">
+            <i class="material-icons">&#xE254;</i><span>Questions</span>
+          </div>
+          <div class="skill-nav-dropdown-option" ng-click="selectPreviewTab()">
+            <i class="material-icons">&#xE037;</i><span>Preview</span>
+          </div>
+        </div>
+        <div class="skill-nav-dropdown-content">
+          <div class="skill-nav-dropdown-text" ng-click="toggleWarningText()">
+            <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
+            <span><[activeTab]></span>
+          </div>
+          <div class="skill-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
+            <i class="fa fa-arrow-up"></i>
+          </div>
+        </div>
+      </div>
+      <div class="skill-nav-dropdown-container save-options-dropdown">
+        <div class="skill-nav-skill-nav-dropdown-options" ng-if="showSkillEditOptions">
+          <div class="skill-nav-dropdown-option" ng-click="saveChanges()">
+            <i class="material-icons">&#xE254;</i>
+            <span>Save Changes</span>
+          </div>
+        </div>
+        <div class="skill-nav-dropdown-content right-container">
+          <div class="skill-nav-dropdown-text" ng-click="discardChanges()">
+            Discard Changes
+            <span ng-if="getChangeListCount() > 0">
               (<[getChangeListCount()]>)
-        </span>
-      </button>
-    </div>
-    <div class="publish-button-container">
-      <button type="button"
-              ng-click="saveChanges()"
-              class="btn publish-skill-btn">
-        <span>Publish Skill</span>
-      </button>
+            </span>
+          </div>
+          <div class="skill-nav-dropdown-icon" ng-click="toggleSkillEditOptions()">
+            <i class="fa fa-arrow-up"></i>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -92,6 +119,57 @@
       border: 2px solid #008098;
       color: #008098;
       font-weight: bold;
+    }
+    .skill-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    .skill-nav-dropdown-container {
+      position: relative;
+      text-align: left;
+      width: 45%;
+    }
+     .skill-nav-skill-nav-dropdown-options {
+      background-color: #FFF;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+      width: 100%;
+    }
+     .skill-nav-dropdown-content {
+      background-color: #FFF;
+      border: 1.5px solid #6d6969;
+      border-radius: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+     .right-container {
+      background-color: #419889;
+      color: #FFF;
+    }
+
+     .skill-nav-dropdown-option {
+      padding: 5px 0;
+    }
+     .skill-nav-dropdown-icon {
+      align-items: center;
+      background-color: #e6e6e6;
+      border-left: 1.5px solid #6d6969;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: 20%;
+    }
+     .skill-nav-dropdown-text {
+      padding: 5px 10px;
+    }
+     .save-options-dropdown {
+      width: 52%;
     }
   }
 </style>

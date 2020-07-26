@@ -93,36 +93,6 @@
     </md-card>
     <button class="btn btn-success btn-sm protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">Add Acquired Skill</button>
   </div>
-  <div class="node-field">
-    <div ng-if="getDestinationNodeIds().length > 0">
-      <label class="form-heading"> Next Chapter </label>
-      <md-card class="destination-node-id"
-               ng-repeat="nodeId in getDestinationNodeIds()"
-               ng-click="viewNodeEditor(nodeId)">
-        <div class="repeating-card-wrapper protractor-test-next-chapter-card">
-          <[nodeIdToTitleMap[nodeId]]>
-          <span class="oppia-remove-prerequisite-skill protractor-test-remove-destination-button" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
-            <i class="material-icons md-18 oppia-remove-skill-button">&#xE14C;</i>
-          </span>
-        </div>
-      </md-card>
-    </div>
-    <div class="oppia-node-ids" ng-if="getDestinationNodeIds().length === 0">
-      <label> Select destination chapter </label>
-      <div>
-        <select class="form-control oppia-destination-select protractor-test-destination-select"
-                ng-model="newNodeId"
-                ng-if="availableNodes.length > 0"
-                ng-options="node.id as node.text for node in availableNodes"
-                ng-click="addDestinationNode(newNodeId)">
-          <option value="">Pick an already existing chapter</option>
-        </select>
-        <button class="btn btn-success protractor-test-add-destination-chapter-button"
-                ng-click="addNewDestinationNode()"> Add a new Destination Chapter
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <style>

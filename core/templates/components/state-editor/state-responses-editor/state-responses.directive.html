@@ -9,8 +9,8 @@
         </td>
         <td class="col-md-5" ng-if="!isInQuestionMode()">
           <span ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
-            <input type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
-            Solicit Answer Details
+            <label for="solicit-answer-details-id">Solicit Answer Details</label>
+            <input id="solicit-answer-details-id" type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
           </span>
         </td>
       </tr>

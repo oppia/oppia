@@ -51,12 +51,12 @@
   will not update when elements are swapped or deleted.
 -->
 <div ng-if="isParamChangesEditorOpen && EditabilityService.isEditableOutsideTutorialMode()">
-  <div ng-model="paramChangesService.displayed"
+  <div ng-model="$ctrl.paramChangesService.displayed"
        ui-sortable="PARAM_CHANGE_LIST_SORTABLE_OPTIONS"
        class="oppia-param-change-draggable-area">
-    <div ng-repeat="paramChange in paramChangesService.displayed"
+    <div ng-repeat="paramChange in $ctrl.paramChangesService.displayed"
          class="oppia-param-editor-row protractor-test-param-changes-list">
-      <span class="oppia-param-change-sort-handle" ng-if="paramChangesService.displayed.length > 1">
+      <span class="oppia-param-change-sort-handle" ng-if="$ctrl.paramChangesService.displayed.length > 1">
         <picture>
           <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
           <source type="image/png" ng-srcset="<[getStaticImageUrl('/general/drag_dots.png')]>">
@@ -118,11 +118,11 @@
   </i>
   <div class="oppia-param-changes-display oppia-param-changes-display-extra oppia-transition-200"
        ng-class="{'oppia-prevent-selection': EditabilityService.isEditable()}"
-       title="Card Parameter Changes">
-    <span ng-if="paramChangesService.savedMemento.length === 0">
+       title="Card Parameter Changes" style="opacity: 0.7;">
+    <span ng-if="$ctrl.paramChangesService.savedMemento.length === 0">
       <em>No parameter changes.</em>
     </span>
-    <div class="oppia-param-display-row" ng-repeat="paramChange in paramChangesService.savedMemento track by $index">
+    <div class="oppia-param-display-row" ng-repeat="paramChange in $ctrl.paramChangesService.savedMemento track by $index">
       <[$index + 1]>. Change <span class="badge badge-info"><[paramChange.name]></span>
        <[HUMAN_READABLE_ARGS_RENDERERS[paramChange.generatorId](paramChange.customizationArgs)]>
     </div>

@@ -1939,14 +1939,24 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         exp_domain.Exploration.from_untitled_yaml(
             'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: mapping '
+            'values are not allowed here'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: while '
+            'scanning a simple key'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'State1:\n(\nInvalid yaml')
 
@@ -7392,7 +7402,6 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
     YAML_CONTENT_V35_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -7634,7 +7643,6 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
     YAML_CONTENT_V39_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -8251,8 +8259,6 @@ states_schema_version: 34
 tags: []
 title: Title
 """)
-
-# pylint: enable=line-too-long
 
 
     def test_load_from_v26_textangular(self):

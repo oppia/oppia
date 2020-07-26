@@ -24,7 +24,9 @@
             <div ng-if="hasLoaded" class="protractor-test-interaction" ng-class="{'oppia-editable-section': EditabilityService.isEditable()}">
               <div class="oppia-interaction-preview oppia-interaction-preview-extra oppia-transition-200"
                    ng-click="openInteractionCustomizerModal()"
-                   ng-if="EditabilityService.isEditable()">
+                   ng-if="EditabilityService.isEditable()"
+                   style="position: absolute; width: 100%; height: 100%;"
+                   aria-label="edit interaction">
               </div>
               <div>
                 <angular-html-bind html-data="interactionPreviewHtml" class="oppia-interaction-preview-extra-info">

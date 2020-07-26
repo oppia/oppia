@@ -1,13 +1,8 @@
-<div ng-if="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak oppia-subtopic-viewer-nav-breadcrumb">
+<div *ngIf="subtopicTitle" class="nav navbar-nav oppia-navbar-breadcrumb oppia-subtopic-viewer-nav-breadcrumb">
   <div class="oppia-subtopic-viewer-nav-separator"></div>
   <div class="oppia-subtopic-viewer-nav-labels-container">
-    <p class="oppia-subtopic-title"><[subtopicTitle]></p>
-    <a class="oppia-topic-name" ng-href="<[getTopicUrl()]>"><[topicName]></a>
-  </div>
-</div>
 
 <style>
-  .oppia-subtopic-viewer-nav-breadcrumb {
     align-items: center;
     height: 56px;
     padding-top: 0;
