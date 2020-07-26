@@ -1155,7 +1155,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
-                to=self.MODERATOR_EMAIL)
+                self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
