@@ -234,11 +234,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(
-            r'eslint-(disable|enable)(-next-line)?'
-            ' @typescript-eslint/no-explicit-any'),
+        'regexp': re.compile(r'no-explicit-any'),
         'message': (
-            'Please do not define any types. You can refer '
+            'Please do not define "any" types. You can refer '
             'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
             'if you\'re having trouble declaring types.'),
         'excluded_files': (),
