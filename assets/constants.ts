@@ -5310,6 +5310,21 @@ export = {
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
 
+  // Name to human readable form mapping of the position of terms object.
+  "POSITION_OF_TERMS_MAPPING": [{
+    "name": "lhs",
+    "humanReadableName": "on LHS"
+  }, {
+    "name": "rhs",
+    "humanReadableName": "on RHS"
+  }, {
+    "name": "both",
+    "humanReadableName": "on both sides"
+  }, {
+    "name": "irrelevant",
+    "humanReadableName": "with reordering allowed around ="
+  }],
+
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 

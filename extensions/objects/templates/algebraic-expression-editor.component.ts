@@ -42,10 +42,11 @@ angular.module('oppia').component('algebraicExpressionEditor', {
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
-          // is not compatible with nerdamer or with the backend validations.
-          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
-            ctrl.value);
+          // Replacing abs symbol, 'absolutevalue(x)', with text, 'abs(x)' and
+          // 'squareroot(x)' with 'sqrt(x)' for compatibility with nerdamer and
+          // backend validators.
+          ctrl.value = ctrl.value.replace(/absolutevalue/g, 'abs');
+          ctrl.value = ctrl.value.replace(/squareroot/g, 'sqrt');
           var answerIsValid = MathInteractionsService.validateExpression(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
@@ -66,7 +67,8 @@ angular.module('oppia').component('algebraicExpressionEditor', {
           ctrl.value = '';
         }
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-creator');
+        GuppyInitializationService.init(
+          'guppy-div-creator', MathExpression.fromText(ctrl.value).toXML());
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
@@ -78,7 +80,9 @@ angular.module('oppia').component('algebraicExpressionEditor', {
             GuppyInitializationService.findActiveGuppyObject());
           if (activeGuppyObject !== undefined) {
             ctrl.hasBeenTouched = true;
-            ctrl.value = activeGuppyObject.guppyInstance.asciimath();
+            try {
+              ctrl.value = activeGuppyObject.guppyInstance.text();
+            } catch {}
             if (eventType === 'change') {
               // Need to manually trigger the digest cycle to make any
               // 'watchers' aware of changes in answer.

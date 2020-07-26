@@ -35,7 +35,7 @@ export class GuppyInitializationService {
   private guppyInstances: Array<GuppyObject> = [];
   private onScreenKeyboardShown = false;
 
-  init(guppyDivClassName: string): void {
+  init(guppyDivClassName: string, initialValue = ''): void {
     this.onScreenKeyboardShown = false;
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
     let divId, guppyInstance;
@@ -45,6 +45,13 @@ export class GuppyInitializationService {
       guppyDivs[i].setAttribute('id', divId);
       // Create a new guppy instance for that div.
       guppyInstance = new Guppy(divId, {});
+
+      // Initialize if with a value for the creator's view.
+      if (guppyDivClassName === 'guppy-div-creator') {
+        guppyInstance.import_xml(initialValue);
+        guppyInstance.engine.end();
+        guppyInstance.activate();
+      }
       this.guppyInstances.push(new GuppyObject(divId, guppyInstance));
     }
   }
