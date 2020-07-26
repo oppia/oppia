@@ -141,7 +141,7 @@ export class AdminBackendApiService {
   sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
     let body = new FormData();
     for (var expId in latexToSvgMapping) {
-      for (var latexValue in latexToSvgMapping[expId]) {
+      for (var latexString in latexToSvgMapping[expId]) {
         // LaTeX strings cannot be appended in the request body as keys for
         // files because of encoding issues (multiple backslash in the LaTeX
         // string is processed improperly, e.g 3 backslashes in an
@@ -150,9 +150,9 @@ export class AdminBackendApiService {
         // the request body.Images can be extracted based on the latexId in the
         // backend.
         body.set(
-          latexToSvgMapping[expId][latexValue].latexId,
-          latexToSvgMapping[expId][latexValue].file);
-        delete latexToSvgMapping[expId][latexValue].file;
+          latexToSvgMapping[expId][latexString].latexId,
+          latexToSvgMapping[expId][latexString].file);
+        delete latexToSvgMapping[expId][latexString].file;
       }
     }
     body.append(

@@ -241,7 +241,7 @@ angular.module('oppia').directive('adminMiscTab', [
             latexMapping[expId] = {};
             for (var i = 0; i < latexStrings.length; i++) {
               var svgFile = await convertLatexToSvgFile(latexStrings[i]);
-              latexMapping[expId][latexValues[i]] = svgFile;
+              latexMapping[expId][latexStrings[i]] = svgFile;
             }
             ctrl.setStatusMessage('LaTeX strings Generated.');
             $rootScope.$apply();
