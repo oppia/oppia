@@ -242,7 +242,8 @@ class _PortPool(python_utils.OBJECT):
             candidate = self._port_queue.pop()
             self._port_queue.appendleft(candidate)
             check_count += 1
-            if (candidate.start_time == 0
+            if (
+                    candidate.start_time == 0
                     or candidate.start_time
                     != _get_process_start_time(candidate.pid)):
                 if _is_port_free(candidate.port):

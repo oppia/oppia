@@ -28,7 +28,8 @@ import python_utils
 from . import clean
 from . import common
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Python execution environent set up for all scripts.
 """)
 

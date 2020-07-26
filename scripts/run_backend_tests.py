@@ -104,7 +104,8 @@ TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
 IMPORTANT: Only one of --test_path and --test_target should be specified.
@@ -227,7 +228,8 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
                             _get_test_target_classes(os.path.join(subroot, f)))
 
             for f in files:
-                if (f.endswith('_test.py') and
+                if (
+                        f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
                     result = result + (
                         _get_test_target_classes(os.path.join(subroot, f)))
@@ -263,8 +265,8 @@ def main(args=None):
                 os.path.join(
                     common.OPPIA_TOOLS_DIR,
                     'coverage-%s' % common.COVERAGE_VERSION)):
-            raise Exception('Coverage is not installed, please run the start '
-                            'script.')
+            raise Exception(
+                'Coverage is not installed, please run the start script.')
 
         pythonpath_components = [COVERAGE_DIR]
         if os.environ.get('PYTHONPATH'):
@@ -273,8 +275,8 @@ def main(args=None):
         os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
     if parsed_args.test_target and parsed_args.test_path:
-        raise Exception('At most one of test_path and test_target '
-                        'should be specified.')
+        raise Exception(
+            'At most one of test_path and test_target should be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
@@ -343,9 +345,10 @@ def main(args=None):
         if not task.finished:
             python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif (task.exception and
-              'No tests were run' in python_utils.convert_to_bytes(
-                  task.exception.args[0])):
+        elif (
+                task.exception and
+                'No tests were run' in python_utils.convert_to_bytes(
+                    task.exception.args[0])):
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0

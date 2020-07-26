@@ -1122,7 +1122,8 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     HINT_AUDIO_FILE = 'answer_hint.mp3'
     SOLUTION_AUDIO_FILE = 'answer_solution.mp3'
 
-    YAML_WITH_AUDIO_TRANSLATIONS = ("""author_notes: ''
+    YAML_WITH_AUDIO_TRANSLATIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -1328,7 +1329,8 @@ title: Title
         self.assertEqual(solution_voiceovers, {})
 
     def test_cannot_load_yaml_with_no_schema_version(self):
-        yaml_with_no_schema_version = ("""
+        yaml_with_no_schema_version = (
+            """
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
@@ -1670,7 +1672,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -1762,7 +1765,8 @@ title: A title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
-    UPDATED_YAML_CONTENT = ("""author_notes: ''
+    UPDATED_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -2022,7 +2026,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents.
     """
 
-    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+    _SAMPLE_INIT_STATE_CONTENT = (
+        """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2060,7 +2065,8 @@ written_translations:
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""classifier_model_id: null
+        'New state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2099,7 +2105,8 @@ written_translations:
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""classifier_model_id: null
+        'Renamed state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -3698,8 +3705,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 )}
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(list(actual_summaries.keys()),
-                         list(expected_summaries.keys()))
+        self.assertEqual(
+            list(actual_summaries.keys()),
+            list(expected_summaries.keys()))
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
@@ -3710,8 +3718,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'exploration_model_last_updated']
         for exp_id in actual_summaries:
             for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
+                self.assertEqual(
+                    getattr(actual_summaries[exp_id], prop),
+                    getattr(expected_summaries[exp_id], prop))
 
     def test_get_all_exploration_summaries(self):
         actual_summaries = exp_services.get_all_exploration_summaries()
@@ -3751,7 +3760,8 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = ("""author_notes: ''
+    UPGRADED_EXP_YAML = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -4142,8 +4152,8 @@ title: Old Title
             }
         }
 
-        with self.assertRaisesRegexp(Exception,
-                                     'Expected hints_list to be a list.*'):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected hints_list to be a list.*'):
             hints_update = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
@@ -4472,9 +4482,10 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
                     'value': [
                         '<p>1</p>',
                         '<p>2</p>',
-                        ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>'),
+                        (
+                            '<oppia-noninteractive-math raw_latex-with-value="'
+                            '&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&'
+                            'amp;quot;"></oppia-noninteractive-math>'),
                         '<p>4</p>'
                     ]
                 },

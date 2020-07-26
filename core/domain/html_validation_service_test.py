@@ -1604,13 +1604,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'uot;"></oppia-noninteractive-math>'
         )
         expected_invalid_tags = [
-            ('<oppia-noninteractive-math raw_latex-with-value="+,-,-,+"></opp'
-             'ia-noninteractive-math>'),
+            (
+                '<oppia-noninteractive-math raw_latex-with-value="+,-,-,+"></op'
+                'pia-noninteractive-math>'),
             ('<oppia-noninteractive-math></oppia-noninteractive-math>'),
-            ('<oppia-noninteractive-math invalid_tag-with-value="&amp;quot;+,'
-             '-,-,+&amp;quot;"></oppia-noninteractive-math>'),
-            ('<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,'
-             '-,+&amp;quot;"></oppia-noninteractive-math>')
+            (
+                '<oppia-noninteractive-math invalid_tag-with-value="&amp;quot;+'
+                ',-,-,+&amp;quot;"></oppia-noninteractive-math>'),
+            (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-'
+                ',-,+&amp;quot;"></oppia-noninteractive-math>')
         ]
         invalid_tags = (
             html_validation_service.validate_math_tags_in_html(html_string))
@@ -1649,19 +1652,23 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
 
         expected_invalid_tags = [
-            ('<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
-             '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
-             'noninteractive-math>'),
+            (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
+                'noninteractive-math>'),
             ('<oppia-noninteractive-math></oppia-noninteractive-math>'),
-            ('<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
-             '+,+,+&amp;quot;"></oppia-noninteractive-math>'),
-            ('<oppia-noninteractive-math math_content-with-v'
-             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
-             '&amp;quot;}"></oppia-noninteractive-math>'),
-            ('<oppia-noninteractive-math math_content-with-value="{'
-             'raw_latex: &amp;quot;(x - a_1)(x - a_2)(x - a'
-             '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
-             ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
+            (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
+                '+,+,+&amp;quot;"></oppia-noninteractive-math>'),
+            (
+                '<oppia-noninteractive-math math_content-with-v'
+                'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+                '&amp;quot;}"></oppia-noninteractive-math>'),
+            (
+                '<oppia-noninteractive-math math_content-with-value="{'
+                'raw_latex: &amp;quot;(x - a_1)(x - a_2)(x - a'
+                '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
         ]
         invalid_tags = (
             html_validation_service.

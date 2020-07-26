@@ -38,7 +38,8 @@ from . import build  # isort:skip
 from . import common  # isort:skip
 # pylint: enable=wrong-import-position
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run the script from the oppia root folder:
     python -m scripts.start
 Note that the root folder MUST be named 'oppia'.

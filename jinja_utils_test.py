@@ -38,8 +38,9 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
             ({'a': 4, '¡Hola!': 2}, '{\\"a\\": 4, \\"\\\\u00a1Hola!\\": 2}'),
             ('', '\\"\\"'),
             (None, 'null'),
-            (['a', {'b': 'c', 'd': ['e', None]}],
-             '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
+            ([
+                'a', {'b': 'c', 'd': ['e', None]}],
+                '[\\"a\\", {\\"b\\": \\"c\\", \\"d\\": [\\"e\\", null]}]')
         ]
 
         for tup in expected_values:

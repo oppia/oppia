@@ -133,7 +133,8 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Creates a third-party directory where all the JS and CSS dependencies are
 built and stored. Depending on the options passed to the script, might also
 minify third-party libraries and/or generate a build directory.
@@ -648,8 +649,9 @@ def hash_should_be_inserted(filepath):
     Returns:
         bool. True if filepath should contain hash else False.
     """
-    return not any(fnmatch.fnmatch(filepath, pattern) for pattern
-                   in FILEPATHS_NOT_TO_RENAME)
+    return not any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_NOT_TO_RENAME)
 
 
 def should_file_be_built(filepath):
@@ -715,7 +717,8 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                 # see the comment above HASHES_JSON_FILENAME for details.
                 relative_path = common.convert_to_posixpath(
                     os.path.relpath(source_path, source))
-                if (hash_should_be_inserted(source + relative_path) and
+                if (
+                        hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
                     relative_path = (
                         _insert_hash(relative_path, file_hashes[relative_path]))
@@ -738,8 +741,9 @@ def is_file_hash_provided_to_frontend(filepath):
     Returns:
         bool. True if file hash should be provided to the frontend else False.
     """
-    return any(fnmatch.fnmatch(filepath, pattern) for pattern
-               in FILEPATHS_PROVIDED_TO_FRONTEND)
+    return any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_PROVIDED_TO_FRONTEND)
 
 
 def generate_md5_hash(filepath):
@@ -874,8 +878,9 @@ def minify_func(source_path, target_path, filename):
             with python_utils.open_file(
                 target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file)
-    elif ((filename.endswith('.css') or filename.endswith('.js')) and
-          not skip_minify):
+    elif (
+            (filename.endswith('.css') or filename.endswith('.js')) and
+            not skip_minify):
         python_utils.PRINT('Minifying %s' % source_path)
         _minify(source_path, target_path)
     else:

@@ -196,7 +196,8 @@ def _validate_validator(obj_type, validator):
 
     customization_keys = list(validator.keys())
     customization_keys.remove('id')
-    assert (set(customization_keys) ==
+    assert (
+            set(customization_keys) ==
             set(reference_dict[validator['id']].keys())), (
                 'Missing keys: %s, Extra keys: %s' % (
                     list(

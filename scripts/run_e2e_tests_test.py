@@ -680,10 +680,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver)
 
         expected_commands = [
-            (['update', '--versions.chrome',
-              CHROME_DRIVER_VERSION],),
-            (['start', '--versions.chrome',
-              CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
+            ([
+                'update', '--versions.chrome',
+                CHROME_DRIVER_VERSION],),
+            ([
+                'start', '--versions.chrome',
+                CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
         ]
 
         run_swap = self.swap_with_checks(

@@ -25,6 +25,7 @@ import linecache
 import os
 import re
 import sys
+import tokenize
 
 import python_utils
 from .. import docstrings_checker
@@ -171,7 +172,7 @@ class HangingIndentChecker(checkers.BaseChecker):
     of hanging indentation.
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.ITokenChecker
 
     name = 'hanging-indent'
     priority = -1
@@ -187,47 +188,65 @@ class HangingIndentChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node):
-        """Process a module.
+    def process_tokens(self, tokens):
+        """Process tokens to check if there is a line break after the bracket.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            tokens: astroid.Tokens. Object to process tokens.
         """
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        exclude = False
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].lstrip().rstrip()
-            # The source files are read as bytes, hence the b' prefix.
-            if line.startswith(b'"""') and not line.endswith(b'"""'):
-                exclude = True
-            if line.endswith(b'"""'):
-                exclude = False
-            if line.startswith(b'#') or exclude:
-                continue
-            line_length = len(line)
-            bracket_count = 0
-            for char_num in python_utils.RANGE(line_length):
-                char = line[char_num]
-                if char == b'(':
-                    if bracket_count == 0:
-                        position = char_num
-                    bracket_count += 1
-                elif char == b')' and bracket_count > 0:
-                    bracket_count -= 1
-            if bracket_count > 0 and position + 1 < line_length:
-                content = line[position + 1:]
-                if not len(content) or not b',' in content:
-                    continue
-                split_list = content.split(b', ')
-                if len(split_list) == 1 and not any(
-                        char.isalpha() for char in split_list[0]):
-                    continue
-                separators = set('@^! #%$&)(+*-=')
-                if not any(char in separators for item in split_list
-                           for char in item):
+        escape_character_indicator = b'\\'
+        string_indicator = b'\''
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            # Check if token type is an operator and is either a
+            # left parenthesis '(' or a right parenthesis ')'.
+            if token_type == tokenize.OP and (
+                    token == b'(' or token == b')'):
+                line = line.strip()
+                bracket_count = 0
+                line_length = len(line)
+                escape_character_found = False
+                in_string = False
+                for char_num in python_utils.RANGE(line_length):
+                    char = line[char_num]
+                    # Check if we are inside a string and if escape
+                    # character found ('\') do not process that character and
+                    # the character follows because next character might be
+                    # an escaped single quote \' and it thinks that the string
+                    # ended but that will not be the case.
+                    if in_string and (
+                            char == escape_character_indicator or
+                            escape_character_found):
+                        escape_character_found = not escape_character_found
+                        continue
+
+                    # Check if we found the string indicator and flip the
+                    # in_string boolean.
+                    if char == string_indicator:
+                        in_string = not in_string
+
+                    # Ignore anything inside a string.
+                    if in_string:
+                        continue
+
+                    if char == b'(':
+                        if bracket_count == 0:
+                            position = char_num
+                        bracket_count += 1
+                    elif char == b')' and bracket_count > 0:
+                        bracket_count -= 1
+
+                if bracket_count > 0 and position + 1 < line_length:
+                    # Allow the use of '[', ']', '{', '}' after the parenthesis.
+                    separators = set('[{( ')
+                    if line[line_length - 1] in separators:
+                        continue
+                    content = line[position + 1:]
+                    # Skip check if there is nothing after the bracket.
+                    split_content = content.split()
+                    if split_content[0] == '#':
+                        continue
                     self.add_message(
-                        'no-break-after-hanging-indent', line=line_num + 1)
+                        'no-break-after-hanging-indent', line=line_num)
 
 
 # The following class was derived from
@@ -254,104 +273,121 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     name = 'parameter_documentation'
     msgs = {
-        'W9005': ('"%s" has constructor parameters '
-                  'documented in class and __init__',
-                  'multiple-constructor-doc',
-                  'Please remove parameter declarations '
-                  'in the class or constructor.'),
-        'W9006': ('"%s" not documented as being raised',
-                  'missing-raises-doc',
-                  'Please document exceptions for '
-                  'all raised exception types.'),
-        'W9008': ('Redundant returns documentation',
-                  'redundant-returns-doc',
-                  'Please remove the return/rtype '
-                  'documentation from this method.'),
-        'W9010': ('Redundant yields documentation',
-                  'redundant-yields-doc',
-                  'Please remove the yields documentation from this method.'),
-        'W9011': ('Missing return documentation',
-                  'missing-return-doc',
-                  'Please add documentation about what this method returns.',
-                  {'old_names': [('W9007', 'missing-returns-doc')]}),
-        'W9012': ('Missing return type documentation',
-                  'missing-return-type-doc',
-                  'Please document the type returned by this method.',
-                  # We can't use the same old_name for two different warnings
-                  # {'old_names': [('W9007', 'missing-returns-doc')]}.
-                 ),
-        'W9013': ('Missing yield documentation',
-                  'missing-yield-doc',
-                  'Please add documentation about what this generator yields.',
-                  {'old_names': [('W9009', 'missing-yields-doc')]}),
-        'W9014': ('Missing yield type documentation',
-                  'missing-yield-type-doc',
-                  'Please document the type yielded by this method.',
-                  # We can't use the same old_name for two different warnings
-                  # {'old_names': [('W9009', 'missing-yields-doc')]}.
-                 ),
-        'W9015': ('"%s" missing in parameter documentation',
-                  'missing-param-doc',
-                  'Please add parameter declarations for all parameters.',
-                  {'old_names': [('W9003', 'missing-param-doc')]}),
-        'W9016': ('"%s" missing in parameter type documentation',
-                  'missing-type-doc',
-                  'Please add parameter type declarations for all parameters.',
-                  {'old_names': [('W9004', 'missing-type-doc')]}),
-        'W9017': ('"%s" differing in parameter documentation',
-                  'differing-param-doc',
-                  'Please check parameter names in declarations.',
-                 ),
-        'W9018': ('"%s" differing in parameter type documentation',
-                  'differing-type-doc',
-                  'Please check parameter names in type declarations.',
-                 ),
+        'W9005': (
+            '"%s" has constructor parameters '
+            'documented in class and __init__',
+            'multiple-constructor-doc',
+            'Please remove parameter declarations '
+            'in the class or constructor.'),
+        'W9006': (
+            '"%s" not documented as being raised',
+            'missing-raises-doc',
+            'Please document exceptions for '
+            'all raised exception types.'),
+        'W9008': (
+            'Redundant returns documentation',
+            'redundant-returns-doc',
+            'Please remove the return/rtype '
+            'documentation from this method.'),
+        'W9010': (
+            'Redundant yields documentation',
+            'redundant-yields-doc',
+            'Please remove the yields documentation from this method.'),
+        'W9011': (
+            'Missing return documentation',
+            'missing-return-doc',
+            'Please add documentation about what this method returns.',
+            {'old_names': [('W9007', 'missing-returns-doc')]}),
+        'W9012': (
+            'Missing return type documentation',
+            'missing-return-type-doc',
+            'Please document the type returned by this method.',
+            # We can't use the same old_name for two different warnings
+            # {'old_names': [('W9007', 'missing-returns-doc')]}.
+        ),
+        'W9013': (
+            'Missing yield documentation',
+            'missing-yield-doc',
+            'Please add documentation about what this generator yields.',
+            {'old_names': [('W9009', 'missing-yields-doc')]}),
+        'W9014': (
+            'Missing yield type documentation',
+            'missing-yield-type-doc',
+            'Please document the type yielded by this method.',
+            # We can't use the same old_name for two different warnings
+            # {'old_names': [('W9009', 'missing-yields-doc')]}.
+        ),
+        'W9015': (
+            '"%s" missing in parameter documentation',
+            'missing-param-doc',
+            'Please add parameter declarations for all parameters.',
+            {'old_names': [('W9003', 'missing-param-doc')]}),
+        'W9016': (
+            '"%s" missing in parameter type documentation',
+            'missing-type-doc',
+            'Please add parameter type declarations for all parameters.',
+            {'old_names': [('W9004', 'missing-type-doc')]}),
+        'W9017': (
+            '"%s" differing in parameter documentation',
+            'differing-param-doc',
+            'Please check parameter names in declarations.',
+        ),
+        'W9018': (
+            '"%s" differing in parameter type documentation',
+            'differing-type-doc',
+            'Please check parameter names in type declarations.',
+        ),
         'W9019': (
-            ('Line starting with "%s" requires 4 space indentation relative to'
-             + ' args line indentation'),
+            'Line starting with "%s" requires 4 space indentation relative to'
+            ' args line indentation',
             '4-space-indentation-for-arg-parameters-doc',
-            ('Please use 4 space indentation in parameter definitions relative'
-             + ' to the args line indentation.')
+            'Please use 4 space indentation in parameter definitions relative'
+            ' to the args line indentation.'
         ),
         'W9020': (
-            ('Line starting with "%s" requires 8 space indentation relative to'
-             + ' args line indentation'),
+            'Line starting with "%s" requires 8 space indentation relative to'
+            ' args line indentation',
             '8-space-indentation-for-arg-in-descriptions-doc',
-            ('Please indent wrap-around descriptions by 8 relative to the args'
-             + ' line indentation.')
+            'Please indent wrap-around descriptions by 8 relative to the args'
+            ' line indentation.'
         ),
         'W9021': (
-            ('Args: indentation is incorrect, must be at the outermost'
-             + ' indentation level.'),
+            'Args: indentation is incorrect, must be at the outermost'
+            ' indentation level.',
             'incorrect-indentation-for-arg-header-doc',
             'Please indent args line to the outermost indentation level.'
         )
     }
 
-    options = (('accept-no-param-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing parameter '
-                         'documentation in the docstring of a '
-                         'function that has parameters.'
-                }),
-               ('accept-no-raise-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing raises '
-                         'documentation in the docstring of a function that '
-                         'raises an exception.'
-                }),
-               ('accept-no-return-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing return '
-                         'documentation in the docstring of a function that '
-                         'returns a statement.'
-                }),
-               ('accept-no-yields-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing yields '
-                         'documentation in the docstring of a generator.'
-                }),
-              )
+    options = (
+        (
+            'accept-no-param-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing parameter '
+                     'documentation in the docstring of a '
+                     'function that has parameters.'
+            }),
+        (
+            'accept-no-raise-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing raises '
+                     'documentation in the docstring of a function that '
+                     'raises an exception.'
+            }),
+        (
+            'accept-no-return-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing return '
+                     'documentation in the docstring of a function that '
+                     'returns a statement.'
+            }),
+        (
+            'accept-no-yields-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing yields '
+                     'documentation in the docstring of a generator.'
+            }),
+        )
 
     priority = -2
 
@@ -460,12 +496,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 # parameter is in the function arguments set. We also check for
                 # arguments that start with * which means it's autofill and will
                 # not appear in the node args list so we handle those too.
-                elif (currently_in_args_section and parameter
-                      and ((parameter.group(0).strip('*')
+                elif (
+                        currently_in_args_section and parameter
+                        and ((
+                            parameter.group(0).strip('*')
                             in expected_argument_names) or
-                           re.search(
-                               br'\*[^ ]+: ',
-                               line_with_no_leading_whitespaces))):
+                             re.search(
+                                 br'\*[^ ]+: ',
+                                 line_with_no_leading_whitespaces))):
                     words_in_line = line_with_no_leading_whitespaces.split(' ')
                     currently_in_freeform_section = False
                     # Check if the current parameter section indentation is
@@ -491,7 +529,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 elif currently_in_args_section:
                     # If it is not a freeform section, we check the indentation.
                     words_in_line = line_with_no_leading_whitespaces.split(' ')
-                    if (not currently_in_freeform_section
+                    if (
+                            not currently_in_freeform_section
                             and current_line_indentation != (
                                 args_indentation + 8)):
                         # Use the first word in the line to identify the error.
@@ -543,7 +582,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not node_doc.supports_yields:
             return
 
-        if ((node_doc.has_yields() or node_doc.has_yields_type()) and
+        if ((
+                node_doc.has_yields() or node_doc.has_yields_type()) and
                 not node.is_generator()):
             self.add_message(
                 'redundant-yields-doc',
@@ -602,14 +642,16 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
         is_property = checker_utils.decorated_with_property(func_node)
 
-        if not (doc.has_returns() or
+        if not (
+                doc.has_returns() or
                 (doc.has_property_returns() and is_property)):
             self.add_message(
                 'missing-return-doc',
                 node=func_node
             )
 
-        if not (doc.has_rtype() or
+        if not (
+                doc.has_rtype() or
                 (doc.has_property_type() and is_property)):
             self.add_message(
                 'missing-return-type-doc',
@@ -711,7 +753,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
         params_with_doc, params_with_type = doc.match_param_docs()
 
         # Tolerate no parameter documentation at all.
-        if (not params_with_doc and not params_with_type
+        if (
+                not params_with_doc and not params_with_type
                 and accept_no_param_doc):
             tolerate_missing_params = True
 
@@ -759,15 +802,18 @@ class DocstringParameterChecker(checkers.BaseChecker):
                         sorted(differing_argument_names)),),
                     node=warning_node)
 
-        _compare_missing_args(params_with_doc, 'missing-param-doc',
-                              self.not_needed_param_in_docstring)
-        _compare_missing_args(params_with_type, 'missing-type-doc',
-                              not_needed_type_in_docstring)
+        _compare_missing_args(
+            params_with_doc, 'missing-param-doc',
+            self.not_needed_param_in_docstring)
+        _compare_missing_args(
+            params_with_type, 'missing-type-doc', not_needed_type_in_docstring)
 
-        _compare_different_args(params_with_doc, 'differing-param-doc',
-                                self.not_needed_param_in_docstring)
-        _compare_different_args(params_with_type, 'differing-type-doc',
-                                not_needed_type_in_docstring)
+        _compare_different_args(
+            params_with_doc, 'differing-param-doc',
+            self.not_needed_param_in_docstring)
+        _compare_different_args(
+            params_with_type, 'differing-type-doc',
+            not_needed_type_in_docstring)
 
     def check_single_constructor_params(self, class_doc, init_doc, class_node):
         """Checks whether a class and corresponding  init() method are
@@ -1092,7 +1138,8 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
             # Allows alphabet characters and underscore for cases where 'yield'
             # is used at the start of a variable name.
             source_line = line.lstrip()
-            if (source_line.startswith(b'yield') and
+            if (
+                    source_line.startswith(b'yield') and
                     not re.search(br'^(yield)( \S|$|\w)', source_line)):
                 self.add_message('single-space-after-yield', line=line_num + 1)
 
@@ -1202,7 +1249,8 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
                 prev_line = file_content[line_num - 1].strip()
 
             # Check if it is a docstring and not some multi-line string.
-            if (prev_line.startswith(b'class ') or
+            if (
+                    prev_line.startswith(b'class ') or
                     prev_line.startswith(b'def ') or in_class_or_function):
                 in_class_or_function = True
                 if prev_line.endswith(b'):') and line.startswith(b'"""'):
@@ -1290,7 +1338,8 @@ class DivisionOperatorChecker(checkers.BaseChecker):
             if line.count(string_indicator) >= 2:
                 continue
 
-            if (re.search(br'[^/]/[^/]', line) and
+            if (
+                    re.search(br'[^/]/[^/]', line) and
                     not line.endswith(multi_line_indicator)):
                 self.add_message(
                     'division-operator-used', line=line_num + 1)
@@ -1453,21 +1502,21 @@ class DocstringChecker(checkers.BaseChecker):
         'W0026': (
             '4 space indentation in docstring.',
             '4-space-indentation-in-docstring',
-            ('Please use 4 space indentation for parameters relative to section'
-             + ' headers.')
+            'Please use 4 space indentation for parameters relative to section'
+            ' headers.'
         ),
         'W0027': (
             '8 space indentation in docstring.',
             '8-space-indentation-in-docstring',
-            ('Please use 8 space indentation in wrap around messages' +
-             ' relative to section headers.')
+            'Please use 8 space indentation in wrap around messages' +
+            ' relative to section headers.'
         ),
         'W0028': (
             'malformed parameter',
             'malformed-parameter',
-            ('The parameter is incorrectly formatted: \nFor returns and yields,'
-             + ' headers should have this format: "type (elaboration). \n'
-             + 'For raises, headers should have the format: "exception: ')
+            'The parameter is incorrectly formatted: \nFor returns and yields,'
+            ' headers should have this format: "type (elaboration). \n'
+            'For raises, headers should have the format: "exception: '
         )
     }
 
@@ -1512,7 +1561,8 @@ class DocstringChecker(checkers.BaseChecker):
                 prev_line = file_content[line_num - 1].strip()
 
             # Check if it is a docstring and not some multi-line string.
-            if (prev_line.startswith(b'class ') or
+            if (
+                    prev_line.startswith(b'class ') or
                     prev_line.startswith(b'def ')) or (in_class_or_function):
                 in_class_or_function = True
                 if prev_line.endswith(b'):') and line.startswith(b'"""'):
@@ -1605,14 +1655,16 @@ class DocstringChecker(checkers.BaseChecker):
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
                 # Check if we are in a docstring raises section.
-                elif (current_docstring_section and
-                      (current_docstring_section ==
-                       self.DOCSTRING_SECTION_RAISES)):
+                elif (
+                        current_docstring_section and
+                        (
+                            current_docstring_section ==
+                            self.DOCSTRING_SECTION_RAISES)):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
-                    if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
-                                 line):
+                    if re.search(
+                            br'^[a-zA-Z0-9_\.\*]+: ', line):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
                             self.add_message(
@@ -1639,15 +1691,20 @@ class DocstringChecker(checkers.BaseChecker):
                 # NOTE: Each function should only have one yield or return
                 # object. If a tuple is returned, wrap both in a tuple parameter
                 # section.
-                elif (current_docstring_section and
-                      (current_docstring_section ==
-                       self.DOCSTRING_SECTION_RETURNS)
-                      or (current_docstring_section ==
-                          self.DOCSTRING_SECTION_YIELDS)):
+                elif (
+                        current_docstring_section and
+                        (
+                            current_docstring_section ==
+                            self.DOCSTRING_SECTION_RETURNS)
+                        or (
+                            current_docstring_section ==
+                            self.DOCSTRING_SECTION_YIELDS)):
                     # Check for the start of a new parameter definition in the
                     # format "type (elaboration)." and check the indentation.
-                    if (re.search(br'^[a-zA-Z_() -:,\*]+\.',
-                                  line) and not in_description):
+                    if (
+                            re.search(
+                                br'^[a-zA-Z_() -:,\*]+\.',
+                                line) and not in_description):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
                             self.add_message(

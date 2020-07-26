@@ -589,11 +589,13 @@ def wait_for_port_to_be_open(port_number):
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (not is_port_open(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+    while (
+            not is_port_open(port_number)
+            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
-    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+    if (
+            waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_open(port_number)):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' %

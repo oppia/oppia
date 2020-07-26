@@ -71,7 +71,8 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Installation script for Oppia third-party libraries.
 """)
 
@@ -257,7 +258,8 @@ def test_manifest_syntax(dependency_type, dependency_dict):
         dependency_url = dependency_url.rpartition('#')[0]
     is_zip_file_format = dependency_type == _DOWNLOAD_FORMAT_ZIP
     is_tar_file_format = dependency_type == _DOWNLOAD_FORMAT_TAR
-    if (dependency_url.endswith('.zip') and not is_zip_file_format or
+    if (
+            dependency_url.endswith('.zip') and not is_zip_file_format or
             is_zip_file_format and not dependency_url.endswith('.zip') or
             dependency_url.endswith('.tar.gz') and not is_tar_file_format or
             is_tar_file_format and not dependency_url.endswith('.tar.gz')):
