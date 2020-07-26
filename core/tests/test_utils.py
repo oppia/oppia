@@ -2276,6 +2276,30 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.dest = None
         return state
 
+
+GenericTestBase = AppEngineTestBase
+
+
+class LinterTestBase(GenericTestBase):
+    """Base class for linter tests."""
+
+    def setUp(self):
+        super(LinterTestBase, self).setUp()
+        self.linter_stdout = []
+
+        def mock_print(*args):
+            """Mock for python_utils.PRINT. Append the values to print to
+            linter_stdout list.
+
+            Args:
+                *args: str. Variable length argument list of values to print in
+                    the same line of output.
+            """
+            self.linter_stdout.append(
+                ' '.join(python_utils.UNICODE(arg) for arg in args))
+
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+
     def assert_same_list_elements(self, phrases, stdout):
         """Checks to see if all of the phrases appear in at least one of the
         stdout outputs.
@@ -2294,8 +2318,17 @@ class AppEngineTestBase(TestBase):
             any(all(phrase in output for phrase in phrases) for
                 output in stdout))
 
+    def assert_failed_messages_count(self, stdout, expected_failed_count):
+        """Assert number of expected failed checks to actual number of failed
+        checks.
 
-GenericTestBase = AppEngineTestBase
+        Args:
+            stdout: list(str). A list of linter output messages.
+
+            expected_failed_count: int. Expected number of failed messages.
+        """
+        failed_count = sum(msg.startswith('FAILED') for msg in stdout)
+        self.assertEqual(failed_count, expected_failed_count)
 
 
 class EmailMessageMock(python_utils.OBJECT):
