@@ -35,6 +35,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { ProfilePageNavbarComponent } from
+  'pages/profile-page/profile-page-navbar.component';
 
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
@@ -49,10 +51,12 @@ import { ObjectsDomainConstants } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    ProfilePageNavbarComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    ProfilePageNavbarComponent
   ],
   providers: [
     AppConstants,
