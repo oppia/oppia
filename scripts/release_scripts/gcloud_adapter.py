@@ -53,7 +53,7 @@ def update_indexes(index_yaml_path, app_name):
         index_yaml_path: str. The path to the index.yaml file.
         app_name: str. The name of the GCloud project.
     """
-    assert os.path.isfile(index_yaml_path)
+    assert os.path.isfile(index_yaml_path), 'Missing indexes file.'
     subprocess.check_output([
         GCLOUD_PATH, '--quiet', 'datastore', 'indexes', 'create',
         index_yaml_path, '--project=%s' % app_name])

@@ -23,16 +23,16 @@ import { Injectable } from '@angular/core';
 import { ExplorationFeatures } from
   'services/exploration-features-backend-api.service';
 
-export interface IExplorationDataDict {
-  'param_changes': IParamChanges[] | [];
+export interface ExplorationDataDict {
+  'param_changes': ParamChanges[] | [];
   states: {
     [propsName : string]: {
-      'param_changes': IParamChanges[] | []
+      'param_changes': ParamChanges[] | []
     }
   };
 }
 
-export interface IParamChanges {
+export interface ParamChanges {
   name: string;
   'generator_id': string;
   'customization_args': {
@@ -52,7 +52,7 @@ export class ExplorationFeaturesService {
   };
 
   init(
-      explorationData: IExplorationDataDict,
+      explorationData: ExplorationDataDict,
       featuresData: ExplorationFeatures): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;

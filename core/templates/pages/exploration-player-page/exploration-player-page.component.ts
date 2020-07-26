@@ -17,6 +17,7 @@
  */
 import 'mousetrap';
 
+require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +

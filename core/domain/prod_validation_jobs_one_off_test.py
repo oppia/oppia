@@ -172,14 +172,12 @@ def update_datastore_types_for_mock_datetime():
     of ndb datetime properties does not fail.
     """
 
-    # pylint: disable=protected-access
-    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime13Hours] = (
+    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime13Hours] = (  # pylint: disable=protected-access
         datastore_types.ValidatePropertyNothing)
-    datastore_types._PACK_PROPERTY_VALUES[MockDatetime13Hours] = (
+    datastore_types._PACK_PROPERTY_VALUES[MockDatetime13Hours] = (  # pylint: disable=protected-access
         datastore_types.PackDatetime)
-    datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (
+    datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (  # pylint: disable=protected-access
         datastore_types.entity_pb.Property.GD_WHEN)
-    # pylint: enable=protected-access
 
 
 class MockModel(base_models.BaseModel):
@@ -249,11 +247,17 @@ class BaseValidatorTests(test_utils.GenericTestBase):
         self.item.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_external_id_relationships\(\) method is missing from the'
+            ' derived class. It should be implemented in the derived class.'):
             MockBaseModelValidator().validate(self.item)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_external_model_properties\(\) method is missing from the'
+            ' derived class. It should be implemented in the derived class.'):
             MockSummaryModelValidator().validate(self.item)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
@@ -262,17 +266,23 @@ class BaseValidatorTests(test_utils.GenericTestBase):
             MockSnapshotContentModelValidator().validate(self.item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_change_domain_class\(\) method is missing from the '
+            'derived class. It should be implemented in the derived class.'):
             snapshot_model = MockSnapshotModel(id='mockmodel')
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
     def test_error_is_raised_if_entity_classes_to_map_over_is_undefined(self):
         job_class = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        with self.assertRaises(NotImplementedError), self.swap(
-            jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
-            job_id = job_class.create_new()
-            job_class.enqueue(job_id)
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The entity_classes_to_map_over\(\) method is missing from the '
+            'derived class. It should be implemented in the derived class.'):
+            with self.swap(jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
+                job_id = job_class.create_new()
+                job_class.enqueue(job_id)
 
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')

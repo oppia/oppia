@@ -23,15 +23,15 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
-  ISubtopicPageContentsBackendDict,
+  SubtopicPageContentsBackendDict,
   SubtopicPageContents,
   SubtopicPageContentsObjectFactory
 } from 'domain/topic/SubtopicPageContentsObjectFactory';
 
-interface ISubtopicPageBackendDict {
+interface SubtopicPageBackendDict {
   'id': string;
   'topic_id': string;
-  'page_contents': ISubtopicPageContentsBackendDict;
+  'page_contents': SubtopicPageContentsBackendDict;
   'language_code': string;
 }
 
@@ -88,7 +88,7 @@ export class SubtopicPageObjectFactory {
       SubtopicPageContentsObjectFactory) {}
 
   createFromBackendDict(
-      subtopicPageBackendDict: ISubtopicPageBackendDict): SubtopicPage {
+      subtopicPageBackendDict: SubtopicPageBackendDict): SubtopicPage {
     return new SubtopicPage(
       subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(

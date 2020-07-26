@@ -32,6 +32,7 @@ from . import pylint_extensions
 import astroid  # isort:skip
 from pylint import testutils  # isort:skip
 from pylint import lint  # isort:skip
+from pylint import utils  # isort:skip
 
 
 class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
@@ -1036,8 +1037,9 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_well_formed_one_line_yield_file.file = filename
         node_well_formed_one_line_yield_file.path = filename
+        node_well_formed_one_line_yield_file.fromlineno = 3
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_well_formed_one_line_yield_file)
 
         with self.checker_test_object.assertNoMessages():
@@ -1058,8 +1060,9 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_well_formed_mult_lines_file.file = filename
         node_well_formed_mult_lines_file.path = filename
+        node_well_formed_mult_lines_file.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_well_formed_mult_lines_file)
 
         with self.checker_test_object.assertNoMessages():
@@ -1079,8 +1082,9 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         yield_nothing_file.file = filename
         yield_nothing_file.path = filename
+        yield_nothing_file.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             yield_nothing_file)
 
         # No errors on yield statements that do nothing.
@@ -1116,7 +1120,7 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
         yield_in_multiline_file.file = filename
         yield_in_multiline_file.path = filename
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             yield_in_multiline_file)
 
         # No errors on yield statements in multi-line comments.
@@ -1137,16 +1141,16 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_too_many_spaces_after_yield_file.file = filename
         node_too_many_spaces_after_yield_file.path = filename
+        node_too_many_spaces_after_yield_file.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_too_many_spaces_after_yield_file)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-after-yield',
-                line=2
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='single-space-after-yield',
+            node=node_too_many_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
     def test_no_space_after_yield_statement(self):
@@ -1163,16 +1167,16 @@ class SingleSpaceAfterYieldTests(unittest.TestCase):
                 """)
         node_no_spaces_after_yield_file.file = filename
         node_no_spaces_after_yield_file.path = filename
+        node_no_spaces_after_yield_file.fromlineno = 2
 
-        self.checker_test_object.checker.process_module(
+        self.checker_test_object.checker.visit_yield(
             node_no_spaces_after_yield_file)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-after-yield',
-                line=2
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='single-space-after-yield',
+            node=node_no_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
 
@@ -1611,138 +1615,33 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
             pylint_extensions.DivisionOperatorChecker)
         self.checker_test_object.setup_method()
 
-    def test_division_operator(self):
-        node_division_operator = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+    def test_division_operator_with_spaces(self):
+        node_division_operator_with_spaces = astroid.extract_node(
+            u"""
+            a / b #@
+            """)
 
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""division = a / b
-                    division=a/b
-                """)
-        node_division_operator.file = filename
-        node_division_operator.path = filename
+        message = testutils.Message(
+            msg_id='division-operator-used',
+            node=node_division_operator_with_spaces)
 
-        self.checker_test_object.checker.process_module(node_division_operator)
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_binop(
+                node_division_operator_with_spaces)
 
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='division-operator-used',
-                line=1
-            ),
-            testutils.Message(
-                msg_id='division-operator-used',
-                line=2
-            ),
-        ):
-            temp_file.close()
+    def test_division_operator_without_spaces(self):
+        node_division_operator_without_spaces = astroid.extract_node(
+            u"""
+            a/b #@
+            """)
 
-    def test_division_operator_inside_single_line_comment(self):
-        node_single_line_comment = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
+        message = testutils.Message(
+            msg_id='division-operator-used',
+            node=node_division_operator_without_spaces)
 
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""# Division = a / b.
-                    division = python_utils.divide(a, b)
-                """)
-        node_single_line_comment.file = filename
-        node_single_line_comment.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_single_line_comment)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_division_operator_inside_string(self):
-        node_division_inside_string = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""string = 'a / b or a/b' + 'a/b'
-                    division = python_utils.divide(a, b)
-                """)
-        node_division_inside_string.file = filename
-        node_division_inside_string.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_division_inside_string)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_division_operator_inside_multiline_docstring(self):
-        node_division_inside_multiline_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    \"\"\"This is inside a multiline docstring
-                    in scripts/linter/pre_commit_linter.\"\"\"
-                """)
-        node_division_inside_multiline_docstring.file = filename
-        node_division_inside_multiline_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_division_inside_multiline_docstring)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_division_operator_inside_single_line_docstring(self):
-        node_division_inside_singleline_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    \"\"\"scripts/linters/pre_commit_linter.py\"\"\"
-                """)
-        node_division_inside_singleline_docstring.file = filename
-        node_division_inside_singleline_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_division_inside_singleline_docstring)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_divide_method_used(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""division = python_utils.divide(a, b)""")
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_binop(
+                node_division_operator_without_spaces)
 
 
 class SingleLineCommentCheckerTests(unittest.TestCase):
@@ -1836,7 +1735,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""# coding: utf-8
-                    # pylint: disable
+                # pylint: disable
                 """)
         node_comment_with_excluded_phrase.file = filename
         node_comment_with_excluded_phrase.path = filename
@@ -2843,4 +2742,130 @@ class NewlineBelowClassDocstringTests(unittest.TestCase):
             node=node_newline_before_docstring_with_incorrect_style)
 
         with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+
+class SingleLinePragmaCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(SingleLinePragmaCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleLinePragmaChecker)
+        self.checker_test_object.setup_method()
+
+    def test_pragma_for_multiline(self):
+        node_pragma_for_multiline = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    # pylint: disable=invalid-name
+                    def funcName():
+                        \"\"\" # pylint: disable=test-purpose\"\"\"
+                        pass
+                    # pylint: enable=invalid-name
+                """)
+        node_pragma_for_multiline.file = filename
+        node_pragma_for_multiline.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_pragma_for_multiline))
+
+        message1 = testutils.Message(
+            msg_id='single-line-pragma',
+            line=2)
+
+        message2 = testutils.Message(
+            msg_id='single-line-pragma',
+            line=6)
+
+        with self.checker_test_object.assertAddsMessages(
+            message1, message2):
+            temp_file.close()
+
+    def test_enable_single_line_pragma_for_multiline(self):
+        node_enable_single_line_pragma_for_multiline = (
+            astroid.scoped_nodes.Module(name='test', doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    # pylint: disable=single-line-pragma
+                    def func():
+                        \"\"\"
+                        # pylint: disable=testing-purpose
+                        \"\"\"
+                        pass
+                    # pylint: enable=single-line-pragma
+                """)
+        node_enable_single_line_pragma_for_multiline.file = filename
+        node_enable_single_line_pragma_for_multiline.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_enable_single_line_pragma_for_multiline))
+
+        message = testutils.Message(
+            msg_id='single-line-pragma',
+            line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_enable_single_line_pragma_with_invalid_name(self):
+        node_enable_single_line_pragma_with_invalid_name = (
+            astroid.scoped_nodes.Module(name='test', doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    # pylint: disable=invalid-name, single-line-pragma
+                    def funcName():
+                        \"\"\"
+                        # pylint: disable=testing-purpose
+                        \"\"\"
+                        pass
+                    # pylint: enable=invalid_name, single-line-pragma
+                """)
+        node_enable_single_line_pragma_with_invalid_name.file = filename
+        node_enable_single_line_pragma_with_invalid_name.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(
+                node_enable_single_line_pragma_with_invalid_name))
+
+        message = testutils.Message(
+            msg_id='single-line-pragma',
+            line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_single_line_pylint_pragma(self):
+        node_with_no_error_message = (
+            astroid.scoped_nodes.Module(name='test', doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    def funcName():  # pylint: disable=single-line-pragma
+                        pass
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
+
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
