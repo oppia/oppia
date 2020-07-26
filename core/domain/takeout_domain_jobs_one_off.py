@@ -45,6 +45,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
     def entity_classes_to_map_over(cls):
         return [
             config_models.ConfigPropertySnapshotMetadataModel,
+            config_models.PlatformParameterSnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionSnapshotMetadataModel,
             exploration_models.ExplorationRightsSnapshotMetadataModel,
