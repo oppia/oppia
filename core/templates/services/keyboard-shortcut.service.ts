@@ -65,8 +65,8 @@ export class KeyboardShortcutService {
     });
   }
 
-  setHref(Href) {
-    window.location.href = Href;
+  setHref(href) {
+    window.location.href = href;
   }
 
   bindNavigationShortcuts() {

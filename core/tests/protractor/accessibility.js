@@ -72,6 +72,12 @@ describe('screenreader and keyboard user accessibility features', function() {
     expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
   };
 
+  beforeAll(async function() {
+    // Should create a user and login.
+    await users.createUser('user11@accessibility.com', 'user11accessibility');
+    await users.login('user11@accessibility.com', true);
+  });
+
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
@@ -88,21 +94,48 @@ describe('screenreader and keyboard user accessibility features', function() {
         .getAttribute('id'));
   });
 
-  it('should test navigation shortcuts for static webpages',
+  it('should test navigation shortcuts for the community-library page',
     async function() {
-      // Should create a user and login.
-      await users.createUser('user11@accessibility.com', 'user11accessibility');
-      await users.login('user11@accessibility.com', true);
-
-      // Should test navigation shortcuts.
       await testNavigationShortcuts('community-library');
+    });
+
+  it('should test navigation shortcuts for the creator-dashboard page',
+    async function() {
       await testNavigationShortcuts('creator-dashboard');
+    });
+
+  it('should test navigation shortcuts for the get-started page',
+    async function() {
       await testNavigationShortcuts('get-started');
+    });
+
+  it('should test navigation shortcuts for the about page',
+    async function() {
       await testNavigationShortcuts('about');
+    });
+
+  it('should test navigation shortcuts for the privacy-policy page',
+    async function() {
       await testNavigationShortcuts('privacy-policy');
+    });
+
+  it('should test navigation shortcuts for the donate page',
+    async function() {
       await testNavigationShortcuts('donate');
+    });
+
+  it('should test navigation shortcuts for the donate preferences page',
+    async function() {
       await testNavigationShortcuts('preferences');
-      await testNavigationShortcuts('learner-dashboard');
+    });
+
+  it('should test navigation shortcuts for the donate learner-dashboard page',
+  async function() {
+    await testNavigationShortcuts('learner-dashboard');
+  });
+
+  it('should test navigation shortcuts for the notifications page',
+    async function() {
       await testNavigationShortcuts('notifications');
     });
 
