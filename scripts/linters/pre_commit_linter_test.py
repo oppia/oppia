@@ -24,7 +24,6 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-import python_utils
 
 from . import codeowner_linter
 from . import pre_commit_linter
@@ -83,36 +82,15 @@ def all_checks_passed(linter_stdout):
     return 'All Checks Passed.' in linter_stdout
 
 
-class LintTests(test_utils.GenericTestBase):
-    """General class for all linter function tests."""
-
-    def setUp(self):
-        super(LintTests, self).setUp()
-        self.linter_stdout = []
-
-        def mock_print(*args):
-            """Mock for python_utils.PRINT. Append the values to print to
-            linter_stdout list.
-
-            Args:
-                *args: str. Variable length argument list of values to print in
-                    the same line of output.
-            """
-            self.linter_stdout.append(
-                ' '.join(python_utils.UNICODE(arg) for arg in args))
-
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        self.sys_swap = self.swap(sys, 'exit', mock_exit)
-        self.install_swap = self.swap_with_checks(
-            install_third_party_libs, 'main',
-            mock_install_third_party_libs_main)
-
-
-class PreCommitLinterTests(LintTests):
+class PreCommitLinterTests(test_utils.LinterTestBase):
     """Tests for methods in pre_commit_linter module."""
 
     def setUp(self):
         super(PreCommitLinterTests, self).setUp()
+        self.sys_swap = self.swap(sys, 'exit', mock_exit)
+        self.install_swap = self.swap_with_checks(
+            install_third_party_libs, 'main',
+            mock_install_third_party_libs_main)
         self.check_codeowner_swap = self.swap(
             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
         self.check_type_defs_swap = self.swap(
@@ -175,6 +153,7 @@ class PreCommitLinterTests(LintTests):
             '19:16',
             'Unexpected whitespace before \":\"   declaration-colon-space-'
             'before'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_main_with_invalid_filepath_with_path_arg(self):
         with self.print_swap, self.assertRaisesRegexp(SystemExit, '1'):
