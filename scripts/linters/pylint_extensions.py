@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks.
+presubmit checks. Next message id would be C0029.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -78,7 +78,97 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'non-explicit-keyword-args',
             'All keyword arguments should be explicitly named in function call.'
         ),
+        'C0027': (
+            'Keyword argument %s used for a non keyword argument in %s '
+            'call of %s.',
+            'arg-name-for-non-keyword-arg',
+            'Position arguments should not be used as keyword arguments '
+            'in function call.'
+        ),
     }
+
+    def _check_non_explicit_keyword_args(
+            self, node, name, callable_name, keyword_args,
+            num_positional_args_unused, num_mandatory_parameters):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            name: str. Name of the keyword argument.
+            callable_name: str. Name of method type.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            num_positional_args_unused: int. Number of unused positional
+                arguments.
+            num_mandatory_parameters: int. Number of mandatory parameters.
+
+        Returns:
+            int. Number of unused positional arguments.
+        """
+        display_name = repr(name)
+
+        if name not in keyword_args and (
+                num_positional_args_unused > (
+                    num_mandatory_parameters)) and (
+                        callable_name != 'constructor'):
+            # This try/except block tries to get the function
+            # name. Since each node may differ, multiple
+            # blocks have been used.
+            try:
+                func_name = node.func.attrname
+            except AttributeError:
+                func_name = node.func.name
+
+            self.add_message(
+                'non-explicit-keyword-args', node=node,
+                args=(
+                    display_name,
+                    callable_name,
+                    func_name))
+            num_positional_args_unused -= 1
+        return num_positional_args_unused
+
+    def _check_argname_for_nonkeyword_arg(
+            self, node, called, callable_name, keyword_args,
+            keyword_args_in_funcdef):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            called: astroid.Call. The function call object.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            callable_name: str. Name of method type.
+            keyword_args_in_funcdef: list(str). Name of all keyword arguments in
+                function definition.
+        """
+        for arg in keyword_args:
+            # TODO(Hudda): Fix the check to cover below case as well. Relevant
+            # issue: https://github.com/oppia/oppia/issues/10038
+            # If there is *args and **kwargs in the function definition skip the
+            # check because we can use keywords arguments in function call even
+            # if **kwargs is present in the function definition. See Example:
+            # Function def -> def func(entity_id, *args, **kwargs):
+            # Function call -> func(entity_id='1', a=1, b=2, c=3)
+            # By parsing calling method we get
+            # keyword_arguments = entity_id, a, b, c.
+            # From the function definition, we will get keyword_arguments = []
+            # Now we do not have a way to identify which one is a keyword
+            # argument and which one is not.
+            if not called.args.kwarg and callable_name != 'constructor':
+                if not arg in keyword_args_in_funcdef:
+                    # This try/except block tries to get the function
+                    # name.
+                    try:
+                        func_name = node.func.attrname
+                    except AttributeError:
+                        func_name = node.func.name
+
+                    self.add_message(
+                        'arg-name-for-non-keyword-arg', node=node,
+                        args=(repr(arg), callable_name, func_name))
 
     def visit_call(self, node):
         """Visits each function call in a lint check.
@@ -136,31 +226,21 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             parameters.append([(name, defval), False])
 
         num_positional_args_unused = num_positional_args
+        # The list below will store all the keyword arguments present in the
+        # function definition.
+        keyword_args_in_funcdef = []
         # Check that all parameters with a default value have
         # been called explicitly.
         for [(name, defval), _] in parameters:
             if defval:
-                display_name = repr(name)
+                keyword_args_in_funcdef.append(name)
+                num_positional_args_unused = (
+                    self._check_non_explicit_keyword_args(
+                        node, name, callable_name, keyword_args,
+                        num_positional_args_unused, num_mandatory_parameters))
 
-                if name not in keyword_args and (
-                        num_positional_args_unused > (
-                            num_mandatory_parameters)) and (
-                                callable_name != 'constructor'):
-                    # This try/except block tries to get the function
-                    # name. Since each node may differ, multiple
-                    # blocks have been used.
-                    try:
-                        func_name = node.func.attrname
-                    except AttributeError:
-                        func_name = node.func.name
-
-                    self.add_message(
-                        'non-explicit-keyword-args', node=node,
-                        args=(
-                            display_name,
-                            callable_name,
-                            func_name))
-                    num_positional_args_unused -= 1
+        self._check_argname_for_nonkeyword_arg(
+            node, called, callable_name, keyword_args, keyword_args_in_funcdef)
 
 
 class HangingIndentChecker(checkers.BaseChecker):
@@ -1728,7 +1808,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
     name = 'single-line-pragma'
     priority = -1
     msgs = {
-        'C0027': (
+        'C0028': (
             'Pylint pragmas should be used to disable a rule '
             'for a single line only',
             'single-line-pragma',
@@ -1755,7 +1835,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                 # pylint will raise the error of single-line-pragma because
                 # from here on all this lint check is enabled. So we need to
                 # ignore this line.
-                if line.startswith(b'# pylint:'):
+                if re.search(br'^(#\s*pylint:)', line):
                     if 'enable' in line and 'single-line-pragma' in line:
                         continue
                     self.add_message(
