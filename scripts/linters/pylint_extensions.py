@@ -283,11 +283,14 @@ class HangingIndentChecker(checkers.BaseChecker):
                 in_string = False
                 for char_num in python_utils.RANGE(line_length):
                     char = line[char_num]
-                    # Check if we are inside a string and if escape
-                    # character found ('\') do not process that character and
-                    # the character follows because next character might be
-                    # an escaped single quote \' and it thinks that the string
-                    # ended but that will not be the case.
+                    # Check if we are inside a string and if a escape
+                    # character is present then do not check the escape
+                    # character and the character that follows next because
+                    # next character may be a string indicator (') and
+                    # that flip the boolean in_string to False and but that
+                    # will be incorrect because we are still inside a
+                    # string. Example: func('this is a \'string\'')
+                    # Here we are skipping both \' characters.
                     if in_string and (
                             char == escape_character_indicator or
                             escape_character_found):
