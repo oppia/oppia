@@ -1808,108 +1808,108 @@ def generate_html_change_list_for_state(
 
     Args:
         state_name: str. The name of the state.
-        new_state_dict: dict. The dict representation of the nenw State object.
+        new_state_dict: dict. The dict representation of the new State object.
         old_state_dict: dict. The dict representation of the old State object
 
     Returns:
         list(ExplorationChange). The generated change list.
     """
 
-    change_lists = []
-    property_name_to_new_value_mapping = []
+    change_list = []
+    property_name_to_new_value_list = []
     if old_state_dict['interaction']['customization_args'] != (
             new_state_dict['interaction']['customization_args']):
-        property_name_to_new_value_mapping.append(
+        property_name_to_new_value_list.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                 new_state_dict['interaction']['customization_args']))
-    if old_state_dict['content'] != (
-            new_state_dict['content']):
-        property_name_to_new_value_mapping.append(
+    if old_state_dict['content'] != new_state_dict['content']:
+        property_name_to_new_value_list.append(
             (exp_domain.STATE_PROPERTY_CONTENT, new_state_dict['content']))
 
     if old_state_dict['written_translations'] != (
             new_state_dict['written_translations']):
-        property_name_to_new_value_mapping.append(
+        property_name_to_new_value_list.append(
             (
                 exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
                 new_state_dict['written_translations']))
     if old_state_dict['interaction']['default_outcome'] != (
             new_state_dict['interaction']['default_outcome']):
-        property_name_to_new_value_mapping.append(
+        property_name_to_new_value_list.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                 new_state_dict['interaction']['default_outcome']))
     if old_state_dict['interaction']['hints'] != (
             new_state_dict['interaction']['hints']):
-        property_name_to_new_value_mapping.append(
+        property_name_to_new_value_list.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
                 new_state_dict['interaction']['hints']))
     if old_state_dict['interaction']['solution'] != (
             new_state_dict['interaction']['solution']):
-        property_name_to_new_value_mapping.append(
+        property_name_to_new_value_list.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
                 new_state_dict['interaction']['solution']))
     if old_state_dict['interaction']['answer_groups'] != (
             new_state_dict['interaction']['answer_groups']):
-        property_name_to_new_value_mapping.append(
+        property_name_to_new_value_list.append(
             (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
                 new_state_dict['interaction']['answer_groups']))
 
-    for property_name, new_value in property_name_to_new_value_mapping:
-        change_lists.append(
+    for property_name, new_value in property_name_to_new_value_list:
+        change_list.append(
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': state_name,
                 'property_name': property_name,
                 'new_value': new_value
             }))
-    return change_lists
+    return change_list
 
 
-def get_latex_strings_and_exp_ids_for_generating_svgs():
+def get_batch_of_exps_for_latex_svg_generation():
     """Returns a batch of LaTeX strings from explorations which have LaTeX
     strings without SVGs.
 
     Returns:
-        dict(str, list). The dict having each key as an exp_id and value
-        as a list of LaTeX string.
+        dict(str, list(str)). The dict having each key as an exp_id and value
+        as a list of LaTeX string. Each list has all the LaTeX stringss in that
+        particular exploration ID.
     """
 
     latex_strings_mapping = {}
     exploration_math_rich_text_info_models = (
         exp_models.ExplorationMathRichTextInfoModel.get_all())
-    size_of_svgs_in_batch = 0
+    size_of_svgs_in_batch_bytes = 0
     for model in exploration_math_rich_text_info_models:
         if model.math_images_generation_required:
+            if size_of_svgs_in_batch_bytes > (
+                    feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
+                break
             latex_strings_mapping[model.id] = model.latex_strings_without_svg
-            size_of_svgs_in_batch += (
+            size_of_svgs_in_batch_bytes += (
                 model.estimated_max_size_of_images_in_bytes)
-            if size_of_svgs_in_batch > feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES:
-                return latex_strings_mapping
     return latex_strings_mapping
 
 
-def update_explorations_with_math_svgs(user_id, exp_id, image_data):
-    """Saves an SVG for each latex value without an SVG in an exploration
+def update_exploration_with_math_svgs(exp_id, image_data):
+    """Saves an SVG for each LaTeX value without an SVG in an exploration
     and updates the exploration. Also the corresponding valid draft changes are
     updated.
 
     Args:
-        image_data: dict. The dictionary having all the image data like latex
-            value and dimensions which will be used for generating and assigning
-            filenames.
-        user_id: str. The ID of the commiter.
+        image_data: dict. The dictionary having all the image data like LaTeX
+            string and dimensions which will be used for generating and
+            assigning filenames.
         exp_id: str. The ID of the exploration to update.
 
     Raises:
         Exception: If any of the SVG images provided fail validation.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    html_strings_after_conversion = ''
+    html_in_exploration_after_conversion = ''
     change_lists = []
     # Create a dict with dimensions for each LaTeX string. This dict will be
     # used for generating a filename for each raw_latex string in the HTML.
@@ -1931,7 +1931,7 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
                 state.to_dict(),
                 add_svg_filenames_for_latex_strings_in_html_string))
         converted_state = state_domain.State.from_dict(converted_state_dict)
-        html_strings_after_conversion += (
+        html_in_exploration_after_conversion += (
             ''.join(converted_state.get_all_html_content_strings()))
         change_lists.extend(
             generate_html_change_list_for_state(
@@ -1940,10 +1940,10 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
     filenames_mapping = (
         html_validation_service.
         extract_svg_filename_latex_mapping_in_math_rte_components(
-            html_strings_after_conversion))
+            html_in_exploration_after_conversion))
 
     for filename, raw_latex in filenames_mapping:
-        image_file = image_data[raw_latex]['file']
+        image_file = image_data[raw_latex]['svg_file']
         image_validation_error_message_suffix = (
             'SVG image provided for latex %s failed validation' % raw_latex)
         if not image_file:
@@ -1965,37 +1965,11 @@ def update_explorations_with_math_svgs(user_id, exp_id, image_data):
             filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id, image_file,
             'image', image_is_compressible)
 
-
     update_exploration(
-        user_id, exp_id, change_lists, 'added SVG images for math tags.')
+        feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
+        'added SVG images for math tags.')
     exploration_math_rich_text_info_model = (
         exp_models.ExplorationMathRichTextInfoModel.get_by_id(exp_id))
     exploration_math_rich_text_info_model.math_images_generation_required = (
         False)
     exploration_math_rich_text_info_model.put()
-    exploration_user_data_model = (
-        user_models.ExplorationUserDataModel.get_all().filter(
-            user_models.ExplorationUserDataModel.exploration_id == exp_id))
-    exploration_version_before_update = exploration.version
-    user_models_to_update = []
-    for model in exploration_user_data_model:
-        if model.draft_change_list is None:
-            continue
-        if model.draft_change_list_exp_version is None:
-            continue
-        draft_change_list = [
-            exp_domain.ExplorationChange(change)
-            for change in model.draft_change_list]
-        if model.draft_change_list_exp_version == (
-                exploration_version_before_update):
-            html_in_draft_change = ''.join(
-                draft_upgrade_services.extract_html_from_draft_change_list(
-                    draft_change_list))
-            if len(
-                    html_validation_service.
-                    get_latex_strings_without_svg_from_html(
-                        html_in_draft_change)) == 0:
-                model.draft_change_list_exp_version += 1
-                user_models_to_update.append(model)
-
-    user_models.ExplorationUserDataModel.put_multi(user_models_to_update)

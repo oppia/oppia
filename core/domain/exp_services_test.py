@@ -4577,6 +4577,44 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.set_admins([self.ADMIN_USERNAME])
 
+    def test_get_batch_of_exps_for_latex_svg_generation(self):
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id2',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,-,-,+', '\\sqrt{x}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id3',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['(x-a)(x-b)', '\\frac{x^2}{y^3}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id4',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['(x-a1)(x-b1)', '\\frac{x^3}{y^2}'],
+            estimated_max_size_of_images_in_bytes=30000).put()
+
+        expected_output = {}
+        mock_max_size_of_math_svgs_batch = 0.05 * 1024 * 1024
+        expected_output = {
+            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
+            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
+            'exp_id3': ['(x-a)(x-b)', '\\frac{x^2}{y^3}']
+        }
+
+        with self.swap(
+            feconf, 'MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES',
+            mock_max_size_of_math_svgs_batch):
+            self.assertEqual(
+                exp_services.get_batch_of_exps_for_latex_svg_generation(),
+                expected_output)
+
     def test_generate_html_change_list_for_state(self):
         old_html = (
             '<oppia-noninteractive-math math_content-with-value="{&amp;'
@@ -4895,23 +4933,11 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             customization_args_dict)
 
         exp_services.save_new_exploration(self.admin_id, exploration1)
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'New title'})]
-        change_list_dict = [change_list[0].to_dict()]
         exp_models.ExplorationMathRichTextInfoModel(
             id='exp_id1',
             math_images_generation_required=True,
             latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
             estimated_max_size_of_images_in_bytes=20000).put()
-        user_models.ExplorationUserDataModel(
-            id='user_id1.exp_id1', user_id='user_id1',
-            exploration_id='exp_id1',
-            draft_change_list=change_list_dict,
-            draft_change_list_last_updated=self.DATETIME,
-            draft_change_list_exp_version=1,
-            draft_change_list_id=10).put()
 
         svg_file_1 = (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
@@ -4935,24 +4961,24 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         )
         image_data = {
             '+,+,+,+': {
-                'file': svg_file_1,
+                'svg_file': svg_file_1,
                 'dimensions': {
-                    'height': '1d429',
-                    'width': '1d33',
-                    'verticalPadding': '0d241'
+                    'encoded_height_string': '1d429',
+                    'encoded_width_string': '1d33',
+                    'encoded_vertical_padding_string': '0d241'
                 }
             },
             '\\frac{x}{y}': {
-                'file': svg_file_2,
+                'svg_file': svg_file_2,
                 'dimensions': {
-                    'height': '1d525',
-                    'width': '3d33',
-                    'verticalPadding': '0d241'
+                    'encoded_height_string': '1d525',
+                    'encoded_width_string': '3d33',
+                    'encoded_vertical_padding_string': '0d241'
                 }
             }
         }
-        exp_services.update_explorations_with_math_svgs(
-            self.admin_id, 'exp_id1', image_data)
+        exp_services.update_exploration_with_math_svgs(
+            'exp_id1', image_data)
         update_exploration = exp_fetchers.get_exploration_by_id('exp_id1')
         updated_html_string = ''
         for state in update_exploration.states.values():
@@ -4970,9 +4996,6 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
             filepath = 'image/%s' % filename
             self.assertTrue(fs.isfile(filepath))
-        user_exp_model = (
-            user_models.ExplorationUserDataModel.get_by_id('user_id1.exp_id1'))
-        self.assertEqual(user_exp_model.draft_change_list_exp_version, 2)
         exploration_math_rich_text_info_model = (
             exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
         self.assertFalse(
@@ -5031,27 +5054,27 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         )
         image_data = {
             '+,+,+,+': {
-                'file': svg_file_1,
+                'svg_file': svg_file_1,
                 'dimensions': {
-                    'height': '1d429',
-                    'width': '1d33',
-                    'verticalPadding': '0d241'
+                    'encoded_height_string': '1d429',
+                    'encoded_width_string': '1d33',
+                    'encoded_vertical_padding_string': '0d241'
                 }
             },
             '\\frac{x}{y}': {
-                'file': None,
+                'svg_file': None,
                 'dimensions': {
-                    'height': '1d525',
-                    'width': '3d33',
-                    'verticalPadding': '0d241'
+                    'encoded_height_string': '1d525',
+                    'encoded_width_string': '3d33',
+                    'encoded_vertical_padding_string': '0d241'
                 }
             }
         }
         with self.assertRaisesRegexp(
             Exception,
             'No image data provided for file with name '):
-            exp_services.update_explorations_with_math_svgs(
-                self.admin_id, 'exp_id1', image_data)
+            exp_services.update_exploration_with_math_svgs(
+                'exp_id1', image_data)
 
     def test_updation_fails_when_svg_file_is_invalid(self):
         exploration1 = exp_domain.Exploration.create_default_exploration(
@@ -5116,19 +5139,19 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
 
         image_data = {
             '+,+,+,+': {
-                'file': svg_file_1,
+                'svg_file': svg_file_1,
                 'dimensions': {
-                    'height': '1d429',
-                    'width': '1d33',
-                    'verticalPadding': '0d241'
+                    'encoded_height_string': '1d429',
+                    'encoded_width_string': '1d33',
+                    'encoded_vertical_padding_string': '0d241'
                 }
             },
             '\\frac{x}{y}': {
-                'file': invalid_svg_file,
+                'svg_file': invalid_svg_file,
                 'dimensions': {
-                    'height': '1d525',
-                    'width': '3d33',
-                    'verticalPadding': '0d241'
+                    'encoded_height_string': '1d525',
+                    'encoded_width_string': '3d33',
+                    'encoded_vertical_padding_string': '0d241'
                 }
             }
         }
@@ -5136,5 +5159,5 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             Exception,
             'Image not recognized SVG image provided for latex \\\\frac{x}{y}'
             ' failed validation'):
-            exp_services.update_explorations_with_math_svgs(
-                self.admin_id, 'exp_id1', image_data)
+            exp_services.update_exploration_with_math_svgs(
+                'exp_id1', image_data)

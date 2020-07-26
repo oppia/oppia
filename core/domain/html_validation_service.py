@@ -855,25 +855,28 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
-def generate_math_svgs_filename(height, width, vertical_padding):
+def generate_math_svgs_filename(
+        encoded_height_string, encoded_width_string,
+        encoded_vertical_padding_string):
     """Generates a random filename for a math SVG based on the given
     dimensions.
 
     Args:
-        height: str. Height of the image.
-        width: str. Width of the image.
-        vertical_padding: str. The vertical padding required for the SVG when
-            displayed inline.
+        encoded_height_string: str. The string from which the actual height
+            can be derived. The actual height for math SVGs are in unit ex.
+        encoded_width_string: str. The string from which the actual width
+            can be derived. The actual width for math SVGs are in unit ex
+        encoded_vertical_padding_string: str. The string from which the actual
+            vertical padding can be derived. The vertical padding is required
+            for vertical allignment of the SVGs when displayed inline.
 
     Returns:
         str. The name of the SVG file with its dimensions in it.
     """
 
-    random_string = (
-        ''.join(
-            random.choice(
-                string.ascii_lowercase + string.digits) for _ in (
-                    python_utils.RANGE(10))))
+    random_string = ''.join(
+        random.choice(string.ascii_lowercase + string.digits)
+        for _ in python_utils.RANGE(10))
     date_object = datetime.datetime.utcnow()
     year = python_utils.UNICODE(date_object.year)
     month = python_utils.UNICODE(date_object.month)[-2:]
@@ -885,7 +888,8 @@ def generate_math_svgs_filename(height, width, vertical_padding):
     date_time_string = '%s%s%s%s%s%s%s' % (
         year, month, day, hour, minute, second, random_string)
     filename = 'mathImg_%s_height_%s_width_%s_vertical_%s.svg' % (
-        date_time_string, height, width, python_utils.UNICODE(vertical_padding))
+        date_time_string, encoded_height_string, encoded_width_string,
+        encoded_vertical_padding_string)
     return filename
 
 
@@ -920,8 +924,9 @@ def add_svg_filenames_for_latex_strings_in_html_string(
             dimensions = raw_latex_to_dimensions_dict[raw_latex]['dimensions']
             filename = (
                 generate_math_svgs_filename(
-                    dimensions['height'], dimensions['width'],
-                    dimensions['verticalPadding']))
+                    dimensions['encoded_height_string'],
+                    dimensions['encoded_width_string'],
+                    dimensions['encoded_vertical_padding_string']))
             math_content_dict = {
                 'raw_latex': raw_latex,
                 'svg_filename': objects.UnicodeString.normalize(filename)

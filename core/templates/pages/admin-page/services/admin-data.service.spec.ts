@@ -177,9 +177,9 @@ describe('Admin Data Service', () => {
         latex_string1: {
           file: new Blob(),
           dimensions: {
-            height: '4d456',
-            width: '3d467',
-            verticalPadding: '0d234'
+            encoded_height_string: '4d456',
+            encoded_width_string: '3d467',
+            encoded_vertical_padding_string: '0d234'
           },
           latexId: '3rmYki9MyZ'
         }
@@ -188,9 +188,9 @@ describe('Admin Data Service', () => {
         latex_string2: {
           file: new Blob(),
           dimensions: {
-            height: '3d456',
-            width: '5d467',
-            verticalPadding: '0d234'
+            encoded_height_string: '3d456',
+            encoded_width_string: '5d467',
+            encoded_vertical_padding_string: '0d234'
           },
           latexId: '4rm6ki9MsZ'
         }

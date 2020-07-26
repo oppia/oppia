@@ -214,7 +214,7 @@ angular.module('oppia').directive('adminMiscTab', [
                 ImageUploadHelperService.convertImageDataToImageFile(dataURI));
               var date = new Date();
               var now = date.getTime();
-              // This is temporary Id will be used for adding and retrieving the
+              // This temporary Id will be used for adding and retrieving the
               // raw image for each LaTeX string from the request body. For more
               // details refer to the docstring in sendMathSvgsToBackend() in
               // AdminBackendApiService.
@@ -223,7 +223,11 @@ angular.module('oppia').directive('adminMiscTab', [
                 Math.random().toString(36).substr(4));
               resolve ({
                 file: resampledFile,
-                dimensions: dimensions,
+                dimensions: {
+                  encoded_height_string: dimensions.height,
+                  encoded_width_string: dimensions.width,
+                  encoded_vertical_padding_string: dimensions.verticalPadding
+                },
                 latexId: latexId
               });
             } else {
@@ -249,16 +253,22 @@ angular.module('oppia').directive('adminMiscTab', [
             function(response) {
               expIdToLatexMapping = response.data.result;
               ctrl.setStatusMessage('Latex values Fetched.');
+              ctrl.generateSVG();
             });
         };
         ctrl.saveSvgsToBackend = function() {
           AdminDataService.sendMathSvgsToBackendAsync(
             latexMapping).then(
             function(response) {
-              ctrl.setStatusMessage('Successfully updated the explorations.');
+              var numberOfExplorationsUpdated = (
+                response.data.number_of_explorations_updated);
+              ctrl.setStatusMessage(
+                'Successfully updated ' + numberOfExplorationsUpdated +
+                ' explorations.');
               $rootScope.$apply();
             }, function(errorResponse) {
-              ctrl.setStatusMessage('Server error.');
+              ctrl.setStatusMessage(
+                'Server error:' + errorResponse.data.error);
               $rootScope.$apply();
             });
         };

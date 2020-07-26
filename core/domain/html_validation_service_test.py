@@ -1950,23 +1950,23 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         raw_latex_to_dimensions_dict = {
             '+,-,-,+': {
                 'dimensions': {
-                    'height': '1d345',
-                    'width': '3d124',
-                    'verticalPadding': '0d124'
+                    'encoded_height_string': '1d345',
+                    'encoded_width_string': '3d124',
+                    'encoded_vertical_padding_string': '0d124'
                 }
             },
             '+,+,+,+': {
                 'dimensions': {
-                    'height': '2d456',
-                    'width': '6d124',
-                    'verticalPadding': '0d231'
+                    'encoded_height_string': '2d456',
+                    'encoded_width_string': '6d124',
+                    'encoded_vertical_padding_string': '0d231'
                 }
             },
             '(x - a_1)(x - a_2)': {
                 'dimensions': {
-                    'height': '4d123',
-                    'width': '23d122',
-                    'verticalPadding': '2d123'
+                    'encoded_height_string': '4d123',
+                    'encoded_width_string': '23d122',
+                    'encoded_vertical_padding_string': '2d123'
                 }
             }
         }

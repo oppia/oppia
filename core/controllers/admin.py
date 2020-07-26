@@ -56,7 +56,6 @@ import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class AdminPage(base.BaseHandler):
@@ -589,7 +588,7 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot generate dummy explorations in production.')
 
 
-class AdminMathSvgImageGenerationHandler(base.BaseHandler):
+class ExplorationsLatexSvgHandler(base.BaseHandler):
     """Handler updating Explorations having math rich-text components with
     math SVGs.
     """
@@ -597,7 +596,7 @@ class AdminMathSvgImageGenerationHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         latex_strings_to_exp_id_mapping = (
-            exp_services.get_latex_strings_and_exp_ids_for_generating_svgs())
+            exp_services.get_batch_of_exps_for_latex_svg_generation())
         self.render_json({
             'result': latex_strings_to_exp_id_mapping
         })
@@ -607,22 +606,23 @@ class AdminMathSvgImageGenerationHandler(base.BaseHandler):
         latex_to_svg_mappings = self.payload.get('latexMapping')
         for exp_id, latex_to_svg_mapping_dict in latex_to_svg_mappings.items():
             for latex_string in latex_to_svg_mapping_dict.keys():
-                image = self.request.get(
+                svg_image = self.request.get(
                     latex_to_svg_mappings[exp_id][latex_string]['latexId'])
-                if not image:
+                if not svg_image:
                     raise self.InvalidInputException(
-                        'In Exploration %s SVG for latex value %s not supplied.'
-                        % (exp_id, latex_string))
-                latex_to_svg_mappings[exp_id][latex_string]['file'] = image
+                        'SVG for LaTeX value %s in exploration %s is not '
+                        'supplied.' % (latex_string, exp_id))
+                latex_to_svg_mappings[exp_id][latex_string]['svg_file'] = (
+                    svg_image)
 
         no_of_explorations_updated = 0
         for exp_id in latex_to_svg_mappings.keys():
-            exp_services.update_explorations_with_math_svgs(
-                self.user_id, exp_id, latex_to_svg_mappings[exp_id])
+            exp_services.update_exploration_with_math_svgs(
+                exp_id, latex_to_svg_mappings[exp_id])
             no_of_explorations_updated += 1
         self.render_json({
-            'result': 'successfully updated %d explorations' % (
-                no_of_explorations_updated)
+            'number_of_explorations_updated': '%d' % (
+                len(latex_to_svg_mappings.keys()))
         })
 
 

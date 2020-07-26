@@ -964,12 +964,12 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class AdminMathSvgImageGenerationHandlerTest(test_utils.GenericTestBase):
+class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
     """Tests for Saving Math SVGs in explorations."""
 
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
-        super(AdminMathSvgImageGenerationHandlerTest, self).setUp()
+        super(ExplorationsLatexSvgHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -1034,7 +1034,6 @@ class AdminMathSvgImageGenerationHandlerTest(test_utils.GenericTestBase):
                 }
             }
         }
-        # Check role correctly gets updated.
         csrf_token = self.get_new_csrf_token()
         svg_file_1 = (
             '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
@@ -1077,7 +1076,7 @@ class AdminMathSvgImageGenerationHandlerTest(test_utils.GenericTestBase):
             expected_status_int=200)
         self.assertEqual(
             response_dict,
-            {'result': 'successfully updated 1 explorations'})
+            {'number_of_explorations_updated': '1'})
         self.logout()
 
     def test_post_svgs_when_some_images_are_not_supplied(self):
@@ -1132,8 +1131,8 @@ class AdminMathSvgImageGenerationHandlerTest(test_utils.GenericTestBase):
                 ('latex_id1', 'latex_id1', svg_file_1),),
             expected_status_int=400)
         self.assertIn(
-            'In Exploration exp_id1 SVG for latex value \\frac{x}{y} not supp'
-            'lied.', response_dict['error'])
+            'SVG for LaTeX value \\frac{x}{y} in exploration exp_id1 is not '
+            'supplied.', response_dict['error'])
         self.logout()
 
 

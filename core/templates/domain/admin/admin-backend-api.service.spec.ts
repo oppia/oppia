@@ -165,7 +165,7 @@ describe('Admin backend api service', () => {
     flushMicrotasks();
   }));
 
-  it('should Send SVGs to the backend.', fakeAsync(() => {
+  it('should send SVGs to the backend.', fakeAsync(() => {
     var successResponse = {
       result: 'successfully updated'
     };
@@ -174,9 +174,9 @@ describe('Admin backend api service', () => {
         latex_string1: {
           file: new Blob(),
           dimensions: {
-            height: '4d456',
-            width: '3d467',
-            verticalPadding: '0d234'
+            encoded_height_string: '4d456',
+            encoded_width_string: '3d467',
+            encoded_vertical_padding_string: '0d234'
           },
           latexId: '3rmYki9MyZ'
         }
@@ -185,9 +185,9 @@ describe('Admin backend api service', () => {
         latex_string2: {
           file: new Blob(),
           dimensions: {
-            height: '3d456',
-            width: '5d467',
-            verticalPadding: '0d234'
+            encoded_height_string: '3d456',
+            encoded_width_string: '5d467',
+            encoded_vertical_padding_string: '0d234'
           },
           latexId: '4rm6ki9MsZ'
         }
@@ -198,9 +198,9 @@ describe('Admin backend api service', () => {
         exp_id1: {
           latex_string1: {
             dimensions: {
-              height: '4d456',
-              width: '3d467',
-              verticalPadding: '0d234'
+              encoded_height_string: '4d456',
+              encoded_width_string: '3d467',
+              encoded_vertical_padding_string: '0d234'
             },
             latexId: '3rmYki9MyZ'
           }
@@ -208,9 +208,9 @@ describe('Admin backend api service', () => {
         exp_id2: {
           latex_string2: {
             dimensions: {
-              height: '3d456',
-              width: '5d467',
-              verticalPadding: '0d234'
+              encoded_height_string: '3d456',
+              encoded_width_string: '5d467',
+              encoded_vertical_padding_string: '0d234'
             },
             latexId: '4rm6ki9MsZ'
           }

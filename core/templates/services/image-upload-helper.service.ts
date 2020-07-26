@@ -116,6 +116,8 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
           }
           // Remove the custom data attributes added by MathJax.
+          // These custom attributes don't affect the rendering of the SVGs,
+          // and they are not present in the white list for allowed attributes.
           for (var i = 0; i < node.attributes.length; i++) {
             if (node.attributes[i].name.toLowerCase().startsWith('data-')) {
               node.removeAttribute(node.attributes[i].name.toLowerCase());
