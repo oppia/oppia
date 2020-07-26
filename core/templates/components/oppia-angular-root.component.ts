@@ -166,6 +166,8 @@ import { ContinueValidationService } from
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { ContributionOpportunitiesService } from
+  'pages/community-dashboard-page/services/contribution-opportunities.service';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -736,6 +738,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static continueRulesService: ContinueRulesService;
   static continueValidationService: ContinueValidationService;
   static contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService;
+  static contributionOpportunitiesService: ContributionOpportunitiesService;
   static constructTranslationIdsService: ConstructTranslationIdsService;
   static countVectorizerService: CountVectorizerService;
   static creatorDashboardBackendApiService: CreatorDashboardBackendApiService;
@@ -1051,6 +1054,7 @@ private contextService: ContextService,
 private continueRulesService: ContinueRulesService,
 private continueValidationService: ContinueValidationService,
 private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService,
+private contributionOpportunitiesService: ContributionOpportunitiesService,
 private constructTranslationIdsService: ConstructTranslationIdsService,
 private countVectorizerService: CountVectorizerService,
 private creatorDashboardBackendApiService: CreatorDashboardBackendApiService,
@@ -1367,6 +1371,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.continueRulesService = this.continueRulesService;
     OppiaAngularRootComponent.continueValidationService = this.continueValidationService;
     OppiaAngularRootComponent.contributionOpportunitiesBackendApiService = this.contributionOpportunitiesBackendApiService;
+    OppiaAngularRootComponent.contributionOpportunitiesService = this.contributionOpportunitiesService;
     OppiaAngularRootComponent.constructTranslationIdsService = this.constructTranslationIdsService;
     OppiaAngularRootComponent.countVectorizerService = this.countVectorizerService;
     OppiaAngularRootComponent.creatorDashboardBackendApiService = this.creatorDashboardBackendApiService;

@@ -17,74 +17,122 @@
  * fields.
  */
 
-require(
-  'pages/community-dashboard-page/services/' +
-  'contribution-opportunities-backend-api.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ContributionOpportunitiesService', [
-  'ContributionOpportunitiesBackendApiService',
-  function(ContributionOpportunitiesBackendApiService) {
-    var skillOpportunitiesCursor = null;
-    var translationOpportunitiesCursor = null;
-    var voiceoverOpportunitiesCursor = null;
-    var moreSkillOpportunitiesAvailable = true;
-    var moreTranslationOpportunitiesAvailable = true;
-    var moreVoiceoverOpportunitiesAvailable = true;
+import { ContributionOpportunitiesBackendApiService } from
+'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
 
-    var _getSkillOpportunities = function(cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-        cursor).then(({ opportunities, nextCursor, more }) => {
-        skillOpportunitiesCursor = nextCursor;
-        moreSkillOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
-      });
-    };
-    var _getTranslationOpportunities = function(
-        languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
-        translationOpportunitiesCursor = nextCursor;
-        moreTranslationOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
-      });
-    };
-    var _getVoiceoverOpportunities = function(
-        languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        languageCode, cursor
-      ).then(function({ opportunities, nextCursor, more }) {
-        voiceoverOpportunitiesCursor = nextCursor;
-        moreVoiceoverOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
-      });
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class ContributionOpportunitiesService {
+  private skillOpportunitiesCursor: string;
+  private translationOpportunitiesCursor: string; 
+  private voiceoverOpportunitiesCursor: string;
+  private moreSkillOpportunitiesAvailable: boolean;
+  private moreTranslationOpportunitiesAvailable: boolean;
+  private moreVoiceoverOpportunitiesAvailable: boolean;
 
-    return {
-      getSkillOpportunities: function(successCallback) {
-        _getSkillOpportunities('', successCallback);
-      },
-      getTranslationOpportunities: function(languageCode, successCallback) {
-        _getTranslationOpportunities(languageCode, '', successCallback);
-      },
-      getVoiceoverOpportunities: function(languageCode, successCallback) {
-        _getVoiceoverOpportunities(languageCode, '', successCallback);
-      },
-      getMoreSkillOpportunities: function(successCallback) {
-        if (moreSkillOpportunitiesAvailable) {
-          _getSkillOpportunities(skillOpportunitiesCursor, successCallback);
-        }
-      },
-      getMoreTranslationOpportunities: function(languageCode, successCallback) {
-        if (moreTranslationOpportunitiesAvailable) {
-          _getTranslationOpportunities(
-            languageCode, translationOpportunitiesCursor, successCallback);
-        }
-      },
-      getMoreVoiceoverOpportunities: function(languageCode, successCallback) {
-        if (moreVoiceoverOpportunitiesAvailable) {
-          _getVoiceoverOpportunities(
-            languageCode, voiceoverOpportunitiesCursor, successCallback);
-        }
-      }
-    };
-  }]);
+  constructor(
+    private contributionOpportunitiesBackendApiService: 
+      ContributionOpportunitiesBackendApiService
+  ) {
+    this.skillOpportunitiesCursor = null;
+    this.translationOpportunitiesCursor = null;
+    this.voiceoverOpportunitiesCursor = null;
+    this.moreSkillOpportunitiesAvailable = true;
+    this.moreTranslationOpportunitiesAvailable = true;
+    this.moreVoiceoverOpportunitiesAvailable = true;
+  }
+
+  private _getSkillOpportunities(
+      cursor: string, 
+      successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    this.contributionOpportunitiesBackendApiService.fetchSkillOpportunities(
+      cursor).then((data: any) => {
+      this.skillOpportunitiesCursor = data.nextCursor;
+      this.moreSkillOpportunitiesAvailable = data.more;
+      successCallback(data.opportunities, data.more);
+    });
+  };
+
+  private _getTranslationOpportunities(
+      languageCode: string, 
+      cursor: string, 
+      successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    this.contributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
+      languageCode, cursor).then((data:any) => {
+      this.translationOpportunitiesCursor = data.nextCursor;
+      this.moreTranslationOpportunitiesAvailable = data.more;
+      successCallback(data.opportunities, data.more);
+    });
+  };
+
+  private _getVoiceoverOpportunities(
+      languageCode: string, 
+      cursor: string, 
+      successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    this.contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
+      languageCode, cursor).then((data: any) => {
+      this.voiceoverOpportunitiesCursor = data.nextCursor;
+      this.moreVoiceoverOpportunitiesAvailable = data.more;
+      successCallback(data.opportunities, data.more);
+    });
+  };
+
+  getSkillOpportunities(
+    successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    this._getSkillOpportunities('', successCallback);
+  }
+
+  getTranslationOpportunities(
+    languageCode: string, 
+    successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    this._getTranslationOpportunities(languageCode, '', successCallback);
+  }
+
+  getVoiceoverOpportunities(
+    languageCode: string, 
+    successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    this._getVoiceoverOpportunities(languageCode, '', successCallback);
+  }
+
+  getMoreSkillOpportunities(
+    successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    if (this.moreSkillOpportunitiesAvailable) {
+      this._getSkillOpportunities(this.skillOpportunitiesCursor, successCallback);
+    }
+  }
+
+  getMoreTranslationOpportunities(
+    languageCode: string, 
+    successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    if (this.moreTranslationOpportunitiesAvailable) {
+      this._getTranslationOpportunities(
+        languageCode, this.translationOpportunitiesCursor, successCallback);
+    }
+  }
+
+  getMoreVoiceoverOpportunities(
+    languageCode: string, 
+    successCallback: (opportunities: Object, more: boolean) => void
+  ): void {
+    if (this.moreVoiceoverOpportunitiesAvailable) {
+      this._getVoiceoverOpportunities(
+        languageCode, this.voiceoverOpportunitiesCursor, successCallback);
+    }
+  }
+}
+
+angular.module('oppia').factory(
+  'ContributionOpportunitiesService',
+  downgradeInjectable(ContributionOpportunitiesService));

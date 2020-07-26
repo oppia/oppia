@@ -131,6 +131,8 @@ import { ContinueValidationService } from
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { ContributionOpportunitiesService } from 
+  'pages/community-dashboard-page/services/contribution-opportunities.service';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -1477,6 +1479,9 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService'],
         upgradedServices['LoaderService'],
         upgradedServices['WindowRef']);
+    upgradedServices['ContributionOpportunitiesService'] = 
+      new ContributionOpportunitiesService(
+        upgradedServices['ContributionOpportunitiesBackendApiService']);
     upgradedServices['EditableCollectionBackendApiService'] =
       new EditableCollectionBackendApiService(
         upgradedServices['HttpClient'],
