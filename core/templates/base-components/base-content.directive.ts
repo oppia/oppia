@@ -44,7 +44,7 @@ angular.module('oppia').directive('baseContent', [
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'BottomNavbarStatusService','KeyboardShortcutService',
+        'BottomNavbarStatusService', 'KeyboardShortcutService',
         'LoaderService', 'SidebarStatusService', 'UrlService',
         function($rootScope, $window, BackgroundMaskService,
             BottomNavbarStatusService, KeyboardShortcutService,
