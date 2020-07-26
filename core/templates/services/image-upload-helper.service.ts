@@ -112,11 +112,19 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           if (node.tagName.toLowerCase() === 'svg') {
             node.removeAttribute('xmlns:xlink');
             node.removeAttribute('role');
+            node.removeAttribute('aria-hidden');
             node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            cleanedSvgString = node.outerHTML;
+          }
+          // Remove the custom data attributes added by MathJax.
+          // These custom attributes don't affect the rendering of the SVGs,
+          // and they are not present in the white list for allowed attributes.
+          for (var i = 0; i < node.attributes.length; i++) {
+            if (node.attributes[i].name.toLowerCase().startsWith('data-')) {
+              node.removeAttribute(node.attributes[i].name.toLowerCase());
+            }
           }
         });
-        return cleanedSvgString;
+        return doc.documentElement.outerHTML;
       },
 
       extractDimensionsFromMathExpressionSvgString: function(svgString) {
@@ -143,9 +151,12 @@ angular.module('oppia').factory('ImageUploadHelperService', [
                 '.', 'd'));
             // This attribute is useful for the vertical allignment of the
             // Math SVG while displaying inline with other text.
-            dimensions.verticalPadding = (
-              (node.getAttribute('style').match(/\d+\.\d+/g)[0]).replace(
-                '.', 'd'));
+            var styleValue = node.getAttribute('style').match(/\d+\.\d+/g);
+            if (styleValue) {
+              dimensions.verticalPadding = styleValue[0].replace('.', 'd');
+            } else {
+              dimensions.verticalPadding = '0';
+            }
           }
         });
         return dimensions;

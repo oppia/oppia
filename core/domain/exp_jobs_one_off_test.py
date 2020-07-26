@@ -22,11 +22,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import datetime
 import logging
+import os
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import rights_manager
@@ -35,6 +37,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (job_models, exp_models, base_models, classifier_models) = (
@@ -2190,7 +2193,8 @@ class InteractionCustomizationArgsValidationJobTests(
         self.assertEqual(actual_output, expected_output)
 
 
-class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
+class ExplorationMathSvgFilenameValidationOneOffJobTests(
+        test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -2200,7 +2204,7 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(
-            ExplorationMathTagValidationOneOffJobTests, self).setUp()
+            ExplorationMathSvgFilenameValidationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -2208,7 +2212,7 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_explorations_with_invalid_math_tags_fails_validation(self):
-        """Tests for the case when there are invalid math tags in the
+        """Tests for the case when there are invalid svg_filenames in the
         explorations.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -2217,12 +2221,16 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         invalid_html_content1 = (
-            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
-            'ath>')
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img1.svg&amp;quot;}"></oppia-noninteractive-math>')
 
         invalid_html_content2 = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="'
-            '+,-,-,+"></oppia-noninteractive-math>')
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img2.svg&amp;quot;}"></oppia-noninteractive-math>')
 
         content1_dict = {
             'content_id': 'content',
@@ -2321,50 +2329,57 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_content(
-                state_domain.SubtitledHtml.from_dict(content2_dict))
-            state2.update_interaction_id('DragAndDropSortInput')
-            state2.update_interaction_customization_args(
-                customization_args_dict)
-            state2.update_interaction_answer_groups([answer_group_dict])
-            state2.update_written_translations(
-                state_domain.WrittenTranslations.from_dict(
-                    written_translations_dict))
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state2.update_interaction_id('DragAndDropSortInput')
+        state2.update_interaction_customization_args(
+            customization_args_dict)
+        state2.update_interaction_answer_groups([answer_group_dict])
+        state2.update_written_translations(
+            state_domain.WrittenTranslations.from_dict(
+                written_translations_dict))
 
-            exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(self.albert_id, exploration)
 
-            job_id = (
-                exp_jobs_one_off
-                .ExplorationMathTagValidationOneOffJob.create_new())
-            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob.enqueue(
-                job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationMathSvgFilenameValidationOneOffJob.create_new())
+        exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off
-            .ExplorationMathTagValidationOneOffJob.get_output(job_id))
+            .ExplorationMathSvgFilenameValidationOneOffJob.get_output(job_id))
 
         actual_output_list = ast.literal_eval(actual_output[0])
         invalid_tag1 = (
-            '<oppia-noninteractive-math></oppia-noninteractive-math>')
+            '\'<oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img1.svg&amp;quot;}"></oppia-noninteractive-math>\'')
         invalid_tag2 = (
-            '<oppia-noninteractive-math raw_latex-with-value="+,-,-,+"></oppi'
-            'a-noninteractive-math>')
+            '\'<oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img2.svg&amp;quot;}"></oppia-noninteractive-math>\'')
         expected_invalid_tags = [invalid_tag1, invalid_tag2]
 
         no_of_invalid_tags_in_output = 0
+
         for output in actual_output_list[1]:
             list_starting_index = output.find('[')
             list_finishing_index = output.find(']')
             stringified_error_list = (
                 output[list_starting_index + 1:list_finishing_index].split(
-                    ', '))
+                    'math>\', '))
             no_of_invalid_tags_in_output = (
                 no_of_invalid_tags_in_output + len(stringified_error_list))
             for invalid_tag in stringified_error_list:
+                if not invalid_tag.endswith('math>\''):
+                    invalid_tag = invalid_tag + 'math>\''
                 self.assertTrue(invalid_tag in expected_invalid_tags)
 
         self.assertEqual(no_of_invalid_tags_in_output, 12)
@@ -2376,28 +2391,26 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
 
         exploration.add_states(['State1'])
-        invalid_html_content = (
-            '<p>Value</p><oppia-noninteractive-math></oppia-noninteractive-m'
-            'ath>')
+        invalid_html_content1 = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img1.svg&amp;quot;}"></oppia-noninteractive-math>')
         content_dict = {
-            'html': invalid_html_content,
+            'html': invalid_html_content1,
             'content_id': 'content'
         }
         state1 = exploration.states['State1']
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exp_services.save_new_exploration(self.albert_id, exploration)
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
         run_job_for_deleted_exp(
             self,
-            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob)
+            exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob)
 
     def test_explorations_with_valid_math_tags(self):
-        """Tests for the case when there are no invalid math tags in the
+        """Tests for the case when there are no invalid svg_filenames in the
         explorations.
         """
 
@@ -2407,9 +2420,19 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         valid_html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img1.svg&amp;quot;}"></oppia-noninteractive-math>')
 
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+        fs.commit('image/img1.svg', raw_image, mimetype='image/svg+xml')
         content1_dict = {
             'content_id': 'content',
             'html': valid_html_content
@@ -2428,29 +2451,26 @@ class ExplorationMathTagValidationOneOffJobTests(test_utils.GenericTestBase):
                 ]
             }
         }
-        # Since the Old math-schema with raw_latex attribute is no longer valid,
-        # it gets cleaned by html_cleaner. We need to prevent this for testing
-        # by swapping it.
-        with self.swap(html_cleaner, 'clean', lambda html: html):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_content(
-                state_domain.SubtitledHtml.from_dict(content2_dict))
-            state2.update_interaction_id('DragAndDropSortInput')
-            state2.update_interaction_customization_args(
-                customization_args_dict)
-            exp_services.save_new_exploration(self.albert_id, exploration)
 
-            job_id = (
-                exp_jobs_one_off
-                .ExplorationMathTagValidationOneOffJob.create_new())
-            exp_jobs_one_off.ExplorationMathTagValidationOneOffJob.enqueue(
-                job_id)
-            self.process_and_flush_pending_tasks()
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        state2.update_interaction_id('DragAndDropSortInput')
+        state2.update_interaction_customization_args(
+            customization_args_dict)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        job_id = (
+            exp_jobs_one_off
+            .ExplorationMathSvgFilenameValidationOneOffJob.create_new())
+        exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off
-            .ExplorationMathTagValidationOneOffJob.get_output(job_id))
+            .ExplorationMathSvgFilenameValidationOneOffJob.get_output(job_id))
         self.assertEqual(len(actual_output), 0)
 
 
