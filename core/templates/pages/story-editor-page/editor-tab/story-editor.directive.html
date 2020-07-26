@@ -13,7 +13,7 @@
         <div class="story-content">
           <h3 class="story-card-header">Story Card</h3>
           <div class="story-title">
-            <label for="storyTitle" class="form-heading">Story Title</label>
+            <label for="storyTitle" class="form-heading">Title*</label>
             <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"
                    ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
                    placeholder="Enter a title for the story." maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" ng-trim="false">
@@ -24,7 +24,7 @@
             </span>
           </div>
           <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
-            <label for="storyDescription" class="form-heading">Story Description</label>
+            <label for="storyDescription" class="form-heading">Description*</label>
             <textarea type="text" class="form-control protractor-test-story-description-field"
                       ng-model="editableDescription"
                       ng-change="updateStoryDescriptionStatus(editableDescription)"
@@ -36,7 +36,7 @@
             </span>
           </div>
           <div class="story-thumbnail">
-            <label class="form-heading">Story Thumbnail</label>
+            <label class="form-heading">Thumbnail Image*</label>
             <thumbnail-uploader filename="story.getThumbnailFilename()"
                                 update-filename="updateStoryThumbnailFilename"
                                 bg-color="story.getThumbnailBgColor()"
@@ -117,30 +117,42 @@
           <div class="chapter-list-card-header">
             <span>Chapters</span>
             <button ng-click="createNode()" class="btn add-chapter-btn protractor-test-add-chapter-button">
-              Add Chapter
+             + ADD CHAPTER
             </button>
           </div>
-          <div class="story-nodes-container">
-            <div ng-repeat="node in linearNodesList track by $index">
-              <md-card class="story-editor-node"
-                       ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       ng-click="navigateToChapterWithId(node.getId(), $index)"
-                       dnd-draggable="node"
-                       dnd-list="linearNodesList"
-                       dnd-effect-allowed="move"
-                       dnd-dragstart="onMoveChapterStart($index, node.getId())"
-                       dnd-drop="rearrangeNodeInStory($index)">
-                <div class="story-editor-node-title">
-                  <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
+          <div ng-if="!linearNodesList.length">
+            <p class="no-chapters-message" style="padding-top: 6px;">
+              This story has no chapters.
+            </p>
+          </div>
+          <div ng-if="linearNodesList.length">
+            <div class="chapter-list-card-heading">
+              <span>Name</span>
+            </div>
+            <div class="story-nodes-container">
+              <div ng-repeat="node in linearNodesList track by $index">
+                <div class="story-editor-node"
+                     ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                     ng-click="navigateToChapterWithId(node.getId(), $index)"
+                     dnd-draggable="node"
+                     dnd-list="linearNodesList"
+                     dnd-effect-allowed="move"
+                     dnd-dragstart="onMoveChapterStart($index, node.getId())"
+                     dnd-drop="rearrangeNodeInStory($index)">
+                  <div class="story-editor-node-title">
+                    <span> <[$index+1]>. </span>
+                    <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
+                  </div>
+                  <div class="edit-options-container">
+                    <i class="fa fa-ellipsis-v chapter-edit-toggle-button protractor-test-edit-options" ng-click="toggleChapterEditOptions($index);$event.stopPropagation()"></i>
+                  </div>
+                  <div class="chapter-option-box" ng-if="selectedChapterIndex === $index" ng-mouseleave="toggleChapterEditOptions(-1)" ng-click="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                    <div class="chapter-edit-option protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())">
+                      <i class="fa fa-trash"></i>
+                      <span>Delete</span>
+                    </div>
+                  </div>
                 </div>
-                <span class="story-editor-delete-node">
-                  <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
-                    <i class="material-icons md-18">&#xE14C;</i>
-                  </span>
-                </span>
-              </md-card>
-              <div ng-if="$index < linearNodesList.length - 1">
-                <i class="material-icons"> arrow_downward </i>
               </div>
             </div>
           </div>
@@ -170,29 +182,38 @@
   }
 
   story-editor .story-editor-node {
-    background-color: #F5F5F5;
-    color: #424242;
-    display: inline-block;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 0.8em;
-    margin: 0;
-    padding-bottom: 5px;
-    padding-top: 5px;
+    align-items: center;
+    border-bottom: 1px solid #dbdbdb;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 15px 0;
     position: relative;
-    text-align: center;
-    white-space: normal;
-    width: 15vw;
+  }
+  .story-editor-node-title {
+    cursor: pointer;
+  }
+  story-editor .story-editor-node:hover {
+    cursor: grab;
   }
 
-  story-editor .selected-node {
-    background-color: #d4d4d4;
+  story-editor .topic-story-name {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
+  }
+  story-editor .topic-name {
+    color: #666;
+    cursor: pointer;
+  }
+
+  story-editor .story-editor-node:active {
+    cursor: move;
   }
 
   story-editor .story-editor-delete-node {
     color: #ef5350;
-    position: absolute;
-    right: 0;
-    top: 0;
   }
 
   story-editor .story-editor-initial-node {
@@ -201,16 +222,8 @@
     top: 0;
   }
 
-  story-editor .story-editor-node-title {
-    color: blue;
-    max-height: 5em;
-    overflow-wrap: break-word;
-    padding: 16px 16px 20px 16px;
-  }
-
   story-editor .story-nodes-container {
     background-color: #FFF;
-    overflow-y: auto;
     text-align: center;
     white-space: initial;
   }
@@ -253,15 +266,16 @@
   story-editor .parent-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-evenly;
     margin: 0 auto;
     width: 90%;
   }
   story-editor .content-container {
-    width: 50%;
+    width: 48%;
   }
   story-editor .chapter-list-container {
-    width: 35%;
+    margin-right: 4%;
+    width: 30%;
   }
   story-editor .content-card {
     margin: 0;
@@ -287,7 +301,7 @@
   }
   story-editor .story-card-header {
     font-size: 20px;
-    margin: 10px 0 0;
+    margin: 24px -18px;
   }
   story-editor .story-contain-text {
     font-size: smaller;
@@ -299,19 +313,41 @@
   }
   story-editor .chapter-list-card-header {
     align-items: center;
-    border-bottom: 2px solid #000;
     display: flex;
+    font-size: 20px;
+    font-weight: bold;
     justify-content: space-between;
     margin-bottom: 15px;
     padding-bottom: 10px;
   }
-  story-editor .topic-story-name {
-    font-size: 15px;
-    margin-bottom: 35px;
-    margin-left: 4%;
+  .chapter-list-card-heading {
+    border-bottom: 2px solid #000;
+    padding-left: 4%;
   }
-  story-editor .topic-name {
-    color: #666;
+  .chapter-list-card-heading span {
+    font-weight: bold;
+  }
+  story-editor .chapter-option-box {
+    background-color: #e1dcdc;
+    border: 1px solid #000;
+    padding: 0;
+    position: absolute;
+    right: -5px;
+    width: 140px;
+    z-index: 1;
+  }
+  story-editor .chapter-edit-option {
     cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+    text-align: left;
+  }
+  story-editor .chapter-edit-option span {
+    margin-left: 5%;
+  }
+
+  story-editor .chapter-edit-toggle-button {
+    cursor: pointer;
+    position: relative;
   }
 </style>

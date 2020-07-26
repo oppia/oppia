@@ -260,6 +260,11 @@ angular.module('oppia').directive('storyEditor', [
             $scope.storyPreviewCardIsShown = !($scope.storyPreviewCardIsShown);
           };
 
+          $scope.toggleChapterEditOptions = function(chapterIndex) {
+            $scope.selectedChapterIndex = (
+              $scope.selectedChapterIndex === chapterIndex) ? -1 : chapterIndex;
+          };
+
           ctrl.$onInit = function() {
             $scope.storyPreviewCardIsShown = false;
             $scope.NOTES_SCHEMA = {

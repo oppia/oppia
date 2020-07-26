@@ -56,8 +56,6 @@ angular.module('oppia').component('storyPreviewTab', {
             AssetsBackendApiService.getThumbnailUrlForPreview(
               'story', ctrl.storyId,
               storyNodes[0].getThumbnailFilename())),
-          left: '225px',
-          top: '35px',
           thumbnailBgColor: storyNodes[0].getThumbnailBgColor()
         });
 

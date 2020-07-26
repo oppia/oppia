@@ -16,29 +16,36 @@
  * @fileoverview Unit tests for story preview tab component.
  */
 
-// TODO(#7222): Remove the following block of unnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { StoryEditorNavigationService } from
+  'pages/story-editor-page/services/story-editor-navigation.service';
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
 describe('Story Preview tab', function() {
   var $scope = null;
   var ctrl = null;
   var story = null;
   var MockStoryEditorNavigationService = null;
-  var StoryEditorNavigationService = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [StoryObjectFactory, StoryEditorNavigationService]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+    $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
+    $provide.value(
+      'StoryEditorNavigationService',
+      TestBed.get(StoryEditorNavigationService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     var StoryObjectFactory = $injector.get('StoryObjectFactory');
     var StoryEditorStateService = $injector.get('StoryEditorStateService');
-    StoryEditorNavigationService = $injector.get(
+    var StoryEditorNavigationService = $injector.get(
       'StoryEditorNavigationService');
     $scope = $rootScope.$new();
     MockStoryEditorNavigationService = {
