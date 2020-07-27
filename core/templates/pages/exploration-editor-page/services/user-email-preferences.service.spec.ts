@@ -16,18 +16,19 @@
  * @fileoverview Unit tests for the UserEmailPreferencesService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-require('pages/exploration-editor-page/' +
-  'services/user-email-preferences.service.ts');
 
-describe('User Email Preferences Service', function() {
-  var UserEmailPreferencesService = null;
-  var httpBackend = null;
-  var CsrfService = null;
+import { HttpClientTestingModule, HttpTestingController } from
+   '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { CsrfTokenService } from 'services/csrf-token.service';
+import {UserEmailPreferencesService } from './user-email-preferences.service';
+
+describe('User Email Preferences Service',() => {
+  let userEmailPreferencesService: UserEmailPreferencesService = null;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
   var expId = '12345';
   var sampleResponse = {
     email_preferences: {
@@ -36,81 +37,73 @@ describe('User Email Preferences Service', function() {
     }
   };
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
+  beforeEach( () => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
     });
+    httpTestingController = TestBed.get(HttpTestingController);
+    userEmailPreferencesService = TestBed.get(UserEmailPreferencesService);  
+    csrfService = TestBed.get(CsrfTokenService);
 
-    angular.mock.inject(function($injector, $q) {
-      UserEmailPreferencesService = $injector
-        .get('UserEmailPreferencesService');
-      CsrfService = $injector.get('CsrfTokenService');
-      httpBackend = $injector.get('$httpBackend');
-
-      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-        var deferred = $q.defer();
-        deferred.resolve('sample-csrf-token');
-        return deferred.promise;
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
       });
     });
-  });
+    });
 
-  afterEach(function() {
-    httpBackend.verifyNoOutstandingExpectation();
-    httpBackend.verifyNoOutstandingRequest();
-  });
+    afterEach(() => {
+      httpTestingController.verify();
+      });
 
-  it('should successfully intialise the service', function() {
-    expect(UserEmailPreferencesService.feedbackNotificationsMuted)
+  it('should successfully intialise the service', fakeAsync(() => {
+    expect(this.userEmailPreferencesService.feedbackNotificationsMuted)
       .toBeUndefined();
-    expect(UserEmailPreferencesService.suggestionNotificationsMuted)
+    expect(this.userEmailPreferencesService.suggestionNotificationsMuted)
       .toBeUndefined();
 
-    UserEmailPreferencesService.init(true, true);
+    userEmailPreferencesService.init(true, true);
 
-    expect(UserEmailPreferencesService.feedbackNotificationsMuted).toBe(true);
-    expect(UserEmailPreferencesService.suggestionNotificationsMuted).toBe(true);
-  });
+    expect(this.userEmailPreferencesService.feedbackNotificationsMuted)
+      .toBe(true);
+    expect(this.userEmailPreferencesService.suggestionNotificationsMuted)
+      .toBe(true);
+  }));
 
   it('should successfully return the feedbackNotificationsMuted value',
-    function() {
-      UserEmailPreferencesService.init(true, true);
-      expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+  fakeAsync(() => {
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
         .toBe(true);
-    });
+    }));
 
   it('should successfully return the suggestionNotificationsMuted value',
-    function() {
-      UserEmailPreferencesService.init(true, true);
-      expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+  fakeAsync(() => {
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
         .toBe(true);
-    });
+    }));
 
   it('should successfully set the feedback notification preferences',
-    function() {
-      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-        .respond(200, sampleResponse);
-      UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
-      httpBackend.flush();
-      expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+  fakeAsync(() => {
+      let req = httpTestingController
+      .expectOne('/createhandler/notificationpreferences/' + expId);
+      expect(req.request.method).toEqual('PUT');
+      userEmailPreferencesService.setFeedbackNotificationPreferences(false);
+      flushMicrotasks();
+
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
         .toBe(false);
-    });
+    }));
 
   it('should successfully set the suggestion notification preferences',
-    function() {
-      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-        .respond(200, sampleResponse);
-      UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
-      httpBackend.flush();
-      expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+  fakeAsync(() => {
+      let req = httpTestingController
+      .expectOne('/createhandler/notificationpreferences/' + expId);
+      expect(req.request.method).toEqual('PUT');
+      userEmailPreferencesService.setSuggestionNotificationPreferences(false);
+      flushMicrotasks();
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
         .toBe(false);
-    });
+    }));
 });
