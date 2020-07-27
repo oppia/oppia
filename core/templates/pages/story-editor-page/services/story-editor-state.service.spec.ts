@@ -178,12 +178,9 @@ describe('Story editor state service', function() {
   it(
     'should fire an init event and set the topic name after loading the ' +
     'first story', function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       StoryEditorStateService.loadStory('storyId_0');
       $rootScope.$apply();
       expect(StoryEditorStateService.getTopicName()).toEqual('Topic Name');
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('storyInitialized');
     }
   );
 
@@ -192,13 +189,10 @@ describe('Story editor state service', function() {
     StoryEditorStateService.loadStory('storyId_0');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
 
     // Load a second story.
     StoryEditorStateService.loadStory('storyId_1');
     $rootScope.$apply();
-
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('storyReinitialized');
   });
 
   it('should track whether it is currently loading the story', function() {
@@ -286,10 +280,8 @@ describe('Story editor state service', function() {
       StoryEditorStateService.loadStory('storyId_0');
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(StoryEditorStateService.saveStory(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 
@@ -347,12 +339,8 @@ describe('Story editor state service', function() {
       StoryEditorStateService.getStory(), 'New title');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
     StoryEditorStateService.saveStory('Commit message');
     $rootScope.$apply();
-
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'storyReinitialized');
   });
 
   it('should track whether it is currently saving the story', function() {

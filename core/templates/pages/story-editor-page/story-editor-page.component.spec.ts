@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+
 // ^^^ This block is to be removed.
 
 require('pages/story-editor-page/story-editor-page.component.ts');
@@ -90,12 +91,10 @@ describe('Story editor page', function() {
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
+
     ctrl.$onInit();
-    $scope.$broadcast('storyInitialized');
-    $scope.$broadcast('storyReinitialized');
 
     expect(StoryEditorStateService.loadStory).toHaveBeenCalledWith('story_1');
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
   });
 
   it('should return to topic editor page when closing confirmation modal',
