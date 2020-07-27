@@ -187,6 +187,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ltt = latex2text.LatexNodes2Text()
 
         if not item.deleted:
+            exploration = exp_fetchers.get_exploration_from_model(item)
             for state_name, state in exploration.states.items():
                 if state.interaction.id == 'MathExpressionInput':
                     types_of_input = set()

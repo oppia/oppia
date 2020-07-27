@@ -1291,8 +1291,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 }],
                 'solution': {
                     'correct_answer': {
-                        'ascii': 'x+y',
-                        'latex': 'x+y'
+                        'ascii': '1.2 + 3',
+                        'latex': '1.2 + 3'
                     },
                     'answer_is_exclusive': False,
                     'explanation': {
@@ -1337,6 +1337,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+        self.assertIsNone(question.question_state_data.interaction.solution)
 
         answer_group = {
             'outcome': {

@@ -601,8 +601,6 @@ title: Old Title
 
         state2 = exploration.states['State2']
 
-        state2.update_interaction_id('MathExpressionInput')
-
         answer_groups_2 = [{
             'outcome': {
                 'dest': 'Introduction',
@@ -630,7 +628,68 @@ title: Old Title
             'tagged_skill_misconception_id': None
         }]
 
-        state2.update_interaction_answer_groups(answer_groups_2)
+        exploration.states['State2'] = state_domain.State.from_dict({
+            'content': {
+                'content_id': 'content_2',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_2': {},
+                    'feedback_2': {},
+                    'feedback_3': {},
+                    'hint_2': {},
+                    'content_3': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_2': {},
+                    'feedback_2': {},
+                    'feedback_3': {},
+                    'hint_2': {},
+                    'content_3': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': answer_groups_2,
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'feedback_3',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': 'Hint 2'
+                    }
+                }],
+                'solution': {
+                    'correct_answer': {
+                        'ascii': '1.2 + 3',
+                        'latex': '1.2 + 3'
+                    },
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'html': 'Solution explanation',
+                        'content_id': 'content_3'
+                    }
+                },
+                'id': 'MathExpressionInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        })
+
         exploration.states_schema_version = 34
         exp_services.save_new_exploration('owner_id', exploration)
 
@@ -650,6 +709,7 @@ title: Old Title
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+        self.assertIsNone(exploration.states['State2'].interaction.solution)
 
 
         exploration = exp_domain.Exploration.create_default_exploration(

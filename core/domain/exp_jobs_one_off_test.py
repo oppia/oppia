@@ -951,63 +951,6 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(actual_output, expected_output)
 
-    def test_error_output_yielded_for_conflicting_inputs(self):
-        """Checks that an error output is yielded in the case when a single
-        state contains rule inputs of different types.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        state1 = exploration.states['State1']
-
-        state1.update_interaction_id('MathExpressionInput')
-
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x+y-z'}
-            }, {
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'y=mx+c'}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        state1.update_interaction_answer_groups(answer_group_list1)
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start MathExpressionInteractionOneOff job on sample exploration.
-        job_id = (
-            exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
-            ))
-        exp_jobs_one_off.MathExpressionValidationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
-                job_id))
-
-        expected_output = [
-            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 '
-            u'State1: x+y-z\']]',
-            u'[u\'MathEquationInput\', [u\'exp_id0 State1: y=mx+c\']]']
-
-        self.assertEqual(actual_output, expected_output)
-
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
 
