@@ -35,7 +35,8 @@ export class UrlService {
   constructor(private windowRef: WindowRef) {}
 
   /**
-   * Returns the current location.
+   * This function is used to find the current location
+   * of the window.
    * @return {boolean} the current location.
    */
   getCurrentLocation(): Location {
@@ -43,7 +44,7 @@ export class UrlService {
   }
 
   /**
-   * Returns the current query string.
+   * This function is used to find the current query string.
    * @return {boolean} the current query string.
    */
   getCurrentQueryString(): string {
@@ -68,7 +69,7 @@ export class UrlService {
   }
 
   /**
-   * Returns whether the url is framed.
+   * This function is used to check whether the url is framed.
    * @return {boolean} whether the url is framed.
    */
   isIframed(): boolean {
@@ -78,7 +79,7 @@ export class UrlService {
   }
 
   /**
-   * Returns the current path name.
+   * This function is used to find the current path name.
    * @return {string} the current path name.
    */
   getPathname(): string {
@@ -86,7 +87,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the topic id from url.
+   * This function is used to find the topic id from url.
    * @return {string} the topic id.
    * @throws Will throw an error if the url is invalid.
    */
@@ -99,7 +100,8 @@ export class UrlService {
   }
 
   /**
-   * Gets the topic name from the learner's url.
+   * This function is used to find the topic name
+   * from the learner's url.
    * @return {string} the topic name.
    * @throws Will throw an error if the url is invalid.
    */
@@ -113,7 +115,7 @@ export class UrlService {
 
 
   /**
-   * Gets the subtopic name from the learner's url.
+   * This function is used to find the subtopic name from the learner's url.
    * @return {string} the subtopic name.
    * @throws Will throw an error if the url for practice session is invalid.
    */
@@ -128,7 +130,7 @@ export class UrlService {
 
 
   /**
-   * Gets the classroom name from the learner's url.
+   * This function is used to find the classroom name from the learner's url.
    * @return {string} the classroom name.
    * @throws Will throw an error if the url is invalid.
    */
@@ -142,7 +144,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the subtopic id from the learner's url.
+   * This function is used to find the subtopic id from the learner's url.
    * @return {string} the subtopic id.
    * @throws Will throw an error if the url is invalid.
    */
@@ -156,7 +158,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the story id from the learner's url.
+   * This function is used to find the story id from the learner's url.
    * @return {string} the story id.
    * @throws Will Throw an error if the url is invalid.
    */
@@ -169,7 +171,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the story id from the viewer's url.
+   * This function is used to find the story id from the viewer's url.
    * @return {string} the story id.
    * @throws Will throw an error if the url is invalid.
    */
@@ -183,7 +185,7 @@ export class UrlService {
 
 
   /**
-   * Gets the story id from the player.
+   * This function is used to find the story id from the player.
    * @return {string} the story id if the id exists.
    */
   getStoryIdInPlayer(): string | null {
@@ -199,7 +201,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the skill id from the url.
+   * This function is used to find the skill id from the url.
    * @return {string} the skill id.
    * @throws Will throw an error if the skill Id is invalid.
    */
@@ -213,7 +215,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the query values as a list.
+   * This function is used to find the query values as a list.
    * @param {string} fieldName - the name of the field.
    * @return {Array<string>} the list of query field values.
    */
@@ -237,7 +239,8 @@ export class UrlService {
   }
 
   /**
-   * Adds the url, the field name, and the field value together.
+   * This function is used to combine the url, the field name,
+   * and the field value together.
    * @param {string} url - the url.
    * @param {string} fieldName - the field name.
    * @param {string} fieldValue - the field value.
@@ -251,21 +254,23 @@ export class UrlService {
   }
 
   /**
-   * Gets the hashed value from the current location.
+   * This function is used to find the hashed value 
+   * from the current location.
    */
   getHash(): string {
     return this.getCurrentLocation().hash;
   }
 
   /**
-   * Gets the origin from the current location.
+   * This function is used to find the origin from the current location.
    */
   getOrigin(): string {
     return this.getCurrentLocation().origin;
   }
 
   /**
-   * Gets the collection id from the exploration url.
+   * This function is used to find the collection id from
+   * the exploration url.
    * @return {string} a collection id if
    * the url parameter doesn't have a 'parent' property
    * but have a 'collection_id' property; @return {null} if otherwise.
@@ -282,7 +287,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the username from the profile url.
+   * This function is used to find the username from the profile url.
    * @return {string} the username.
    * @throws Will throw exception if the profile URL is invalid.
    */
@@ -295,7 +300,7 @@ export class UrlService {
   }
 
   /**
-   * Gets the collection id from the url.
+   * This function is used to find the collection id from the url.
    * @return {string} the collection id.
    * @throws Will throw exception if the profile URL is invalid.
    */
@@ -308,7 +313,8 @@ export class UrlService {
   }
 
   /**
-   * Gets the collection id from the editor url.
+   * This function is used to find
+   * the collection id from the editor url.
    * @return {string} the collection id.
    * @throws Will throw exception if the editor URL is invalid.
    */
@@ -321,7 +327,8 @@ export class UrlService {
   }
 
   /**
-   * Gets the exploration version id from the url.
+   * This function is used to find the exploration
+   * version id from the url.
    * @return {number} the exploration version from Url
    * if an exploration version can be extracted;
    * {null} if otherwise.
