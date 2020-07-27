@@ -58,12 +58,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.check_function_calls['remove_is_called'] = True
         def mock_rename(unused_path1, unused_path2):
             self.check_function_calls['rename_is_called'] = True
-        # pylint: disable=unused-argument
-        def mock_url_retrieve(unused_url, filename):
+        def mock_url_retrieve(unused_url, filename):  # pylint: disable=unused-argument
             pass
-        def mock_extractall(unused_self, path):
+        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
-        # pylint: enable=unused-argument
 
         self.unzip_swap = self.swap(
             install_third_party, 'TMP_UNZIP_PATH', MOCK_TMP_UNZIP_PATH)
@@ -78,7 +76,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             zipfile.ZipFile, 'extractall', mock_extractall)
 
     def test_download_files_with_invalid_source_filenames(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesRegexp(
+            AssertionError,
+            'Expected list of filenames, got \'invalid source filename\''):
             install_third_party.download_files(
                 'source_url', 'target_dir', 'invalid source filename')
 
@@ -144,10 +144,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             temp_file = tempfile.NamedTemporaryFile()
             file_obj = python_utils.open_file(temp_file.name, 'r')
             return file_obj
-        # pylint: disable=unused-argument
-        def mock_string_io(buffer_value):
+        def mock_string_io(buffer_value):  # pylint: disable=unused-argument
             return MOCK_TMP_UNZIP_PATH
-        # pylint: enable=unused-argument
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
@@ -215,7 +213,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaises(SystemExit):
+        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             install_third_party.test_manifest_syntax(
                 'files', {
                     'files': ['yuicompressor-2.4.8.jar'],
@@ -230,7 +228,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaises(SystemExit):
+        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             install_third_party.test_manifest_syntax(
                 'zip', {
                     'url': 'https://github.com/jsocol/bleach/v3.1.0.zip',
@@ -248,7 +246,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg):
             print_arr.append(msg)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        with print_swap, self.assertRaises(SystemExit):
+        with print_swap, self.assertRaisesRegexp(SystemExit, '1'):
             install_third_party.test_manifest_syntax(
                 'tar', {
                     'version': '4.7.1',

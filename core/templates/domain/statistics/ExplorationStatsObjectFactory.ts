@@ -19,17 +19,17 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { IStateStatsBackendDict, StateStats, StateStatsObjectFactory } from
+import { StateStatsBackendDict, StateStats, StateStatsObjectFactory } from
   'domain/statistics/StateStatsObjectFactory';
 
-export interface IExplorationStatsBackendDict {
+export interface ExplorationStatsBackendDict {
   'exp_id': string;
   'exp_version': number;
   'num_starts': number;
   'num_actual_starts': number;
   'num_completions': number;
   'state_stats_mapping': {
-    [stateName: string]: IStateStatsBackendDict;
+    [stateName: string]: StateStatsBackendDict;
   };
 }
 
@@ -133,7 +133,7 @@ export class ExplorationStatsObjectFactory {
   constructor(private stateStatsObjectFactory: StateStatsObjectFactory) {}
 
   createFromBackendDict(
-      backendDict: IExplorationStatsBackendDict): ExplorationStats {
+      backendDict: ExplorationStatsBackendDict): ExplorationStats {
     const stateStatsMapping = (
       new Map(Object.entries(backendDict.state_stats_mapping).map(
         ([stateName, stateStatsBackendDict]) => [

@@ -36,6 +36,7 @@ describe('NumericExpressionEditor', function() {
   var guppyConfigurationService = null;
   var mathInteractionsService = null;
   var guppyInitializationService = null;
+  let deviceInfoService = null;
 
   class MockGuppy {
     constructor(id: string, config: Object) {}
@@ -56,6 +57,7 @@ describe('NumericExpressionEditor', function() {
       new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
+    deviceInfoService = new DeviceInfoService(new WindowRef());
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
@@ -94,5 +96,14 @@ describe('NumericExpressionEditor', function() {
     ctrl.value = '45/2';
     expect(ctrl.isCurrentAnswerValid()).toBeTrue();
     expect(ctrl.warningText).toBe('');
+  });
+
+  it('should set the value of showOSK to true', function() {
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+
+    expect(guppyInitializationService.getShowOSK()).toBeFalse();
+    ctrl.showOSK();
+    expect(guppyInitializationService.getShowOSK()).toBeTrue();
   });
 });

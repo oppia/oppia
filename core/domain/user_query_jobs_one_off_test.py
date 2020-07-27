@@ -316,7 +316,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         ) % query_id
 
         messages = self._get_sent_email_messages(
-            to=self.USER_SUBMITTER_EMAIL)
+            self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
         self.assertEqual(
@@ -360,7 +360,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         ) % query_id
 
         messages = self._get_sent_email_messages(
-            to=self.USER_SUBMITTER_EMAIL)
+            self.USER_SUBMITTER_EMAIL)
         self.assertEqual(
             messages[0].html.decode(), expected_email_html_body)
         self.assertEqual(
