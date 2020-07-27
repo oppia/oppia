@@ -61,25 +61,34 @@ export class EmailDashboardBackendApiService {
     if (cursor) {
       params.cursor = cursor;
     }
-    return this.http.get<EmailDashboardQueryResultsBackendDict>(
-      this.QUERY_DATA_URL, {
-        params: params
-      }).toPromise().then(data => {
-      let emailDashboardQueryResultsObject = (
-        this.queryResultsObjectFactory.createFromBackendDict(data));
-      return emailDashboardQueryResultsObject;
+
+    return new Promise((resolve, reject) => {
+      this.http.get<EmailDashboardQueryResultsBackendDict>(
+        this.QUERY_DATA_URL, {
+          params: params
+        }).toPromise().then(data => {
+        let emailDashboardQueryResultsObject = (
+          this.queryResultsObjectFactory.createFromBackendDict(data));
+        resolve(emailDashboardQueryResultsObject);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 
   fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
-    return this.http.get<EmailDashboardQueryBackendDict>(
-      this.QUERY_STATUS_CHECK_URL, {
-        params: {
-          query_id: queryId
-        }
-      }).toPromise().then(data => {
-      let queryObject = this.queryObjectFactory.createFromBackendDict(data);
-      return queryObject;
+    return new Promise((resolve, reject) => {
+      this.http.get<EmailDashboardQueryBackendDict>(
+        this.QUERY_STATUS_CHECK_URL, {
+          params: {
+            query_id: queryId
+          }
+        }).toPromise().then(data => {
+        let queryObject = this.queryObjectFactory.createFromBackendDict(data);
+        resolve(queryObject);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 
@@ -93,11 +102,15 @@ export class EmailDashboardBackendApiService {
       edited_fewer_than_n_exps: data.editedFewerThanNExps
     };
 
-    return this.http.post<EmailDashboardQueryBackendDict>(
-      this.QUERY_DATA_URL, {
-        data: postData}).toPromise().then(data => {
-      let queryObject = this.queryObjectFactory.createFromBackendDict(data);
-      return queryObject;
+    return new Promise((resolve, reject) => {
+      this.http.post<EmailDashboardQueryBackendDict>(
+        this.QUERY_DATA_URL, {
+          data: postData}).toPromise().then(data => {
+        let queryObject = this.queryObjectFactory.createFromBackendDict(data);
+        resolve(queryObject);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 }

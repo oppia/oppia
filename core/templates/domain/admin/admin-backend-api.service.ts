@@ -108,30 +108,34 @@ export class AdminBackendApiService {
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
-    return this.http.get<AdminPageDataBackendDict>(
-      AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
-      return {
-        demoExplorations: response.demo_explorations,
-        demoCollections: response.demo_collections,
-        demoExplorationIds: response.demo_exploration_ids,
-        oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
-          this.jobStatusSummaryObjectFactory.createFromBackendDict),
-        humanReadableCurrentTime: response.human_readable_current_time,
-        auditJobStatusSummaries: response.audit_job_status_summaries.map(
-          this.jobStatusSummaryObjectFactory.createFromBackendDict),
-        updatableRoles: response.updatable_roles,
-        roleGraphData: response.role_graph_data,
-        configProperties: response.config_properties,
-        viewableRoles: response.viewable_roles,
-        unfinishedJobData: response.unfinished_job_data.map(
-          this.jobDataObjectFactory.createFromBackendDict),
-        recentJobData: response.recent_job_data.map(
-          this.jobDataObjectFactory.createFromBackendDict),
-        continuousComputationsData: response.continuous_computations_data.map(
-          this.computationDataObjectFactory.createFromBackendDict),
-        topicSummaries: response.topic_summaries.map(
-          this.topicSummaryObjectFactory.createFromBackendDict)
-      };
+    return new Promise((resolve, reject) => {
+      this.http.get<AdminPageDataBackendDict>(
+        AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
+        resolve({
+          demoExplorations: response.demo_explorations,
+          demoCollections: response.demo_collections,
+          demoExplorationIds: response.demo_exploration_ids,
+          oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
+            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+          humanReadableCurrentTime: response.human_readable_current_time,
+          auditJobStatusSummaries: response.audit_job_status_summaries.map(
+            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+          updatableRoles: response.updatable_roles,
+          roleGraphData: response.role_graph_data,
+          configProperties: response.config_properties,
+          viewableRoles: response.viewable_roles,
+          unfinishedJobData: response.unfinished_job_data.map(
+            this.jobDataObjectFactory.createFromBackendDict),
+          recentJobData: response.recent_job_data.map(
+            this.jobDataObjectFactory.createFromBackendDict),
+          continuousComputationsData: response.continuous_computations_data.map(
+            this.computationDataObjectFactory.createFromBackendDict),
+          topicSummaries: response.topic_summaries.map(
+            this.topicSummaryObjectFactory.createFromBackendDict)
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 
