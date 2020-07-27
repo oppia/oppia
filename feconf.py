@@ -390,12 +390,10 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
-# To use GAE email service.
-EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
 # To use mailgun email service.
 EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
-EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun API key.
 MAILGUN_API_KEY = None
@@ -533,6 +531,10 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
+
+# We generate images for existing math rich text components in batches. This
+# gives the maximum size for a batch of Math SVGs in bytes.
+MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
@@ -720,6 +722,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
+IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'

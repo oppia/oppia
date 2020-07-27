@@ -352,8 +352,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            story_id, title='A story',
-            corresponding_topic_id=topic_id)
+            story_id, 'A story', 'Description', topic_id)
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
@@ -403,7 +402,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_admin_topics_csv_download_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_custom_response(
-            '/admintopicscsvdownloadhandler', expected_content_type='text/csv')
+            '/admintopicscsvdownloadhandler', 'text/csv')
 
         self.assertEqual(
             response.headers['Content-Disposition'],
@@ -1164,13 +1163,13 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
-                '/senddummymailtoadminhandler', payload={},
+                '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=200)
             self.assertEqual(generated_response, {})
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
-                '/senddummymailtoadminhandler', payload={},
+                '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=400)
             self.assertEqual(
                 generated_response['error'], 'This app cannot send emails.')
@@ -1192,7 +1191,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': None},
             csrf_token=csrf_token,
@@ -1206,7 +1205,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': None,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
@@ -1220,7 +1219,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': 123},
             csrf_token=csrf_token,
@@ -1234,7 +1233,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': 123,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
@@ -1249,7 +1248,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': long_username},
             csrf_token=csrf_token,
@@ -1266,7 +1265,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': non_existent_username,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
@@ -1278,7 +1277,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         response = self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': self.OLD_USERNAME},
             csrf_token=csrf_token,
@@ -1291,7 +1290,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
         self.put_json(
             '/updateusernamehandler',
-            payload={
+            {
                 'old_username': self.OLD_USERNAME,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token)
@@ -1315,7 +1314,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             mock_get_current_time_in_millisecs):
             self.put_json(
                 '/updateusernamehandler',
-                payload={
+                {
                     'old_username': self.OLD_USERNAME,
                     'new_username': self.NEW_USERNAME},
                 csrf_token=csrf_token)

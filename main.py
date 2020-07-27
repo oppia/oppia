@@ -769,6 +769,11 @@ URLS = MAPREDUCE_HANDLERS + [
             feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
             constants.TASK_ENTITY_TYPE_EXPLORATION),
         improvements.ExplorationImprovementsHistoryHandler),
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

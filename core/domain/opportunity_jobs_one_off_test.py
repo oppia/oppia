@@ -78,9 +78,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         topic_services.save_new_topic(self.owner_id, topic_2)
 
         story_1 = story_domain.Story.create_default_story(
-            story_id_1, title='A story', corresponding_topic_id=self.topic_id_1)
+            story_id_1, 'A story', 'description', self.topic_id_1)
         story_2 = story_domain.Story.create_default_story(
-            story_id_2, title='A story', corresponding_topic_id=self.topic_id_2)
+            story_id_2, 'A story', 'description', self.topic_id_2)
 
         story_services.save_new_story(self.owner_id, story_1)
         story_services.save_new_story(self.owner_id, story_2)
