@@ -126,7 +126,7 @@ describe('Topic editor functionality', function() {
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'Story description', '../data/test_svg.svg');
+      'Story Title', 'Story description', Constants.TEST_SVG_PATH);
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -273,7 +273,7 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(topicName,
       'Description', false);
     await topicEditorPage.createStory(
-      'Story 0', 'Story description', '../data/test_svg.svg');
+      'Story 0', 'Story description', Constants.TEST_SVG_PATH);
     var url = await browser.getCurrentUrl();
     storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -287,7 +287,7 @@ describe('Chapter editor functionality', function() {
 
   it('should create a basic chapter.', async function() {
     await storyEditorPage.createNewChapter(
-      'Chapter 1', dummyExplorationIds[0], '../data/test_svg.svg');
+      'Chapter 1', dummyExplorationIds[0], Constants.TEST_SVG_PATH);
     await storyEditorPage.changeNodeDescription('Chapter description 1');
     await storyEditorPage.changeNodeOutline(
       await forms.toRichText('First outline'));
@@ -321,7 +321,7 @@ describe('Chapter editor functionality', function() {
 
   it('should add one more chapter to the story', async function() {
     await storyEditorPage.createNewChapter(
-      'Chapter 2', dummyExplorationIds[1], '../data/test_svg.svg');
+      'Chapter 2', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
     await storyEditorPage.navigateToChapterByIndex(1);
     await storyEditorPage.changeNodeDescription('Chapter description 2');
     await storyEditorPage.changeNodeOutline(
@@ -339,7 +339,7 @@ describe('Chapter editor functionality', function() {
   it('should fail to add one more chapter with existing exploration',
     async function() {
       await storyEditorPage.createNewChapter(
-        'Chapter 3', dummyExplorationIds[1], '../data/test_svg.svg');
+        'Chapter 3', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
       await storyEditorPage.expectExplorationIdAlreadyExistWarning();
     }
   );
@@ -347,7 +347,7 @@ describe('Chapter editor functionality', function() {
   it('should add one more chapter and change the chapters sequences',
     async function() {
       await storyEditorPage.createNewChapter(
-        'Chapter 3', dummyExplorationIds[2], '../data/test_svg.svg');
+        'Chapter 3', dummyExplorationIds[2], Constants.TEST_SVG_PATH);
       await storyEditorPage.navigateToChapterByIndex(2);
       await storyEditorPage.expectChaptersListToBe(
         ['Chapter 1', 'Chapter 2', 'Chapter 3']);
