@@ -75,7 +75,7 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
           ctrl.$onInit = function() {
             $scope.story = StoryEditorStateService.getStory();
             const storyInitializedSubscription =
-              StoryEditorStateService.getStoryInitializedSubject().subscribe(
+              StoryEditorStateService.onStoryInitializedSubject.subscribe(
                 () => $scope.topicName = StoryEditorStateService.getTopicName()
               );
             ctrl.attachedSubscriptions.add(storyInitializedSubscription);

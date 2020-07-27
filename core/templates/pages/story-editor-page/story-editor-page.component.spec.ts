@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Subject } from 'rxjs';
 
 // ^^^ This block is to be removed.
 
@@ -85,16 +86,25 @@ describe('Story editor page', function() {
     });
   }));
 
-  it('should load story based on its id on url when component is initialized' +
+  fit('should load story based on its id on url when component is initialized' +
     ' and set page title', function() {
-    spyOn(StoryEditorStateService, 'loadStory').and.stub();
+    let sampleSubject = new Subject();
+    let sampleSubject2 = new Subject();
+    spyOn(StoryEditorStateService, 'loadStory').and.callFake(function() {
+      sampleSubject.next();
+      sampleSubject2.next();
+    });
+    spyOn(StoryEditorStateService,
+      'getStoryInitializedSubject').and.returnValue(sampleSubject);
+    spyOn(StoryEditorStateService,
+      'getStoryReinitializedSubject').and.returnValue(sampleSubject2);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
 
     ctrl.$onInit();
 
     expect(StoryEditorStateService.loadStory).toHaveBeenCalledWith('story_1');
+    expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
   });
 
   it('should return to topic editor page when closing confirmation modal',

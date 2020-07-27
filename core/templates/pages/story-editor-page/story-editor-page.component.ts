@@ -81,17 +81,17 @@ angular.module('oppia').component('storyEditorPage', {
       };
 
       ctrl.$onInit = function() {
-        StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         const storyInitializedSubscription =
-          StoryEditorStateService.getStoryInitializedSubject().subscribe(
-            () => setPageTitle()
-          );
+        StoryEditorStateService.onStoryInitializedSubject.subscribe(
+          () => setPageTitle()
+        );
         ctrl.attachedSubscriptions.add(storyInitializedSubscription);
         const storyReinitializedSubscription =
-          StoryEditorStateService.getStoryReinitializedSubject().subscribe(
+          StoryEditorStateService.onStoryReinitializedSubject.subscribe(
             () => setPageTitle()
           );
         ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
+        StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
       };
 
       ctrl.$onDestroy = function() {

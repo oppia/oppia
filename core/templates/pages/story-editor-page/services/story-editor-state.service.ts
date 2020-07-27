@@ -42,15 +42,15 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _skillSummaries = [];
     var _expIdsChanged = false;
 
-    var storyInitializedSubject = new Subject();
-    var storyReinitializedSubject = new Subject();
+    var _storyInitializedSubject = new Subject();
+    var _storyReinitializedSubject = new Subject();
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
       if (_storyIsInitialized) {
-        storyReinitializedSubject.next();
+        _storyReinitializedSubject.next();
       } else {
-        storyInitializedSubject.next();
+        _storyInitializedSubject.next();
         _storyIsInitialized = true;
       }
     };
@@ -144,9 +144,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
        * Sets the story stored within this service, propogating changes to
        * all bindings to the story returned by getStory(). The first
        * time this is called it will fire a global event based on the
-       * next() function of the storyInitializedSubject. All subsequent
+       * next() function of the _storyInitializedSubject. All subsequent
        * calls will similarly fire a next() function of the
-       * storyReinitializedSubject.
+       * _storyReinitializedSubject.
        */
       setStory: function(story) {
         _setStory(story);
@@ -227,12 +227,12 @@ angular.module('oppia').factory('StoryEditorStateService', [
         return _storyIsBeingSaved;
       },
 
-      getStoryInitializedSubject: function() {
-        return storyInitializedSubject;
+      get onStoryInitializedSubject() {
+        return _storyInitializedSubject;
       },
 
-      getStoryReinitializedSubject: function() {
-        return storyReinitializedSubject;
+      get onStoryReinitializedSubject() {
+        return _storyReinitializedSubject;
       }
     };
   }
