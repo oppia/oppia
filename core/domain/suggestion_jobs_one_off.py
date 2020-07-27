@@ -105,12 +105,9 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if (
-                key not in [
-                    SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
-                    (
-                        SuggestionMathMigrationOneOffJob.
-                        _ERROR_KEY_BEFORE_MIGRATION)]):
+        if key not in [
+                SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
+                SuggestionMathMigrationOneOffJob._ERROR_KEY_BEFORE_MIGRATION]:
             no_of_suggestions_migrated = (
                 sum(ast.literal_eval(v) for v in values))
             yield (key, ['%d suggestions successfully migrated.' % (

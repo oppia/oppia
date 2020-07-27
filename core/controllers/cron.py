@@ -169,8 +169,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
 
         job_instances = job_models.JobModel.get_recent_jobs(1000, max_age_msec)
         for job_instance in job_instances:
-            if (
-                    job_instance.time_started_msec < max_start_time_msec and not
+            if (job_instance.time_started_msec < max_start_time_msec and not
                     job_instance.has_been_cleaned_up):
                 if 'root_pipeline_id' in job_instance.metadata:
                     pipeline_id = job_instance.metadata['root_pipeline_id']
@@ -188,8 +187,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
                 have_start_time and
                 pline['startTimeMs'] < max_start_time_msec)
 
-            if (
-                    job_started_too_long_ago or
+            if (job_started_too_long_ago or
                     (not have_start_time and job_definitely_terminated)):
                 # At this point, the map/reduce pipeline is either in a
                 # terminal state, or has taken so long that there's no

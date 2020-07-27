@@ -513,10 +513,9 @@ class SetupTests(test_utils.GenericTestBase):
 
     def test_chrome_bin_setup_with_windows_chrome(self):
         def mock_isfile(path):
-            return (
-                path == (
-                    'c:\\Program Files (x86)\\Google\\Chrome\\' +
-                    'Application\\Chrome.exe'))
+            return path == (
+                'c:\\Program Files (x86)\\Google\\Chrome\\' +
+                'Application\\Chrome.exe')
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         with self.test_py_swap, self.create_swap, self.uname_swap:
             with self.exists_swap, self.chown_swap, self.chmod_swap:

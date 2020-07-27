@@ -179,8 +179,7 @@ class UserSettings(python_utils.OBJECT):
         if not is_user_id_correct(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
-        if (
-                self.gae_id is not None and
+        if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
             raise utils.ValidationError(
                 'Expected gae_id to be a string, received %s' %
@@ -192,8 +191,7 @@ class UserSettings(python_utils.OBJECT):
                 'Expected email to be a string, received %s' % self.email)
         if not self.email:
             raise utils.ValidationError('No user email specified.')
-        if (
-                '@' not in self.email or self.email.startswith('@')
+        if ('@' not in self.email or self.email.startswith('@')
                 or self.email.endswith('@')):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
@@ -209,8 +207,7 @@ class UserSettings(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected dashboard display preference to be a string, '
                 'received %s' % self.creator_dashboard_display_pref)
-        if (
-                self.creator_dashboard_display_pref not in
+        if (self.creator_dashboard_display_pref not in
                 list(constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values(
                     ))):
             raise utils.ValidationError(
@@ -1630,8 +1627,7 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
         Exception: If schema_version > CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
     """
     stats_schema_version = versioned_dashboard_stats.schema_version
-    if not (
-            1 <= stats_schema_version
+    if not (1 <= stats_schema_version
             <= feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d dashboard stats schemas at '
@@ -1784,8 +1780,7 @@ def is_at_least_moderator(user_id):
         bool. True if user is atleast a moderator, False otherwise.
     """
     user_role = get_user_role_from_id(user_id)
-    if (
-            user_role == feconf.ROLE_ID_MODERATOR or
+    if (user_role == feconf.ROLE_ID_MODERATOR or
             user_role == feconf.ROLE_ID_ADMIN):
         return True
     return False

@@ -835,8 +835,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        if (
-                not image.has_attr('filepath-with-value') or
+        if (not image.has_attr('filepath-with-value') or
                 image['filepath-with-value'] == ''):
             image.decompose()
             continue

@@ -442,8 +442,8 @@ class DraftChangeMathRichTextAuditOneOffJob(
             final_values = list(set(values))
             yield ((
                 'found %d explorations having draft changes with math-tags '
-                'having no SVG') % (len(
-                    final_values)), final_values)
+                'having no SVG'
+            ) % len(final_values), final_values)
         else:
             yield (key, values)
 

@@ -469,16 +469,14 @@ class Collection(python_utils.OBJECT):
         collection_schema_version = collection_dict.get('schema_version')
         if collection_schema_version is None:
             raise Exception('Invalid YAML file: no schema version specified.')
-        if not (
-                1 <= collection_schema_version
+        if not (1 <= collection_schema_version
                 <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             raise Exception(
                 'Sorry, we can only process v1 to v%s collection YAML files at '
                 'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        while (
-                collection_schema_version <
-                feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+        while (collection_schema_version <
+               feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             conversion_fn = getattr(
                 cls, '_convert_v%s_dict_to_v%s_dict' % (
                     collection_schema_version, collection_schema_version + 1))
@@ -642,8 +640,7 @@ class Collection(python_utils.OBJECT):
             Exception: The value of the key 'schema_version' in
                 versioned_collection_contents is not valid.
         """
-        if (
-                versioned_collection_contents['schema_version'] + 1 >
+        if (versioned_collection_contents['schema_version'] + 1 >
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
             raise Exception(
                 'Collection is version %d but current collection'
@@ -932,8 +929,7 @@ class Collection(python_utils.OBJECT):
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
 
-            if (
-                    tag[0] not in string.ascii_lowercase or
+            if (tag[0] not in string.ascii_lowercase or
                     tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
@@ -1123,8 +1119,7 @@ class CollectionSummary(python_utils.OBJECT):
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
 
-            if (
-                    tag[0] not in string.ascii_lowercase or
+            if (tag[0] not in string.ascii_lowercase or
                     tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '

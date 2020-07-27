@@ -527,8 +527,7 @@ def execute_deployment():
             update_configs.main(personal_access_token)
             with python_utils.open_file(common.FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()
-                if (
-                        'MAILGUN_API_KEY' not in feconf_contents or
+                if ('MAILGUN_API_KEY' not in feconf_contents or
                         'MAILGUN_API_KEY = None' in feconf_contents):
                     raise Exception(
                         'The mailgun API key must be added before deployment.')

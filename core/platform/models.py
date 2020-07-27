@@ -237,9 +237,9 @@ class _Gae(Platform):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:
-            raise Exception((
+            raise Exception(
                 'Invalid email service provider: %s' % (
-                    feconf.EMAIL_SERVICE_PROVIDER)))
+                    feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
     def import_memcache_services(cls):

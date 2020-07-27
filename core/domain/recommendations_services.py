@@ -164,8 +164,7 @@ def get_topic_similarity(topic_1, topic_2):
     the topics are the same.
     """
 
-    if (
-            topic_1 in RECOMMENDATION_CATEGORIES and
+    if (topic_1 in RECOMMENDATION_CATEGORIES and
             topic_2 in RECOMMENDATION_CATEGORIES):
         topic_similarities = get_topic_similarities_dict()
         return topic_similarities[topic_1][topic_2]
@@ -247,8 +246,7 @@ def validate_topic_similarities(data):
 
     for row_ind in python_utils.RANGE(topics_length):
         for col_ind in python_utils.RANGE(topics_length):
-            if (
-                    topic_similarities_values[row_ind][col_ind] !=
+            if (topic_similarities_values[row_ind][col_ind] !=
                     topic_similarities_values[col_ind][row_ind]):
                 raise Exception('Expected topic similarities to be symmetric.')
 

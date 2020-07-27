@@ -68,8 +68,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new question into the datastore if it's different from
         # the old version.
-        if (
-                item.question_state_data_schema_version <=
+        if (item.question_state_data_schema_version <=
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             commit_cmds = [question_domain.QuestionChange({
                 'cmd': question_domain.CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long

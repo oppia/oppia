@@ -69,8 +69,7 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new story into the datastore if it's different from
         # the old version.
-        if (
-                item.story_contents_schema_version <=
+        if (item.story_contents_schema_version <=
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
             commit_cmds = [story_domain.StoryChange({
                 'cmd': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,

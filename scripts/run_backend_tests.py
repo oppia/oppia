@@ -228,8 +228,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
                             _get_test_target_classes(os.path.join(subroot, f)))
 
             for f in files:
-                if (
-                        f.endswith('_test.py') and
+                if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
                     result = result + (
                         _get_test_target_classes(os.path.join(subroot, f)))
@@ -345,10 +344,9 @@ def main(args=None):
         if not task.finished:
             python_utils.PRINT('CANCELED  %s' % spec.test_target)
             test_count = 0
-        elif (
-                task.exception and
-                'No tests were run' in python_utils.convert_to_bytes(
-                    task.exception.args[0])):
+        elif (task.exception and
+              'No tests were run' in python_utils.convert_to_bytes(
+                  task.exception.args[0])):
             python_utils.PRINT(
                 'ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0

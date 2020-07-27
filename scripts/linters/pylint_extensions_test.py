@@ -199,6 +199,8 @@ class HangingIndentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
+                if (a > 1 and
+                        b > 2):
                 """)
         node_break_after_hanging_indent.file = filename
         node_break_after_hanging_indent.path = filename
@@ -222,6 +224,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""self.post_json('/ml/\\trainedclassifierhandler',  # pylint: disable=invalid-name
                 self.payload, expect_errors=True, expected_status_int=401)
+
+                if (a > 1 and
+                        b > 2):  # pylint: disable=invalid-name
                 """)
         node_break_after_hanging_indent.file = filename
         node_break_after_hanging_indent.path = filename

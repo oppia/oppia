@@ -159,8 +159,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             else:
                 invalid_exp_ids.append(exp_ids[ind])
 
-        if (len(
-                returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
+        if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
                 or search_cursor is None):
             break
         else:
@@ -168,8 +167,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
-    if (len(
-            returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
+    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
@@ -358,8 +356,7 @@ def apply_change_list(exploration_id, change_list):
                 exploration.delete_state(change.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state = exploration.states[change.state_name]
-                if (
-                        change.property_name ==
+                if (change.property_name ==
                         exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(
                         list(python_utils.MAP(
@@ -367,41 +364,34 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     state.update_interaction_answer_groups(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
                         )
                     state.update_interaction_default_outcome(new_outcome)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if not isinstance(change.new_value, list):
                         raise Exception(
                             'Expected hints_list to be a list,'
@@ -409,25 +399,22 @@ def apply_change_list(exploration_id, change_list):
                     new_hints_list = [state_domain.Hint.from_dict(hint_dict)
                                       for hint_dict in change.new_value]
                     state.update_interaction_hints(new_hints_list)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     new_solution = None
                     if change.new_value is not None:
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value)
                     state.update_interaction_solution(new_solution)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
@@ -452,9 +439,8 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected written_translations to be a dict, '
@@ -1282,8 +1268,7 @@ def save_new_exploration_from_yaml_and_assets(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(asset_filename, asset_content)
 
-    if (
-            exp_schema_version <=
+    if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
         # The schema of the YAML file for older explorations did not include
         # a title and a category; these need to be manually specified.
@@ -1528,8 +1513,7 @@ def is_voiceover_change_list(change_list):
         allowed for voice artist to do.
     """
     for change in change_list:
-        if (
-                change.property_name !=
+        if (change.property_name !=
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
@@ -1652,8 +1636,7 @@ def create_or_update_draft(
             'changes in the change list.')
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    if (
-            exp_user_data and exp_user_data.draft_change_list and
+    if (exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
 
@@ -1695,8 +1678,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]
-            if (
-                    exploration.version >
+            if (exploration.version >
                     exp_user_data.draft_change_list_exp_version):
                 logging.info(
                     'Exploration and draft versions out of sync, trying '
@@ -1711,8 +1693,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_change_list_exp_version = exploration.version
     updated_exploration = None
 
-    if (
-            exp_user_data and exp_user_data.draft_change_list and
+    if (exp_user_data and exp_user_data.draft_change_list and
             is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
         updated_exploration = apply_change_list(exp_id, draft_change_list)
         updated_exploration_has_no_invalid_math_tags = True

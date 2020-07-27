@@ -748,13 +748,11 @@ class Topic(python_utils.OBJECT):
             raise Exception(
                 'Expected from_index and to_index values to be different.')
 
-        if (
-                from_index >= len(self.canonical_story_references) or
+        if (from_index >= len(self.canonical_story_references) or
                 from_index < 0):
             raise Exception('Expected from_index value to be with-in bounds.')
 
-        if (
-                to_index >= len(self.canonical_story_references) or
+        if (to_index >= len(self.canonical_story_references) or
                 to_index < 0):
             raise Exception('Expected to_index value to be with-in bounds.')
 
@@ -876,8 +874,7 @@ class Topic(python_utils.OBJECT):
                 'Expected story reference schema version to be an integer, '
                 'received %s' % self.story_reference_schema_version)
 
-        if (
-                self.subtopic_schema_version !=
+        if (self.subtopic_schema_version !=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected subtopic schema version to be %s, received %s'
@@ -1289,13 +1286,11 @@ class Topic(python_utils.OBJECT):
 
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
-        if (
-                from_index >= len(self.subtopics[subtopic_index].skill_ids) or
+        if (from_index >= len(self.subtopics[subtopic_index].skill_ids) or
                 from_index < 0):
             raise Exception('Expected from_index value to be with-in bounds.')
 
-        if (
-                to_index >= len(self.subtopics[subtopic_index].skill_ids) or
+        if (to_index >= len(self.subtopics[subtopic_index].skill_ids) or
                 to_index < 0):
             raise Exception('Expected to_index value to be with-in bounds.')
 

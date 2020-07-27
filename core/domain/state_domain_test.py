@@ -238,7 +238,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
                 (
                     '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
-                    'pec htmls</p>'), '',
+                    'pec htmls</p>'),
+                '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
                 '<p>state customization arg html 1</p>',

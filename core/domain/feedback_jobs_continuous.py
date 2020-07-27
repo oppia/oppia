@@ -147,15 +147,13 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             old_status = args[1]
             updated_status = args[2]
             # Status changed from closed to open.
-            if (
-                    old_status != feedback_models.STATUS_CHOICES_OPEN
+            if (old_status != feedback_models.STATUS_CHOICES_OPEN
                     and updated_status == feedback_models.STATUS_CHOICES_OPEN):
                 transaction_services.run_in_transaction(
                     _increment_open_threads_count)
             # Status changed from open to closed.
-            elif (
-                    old_status == feedback_models.STATUS_CHOICES_OPEN
-                    and updated_status != feedback_models.STATUS_CHOICES_OPEN):
+            elif (old_status == feedback_models.STATUS_CHOICES_OPEN
+                  and updated_status != feedback_models.STATUS_CHOICES_OPEN):
                 transaction_services.run_in_transaction(
                     _decrement_open_threads_count)
 

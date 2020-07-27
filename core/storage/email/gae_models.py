@@ -259,8 +259,7 @@ class SentEmailModel(base_models.BaseModel):
             email_hash, sent_datetime_lower_bound=sent_datetime_lower_bound)
 
         for message in messages:
-            if (
-                    message.recipient_id == recipient_id and
+            if (message.recipient_id == recipient_id and
                     message.subject == email_subject and
                     message.html_body == email_body):
                 return True

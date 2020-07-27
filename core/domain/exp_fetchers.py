@@ -66,17 +66,15 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     if states_schema_version is None or states_schema_version < 1:
         states_schema_version = 0
 
-    if not (
-            0 <= states_schema_version
+    if not (0 <= states_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned exploration '
             'state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    while (
-            states_schema_version <
-            feconf.CURRENT_STATE_SCHEMA_VERSION):
+    while (states_schema_version <
+           feconf.CURRENT_STATE_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states, states_schema_version,
             exploration_id)
@@ -175,8 +173,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
-    if (
-            run_conversion and exploration_model.states_schema_version !=
+    if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_states_schema(
             versioned_exploration_states, exploration_model.id)

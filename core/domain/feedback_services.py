@@ -671,8 +671,7 @@ def update_feedback_email_retries(user_id):
     time_since_buffered = (
         (datetime.datetime.utcnow() - model.created_on).seconds)
 
-    if (
-            time_since_buffered >
+    if (time_since_buffered >
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):
         model.retries += 1
         model.put()
@@ -717,8 +716,7 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
 
     updated_references = [
         reference for reference in model.feedback_message_references
-        if (
-            reference['entity_id'] != exploration_id or
+        if (reference['entity_id'] != exploration_id or
             reference['thread_id'] != thread_id)
     ]
 

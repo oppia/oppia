@@ -716,8 +716,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                 # see the comment above HASHES_JSON_FILENAME for details.
                 relative_path = common.convert_to_posixpath(
                     os.path.relpath(source_path, source))
-                if (
-                        hash_should_be_inserted(source + relative_path) and
+                if (hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
                     relative_path = (
                         _insert_hash(relative_path, file_hashes[relative_path]))
@@ -877,9 +876,8 @@ def minify_func(source_path, target_path, filename):
             with python_utils.open_file(
                 target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file)
-    elif (
-            (filename.endswith('.css') or filename.endswith('.js')) and
-            not skip_minify):
+    elif ((filename.endswith('.css') or filename.endswith('.js')) and
+          not skip_minify):
         python_utils.PRINT('Minifying %s' % source_path)
         _minify(source_path, target_path)
     else:

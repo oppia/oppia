@@ -393,9 +393,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
-                for state_stats in (list(
+                for state_stats in list(
                         datastore_stats_for_version.
-                        state_stats_mapping.values())):
+                        state_stats_mapping.values()):
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0
@@ -1107,8 +1107,7 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 % (key, sum_completions, all_completions),)
 
         for state_name in all_state_hit:
-            if (
-                    state_name not in sum_state_hit and
+            if (state_name not in sum_state_hit and
                     all_state_hit[state_name] != 0):
                 yield (
                     'state hit count not same exp_id:%s state:%s, '

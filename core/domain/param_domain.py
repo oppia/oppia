@@ -82,9 +82,8 @@ class ParamSpec(python_utils.OBJECT):
         # Ensure the obj_type is among the supported ParamSpec types.
         if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
-                (
-                    '%s is not among the supported object types for parameters:'
-                    ' {%s}.') %
+                '%s is not among the supported object types for parameters:'
+                ' {%s}.' %
                 (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 

@@ -124,8 +124,8 @@ class ActivityRights(python_utils.OBJECT):
                 has owners, editors, voice artists or viewers specified.
         """
         if self.community_owned:
-            if (self.owner_ids or self.editor_ids or self.voice_artist_ids or (
-                    self.viewer_ids)):
+            if (self.owner_ids or self.editor_ids or self.voice_artist_ids or
+                    self.viewer_ids):
                 raise utils.ValidationError(
                     'Community-owned explorations should have no owners, '
                     'editors, voice artists or viewers specified.')
@@ -731,18 +731,16 @@ def check_can_edit_activity(user, activity_rights):
     if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
         return False
 
-    if (
-            activity_rights.is_owner(user.user_id) or
+    if (activity_rights.is_owner(user.user_id) or
             activity_rights.is_editor(user.user_id)):
         return True
 
-    if (
-            activity_rights.community_owned or
+    if (activity_rights.community_owned or
             (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
         return True
 
-    if (activity_rights.is_published() and (
-            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions)):
+    if (activity_rights.is_published() and
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False
@@ -766,19 +764,17 @@ def check_can_voiceover_activity(user, activity_rights):
     if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
         return False
 
-    if (
-            activity_rights.is_owner(user.user_id) or
+    if (activity_rights.is_owner(user.user_id) or
             activity_rights.is_editor(user.user_id) or
             activity_rights.is_voice_artist(user.user_id)):
         return True
 
-    if (
-            activity_rights.community_owned or
-            (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
+    if (activity_rights.community_owned or
+            role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions):
         return True
 
-    if (activity_rights.is_published() and (
-            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions)):
+    if (activity_rights.is_published() and
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False
@@ -818,14 +814,12 @@ def check_can_delete_activity(user, activity_rights):
 
     if role_services.ACTION_DELETE_ANY_ACTIVITY in user.actions:
         return True
-    elif (
-            activity_rights.is_private() and
-            (role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions)
-            and activity_rights.is_owner(user.user_id)):
+    elif (activity_rights.is_private() and
+          (role_services.ACTION_DELETE_OWNED_PRIVATE_ACTIVITY in user.actions)
+          and activity_rights.is_owner(user.user_id)):
         return True
-    elif (
-            activity_rights.is_published() and
-            (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in user.actions)):
+    elif (activity_rights.is_published() and
+          (role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY in user.actions)):
         return True
 
     return False
@@ -846,17 +840,14 @@ def check_can_modify_activity_roles(user, activity_rights):
     if activity_rights is None:
         return False
 
-    if (
-            activity_rights.community_owned or
+    if (activity_rights.community_owned or
             activity_rights.cloned_from):
         return False
 
-    if (
-            role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY in
+    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY in
             user.actions):
         return True
-    if (
-            role_services.ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY in
+    if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
         if activity_rights.is_owner(user.user_id):
             return True
@@ -1000,8 +991,7 @@ def _assign_role(
             old_role = ROLE_VOICE_ARTIST
 
     elif new_role == ROLE_EDITOR:
-        if (
-                activity_rights.is_editor(assignee_id) or
+        if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
                 'This user already can edit this %s.' % activity_type)
@@ -1017,8 +1007,7 @@ def _assign_role(
             old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VOICE_ARTIST:
-        if (
-                activity_rights.is_editor(assignee_id) or
+        if (activity_rights.is_editor(assignee_id) or
                 activity_rights.is_voice_artist(assignee_id) or
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
@@ -1031,8 +1020,7 @@ def _assign_role(
             old_role = ROLE_VIEWER
 
     elif new_role == ROLE_VIEWER:
-        if (
-                activity_rights.is_owner(assignee_id) or
+        if (activity_rights.is_owner(assignee_id) or
                 activity_rights.is_editor(assignee_id) or
                 activity_rights.is_viewer(assignee_id)):
             raise Exception(

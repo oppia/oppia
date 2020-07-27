@@ -45,8 +45,7 @@ def subscribe_to_thread(user_id, feedback_thread_id):
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if (
-            feedback_thread_id not in
+    if (feedback_thread_id not in
             subscriptions_model.general_feedback_thread_ids):
         subscriptions_model.general_feedback_thread_ids.append(
             feedback_thread_id)

@@ -914,8 +914,7 @@ class StateAnswers(python_utils.OBJECT):
                     % python_utils.UNICODE(self.interaction_id))
 
             # Verify interaction_id is valid.
-            if (
-                    self.interaction_id not in
+            if (self.interaction_id not in
                     interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
                     'Unknown interaction_id: %s' % self.interaction_id)
@@ -1319,8 +1318,7 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
                 'Expected calculation_id to be a string, received %s'
                 % python_utils.UNICODE(self.calculation_id))
 
-        if (
-                not isinstance(self.calculation_output, AnswerFrequencyList)
+        if (not isinstance(self.calculation_output, AnswerFrequencyList)
                 and not isinstance(
                     self.calculation_output, CategorizedAnswerFrequencyLists)):
             raise utils.ValidationError(
@@ -1459,8 +1457,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
                 'Expected interaction_id to be a string, received %s'
                 % python_utils.UNICODE(self.interaction_id))
 
-        if (
-                self.interaction_id not in
+        if (self.interaction_id not in
                 interaction_registry.Registry.get_all_interaction_ids()):
             raise utils.ValidationError(
                 'Unknown interaction_id: %s' % self.interaction_id)
@@ -1500,8 +1497,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
         """
         learner_answer_info_dict_size = (
             learner_answer_info.get_learner_answer_info_dict_size())
-        if (
-                self.accumulated_answer_info_json_size_bytes +
+        if (self.accumulated_answer_info_json_size_bytes +
                 learner_answer_info_dict_size <= (
                     MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE)):
             self.learner_answer_info_list.append(learner_answer_info)

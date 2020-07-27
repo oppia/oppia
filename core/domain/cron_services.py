@@ -83,8 +83,7 @@ class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
             jobs.MAPPER_PARAM_MAX_START_TIME_MSEC)
 
         if isinstance(item, mapreduce_model.MapreduceState):
-            if (
-                    item.result_status == 'success' and
+            if (item.result_status == 'success' and
                     utils.get_time_in_millisecs(item.start_time) <
                     max_start_time_msec):
                 item.delete()
@@ -93,8 +92,7 @@ class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
                 yield ('mr_state_remaining', 1)
 
         if isinstance(item, mapreduce_model.ShardState):
-            if (
-                    item.result_status == 'success' and
+            if (item.result_status == 'success' and
                     utils.get_time_in_millisecs(item.update_time) <
                     max_start_time_msec):
                 item.delete()

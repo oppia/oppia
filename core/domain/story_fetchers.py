@@ -52,16 +52,14 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
             is supported at present.
     """
     story_contents_schema_version = versioned_story_contents['schema_version']
-    if not (
-            1 <= story_contents_schema_version
+    if not (1 <= story_contents_schema_version
             <= feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
-    while (
-            story_contents_schema_version <
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+    while (story_contents_schema_version <
+           feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         story_domain.Story.update_story_contents_from_model(
             versioned_story_contents, story_contents_schema_version)
         story_contents_schema_version += 1
@@ -104,8 +102,7 @@ def get_story_from_model(story_model):
     }
 
     # Migrate the story contents if it is not using the latest schema version.
-    if (
-            story_model.story_contents_schema_version !=
+    if (story_model.story_contents_schema_version !=
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         _migrate_story_contents_to_latest_schema(
             versioned_story_contents)

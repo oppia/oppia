@@ -1896,8 +1896,7 @@ class StateAnswersModel(base_models.BaseModel):
         sharded_answer_lists = [list(current_answer_list)]
         sharded_answer_list_sizes = [current_answer_list_size]
         for answer_dict, answer_size in new_answer_list_sorted:
-            if (
-                    sharded_answer_list_sizes[-1] + answer_size <=
+            if (sharded_answer_list_sizes[-1] + answer_size <=
                     cls._MAX_ANSWER_LIST_BYTE_SIZE):
                 sharded_answer_lists[-1].append(answer_dict)
                 sharded_answer_list_sizes[-1] += answer_size

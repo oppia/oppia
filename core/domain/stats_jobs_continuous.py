@@ -76,8 +76,7 @@ class InteractionAnswerSummariesMRJobManager(
         Yields:
             dict(str, str). The submitted answer in dict format.
         """
-        if (
-                InteractionAnswerSummariesMRJobManager
+        if (InteractionAnswerSummariesMRJobManager
                 .entity_created_before_job_queued(item)):
             # Output answers submitted to the exploration for this exp version.
             versioned_key = u'%s:%s:%s' % (

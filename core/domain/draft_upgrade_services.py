@@ -109,36 +109,31 @@ def extract_html_from_draft_change_list(draft_change_list):
         if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
             # new_value['html'] = conversion_fn(new_value['html'])
             html_list += [new_value['html']]
-        elif (
-                change.property_name ==
-                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+        elif (change.property_name ==
+              exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
             # Only customization args with the key 'choices' have HTML
             # content in them.
             if 'choices' in new_value.keys():
                 html_list += new_value['choices']['value']
-        elif (
-                change.property_name ==
-                exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+        elif (change.property_name ==
+              exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
             written_translations = (
                 state_domain.WrittenTranslations.from_dict(new_value))
             html_in_written_translations = (
                 written_translations.get_all_html_content_strings())
             html_list += html_in_written_translations
 
-        elif (
-                change.property_name ==
-                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+        elif (change.property_name ==
+              exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
             html_list = html_list + [new_value['feedback']['html']]
-        elif (
-                change.property_name ==
-                exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+        elif (change.property_name ==
+              exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
             for hint in new_value:
                 hint_html = hint['hint_content']['html']
                 html_list += [hint_html]
 
-        elif (
-                change.property_name ==
-                exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+        elif (change.property_name ==
+              exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
             html_list = html_list + [new_value['explanation']['html']]
             # TODO(#9413): Find a way to include a reference to the
             # interaction type in the Draft change lists.
@@ -157,9 +152,8 @@ def extract_html_from_draft_change_list(draft_change_list):
                                         answer_html, python_utils.UNICODE):
                                     html_list += [answer_html]
 
-        elif (
-                change.property_name ==
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+        elif (change.property_name ==
+              exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
             for answer_group_dict in new_value:
                 answer_group = (
                     state_domain.AnswerGroup.from_dict(answer_group_dict))
@@ -194,9 +188,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             new_value = change.new_value
             if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                 new_value['html'] = conversion_fn(new_value['html'])
-            elif (
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 # Only customization args with the key 'choices' have HTML
                 # content in them.
                 if 'choices' in new_value.keys():
@@ -204,29 +197,25 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             new_value['choices']['value']):
                         new_value['choices']['value'][value_index] = (
                             conversion_fn(value))
-            elif (
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                 new_value = (
                     state_domain.WrittenTranslations.
                     convert_html_in_written_translations(
                         new_value, conversion_fn))
-            elif (
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                 new_value = (
                     state_domain.Outcome.convert_html_in_outcome(
                         new_value, conversion_fn))
-            elif (
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                 new_value = [
                     (state_domain.Hint.convert_html_in_hint(
                         hint_dict, conversion_fn))
                     for hint_dict in new_value]
-            elif (
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                 new_value['explanation']['html'] = (
                     conversion_fn(new_value['explanation']['html']))
                 # TODO(#9413): Find a way to include a reference to the
@@ -249,9 +238,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                                         new_value['correct_answer'][list_index][
                                             answer_html_index] = (
                                                 conversion_fn(answer_html))
-            elif (
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 new_value = [
                     (state_domain.AnswerGroup.convert_html_in_answer_group(
                         answer_group, conversion_fn))
@@ -279,8 +267,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                    change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 if change.new_value.keys() == ['choices']:
@@ -326,8 +313,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                    change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                 # Get the language code to access the language code correctly.
@@ -363,8 +349,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                    change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 draft_change_list[i] = exp_domain.ExplorationChange({
@@ -410,8 +395,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (
-                    change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED):  # pylint: disable=line-too-long
                 draft_change_list[i] = exp_domain.ExplorationChange({

@@ -179,8 +179,7 @@ def _delete_user_models(user_id):
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.user]):
-        if (
-                model_class.get_deletion_policy() not in
+        if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE]):
             model_class.apply_deletion_policy(user_id)
@@ -305,8 +304,7 @@ def _verify_user_models_deleted(user_id):
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.user]):
-        if (
-                model_class.get_deletion_policy() not in
+        if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE] and
                 model_class.has_reference_to_user_id(user_id)):

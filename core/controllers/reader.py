@@ -100,8 +100,7 @@ class ExplorationEmbedPage(base.BaseHandler):
         # error is raised. The self.request.get('iframed') part of the check is
         # needed for backwards compatibility with older versions of the
         # embedding script.
-        if (
-                feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
+        if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
                 self.request.get('iframed')):
             self.iframed = True
 
@@ -289,8 +288,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
                 # ordering of the list is important (i.e. [a, b, c] is different
                 # from [b, c, a]).
-                if (
-                        issue_customization_args[identifying_arg] ==
+                if (issue_customization_args[identifying_arg] ==
                         playthrough.issue_customization_args[identifying_arg]):
                     return issue
         issue = stats_domain.ExplorationIssue(
@@ -838,8 +836,7 @@ class QuestionPlayerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
-        if not (
-                fetch_by_difficulty_value == 'true' or
+        if not (fetch_by_difficulty_value == 'true' or
                 fetch_by_difficulty_value == 'false'):
             raise self.InvalidInputException(
                 'fetch_by_difficulty must be true or false')

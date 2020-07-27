@@ -61,8 +61,7 @@ def get_setters_property_name(node):
     """
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
-        if (
-                isinstance(decorator_node, astroid.Attribute) and
+        if (isinstance(decorator_node, astroid.Attribute) and
                 decorator_node.attrname == 'setter' and
                 isinstance(decorator_node.expr, astroid.Name)):
             return decorator_node.expr.name
@@ -127,9 +126,8 @@ def possible_exc_types(node):
         inferred = utils.safe_infer(node.exc)
         if inferred:
             excs = [inferred.name]
-    elif (
-            isinstance(node.exc, astroid.Call) and
-            isinstance(node.exc.func, astroid.Name)):
+    elif (isinstance(node.exc, astroid.Call) and
+          isinstance(node.exc.func, astroid.Name)):
         target = utils.safe_infer(node.exc.func)
         if isinstance(target, astroid.ClassDef):
             excs = [target.name]

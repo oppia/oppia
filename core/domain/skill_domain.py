@@ -730,14 +730,12 @@ class Skill(python_utils.OBJECT):
                     'The misconception with id %s is out of bounds.'
                     % misconception.id)
             misconception.validate()
-        if (
-                self.all_questions_merged and
+        if (self.all_questions_merged and
                 self.superseding_skill_id is None):
             raise utils.ValidationError(
                 'Expected a value for superseding_skill_id when '
                 'all_questions_merged is True.')
-        if (
-                self.superseding_skill_id is not None and
+        if (self.superseding_skill_id is not None and
                 self.all_questions_merged is None):
             raise utils.ValidationError(
                 'Expected a value for all_questions_merged when '

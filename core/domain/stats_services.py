@@ -57,8 +57,7 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
     if issue_schema_version is None or issue_schema_version < 1:
         issue_schema_version = 0
 
-    if not (
-            0 <= issue_schema_version
+    if not (0 <= issue_schema_version
             <= stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned issue schemas '
@@ -88,8 +87,7 @@ def _migrate_to_latest_action_schema(learner_action_dict):
     if action_schema_version is None or action_schema_version < 1:
         action_schema_version = 0
 
-    if not (
-            0 <= action_schema_version
+    if not (0 <= action_schema_version
             <= stats_models.CURRENT_ACTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned action schemas '
@@ -1025,8 +1023,7 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
         exploration_id, VERSION_ALL, state_name, calculation_id)
     if calc_output_model:
         calculation_output = None
-        if (
-                calc_output_model.calculation_output_type ==
+        if (calc_output_model.calculation_output_type ==
                 stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
             calculation_output = (
                 stats_domain.AnswerFrequencyList.from_raw_type(

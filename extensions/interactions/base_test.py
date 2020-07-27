@@ -329,8 +329,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         # Below, we raise an exception if the existing
                         # interaction ID is overwritten by another
                         # interaction ID.
-                        if (
-                                html_type_dict['interactionId'] !=
+                        if (html_type_dict['interactionId'] !=
                                 interaction_id):
                             raise Exception(
                                 'Each html type should refer to only'

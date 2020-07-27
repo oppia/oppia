@@ -1227,8 +1227,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         Returns:
             realtime_layer. The realtime layer entity.
         """
-        if (
-                self.realtime_layer is None or
+        if (self.realtime_layer is None or
                 python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
@@ -1473,8 +1472,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             ends.
             """
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
-            if (
-                    cc_model.status_code ==
+            if (cc_model.status_code ==
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
                 cc_model.status_code = (
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
@@ -1512,8 +1510,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 cc_model = job_models.ContinuousComputationModel(
                     id=cls.__name__)
 
-            if (
-                    cc_model.status_code !=
+            if (cc_model.status_code !=
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE):
                 raise Exception(
                     'Attempted to start computation %s, which is already '

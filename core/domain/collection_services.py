@@ -80,16 +80,14 @@ def _migrate_collection_contents_to_latest_schema(
             supported at present.
     """
     collection_schema_version = versioned_collection_contents['schema_version']
-    if not (
-            1 <= collection_schema_version
+    if not (1 <= collection_schema_version
             <= feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d collection schemas at '
             'present.' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-    while (
-            collection_schema_version <
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+    while (collection_schema_version <
+           feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         collection_domain.Collection.update_collection_contents_from_model(
             versioned_collection_contents, collection_schema_version)
         collection_schema_version += 1
@@ -139,8 +137,7 @@ def get_collection_from_model(collection_model):
         }
 
     # Migrate the collection if it is not using the latest schema version.
-    if (
-            collection_model.schema_version !=
+    if (collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
         _migrate_collection_contents_to_latest_schema(
             versioned_collection_contents)
@@ -627,29 +624,23 @@ def apply_change_list(collection_id, change_list):
             elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
                 collection.swap_nodes(change.first_index, change.second_index)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if (
-                        change.property_name ==
+                if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
                     collection.update_title(change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
                     collection.update_category(change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
                     collection.update_objective(change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
                     collection.update_language_code(change.new_value)
-                elif (
-                        change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_TAGS):
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_TAGS):
                     collection.update_tags(change.new_value)
-            elif (
-                    change.cmd ==
-                    collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -949,8 +940,7 @@ def update_collection(
     _save_collection(committer_id, collection, commit_message, change_list)
     update_collection_summary(collection.id, committer_id)
 
-    if (
-            not rights_manager.is_collection_private(collection.id) and
+    if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
         user_services.update_first_contribution_msec_if_not_set(
             committer_id, utils.get_current_time_in_millisecs())

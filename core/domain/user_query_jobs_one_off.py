@@ -53,8 +53,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)
 
-        if (
-                user_id == query_model.submitter_id or
+        if (user_id == query_model.submitter_id or
                 user_services.is_at_least_moderator(user_id)):
             return
 

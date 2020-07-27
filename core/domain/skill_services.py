@@ -569,8 +569,7 @@ def apply_change_list(skill_id, change_list, committer_id):
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
-                if (
-                        change.property_name ==
+                if (change.property_name ==
                         skill_domain.SKILL_PROPERTY_DESCRIPTION):
                     if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (
                             user.actions):
@@ -582,27 +581,22 @@ def apply_change_list(skill_id, change_list, committer_id):
                         opportunity_services
                         .update_skill_opportunity_skill_description(
                             skill.id, change.new_value))
-                elif (
-                        change.property_name ==
-                        skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
-                elif (
-                        change.property_name ==
-                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
                     skill.update_superseding_skill_id(change.new_value)
-                elif (
-                        change.property_name ==
-                        skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
                     skill.record_that_all_questions_are_merged(change.new_value)
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
-                if (
-                        change.property_name ==
+                if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
                     skill.update_explanation(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
-                elif (
-                        change.property_name ==
-                        skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
+                elif (change.property_name ==
+                      skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     worked_examples_list = [
                         skill_domain.WorkedExample.from_dict(worked_example)
                         for worked_example in change.new_value]
@@ -620,40 +614,32 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 skill.update_rubric(
                     change.difficulty, change.explanations)
-            elif (
-                    change.cmd ==
-                    skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
-                if (
-                        change.property_name ==
+            elif (change.cmd ==
+                  skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
+                if (change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
                     skill.update_misconception_name(
                         change.misconception_id, change.new_value)
-                elif (
-                        change.property_name ==
-                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
                     skill.update_misconception_notes(
                         change.misconception_id, change.new_value)
-                elif (
-                        change.property_name ==
-                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
-                elif (
-                        change.property_name ==
-                        skill_domain.
-                        SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED):
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
                     skill.update_misconception_must_be_addressed(
                         change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
-            elif (
-                    change.cmd ==
-                    skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
-                    or change.cmd ==
-                    skill_domain.
-                    CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION
-                    or change.cmd ==
-                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
+                  or change.cmd ==
+                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION # pylint: disable=line-too-long
+                  or change.cmd ==
+                  skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the

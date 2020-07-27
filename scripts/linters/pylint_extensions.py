@@ -271,26 +271,35 @@ class HangingIndentChecker(checkers.BaseChecker):
         """
         escape_character_indicator = b'\\'
         string_indicator = b'\''
+        excluded = False
         for (token_type, token, (line_num, _), _, line) in tokens:
             # Check if token type is an operator and is either a
             # left parenthesis '(' or a right parenthesis ')'.
             if token_type == tokenize.OP and (
                     token == b'(' or token == b')'):
                 line = line.strip()
+
+                # Exclude 'if', 'elif', 'while' statements.
+                if line.startswith((b'if ', b'while ', b'elif ')):
+                    excluded = True
+                # Skip check if there is a comment at the end of line.
+                if excluded:
+                    split_line = line.split()
+                    if '#' in split_line:
+                        comment_index = split_line.index('#')
+                        if split_line[comment_index - 1].endswith(b'):'):
+                            excluded = False
+                    elif line.endswith(b'):'):
+                        excluded = False
+                if excluded:
+                    continue
+
                 bracket_count = 0
                 line_length = len(line)
                 escape_character_found = False
                 in_string = False
                 for char_num in python_utils.RANGE(line_length):
                     char = line[char_num]
-                    # Check if we are inside a string and if a escape
-                    # character is present then do not check the escape
-                    # character and the character that follows next because
-                    # next character may be a string indicator (') and
-                    # that flip the boolean in_string to False and but that
-                    # will be incorrect because we are still inside a
-                    # string. Example: func('this is a \'string\'')
-                    # Here we are skipping both \' characters.
                     if in_string and (
                             char == escape_character_indicator or
                             escape_character_found):
@@ -580,14 +589,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 # parameter is in the function arguments set. We also check for
                 # arguments that start with * which means it's autofill and will
                 # not appear in the node args list so we handle those too.
-                elif (
-                        currently_in_args_section and parameter
-                        and ((
-                            parameter.group(0).strip('*')
-                            in expected_argument_names) or
-                             re.search(
-                                 br'\*[^ ]+: ',
-                                 line_with_no_leading_whitespaces))):
+                elif (currently_in_args_section and parameter
+                      and ((
+                          parameter.group(0).strip('*')
+                          in expected_argument_names) or
+                           re.search(
+                               br'\*[^ ]+: ',
+                               line_with_no_leading_whitespaces))):
                     words_in_line = line_with_no_leading_whitespaces.split(' ')
                     currently_in_freeform_section = False
                     # Check if the current parameter section indentation is
@@ -613,8 +621,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 elif currently_in_args_section:
                     # If it is not a freeform section, we check the indentation.
                     words_in_line = line_with_no_leading_whitespaces.split(' ')
-                    if (
-                            not currently_in_freeform_section
+                    if (not currently_in_freeform_section
                             and current_line_indentation != (
                                 args_indentation + 8)):
                         # Use the first word in the line to identify the error.
@@ -666,8 +673,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         if not node_doc.supports_yields:
             return
 
-        if ((
-                node_doc.has_yields() or node_doc.has_yields_type()) and
+        if ((node_doc.has_yields() or node_doc.has_yields_type()) and
                 not node.is_generator()):
             self.add_message(
                 'redundant-yields-doc',
@@ -726,16 +732,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
         is_property = checker_utils.decorated_with_property(func_node)
 
-        if not (
-                doc.has_returns() or
+        if not (doc.has_returns() or
                 (doc.has_property_returns() and is_property)):
             self.add_message(
                 'missing-return-doc',
                 node=func_node
             )
 
-        if not (
-                doc.has_rtype() or
+        if not (doc.has_rtype() or
                 (doc.has_property_type() and is_property)):
             self.add_message(
                 'missing-return-type-doc',
@@ -837,8 +841,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         params_with_doc, params_with_type = doc.match_param_docs()
 
         # Tolerate no parameter documentation at all.
-        if (
-                not params_with_doc and not params_with_type
+        if (not params_with_doc and not params_with_type
                 and accept_no_param_doc):
             tolerate_missing_params = True
 
@@ -1197,8 +1200,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
         """
         line_number = node.fromlineno
         line = linecache.getline(node.root().file, line_number).lstrip()
-        if (
-                line.startswith(b'yield') and
+        if (line.startswith(b'yield') and
                 not re.search(br'^(yield)( \S|$|\w)', line)):
             self.add_message('single-space-after-yield', node=node)
 
@@ -1308,8 +1310,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
                 prev_line = file_content[line_num - 1].strip()
 
             # Check if it is a docstring and not some multi-line string.
-            if (
-                    prev_line.startswith(b'class ') or
+            if (prev_line.startswith(b'class ') or
                     prev_line.startswith(b'def ') or in_class_or_function):
                 in_class_or_function = True
                 if prev_line.endswith(b'):') and line.startswith(b'"""'):
@@ -1583,8 +1584,7 @@ class DocstringChecker(checkers.BaseChecker):
                 prev_line = file_content[line_num - 1].strip()
 
             # Check if it is a docstring and not some multi-line string.
-            if (
-                    prev_line.startswith(b'class ') or
+            if (prev_line.startswith(b'class ') or
                     prev_line.startswith(b'def ')) or (in_class_or_function):
                 in_class_or_function = True
                 if prev_line.endswith(b'):') and line.startswith(b'"""'):
@@ -1677,11 +1677,9 @@ class DocstringChecker(checkers.BaseChecker):
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
                 # Check if we are in a docstring raises section.
-                elif (
-                        current_docstring_section and
-                        (
-                            current_docstring_section ==
-                            self.DOCSTRING_SECTION_RAISES)):
+                elif (current_docstring_section and (
+                        current_docstring_section ==
+                        self.DOCSTRING_SECTION_RAISES)):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
@@ -1713,20 +1711,16 @@ class DocstringChecker(checkers.BaseChecker):
                 # NOTE: Each function should only have one yield or return
                 # object. If a tuple is returned, wrap both in a tuple parameter
                 # section.
-                elif (
-                        current_docstring_section and
-                        (
-                            current_docstring_section ==
-                            self.DOCSTRING_SECTION_RETURNS)
-                        or (
+                elif (current_docstring_section and (
+                        current_docstring_section ==
+                        self.DOCSTRING_SECTION_RETURNS) or (
                             current_docstring_section ==
                             self.DOCSTRING_SECTION_YIELDS)):
                     # Check for the start of a new parameter definition in the
                     # format "type (elaboration)." and check the indentation.
-                    if (
-                            re.search(
-                                br'^[a-zA-Z_() -:,\*]+\.',
-                                line) and not in_description):
+                    if (re.search(
+                            br'^[a-zA-Z_() -:,\*]+\.',
+                            line) and not in_description):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
                             self.add_message(
