@@ -537,7 +537,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
 
         exploration.add_states([
             'State1', 'State2', 'State3', 'State4', 'State5', 'State6',
-            'State7'])
+            'State7', 'State8', 'State9'])
 
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
@@ -546,6 +546,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state5 = exploration.states['State5']
         state6 = exploration.states['State6']
         state7 = exploration.states['State7']
+        state8 = exploration.states['State8']
+        state9 = exploration.states['State9']
 
         state1.update_interaction_id('MathExpressionInput')
         state2.update_interaction_id('MathExpressionInput')
@@ -554,6 +556,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state5.update_interaction_id('MathExpressionInput')
         state6.update_interaction_id('MathExpressionInput')
         state7.update_interaction_id('MathExpressionInput')
+        state8.update_interaction_id('MathExpressionInput')
+        state9.update_interaction_id('MathExpressionInput')
 
         answer_group_list1 = [{
             'rule_specs': [{
@@ -717,6 +721,54 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state7.update_interaction_answer_groups(answer_group_list7)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
+        answer_group_list8 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {
+                    'x': u'(3.5+6)^2'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state8</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state8.update_interaction_answer_groups(answer_group_list8)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        answer_group_list9 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {
+                    'x': u'sqrt(4)-abs(3)'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state9</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state9.update_interaction_answer_groups(answer_group_list9)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
         job_id = (
             exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
             ))
@@ -727,14 +779,16 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
                 job_id))
         expected_output = [
-            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', '
-            u'u\'exp_id0 State5: \\xe2\\xe9\\xee\\xf4\\xfc\']]',
-            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\', '
-            u'u\'exp_id0 State6: sin(theta)^2 + cos(theta)^2 = 1\']]',
-            u'[u\'Valid Expression\', [u\'exp_id0 State1: x+y-z\', '
-            u'u\'exp_id0 State7: (arcsin(A)*cos(B) + cos(A)*arcsin(B))/'
-            u'(cos(A)*arccos(B) - arcsin(A)*sin(B))\', '
-            u'u\'exp_id0 State4: sqrt(x/y)\']]']
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 '
+            u'State1: x+y-z\', u\'exp_id0 State7: (arcsin(A)*cos(B) + cos(A)*'
+            u'arcsin(B))/(cos(A)*arccos(B) - arcsin(A)*sin(B))\', u\'exp_id0 '
+            u'State4: sqrt(x/y)\']]',
+            u'[u\'Invalid\', [u\'exp_id0 State3: x<y>z\', u\'exp_id0 State5: '
+            u'\\xe2\\xe9\\xee\\xf4\\xfc\']]',
+            u'[u\'MathEquationInput\', [u\'exp_id0 State2: y=m*x+c\', '
+            u'u\'exp_id0 State6: (sin(theta))^2 + (cos(theta))^2 = 1\']]',
+            u'[u\'NumericExpressionInput\', [u\'exp_id0 State9: '
+            u'sqrt(4)-abs(3)\', u\'exp_id0 State8: (3.5+6)^2\']]']
 
         self.assertEqual(actual_output, expected_output)
 
@@ -742,9 +796,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         """Checks that the number of valid explorations yielded is less than
         the limit mentioned by the VALID_MATH_EXP_YIELD_LIMIT constant.
         """
-        one_off_job_cls = exp_jobs_one_off.MathExpressionValidationOneOffJob
         # Resetting the threshold only for testing purposes.
-        one_off_job_cls.VALID_MATH_INPUTS_YIELD_LIMIT = 3
+        exp_jobs_one_off.VALID_MATH_INPUTS_YIELD_LIMIT = 3
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -891,9 +944,222 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         # Only 3 exploration details should be yielded since the threshold is 3.
         expected_output = [
-            u'[u\'Valid Equation\', [u\'exp_id0 State2: y=m*x+c\']]',
-            u'[u\'Valid Expression\', [u\'exp_id0 State3: sqrt(x/y)\', '
-            u'u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: pi*r^2\']]']
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id0 State3: '
+            u'sqrt(x/y)\', u\'exp_id0 State1: x+y-z\', u\'exp_id0 State5: '
+            u'pi*r^2\']]',
+            u'[u\'MathEquationInput\', [u\'exp_id0 State2: y=m*x+c\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_invalid_solutions_are_yielded_in_output(self):
+        """The following tests are specifically for state version upgrade from
+        34 to 35. That migration function contains some conditional logic that
+        is not fully tested by the test above.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id_1')
+
+        exploration.add_states(['State1', 'State2'])
+
+        answer_groups_1 = [{
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }, {
+                'inputs': {
+                    'x': 'x=y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        exploration.states['State1'] = state_domain.State.from_dict({
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'content_2': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'content_2': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': answer_groups_1,
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': {
+                    'correct_answer': {
+                        'ascii': 'x+y',
+                        'latex': 'x+y'
+                    },
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'html': 'Solution explanation',
+                        'content_id': 'content_2'
+                    }
+                },
+                'id': 'MathExpressionInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        })
+
+        answer_groups_2 = [{
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }, {
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        exploration.states['State2'] = state_domain.State.from_dict({
+            'content': {
+                'content_id': 'content2',
+                'html': 'Question 2'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content2': {},
+                    'feedback2': {},
+                    'feedback3': {},
+                    'hint2': {},
+                    'content3': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content2': {},
+                    'feedback2': {},
+                    'feedback3': {},
+                    'hint2': {},
+                    'content3': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': answer_groups_2,
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'feedback3',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint2',
+                        'html': 'Hint 2'
+                    }
+                }],
+                'solution': {
+                    'correct_answer': {
+                        'ascii': '1.2 + 3',
+                        'latex': '1.2 + 3'
+                    },
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'html': 'Solution explanation',
+                        'content_id': 'content3'
+                    }
+                },
+                'id': 'MathExpressionInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        })
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        job_id = (
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new(
+            ))
+        exp_jobs_one_off.MathExpressionValidationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionValidationOneOffJob.get_output(
+                job_id))
+        expected_output = [
+            u'[u\'AlgebraicExpressionInput\', [u\'exp_id_1 State2: x+y\', '
+            u'u\'exp_id_1 State1: x+y\']]',
+            u'[u\'Invalid\', [u\'Solution: 1.2 + 3 in state: State2 from '
+            u'exploration with ID: exp_id_1 is expected to be of type: '
+            u'AlgebraicExpressionInput.\', u\'Solution: x+y in state: State1 '
+            u'from exploration with ID: exp_id_1 is expected to be of type: '
+            u'MathEquationInput.\']]', u'[u\'MathEquationInput\', '
+            u'[u\'exp_id_1 State1: x=y\']]', u'[u\'NumericExpressionInput\', '
+            u'[u\'exp_id_1 State2: 1.2 + 3\']]']
 
         self.assertEqual(actual_output, expected_output)
 
