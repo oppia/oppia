@@ -91,14 +91,16 @@ export class PlayerPositionService {
   }
 
   /**
-   * This function is used to record that the user has clicked on the navigation button.
+   * This function is used to record that the user has clicked
+   * on the navigation button.
    */
   recordNavigationButtonClick(): void {
     this.learnerJustSubmittedAnAnswer = false;
   }
 
   /**
-   * This function is used to get whether the learner has just submitted an answer.
+   * This function is used to get whether the learner has just
+   * submitted an answer.
    * @return {boolean} Whether the learner has just submitted an answer.
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
