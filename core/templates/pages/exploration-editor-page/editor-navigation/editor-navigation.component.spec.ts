@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
+import { of } from 'rxjs';
+
 describe('Editor Navigation Component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
@@ -30,16 +32,26 @@ describe('Editor Navigation Component', function() {
   var ExplorationWarningsService = null;
   var ThreadDataService = null;
   var UserService = null;
-  var WindowDimensionsService = null;
 
   var explorationId = 'exp1';
   var userInfo = {
     isLoggedIn: () => true
   };
-  var widthSpy = null;
+  var windowWidth = null;
   var isImprovementsTabEnabledAsyncSpy = null;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'WindowDimensionsService', {
+        getWidth: function() {
+          return windowWidth;
+        },
+        getResizeEvent: function() {
+          return of(new Event('resize'));
+        }
+      });
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     $q = $injector.get('$q');
@@ -53,13 +65,11 @@ describe('Editor Navigation Component', function() {
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
     UserService = $injector.get('UserService');
     ThreadDataService = $injector.get('ThreadDataService');
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
 
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(UserService, 'getUserInfoAsync').and.returnValue(userInfo);
 
-    widthSpy = spyOn(WindowDimensionsService, 'getWidth');
-    widthSpy.and.returnValue(1200);
+    windowWidth = 1200;
 
     isImprovementsTabEnabledAsyncSpy = spyOn(
       ExplorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -204,50 +214,5 @@ describe('Editor Navigation Component', function() {
   it('should get open thread count from thread data service', function() {
     spyOn(ThreadDataService, 'getOpenThreadsCount').and.returnValue(5);
     expect($scope.getOpenThreadsCount()).toBe(5);
-  });
-
-  it('should hide post tutorial help popover when resizing page to greater' +
-    ' than 1024px', function() {
-    widthSpy.and.returnValue(1200);
-
-    window.dispatchEvent(new Event('resize'));
-    // Waiting for $applyAsync be called, which can take ~10 miliseconds
-    // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
-    $flushPendingTasks();
-
-    $rootScope.$broadcast('openPostTutorialHelpPopover');
-
-    expect($scope.isPostTutorialHelpPopoverShown())
-      .toBe(true);
-    expect($scope.isScreenLarge()).toBe(true);
-
-    // Waiting for $timeout to be flushed.
-    $flushPendingTasks();
-    $verifyNoPendingTasks('timeout');
-
-    expect($scope.isPostTutorialHelpPopoverShown())
-      .toBe(false);
-  });
-
-  it('should hide post tutorial help popover when resizing page to less than' +
-    ' 1024px', function() {
-    widthSpy.and.returnValue(768);
-
-    window.dispatchEvent(new Event('resize'));
-    // Waiting for $applyAsync be called, which can take ~10 miliseconds
-    // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
-    $flushPendingTasks();
-
-
-    $rootScope.$broadcast('openPostTutorialHelpPopover');
-
-    expect($scope.isPostTutorialHelpPopoverShown())
-      .toBe(false);
-  });
-
-  it('should unsubscribe resize subscription on destroy hook', function() {
-    expect(ctrl.resizeSubscription.closed).toBe(false);
-    ctrl.$onDestroy();
-    expect(ctrl.resizeSubscription.closed).toBe(true);
   });
 });
