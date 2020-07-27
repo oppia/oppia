@@ -30,6 +30,7 @@ import bs4
 from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import html_domain
 from core.domain import image_services
 from core.domain import rte_component_registry
 from extensions.objects.models import objects
@@ -855,9 +856,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
-def generate_math_svgs_filename(
-        encoded_height_string, encoded_width_string,
-        encoded_vertical_padding_string):
+def generate_math_svgs_filename(latex_string_svg_image_dimensions):
     """Generates a random filename for a math SVG based on the given
     dimensions.
 
@@ -865,14 +864,8 @@ def generate_math_svgs_filename(
     explorations have a valid math SVG stored in the datastore.
 
     Args:
-        encoded_height_string: str. The string from which the actual height
-            can be derived. The actual height for math SVGs are in unit ex.
-        encoded_width_string: str. The string from which the actual width
-            can be derived. The actual width for math SVGs are in unit ex
-        encoded_vertical_padding_string: str. The string from which the actual
-            vertical padding can be derived. The vertical padding is required
-            for vertical allignment of the SVGs when displayed inline.
-
+        latex_string_svg_image_dimensions: LatexStringSvgImageDimensions.
+            The dimensions for the SVG image.
     Returns:
         str. The name of the SVG file with its dimensions in it.
     """
@@ -891,13 +884,15 @@ def generate_math_svgs_filename(
     date_time_string = '%s%s%s%s%s%s%s' % (
         year, month, day, hour, minute, second, random_string)
     filename = 'mathImg_%s_height_%s_width_%s_vertical_%s.svg' % (
-        date_time_string, encoded_height_string, encoded_width_string,
+        date_time_string, latex_string_svg_image_dimensions.
+        encoded_height_string, latex_string_svg_image_dimensions.
+        encoded_width_string, latex_string_svg_image_dimensions.
         encoded_vertical_padding_string)
     return filename
 
 
 def add_svg_filenames_for_latex_strings_in_html_string(
-        raw_latex_to_dimensions_dict, html_string):
+        raw_latex_to_image_data_dict, html_string):
     """Adds the filenames for math rich-text components with empty svg_filename
     field based on the given images data.
 
@@ -905,11 +900,9 @@ def add_svg_filenames_for_latex_strings_in_html_string(
     explorations have a valid math SVG stored in the datastore.
 
     Args:
-        raw_latex_to_dimensions_dict: dict. The dictionary having the dimensions
-            for each LaTeX string which will be used for generating and
-            assigning filenames. The image data has key as the raw_latex string
-            and value for each key, has the dimensions for the corresponding key
-            (raw_latex).
+        raw_latex_to_image_data_dict: dict(str, LatexStringSvgImageData). The
+            dictionary having the key as a LaTeX string and the corresponding
+            value as the SVG image data for that LaTeX string.
         html_string: str. HTML string to modify.
 
     Returns:
@@ -927,12 +920,11 @@ def add_svg_filenames_for_latex_strings_in_html_string(
         svg_filename = (
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
-            dimensions = raw_latex_to_dimensions_dict[raw_latex]['dimensions']
+            dimensions = (
+                raw_latex_to_image_data_dict[raw_latex].
+                latex_string_svg_image_dimensions)
             filename = (
-                generate_math_svgs_filename(
-                    dimensions['encoded_height_string'],
-                    dimensions['encoded_width_string'],
-                    dimensions['encoded_vertical_padding_string']))
+                generate_math_svgs_filename(dimensions))
             math_content_dict = {
                 'raw_latex': raw_latex,
                 'svg_filename': objects.UnicodeString.normalize(filename)

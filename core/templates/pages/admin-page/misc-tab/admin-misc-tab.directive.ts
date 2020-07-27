@@ -53,6 +53,7 @@ angular.module('oppia').directive('adminMiscTab', [
           '/senddummymailtoadminhandler');
         var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
         var ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler';
+        var NEW_STRUCTURES_LATEX_SVG_HANDLER = 'newstructureslatexsvghandler';
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
@@ -232,54 +233,6 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
-        var latexMapping = {};
-        var expIdToLatexMapping = null;
-        ctrl.generateSvgs = async function() {
-          var countOfSvgsGenerated = 0;
-          for (var expId in expIdToLatexMapping) {
-            var latexStrings = expIdToLatexMapping[expId];
-            latexMapping[expId] = {};
-            for (var i = 0; i < latexStrings.length; i++) {
-              var svgFile = await convertLatexToSvgFile(latexStrings[i]);
-              latexMapping[expId][latexStrings[i]] = svgFile;
-            }
-            ctrl.setStatusMessage('LaTeX strings Generated.');
-            $rootScope.$apply();
-          }
-        };
-
-        // TODO(#10045): Remove this function once all the math-rich text
-        // components in explorations have a valid math SVG stored in the
-        // datastore.
-        ctrl.fetchAndGenerateSvgsForExplorations = function() {
-          $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
-            function(response) {
-              expIdToLatexMapping = (
-                response.data.latex_strings_to_exp_id_mapping);
-              ctrl.setStatusMessage('LaTeX strings fetched from backend.');
-              ctrl.generateSvgs();
-            });
-        };
-        // TODO(#10045): Remove this function once all the math-rich text
-        // components in explorations have a valid math SVG stored in the
-        // datastore.
-        ctrl.saveSvgsToBackend = function() {
-          AdminDataService.sendMathSvgsToBackendAsync(
-            latexMapping).then(
-            function(response) {
-              var numberOfExplorationsUpdated = (
-                response.number_of_explorations_updated);
-              ctrl.setStatusMessage(
-                'Successfully updated ' + numberOfExplorationsUpdated +
-                ' explorations.');
-              $rootScope.$apply();
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error:' + errorResponse.data.error);
-              $rootScope.$apply();
-            });
-        };
-
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
           $http.put(
@@ -331,6 +284,8 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.regenerationMessage = null;
           ctrl.oldUsername = null;
           ctrl.newUsername = null;
+          ctrl.newStructuresEntityChosen = null;
+          ctrl.newStructureEntities = ['topic', 'skill', 'story', 'question'];
         };
       }]
     };

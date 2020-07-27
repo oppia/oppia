@@ -588,45 +588,6 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot generate dummy explorations in production.')
 
 
-class ExplorationsLatexSvgHandler(base.BaseHandler):
-    """Handler updating Explorations having math rich-text components with
-    math SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-    """
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        latex_strings_to_exp_id_mapping = (
-            exp_services.get_batch_of_exps_for_latex_svg_generation())
-        self.render_json({
-            'latex_strings_to_exp_id_mapping': latex_strings_to_exp_id_mapping
-        })
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        latex_to_svg_mappings = self.payload.get('latexMapping')
-        for exp_id, latex_to_svg_mapping_dict in latex_to_svg_mappings.items():
-            for latex_string in latex_to_svg_mapping_dict.keys():
-                svg_image = self.request.get(
-                    latex_to_svg_mappings[exp_id][latex_string]['latexId'])
-                if not svg_image:
-                    raise self.InvalidInputException(
-                        'SVG for LaTeX string %s in exploration %s is not '
-                        'supplied.' % (latex_string, exp_id))
-                latex_to_svg_mappings[exp_id][latex_string]['svg_file'] = (
-                    svg_image)
-
-        for exp_id in latex_to_svg_mappings.keys():
-            exp_services.update_exploration_with_math_svgs(
-                exp_id, latex_to_svg_mappings[exp_id])
-        self.render_json({
-            'number_of_explorations_updated': '%d' % (
-                len(latex_to_svg_mappings.keys()))
-        })
-
-
 class AdminRoleHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
@@ -705,6 +666,51 @@ class AdminJobOutputHandler(base.BaseHandler):
         self.render_json({
             'output': jobs.get_job_output(job_id)
         })
+
+
+class NewStructuresLatexSvgHandler(base.BaseHandler):
+    """Handler for updating topics, stories, skills and questions having math
+    rich-text components with math SVGs.
+
+    TODO(#10045): Remove this handler once all the math-rich text components in
+    the topics, stories, skills and questions have a valid math SVG stored in
+    the datastore.
+    """
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        entity_type = self.request.get('entity_type')
+        if entity_type == feconf.ENTITY_TYPE_TOPIC:
+            self.render_json({
+                'entity_type': entity_type,
+                'latex_strings_to_subtopic_id_mapping': (
+                    subtopic_page_services.
+                    get_batch_of_subtopic_pages_for_latex_svg_generation())
+            })
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        latex_to_svg_mappings = self.payload.get('latexMapping')
+        entity_type = self.payload.get('entityType')
+        for entity_id, latex_to_svg_mapping_dict in (
+                latex_to_svg_mappings.items()):
+            for latex_string in latex_to_svg_mapping_dict.keys():
+                svg_image = self.request.get(
+                    latex_to_svg_mappings[entity_id][latex_string]['latexId'])
+                if not svg_image:
+                    raise self.InvalidInputException(
+                        'SVG for LaTeX string %s in %s %s is not '
+                        'supplied.' % (latex_string, entity_id, entity_type))
+                latex_to_svg_mappings[entity_id][latex_string]['svg_file'] = (
+                    svg_image)
+        if entity_type == feconf.ENTITY_TYPE_TOPIC:
+            for subtopic_id in latex_to_svg_mappings.keys():
+                subtopic_page_services.update_subtopics_with_math_svgs(
+                    subtopic_id, latex_to_svg_mappings[subtopic_id])
+            self.render_json({
+                'no_of_subtopics_updated': '%d' % (
+                    len(latex_to_svg_mappings.keys()))
+            })
 
 
 class AdminTopicsCsvFileDownloader(base.BaseHandler):

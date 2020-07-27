@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import html_domain
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -350,3 +351,211 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             assert_raises_regexp_context_manager):
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)
+
+    def test_get_batch_of_subtopic_pages_for_latex_svg_generation(self):
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+
+        page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content',
+                'html': valid_html_content1
+            },
+            'recorded_voiceovers': {},
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {
+                        'en': {
+                            'html': valid_html_content2,
+                            'needs_update': True
+                        },
+                        'hi': {
+                            'html': 'Hey!',
+                            'needs_update': False
+                        }
+                    }
+                }
+            }
+        }
+        self.subtopic_page.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict(
+                {
+                    'content_id': 'content',
+                    'html': valid_html_content1
+                }))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, self.subtopic_page, 'Updated page contents',
+            [subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'subtopic_id': 1,
+                'property_name': 'page_contents_html',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': valid_html_content1
+                },
+                'old_value': {
+                    'content_id': 'content',
+                    'html': ''
+                }
+            })])
+
+        topic_id2 = topic_services.get_new_topic_id()
+        subtopic_page2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                2, topic_id2))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page2, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 2,
+                'title': 'Sample2'
+            })]
+        )
+        subtopic_page_id2 = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id2, 2))
+        subtopic_page2.update_page_contents_written_translations(
+            page_contents_dict['written_translations'])
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page2, 'Updated page contents',
+            [subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'subtopic_id': 2,
+                'property_name': 'page_written_translations',
+                'new_value': page_contents_dict['written_translations'],
+                'old_value': {}
+            })])
+
+
+        topic_id3 = topic_services.get_new_topic_id()
+        subtopic_page3 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                3, topic_id2))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page3, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 3,
+                'title': 'Sample2'
+            })]
+        )
+        expected_output = {
+            subtopic_page2.id: [b'+,+,+,+'],
+            self.subtopic_page.id: [b'\\frac{x}{y}']
+        }
+        self.assertEqual(
+            subtopic_page_services.
+            get_batch_of_subtopic_pages_for_latex_svg_generation(),
+            expected_output)
+
+    def test_update_subtopics_with_math_svgs(self):
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+
+        page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content',
+                'html': valid_html_content1
+            },
+            'recorded_voiceovers': {},
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {
+                        'en': {
+                            'html': valid_html_content2,
+                            'needs_update': True
+                        },
+                        'hi': {
+                            'html': 'Hey!',
+                            'needs_update': False
+                        }
+                    }
+                }
+            }
+        }
+        self.subtopic_page.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict(
+                {
+                    'content_id': 'content',
+                    'html': valid_html_content1
+                }))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, self.subtopic_page, 'Updated page contents',
+            [subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'subtopic_id': 1,
+                'property_name': 'page_contents_html',
+                'new_value': state_domain.SubtitledHtml.from_dict(
+                    {
+                        'content_id': 'content',
+                        'html': valid_html_content1
+                    }),
+                'old_value': None
+            })])
+
+        self.subtopic_page.update_page_contents_written_translations(
+            page_contents_dict['written_translations'])
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, self.subtopic_page, 'Updated page contents',
+            [subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'subtopic_id': 1,
+                'property_name': 'page_written_translations',
+                'new_value': state_domain.WrittenTranslations.from_dict(
+                    page_contents_dict['written_translations']),
+                'old_value': None
+            })])
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        image_data1 = html_domain.LatexStringSvgImageData(
+            '\\frac{x}{y}', svg_file_1,
+            html_domain.LatexStringSvgImageDimensions('1d429', '1d33', '0d241'))
+        image_data2 = html_domain.LatexStringSvgImageData(
+            '+,+,+,+', svg_file_2,
+            html_domain.LatexStringSvgImageDimensions('1d525', '3d33', '0d241'))
+        raw_latex_to_image_data_dict = {
+            '+,+,+,+': image_data2,
+            '\\frac{x}{y}': image_data1
+        }
+        subtopic_page_services.update_subtopics_with_math_svgs(
+            self.subtopic_page.id, raw_latex_to_image_data_dict)

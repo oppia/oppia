@@ -92,6 +92,36 @@
   </div>
 
 </md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <div class="d-xl-inline-flex form-group">
+    <label for="update-role-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Entity</label>
+    <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+      <select id="update-role-input" ng-options="entity for entity in $ctrl.newStructureEntities" ng-model="$ctrl.newStructuresEntityChosen" class="form-control protractor-update-form-role-select">
+      </select>
+    </div>
+  </div>
+
+  <h3>generate SVGs for <[$ctrl.newStructuresEntityChosen]></h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForNewStructures($ctrl.newStructuresEntityChosen)">
+      <div class="form-group row">
+        <input type="submit" value="Fetch and generate SVGs">
+      </div>
+    </form>
+  </div>
+
+  <h3>save the SVGs for <[$ctrl.newStructuresEntityChosen]></h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.saveSvgsToBackend()">
+      <div class="form-group row">
+        <input type="submit" value="Save">
+      </div>
+    </form>
+  </div>
+
+</md-card>
+
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Update username</h3>
   <div class="oppia-query-form">

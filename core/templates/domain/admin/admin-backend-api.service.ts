@@ -138,10 +138,11 @@ export class AdminBackendApiService {
   // TODO(#10045): Remove this function once all the math-rich text
   // components in explorations have a valid math SVG stored in the
   // datastore.
-  sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
+  sendNewStructuresMathSvgsToBackend(
+      latexToSvgMapping, entityType): Promise<Object> {
     let body = new FormData();
-    for (var expId in latexToSvgMapping) {
-      for (var latexString in latexToSvgMapping[expId]) {
+    for (var entityId in latexToSvgMapping) {
+      for (var latexString in latexToSvgMapping[entityId]) {
         // LaTeX strings cannot be appended in the request body as keys for
         // files because of encoding issues (multiple backslash in the LaTeX
         // string is processed improperly, e.g 3 backslashes in an
@@ -150,14 +151,18 @@ export class AdminBackendApiService {
         // the request body.Images can be extracted based on the latexId in the
         // backend.
         body.set(
-          latexToSvgMapping[expId][latexString].latexId,
-          latexToSvgMapping[expId][latexString].file);
-        delete latexToSvgMapping[expId][latexString].file;
+          latexToSvgMapping[entityId][latexString].latexId,
+          latexToSvgMapping[entityId][latexString].file);
+        delete latexToSvgMapping[entityId][latexString].file;
       }
     }
     body.append(
-      'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
-    return this.http.post('/adminmathsvghandler', body).toPromise();
+      'payload', JSON.stringify(
+        {
+          latexMapping: latexToSvgMapping,
+          entityType: entityType
+        }));
+    return this.http.post('/newstructureslatexsvghandler', body).toPromise();
   }
 }
 
