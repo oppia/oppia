@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Subscription } from 'rxjs';
+
 /**
  * @fileoverview Controller for the main story editor.
  */
@@ -51,14 +53,15 @@ angular.module('oppia').directive('storyEditor', [
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
-        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_CHAPTER_TITLE',
+        'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
+        'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
-            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_CHAPTER_TITLE) {
+            AlertsService, MAX_CHARS_IN_STORY_TITLE,
+            MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
+          ctrl.attachedSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
@@ -246,8 +249,16 @@ angular.module('oppia').directive('storyEditor', [
               _initEditor();
             });
 
-            $scope.$on(EVENT_STORY_INITIALIZED, _init);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
+            const storyInitializedSubscription =
+              StoryEditorStateService.getStoryInitializedSubject().subscribe(
+                () => _init()
+              );
+            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
+            const storyReinitializedSubscription =
+              StoryEditorStateService.getStoryReinitializedSubject().subscribe(
+                () => _initEditor()
+              );
+            ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
 
             _init();
             _initEditor();

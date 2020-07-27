@@ -25,14 +25,14 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+import { Subject } from 'rxjs';
+
 angular.module('oppia').factory('StoryEditorStateService', [
-  '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
+  'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',
-  'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
   function(
-      $rootScope, AlertsService, EditableStoryBackendApiService,
-      StoryObjectFactory, UndoRedoService,
-      EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+      AlertsService, EditableStoryBackendApiService,
+      StoryObjectFactory, UndoRedoService) {
     var _story = StoryObjectFactory.createInterstitialStory();
     var _storyIsInitialized = false;
     var _storyIsLoading = false;
@@ -42,12 +42,15 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _skillSummaries = [];
     var _expIdsChanged = false;
 
+    var storyInitializedSubject = new Subject();
+    var storyReinitializedSubject = new Subject();
+
     var _setStory = function(story) {
       _story.copyFromStory(story);
       if (_storyIsInitialized) {
-        $rootScope.$broadcast(EVENT_STORY_REINITIALIZED);
+        storyReinitializedSubject.next();
       } else {
-        $rootScope.$broadcast(EVENT_STORY_INITIALIZED);
+        storyInitializedSubject.next();
         _storyIsInitialized = true;
       }
     };
@@ -221,6 +224,14 @@ angular.module('oppia').factory('StoryEditorStateService', [
        */
       isSavingStory: function() {
         return _storyIsBeingSaved;
+      },
+
+      getStoryInitializedSubject: function() {
+        return storyInitializedSubject;
+      },
+
+      getStoryReinitializedSubject: function() {
+        return storyReinitializedSubject;
       }
     };
   }

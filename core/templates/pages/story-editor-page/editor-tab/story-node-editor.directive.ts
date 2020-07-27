@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for the story node editor.
  */
@@ -35,6 +36,8 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -62,17 +65,16 @@ angular.module('oppia').directive('storyNodeEditor', [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'StoryEditorStateService', 'ExplorationIdValidationService',
         'TopicsAndSkillsDashboardBackendApiService',
-        'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
-        'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
+        'StoryUpdateService', 'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR',
         'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             StoryEditorStateService, ExplorationIdValidationService,
             TopicsAndSkillsDashboardBackendApiService,
-            StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
-            EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
+            StoryUpdateService, UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR,
             MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
+          ctrl.attachedSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
           $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
             MAX_CHARS_IN_CHAPTER_DESCRIPTION);
@@ -428,11 +430,23 @@ angular.module('oppia').directive('storyNodeEditor', [
             // with empty exploration id.
             $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.expIdCanBeSaved = true;
-            $scope.$on(EVENT_STORY_INITIALIZED, _init);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _init);
+            const storyInitializedSubscription =
+              StoryEditorStateService.getInitializedSubject().subscribe(
+                () => _init()
+              );
+            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
+            const storyReinitializedSubscription =
+              StoryEditorStateService.getReinitializedSubject().subscribe(
+                () => _init()
+              );
+            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
             $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
 
             _init();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.attachedSubscriptions.unsubscribe();
           };
         }
       ]

@@ -31,6 +31,9 @@ require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
+
 angular.module('oppia').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -41,15 +44,14 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'EditableStoryBackendApiService', 'UndoRedoService',
         'StoryEditorStateService', 'UrlService',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             EditableStoryBackendApiService, UndoRedoService,
             StoryEditorStateService, UrlService,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
+          ctrl.attachedSubscriptions = new Subscription();
           $scope.explorationValidationIssues = [];
 
           $scope.getChangeListLength = function() {
@@ -169,10 +171,22 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
-            $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
+            const storyInitializedSubscription =
+              StoryEditorStateService.getStoryInitializedSubject().subscribe(
+                () => _validateStory()
+              );
+            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
+            const storyReinitializedSubscription =
+              StoryEditorStateService.getStoryReinitializedSubject().subscribe(
+                () => _validateStory()
+              );
+            ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.attachedSubscriptions.unsubscribe();
           };
         }
       ]

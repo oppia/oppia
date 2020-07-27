@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
@@ -28,6 +29,9 @@ require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
+
 angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -39,13 +43,12 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
       controller: [
         '$scope', '$uibModal', '$window', 'UrlService',
         'UrlInterpolationService', 'UndoRedoService', 'StoryEditorStateService',
-        'EVENT_STORY_INITIALIZED',
         function(
             $scope, $uibModal, $window, UrlService,
-            UrlInterpolationService, UndoRedoService, StoryEditorStateService,
-            EVENT_STORY_INITIALIZED
+            UrlInterpolationService, UndoRedoService, StoryEditorStateService
         ) {
           var ctrl = this;
+          ctrl.attachedSubscriptions = new Subscription();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
           $scope.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -71,9 +74,14 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
           };
           ctrl.$onInit = function() {
             $scope.story = StoryEditorStateService.getStory();
-            $scope.$on(EVENT_STORY_INITIALIZED, function() {
-              $scope.topicName = StoryEditorStateService.getTopicName();
-            });
+            const storyInitializedSubscription =
+              StoryEditorStateService.getStoryInitializedSubject().subscribe(
+                () => $scope.topicName = StoryEditorStateService.getTopicName()
+              );
+            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.attachedSubscriptions.unsubscribe();
           };
         }
       ]

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Component for the story editor page.
  */
@@ -35,19 +36,20 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
     '$scope', '$uibModal', '$window', 'PageTitleService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
-    'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
     function(
         $scope, $uibModal, $window, PageTitleService,
         StoryEditorStateService, UndoRedoService,
-        UrlInterpolationService, UrlService,
-        EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+        UrlInterpolationService, UrlService) {
       var ctrl = this;
+      ctrl.attachedSubscriptions = new Subscription();
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
         if (UndoRedoService.getChangeCount() > 0) {
@@ -80,8 +82,20 @@ angular.module('oppia').component('storyEditorPage', {
 
       ctrl.$onInit = function() {
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
-        $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
-        $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
+        const storyInitializedSubscription =
+          StoryEditorStateService.getStoryInitializedSubject().subscribe(
+            () => setPageTitle()
+          );
+        ctrl.attachedSubscriptions.add(storyInitializedSubscription);
+        const storyReinitializedSubscription =
+          StoryEditorStateService.getStoryReinitializedSubject().subscribe(
+            () => setPageTitle()
+          );
+        ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.attachedSubscriptions.unsubscribe();
       };
     }
   ]
