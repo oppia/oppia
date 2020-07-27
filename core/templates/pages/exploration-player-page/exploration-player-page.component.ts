@@ -42,7 +42,7 @@ angular.module('oppia').component('explorationPlayerPage', {
     'CommandExecutorService', '$rootScope',
     function(
         ContextService, PageTitleService,
-        ReadOnlyExplorationBackendApiService, 
+        ReadOnlyExplorationBackendApiService,
         CommandExecutorService, $rootScope) {
       var ctrl = this;
       ctrl.$onInit = function() {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Oppia interaction from outer iframe with messaging with commands.
+ * @fileoverview Oppia interaction from outer iframe with messaging commands.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -33,7 +33,7 @@ export class CommandExecutorService {
     SELECT_ITEM_BULLET: this.selectItemBullet,
     SUBMIT: this.submit,
     HOST_NAME: this.setHostname
-  }; 
+  };
   setElementsOnPage = 0;
   hostname = '';
   cachedOuterFrameMessage = '';
@@ -71,22 +71,22 @@ export class CommandExecutorService {
       TextInput: 'ENTER_TEXT_NUMBER_UNITS',
       'default': ''
     };
-    this.setElementsOnPage = 0
+    this.setElementsOnPage = 0;
     if (stateToCommand[id] === '') {
       return;
     }
     if (this.hostname === '') {
       this.cachedOuterFrameMessage = stateToCommand[id];
     } else {
-      this.windowRef.nativeWindow.parent.postMessage(stateToCommand[id], 
-        this.hostname)
+      this.windowRef.nativeWindow.parent.postMessage(stateToCommand[id],
+        this.hostname);
     }
   }
 
   setHostname(windowRef, hostname) {
     this.hostname = hostname;
     if (this.cachedOuterFrameMessage !== '') {
-      windowRef.nativeWindow.parent.postMessage(this.cachedOuterFrameMessage, 
+      windowRef.nativeWindow.parent.postMessage(this.cachedOuterFrameMessage,
         this.hostname);
     }
   }
@@ -102,15 +102,15 @@ export class CommandExecutorService {
         'protractor-test-next-card-button')[0] as HTMLElement;
       button.click();
     }
-    this.setElementsOnPage = 0
+    this.setElementsOnPage = 0;
   }
 
   fillTextBox(windowRef, text) {
     var box = windowRef.nativeWindow.document.getElementsByClassName(
       'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
     box.value = text;
-    var evt = document.createEvent("HTMLEvents"); 
-    evt.initEvent("change", false, true); 
+    var evt = document.createEvent('HTMLEvents');
+    evt.initEvent('change', false, true);
     box.dispatchEvent(evt);
     var button = windowRef.nativeWindow.document.getElementsByClassName(
       'oppia-learner-confirm-button protractor-test-submit-answer-button \
@@ -123,22 +123,21 @@ export class CommandExecutorService {
       var box;
       if (this.setElementsOnPage === 0) {
         var box = windowRef.nativeWindow.document.getElementsByClassName(
-          'form-control ng-pristine ng-untouched ng-valid ng-empty')[0]
+          'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
         box.value = elements[i];
         this.setElementsOnPage += 1;
       } else {
         var addButton = windowRef.nativeWindow.document.getElementsByClassName(
-          'btn btn-secondary btn-sm protractor-test-add-list-entry')
-          [this.setElementsOnPage-1] as HTMLElement;
+          'btn btn-secondary btn-sm protractor-\
+          test-add-list-entry')[this.setElementsOnPage - 1] as HTMLElement;
         addButton.click();
         this.setElementsOnPage += 1;
         var box = windowRef.nativeWindow.document.getElementsByClassName(
           'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
         box.value = elements[i];
-
       }
-      var evt = document.createEvent("HTMLEvents"); 
-      evt.initEvent("change", false, true); 
+      var evt = document.createEvent('HTMLEvents');
+      evt.initEvent('change', false, true);
       box.dispatchEvent(evt);
     }
   }
@@ -147,8 +146,9 @@ export class CommandExecutorService {
     var boxes = windowRef.nativeWindow.document.getElementsByClassName(
       'form-control ng-pristine ng-untouched ng-valid ng-empty');
     for (var i = 0; i < boxes.length; i++) {
-      if (boxes[i].value == element) {
-        var deleteButton = windowRef.nativeWindow.document.getElementsByClassName(
+      if (boxes[i].value === element) {
+        var deleteButton = 
+        windowRef.nativeWindow.document.getElementsByClassName(
           'material-icons md-18');
         deleteButton[i].click();
       }
@@ -172,9 +172,9 @@ export class CommandExecutorService {
   }
 
   selectItemBullet(windowRef, message) {
-    message = Number(message)
+    message = Number(message);
     var button = windowRef.nativeWindow.document.getElementsByClassName(
-      "multiple-choice-outer-radio-button")[message-1] as HTMLElement;
+      'multiple-choice-outer-radio-button')[message - 1] as HTMLElement;
     button.click();
   }
 }

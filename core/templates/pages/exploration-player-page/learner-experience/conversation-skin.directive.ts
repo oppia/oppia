@@ -670,7 +670,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
           var _addNewCard = function(newCard) {
             PlayerTranscriptService.addNewCard(newCard);
-            $rootScope.$broadcast('livePlayerStateChange', newCard)
+            $rootScope.$broadcast('livePlayerStateChange', newCard);
 
             var totalNumCards = PlayerTranscriptService.getNumCards();
 
