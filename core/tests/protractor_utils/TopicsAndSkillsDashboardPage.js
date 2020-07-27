@@ -17,6 +17,7 @@
  * in Protractor tests.
  */
 
+var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
 var workflow = require('./workflow.js');
@@ -163,11 +164,11 @@ var TopicsAndSkillsDashboardPage = function() {
   this.mergeSkillWithIndexToSkillWithIndex = async function(
       oldSkillIndex, newSkillIndex) {
     await this.waitForSkillsToLoad();
-    var skillEditOptionBox = skillEditOptions.get(oldSkillIndex);
-    await skillEditOptionBox.click();
-    await waitFor.visibilityOf(
-      mergeSkillsButton, 'Merge button taking too long to appear.');
-    await mergeSkillsButton.click();
+    await action.click(
+      'Skill edit options', skillEditOptions.get(oldSkillIndex));
+    await action.click(
+      'Merge skill button', mergeSkillsButton);
+
     var skills = await skillsListItems;
     await skills[newSkillIndex].click();
     await confirmSkillsMergeButton.click();
@@ -175,22 +176,21 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.navigateToTopicWithIndex = async function(index) {
     await this.waitForTopicsToLoad();
-    var topicEditOptionBox = topicEditOptions.get(index);
-    await topicEditOptionBox.click();
-    await waitFor.elementToBeClickable(
-      editTopicButton,
-      'Edit Topic button takes too long to be clickable');
-    await editTopicButton.click();
+    await action.click(
+      'Topic edit option', topicEditOptions.get(index));
+    await action.click(
+      'Edit topic button', editTopicButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.assignSkillWithIndexToTopic = async function(index, topicIndex) {
     await this.waitForSkillsToLoad();
-    var assignSkillButton = assignSkillToTopicButtons.get(index);
-    await waitFor.elementToBeClickable(
-      assignSkillButton,
-      'Assign skill button taking too long to be clickable');
-    await assignSkillButton.click();
+    await waitFor.visibilityOf(
+      assignSkillToTopicButtons.first(),
+      'Assign button taking too long to appear.');
+    await action.click(
+      'Assign skill to topic button', assignSkillToTopicButtons.get(index));
+
     var topic = topicsListItems.get(topicIndex);
     await waitFor.elementToBeClickable(
       topic, 'Topic list item taking too long to be clickable');
@@ -319,31 +319,23 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.deleteTopicWithIndex = async function(index) {
     await this.waitForTopicsToLoad();
-    var topicEditOptionBox = topicEditOptions.get(index);
-    await topicEditOptionBox.click();
-    await waitFor.elementToBeClickable(
-      deleteTopicButton,
-      'Delete Topic button takes too long to be clickable');
-    await deleteTopicButton.click();
-    await waitFor.elementToBeClickable(
-      confirmTopicDeletionButton,
-      'Confirm Delete Topic button takes too long to be clickable');
-    await confirmTopicDeletionButton.click();
+
+    await action.click(
+      'Topic edit option', topicEditOptions.get(index));
+    await action.click('Delete topic button', deleteTopicButton);
+    await action.click(
+      'Confirm Delete Topic button', confirmTopicDeletionButton);
     await this.get();
   };
 
   this.deleteSkillWithIndex = async function(index) {
     await this.waitForSkillsToLoad();
-    var skillEditOptionBox = skillEditOptions.get(index);
-    await skillEditOptionBox.click();
-    await waitFor.elementToBeClickable(
-      deleteSkillButton,
-      'Delete skill button takes too long to be clickable');
-    await deleteSkillButton.click();
-    await waitFor.elementToBeClickable(
-      confirmSkillDeletionButton,
-      'Confirm Delete Skill button takes too long to be clickable');
-    await confirmSkillDeletionButton.click();
+    await action.click(
+      'Skill edit option', skillEditOptions.get(index));
+    await action.click(
+      'Delete skill button', deleteSkillButton);
+    await action.click(
+      'Confirm delete skill button', confirmSkillDeletionButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -427,6 +419,12 @@ var TopicsAndSkillsDashboardPage = function() {
       unassignSkillButon,
       'Unassign Skill button takes too long to be clickable');
     await unassignSkillButon.click();
+
+    await waitFor.modalPopupToAppear();
+    await waitFor.visibilityOf(
+      assignedTopicNamesInput.first(),
+      'Topic names in unassign skill from topics modal taking' +
+      ' too long to appear.');
     var assignedTopicInput = assignedTopicNamesInput.get(topicIndex);
     await waitFor.elementToBeClickable(
       assignedTopicInput,
@@ -435,7 +433,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
     await waitFor.elementToBeClickable(
       confirmUnassignSkillButton,
-      'Confirm Delete Topic button takes too long to be clickable');
+      'Confirm Unassign skill button takes too long to be clickable');
     await confirmUnassignSkillButton.click();
   };
 
