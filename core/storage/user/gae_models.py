@@ -69,7 +69,7 @@ class UserSettingsModel(base_models.BaseModel):
     profiles_list = ndb.StringProperty(default=None, repeated=True)
     # Pin assocaited with the user profile.
     pin = ndb.StringProperty(default=None)
-    # Date created timestamp. Used on android. May be None.
+    # Date timestamp when the account/profile was created. May be None.
     date_created_timestamp = ndb.DateTimeProperty(default=None)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
