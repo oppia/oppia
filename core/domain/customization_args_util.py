@@ -106,19 +106,10 @@ def validate_customization_args_and_values(
             raise utils.ValidationError(
                 'Customization argument is missing key: %s' % ca_spec.name)
         try:
-            # Since SubtitledHtml is a custom object which contains a html
-            # field as one of the properties in its dict schema, we use
-            # apply_custom_validators=False so that normalize_against_schema
-            # traverses to the nested html schema inside SubtitledHtml and
-            # properly normalizes the html.
-            # Additionally, default values might not pass custom validation
-            # checks (e.g. the Image component has a required field whose
-            # default value is empty).
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
                     customization_args[ca_spec.name]['value'],
-                    ca_spec.schema,
-                    apply_custom_validators=False))
+                    ca_spec.schema))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are
             # not involved (If they are, can we get sample values for the

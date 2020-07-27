@@ -24,25 +24,24 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
 import { LoggerService } from 'services/contextual/logger.service';
-import { IParamChangeBackendDict, ParamChange } from
+import { ParamChangeBackendDict, ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { IParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
+import { ParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
-import {
-  EndExplorationCustomizationArgs,
-  InteractionCustomizationArgs
-} from 'interactions/customization-args-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { IBindableVoiceovers } from
+import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { Interaction } from
+  'domain/exploration/InteractionObjectFactory';
+import { BindableVoiceovers } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import {
-  IStateObjectsBackendDict,
-  IVoiceoverObjectsDict,
+  StateObjectsBackendDict,
   States,
-  StatesObjectFactory
+  StatesObjectFactory,
+  VoiceoverObjectsDict
 } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -50,11 +49,11 @@ import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
-interface IExplorationBackendDict {
+interface ExplorationBackendDict {
   'init_state_name': string;
-  'param_changes': IParamChangeBackendDict[];
-  'param_specs': IParamSpecsBackendDict;
-  'states': IStateObjectsBackendDict;
+  'param_changes': ParamChangeBackendDict[];
+  'param_specs': ParamSpecsBackendDict;
+  'states': StateObjectsBackendDict;
   'title': string;
   'language_code': string;
 }
@@ -184,7 +183,7 @@ export class Exploration {
     return this.getState(stateName).content.getHtml();
   }
 
-  getVoiceovers(stateName: string): IBindableVoiceovers {
+  getVoiceovers(stateName: string): BindableVoiceovers {
     let state = this.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
@@ -209,7 +208,7 @@ export class Exploration {
     return voiceovers || null;
   }
 
-  getAllVoiceovers(languageCode: string): IVoiceoverObjectsDict {
+  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
     return this.states.getAllVoiceovers(languageCode);
   }
 
@@ -233,7 +232,7 @@ export class ExplorationObjectFactory {
               private urlInterpolationService: UrlInterpolationService) {}
 
   createFromBackendDict(
-      explorationBackendDict: IExplorationBackendDict): Exploration {
+      explorationBackendDict: ExplorationBackendDict): Exploration {
     return new Exploration(
       explorationBackendDict.init_state_name,
       this.paramChangesObjectFactory.createFromBackendList(

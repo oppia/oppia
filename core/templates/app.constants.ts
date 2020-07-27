@@ -113,7 +113,7 @@ export class AppConstants {
 
   // Do not modify these, for backwards-compatibility reasons.
   public static COMPONENT_NAME_CONTENT = 'content';
-  public static COMPONENT_NAME_CUSTIMOZATION_ARG = 'ca';
+  public static COMPONENT_NAME_CUSTOMIZATION_ARG = 'ca';
   public static COMPONENT_NAME_HINT = 'hint';
   public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';

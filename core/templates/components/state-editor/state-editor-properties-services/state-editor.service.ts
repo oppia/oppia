@@ -26,9 +26,9 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import {
-  InteractionCustomizationArgs,
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
+  InteractionCustomizationArgs,
   ItemSelectionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
@@ -40,7 +40,7 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 
-interface IAnswerChoice {
+interface AnswerChoice {
   val: string | number;
   label: string;
 }
@@ -165,7 +165,7 @@ export class StateEditorService {
 
   getAnswerChoices(
       interactionId: string,
-      customizationArgs: InteractionCustomizationArgs): IAnswerChoice[] {
+      customizationArgs: InteractionCustomizationArgs): AnswerChoice[] {
     if (!interactionId) {
       return null;
     }

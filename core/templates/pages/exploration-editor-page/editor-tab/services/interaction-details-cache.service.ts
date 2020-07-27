@@ -28,7 +28,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 
-interface IInteractionDetailsCache {
+interface InteractionDetailsCache {
   [interactionId: string]: InteractionCustomizationArgs;
 }
 
@@ -36,7 +36,7 @@ interface IInteractionDetailsCache {
   providedIn: 'root'
 })
 export class InteractionDetailsCacheService {
-  static _cache: IInteractionDetailsCache = {};
+  static _cache: InteractionDetailsCache = {};
 
   reset(): void {
     InteractionDetailsCacheService._cache = {};

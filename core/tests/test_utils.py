@@ -670,7 +670,6 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
-    # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
@@ -849,7 +848,7 @@ tags: []
             expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=expect_errors,
+            expect_errors,
             expected_status_int=expected_status_int,
             upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
@@ -955,8 +954,8 @@ tags: []
         incoming_email_url = '/_ah/mail/%s' % recipient_email
 
         return self._send_post_request(
-            app, incoming_email_url, data, headers=headers,
-            expect_errors=expect_errors,
+            app, incoming_email_url, data,
+            expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
@@ -1529,7 +1528,7 @@ tags: []
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes
@@ -2124,6 +2123,23 @@ tags: []
             self.logout()
             os.environ.update(initial_user_env)
 
+    def assertRaises(self, exc, fun, *args, **kwds):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
+            self, expected_exception, expected_regexp, callable_obj=None,
+            *args, **kwargs):
+        if expected_regexp == '':
+            raise Exception(
+                'Please provide a sufficiently strong regexp string to '
+                'validate that the correct error is being raised.')
+
+        return super(TestBase, self).assertRaisesRegexp(
+            expected_exception, expected_regexp,
+            callable_obj=callable_obj, *args, **kwargs)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
@@ -2341,6 +2357,30 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.dest = None
         return state
 
+
+GenericTestBase = AppEngineTestBase
+
+
+class LinterTestBase(GenericTestBase):
+    """Base class for linter tests."""
+
+    def setUp(self):
+        super(LinterTestBase, self).setUp()
+        self.linter_stdout = []
+
+        def mock_print(*args):
+            """Mock for python_utils.PRINT. Append the values to print to
+            linter_stdout list.
+
+            Args:
+                *args: str. Variable length argument list of values to print in
+                    the same line of output.
+            """
+            self.linter_stdout.append(
+                ' '.join(python_utils.UNICODE(arg) for arg in args))
+
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+
     def assert_same_list_elements(self, phrases, stdout):
         """Checks to see if all of the phrases appear in at least one of the
         stdout outputs.
@@ -2359,8 +2399,17 @@ class AppEngineTestBase(TestBase):
             any(all(phrase in output for phrase in phrases) for
                 output in stdout))
 
+    def assert_failed_messages_count(self, stdout, expected_failed_count):
+        """Assert number of expected failed checks to actual number of failed
+        checks.
 
-GenericTestBase = AppEngineTestBase
+        Args:
+            stdout: list(str). A list of linter output messages.
+
+            expected_failed_count: int. Expected number of failed messages.
+        """
+        failed_count = sum(msg.startswith('FAILED') for msg in stdout)
+        self.assertEqual(failed_count, expected_failed_count)
 
 
 class EmailMessageMock(python_utils.OBJECT):

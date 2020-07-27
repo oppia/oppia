@@ -22,9 +22,9 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { IAnswerStatsBackendDict } from
+import { AnswerStatsBackendDict } from
   'domain/exploration/visualization-info-object.factory';
-import { IStateBackendDict } from 'domain/state/StateObjectFactory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
@@ -58,7 +58,7 @@ describe('StateTopAnswersStatsService', () => {
 
   const expId = '7';
 
-  const stateBackendDict: IStateBackendDict = {
+  const stateBackendDict: StateBackendDict = {
     content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
     next_content_id_index: 0,
     param_changes: [],
@@ -124,7 +124,7 @@ describe('StateTopAnswersStatsService', () => {
 
   const spyOnBackendApiFetchStatsAsync = (
       stateName: string,
-      answersStatsBackendDicts: IAnswerStatsBackendDict[]): jasmine.Spy => {
+      answersStatsBackendDicts: AnswerStatsBackendDict[]): jasmine.Spy => {
     const answersStats = answersStatsBackendDicts.map(
       a => answerStatsObjectFactory.createFromBackendDict(a));
     return spyOn(stateTopAnswersStatsBackendApiService, 'fetchStatsAsync')

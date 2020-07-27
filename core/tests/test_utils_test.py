@@ -188,10 +188,11 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         function = lambda x: x ** 2
 
         failing_func = test_utils.FailingFunction(
-            function, MockError, test_utils.FailingFunction.INFINITY)
+            function, MockError('Dummy Exception'),
+            test_utils.FailingFunction.INFINITY)
 
         for i in python_utils.RANGE(20):
-            with self.assertRaises(MockError):
+            with self.assertRaisesRegexp(MockError, 'Dummy Exception'):
                 failing_func(i)
 
     def test_failing_function_raises_error_with_invalid_num_tries(self):
@@ -384,10 +385,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_kwargs(self):
-        # pylint: disable=unused-argument
-        def mock_getenv(key, default):
+        def mock_getenv(key, default): # pylint: disable=unused-argument
             return
-        # pylint: enable=unused-argument
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_kwargs=[
                 {'key': '123', 'default': '456'},
@@ -398,10 +397,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
             SwapWithCheckTestClass.functions_with_kwargs()
 
     def test_swap_with_check_on_expected_kwargs_failed_on_wrong_numbers(self):
-        # pylint: disable=unused-argument
-        def mock_getenv(key, default):
+        def mock_getenv(key, default): # pylint: disable=unused-argument
             return
-        # pylint: enable=unused-argument
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_kwargs=[
                 {'key': '123', 'default': '456'},
@@ -416,14 +413,35 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_capature_exception_raised_by_tested_function(
             self):
         def mock_getcwd():
-            raise ValueError()
+            raise ValueError('Exception raised from getcwd()')
 
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError, r'Exception raised from getcwd\(\)'):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
+
+    def test_assert_raises_with_error_message(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.'):
+            self.assertRaises(Exception, mock_exception_func)
+
+    def test_assert_raises_regexp_with_empty_string(self):
+        def mock_exception_func():
+            raise Exception()
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please provide a sufficiently strong regexp string to '
+            'validate that the correct error is being raised.'):
+            self.assertRaisesRegexp(Exception, '', mock_exception_func)
 
 
 class EmailMockTests(test_utils.EmailTestBase):
@@ -444,18 +462,18 @@ class EmailMockTests(test_utils.EmailTestBase):
         to emails_dict.
         """
         self._send_email_to_recipients(
-            sender_email='a@a.com',
-            recipient_emails=['b@b.com'],
-            subject=(
+            'a@a.com',
+            ['b@b.com'],
+            (
                 'Hola 😂 - invitation to collaborate'
                 .encode(encoding='utf-8')),
-            plaintext_body='plaintext_body 😂'.encode(encoding='utf-8'),
-            html_body='Hi abc,<br> 😂'.encode(encoding='utf-8'),
+            'plaintext_body 😂'.encode(encoding='utf-8'),
+            'Hi abc,<br> 😂'.encode(encoding='utf-8'),
             bcc=['c@c.com'],
             reply_to='abc',
             recipient_variables={'b@b.com': {'first': 'Bob', 'id': 1}})
         messages = self._get_sent_email_messages(
-            to='b@b.com')
+            'b@b.com')
         all_messages = self._get_all_sent_email_messages()
 
         self.assertEqual(len(messages), 1)
@@ -498,5 +516,5 @@ class SwapWithCheckTestClass(python_utils.OBJECT):
     @classmethod
     def functions_with_kwargs(cls):
         """Run a few functions with kwargs."""
-        os.getenv(key='123', default='456')
-        os.getenv(key='678', default='900')
+        os.getenv('123', default='456')
+        os.getenv('678', default='900')

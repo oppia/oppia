@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
-  IRecordedVoiceOverBackendDict,
+  RecordedVoiceOverBackendDict,
   RecordedVoiceovers,
   RecordedVoiceoversObjectFactory
 } from 'domain/exploration/RecordedVoiceoversObjectFactory';
@@ -34,9 +34,9 @@ import {
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-export interface ISubtopicPageContentsBackendDict {
+export interface SubtopicPageContentsBackendDict {
   'subtitled_html': SubtitledHtmlBackendDict;
-  'recorded_voiceovers': IRecordedVoiceOverBackendDict;
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
 }
 
 export class SubtopicPageContents {
@@ -72,7 +72,7 @@ export class SubtopicPageContents {
     this._recordedVoiceovers = cloneDeep(newRecordedVoiceovers);
   }
 
-  toBackendDict(): ISubtopicPageContentsBackendDict {
+  toBackendDict(): SubtopicPageContentsBackendDict {
     return {
       subtitled_html: this._subtitledHtml.toBackendDict(),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
@@ -97,7 +97,7 @@ export class SubtopicPageContentsObjectFactory {
   }
 
   createFromBackendDict(
-      backendDict: ISubtopicPageContentsBackendDict): SubtopicPageContents {
+      backendDict: SubtopicPageContentsBackendDict): SubtopicPageContents {
     return new SubtopicPageContents(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         backendDict.subtitled_html),

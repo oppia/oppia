@@ -32,7 +32,7 @@ import { Outcome } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-interface IWarning {
+interface Warning {
   type: string,
   message: string
 }
@@ -43,7 +43,7 @@ interface IWarning {
 export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
   getCustomizationArgsWarnings(
-      customizationArgs: TextInputCustomizationArgs): IWarning[] {
+      customizationArgs: TextInputCustomizationArgs): Warning[] {
     var warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
@@ -94,7 +94,7 @@ export class TextInputValidationService {
   getAllWarnings(
       stateName: string,
       customizationArgs: TextInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.bivs.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));

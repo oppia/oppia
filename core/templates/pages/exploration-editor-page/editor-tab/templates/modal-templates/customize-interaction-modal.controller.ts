@@ -297,7 +297,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           traverseSchemaAndAssignContentIds(
             caValues[name].value,
             caSpec.schema,
-            `${AppConstants.COMPONENT_NAME_CUSTIMOZATION_ARG}_${name}`);
+            `${AppConstants.COMPONENT_NAME_CUSTOMIZATION_ARG}_${name}`);
         }
       }
     };

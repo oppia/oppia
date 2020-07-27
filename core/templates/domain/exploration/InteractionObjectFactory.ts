@@ -21,15 +21,15 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { IAnswerGroupBackendDict, AnswerGroup, AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IHintBackendDict, Hint, HintObjectFactory } from
+import { HintBackendDict, Hint, HintObjectFactory } from
   'domain/exploration/HintObjectFactory';
-import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
+import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { ISolutionBackendDict, Solution, SolutionObjectFactory } from
+import { SolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
-import { IInteractionAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer } from 'interactions/answer-defs';
 import {
   InteractionCustomizationArgObjectFactory, InteractionCustomizationArg
 } from 'domain/exploration/interaction-customization-arg-object.factory';
@@ -40,18 +40,18 @@ import {
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export interface InteractionBackendDict {
-  'default_outcome': IOutcomeBackendDict;
-  'answer_groups': IAnswerGroupBackendDict[];
-  'confirmed_unclassified_answers': IInteractionAnswer[];
+  'default_outcome': OutcomeBackendDict;
+  'answer_groups': AnswerGroupBackendDict[];
+  'confirmed_unclassified_answers': InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
-  'hints': IHintBackendDict[];
+  'hints': HintBackendDict[];
   'id': string;
-  'solution': ISolutionBackendDict;
+  'solution': SolutionBackendDict;
 }
 
 export class Interaction {
   answerGroups: AnswerGroup[];
-  confirmedUnclassifiedAnswers: IInteractionAnswer[];
+  confirmedUnclassifiedAnswers: InteractionAnswer[];
   customizationArgs: {[name: string]: InteractionCustomizationArg};
   defaultOutcome: Outcome;
   hints: Hint[];
@@ -59,7 +59,7 @@ export class Interaction {
   solution: Solution;
   constructor(
       answerGroups: AnswerGroup[],
-      confirmedUnclassifiedAnswers: IInteractionAnswer[],
+      confirmedUnclassifiedAnswers: InteractionAnswer[],
       customizationArgs: {[name: string]: InteractionCustomizationArg},
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
@@ -199,7 +199,7 @@ export class InteractionObjectFactory {
   }
 
   generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: IAnswerGroupBackendDict[]) {
+      answerGroupBackendDicts: AnswerGroupBackendDict[]) {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
@@ -207,13 +207,13 @@ export class InteractionObjectFactory {
     });
   }
 
-  generateHintsFromBackend(hintBackendDicts: IHintBackendDict[]) {
+  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]) {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
   }
 
-  generateSolutionFromBackend(solutionBackendDict: ISolutionBackendDict) {
+  generateSolutionFromBackend(solutionBackendDict: SolutionBackendDict) {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }
 }

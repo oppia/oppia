@@ -16,30 +16,31 @@
  * @fileoverview Type definiitions for Customization Args.
  */
 
-import { IGraphAnswer } from 'interactions/answer-defs';
+import { GraphAnswer } from 'interactions/answer-defs';
 
 import { SubtitledHtmlBackendDict, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-interface ILabeledRegion {
+
+interface LabeledRegion {
   region: {
     area: number[][];
   };
   label: string;
 }
 
-export interface IImageWithRegions {
-  labeledRegions: ILabeledRegion[];
+interface ImageWithRegions {
+  labeledRegions: LabeledRegion[];
   imagePath: string;
 }
 
-export interface IReadableMusicNote {
+interface ReadableMusicNote {
   readableNoteName: string;
 }
 
-
+export interface AlgebraicExpressionInputCustomizationArgs { }
 interface AlgebraicExpressionInputCustomizationArgsBackendDict { }
 export interface AlgebraicExpressionInputCustomizationArgs { }
 type AlgebraicExpressionInputCustomizationArgsBackendDictValue = (
@@ -48,6 +49,7 @@ type AlgebraicExpressionInputCustomizationArgsBackendDictValue = (
 type AlgebraicExpressionInputCustomizationArgsValue = (
   AlgebraicExpressionInputCustomizationArgs[
     keyof AlgebraicExpressionInputCustomizationArgs]['value']);
+
 interface CodeReplCustomizationArgsBackendDict {
   language?: {
     value: string;
@@ -182,7 +184,7 @@ type FractionInputCustomizationArgsValue = (
 
 interface GraphInputCustomizationArgsBackendDict {
   graph?: {
-    value: IGraphAnswer;
+    value: GraphAnswer;
   };
   canAddVertex: {
     value: boolean;
@@ -208,7 +210,7 @@ interface GraphInputCustomizationArgsBackendDict {
 }
 export interface GraphInputCustomizationArgs {
   graph?: {
-    value: IGraphAnswer;
+    value: GraphAnswer;
   };
   canAddVertex: {
     value: boolean;
@@ -242,7 +244,7 @@ type GraphInputCustomizationArgsValue = (
 
 interface ImageClickInputCustomizationArgsBackendDict {
   imageAndRegions?: {
-    value: IImageWithRegions;
+    value: ImageWithRegions;
   };
   highlightRegionsOnHover?: {
     value: string;
@@ -250,7 +252,7 @@ interface ImageClickInputCustomizationArgsBackendDict {
 }
 export interface ImageClickInputCustomizationArgs {
   imageAndRegions?: {
-    value: IImageWithRegions;
+    value: ImageWithRegions;
   };
   highlightRegionsOnHover?: {
     value: string;
@@ -377,18 +379,18 @@ type MultipleChoiceInputCustomizationArgsValue = (
 
 interface MusicNotesInputCustomizationArgsBackendDict {
   sequenceToGuess?: {
-    value: IReadableMusicNote[];
+    value: ReadableMusicNote[];
   };
   initialSequence?: {
-    value: IReadableMusicNote[];
+    value: ReadableMusicNote[];
   };
 }
 export interface MusicNotesInputCustomizationArgs {
   sequenceToGuess?: {
-    value: IReadableMusicNote[];
+    value: ReadableMusicNote[];
   };
   initialSequence?: {
-    value: IReadableMusicNote[];
+    value: ReadableMusicNote[];
   };
 }
 type MusicNotesInputCustomizationArgsBackendDictValue = (

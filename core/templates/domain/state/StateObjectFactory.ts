@@ -21,12 +21,12 @@ import { Injectable } from '@angular/core';
 
 import { InteractionBackendDict, Interaction, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { IParamChangeBackendDict, ParamChange } from
+import { ParamChangeBackendDict, ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import {
-  IRecordedVoiceOverBackendDict,
+  RecordedVoiceOverBackendDict,
   RecordedVoiceovers,
   RecordedVoiceoversObjectFactory
 } from 'domain/exploration/RecordedVoiceoversObjectFactory';
@@ -36,21 +36,21 @@ import {
   SubtitledHtmlObjectFactory
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import {
-  IWrittenTranslationsBackendDict,
+  WrittenTranslationsBackendDict,
   WrittenTranslations,
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 const constants = require('constants.ts');
 
-export interface IStateBackendDict {
+export interface StateBackendDict {
   'classifier_model_id': string;
   'content': SubtitledHtmlBackendDict;
   'interaction': InteractionBackendDict;
-  'param_changes': IParamChangeBackendDict[];
-  'recorded_voiceovers': IRecordedVoiceOverBackendDict;
+  'param_changes': ParamChangeBackendDict[];
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
-  'written_translations': IWrittenTranslationsBackendDict;
+  'written_translations': WrittenTranslationsBackendDict;
   'next_content_id_index': number;
 }
 
@@ -83,7 +83,7 @@ export class State {
     this.name = newName;
   }
 
-  toBackendDict(): IStateBackendDict {
+  toBackendDict(): StateBackendDict {
     return {
       content: this.content.toBackendDict(),
       classifier_model_id: this.classifierModelId,
@@ -139,7 +139,7 @@ export class StateObjectFactory {
   }
 
   createFromBackendDict(
-      stateName: string, stateDict: IStateBackendDict): State {
+      stateName: string, stateDict: StateBackendDict): State {
     return new State(
       stateName,
       stateDict.classifier_model_id,

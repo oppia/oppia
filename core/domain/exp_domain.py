@@ -2679,7 +2679,7 @@ class Exploration(python_utils.OBJECT):
 
                 if is_subtitled_html_spec or is_subtitled_unicode_spec:
                     # Default is a SubtitledHtml dict or SubtitleUnicode dict.
-                    new_value = ca_spec.default_value
+                    new_value = copy.deepcopy(ca_spec.default_value)
 
                     # If available, assign value to html or unicode_str.
                     if ca_name in ca_dict:
@@ -2706,7 +2706,7 @@ class Exploration(python_utils.OBJECT):
                             })
                     else:
                         # Default is a list of SubtitledHtml dict.
-                        new_value.extend(ca_spec.default_value)
+                        new_value.extend(copy.deepcopy(ca_spec.default_values))
 
                     # Assign content_ids.
                     for subtitled_html_dict in new_value:

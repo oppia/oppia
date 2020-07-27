@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { NumericInputCustomizationArgs } from
   'interactions/customization-args-defs';
@@ -39,14 +39,14 @@ export class NumericInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: NumericInputCustomizationArgs): IWarning[] {
+      customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];
   }
 
   getAllWarnings(
       stateName: string,
       customizationArgs: NumericInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(

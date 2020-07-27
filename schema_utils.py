@@ -92,9 +92,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
                 obj, obj_class.SCHEMA, apply_custom_validators=False)
         else:
             normalized_obj = obj_class.normalize(obj)
-    elif (schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT or
-          schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_HTML or
-          schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_UNICODE):
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
             p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
@@ -108,6 +106,37 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             key = prop[SCHEMA_KEY_NAME]
             normalized_obj[key] = normalize_against_schema(
                 obj[key], prop[SCHEMA_KEY_SCHEMA])
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_HTML:
+        assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
+        assert 'html' in obj, ('Expected dict with key html, received %s' % obj)
+        assert ('content_id' in obj, 
+            'Expected dict with key content_id, received %s' % obj)
+        assert (len(obj.keys()) == 2,
+            'Expected dict with 2 keys, received %s' % obj)
+
+        normalized_obj = {}
+        normalized_obj['html'] = normalize_against_schema(
+            obj['html'],
+            {'type': SCHEMA_TYPE_HTML})
+        normalized_obj['content_id'] = normalize_against_schema(
+            obj['content_id'],
+            {'type': SCHEMA_TYPE_UNICODE_OR_NONE})
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_UNICODE:
+        assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
+        assert ('unicode_str' in obj, 
+            'Expected dict with key unicode_str, received %s' % obj)
+        assert ('content_id' in obj, 
+            'Expected dict with key content_id, received %s' % obj)
+        assert (len(obj.keys()) == 2,
+            'Expected dict with 2 keys, received %s' % obj)
+
+        normalized_obj = {}
+        normalized_obj['unicode_str'] = normalize_against_schema(
+            obj['unicode_str'],
+            {'type': SCHEMA_TYPE_UNICODE})
+        normalized_obj['content_id'] = normalize_against_schema(
+            obj['content_id'],
+            {'type': SCHEMA_TYPE_UNICODE_OR_NONE})
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         obj = float(obj)
         assert isinstance(obj, numbers.Real), (
@@ -133,7 +162,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
         if SCHEMA_KEY_LEN in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LEN]
+            assert len(obj) == schema[SCHEMA_KEY_LEN], (
+                'Expected length of %s got %s' % (
+                    schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(item, item_schema) for item in obj
         ]
@@ -237,11 +268,7 @@ class Normalizers(python_utils.OBJECT):
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-# TODO(ankita240796): The disable comment is required since the lint tests
-# fail on circleci with the multiple-statements error on the line even though
-# the line is empty. This is a temporary fix to unblock PRs.
-# Relevant issue: https://github.com/oppia/oppia/issues/7307.
-# pylint: disable=multiple-statements
+
     @staticmethod
     def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.

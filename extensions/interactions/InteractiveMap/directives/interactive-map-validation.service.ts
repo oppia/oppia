@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractiveMapCustomizationArgs } from
   'interactions/customization-args-defs';
@@ -39,7 +39,7 @@ export class InteractiveMapValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: InteractiveMapCustomizationArgs): IWarning[] {
+      customizationArgs: InteractiveMapCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -65,7 +65,7 @@ export class InteractiveMapValidationService {
 
   getAllWarnings(
       stateName: string, customizationArgs: InteractiveMapCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(

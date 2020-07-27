@@ -249,13 +249,13 @@ class EditorTests(BaseEditorControllerTests):
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
 
         exploration_rights = self.put_json(
-            publish_url, payload={},
+            publish_url, {},
             csrf_token=csrf_token)['rights']
 
         self.assertEqual(exploration_rights['status'], 'private')
 
         exploration_rights = self.put_json(
-            publish_url, payload={'make_public': True},
+            publish_url, {'make_public': True},
             csrf_token=csrf_token)['rights']
 
         self.assertEqual(exploration_rights['status'], 'public')
@@ -1428,11 +1428,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         """Test exploration rights handler for assign role for exploration."""
         # Create several users.
         self.signup(
-            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(
-            self.COLLABORATOR2_EMAIL, username=self.COLLABORATOR2_USERNAME)
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
         self.signup(
-            self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
+            self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
 
         # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
@@ -1603,7 +1603,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Create a random user.
         self.signup(
-            self.RANDOM_USER_EMAIL, username=self.RANDOM_USER_USERNAME)
+            self.RANDOM_USER_EMAIL, self.RANDOM_USER_USERNAME)
 
         # Check community_owned_status value.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
@@ -1669,7 +1669,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={
+            {
                 'version': exploration.version,
                 'new_member_username': 'invalid_new_member_username'},
             csrf_token=csrf_token, expected_status_int=400)
@@ -1688,7 +1688,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assertFalse(exploration_rights.viewable_if_private)
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={
+            {
                 'version': exploration.version,
                 'viewable_if_private': True}, csrf_token=csrf_token)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -1704,7 +1704,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={'version': exploration.version}, csrf_token=csrf_token,
+            {'version': exploration.version}, csrf_token=csrf_token,
             expected_status_int=400)
 
         self.assertEqual(
@@ -1777,7 +1777,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id),
-            payload={'message_type': 'invalid_message_type'},
+            {'message_type': 'invalid_message_type'},
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid message type.')
@@ -1889,7 +1889,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
             # Check that an email was sent with the correct content.
             messages = self._get_sent_email_messages(
-                to=self.EDITOR_EMAIL)
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             self.assertEqual(

@@ -76,7 +76,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(self.exploration_1.id, retrieved_exploration.id)
         self.assertEqual(self.exploration_1.title, retrieved_exploration.title)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id fake_exploration'
+            ' not found'):
             exp_fetchers.get_exploration_by_id('fake_exploration')
 
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
@@ -165,7 +168,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         self.assertNotIn('doesnt_exist', result)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Couldn\'t find explorations with the following ids:\n'
+            'doesnt_exist'):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist'])
 

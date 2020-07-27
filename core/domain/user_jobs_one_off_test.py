@@ -1414,8 +1414,8 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
         exp_services.save_new_exploration(self.owner_id, exploration)
         exp_migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': '33',
-            'to_version': '34'
+            'from_version': '34',
+            'to_version': '35'
         })]
         exp_services.update_exploration(
             self.owner_id, 'exp_id', exp_migration_change_list,
@@ -1627,8 +1627,8 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
         exp_services.save_new_exploration(self.owner_id, exploration)
         exp_migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': '33',
-            'to_version': '34'
+            'from_version': '34',
+            'to_version': '35'
         })]
         exp_services.update_exploration(
             self.owner_id, 'exp_id', exp_migration_change_list,

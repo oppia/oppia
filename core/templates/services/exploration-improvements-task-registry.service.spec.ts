@@ -20,7 +20,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import {
   ExplorationTask,
   ExplorationTaskType,
@@ -29,6 +28,8 @@ import {
 } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTask } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
+import { StateStatsBackendDict } from
+  'domain/statistics/StateStatsObjectFactory';
 import { IneffectiveFeedbackLoopTask } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
 import { NeedsGuidingResponsesTask } from
@@ -37,20 +38,19 @@ import { SuccessiveIncorrectAnswersTask } from
   'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
-import { IStateBackendDict } from 'domain/state/StateObjectFactory';
-import { ExplorationStatsObjectFactory, IExplorationStatsBackendDict } from
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
   'domain/statistics/ExplorationStatsObjectFactory';
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
-  ICyclicStateTransitionsPlaythroughIssueBackendDict,
-  IEarlyQuitPlaythroughIssueBackendDict,
-  IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
+  CyclicStateTransitionsPlaythroughIssueBackendDict,
+  EarlyQuitPlaythroughIssueBackendDict,
+  MultipleIncorrectSubmissionsPlaythroughIssueBackendDict,
   MultipleIncorrectSubmissionsPlaythroughIssue,
-  PlaythroughIssueObjectFactory
+  PlaythroughIssueObjectFactory,
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { IStateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 
@@ -67,15 +67,15 @@ describe('Exploration improvements task registrar service', () => {
 
   let answerStatsBackendDict: AnswerStatsBackendDict;
   let cstPlaythroughIssueBackendDict:
-    ICyclicStateTransitionsPlaythroughIssueBackendDict;
+    CyclicStateTransitionsPlaythroughIssueBackendDict;
   let eqPlaythroughIssueBackendDict:
-    IEarlyQuitPlaythroughIssueBackendDict;
-  let expStatsBackendDict: IExplorationStatsBackendDict;
+    EarlyQuitPlaythroughIssueBackendDict;
+  let expStatsBackendDict: ExplorationStatsBackendDict;
   let misPlaythroughIssueBackendDict:
-    IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict;
-  let stateBackendDict: IStateBackendDict;
-  let stateStatsBackendDict: IStateStatsBackendDict;
-  let statesBackendDict: {[stateName: string]: IStateBackendDict};
+    MultipleIncorrectSubmissionsPlaythroughIssueBackendDict;
+  let stateBackendDict: StateBackendDict;
+  let stateStatsBackendDict: StateStatsBackendDict;
+  let statesBackendDict: {[stateName: string]: StateBackendDict};
   let taskBackendDict: ExplorationTaskBackendDict;
   let config: ExplorationImprovementsConfig;
 

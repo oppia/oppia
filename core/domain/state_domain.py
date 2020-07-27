@@ -807,6 +807,10 @@ class InteractionInstance(python_utils.OBJECT):
         # name to InteractionCustomizationArg, so that we can utilize
         # InteractionCustomizationArg helper functions.
         # Then, covert back to original dict format afterwards, at the end.
+
+        # We use skip_html_cleaning=True because we may be converting an old
+        # schema of html that is now invalid- the html cleaning process would
+        # remove invalid html before we get a chance to migrate it.
         customization_args = (
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
@@ -851,10 +855,10 @@ class InteractionInstance(python_utils.OBJECT):
                 argument name to a customization argument dict, which is a dict
                 of the single key 'value' to the value of the customization
                 argument.
-            skip_html_cleaning: boolean. Whether or not to skip html cleaning
+            skip_html_cleaning: bool. Whether or not to skip html cleaning
                 when constructing the SubtitledHtml domain objects. This
-                should be used if the end goal is to apply conversion functions
-                on the html, and the old html is no longer valid.
+                should only be used if the end goal is to apply conversion
+                functions on the html, and the old html is no longer valid.
 
         Returns:
             dict. A dictionary of customization argument names to the
@@ -936,10 +940,10 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 single key 'value' to the value of the customization argument.
             ca_schema: dict. The schema that defines the customization argument
                 value.
-            skip_html_cleaning: boolean. Whether or not to skip html cleaning
+            skip_html_cleaning: bool. Whether or not to skip html cleaning
                 when constructing the SubtitledHtml domain objects. This
-                should be used if the end goal is to apply conversion functions
-                on the html, and the old html is no longer valid.
+                should only be used if the end goal is to apply conversion
+                functions on the html, and the old html is no longer valid.
 
         Returns:
             InteractionCustomizationArg. The customization argument domain
@@ -2064,15 +2068,12 @@ class SubtitledHtml(python_utils.OBJECT):
                 content.
             html: str. A piece of user-submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
-            skip_html_cleaning: boolean. Whether or not to skip html cleaning.
-                This should be used if the end goal is to apply conversion
+            skip_html_cleaning: bool. Whether or not to skip html cleaning.
+                This should only be used if the end goal is to apply conversion
                 functions on the html, and the old html is no longer valid.
         """
         self.content_id = content_id
-        if skip_html_cleaning:
-            self.html = html
-        else:
-            self.html = html_cleaner.clean(html)
+        self.html = html if skip_html_cleaning else html_cleaner.clean(html)
         self.validate()
 
     def to_dict(self):

@@ -24,7 +24,7 @@ import { CamelCaseToHyphensPipe } from
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { IInteractionAnswer } from 'interactions/answer-defs';
+import { InteractionAnswer } from 'interactions/answer-defs';
 import { InteractionCustomizationArg } from
   'domain/exploration/interaction-customization-arg-object.factory';
 import { InteractionCustomizationArgs } from
@@ -99,7 +99,7 @@ export class ExplorationHtmlFormatterService {
   }
 
   getShortAnswerHtml(
-      answer: IInteractionAnswer, interactionId: string,
+      answer: InteractionAnswer, interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs) : string {
     var interactionChoices = null;
 
