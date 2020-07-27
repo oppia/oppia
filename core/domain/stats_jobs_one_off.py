@@ -1378,6 +1378,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                     '' if len(exp_versions_without_stats_as_strs) == 1 else 's',
                     ', '.join(exp_versions_without_stats_as_strs)))
 
+
 class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to check if all customization arguments stored in
     Playthrough, and ExplorationIssues are fully populated with
