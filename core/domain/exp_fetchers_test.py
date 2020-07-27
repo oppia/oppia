@@ -599,8 +599,6 @@ title: Old Title
 
         exploration.add_states(['State2'])
 
-        state2 = exploration.states['State2']
-
         answer_groups_2 = [{
             'outcome': {
                 'dest': 'Introduction',
