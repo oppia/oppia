@@ -20,8 +20,32 @@ import 'mousetrap';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
 describe('KeyboardShortcutService', () => {
-  jasmine.getEnv().allowRespy(true);
+  var skipButton = document.createElement('button');
+  var nextButton = document.createElement('button');
+  var continueToNextCardButton = document.createElement('button');
+  var continueButton = document.createElement('button');
+  var backButton = document.createElement('button');
+  var searchBar = document.createElement('input');
+  var categoryBar = document.createElement('select');
+
   const keyboardShortcutService = new KeyboardShortcutService();
+
+  beforeAll(() => {
+    skipButton.setAttribute('id', 'skipToMainContentId');
+    backButton.setAttribute('id', 'backButtonId');
+    nextButton.setAttribute('class', 'protractor-test-next-button');
+    continueButton.setAttribute('class', 'protractor-test-continue-button');
+    continueToNextCardButton.setAttribute(
+      'class', 'protractor-test-continue-to-next-card-button');
+    searchBar.setAttribute(
+      'class', 'protractor-test-search-input');
+    categoryBar.setAttribute('id', 'categoryBar');
+    document.body.append(skipButton);
+    document.body.append(continueButton);
+    document.body.append(backButton);
+    document.body.append(searchBar);
+    document.body.append(categoryBar);
+  });
 
   it('should test navigation shortcuts.', () => {
     keyboardShortcutService.setHref('#foo');
@@ -38,30 +62,37 @@ describe('KeyboardShortcutService', () => {
   });
 
   it('should test library page action shortcuts', () => {
-    spyOn(document, 'getElementById').and.callFake(function() {
-      return document.createElement('button1');
-    });
-
-    spyOn(document, 'querySelector').and.callFake(function() {
-      return document.createElement('button2');
-    });
     keyboardShortcutService.bindLibraryPageShortcuts();
+    
     Mousetrap.trigger('s');
+    expect(skipButton.isEqualNode(document.activeElement));
+    
     Mousetrap.trigger('/');
+    expect(searchBar.isEqualNode(document.activeElement));
+    
     Mousetrap.trigger('c');
+    expect(categoryBar.isEqualNode(document.activeElement));
   });
 
   it('should test exploration player action shortcuts', () => {
-    spyOn(document, 'getElementById').and.callFake(function() {
-      return document.createElement('button1');
-    });
-
-    spyOn(document, 'querySelector').and.callFake(function() {
-      return document.createElement('button2');
-    });
     keyboardShortcutService.bindExplorationPlayerShortcuts();
+    
     Mousetrap.trigger('s');
-    Mousetrap.trigger('j');
+    expect(skipButton.isEqualNode(document.activeElement));
+
     Mousetrap.trigger('k');
+    expect(backButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('j');
+    expect(continueButton.isEqualNode(document.activeElement));
+
+    document.body.append(continueToNextCardButton);
+    Mousetrap.trigger('j');
+    expect(continueToNextCardButton.isEqualNode(document.activeElement));
+
+    document.body.append(nextButton);
+    Mousetrap.trigger('j');
+    expect(nextButton.isEqualNode(document.activeElement));
+
   });
 });

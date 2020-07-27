@@ -45,33 +45,6 @@ describe('screenreader and keyboard user accessibility features', function() {
     await browser.wait(EC.urlContains(url), timeout);
   };
 
-  var testNavigationShortcuts = async function(url) {
-    await browser.get(url);
-    await waitForUrlRedirection(url);
-    // Should trigger keyboard shortcuts.
-    await triggerKeys('0');
-    await waitForUrlRedirection(getStartedUrl);
-    expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-    await triggerKeys('1');
-    await waitForUrlRedirection(communityLibraryUrl);
-    expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-    await triggerKeys('2');
-    await waitForUrlRedirection(learnerDashboardUrl);
-    expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-    await triggerKeys('3');
-    await waitForUrlRedirection(creatorDashboardUrl);
-    expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-    await triggerKeys('4');
-    await waitForUrlRedirection(aboutUrl);
-    expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-    await triggerKeys('5');
-    await waitForUrlRedirection(notificationsUrl);
-    expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-    await triggerKeys('6');
-    await waitForUrlRedirection(preferencesUrl);
-    expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-  };
-
   beforeAll(async function() {
     // Should create a user and login.
     await users.createUser('user11@accessibility.com', 'user11accessibility');
@@ -96,47 +69,308 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should test navigation shortcuts for the community-library page',
     async function() {
-      await testNavigationShortcuts('community-library');
+      await browser.get('community-library');
+      await waitForUrlRedirection('community-library');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
   it('should test navigation shortcuts for the creator-dashboard page',
     async function() {
-      await testNavigationShortcuts('creator-dashboard');
+      await browser.get('creator-dashboard');
+      await waitForUrlRedirection('creator-dashboard');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
   it('should test navigation shortcuts for the get-started page',
     async function() {
-      await testNavigationShortcuts('get-started');
+      await browser.get('get-started');
+      await waitForUrlRedirection('get-started');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
   it('should test navigation shortcuts for the about page',
     async function() {
-      await testNavigationShortcuts('about');
+      await browser.get('about');
+      await waitForUrlRedirection('about');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
   it('should test navigation shortcuts for the privacy-policy page',
     async function() {
-      await testNavigationShortcuts('privacy-policy');
+      await browser.get('privacy-policy');
+      await waitForUrlRedirection('privacy-policy');
+
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
   it('should test navigation shortcuts for the donate page',
     async function() {
-      await testNavigationShortcuts('donate');
+      await browser.get('donate');
+      await waitForUrlRedirection('donate');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
-  it('should test navigation shortcuts for the donate preferences page',
+  it('should test navigation shortcuts for the preferences page',
     async function() {
-      await testNavigationShortcuts('preferences');
+      await browser.get('preferences');
+      await waitForUrlRedirection('preferences');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
-  it('should test navigation shortcuts for the donate learner-dashboard page',
+  it('should test navigation shortcuts for the learner-dashboard page',
     async function() {
-      await testNavigationShortcuts('learner-dashboard');
+      await browser.get('learner-dashboard');
+      await waitForUrlRedirection('learner-dashboard');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
   it('should test navigation shortcuts for the notifications page',
     async function() {
-      await testNavigationShortcuts('notifications');
+      await browser.get('notifications');
+      await waitForUrlRedirection('notifications');
+  
+      await triggerKeys('0');
+      await waitForUrlRedirection(getStartedUrl);
+      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+  
+      await triggerKeys('1');
+      await waitForUrlRedirection(communityLibraryUrl);
+      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+  
+      await triggerKeys('2');
+      await waitForUrlRedirection(learnerDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+  
+      await triggerKeys('3');
+      await waitForUrlRedirection(creatorDashboardUrl);
+      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+  
+      await triggerKeys('4');
+      await waitForUrlRedirection(aboutUrl);
+      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
+  
+      await triggerKeys('5');
+      await waitForUrlRedirection(notificationsUrl);
+      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
+  
+      await triggerKeys('6');
+      await waitForUrlRedirection(preferencesUrl);
+      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
     });
 
   afterEach(async function() {

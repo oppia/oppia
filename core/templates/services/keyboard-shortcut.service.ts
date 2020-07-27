@@ -41,8 +41,16 @@ export class KeyboardShortcutService {
     Mousetrap.bind('j', function() {
       var nextButton = <HTMLElement>document.querySelector(
         '.protractor-test-next-button');
+      var continueToNextCardButton = <HTMLElement>document.querySelector(
+        '.protractor-test-continue-to-next-card-button');
+      var continueButton = <HTMLElement>document.querySelector(
+        '.protractor-test-continue-button');
       if (nextButton !== null) {
         nextButton.focus();
+      } else if (continueToNextCardButton !== null) {
+        continueToNextCardButton.focus();
+      } else if (continueButton !== null) {
+        continueButton.focus();
       }
       return false;
     });
@@ -50,7 +58,9 @@ export class KeyboardShortcutService {
 
   bindLibraryPageShortcuts() {
     Mousetrap.bind('/', function() {
-      document.getElementById('searchBar').focus();
+      var searchBar = <HTMLElement>document.querySelector(
+        '.protractor-test-search-input');
+      searchBar.focus();
       return false;
     });
 
