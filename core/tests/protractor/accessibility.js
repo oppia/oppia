@@ -71,31 +71,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('community-library');
       await waitForUrlRedirection('community-library');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -105,31 +105,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('creator-dashboard');
       await waitForUrlRedirection('creator-dashboard');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -139,31 +139,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('get-started');
       await waitForUrlRedirection('get-started');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -173,31 +173,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('about');
       await waitForUrlRedirection('about');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -211,27 +211,27 @@ describe('screenreader and keyboard user accessibility features', function() {
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -241,31 +241,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('donate');
       await waitForUrlRedirection('donate');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -275,31 +275,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('preferences');
       await waitForUrlRedirection('preferences');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -309,31 +309,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('learner-dashboard');
       await waitForUrlRedirection('learner-dashboard');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
@@ -343,31 +343,31 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('notifications');
       await waitForUrlRedirection('notifications');
-  
+
       await triggerKeys('0');
       await waitForUrlRedirection(getStartedUrl);
       expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-  
+
       await triggerKeys('1');
       await waitForUrlRedirection(communityLibraryUrl);
       expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-  
+
       await triggerKeys('2');
       await waitForUrlRedirection(learnerDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-  
+
       await triggerKeys('3');
       await waitForUrlRedirection(creatorDashboardUrl);
       expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-  
+
       await triggerKeys('4');
       await waitForUrlRedirection(aboutUrl);
       expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-  
+
       await triggerKeys('5');
       await waitForUrlRedirection(notificationsUrl);
       expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-  
+
       await triggerKeys('6');
       await waitForUrlRedirection(preferencesUrl);
       expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);

@@ -63,20 +63,20 @@ describe('KeyboardShortcutService', () => {
 
   it('should test library page action shortcuts', () => {
     keyboardShortcutService.bindLibraryPageShortcuts();
-    
+
     Mousetrap.trigger('s');
     expect(skipButton.isEqualNode(document.activeElement));
-    
+
     Mousetrap.trigger('/');
     expect(searchBar.isEqualNode(document.activeElement));
-    
+
     Mousetrap.trigger('c');
     expect(categoryBar.isEqualNode(document.activeElement));
   });
 
   it('should test exploration player action shortcuts', () => {
     keyboardShortcutService.bindExplorationPlayerShortcuts();
-    
+
     Mousetrap.trigger('s');
     expect(skipButton.isEqualNode(document.activeElement));
 
@@ -93,6 +93,5 @@ describe('KeyboardShortcutService', () => {
     document.body.append(nextButton);
     Mousetrap.trigger('j');
     expect(nextButton.isEqualNode(document.activeElement));
-
   });
 });
