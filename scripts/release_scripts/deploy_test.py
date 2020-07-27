@@ -26,13 +26,14 @@ import sys
 import tempfile
 
 from core.tests import test_utils
-import github
 import python_utils
 from scripts import common
 from scripts import install_third_party_libs
 from scripts.release_scripts import deploy
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 

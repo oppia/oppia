@@ -48,7 +48,6 @@ import shutil
 import subprocess
 import sys
 
-import github
 import python_utils
 import release_constants
 from scripts import common
@@ -59,6 +58,8 @@ from scripts.release_scripts import update_configs
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

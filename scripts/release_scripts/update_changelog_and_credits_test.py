@@ -26,12 +26,13 @@ import sys
 import tempfile
 
 from core.tests import test_utils
-import github
 import python_utils
 import release_constants
 from scripts import common
 from scripts.release_scripts import generate_release_info
 from scripts.release_scripts import update_changelog_and_credits
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
