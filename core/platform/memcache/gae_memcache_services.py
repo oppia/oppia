@@ -36,21 +36,15 @@ def get_multi(keys):
         keys: list(str). A list of keys (strings) to look up.
 
     Returns:
-        dict. A dict of key-value pairs for the keys/values that were present in
-        memcache.
+        dict(str, str). A dict of (key,value) pairs for the keys/values that
+        were present in the Redis cache. The keys and values are both strings.
     """
     assert isinstance(keys, list)
     result = redis_client.mget(keys)
     if result and (result != [None]):
         dct = {}
-        for key, value in zip(keys, result):
-            correct_type_of_dict = cache_services.get_correct_dict_type_of_key(
-                key)
-            if correct_type_of_dict:
-                value_dict = json.loads(value)
-                dct[key] = correct_type_of_dict.from_dict(value_dict)
-            else:
-                dct[key] = value
+        for key, value in zip(keys, result)
+            dct[key] = value
         return dct
     else:
         return {}
@@ -60,22 +54,17 @@ def set_multi(key_value_mapping):
     """Sets multiple keys' values at once.
 
     Args:
-        key_value_mapping: a dict of {key: value} pairs. The key is a string
-            and the value is anything that is serializable using the Python
-            pickle module. The combined size of each key and value must be
-            < 1 MB. The total size of key_value_mapping should be at most 32 MB.
+        key_value_mapping: a dict of {key: value} pairs. Both the key and value
+            are strings. The value can either be a primitive binary-safe string
+            or the json encoded version of a dictionary using
+            core.domain.caching_services.
 
     Returns:
-        list(str). A list of the keys whose values were NOT set.
+        int. Number of successful inserts to the Redis cache.
     """
     assert isinstance(key_value_mapping, dict)
-    for key, value in key_value_mapping.items():
-        if hasattr(value, 'to_dict'):
-            key_value_mapping[key] = json.dumps(value.to_dict())
     added = redis_client.mset(key_value_mapping)
-    if added != len(key_value_mapping):
-        logging.error('Redis set failed.')
-    return []
+    return added
 
 
 def delete(key):
@@ -85,14 +74,11 @@ def delete(key):
         key: str. A key (string) to delete.
 
     Returns:
-        int. 1 if the delete failed, and 2 for a successful delete.
+        bool. True if the key is deleted. False if it failed.
     """
     assert isinstance(key, python_utils.BASESTRING)
     return_code = redis_client.delete(key)
-    if return_code != 1:
-        logging.error('Redis delete failed.')
-        return 1
-    return 2
+    return return_code == 1
 
 
 def delete_multi(keys):
@@ -102,12 +88,9 @@ def delete_multi(keys):
         keys: list(str). The keys (strings) to delete.
 
     Returns:
-        bool. True if all operations complete successfully; False
-        otherwise.
+        bool. True if all operations complete successfully; False otherwise.
     """
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)
     return_value = redis_client.delete(*keys)
-    if return_value != len(keys):
-        logging.error('Redis delete failed.')
-    return True
+    return return_value == len(keys)
