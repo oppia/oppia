@@ -3029,3 +3029,33 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+
+    def test_no_and_extra_space_before_pylint(self):
+        node_no_and_extra_space_before_pylint = (
+            astroid.scoped_nodes.Module(name='test', doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    # pylint:disable=single-line-pragma
+                    def func():
+                        \"\"\"
+                        # pylint: disable=testing-purpose
+                        \"\"\"
+                        pass
+                    # pylint:     enable=single-line-pragma
+                """)
+        node_no_and_extra_space_before_pylint.file = filename
+        node_no_and_extra_space_before_pylint.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_no_and_extra_space_before_pylint))
+
+        message = testutils.Message(
+            msg_id='single-line-pragma',
+            line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()

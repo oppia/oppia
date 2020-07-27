@@ -1892,7 +1892,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                 # pylint will raise the error of single-line-pragma because
                 # from here on all this lint check is enabled. So we need to
                 # ignore this line.
-                if line.startswith(b'# pylint:'):
+                if re.search(br'^(#\s*pylint:)', line):
                     if 'enable' in line and 'single-line-pragma' in line:
                         continue
                     self.add_message(

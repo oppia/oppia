@@ -1454,7 +1454,7 @@ tags: []
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes
