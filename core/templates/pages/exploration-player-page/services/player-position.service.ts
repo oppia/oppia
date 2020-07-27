@@ -41,7 +41,7 @@ export class PlayerPositionService {
   }
 
   /**
-   * Get the name of the current state.
+   * This function is used to get the name of the current state.
    * @return {string} a string that shows the name of the current state.
    */
   getCurrentStateName(): string {
@@ -51,7 +51,7 @@ export class PlayerPositionService {
   }
 
   /**
-   * Set the index of the displayed card.
+   * This function is used to set the index of the displayed card.
    * @param {number} index - The new index of the card.
    */
   setDisplayedCardIndex(index: number): void {
@@ -64,7 +64,7 @@ export class PlayerPositionService {
   }
 
   /**
-   * Get the index of the displayed card.
+   * This function is used to get the index of the displayed card.
    * @return {number} The index of the displayed card.
    */
   getDisplayedCardIndex(): number {
@@ -72,21 +72,21 @@ export class PlayerPositionService {
   }
 
   /**
-   * Record that the user has submitted an answer.
+   * This function is used to record that the user has submitted an answer.
    */
   recordAnswerSubmission(): void {
     this.learnerJustSubmittedAnAnswer = true;
   }
 
   /**
-   * Record that the user has clicked on the navigation button.
+   * This function is used to record that the user has clicked on the navigation button.
    */
   recordNavigationButtonClick(): void {
     this.learnerJustSubmittedAnAnswer = false;
   }
 
   /**
-   * Gets whether the learner has just submitted an answer.
+   * This function is used to get whether the learner has just submitted an answer.
    * @return {boolean} Whether the learner has just submitted an answer.
    */
   hasLearnerJustSubmittedAnAnswer(): boolean {
