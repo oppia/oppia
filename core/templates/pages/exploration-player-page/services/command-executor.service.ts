@@ -94,7 +94,8 @@ export class CommandExecutorService {
   continueClick(windowRef) {
     try {
       var button = windowRef.nativeWindow.document.getElementsByClassName(
-        'oppia-learner-confirm-button md-button md-ink-ripple')[0] as HTMLElement;
+        'oppia-learner-confirm-button md-button md-ink-ripple'
+        )[0] as HTMLElement;
       button.click();
     } catch {
       var button = windowRef.nativeWindow.document.getElementsByClassName(
@@ -126,7 +127,8 @@ export class CommandExecutorService {
         this.setElementsOnPage += 1;
       } else {
         var addButton = windowRef.nativeWindow.document.getElementsByClassName(
-          'btn btn-secondary btn-sm')[this.setElementsOnPage - 1] as HTMLElement;
+          'btn btn-secondary btn-sm'
+          )[this.setElementsOnPage - 1] as HTMLElement;
         addButton.click();
         this.setElementsOnPage += 1;
         var box = windowRef.nativeWindow.document.getElementsByClassName(
