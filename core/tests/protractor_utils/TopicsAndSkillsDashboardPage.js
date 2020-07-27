@@ -20,6 +20,7 @@
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
 var workflow = require('./workflow.js');
+var general = require('../protractor_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics-and-skills-dashboard';
@@ -126,18 +127,8 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.get = async function() {
     await browser.get('/');
-    var profileDropdown = element(
-      by.css('.protractor-test-profile-dropdown'));
-    await waitFor.elementToBeClickable(
-      profileDropdown, 'Could not click profile dropdown');
-    await profileDropdown.click();
-    var topicsAndSkillsDashboardLink = element(by.css(
-      '.protractor-test-topics-and-skills-dashboard-link'));
-    await waitFor.elementToBeClickable(
-      topicsAndSkillsDashboardLink,
-      'Could not click on the topics and skills dashboard link');
-    await topicsAndSkillsDashboardLink.click();
     await waitFor.pageToFullyLoad();
+    await general.navigateToTopicsAndSkillsDashboardPage();
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/topics-and-skills-dashboard');
   };
