@@ -121,11 +121,11 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
 };
 
 /**
- * @param {string} url - URL to redirect 
+ * @param {string} url - URL to redirect
  */
 var urlRedirection = async function(url) {
   // Checks that the current URL matches the expected text.
-  await browser.wait(until.urlIs(url), 15000, "URL redirection took too long");
+  await browser.wait(until.urlIs(url), 15000, 'URL redirection took too long');
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
