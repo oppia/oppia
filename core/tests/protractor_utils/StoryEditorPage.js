@@ -144,7 +144,7 @@ var StoryEditorPage = function() {
 
   this.deleteChapterWithIndex = async function(index) {
     await waitFor.visibilityOf(
-      await chapterEditOptions.first(),
+      chapterEditOptions.first(),
       'Chapter list taking too long to appear.');
     await action.click('Chapter edit options', chapterEditOptions.get(index));
     await action.click('Delete chapter button', deleteChapterButton);
@@ -164,7 +164,7 @@ var StoryEditorPage = function() {
 
   this.navigateToChapterWithName = async function(chapterName) {
     await waitFor.visibilityOf(
-      await chapterTitles.first(), 'Chapter list taking too long to appear');
+      chapterTitles.first(), 'Chapter list taking too long to appear');
     var chapterIndex = -1;
     for (var i = 0; i < await chapterTitles.count(); i++) {
       if (await chapterTitles.get(i).getText() === chapterName) {
@@ -176,6 +176,8 @@ var StoryEditorPage = function() {
 
     await action.click('Chapter list item', chapterTitles.get(i));
     await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      nodeOutlineEditor, 'Chapter editor is taking too long to appear.');
     await general.scrollToTop();
   };
 
