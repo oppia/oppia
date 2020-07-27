@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ITranslationBackendDict {
+export interface TranslationBackendDict {
   'html': string;
   'needs_update': boolean;
 }
@@ -45,7 +45,7 @@ export class WrittenTranslation {
     this.needsUpdate = !this.needsUpdate;
   }
 
-  toBackendDict(): ITranslationBackendDict {
+  toBackendDict(): TranslationBackendDict {
     return {
       html: this.html,
       needs_update: this.needsUpdate
@@ -61,7 +61,7 @@ export class WrittenTranslationObjectFactory {
     return new WrittenTranslation(html, false);
   }
 
-  createFromBackendDict(translationBackendDict: ITranslationBackendDict) {
+  createFromBackendDict(translationBackendDict: TranslationBackendDict) {
     return new WrittenTranslation(
       translationBackendDict.html,
       translationBackendDict.needs_update);
