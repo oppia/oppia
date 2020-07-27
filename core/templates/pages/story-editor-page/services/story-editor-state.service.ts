@@ -144,8 +144,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
        * Sets the story stored within this service, propogating changes to
        * all bindings to the story returned by getStory(). The first
        * time this is called it will fire a global event based on the
-       * EVENT_STORY_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_STORY_REINITIALIZED event.
+       * next() function of the storyInitializedSubject. All subsequent
+       * calls will similarly fire a next() function of the
+       * storyReinitializedSubject.
        */
       setStory: function(story) {
         _setStory(story);
