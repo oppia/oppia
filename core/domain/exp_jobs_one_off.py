@@ -187,36 +187,42 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ltt = latex2text.LatexNodes2Text()
 
         if not item.deleted:
-            exploration = exp_fetchers.get_exploration_from_model(item)
-            for state_name, state in exploration.states.items():
-                if state.interaction.id == 'MathExpressionInput':
-                    types_of_input = set()
-                    for group in state.interaction.answer_groups:
-                        for rule_spec in group.rule_specs:
-                            rule_input = ltt.latex_to_text(
-                                rule_spec.inputs['x'])
+            go_on = True
+            try:
+                exploration = exp_fetchers.get_exploration_from_model(item)
+            except Exception:
+                yield (exp_domain.TYPE_INVALID_EXPRESSION, item.id)
+                go_on = False
+            if go_on:
+                for state_name, state in exploration.states.items():
+                    if state.interaction.id == 'MathExpressionInput':
+                        types_of_input = set()
+                        for group in state.interaction.answer_groups:
+                            for rule_spec in group.rule_specs:
+                                rule_input = ltt.latex_to_text(
+                                    rule_spec.inputs['x'])
 
-                            rule_input = exp_domain.clean_math_expression(
-                                rule_input)
+                                rule_input = exp_domain.clean_math_expression(
+                                    rule_input)
 
-                            type_of_input = (
-                                exp_domain.TYPE_INVALID_EXPRESSION)
-                            if is_valid_algebraic_expression(rule_input):
                                 type_of_input = (
-                                    exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
-                            elif is_valid_numeric_expression(rule_input):
-                                type_of_input = (
-                                    exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
-                            elif is_valid_math_equation(rule_input):
-                                type_of_input = (
-                                    exp_domain.TYPE_VALID_MATH_EQUATION)
+                                    exp_domain.TYPE_INVALID_EXPRESSION)
+                                if is_valid_algebraic_expression(rule_input):
+                                    type_of_input = (
+                                        exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+                                elif is_valid_numeric_expression(rule_input):
+                                    type_of_input = (
+                                        exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
+                                elif is_valid_math_equation(rule_input):
+                                    type_of_input = (
+                                        exp_domain.TYPE_VALID_MATH_EQUATION)
 
-                            types_of_input.add(type_of_input)
+                                types_of_input.add(type_of_input)
 
-                            output_values = '%s %s: %s' % (
-                                item.id, state_name, rule_input)
+                                output_values = '%s %s: %s' % (
+                                    item.id, state_name, rule_input)
 
-                            yield (type_of_input, output_values.encode('utf-8'))
+                                yield (type_of_input, output_values.encode('utf-8'))
 
 
     @staticmethod
