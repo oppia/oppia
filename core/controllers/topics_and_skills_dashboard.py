@@ -126,16 +126,12 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                     skills_list.append(skill_dict)
                 categorized_skills_dict[topic.name][
                     subtopic.title] = skills_list
-        categorized_skills_dict['untriaged_skills'] = []
+
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
-                categorized_skills_dict['untriaged_skills'].append({
-                    'skill_id': skill_id,
-                    'skill_description': skill_summary_dict['description']
-                })
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -165,6 +161,25 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)
+
+
+class TopicAssignmentsHandler(base.BaseHandler):
+    """Provides information about which topics contain the given skill."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self, skill_id):
+        """Handles GET requests."""
+        topic_assignments = skill_services.get_all_topic_assignments_for_skill(
+            skill_id)
+        topic_assignment_dicts = [
+            topic_assignment.to_dict()
+            for topic_assignment in topic_assignments]
+
+        self.render_json({
+            'topic_assignment_dicts': topic_assignment_dicts
+        })
 
 
 class SkillsDashboardPageDataHandler(base.BaseHandler):
@@ -386,18 +401,12 @@ class MergeSkillHandler(base.BaseHandler):
                     skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
                 'old_value': old_skill.superseding_skill_id,
                 'new_value': new_skill_id
-            }),
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                'old_value': False,
-                'new_value': True
             })
         ]
         skill_services.update_skill(
             self.user_id, old_skill_id, changelist,
             'Marking the skill as having being merged successfully.')
+        skill_services.delete_skill(self.user_id, old_skill_id)
         self.render_json({
             'merged_into_skill': new_skill_id
         })

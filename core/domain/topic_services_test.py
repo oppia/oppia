@@ -48,6 +48,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     subtopic_id = 1
     skill_id_1 = 'skill_1'
     skill_id_2 = 'skill_2'
+    skill_id_3 = 'skill_3'
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
@@ -64,18 +65,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
         self.save_new_story(
-            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_3,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 3',
+            description='Description 3'
+        )
         self.save_new_story(
-            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
-            self.TOPIC_ID)
-        self.save_new_story(
-            self.story_id_2, self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_2,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -327,6 +334,110 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_commit_log_entry.commit_message,
             'Rearranged canonical story on index 2 to index 0.')
 
+    def test_rearrange_skill_in_subtopic(self):
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, self.skill_id_3)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_2
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_3
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Added skills to the subtopic.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics[0].skill_ids), 3)
+        skill_ids = topic.subtopics[0].skill_ids
+        self.assertEqual(skill_ids[0], self.skill_id_1)
+        self.assertEqual(skill_ids[1], self.skill_id_2)
+        self.assertEqual(skill_ids[2], self.skill_id_3)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+            'subtopic_id': 1,
+            'from_index': 2,
+            'to_index': 0
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Rearranged skill from index 2 to index 0 for subtopic with id 1.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics[0].skill_ids), 3)
+        skill_ids = topic.subtopics[0].skill_ids
+        self.assertEqual(skill_ids[0], self.skill_id_3)
+        self.assertEqual(skill_ids[1], self.skill_id_1)
+        self.assertEqual(skill_ids[2], self.skill_id_2)
+
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 5)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Rearranged skill from index 2 to index 0 for subtopic with id 1.')
+
+    def test_rearrange_subtopic(self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title2',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title3',
+            'subtopic_id': 3
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Added subtopics to the topic.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 3)
+        subtopics = topic.subtopics
+        self.assertEqual(subtopics[0].id, 1)
+        self.assertEqual(subtopics[1].id, 2)
+        self.assertEqual(subtopics[2].id, 3)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REARRANGE_SUBTOPIC,
+            'from_index': 2,
+            'to_index': 0
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Rearranged subtopic from index 2 to index 0.')
+
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 3)
+        subtopics = topic.subtopics
+        self.assertEqual(subtopics[0].id, 3)
+        self.assertEqual(subtopics[1].id, 1)
+        self.assertEqual(subtopics[2].id, 2)
+
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 4)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Rearranged subtopic from index 2 to index 0.')
+
     def test_cannot_update_topic_property_with_invalid_changelist(self):
         with self.assertRaisesRegexp(
             Exception, (
@@ -465,8 +576,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'invalid_story', self.user_id_admin)
 
         self.save_new_story(
-            'story_10', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_10',
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         with self.assertRaisesRegexp(
             Exception, 'Story with given id doesn\'t exist in the topic'):
             topic_services.publish_story(
@@ -479,8 +594,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         # Throw error if a story node doesn't have an exploration.
         self.save_new_story(
-            'story_id_new', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_id_new',
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_new')
         changelist = [

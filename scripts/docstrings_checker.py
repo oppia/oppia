@@ -32,13 +32,9 @@ _PYLINT_PATH = os.path.join(
     _PARENT_DIR, 'oppia_tools', 'pylint-%s' % common.PYLINT_VERSION)
 sys.path.insert(0, _PYLINT_PATH)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid # isort:skip
-from pylint.checkers import utils # isort:skip
-from pylint.extensions import _check_docs_utils # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
+import astroid # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def space_indentation(s):
@@ -82,7 +78,7 @@ def get_setters_property(node):
         astroid.FunctionDef|None. The node relating to the property of
         the given setter node, or None if one could not be found.
     """
-    property_ = None
+    setters_property = None
 
     property_name = get_setters_property_name(node)
     class_node = utils.node_frame_class(node)
@@ -90,10 +86,10 @@ def get_setters_property(node):
         class_attrs = class_node.getattr(node.name)
         for attr in class_attrs:
             if utils.decorated_with_property(attr):
-                property_ = attr
+                setters_property = attr
                 break
 
-    return property_
+    return setters_property
 
 
 def returns_something(return_node):

@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IStorySummaryBackendDict {
+export interface StorySummaryBackendDict {
   'id': string;
   'title': string;
   'node_titles': string[];
@@ -28,6 +28,7 @@ export interface IStorySummaryBackendDict {
   'thumbnail_bg_color': string;
   'description': string;
   'story_is_published': boolean;
+  'completed_node_titles': string[]
 }
 
 export class StorySummary {
@@ -38,7 +39,8 @@ export class StorySummary {
     private _thumbnailFilename: string,
     private _thumbnailBgColor: string,
     private _description: string,
-    private _storyIsPublished: boolean
+    private _storyIsPublished: boolean,
+    private _completedNodeTitles: string[]
   ) {}
 
   getId(): string {
@@ -55,6 +57,10 @@ export class StorySummary {
 
   getThumbnailFilename(): string {
     return this._thumbnailFilename;
+  }
+
+  isNodeCompleted(nodeTitle: string): boolean {
+    return (this._completedNodeTitles.indexOf(nodeTitle) !== -1);
   }
 
   getThumbnailBgColor(): string {
@@ -75,7 +81,7 @@ export class StorySummary {
 })
 export class StorySummaryObjectFactory {
   createFromBackendDict(
-      storySummaryBackendDict: IStorySummaryBackendDict): StorySummary {
+      storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
@@ -83,7 +89,8 @@ export class StorySummaryObjectFactory {
       storySummaryBackendDict.thumbnail_filename,
       storySummaryBackendDict.thumbnail_bg_color,
       storySummaryBackendDict.description,
-      storySummaryBackendDict.story_is_published
+      storySummaryBackendDict.story_is_published,
+      storySummaryBackendDict.completed_node_titles
     );
   }
 }

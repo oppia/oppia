@@ -32,7 +32,7 @@ transaction_services = models.Registry.import_transaction_services()
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
 # method to find the location of this delimiter.
-_VERSION_DELIMITER = '-'
+VERSION_DELIMITER = '-'
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
@@ -90,7 +90,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The get_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -103,7 +105,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The has_reference_to_user_id() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def export_data(user_id):
@@ -116,7 +120,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The export_data() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def get_export_policy():
@@ -126,7 +132,9 @@ class BaseModel(ndb.Model):
             NotImplementedError: The method is not overwritten in a derived
                 class.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The get_export_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -307,7 +315,7 @@ class BaseModel(ndb.Model):
 
         Args:
             entity_name: The name of the entity. Coerced to a utf-8 encoded
-                string. Defaults to ''.
+                string.
 
         Returns:
             str. New unique id for this entity class.
@@ -457,7 +465,9 @@ class BaseCommitLogEntryModel(BaseModel):
             NotImplementedError: The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_instance_id() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
@@ -619,7 +629,7 @@ class VersionedModel(BaseModel):
             version.
         """
         return '%s%s%s' % (
-            instance_id, _VERSION_DELIMITER, version_number)
+            instance_id, VERSION_DELIMITER, version_number)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -730,7 +740,8 @@ class VersionedModel(BaseModel):
         Raises:
             Exception: This model instance has been already deleted.
         """
-        versioned_models = cls.get_multi(entity_ids)
+        versioned_models = cls.get_multi(
+            entity_ids, include_deleted=force_deletion)
         if force_deletion:
             all_models_metadata_keys = []
             all_models_content_keys = []
@@ -782,7 +793,9 @@ class VersionedModel(BaseModel):
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The put() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     def commit(self, committer_id, commit_message, commit_cmds):
         """Saves a version snapshot and updates the model.
@@ -865,16 +878,14 @@ class VersionedModel(BaseModel):
         # default states_schema_version value rather than taking the
         # states_schema_version value from the latest exploration version.
 
-        # pylint: disable=protected-access
         snapshot_id = model.get_snapshot_id(model.id, version_number)
         new_model = cls(id=model.id)
-        new_model._reconstitute_from_snapshot_id(snapshot_id)
+        new_model._reconstitute_from_snapshot_id(snapshot_id)  # pylint: disable=protected-access
         new_model.version = current_version
 
-        new_model._trusted_commit(
+        new_model._trusted_commit(  # pylint: disable=protected-access
             committer_id, cls._COMMIT_TYPE_REVERT, commit_message,
             commit_cmds)
-        # pylint: enable=protected-access
 
     @classmethod
     def get_version(cls, entity_id, version_number, strict=True):
@@ -895,18 +906,17 @@ class VersionedModel(BaseModel):
         Raises:
             Exception: This model instance has been deleted.
         """
-        # pylint: disable=protected-access
         current_version_model = cls.get(entity_id, strict=strict)
 
         if current_version_model is None:
             return None
 
-        current_version_model._require_not_marked_deleted()
+        current_version_model._require_not_marked_deleted()  # pylint: disable=protected-access
 
         snapshot_id = cls.get_snapshot_id(entity_id, version_number)
 
         try:
-            return cls(
+            return cls(  # pylint: disable=protected-access
                 id=entity_id,
                 version=version_number
             )._reconstitute_from_snapshot_id(snapshot_id)
@@ -914,7 +924,6 @@ class VersionedModel(BaseModel):
             if not strict:
                 return None
             raise e
-        # pylint: enable=protected-access
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):
@@ -947,7 +956,6 @@ class VersionedModel(BaseModel):
                 'version number %s.' % (max_version, current_version))
 
         snapshot_ids = []
-        # pylint: disable=protected-access
         for version in version_numbers:
             snapshot_id = cls.get_snapshot_id(entity_id, version)
             snapshot_ids.append(snapshot_id)
@@ -958,13 +966,12 @@ class VersionedModel(BaseModel):
                 raise ValueError(
                     'At least one version number is invalid.')
             snapshot_dict = snapshot_model.content
-            reconstituted_model = cls(id=entity_id)._reconstitute(
+            reconstituted_model = cls(id=entity_id)._reconstitute(  # pylint: disable=protected-access
                 snapshot_dict)
             reconstituted_model.created_on = snapshot_model.created_on
             reconstituted_model.last_updated = snapshot_model.last_updated
 
             instances.append(reconstituted_model)
-        # pylint: enable=protected-access
         return instances
 
     @classmethod
@@ -1026,14 +1033,12 @@ class VersionedModel(BaseModel):
             Exception: There is no model instance corresponding to at least one
                 of the given version numbers.
         """
-        # pylint: disable=protected-access
         if not allow_deleted:
-            cls.get(model_instance_id)._require_not_marked_deleted()
+            cls.get(model_instance_id)._require_not_marked_deleted()  # pylint: disable=protected-access
 
         snapshot_ids = [
             cls.get_snapshot_id(model_instance_id, version_number)
             for version_number in version_numbers]
-        # pylint: enable=protected-access
         metadata_keys = [
             ndb.Key(cls.SNAPSHOT_METADATA_CLASS, snapshot_id)
             for snapshot_id in snapshot_ids]
@@ -1126,7 +1131,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(_VERSION_DELIMITER)]
+        return self.id[:self.id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self):
         """Gets the version number from the snapshot id.
@@ -1134,7 +1139,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
+        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
 
     @classmethod
     def export_data(cls, user_id):
@@ -1190,7 +1195,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Instance id part of snapshot id.
         """
-        return self.id[:self.id.rfind(_VERSION_DELIMITER)]
+        return self.id[:self.id.rfind(VERSION_DELIMITER)]
 
     def get_version_string(self):
         """Gets the version number from the snapshot id.
@@ -1198,7 +1203,7 @@ class BaseSnapshotContentModel(BaseModel):
         Returns:
             str. Version number part of snapshot id.
         """
-        return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
+        return self.id[self.id.rfind(VERSION_DELIMITER) + 1:]
 
 
 class BaseMapReduceBatchResultsModel(BaseModel):

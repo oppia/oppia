@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ITopicRightsBackendDict {
+export interface TopicRightsBackendDict {
   'published': boolean;
   'can_publish_topic': boolean;
   'can_edit_topic': boolean;
@@ -81,7 +81,7 @@ export class TopicRightsObjectFactory {
   // This function takes a JSON object which represents a backend
   // topic python dict.
   createFromBackendDict(
-      topicRightsBackendObject: ITopicRightsBackendDict) {
+      topicRightsBackendObject: TopicRightsBackendDict) {
     return new TopicRights(
       topicRightsBackendObject.published,
       topicRightsBackendObject.can_publish_topic,

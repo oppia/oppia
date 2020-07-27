@@ -93,7 +93,9 @@ angular.module('oppia').directive('questionsTab', [
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
                 $scope.getSkillsCategorizedByTopics = (
-                  response.categorized_skills_dict);
+                  response.categorizedSkillsDict);
+                $scope.getUntriagedSkillSummaries = (
+                  response.untriagedSkillSummaries);
               });
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.misconceptions = [];

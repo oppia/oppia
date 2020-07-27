@@ -215,7 +215,9 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please do not use innerHTML property.',
         'excluded_files': (
             'core/templates/Polyfills.ts',
-            'core/templates/filters/translate.pipe.spec.ts'),
+            'core/templates/filters/translate.pipe.spec.ts',
+            'core/templates/components/ck-editor-helpers/' +
+            'ck-editor-copy-content-service.spec.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
@@ -229,6 +231,15 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'typings/guppy-defs-b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.d.ts',
             'core/templates/services/UpgradedServices.ts'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'no-explicit-any'),
+        'message': (
+            'Please do not define "any" types. You can refer '
+            'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
+            'if you\'re having trouble declaring types.'),
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]

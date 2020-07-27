@@ -41,8 +41,6 @@ IMPORTANT NOTES:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
@@ -50,21 +48,17 @@ import shutil
 import subprocess
 import sys
 
+import github
 import python_utils
 import release_constants
 from scripts import common
 from scripts import install_third_party_libs
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
-# pylint: enable=wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -151,8 +145,10 @@ def preprocess_release(app_name, deploy_data_path):
         os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
         content = assets_file.read()
 
-    assert '"DEV_MODE": true' in content
-    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
+    assert '"DEV_MODE": true' in content, 'Invalid DEV_MODE'
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content, (
+        'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+            common.CONSTANTS_FILE_PATH))
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
@@ -288,14 +284,22 @@ def switch_version(app_name, current_release_version):
             current_release_version, app_name))
     library_page_loads_correctly = check_errors_in_a_page(
         release_version_library_url, 'Library page is loading correctly?')
-    if library_page_loads_correctly:
-        gcloud_adapter.switch_version(
-            app_name, current_release_version)
-        python_utils.PRINT('Successfully migrated traffic to release version!')
-    else:
+
+    if not library_page_loads_correctly:
         raise Exception(
             'Aborting version switch due to issues in library page '
             'loading.')
+
+    version_switch = release_constants.AFFIRMATIVE_CONFIRMATIONS[0]
+    if common.is_current_branch_a_hotfix_branch():
+        python_utils.PRINT('Do you want to switch version?')
+        version_switch = python_utils.INPUT()
+
+    if version_switch in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        gcloud_adapter.switch_version(
+            app_name, current_release_version)
+        python_utils.PRINT(
+            'Successfully migrated traffic to release version!')
 
 
 def check_breakage(app_name, current_release_version):
@@ -398,20 +402,32 @@ def check_travis_and_circleci_tests(current_branch_name):
             'Please fix the circleci tests before deploying.')
 
 
-def create_release_doc():
-    """Asks the co-ordinator to create a doc for the current release."""
+def check_release_doc():
+    """Asks the co-ordinator to create a doc for the current release.
+    or update the doc for the hotfix.
+    """
+    message = (
+        'Please create a dedicated section for this release in the '
+        'release tracking document created by the QA Lead.\n'
+        'The three tabs in your browser point to: '
+        'Release drive url, template for the release notes, example of '
+        'release notes from previous release.')
+    if common.is_current_branch_a_hotfix_branch():
+        message = (
+            'Please ensure you note down the notes for the hotfix in the '
+            'release tracking document created by the QA Lead for the release '
+            'corresponding to the hotfix.\n'
+            'The three tabs in your browser point to: '
+            'Release drive url, template for the release notes, example of '
+            'release notes from previous release.')
+
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_DRIVE_URL)
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_NOTES_TEMPLATE_URL)
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_NOTES_EXAMPLE_URL)
-    common.ask_user_to_confirm(
-        'Please create a dedicated section for this release in the '
-        'release tracking document created by the QA Lead.\n'
-        'The three tabs in your browser point to: '
-        'Release drive url, template for the release notes, example of release '
-        'notes from previous release.')
+    common.ask_user_to_confirm(message)
 
 
 def execute_deployment():
@@ -489,7 +505,7 @@ def execute_deployment():
     gcloud_adapter.require_gcloud_to_be_available()
     try:
         if app_name == APP_NAME_OPPIASERVER:
-            create_release_doc()
+            check_release_doc()
             release_version_number = common.get_current_release_version_number(
                 current_branch_name)
             last_commit_message = subprocess.check_output(

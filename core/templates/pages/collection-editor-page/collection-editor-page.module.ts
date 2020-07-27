@@ -26,7 +26,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
 ]);
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -49,6 +49,20 @@ import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { ServicesConstants } from 'services/services.constants';
 
+import { CollectionHistoryTabComponent } from
+  'pages/collection-editor-page/history-tab/collection-history-tab.component';
+import { CollectionDetailsEditor } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
+import { CollectionPermissionsCard } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
+import { CollectionSettingsTabComponent } from
+  'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
+import { CollectionStatisticsTabComponent } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -56,10 +70,18 @@ import { ServicesConstants } from 'services/services.constants';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent,
+    CollectionDetailsEditor,
+    CollectionPermissionsCard
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent,
   ],
   providers: [
     AppConstants,

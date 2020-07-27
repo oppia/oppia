@@ -21,8 +21,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { SkillMasteryObjectFactory, SkillMastery } from
-  './SkillMasteryObjectFactory';
+import {
+  SkillMasteryObjectFactory,
+  SkillMastery,
+  SkillMasteryBackendDict
+} from 'domain/skill/SkillMasteryObjectFactory';
+
+interface SkillMasteryBackendResponse {
+  'degrees_of_mastery': SkillMasteryBackendDict;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -32,16 +39,15 @@ export class SkillMasteryBackendApiService {
     private httpClient: HttpClient,
     private skillMasteryObjectFactory: SkillMasteryObjectFactory) {}
 
-  _fetchSkillMasteryDegrees(skillIds: Array<string>,
-      successCallback: (
-        value?: SkillMastery | PromiseLike<SkillMastery>
-      ) => void,
-      errorCallback: (reason?: any) => void): void {
-    this.httpClient.get(SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, {
-      params: {
-        comma_separated_skill_ids: skillIds.join(',')
-      }
-    }).toPromise().then((response: any) => {
+  _fetchSkillMasteryDegrees(skillIds: string[],
+      successCallback: (value: SkillMastery) => void,
+      errorCallback: (reason: string) => void): void {
+    this.httpClient.get<SkillMasteryBackendResponse>(
+      SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, {
+        params: {
+          comma_separated_skill_ids: skillIds.join(',')
+        }
+      }).toPromise().then(response => {
       if (successCallback) {
         let skillMastery = (
           this.skillMasteryObjectFactory.createFromBackendDict(
@@ -50,40 +56,39 @@ export class SkillMasteryBackendApiService {
       }
     }, (errorResponse) =>{
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
   _updateSkillMasteryDegrees(masteryPerSkillMapping: {[key: string]: number},
-      successCallback: (
-        value?: SkillMastery | PromiseLike<SkillMastery>
-      ) => void,
-      errorCallback: (reason?: any) => void): void {
+      successCallback: () => void,
+      errorCallback: (reason: string) => void): void {
     let putData = {
       mastery_change_per_skill: masteryPerSkillMapping
     };
 
-    this.httpClient.put(SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE,
-      putData).toPromise().then((response: any) => {
+    this.httpClient.put(
+      SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, putData
+    ).toPromise().then(() => {
       if (successCallback) {
         successCallback();
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
-  fetchSkillMasteryDegrees(skillIds: Array<string>): Promise<SkillMastery> {
+  fetchSkillMasteryDegrees(skillIds: string[]): Promise<SkillMastery> {
     return new Promise((resolve, reject) => {
       this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
     });
   }
 
   updateSkillMasteryDegrees(
-      masteryPerSkillMapping: {[key: string]: number}): Promise<SkillMastery> {
+      masteryPerSkillMapping: {[key: string]: number}): Promise<void> {
     return new Promise((resolve, reject) => {
       this._updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);
     });

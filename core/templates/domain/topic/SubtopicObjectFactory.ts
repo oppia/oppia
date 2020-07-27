@@ -20,10 +20,10 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SkillSummary, SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 
-export interface ISubtopicBackendDict {
+export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
@@ -31,24 +31,26 @@ export interface ISubtopicBackendDict {
   'thumbnail_bg_color': string;
 }
 
-export interface ISkillIdToDescriptionMap {
+export interface SkillIdToDescriptionMap {
   [skillId: string]: string;
 }
 
 export class Subtopic {
   _id: number;
   _title: string;
-  _skillSummaries: SkillSummary[];
-  _skillSummaryObjectFactory: SkillSummaryObjectFactory;
+  _skillSummaries: ShortSkillSummary[];
+  _skillIds: string[];
+  _skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap,
-      skillSummaryObjectFactory: SkillSummaryObjectFactory,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap,
+      skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
       thumbnailFilename: string, thumbnailBgColor: string) {
     this._id = subtopicId;
     this._title = title;
+    this._skillIds = skillIds;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
@@ -108,8 +110,12 @@ export class Subtopic {
   }
 
   // Returns the summaries of the skills in the subtopic.
-  getSkillSummaries(): SkillSummary[] {
+  getSkillSummaries(): ShortSkillSummary[] {
     return this._skillSummaries.slice();
+  }
+
+  getSkillIds(): Array<string> {
+    return this._skillIds.slice();
   }
 
   hasSkill(skillId: string): boolean {
@@ -159,11 +165,12 @@ export class Subtopic {
   providedIn: 'root'
 })
 export class SubtopicObjectFactory {
-  constructor(private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
+  constructor(
+    private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
 
   create(
-      subtopicBackendDict: ISubtopicBackendDict,
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap) {
+      subtopicBackendDict: SubtopicBackendDict,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap) {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,

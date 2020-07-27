@@ -17,6 +17,9 @@
  *               help tab in the navbar.
  */
 
+import { State } from 'domain/state/StateObjectFactory';
+
+require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
@@ -36,35 +39,35 @@ require(
   'editor-navigation.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.directive.ts');
+  'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.directive.ts');
+  'exploration-title-editor.component.ts');
 require(
   'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
-  'param-changes-editor.directive.ts');
+  'param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.directive.ts');
 require('pages/exploration-editor-page/feedback-tab/feedback-tab.directive.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.directive.ts');
+  'thread-table.component.ts');
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
-  'improvements-tab.directive.ts');
+  'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
+  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/charts/pie-chart.directive.ts');
+  'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'playthrough-issues.directive.ts');
@@ -138,6 +141,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
+require('services/exploration-improvements.service.ts');
 require('services/page-title.service.ts');
 require('services/playthrough-issues.service.ts');
 require('services/site-analytics.service.ts');
@@ -151,46 +155,42 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$http', '$log', '$q', '$scope', '$templateCache',
-    '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
-    'ChangeListService', 'ContextService', 'EditabilityService',
-    'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
-    'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
-    'ExplorationFeaturesBackendApiService', 'ExplorationFeaturesService',
+    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
+    'AutosaveInfoModalsService', 'ChangeListService', 'ContextService',
+    'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
+    'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
+    'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
+    'ExplorationFeaturesService', 'ExplorationImprovementsService',
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
-    'ExplorationTitleService', 'ExplorationWarningsService',
-    'GraphDataService', 'PageTitleService', 'LoaderService',
-    'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-    'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
+    'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
+    'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
+    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService', 'StateEditorService',
-    'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
-    'StateTutorialFirstTimeService', 'ThreadDataService',
-    'UrlInterpolationService', 'UserEmailPreferencesService',
-    'UserExplorationPermissionsService',
+    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
+    'ThreadDataService', 'UrlInterpolationService',
+    'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
-        $http, $log, $q, $scope, $templateCache,
-        $timeout, $uibModal, $window, AutosaveInfoModalsService,
-        ChangeListService, ContextService, EditabilityService,
-        ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
-        ExplorationCorrectnessFeedbackService, ExplorationDataService,
-        ExplorationFeaturesBackendApiService, ExplorationFeaturesService,
+        $q, $scope, $templateCache, $timeout, $uibModal,
+        AutosaveInfoModalsService, ChangeListService, ContextService,
+        EditabilityService, ExplorationAutomaticTextToSpeechService,
+        ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
+        ExplorationDataService, ExplorationFeaturesBackendApiService,
+        ExplorationFeaturesService, ExplorationImprovementsService,
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
-        ExplorationTitleService, ExplorationWarningsService,
-        GraphDataService, PageTitleService, LoaderService,
-        ParamChangesObjectFactory, ParamSpecsObjectFactory,
-        PlaythroughIssuesService, RouterService, SiteAnalyticsService,
+        ExplorationTitleService, ExplorationWarningsService, GraphDataService,
+        PageTitleService, LoaderService, ParamChangesObjectFactory,
+        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService, StateEditorService,
-        StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
-        StateTutorialFirstTimeService, ThreadDataService,
-        UrlInterpolationService, UserEmailPreferencesService,
-        UserExplorationPermissionsService,
+        StateTopAnswersStatsService, StateTutorialFirstTimeService,
+        ThreadDataService, UrlInterpolationService,
+        UserEmailPreferencesService, UserExplorationPermissionsService,
         EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
@@ -232,8 +232,8 @@ angular.module('oppia').component('explorationEditorPage', {
 
       // Initializes the exploration page using data from the backend.
       // Called on page load.
-      ctrl.initExplorationPage = function(successCallback) {
-        $q.all([
+      ctrl.initExplorationPage = () => {
+        return $q.all([
           ExplorationDataService.getData((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
@@ -243,9 +243,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
             ContextService.getExplorationId()),
           ThreadDataService.getOpenThreadsCountAsync()
-        ]).then(function(combinedData) {
-          var [explorationData, featuresData, openThreadsCount] =
-            combinedData;
+        ]).then(async([explorationData, featuresData, openThreadsCount]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ContextService.setExplorationIsLinkedToStory();
           }
@@ -303,7 +301,7 @@ angular.module('oppia').component('explorationEditorPage', {
               .mute_suggestion_notifications);
 
           UserExplorationPermissionsService.getPermissionsAsync()
-            .then(function(permissions) {
+            .then(permissions => {
               if (permissions.canEdit) {
                 EditabilityService.markEditable();
               }
@@ -313,7 +311,7 @@ angular.module('oppia').component('explorationEditorPage', {
             });
 
           StateEditorService.updateExplorationWhitelistedStatus(
-            featuresData.is_exploration_whitelisted);
+            featuresData.isExplorationWhitelisted);
 
           GraphDataService.recompute();
 
@@ -333,8 +331,6 @@ angular.module('oppia').component('explorationEditorPage', {
               RouterService.navigateToMainTab();
             }
           }
-
-          ExplorationWarningsService.updateWarnings();
 
           // Initialize changeList by draft changes if they exist.
           if (explorationData.draft_changes !== null) {
@@ -362,10 +358,6 @@ angular.module('oppia').component('explorationEditorPage', {
             $scope.$broadcast('refreshStateEditor');
           }
 
-          if (successCallback) {
-            successCallback();
-          }
-
           StateTutorialFirstTimeService.initEditor(
             explorationData.show_state_editor_tutorial_on_load,
             ctrl.explorationId);
@@ -375,16 +367,35 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
+          // Statistics and the improvement tasks derived from them are only
+          // relevant when an exploration is published and is being played by
+          // learners.
           if (ExplorationRightsService.isPublic()) {
-            // Stats are loaded asynchronously after the exploration data
-            // because they are not needed to interact with the editor.
-            StateTopAnswersStatsBackendApiService.fetchStats(
-              ctrl.explorationId
-            ).then(StateTopAnswersStatsService.init).then(function() {
-              ExplorationWarningsService.updateWarnings();
-              $scope.$broadcast('refreshStateEditor');
-            });
+            await StateTopAnswersStatsService.initAsync(
+              ctrl.explorationId, ExplorationStatesService.getStates());
+
+            ExplorationStatesService.registerOnStateAddedCallback(
+              (stateName: string) => {
+                StateTopAnswersStatsService.onStateAdded(stateName);
+              });
+            ExplorationStatesService.registerOnStateDeletedCallback(
+              (stateName: string) => {
+                StateTopAnswersStatsService.onStateDeleted(stateName);
+              });
+            ExplorationStatesService.registerOnStateRenamedCallback(
+              (oldName: string, newName: string) => {
+                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
+              });
+            ExplorationStatesService.registerOnStateInteractionSavedCallback(
+              (state: State) => {
+                StateTopAnswersStatsService.onStateInteractionSaved(state);
+              });
           }
+
+          await ExplorationImprovementsService.initAsync();
+
+          ExplorationWarningsService.updateWarnings();
+          $scope.$broadcast('refreshStateEditor');
         });
       };
 
@@ -421,11 +432,6 @@ angular.module('oppia').component('explorationEditorPage', {
         });
       };
 
-      ctrl.isImprovementsTabEnabled = function() {
-        return ExplorationFeaturesService.isInitialized() &&
-          ExplorationFeaturesService.isImprovementsTabEnabled();
-      };
-
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -451,9 +457,8 @@ angular.module('oppia').component('explorationEditorPage', {
           GraphDataService.recompute();
           ExplorationWarningsService.updateWarnings();
         });
-        $scope.$on('initExplorationPage', function(
-            unusedEvtData, successCallback) {
-          ctrl.initExplorationPage(successCallback);
+        $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
+          ctrl.initExplorationPage().then(successCallback);
         });
         $scope.$on(
           'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
@@ -603,6 +608,13 @@ angular.module('oppia').component('explorationEditorPage', {
               ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
             }
           });
+
+        let improvementsTabIsEnabled = false;
+        $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
+          .then(improvementsTabIsEnabledResponse => {
+            improvementsTabIsEnabled = improvementsTabIsEnabledResponse;
+          });
+        ctrl.isImprovementsTabEnabled = () => improvementsTabIsEnabled;
 
         // Replace the ng-joyride template with one that uses <[...]>
         // interpolators instead of/ {{...}} interpolators.
