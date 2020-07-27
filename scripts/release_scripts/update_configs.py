@@ -29,6 +29,7 @@ import os
 import re
 import sys
 
+import github
 import python_utils
 import release_constants
 from scripts import common
@@ -36,10 +37,6 @@ from scripts import common
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
 
 FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')
@@ -159,7 +156,7 @@ def add_mailgun_api_key():
     with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
         feconf_lines = f.readlines()
 
-    assert 'MAILGUN_API_KEY = None\n' in feconf_lines
+    assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
 
     with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
         for line in feconf_lines:
@@ -178,7 +175,8 @@ def main(personal_access_token):
     """
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
-    assert common.is_current_branch_a_release_branch()
+    assert common.is_current_branch_a_release_branch(), (
+        'Current branch is not a release branch_name')
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     try:
         python_utils.url_open(TERMS_PAGE_URL)

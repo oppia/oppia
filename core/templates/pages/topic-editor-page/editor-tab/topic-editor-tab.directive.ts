@@ -89,6 +89,8 @@ angular.module('oppia').directive('topicEditorTab', [
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
+            $scope.skillQuestionCountDict = (
+              TopicEditorStateService.getSkillQuestionCountDict());
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
@@ -101,6 +103,15 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
             $scope.subtopics = $scope.topic.getSubtopics();
+            $scope.subtopicQuestionCountDict = {};
+            $scope.subtopics.map((subtopic) => {
+              const subtopicId = subtopic.getId();
+              $scope.subtopicQuestionCountDict[subtopicId] = 0;
+              subtopic.getSkillSummaries().map((skill) => {
+                $scope.subtopicQuestionCountDict[subtopicId] += (
+                  $scope.skillQuestionCountDict[skill.id]);
+              });
+            });
             $scope.uncategorizedSkillSummaries = (
               $scope.topic.getUncategorizedSkillSummaries());
             $scope.editableThumbnailDataUrl = (
@@ -167,8 +178,7 @@ angular.module('oppia').directive('topicEditorTab', [
                 // No further action is needed.
               });
             } else {
-              StoryCreationService.createNewCanonicalStory(
-                $scope.topic.getId());
+              StoryCreationService.createNewCanonicalStory();
             }
           };
 
@@ -298,11 +308,14 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.showSubtopicEditOptions = function(index) {
-            $scope.subtopicEditOptionsAreShown = index;
+            $scope.subtopicEditOptionsAreShown = (
+                ($scope.subtopicEditOptionsAreShown === index) ? null : index);
           };
 
           $scope.toggleUncategorizedSkillOptions = function(index) {
-            $scope.uncategorizedEditOptionsIndex = index;
+            $scope.uncategorizedEditOptionsIndex = (
+                ($scope.uncategorizedEditOptionsIndex === index) ?
+                    null : index);
           };
 
           $scope.changeSubtopicAssignment = function(

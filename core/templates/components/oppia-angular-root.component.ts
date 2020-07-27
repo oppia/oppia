@@ -227,6 +227,8 @@ import { ExplorationOpportunitySummaryObjectFactory } from
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
+import { ExplorationImprovementsConfigObjectFactory } from
+  'domain/improvements/exploration-improvements-config-object.factory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationPermissionsBackendApiService } from
@@ -386,6 +388,8 @@ import { MusicPhrasePlayerService } from
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
 import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { NewlyCreatedStoryObjectFactory } from
+  'domain/topic/NewlyCreatedStoryObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NonExistentActivitiesObjectFactory } from
@@ -763,6 +767,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationFeaturesService: ExplorationFeaturesService;
   static explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   static explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService;
+  static explorationImprovementsConfigObjectFactory: ExplorationImprovementsConfigObjectFactory;
   static explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService;
   static explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   static explorationObjectFactory: ExplorationObjectFactory;
@@ -847,6 +852,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
   static needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory;
+  static newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory;
   static newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory;
   static nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
@@ -1077,6 +1083,7 @@ private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiServi
 private explorationFeaturesService: ExplorationFeaturesService,
 private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
 private explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService,
+private explorationImprovementsConfigObjectFactory: ExplorationImprovementsConfigObjectFactory,
 private explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService,
 private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
@@ -1161,6 +1168,7 @@ private musicNotesInputRulesService: MusicNotesInputRulesService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
 private needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory,
+private newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory,
 private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
@@ -1392,6 +1400,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationFeaturesService = this.explorationFeaturesService;
     OppiaAngularRootComponent.explorationHtmlFormatterService = this.explorationHtmlFormatterService;
     OppiaAngularRootComponent.explorationImprovementsBackendApiService = this.explorationImprovementsBackendApiService;
+    OppiaAngularRootComponent.explorationImprovementsConfigObjectFactory = this.explorationImprovementsConfigObjectFactory;
     OppiaAngularRootComponent.explorationImprovementsTaskRegistryService = this.explorationImprovementsTaskRegistryService;
     OppiaAngularRootComponent.explorationMetadataObjectFactory = this.explorationMetadataObjectFactory;
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
@@ -1475,6 +1484,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.musicNotesInputRulesService = this.musicNotesInputRulesService;
     OppiaAngularRootComponent.musicNotesInputValidationService = this.musicNotesInputValidationService;
     OppiaAngularRootComponent.musicPhrasePlayerService = this.musicPhrasePlayerService;
+    OppiaAngularRootComponent.newlyCreatedStoryObjectFactory = this.newlyCreatedStoryObjectFactory;
     OppiaAngularRootComponent.newlyCreatedTopicObjectFactory = this.newlyCreatedTopicObjectFactory;
     OppiaAngularRootComponent.needsGuidingResponsesTaskObjectFactory = this.needsGuidingResponsesTaskObjectFactory;
     OppiaAngularRootComponent.nonExistentActivitiesObjectFactory = this.nonExistentActivitiesObjectFactory;

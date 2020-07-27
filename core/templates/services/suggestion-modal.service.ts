@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface IParamDict {
+export interface ParamDict {
   action: string;
   audioUpdateRequired?: boolean;
   commitMessage?: string;
@@ -50,7 +50,7 @@ export class SuggestionModalService {
   // 'any' since '$uibModalInstance' is a AngularJS native object and does not
   // have a TS interface.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  acceptSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
+  acceptSuggestion($uibModalInstance: any, paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
@@ -58,7 +58,7 @@ export class SuggestionModalService {
   // 'any' since '$uibModalInstance' is a AngularJS native object and does not
   // have a TS interface.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rejectSuggestion($uibModalInstance: any, paramDict: IParamDict): void {
+  rejectSuggestion($uibModalInstance: any, paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
