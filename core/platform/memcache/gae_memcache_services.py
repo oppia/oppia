@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import python_utils
-from core.domain import cache_services
 import json
 
 from google.appengine.api import memcache
