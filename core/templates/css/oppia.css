@@ -2119,7 +2119,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-response-button,
 .oppia-add-fallback-button,
 .oppia-add-hint-button {
-  background-color: rgba(5, 140, 166, 0.902);
+  background-color: rgba(5, 140, 166, 0.9);
   border: 0;
   border-radius: 0;
   color: white;
