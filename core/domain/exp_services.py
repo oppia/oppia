@@ -1810,7 +1810,7 @@ def generate_html_change_list_for_state(
     Args:
         state_name: str. The name of the state.
         new_state_dict: dict. The dict representation of the new State object.
-        old_state_dict: dict. The dict representation of the old State object
+        old_state_dict: dict. The dict representation of the old State object.
 
     Returns:
         list(ExplorationChange). The generated change list.
@@ -1886,7 +1886,7 @@ def get_batch_of_exps_for_latex_svg_generation():
     latex_strings_mapping = {}
     exploration_math_rich_text_info_models = (
         exp_models.ExplorationMathRichTextInfoModel.get_all().filter(
-            exp_models. # pylint: disable=singleton-comparison
+            exp_models.  # pylint: disable=singleton-comparison
             ExplorationMathRichTextInfoModel.
             math_images_generation_required == True))
     size_of_svgs_in_batch_bytes = 0
@@ -1900,7 +1900,7 @@ def get_batch_of_exps_for_latex_svg_generation():
     return latex_strings_mapping
 
 
-def update_exploration_with_math_svgs(exp_id, image_data):
+def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
     """Saves an SVG for each LaTeX string without an SVG in an exploration
     and updates the exploration. Also the corresponding valid draft changes are
     updated.
@@ -1909,9 +1909,9 @@ def update_exploration_with_math_svgs(exp_id, image_data):
     explorations have a valid math SVG stored in the datastore.
 
     Args:
-        image_data: dict. The dictionary having all the image data like LaTeX
-            string and dimensions which will be used for generating and
-            assigning filenames.
+        raw_latex_to_image_data_dict: dict(str, LatexStringSvgImageData). The
+            dictionary having the key as a LaTeX string and the corresponding
+            value as the SVG image data for that LaTeX string.
         exp_id: str. The ID of the exploration to update.
 
     Raises:
@@ -1920,20 +1920,20 @@ def update_exploration_with_math_svgs(exp_id, image_data):
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     html_in_exploration_after_conversion = ''
     change_lists = []
-    # Create a dict with dimensions for each LaTeX string. This dict will be
-    # used for generating a filename for each raw_latex string in the HTML.
-    raw_latex_to_dimensions_dict = {}
-    for raw_latex, raw_latex_dict in image_data.items():
-        raw_latex_to_dimensions_dict[raw_latex] = {}
-        raw_latex_to_dimensions_dict[raw_latex]['dimensions'] = (
-            raw_latex_dict['dimensions'])
+    # # Create a dict with dimensions for each LaTeX string. This dict will be
+    # # used for generating a filename for each raw_latex string in the HTML.
+    # raw_latex_to_dimensions_dict = {}
+    # for raw_latex, raw_latex_dict in image_data.items():
+    #     raw_latex_to_dimensions_dict[raw_latex] = {}
+    #     raw_latex_to_dimensions_dict[raw_latex]['dimensions'] = (
+    #         raw_latex_dict['dimensions'])
 
     for state_name, state in exploration.states.items():
         add_svg_filenames_for_latex_strings_in_html_string = (
             functools.partial(
                 html_validation_service.
                 add_svg_filenames_for_latex_strings_in_html_string,
-                raw_latex_to_dimensions_dict))
+                raw_latex_to_image_data_dict))
         old_state_dict = copy.deepcopy(state.to_dict())
         converted_state_dict = (
             state_domain.State.convert_html_fields_in_state(
@@ -1952,15 +1952,9 @@ def update_exploration_with_math_svgs(exp_id, image_data):
             html_in_exploration_after_conversion))
 
     for filename, raw_latex in filenames_mapping:
-        image_file = image_data[raw_latex]['svg_file']
+        image_file = raw_latex_to_image_data_dict[raw_latex].raw_image
         image_validation_error_message_suffix = (
             'SVG image provided for latex %s failed validation' % raw_latex)
-        if not image_file:
-            logging.error(
-                'Image not provided for filename %s' % (filename))
-            raise Exception(
-                'No image data provided for file with name %s. %s'
-                % (filename, image_validation_error_message_suffix))
         try:
             file_format = (
                 image_validation_services.validate_image_and_filename(

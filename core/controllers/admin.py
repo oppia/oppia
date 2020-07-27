@@ -32,6 +32,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import html_domain
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -590,12 +591,14 @@ class AdminHandler(base.BaseHandler):
 
 
 class ExplorationsLatexSvgHandler(base.BaseHandler):
-    """Handler updating Explorations having math rich-text components with
+    """Handler updating explorations having math rich-text components with
     math SVGs.
 
     TODO(#10045): Remove this function once all the math-rich text components in
     explorations have a valid math SVG stored in the datastore.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -616,8 +619,19 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
                     raise self.InvalidInputException(
                         'SVG for LaTeX string %s in exploration %s is not '
                         'supplied.' % (latex_string, exp_id))
-                latex_to_svg_mappings[exp_id][latex_string]['svg_file'] = (
-                    svg_image)
+
+                dimensions = (
+                    latex_to_svg_mappings[exp_id][latex_string]['dimensions'])
+                latex_string_svg_image_dimensions = (
+                    html_domain.LatexStringSvgImageDimensions(
+                        dimensions['encoded_height_string'],
+                        dimensions['encoded_width_string'],
+                        dimensions['encoded_vertical_padding_string']))
+                latex_string_svg_image_data = (
+                    html_domain.LatexStringSvgImageData(
+                        svg_image, latex_string_svg_image_dimensions))
+                latex_to_svg_mappings[exp_id][latex_string] = (
+                    latex_string_svg_image_data)
 
         for exp_id in latex_to_svg_mappings.keys():
             exp_services.update_exploration_with_math_svgs(

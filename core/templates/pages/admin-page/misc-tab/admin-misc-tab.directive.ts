@@ -243,7 +243,7 @@ angular.module('oppia').directive('adminMiscTab', [
               var svgFile = await convertLatexToSvgFile(latexStrings[i]);
               latexMapping[expId][latexStrings[i]] = svgFile;
             }
-            ctrl.setStatusMessage('LaTeX strings Generated.');
+            ctrl.setStatusMessage('LaTeX strings generated.');
             $rootScope.$apply();
           }
         };

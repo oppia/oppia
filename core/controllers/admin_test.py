@@ -1019,17 +1019,17 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
                 '+,+,+,+': {
                     'latexId': 'latex_id1',
                     'dimensions': {
-                        'height': '1d429',
-                        'width': '1d33',
-                        'verticalPadding': '0d241'
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
                     }
                 },
                 '\\frac{x}{y}': {
                     'latexId': 'latex_id2',
                     'dimensions': {
-                        'height': '1d525',
-                        'width': '3d33',
-                        'verticalPadding': '0d241'
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
                     }
                 }
             }
@@ -1092,17 +1092,17 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
                 '+,+,+,+': {
                     'latexId': 'latex_id1',
                     'dimensions': {
-                        'height': '1d429',
-                        'width': '1d33',
-                        'verticalPadding': '0d241'
+                        'encoded_height_string': '1d429',
+                        'encoded_width_string': '1d33',
+                        'encoded_vertical_padding_string': '0d241'
                     }
                 },
                 '\\frac{x}{y}': {
                     'latexId': 'latex_id2',
                     'dimensions': {
-                        'height': '1d525',
-                        'width': '3d33',
-                        'verticalPadding': '0d241'
+                        'encoded_height_string': '1d525',
+                        'encoded_width_string': '3d33',
+                        'encoded_vertical_padding_string': '0d241'
                     }
                 }
             }

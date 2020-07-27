@@ -147,7 +147,7 @@ export class AdminBackendApiService {
         // string is processed improperly, e.g 3 backslashes in an
         // expressions becomes 2 backslashes). As a workaround, we use a
         // temporary latexId as keys for adding and retrieving raw images from
-        // the request body.Images can be extracted based on the latexId in the
+        // the request body. Images can be extracted based on the latexId in the
         // backend.
         body.set(
           latexToSvgMapping[expId][latexString].latexId,

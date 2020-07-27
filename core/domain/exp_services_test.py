@@ -32,6 +32,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import html_domain
 from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import rating_services
@@ -4958,23 +4959,19 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
             ' 52 289Z"/></g></svg>'
         )
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_1, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_2, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
         image_data = {
-            '+,+,+,+': {
-                'svg_file': svg_file_1,
-                'dimensions': {
-                    'encoded_height_string': '1d429',
-                    'encoded_width_string': '1d33',
-                    'encoded_vertical_padding_string': '0d241'
-                }
-            },
-            '\\frac{x}{y}': {
-                'svg_file': svg_file_2,
-                'dimensions': {
-                    'encoded_height_string': '1d525',
-                    'encoded_width_string': '3d33',
-                    'encoded_vertical_padding_string': '0d241'
-                }
-            }
+            '+,+,+,+': latex_string_svg_image_data1,
+            '\\frac{x}{y}': latex_string_svg_image_data2
         }
         exp_services.update_exploration_with_math_svgs(
             'exp_id1', image_data)
@@ -5000,80 +4997,6 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             exploration_math_rich_text_info_model.
             math_images_generation_required)
-
-    def test_updation_fails_when_image_file_is_not_provided(self):
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id1', title='title1', category='category')
-        exploration1.add_states(['FirstState'])
-        exploration1_state = exploration1.states['FirstState']
-
-        valid_html_content1 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
-            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
-            '></oppia-noninteractive-math>'
-        )
-        valid_html_content2 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        content_dict = {
-            'content_id': 'content',
-            'html': valid_html_content1
-        }
-        customization_args_dict = {
-            'choices': {
-                'value': [
-                    valid_html_content1,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    valid_html_content2
-                ]
-            }
-        }
-
-        exploration1_state.update_content(
-            state_domain.SubtitledHtml.from_dict(content_dict))
-        exploration1_state.update_interaction_id('DragAndDropSortInput')
-        exploration1_state.update_interaction_customization_args(
-            customization_args_dict)
-
-        exp_services.save_new_exploration(self.admin_id, exploration1)
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        image_data = {
-            '+,+,+,+': {
-                'svg_file': svg_file_1,
-                'dimensions': {
-                    'encoded_height_string': '1d429',
-                    'encoded_width_string': '1d33',
-                    'encoded_vertical_padding_string': '0d241'
-                }
-            },
-            '\\frac{x}{y}': {
-                'svg_file': None,
-                'dimensions': {
-                    'encoded_height_string': '1d525',
-                    'encoded_width_string': '3d33',
-                    'encoded_vertical_padding_string': '0d241'
-                }
-            }
-        }
-        with self.assertRaisesRegexp(
-            Exception,
-            'No image data provided for file with name '):
-            exp_services.update_exploration_with_math_svgs(
-                'exp_id1', image_data)
 
     def test_updation_fails_when_svg_file_is_invalid(self):
         exploration1 = exp_domain.Exploration.create_default_exploration(
@@ -5136,23 +5059,18 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             '3 504 145284 52 289Z"/></g></svg>'
         )
 
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_1, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                invalid_svg_file, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
         image_data = {
-            '+,+,+,+': {
-                'svg_file': svg_file_1,
-                'dimensions': {
-                    'encoded_height_string': '1d429',
-                    'encoded_width_string': '1d33',
-                    'encoded_vertical_padding_string': '0d241'
-                }
-            },
-            '\\frac{x}{y}': {
-                'svg_file': invalid_svg_file,
-                'dimensions': {
-                    'encoded_height_string': '1d525',
-                    'encoded_width_string': '3d33',
-                    'encoded_vertical_padding_string': '0d241'
-                }
-            }
+            '+,+,+,+': latex_string_svg_image_data1,
+            '\\frac{x}{y}': latex_string_svg_image_data2
         }
         with self.assertRaisesRegexp(
             Exception,

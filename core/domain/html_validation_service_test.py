@@ -25,6 +25,7 @@ import re
 
 import bs4
 from core.domain import fs_domain
+from core.domain import html_domain
 from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
@@ -1918,15 +1919,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             r'mathImg_[0-9]+\S{10}_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d'
             ']+.svg')
         filenames = []
+
         filenames.append(
             html_validation_service.generate_math_svgs_filename(
-                '4d123', '2d145', '0d124'))
+                html_domain.LatexStringSvgImageDimensions(
+                    '4d123', '2d145', '0d124')))
         filenames.append(
             html_validation_service.generate_math_svgs_filename(
-                '4d123', '2d145', '0'))
+                html_domain.LatexStringSvgImageDimensions(
+                    '4d123', '2d145', '0')))
         filenames.append(
             html_validation_service.generate_math_svgs_filename(
-                '43d12', '12d14', '0d124'))
+                html_domain.LatexStringSvgImageDimensions(
+                    '43d12', '12d14', '0d124')))
+
         for filename in filenames:
             self.assertTrue(re.match(filename_pattern_regex, filename))
 
@@ -1947,33 +1953,29 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;qu'
             'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}'
             '"></oppia-noninteractive-math>')
-        raw_latex_to_dimensions_dict = {
-            '+,-,-,+': {
-                'dimensions': {
-                    'encoded_height_string': '1d345',
-                    'encoded_width_string': '3d124',
-                    'encoded_vertical_padding_string': '0d124'
-                }
-            },
-            '+,+,+,+': {
-                'dimensions': {
-                    'encoded_height_string': '2d456',
-                    'encoded_width_string': '6d124',
-                    'encoded_vertical_padding_string': '0d231'
-                }
-            },
-            '(x - a_1)(x - a_2)': {
-                'dimensions': {
-                    'encoded_height_string': '4d123',
-                    'encoded_width_string': '23d122',
-                    'encoded_vertical_padding_string': '2d123'
-                }
-            }
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                '', html_domain.LatexStringSvgImageDimensions(
+                    '1d345', '3d124', '0d124')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                '', html_domain.LatexStringSvgImageDimensions(
+                    '2d456', '6d124', '0d231')))
+        latex_string_svg_image_data3 = (
+            html_domain.LatexStringSvgImageData(
+                '', html_domain.LatexStringSvgImageDimensions(
+                    '4d123', '23d122', '2d123')))
+
+        raw_latex_to_image_data_dict = {
+            '+,-,-,+': latex_string_svg_image_data1,
+            '+,+,+,+': latex_string_svg_image_data2,
+            '(x - a_1)(x - a_2)': latex_string_svg_image_data3
         }
         converted_html_string = (
             html_validation_service.
             add_svg_filenames_for_latex_strings_in_html_string(
-                raw_latex_to_dimensions_dict, html_string))
+                raw_latex_to_image_data_dict, html_string))
         filenames = (
             html_validation_service.
             extract_svg_filenames_in_math_rte_components(converted_html_string))
