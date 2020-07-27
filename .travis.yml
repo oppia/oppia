@@ -25,7 +25,7 @@ env:
     - RUN_E2E_TESTS_EXTENSIONS=true
     - RUN_E2E_TESTS_LEARNER=true
     - RUN_E2E_TESTS_SKILL_EDITOR=true
-    # - RUN_E2E_TESTS_EMBEDDING=true
+    - RUN_E2E_TESTS_EMBEDDING=true
 
 jobs:
   allow_failures: []
@@ -71,7 +71,7 @@ script:
 - if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="learner" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
-# - if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
 
 cache:
   # Cache Oppia's dependencies.

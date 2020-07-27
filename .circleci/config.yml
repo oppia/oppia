@@ -166,10 +166,6 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
-          name: Run e2e embedding test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
-      - run:
           name: Run e2e publication test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
