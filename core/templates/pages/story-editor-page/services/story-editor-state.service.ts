@@ -118,34 +118,33 @@ angular.module('oppia').factory('StoryEditorStateService', [
       },
 
       /**
-       * Set exploration Ids changed to false.
+       * Set _expIdsChanged to false.
        */
       resetExpIdsChanged: function() {
         _expIdsChanged = false;
       },
 
       /**
-       * @return {boolean} Wether any of of the exporation ids have changed.
+       * @return {boolean} Whether any of the exploration ids have changed.
        */
       areAnyExpIdsChanged: function() {
         return _expIdsChanged;
       },
 
       /**
-       * Returns the current story to be shared among the story
+       * @return {Story} Returns the current story to be shared among the story
        * editor. Please note any changes to this story will be propogated
        * to all bindings to it. This story object will be retained for the
        * lifetime of the editor. This function never returns null, though it may
        * return an empty story object if the story has not yet been
        * loaded for this editor instance.
-       * @return {Story} Returns the current story to be shared.
        */
       getStory: function() {
         return _story;
       },
 
       /**
-       * @return {object} Returns an array of the list of skill summaries.
+       * @return {object} Returns a list of skill summaries.
        */
       getSkillSummaries: function() {
         return _skillSummaries;
@@ -164,15 +163,13 @@ angular.module('oppia').factory('StoryEditorStateService', [
       },
 
       /**
-       * Returns the topic name stored within this service.
-       * @return {string} A string that represents the topic name.
+       * @return {string} The topic name.
        */
       getTopicName: function() {
         return _topicName;
       },
 
       /**
-       * Returns whether or not the story has been published.
        * @return {bool} Whether or not the story has been published.
        */
       isStoryPublished: function() {
@@ -190,7 +187,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
        * current story.
        * @param {function} successCallback - Function to be called if story
        * successfully saves.
-       * @return {bool} Whether or not the story succesfully saves.
+       * @return {bool} Whether or not the story successfully saves.
        */
       saveStory: function(commitMessage, successCallback) {
         if (!_storyIsInitialized) {
@@ -223,10 +220,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
 
       /**
        * @param {bool} newStoryStatusIsPublic - Whether or not the story is
-       * public or not.
+       * public.
        * @param {function} successCallback - Function to be called if story
        * publication status successfully changes.
-       * @return {bool} Whether or not the story publciation status
+       * @return {bool} Whether or not the story publication status
        * succesfully changes.
        */
       changeStoryPublicationStatus: function(
@@ -252,8 +249,6 @@ angular.module('oppia').factory('StoryEditorStateService', [
       },
 
       /**
-       * Returns whether this service is currently attempting to save the
-       * story maintained by this service.
        * @return {bool} Whether or not the service is currently saving the
        * maintained story.
        */
