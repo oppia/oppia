@@ -257,7 +257,7 @@ class SignupPage(base.BaseHandler):
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
-        if user_services.has_account_fully_registered(self.user_id):
+        if user_services.has_fully_registered_account(self.user_id):
             self.redirect(return_url)
             return
 
@@ -296,10 +296,10 @@ class SignupHandler(base.BaseHandler):
             'can_receive_email_updates')
 
         has_ever_registered = user_services.has_ever_registered(self.user_id)
-        has_account_fully_registered = (
-            user_services.has_account_fully_registered(self.user_id))
+        has_fully_registered_account = (
+            user_services.has_fully_registered_account(self.user_id))
 
-        if has_account_fully_registered:
+        if has_fully_registered_account:
             self.render_json({})
             return
 

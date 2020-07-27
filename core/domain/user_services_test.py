@@ -1333,7 +1333,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
-        self.assertFalse(user_services.has_account_fully_registered(None))
+        self.assertFalse(user_services.has_fully_registered_account(None))
 
     def test_cannot_create_new_user_with_existing_user_id(self):
         with self.assertRaisesRegexp(
