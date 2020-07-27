@@ -178,9 +178,6 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        # Changing the schema version back to 34 only for this audit job since
-        # the migration from 34 to 35 is what this job is supposed to audit.
-        feconf.CURRENT_STATE_SCHEMA_VERSION = 34
         is_valid_algebraic_expression = schema_utils.get_validator(
             'is_valid_algebraic_expression')
         is_valid_numeric_expression = schema_utils.get_validator(
@@ -193,7 +190,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             exploration = exp_fetchers.get_exploration_from_model(item)
             for state_name, state in exploration.states.items():
                 if state.interaction.id == 'MathExpressionInput':
-                    type_of_input = set()
+                    types_of_input = set()
                     for group in state.interaction.answer_groups:
                         for rule_spec in group.rule_specs:
                             rule_input = ltt.latex_to_text(
@@ -223,21 +220,20 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                     if state.interaction.solution and (
                             exp_domain.TYPE_INVALID_EXPRESSION not in (
-                                types_of_inputs)):
-                        correct_answer = state.interaction.solution[
-                            'correct_answer']['ascii']
+                                types_of_input)):
+                        correct_answer = state.interaction.solution.correct_answer['ascii']
                         correct_answer = exp_domain.clean_math_expression(
                             correct_answer)
-                        
+
                         equation_condition = (
                             exp_domain.TYPE_VALID_MATH_EQUATION in (
-                                types_of_inputs) and not (
+                                types_of_input) and not (
                                 is_valid_math_equation(correct_answer)))
                         algebraic_condition = (
                             exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION in (
-                                types_of_inputs) and not (
+                                types_of_input) and not (
                                 is_valid_algebraic_expression(correct_answer)))
-                        
+
                         if equation_condition or algebraic_condition:
                             if equation_condition:
                                 expected_type = (
