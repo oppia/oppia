@@ -55,6 +55,13 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
+      "oppiamlProto": {
+        "version": "0.0.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/oppia/oppia-ml-proto/archive/0.0.0.zip",
+        "rootDirPrefix": "oppia-ml-proto-",
+        "targetDirPrefix": "oppia-ml-proto-"
+      },
       "packaging": {
         "version": "20.3",
         "downloadFormat": "tar",
@@ -62,6 +69,14 @@
         "tarRootDirPrefix": "packaging-",
         "rootDirPrefix": "packaging-",
         "targetDirPrefix": "packaging-"
+      },
+      "prototool": {
+        "version": "1.10.0",
+        "downloadFormat": "tar",
+        "url": "https://github.com/uber/prototool/releases/download/v1.10.0/prototool-Linux-x86_64.tar.gz",
+        "tarRootDir": "prototool",
+        "rootDirPrefix": "prototool-",
+        "targetDirPrefix": "prototool-"
       },
       "simpleJson": {
         "version": "3.17.0",

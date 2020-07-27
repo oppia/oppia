@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import datetime
+import json
 import os
 
 from core.domain import classifier_services
@@ -28,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain.proto import text_classifier_pb2
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -69,15 +71,17 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def _create_classifier_training_job(
             self, algorithm_id, interaction_id, exp_id, exp_version,
             next_scheduled_check_time, training_data, state_name, status,
-            classifier_data, data_schema_version):
+            classifier_data, algorithm_version):
         """Creates a new classifier training job model and stores
         classfier data in a file.
         """
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             algorithm_id, interaction_id, exp_id, exp_version,
             next_scheduled_check_time, training_data, state_name, status,
-            data_schema_version)
-        fs_services.save_classifier_data(exp_id, job_id, classifier_data)
+            algorithm_version)
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.model_json = json.dumps(classifier_data)
+        fs_services.save_classifier_data(exp_id, job_id, classifier_data_proto)
         return job_id
 
     def test_creation_of_jobs_and_mappings(self):
@@ -303,13 +307,20 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(all_mappings.count(), 1)
 
         # Create job and mapping for previous version.
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            'TextInput']['algorithm_id']
         job_id = self._create_classifier_training_job(
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            'TextInput', self.exp_id, exploration.version - 1,
+            algorithm_id, 'TextInput', self.exp_id, exploration.version - 1,
             next_scheduled_check_time, [], 'Old home',
             feconf.TRAINING_JOB_STATUS_COMPLETE, {}, 1)
         classifier_models.TrainingJobExplorationMappingModel.create(
-            self.exp_id, exploration.version - 1, 'Old home', job_id)
+            self.exp_id, exploration.version - 1, 'Old home',
+            {algorithm_id: job_id})
+
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 2)
+
         classifier_services.handle_non_retrainable_states(
             exploration, state_names, exp_versions_diff)
 
@@ -357,12 +368,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_training_job.next_scheduled_check_time,
             next_scheduled_check_time)
         self.assertEqual(classifier_training_job.training_data, [])
-        self.assertEqual(classifier_training_job.classifier_data, {})
+        self.assertEqual(
+            json.loads(classifier_training_job.classifier_data.model_json), {})
         self.assertEqual(classifier_training_job.state_name, state_name)
         self.assertEqual(
             classifier_training_job.status,
             feconf.TRAINING_JOB_STATUS_NEW)
-        self.assertEqual(classifier_training_job.data_schema_version, 1)
+        self.assertEqual(classifier_training_job.algorithm_version, 1)
 
     def test_deletion_of_classifier_training_jobs(self):
         """Test the delete_classifier_training_job method."""
@@ -455,12 +467,14 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         state_name = 'Home'
         interaction_id = 'TextInput'
-
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+        algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_version']
         job_id = self._create_classifier_training_job(
-            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1,
+            algorithm_id, interaction_id, exp_id, 1,
             datetime.datetime.utcnow(), [], state_name,
-            feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
+            feconf.TRAINING_JOB_STATUS_PENDING, {}, algorithm_version)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -519,102 +533,55 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.classifier_data, {})
+        self.assertEqual(json.loads(
+            classifier_training_job.classifier_data.model_json), {})
 
-        classifier_data = {'classifier_data': 'data'}
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.model_json = json.dumps(
+            {'classifier_data': 'data'})
         classifier_services.store_classifier_data(
-            job_id, classifier_data)
+            job_id, classifier_data_proto)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(
-            classifier_training_job.classifier_data, classifier_data)
+        self.assertDictEqual(
+            json.loads(classifier_training_job.classifier_data.model_json),
+            {'classifier_data': 'data'})
 
     def test_retrieval_of_classifier_training_jobs_from_exploration_attributes(
             self):
-        """Test the get_classifier_training_jobs method."""
+        """Test the get_classifier_training_job method."""
 
         exp_id = u'1'
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_name = u'टेक्स्ट'
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            'TextInput']['algorithm_id']
+        algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            'TextInput']['algorithm_version']
         job_id = self._create_classifier_training_job(
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            'TextInput', exp_id, 1, next_scheduled_check_time, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
+            algorithm_id, 'TextInput', exp_id, 1, next_scheduled_check_time,
+            [], state_name, feconf.TRAINING_JOB_STATUS_NEW, {},
+            algorithm_version)
         classifier_models.TrainingJobExplorationMappingModel.create(
-            exp_id, 1, state_name, job_id)
-        classifier_training_jobs = (
-            classifier_services.get_classifier_training_jobs(
-                exp_id, 1, [state_name]))
-        self.assertEqual(len(classifier_training_jobs), 1)
-        self.assertEqual(classifier_training_jobs[0].exp_id, exp_id)
-        self.assertEqual(classifier_training_jobs[0].exp_version, 1)
-        self.assertEqual(classifier_training_jobs[0].state_name, state_name)
-        self.assertEqual(classifier_training_jobs[0].job_id, job_id)
+            exp_id, 1, state_name, {algorithm_id: job_id})
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job(
+                exp_id, 1, state_name, algorithm_id))
+        self.assertIsNotNone(classifier_training_job)
+        self.assertEqual(classifier_training_job.exp_id, exp_id)
+        self.assertEqual(classifier_training_job.exp_version, 1)
+        self.assertEqual(classifier_training_job.state_name, state_name)
+        self.assertEqual(classifier_training_job.job_id, job_id)
 
         # Test that method returns a list with None as elements when job does
         # not exist.
         false_state_name = 'false_name'
-        classifier_training_jobs = (
-            classifier_services.get_classifier_training_jobs(
-                exp_id, 1, [false_state_name]))
-        self.assertEqual(classifier_training_jobs, [None])
-
-    def test_convert_strings_to_float_numbers_in_classifier_data(self):
-        """Make sure that all values are converted correctly."""
-        test_dict = {
-            'a': {
-                'ab': 'abcd',
-                'ad': {
-                    'ada': 'abcdef',
-                    'adc': [{
-                        'adca': 'abcd',
-                        'adcb': '0.1234',
-                        'adcc': ['ade', 'afd'],
-                    }],
-                },
-                'ae': [['123', '0.123'], ['abc']],
-            },
-            'b': {
-                'bd': ['-2.48521656693', '-2.48521656693', '-2.48521656693'],
-                'bg': ['abc', 'def', 'ghi'],
-                'bh': ['abc', '123'],
-            },
-            'c': '1.123432',
-        }
-
-        expected_dict = {
-            'a': {
-                'ab': 'abcd',
-                'ad': {
-                    'ada': 'abcdef',
-                    'adc': [{
-                        'adca': 'abcd',
-                        'adcb': 0.1234,
-                        'adcc': ['ade', 'afd']
-                    }]
-                },
-                'ae': [['123', 0.123], ['abc']],
-            },
-            'b': {
-                'bd': [-2.48521656693, -2.48521656693, -2.48521656693],
-                'bg': ['abc', 'def', 'ghi'],
-                'bh': ['abc', '123'],
-            },
-            'c': 1.123432,
-        }
-
-        output_dict = (
-            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
-                test_dict))
-        self.assertDictEqual(expected_dict, output_dict)
-
-    def test_can_not_convert_strings_to_float_numbers_in_classifier_data(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Expected all classifier data objects to be '
-            'lists, dicts, strings, integers but received'):
-            (classifier_services.
-             convert_strings_to_float_numbers_in_classifier_data(2.0124))
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job(
+                exp_id, 1, false_state_name, algorithm_id))
+        self.assertIsNone(classifier_training_job)
 
     def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(self):
         with self.assertRaisesRegexp(

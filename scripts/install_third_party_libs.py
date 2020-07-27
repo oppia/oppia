@@ -69,6 +69,11 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
     'configparser.py')
 
+# Path of the prototool executable.
+PROTOTOOL_PATH = os.path.join(
+    common.THIRD_PARTY_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION,
+    'bin', 'prototool')
+
 
 def tweak_yarn_executable():
     """When yarn is run on Windows, the file yarn will be executed by default.
@@ -146,6 +151,41 @@ def pip_install(package, version, install_path):
         raise Exception('Error installing package')
 
 
+def compile_protobuf_files():
+    """Compiles protobuf files using prototool.
+
+    Raises:
+        Exception. If there is any error in compiling the proto files.
+    """
+    # The call to python -m is used to ensure that Python and Pip versions are
+    # compatible.
+    oppia_ml_proto_path = os.path.join(
+        common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')
+    oppia_proto_path = os.path.join('core', 'domain', 'proto')
+
+    command = [
+        PROTOTOOL_PATH, 'generate', oppia_ml_proto_path]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    else:
+        python_utils.PRINT(stderr)
+        raise Exception('Error compiling oppia-ml proto files.')
+
+    command = [
+        PROTOTOOL_PATH, 'generate', oppia_proto_path]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    else:
+        python_utils.PRINT(stderr)
+        raise Exception('Error compiling oppia proto files.')
+
+
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
 
@@ -178,6 +218,7 @@ def main():
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
+        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
@@ -215,6 +256,10 @@ def main():
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
+
+    # Compile protobuf files.
+    python_utils.PRINT('Compiling protobuf files.')
+    compile_protobuf_files()
 
     if common.is_windows_os():
         tweak_yarn_executable()

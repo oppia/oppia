@@ -24,7 +24,6 @@ import random
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classifier_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import event_services
@@ -176,16 +175,6 @@ class ExplorationHandler(base.BaseHandler):
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
 
-        # Retrieve all classifiers for the exploration.
-        state_classifier_mapping = {}
-        classifier_training_jobs = (
-            classifier_services.get_classifier_training_jobs(
-                exploration_id, exploration.version,
-                list(exploration.states.keys())))
-        for index, state_name in enumerate(exploration.states.keys()):
-            if classifier_training_jobs[index] is not None:
-                state_classifier_mapping[state_name] = (
-                    classifier_training_jobs[index].to_player_dict())
 
         self.values.update({
             'can_edit': (
@@ -197,7 +186,6 @@ class ExplorationHandler(base.BaseHandler):
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
             'preferred_audio_language_code': preferred_audio_language_code,
-            'state_classifier_mapping': state_classifier_mapping,
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),

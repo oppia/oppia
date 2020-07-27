@@ -808,6 +808,19 @@ tags: []
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
+    def _parse_blob_response(self, response, expect_errors):
+        """Convert a JSON server response to an object (such as a dict)."""
+        if not expect_errors:
+            self.assertTrue(
+                response.status_int >= 200 and
+                response.status_int < 400)
+        else:
+            self.assertTrue(response.status_int >= 400)
+        self.assertEqual(
+            response.content_type, 'application/octet-stream')
+
+        return response
+
     def get_json(self, url, params=None, expected_status_int=200):
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
@@ -830,6 +843,29 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
+
+    def get_blob(self, url, params=None, expected_status_int=200):
+        """Get a BLOB response."""
+        if params is not None:
+            self.assertTrue(isinstance(params, dict))
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
+
+        blob_response = self.testapp.get(
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(blob_response.status_int, expected_status_int)
+        return self._parse_blob_response(blob_response, expect_errors)
 
     def post_json(self, url, payload, csrf_token=None,
                   expected_status_int=200, upload_files=None):
@@ -856,6 +892,31 @@ tags: []
 
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
+
+    def post_blob(self, url, payload, csrf_token=None, expected_status_int=200):
+        """Post a BLOB object to the server; return the received object."""
+        data = payload
+        if csrf_token:
+            data['csrf_token'] = csrf_token
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
+        response = self._send_post_request(
+            self.testapp, url, data,
+            expect_errors=expect_errors,
+            expected_status_int=expected_status_int,
+            headers={b'content-type': b'application/octet-stream'})
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+
+        self.assertEqual(response.status_int, expected_status_int)
+        return self._parse_json_response(response, expect_errors)
 
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""

@@ -17,9 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
 import hashlib
 import hmac
-import json
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -27,43 +27,41 @@ from core.controllers import base
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
+from core.domain import exp_fetchers
+from core.domain.proto import training_job_response_payload_pb2
 import feconf
 import python_utils
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
 # in Oppia-ml.
-def generate_signature(secret, message):
+def generate_signature(secret, message, vm_id):
     """Generates digital signature for given data.
 
     Args:
         secret: str. The secret used to communicate with Oppia-ml.
-        message: dict. The message payload data.
+        message: str. The message payload data.
+        vm_id: str. The ID of the VM that generated message.
 
     Returns:
         str. The signature of the payload data.
     """
-    message_json = json.dumps(message, sort_keys=True)
+    # message_json = json.dumps(message, sort_keys=True)
+    message = '%s|%s' % (base64.b64encode(message), vm_id)
     return hmac.new(
-        secret, msg=message_json, digestmod=hashlib.sha256).hexdigest()
+        secret, msg=message, digestmod=hashlib.sha256).hexdigest()
 
 
-def validate_job_result_message_dict(message):
+def validate_job_result_message_proto(job_result_proto):
     """Validates the data-type of the message payload data.
 
     Args:
-        message: dict. The message payload data.
+        job_result_proto: object. The protobuf object containing job result.
 
     Returns:
         bool. Whether the payload dict is valid.
     """
-    job_id = message.get('job_id')
-    classifier_data_with_floats_stringified = message.get(
-        'classifier_data_with_floats_stringified')
-
-    if not isinstance(job_id, python_utils.BASESTRING):
-        return False
-    if not isinstance(classifier_data_with_floats_stringified, dict):
+    if job_result_proto.WhichOneof('classifier_frozen_model') is None:
         return False
     return True
 
@@ -87,7 +85,7 @@ def verify_signature(message, vm_id, received_signature):
     if secret is None:
         return False
 
-    generated_signature = generate_signature(secret, message)
+    generated_signature = generate_signature(secret, message, vm_id)
     if generated_signature != received_signature:
         return False
     return True
@@ -99,31 +97,26 @@ class TrainedClassifierHandler(base.BaseHandler):
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""
-        signature = self.payload.get('signature')
-        message = self.payload.get('message')
-        vm_id = self.payload.get('vm_id')
+        payload = training_job_response_payload_pb2.TrainingJobResponsePayload()
+        payload.ParseFromString(self.request.body)
+        signature = payload.signature
+        vm_id = payload.vm_id
         if vm_id == feconf.DEFAULT_VM_ID and not constants.DEV_MODE:
             raise self.UnauthorizedUserException
 
-        if not validate_job_result_message_dict(message):
+        if not validate_job_result_message_proto(payload.job_result):
             raise self.InvalidInputException
-        if not verify_signature(message, vm_id, signature):
+        if not verify_signature(
+                payload.job_result.SerializeToString(), vm_id, signature):
             raise self.UnauthorizedUserException
 
-        job_id = message['job_id']
-        # The classifier data received in the payload has all floating point
-        # values stored as strings. This is because floating point numbers
-        # are represented differently on GAE(Oppia) and GCE(Oppia-ml).
-        # Therefore, converting all floating point numbers to string keeps
-        # signature consistent on both Oppia and Oppia-ml.
-        # For more info visit: https://stackoverflow.com/q/40173295
-        classifier_data = (
-            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
-                message['classifier_data_with_floats_stringified']))
+        job_id = payload.job_result.job_id
+
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
@@ -134,7 +127,11 @@ class TrainedClassifierHandler(base.BaseHandler):
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
         try:
-            classifier_services.store_classifier_data(job_id, classifier_data)
+            classifier_data_proto = getattr(
+                payload.job_result,
+                payload.job_result.WhichOneof('classifier_frozen_model'))
+            classifier_services.store_classifier_data(
+                job_id, classifier_data_proto)
         except Exception as e:
             raise self.InternalErrorException(e)
 
@@ -142,6 +139,63 @@ class TrainedClassifierHandler(base.BaseHandler):
         classifier_services.mark_training_job_complete(job_id)
 
         return self.render_json({})
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles get requests.
+
+        Retrieves trained classifier data from GCS and transfers it to frontend.
+        """
+        exploration_id = self.request.get('exploration_id')
+        state_name = self.request.get('state_name')
+
+        try:
+            exp_version = int(self.request.get('exploration_version'))
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=exp_version)
+            interaction_id = exploration.states[state_name].interaction.id
+        except:
+            raise self.InvalidInputException(
+                'Entity for exploration with id %s and version %s not found.'
+                % (exploration_id, self.request.get('exploration_version')))
+
+        if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
+            raise self.PageNotFoundException(
+                'No classifier algorithm found for %s interaction' % (
+                    interaction_id))
+
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+        algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_version']
+
+        training_job_exploration_mapping = (
+            classifier_services.get_training_job_exploration_mapping(
+                exploration_id, exp_version, state_name))
+        if not training_job_exploration_mapping:
+            raise self.InvalidInputException
+
+        if algorithm_id not in (
+                training_job_exploration_mapping.algorithm_id_to_job_id_map):
+            classifier_services.migrate_exploration_training_job(
+                training_job_exploration_mapping)
+            raise self.PageNotFoundException
+
+        training_job = classifier_services.get_classifier_training_job_by_id(
+            training_job_exploration_mapping.algorithm_id_to_job_id_map[
+                algorithm_id])
+
+        if training_job is None or (
+                training_job.status != feconf.TRAINING_JOB_STATUS_COMPLETE):
+            raise self.PageNotFoundException
+
+        if training_job.algorithm_version != algorithm_version:
+            classifier_services.migrate_exploration_training_job(
+                training_job_exploration_mapping)
+            raise self.PageNotFoundException
+
+        return self.render_blob(
+            training_job.to_player_proto().SerializeToString())
 
 
 class NextJobHandler(base.BaseHandler):
@@ -168,6 +222,7 @@ class NextJobHandler(base.BaseHandler):
             classifier_services.mark_training_job_pending(next_job.job_id)
             response['job_id'] = next_job.job_id
             response['algorithm_id'] = next_job.algorithm_id
+            response['algorithm_version'] = next_job.algorithm_version
             response['training_data'] = next_job.training_data
 
         return self.render_json(response)

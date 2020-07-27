@@ -89,6 +89,12 @@ if os.path.isdir(oppia_tools_path):
         raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
     sys.path.insert(0, pil_path)
 
+    protobuf_path = os.path.join(
+        oppia_tools_path, 'protobuf-3.12.0')
+    if not os.path.isdir(protobuf_path):
+        raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
+    sys.path.insert(0, protobuf_path)
+
 THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.6.1'),
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.9.0'),

@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
+import json
 import math
 import random
 import time
@@ -56,6 +57,7 @@ from core.domain import user_id_migration
 from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
+from core.domain.proto import text_classifier_pb2
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -586,23 +588,26 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         next_scheduled_check_time = datetime.datetime.utcnow()
-        classifier_data = {'classifier_data': 'data'}
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.model_json = json.dumps(
+            {'classifier_data': 'data'})
+
         id0 = classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', '0', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'StateTest0', feconf.TRAINING_JOB_STATUS_NEW, 1)
         fs_services.save_classifier_data(
-            'TextClassifier', id0, classifier_data)
+            'TextClassifier', id0, classifier_data_proto)
         self.model_instance_0 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id0))
         id1 = classifier_models.ClassifierTrainingJobModel.create(
-            'CodeClassifier', 'CodeRepl', '1', 1,
+            'TextClassifier', 'TextInput', '1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'StateTest1', feconf.TRAINING_JOB_STATUS_NEW, 1)
         fs_services.save_classifier_data(
-            'CodeClassifier', id1, classifier_data)
+            'TextClassifier', id1, classifier_data_proto)
         self.model_instance_1 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
 
@@ -719,11 +724,11 @@ class TrainingJobExplorationMappingModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         id0 = classifier_models.TrainingJobExplorationMappingModel.create(
-            '0', 1, 'StateTest0', 'job0')
+            '0', 1, 'StateTest0', {'TextClassifier': 'job0'})
         self.model_instance_0 = (
             classifier_models.TrainingJobExplorationMappingModel.get_by_id(id0))
         id1 = classifier_models.TrainingJobExplorationMappingModel.create(
-            '1', 1, 'StateTest1', 'job1')
+            '1', 1, 'StateTest1', {'TextClassifier': 'job1'})
         self.model_instance_1 = (
             classifier_models.TrainingJobExplorationMappingModel.get_by_id(id1))
 
@@ -783,7 +788,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
         model_instance_with_invalid_exp_version = (
             classifier_models.TrainingJobExplorationMappingModel(
                 id='0.5.StateTest0', exp_id='0', exp_version=5,
-                state_name='StateTest0', job_id='job_id'))
+                state_name='StateTest0',
+                algorithm_id_to_job_id_map={'TextClassifier': 'job_id'}))
         model_instance_with_invalid_exp_version.put()
         expected_output = [
             (
@@ -799,7 +805,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
         model_instance_with_invalid_state_name = (
             classifier_models.TrainingJobExplorationMappingModel(
                 id='0.1.invalid', exp_id='0', exp_version=1,
-                state_name='invalid', job_id='job_id'))
+                state_name='invalid',
+                algorithm_id_to_job_id_map={'TextClassifier': 'job_id'}))
         model_instance_with_invalid_state_name.put()
         expected_output = [
             (

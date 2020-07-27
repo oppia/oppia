@@ -65,9 +65,9 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     },
     'tar': {
         'mandatory_keys': [
-            'version', 'url', 'tarRootDirPrefix',
+            'version', 'url',
             'targetDirPrefix', 'downloadFormat'],
-        'optional_key_pairs': []
+        'optional_key_pairs': [['tarRootDirPrefix', 'tarRootDir']]
     }
 }
 
@@ -321,8 +321,13 @@ def download_manifest_files(filepath):
                     dependency_zip_root_name, dependency_target_root_name)
 
             elif download_format == _DOWNLOAD_FORMAT_TAR:
-                dependency_tar_root_name = (
-                    dependency_contents['tarRootDirPrefix'] + dependency_rev)
+                if 'tarRootDir' in dependency_contents:
+                    dependency_tar_root_name = dependency_contents['tarRootDir']
+                else:
+                    dependency_tar_root_name = (
+                        dependency_contents['tarRootDirPrefix'] +
+                        dependency_rev)
+
                 dependency_target_root_name = (
                     dependency_contents['targetDirPrefix'] + dependency_rev)
                 download_and_untar_files(

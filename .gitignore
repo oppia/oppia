@@ -4,6 +4,7 @@
 *.swo
 *.bak
 gae_runtime/*
+core/domain/proto/*.py
 # We have added .git over here such that "git check-ignore" command should
 # ignore the files and dirs inside the .git dir.
 .git/*

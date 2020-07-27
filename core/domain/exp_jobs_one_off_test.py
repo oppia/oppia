@@ -1272,7 +1272,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         # Store training job model for the classifier model.
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
-            classifier_model_id)
+            {'TextClassifier': classifier_model_id})
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
@@ -1289,7 +1289,9 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             self.NEW_EXP_ID, new_exploration.version,
             [initial_state_name])[0]
         self.assertEqual(
-            classifier_exp_mapping_model.job_id, classifier_model_id)
+            classifier_exp_mapping_model.algorithm_id_to_job_id_map[
+                'TextClassifier'],
+            classifier_model_id)
 
     def test_migration_job_fails_with_invalid_exploration(self):
         observed_log_messages = []

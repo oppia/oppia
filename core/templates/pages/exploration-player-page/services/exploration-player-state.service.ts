@@ -52,9 +52,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
   'PlayerTranscriptService', 'PlaythroughService',
   'PretestQuestionBackendApiService',
   'QuestionBackendApiService', 'QuestionPlayerEngineService',
-  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'UrlService',
-  'EXPLORATION_MODE',
+  'ReadOnlyExplorationBackendApiService', 'StatsReportingService',
+  'UrlInterpolationService', 'UrlService', 'EXPLORATION_MODE',
   function(
       $q, $rootScope, ContextService,
       EditableExplorationBackendApiService,
@@ -64,9 +63,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       PlayerTranscriptService, PlaythroughService,
       PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
-      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, UrlService,
-      EXPLORATION_MODE) {
+      ReadOnlyExplorationBackendApiService, StatsReportingService,
+      UrlInterpolationService, UrlService, EXPLORATION_MODE) {
     StatsReportingService = (
       OppiaAngularRootComponent.statsReportingService);
     var currentEngineService = null;
@@ -89,7 +87,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
 
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
-      StateClassifierMappingService.init(returnDict.state_classifier_mapping);
       // For some cases, version is set only after
       // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
       // Use returnDict.version for non-null version value.

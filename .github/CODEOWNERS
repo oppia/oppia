@@ -42,6 +42,9 @@
 /core/storage/classifier/ @prasanna08
 /core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
+/prototool.yaml @prasanna08
+/core/domain/algorithm_proto_registry*.py @prasanna08
+/core/domain/proto/* @prasanna08
 
 
 # Audio and Translation team.

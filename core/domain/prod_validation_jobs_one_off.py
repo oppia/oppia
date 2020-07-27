@@ -895,7 +895,8 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         return classifier_domain.TrainingJobExplorationMapping(
-            item.exp_id, item.exp_version, item.state_name, item.job_id)
+            item.exp_id, item.exp_version, item.state_name,
+            item.algorithm_id_to_job_id_map)
 
     @classmethod
     def _get_external_id_relationships(cls, item):

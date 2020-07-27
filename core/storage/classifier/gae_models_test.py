@@ -61,7 +61,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_job.training_data,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
-        self.assertEqual(training_job.data_schema_version, 1)
+        self.assertEqual(training_job.algorithm_version, 1)
 
     def test_query_new_and_pending_training_jobs(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -125,7 +125,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                 'algorithm_id'],
             'training_data': [],
             'status': feconf.TRAINING_JOB_STATUS_NEW,
-            'data_schema_version': 1
+            'algorithm_version': 1
         })
         job_dicts_list.append({
             'exp_id': u'1',
@@ -137,7 +137,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                 'algorithm_id'],
             'training_data': [],
             'status': feconf.TRAINING_JOB_STATUS_NEW,
-            'data_schema_version': 1
+            'algorithm_version': 1
         })
 
         job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
@@ -160,7 +160,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_job1.status,
             feconf.TRAINING_JOB_STATUS_NEW)
-        self.assertEqual(training_job1.data_schema_version, 1)
+        self.assertEqual(training_job1.algorithm_version, 1)
 
         training_job2 = (
             classifier_models.ClassifierTrainingJobModel.get(job_ids[1]))
@@ -178,7 +178,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_job2.status,
             feconf.TRAINING_JOB_STATUS_NEW)
-        self.assertEqual(training_job2.data_schema_version, 1)
+        self.assertEqual(training_job2.algorithm_version, 1)
 
     def test_raise_exception_by_mocking_collision(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -212,7 +212,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_new_mapping_runs_successfully(self):
         mapping_id = (
             classifier_models.TrainingJobExplorationMappingModel.create(
-                'exp_id1', 2, 'state_name4', 'job_id4'))
+                'exp_id1', 2, 'state_name4', {'algorithm_id': 'job_id4'}))
 
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
@@ -220,20 +220,21 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(mapping.exp_id, 'exp_id1')
         self.assertEqual(mapping.exp_version, 2)
         self.assertEqual(mapping.state_name, 'state_name4')
-        self.assertEqual(mapping.job_id, 'job_id4')
+        self.assertEqual(
+            mapping.algorithm_id_to_job_id_map, {'algorithm_id': 'job_id4'})
 
         # Test that exception is raised when creating mapping with same id.
         with self.assertRaisesRegexp(Exception, (
             'A model with the same ID already exists.')):
             mapping_id = (
                 classifier_models.TrainingJobExplorationMappingModel.create(
-                    'exp_id1', 2, 'state_name4', 'job_id4'))
+                    'exp_id1', 2, 'state_name4', {'algorithm_id': 'job_id4'}))
 
         # Test that state names with unicode characters get saved correctly.
         state_name1 = u'Klüft'
         mapping_id = (
             classifier_models.TrainingJobExplorationMappingModel.create(
-                'exp_id1', 2, state_name1, 'job_id4'))
+                'exp_id1', 2, state_name1, {'algorithm_id': 'job_id4'}))
 
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
@@ -244,7 +245,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         state_name2 = u'टेक्स्ट'
         mapping_id = (
             classifier_models.TrainingJobExplorationMappingModel.create(
-                'exp_id1', 2, state_name2, 'job_id4'))
+                'exp_id1', 2, state_name2, {'algorithm_id': 'job_id4'}))
 
         mapping = classifier_models.TrainingJobExplorationMappingModel.get(
             mapping_id)
@@ -258,7 +259,7 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         state_name = 'state_name1'
         job_id = 'job_id1'
         classifier_models.TrainingJobExplorationMappingModel.create(
-            exp_id, exp_version, state_name, job_id)
+            exp_id, exp_version, state_name, {'algorithm_id': job_id})
 
         mappings = (
             classifier_models.TrainingJobExplorationMappingModel.get_models(
@@ -268,16 +269,17 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(mappings[0].exp_id, exp_id)
         self.assertEqual(mappings[0].exp_version, 1)
         self.assertEqual(mappings[0].state_name, state_name)
-        self.assertEqual(mappings[0].job_id, job_id)
+        self.assertDictEqual(
+            mappings[0].algorithm_id_to_job_id_map, {'algorithm_id': job_id})
 
     def test_create_multi_mappings(self):
         job_exploration_mappings = []
         job_exploration_mappings.append(
             classifier_domain.TrainingJobExplorationMapping(
-                u'1', 1, 'Home', 'job_id1'))
+                u'1', 1, 'Home', {'algorithm_id': 'job_id1'}))
         job_exploration_mappings.append(
             classifier_domain.TrainingJobExplorationMapping(
-                u'1', 2, 'Home', 'job_id2'))
+                u'1', 2, 'Home', {'algorithm_id': 'job_id2'}))
 
         mapping_ids = (
             classifier_models.TrainingJobExplorationMappingModel.create_multi(
@@ -289,7 +291,8 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
                 mapping_ids[0]))
         self.assertEqual(mapping1.exp_id, '1')
         self.assertEqual(mapping1.exp_version, 1)
-        self.assertEqual(mapping1.job_id, 'job_id1')
+        self.assertDictEqual(
+            mapping1.algorithm_id_to_job_id_map, {'algorithm_id': 'job_id1'})
         self.assertEqual(mapping1.state_name, 'Home')
 
         mapping2 = (
@@ -297,5 +300,6 @@ class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
                 mapping_ids[1]))
         self.assertEqual(mapping2.exp_id, '1')
         self.assertEqual(mapping2.exp_version, 2)
-        self.assertEqual(mapping2.job_id, 'job_id2')
+        self.assertEqual(
+            mapping2.algorithm_id_to_job_id_map, {'algorithm_id': 'job_id2'})
         self.assertEqual(mapping2.state_name, 'Home')

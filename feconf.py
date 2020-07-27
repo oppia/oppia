@@ -95,13 +95,10 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
-        'current_data_schema_version': 1
+        'algorithm_version': 1
     },
-    'CodeRepl': {
-        'algorithm_id': 'CodeClassifier',
-        'current_data_schema_version': 1
-    }
 }
+
 # Classifier job time to live (in mins).
 CLASSIFIER_JOB_TTL_MINS = 5
 TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
@@ -629,7 +626,6 @@ DEMO_EXPLORATIONS = {
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
     u'17': 'audio_test',
-    u'18': 'code_classifier_test.yaml',
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
     u'21': 'example_exploration_in_collection3.yaml',
@@ -834,8 +830,8 @@ MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with App.js.
-ENABLE_ML_CLASSIFIERS = False
+# NOTE TO DEVELOPERS: This should be synchronized with app.constants.ts.
+ENABLE_ML_CLASSIFIERS = FALSE
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
