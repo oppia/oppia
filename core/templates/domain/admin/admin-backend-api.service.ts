@@ -139,10 +139,10 @@ export class AdminBackendApiService {
   // components in explorations have a valid math SVG stored in the
   // datastore.
   sendNewStructuresMathSvgsToBackend(
-      latexToSvgMapping, entityType): Promise<Object> {
+      newStructuresLatexToSvgMapping, entityType): Promise<Object> {
     let body = new FormData();
-    for (var entityId in latexToSvgMapping) {
-      for (var latexString in latexToSvgMapping[entityId]) {
+    for (var entityId in newStructuresLatexToSvgMapping) {
+      for (var latexString in newStructuresLatexToSvgMapping[entityId]) {
         // LaTeX strings cannot be appended in the request body as keys for
         // files because of encoding issues (multiple backslash in the LaTeX
         // string is processed improperly, e.g 3 backslashes in an
@@ -151,9 +151,9 @@ export class AdminBackendApiService {
         // the request body.Images can be extracted based on the latexId in the
         // backend.
         body.set(
-          latexToSvgMapping[entityId][latexString].latexId,
-          latexToSvgMapping[entityId][latexString].file);
-        delete latexToSvgMapping[entityId][latexString].file;
+          newStructuresLatexToSvgMapping[entityId][latexString].latexId,
+          newStructuresLatexToSvgMapping[entityId][latexString].file);
+        delete newStructuresLatexToSvgMapping[entityId][latexString].file;
       }
     }
     body.append(

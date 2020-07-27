@@ -233,6 +233,58 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
+        var newStructuresLatexToSvgMapping = {};
+        var newStructureEntityIdToLatexMapping = null;
+        var numberOfLatexStrings = 0;
+        ctrl.generateSvgsForNewStructures = async function() {
+          var countOfSvgsGenerated = 0;
+          for (var entityId in newStructureEntityIdToLatexMapping) {
+            var latexStrings = newStructureEntityIdToLatexMapping[entityId];
+            newStructuresLatexToSvgMapping[entityId] = {};
+            for (var i = 0; i < latexStrings.length; i++) {
+              var svgFile = await convertLatexToSvgFile(latexStrings[i]);
+              countOfSvgsGenerated++;
+              LoggerService.info(
+                  'generated ' + countOfSvgsGenerated.toString() + ' SVGs');
+                newStructuresLatexToSvgMapping[entityId][latexStrings[i]] = (
+                  svgFile);
+            }
+            if (numberOfLatexStrings === countOfSvgsGenerated) {
+              ctrl.setStatusMessage(
+                'SVGs generated for ' + countOfSvgsGenerated.toString() +
+                ' LaTeX strings .');
+              $rootScope.$apply();
+            }
+          }
+        };
+        ctrl.fetchAndGenerateSvgsForNewStructures = function() {
+          $http.get('/newstructureslatexsvghandler', {
+            params: {
+              entity_type: ctrl.newStructuresEntityChosen
+            }
+          }).then(
+            function(response) {
+              entityIdToLatexMapping = (
+                response.data.latex_strings_to_entity_id_mapping);
+              ctrl.generateSvgsForNewStructures();
+            });
+        };
+
+        ctrl.saveNewStructuresSvgsToBackend = function() {
+          AdminDataService.sendNewStructuresMathSvgsToBackend(
+            newStructuresLatexToSvgMapping,
+            ctrl.newStructuresEntityChosen).then(
+              function(response) {
+                ctrl.setStatusMessage(
+                  'Successfully updated the ' + ctrl.newStructuresEntityChosen);
+                $rootScope.$apply();
+              }, function(errorResponse) {
+                ctrl.setStatusMessage(
+                  'Server error:' + errorResponse.data.error);
+                $rootScope.$apply();
+              });
+        };
+
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
           $http.put(

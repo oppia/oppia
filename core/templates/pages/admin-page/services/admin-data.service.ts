@@ -51,9 +51,9 @@ export class AdminDataService {
   // components in explorations have a valid math SVG stored in the
   // datastore.
   sendNewStructuresMathSvgsToBackendAsync(
-      latexToSvgMapping, entityType): Promise<Object> {
-    return this.adminBackendApiService.  sendNewStructuresMathSvgsToBackend(
-      latexToSvgMapping, entityType);
+      newStructuresLatexToSvgMapping, entityType): Promise<Object> {
+    return this.adminBackendApiService.sendNewStructuresMathSvgsToBackend(
+      newStructuresLatexToSvgMapping, entityType);
   }
 }
 
