@@ -76,7 +76,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.save_new_skill('skill_id_2', self.admin_id, description='Skill 2')
 
         self.story = story_domain.Story.create_default_story(
-            self.story_id_1, 'Public Story Title', self.topic_id)
+            self.story_id_1, 'Public Story Title', 'Description', self.topic_id)
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1)
         ]
@@ -85,7 +85,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story)
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'Private Story Title', self.topic_id)
+            self.story_id_2, 'Private Story Title', 'Description',
+            self.topic_id)
         story_services.save_new_story(self.admin_id, self.story_2)
         self.save_new_topic(
             self.topic_id, 'user', name='Topic',
@@ -176,7 +177,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'exploration_id': self.exp_id
         }
         story = story_domain.Story.create_default_story(
-            self.story_id_3, 'Public Story Title', self.topic_id)
+            self.story_id_3, 'Public Story Title', 'Description', self.topic_id)
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(node)
         ]

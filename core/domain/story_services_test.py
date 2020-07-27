@@ -51,7 +51,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         super(StoryServicesUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -1566,8 +1566,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            self.STORY_1_ID, 'Title', self.TOPIC_ID)
-        story.description = ('Description')
+            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID)
+
         self.node_1 = {
             'id': self.NODE_ID_1,
             'thumbnail_filename': 'image.svg',

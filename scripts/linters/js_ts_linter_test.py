@@ -39,11 +39,7 @@ ESPRIMA_PATH = os.path.join(
 
 sys.path.insert(1, ESPRIMA_PATH)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import esprima  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import esprima  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()

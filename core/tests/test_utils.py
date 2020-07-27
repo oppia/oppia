@@ -666,7 +666,6 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
-    # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
@@ -845,7 +844,7 @@ tags: []
             expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=expect_errors,
+            expect_errors,
             expected_status_int=expected_status_int,
             upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
@@ -951,8 +950,8 @@ tags: []
         incoming_email_url = '/_ah/mail/%s' % recipient_email
 
         return self._send_post_request(
-            app, incoming_email_url, data, headers=headers,
-            expect_errors=expect_errors,
+            app, incoming_email_url, data,
+            expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
@@ -1452,7 +1451,7 @@ tags: []
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes

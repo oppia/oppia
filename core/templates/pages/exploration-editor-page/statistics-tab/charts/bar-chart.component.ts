@@ -16,37 +16,40 @@
  * @fileoverview Directive for bar chart visualization.
  */
 
-angular.module('oppia').directive('barChart', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      // A read-only array representing the table of chart data.
-      data: '&',
-      // A read-only object containing several chart options. This object
-      // should have the following keys: chartAreaWidth, colors, height,
-      // legendPosition and width.
-      options: '&'
-    },
-    controller: ['$scope', '$element', function($scope, $element) {
-      if (!$.isArray($scope.data())) {
+angular.module('oppia').component('barChart', {
+  bindings: {
+    // A read-only array representing the table of chart data.
+    data: '&',
+    // A read-only object containing several chart options. This object
+    // should have the following keys: chartAreaWidth, colors, height,
+    // legendPosition and width.
+    options: '&'
+  },
+  controller: ['$scope', '$element', 'WindowDimensionsService', function(
+      $scope, $element, WindowDimensionsService) {
+    var ctrl = this;
+
+    ctrl.$onInit = function() {
+      if (!$.isArray(ctrl.data())) {
         return;
       }
-      var options = $scope.options();
+      var options = ctrl.options();
       var chart = null;
 
       var redrawChart = function() {
         if (!chart) {
           try {
             // Occasionally, we run into the following error:
-            // "TypeError: google.visualization.BarChart is not a constructor".
-            // This ignores the above error since the bar chart directive is to
-            // be deprecated soon.
+            // "TypeError: google.visualization.BarChart is not a
+            // constructor".
+            // This ignores the above error since the bar chart directive is
+            // to be deprecated soon.
             chart = new google.visualization.BarChart($element[0]);
           } catch (e) {
             return;
           }
         }
-        chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+        chart.draw(google.visualization.arrayToDataTable(ctrl.data()), {
           chartArea: {
             left: 0,
             width: options.chartAreaWidth
@@ -67,7 +70,18 @@ angular.module('oppia').directive('barChart', [function() {
       };
 
       $scope.$watch('data()', redrawChart);
-      $(window).resize(redrawChart);
-    }]
-  };
-}]);
+
+      ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
+        .subscribe(evt => {
+          redrawChart();
+          $scope.$applyAsync();
+        });
+    };
+
+    ctrl.$onDestroy = function() {
+      if (ctrl.resizeSubscription) {
+        ctrl.resizeSubscription.unsubscribe();
+      }
+    };
+  }]
+});

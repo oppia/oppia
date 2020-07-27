@@ -182,8 +182,7 @@ angular.module('oppia').directive('topicEditorTab', [
                 // No further action is needed.
               });
             } else {
-              StoryCreationService.createNewCanonicalStory(
-                $scope.topic.getId());
+              StoryCreationService.createNewCanonicalStory();
             }
           };
 
