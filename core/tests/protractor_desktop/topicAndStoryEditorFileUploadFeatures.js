@@ -129,7 +129,8 @@ describe('Topic editor functionality', function() {
       TOPIC_DESCRIPTION, false);
 
     await topicEditorPage.expectNumberOfStoriesToBe(0);
-    await topicEditorPage.createStory('Story Title');
+    await topicEditorPage.createStory(
+      'Story Title', 'Story description', '../data/test_svg.svg');
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -137,7 +138,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.navigateToStoryWithIndex(0);
     var defaultThumbnailImageSrc = (
       await storyEditorPage.getStoryThumbnailSource());
-    await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg');
+    await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg', true);
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await storyEditorPage.saveStory('Added thumbnail.');
@@ -214,8 +215,9 @@ describe('Chapter editor functionality', function() {
     await topicEditorPage.changeTopicDescription('Topic Description');
     await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
     await topicEditorPage.saveTopic('Changed topic name and description.');
-    await topicEditorPage.createStory('Story 0');
-    await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg');
+    await topicEditorPage.createStory(
+      'Story 0', 'Story description', '../data/test_svg.svg');
+    await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg', true);
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await storyEditorPage.createNewChapter(

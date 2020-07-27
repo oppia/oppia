@@ -125,7 +125,8 @@ describe('Topic editor functionality', function() {
 
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
-    await topicEditorPage.createStory('Story Title');
+    await topicEditorPage.createStory(
+      'Story Title', 'Story description', '../data/test_svg.svg');
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -271,7 +272,8 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(topicName,
       'Description', false);
-    await topicEditorPage.createStory('Story 0');
+    await topicEditorPage.createStory(
+      'Story 0', 'Story description', '../data/test_svg.svg');
     var url = await browser.getCurrentUrl();
     storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
