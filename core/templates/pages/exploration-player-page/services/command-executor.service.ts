@@ -94,8 +94,7 @@ export class CommandExecutorService {
   continueClick(windowRef) {
     try {
       var button = windowRef.nativeWindow.document.getElementsByClassName(
-        'oppia-learner-confirm-button protractor-test-continue-button \
-        md-button md-ink-ripple')[0] as HTMLElement;
+        'oppia-learner-confirm-button md-button md-ink-ripple')[0] as HTMLElement;
       button.click();
     } catch {
       var button = windowRef.nativeWindow.document.getElementsByClassName(
@@ -113,8 +112,7 @@ export class CommandExecutorService {
     evt.initEvent('change', false, true);
     box.dispatchEvent(evt);
     var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'oppia-learner-confirm-button protractor-test-submit-answer-button \
-      md-button md-ink-ripple')[0] as HTMLElement;
+      'oppia-learner-confirm-button md-button md-ink-ripple')[0] as HTMLElement;
     button.click();
   }
 
@@ -128,8 +126,7 @@ export class CommandExecutorService {
         this.setElementsOnPage += 1;
       } else {
         var addButton = windowRef.nativeWindow.document.getElementsByClassName(
-          'btn btn-secondary btn-sm protractor-\
-          test-add-list-entry')[this.setElementsOnPage - 1] as HTMLElement;
+          'btn btn-secondary btn-sm')[this.setElementsOnPage - 1] as HTMLElement;
         addButton.click();
         this.setElementsOnPage += 1;
         var box = windowRef.nativeWindow.document.getElementsByClassName(
@@ -147,7 +144,7 @@ export class CommandExecutorService {
       'form-control ng-pristine ng-untouched ng-valid ng-empty');
     for (var i = 0; i < boxes.length; i++) {
       if (boxes[i].value === element) {
-        var deleteButton = 
+        var deleteButton =
         windowRef.nativeWindow.document.getElementsByClassName(
           'material-icons md-18');
         deleteButton[i].click();
@@ -157,16 +154,16 @@ export class CommandExecutorService {
   }
 
   enterFraction(windowRef, fraction) {
+    var fractionElementName = 'form-control ng-pristine ng-untouched \n' +
+    'ng-valid ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty';
     var fractionBox = windowRef.nativeWindow.document.getElementsByClassName(
-      'form-control ng-pristine ng-untouched ng-valid \
-      ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty')[0];
+      fractionElementName)[0];
     fractionBox.value = fraction;
   }
 
   submit(windowRef) {
     var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'oppia-learner-confirm-button protractor-test-submit-answer-button \
-      md-button md-ink-ripple')[0] as HTMLElement;
+      'oppia-learner-confirm-button md-button md-ink-ripple')[0] as HTMLElement;
     button.click();
     this.setElementsOnPage = 0;
   }
