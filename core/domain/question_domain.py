@@ -429,15 +429,6 @@ class Question(python_utils.OBJECT):
                         'solution']['correct_answer']['ascii']
                     correct_answer = exp_domain.clean_math_expression(
                         correct_answer)
-                    # equation_condition = new_interaction_id == (
-                    #     exp_domain.TYPE_VALID_MATH_EQUATION) and not (
-                    #         is_valid_math_equation(correct_answer))
-                    # algebraic_condition = new_interaction_id == (
-                    #     exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION) and not (
-                    #         is_valid_algebraic_expression(correct_answer))
-                    # if equation_condition or algebraic_condition:
-                    #     question_state_dict['interaction']['solution'] = None
-                    # else:
                     question_state_dict['interaction'][
                         'solution']['correct_answer'] = correct_answer
 

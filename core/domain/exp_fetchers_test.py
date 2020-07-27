@@ -674,8 +674,8 @@ title: Old Title
                 }],
                 'solution': {
                     'correct_answer': {
-                        'ascii': '1.2 + 3',
-                        'latex': '1.2 + 3'
+                        'ascii': 'x+y',
+                        'latex': 'x+y'
                     },
                     'answer_is_exclusive': False,
                     'explanation': {
@@ -709,7 +709,6 @@ title: Old Title
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
-        self.assertIsNone(exploration.states['State2'].interaction.solution)
 
 
         exploration = exp_domain.Exploration.create_default_exploration(
