@@ -249,9 +249,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""\"""Some multiline
+                u"""\"\"\"Some multiline
                 docstring.
-                \"""
+                \"\"\"
                 # Load JSON.
                 master_translation_dict = json.loads(
                 utils.get_file_contents(os.path.join(
