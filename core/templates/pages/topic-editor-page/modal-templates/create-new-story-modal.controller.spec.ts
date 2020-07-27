@@ -13,39 +13,60 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for NewStoryTitleEditorModalController.
+ * @fileoverview Unit tests for CreateNewStoryModalController.
  */
+
+import { NewlyCreatedStoryObjectFactory } from
+  'domain/topic/NewlyCreatedStoryObjectFactory';
 
 const CONSTANTS = require('constants.ts');
 
-describe('New Story Title Editor Modal Controller', function() {
+describe('Create New Story Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
+  var ImageLocalStorageService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'NewlyCreatedStoryObjectFactory', new NewlyCreatedStoryObjectFactory());
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
+    ImageLocalStorageService = $injector.get('ImageLocalStorageService');
+
+    spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
+      [{filename: 'a.png', image: 'faf'}]);
 
     $scope = $rootScope.$new();
-    $controller('NewStoryTitleEditorModalController', {
+    $controller('CreateNewStoryModalController', {
       $scope: $scope,
-      $uibModalInstance: $uibModalInstance
+      $uibModalInstance: $uibModalInstance,
+      ImageLocalStorageService: ImageLocalStorageService
     });
   }));
 
   it('should check if properties was initialized correctly', function() {
-    expect($scope.storyTitle).toBe('');
+    expect($scope.story.title).toBe('');
+    expect($scope.story.description).toBe('');
     expect($scope.MAX_CHARS_IN_STORY_TITLE).toBe(
       CONSTANTS.MAX_CHARS_IN_STORY_TITLE);
   });
 
-  it('should check if a provided story title is empty', function() {
-    expect($scope.isStoryTitleEmpty('')).toBe(true);
-    expect($scope.isStoryTitleEmpty('Story Title')).toBe(false);
-    expect($scope.isStoryTitleEmpty()).toBe(false);
-    expect($scope.isStoryTitleEmpty(null)).toBe(false);
+  it('should check if the story is valid', function() {
+    expect($scope.isValid()).toBe(false);
+
+    $scope.story.title = 'title';
+    expect($scope.isValid()).toBe(false);
+
+    $scope.story.description = 'description';
+    expect($scope.isValid()).toBe(true);
+
+    $scope.story.title = '';
+    expect($scope.isValid()).toBe(false);
   });
 });
