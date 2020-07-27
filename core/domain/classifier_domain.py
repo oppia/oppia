@@ -84,39 +84,40 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
-        job_id: str. The unique id of the classifier training job.
-        algorithm_id: str. The id of the algorithm that will be used for
-            generating the classifier.
-        interaction_id: str. The id of the interaction to which the algorithm
-            belongs.
-        exp_id: str. The id of the exploration id that contains the state
-            for which classifier will be generated.
-        exp_version: int. The version of the exploration when
-            the training job was generated.
-        next_scheduled_check_time: datetime.datetime. The next scheduled time to
-            check the job.
-        state_name: str. The name of the state for which the classifier will be
-            generated.
-        status: str. The status of the training job request. This can be either
-            NEW (default), PENDING (when a job has been picked up) or COMPLETE.
-        training_data: list(dict). The training data that is used for training
-            the classifier. This is populated lazily when the job request is
-            picked up by the VM. The list contains dicts where each dict
-            represents a single training data group, for example:
-            training_data = [
-                {
-                    'answer_group_index': 1,
-                    'answers': ['a1', 'a2']
-                },
-                {
-                    'answer_group_index': 2,
-                    'answers': ['a2', 'a3']
-                }
-            ]
-        classifier_data: Object. The protobuf object containing classifier model
-            parameters.
-        algorithm_version: int. Schema version of the classsifier model to be
-            trained. This depends on the algorithm ID.
+            job_id: str. The unique id of the classifier training job.
+            algorithm_id: str. The id of the algorithm that will be used for
+                generating the classifier.
+            interaction_id: str. The id of the interaction to which the
+                algorithm belongs.
+            exp_id: str. The id of the exploration id that contains the state
+                for which classifier will be generated.
+            exp_version: int. The version of the exploration when
+                the training job was generated.
+            next_scheduled_check_time: datetime.datetime. The next scheduled
+                time to check the job.
+            state_name: str. The name of the state for which the classifier
+                will be generated.
+            status: str. The status of the training job request. This can be
+                either NEW (default), PENDING (when a job has been picked up)
+                or COMPLETE.
+            training_data: list(dict). The training data that is used for
+                training the classifier. This is populated lazily when the job
+                request is picked up by the VM. The list contains dicts where
+                each dict represents a single training data group, for example:
+                training_data = [
+                    {
+                        'answer_group_index': 1,
+                        'answers': ['a1', 'a2']
+                    },
+                    {
+                        'answer_group_index': 2,
+                        'answers': ['a2', 'a3']
+                    }
+                ]
+            classifier_data: Object. The protobuf object containing classifier
+                model parameters.
+            algorithm_version: int. Schema version of the classsifier model to
+                be trained. This depends on the algorithm ID.
         """
         self._job_id = job_id
         self._algorithm_id = algorithm_id
@@ -246,7 +247,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
 
         Returns:
             int. Version of the classifier algorithm.
-                This depends on the algorithm ID.
+            This depends on the algorithm ID.
         """
         return self._algorithm_version
 
@@ -488,7 +489,7 @@ class TrainingJobExplorationMapping(python_utils.OBJECT):
 
         Returns:
             dict. Mapping of algorithm IDs to corresponding unique trainnig
-                job IDs.
+            job IDs.
         """
         return self._algorithm_id_to_job_id_map
 

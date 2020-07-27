@@ -609,7 +609,7 @@ def get_classifier_training_job_maps(exp_id, exp_version, state_names):
 
     Returns:
         list(dict(str: ClassifierTrainingJob)). Domain objects for the
-            Classifier training job model for algorithm_ids.
+        Classifier training job model for algorithm_ids.
     """
     training_job_exploration_mapping_models = (
         classifier_models.TrainingJobExplorationMappingModel.get_models(

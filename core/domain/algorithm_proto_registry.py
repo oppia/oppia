@@ -23,6 +23,7 @@ from core.domain.proto import text_classifier_pb2
 
 import python_utils
 
+
 class Registry(python_utils.OBJECT):
     """Registry of all classifier classes."""
 

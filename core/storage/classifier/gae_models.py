@@ -287,7 +287,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
         Returns:
             ClassifierExplorationMappingModel|None. The model instances
-                for the classifier exploration mapping.
+            for the classifier exploration mapping.
         """
         mapping_id = cls._generate_id(exp_id, exp_version, state_name)
         model = cls.get_by_id(mapping_id)

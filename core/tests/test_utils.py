@@ -905,8 +905,7 @@ tags: []
             expect_errors = True
         response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=expect_errors,
-            expected_status_int=expected_status_int,
+            expect_errors, expected_status_int=expected_status_int,
             headers={b'content-type': b'application/octet-stream'})
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
