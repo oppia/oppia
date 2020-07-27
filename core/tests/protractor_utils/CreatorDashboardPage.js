@@ -53,7 +53,7 @@ var CreatorDashboardPage = function() {
     await waitFor.visibilityOf(explorationDashboardCard);
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
-      // Tile text contains title, possibly followed by newline and text
+      // Tile text contains title, possibly followed by newline and text.
       return (
         text.startsWith(explorationTitle + '\n') ||
         text === explorationTitle

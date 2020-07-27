@@ -41,6 +41,7 @@ import sys
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
+from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
@@ -74,6 +75,7 @@ class ChangedBranch(python_utils.OBJECT):
     that need to be linted. It does not change branch when modified files are
     not committed.
     """
+
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
         self.old_branch = subprocess.check_output(get_branch_cmd).strip()
@@ -226,6 +228,18 @@ def extract_files_to_lint(file_diffs):
     return lint_files
 
 
+def get_parent_branch_name_for_diff():
+    """Returns remote branch name against which the diff has to be checked.
+
+    Returns:
+        str: The name of the remote branch.
+    """
+    if common.is_current_branch_a_hotfix_branch():
+        return 'release-%s' % common.get_current_release_version_number(
+            common.get_current_branch_name())
+    return 'develop'
+
+
 def collect_files_being_pushed(ref_list, remote):
     """Collect modified files and filter those that need linting.
 
@@ -235,7 +249,7 @@ def collect_files_being_pushed(ref_list, remote):
 
     Returns:
         dict: Dict mapping branch names to 2-tuples of the form (list of
-            changed files, list of files to lint).
+        changed files, list of files to lint).
     """
     if not ref_list:
         return {}
@@ -251,7 +265,7 @@ def collect_files_being_pushed(ref_list, remote):
     for branch, _ in python_utils.ZIP(branches, hashes):
         # Get the difference to remote/develop.
         modified_files = compare_to_remote(
-            remote, branch, remote_branch='develop')
+            remote, branch, remote_branch=get_parent_branch_name_for_diff())
         files_to_lint = extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 
@@ -345,7 +359,7 @@ def does_diff_include_js_or_ts_files(diff_files):
 
     Returns:
         bool. Whether the diff contains changes in any JavaScript or TypeScript
-            files.
+        files.
     """
 
     for file_path in diff_files:

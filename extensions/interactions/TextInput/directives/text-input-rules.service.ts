@@ -20,18 +20,20 @@ import { Injectable } from '@angular/core';
 
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import { TextInputAnswer } from 'interactions/answer-defs';
+import { TextInputRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TextInputRulesService {
   constructor(private nws: NormalizeWhitespacePipe) {}
-  Equals(answer: string, inputs: {x: string}): boolean {
+  Equals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer.toLowerCase() === normalizedInput.toLowerCase();
   }
-  FuzzyEquals(answer: string, inputs: {x: string}): boolean {
+  FuzzyEquals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var answerString = normalizedAnswer.toLowerCase();
 
@@ -61,18 +63,19 @@ export class TextInputRulesService {
     }
     return editDistance[inputString.length][answerString.length] === 1;
   }
-  CaseSensitiveEquals(answer: string, inputs: {x: string}): boolean {
+  CaseSensitiveEquals(
+      answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer === normalizedInput;
   }
-  StartsWith(answer: string, inputs: {x: string}): boolean {
+  StartsWith(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer.toLowerCase().indexOf(
       normalizedInput.toLowerCase()) === 0;
   }
-  Contains(answer: string, inputs: {x: string}): boolean {
+  Contains(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     var normalizedAnswer = this.nws.transform(answer);
     var normalizedInput = this.nws.transform(inputs.x);
     return normalizedAnswer.toLowerCase().indexOf(

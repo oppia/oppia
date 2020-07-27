@@ -20,9 +20,10 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+require('services/contextual/device-info.service.ts');
 require('services/guppy-configuration.service.ts');
-require('services/math-interactions.service.ts');
 require('services/guppy-initialization.service.ts');
+require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('algebraicExpressionEditor', {
   bindings: {
@@ -31,23 +32,31 @@ angular.module('oppia').component('algebraicExpressionEditor', {
   template: require('./algebraic-expression-editor.component.html'),
   controller: [
     '$scope', 'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService',
+    'MathInteractionsService', 'DeviceInfoService',
     function(
         $scope, GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService) {
+        MathInteractionsService, DeviceInfoService) {
       const ctrl = this;
       ctrl.warningText = '';
       ctrl.hasBeenTouched = false;
 
       ctrl.isCurrentAnswerValid = function() {
         if (ctrl.hasBeenTouched) {
-          var answerIsValid = MathInteractionsService.validateAnswer(
+          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
+          // is not compatible with nerdamer or with the backend validations.
+          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
+            ctrl.value);
+          var answerIsValid = MathInteractionsService.validateExpression(
             ctrl.value);
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }
         ctrl.warningText = '';
         return true;
+      };
+
+      ctrl.showOSK = function() {
+        GuppyInitializationService.setShowOSK(true);
       };
 
       ctrl.$onInit = function() {
@@ -58,15 +67,23 @@ angular.module('oppia').component('algebraicExpressionEditor', {
         }
         GuppyConfigurationService.init();
         GuppyInitializationService.init('guppy-div-creator');
-        Guppy.event('change', () => {
+        let eventType = (
+          DeviceInfoService.isMobileUserAgent() &&
+          DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
+        // We need the 'focus' event while using the on screen keyboard (only
+        // for touch-based devices) to capture input from user and the 'change'
+        // event while using the normal keyboard.
+        Guppy.event(eventType, () => {
           var activeGuppyObject = (
             GuppyInitializationService.findActiveGuppyObject());
           if (activeGuppyObject !== undefined) {
             ctrl.hasBeenTouched = true;
             ctrl.value = activeGuppyObject.guppyInstance.asciimath();
-            // Need to manually trigger the digest cycle to make any 'watchers'
-            // aware of changes in answer.
-            $scope.$apply();
+            if (eventType === 'change') {
+              // Need to manually trigger the digest cycle to make any
+              // 'watchers' aware of changes in answer.
+              $scope.$apply();
+            }
           }
         });
       };

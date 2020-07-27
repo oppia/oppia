@@ -21,10 +21,10 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'sharing-links.directive.ts');
+  'sharing-links.component.ts');
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'editor-reloading-modal.controller.ts');
@@ -90,7 +90,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
       DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
-    // (request has been sent to backend but no reply received yet)
+    // (request has been sent to backend but no reply received yet).
     var saveIsInProgress = false;
 
     // This flag is used to ensure only one save exploration modal can be open
@@ -277,7 +277,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           });
 
           modalInstance.opened.then(function() {
-            // Toggle loading dots off after modal is opened
+            // Toggle loading dots off after modal is opened.
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
             }
@@ -390,11 +390,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
             controller: 'ExplorationSaveModalController'
           });
 
-          // Modal is Opened
+          // Modal is Opened.
           modalIsOpen = true;
 
           modalInstance.opened.then(function() {
-            // Toggle loading dots off after modal is opened
+            // Toggle loading dots off after modal is opened.
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
             }

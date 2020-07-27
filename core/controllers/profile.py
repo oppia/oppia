@@ -17,7 +17,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
+import json
 import re
+import zipfile
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -31,6 +34,7 @@ from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -85,7 +89,7 @@ class ProfileHandler(base.BaseHandler):
 
         self.values.update({
             'profile_is_of_current_user': profile_is_of_current_user,
-            'profile_username': user_settings.username,
+            'username_of_viewed_profile': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'first_contribution_msec': (
@@ -105,7 +109,7 @@ class ProfileHandler(base.BaseHandler):
 class PreferencesPage(base.BaseHandler):
     """The preferences page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         self.render_template('preferences-page.mainpage.html')
@@ -116,7 +120,7 @@ class PreferencesHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -163,7 +167,7 @@ class PreferencesHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
         update_type = self.payload.get('update_type')
@@ -210,7 +214,7 @@ class ProfilePictureHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -336,7 +340,7 @@ class SignupHandler(base.BaseHandler):
 class DeleteAccountPage(base.BaseHandler):
     """The delete account page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
@@ -347,7 +351,7 @@ class DeleteAccountPage(base.BaseHandler):
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def delete(self):
         """Handles DELETE requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
@@ -362,14 +366,32 @@ class ExportAccountHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def get(self):
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_EXPORT:
             raise self.PageNotFoundException
 
-        user_data = takeout_service.export_data_for_user(self.user_id)
-        self.render_json(user_data)
+        # Retrieve user data.
+        user_takeout_object = takeout_service.export_data_for_user(
+            self.user_id)
+        user_data = user_takeout_object.user_data
+        user_images = user_takeout_object.user_images
+
+        # Create zip file.
+        temp_file = python_utils.string_io()
+        with zipfile.ZipFile(
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            zfile.writestr('oppia_takeout_data.json', json.dumps(user_data))
+            for image in user_images:
+                b64_png_no_header = image.b64_image_data.split(',')[1]
+                decoded_png = base64.b64decode(
+                    python_utils.url_unquote_plus(b64_png_no_header))
+                zfile.writestr('images/' + image.image_export_path, decoded_png)
+
+        # Render file for download.
+        self.render_downloadable_file(
+            temp_file.getvalue(), 'oppia_takeout_data.zip', 'text/plain')
 
 
 class PendingAccountDeletionPage(base.BaseHandler):
@@ -409,7 +431,7 @@ class UsernameCheckHandler(base.BaseHandler):
 class SiteLanguageHandler(base.BaseHandler):
     """Changes the preferred system language in the user's preferences."""
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.can_manage_own_account
     def put(self):
         """Handles PUT requests."""
         site_language_code = self.payload.get('site_language_code')

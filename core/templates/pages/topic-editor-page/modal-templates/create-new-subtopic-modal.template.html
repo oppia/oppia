@@ -10,15 +10,16 @@
     </div>
     <input class="form-control protractor-test-new-subtopic-title-field" style="font-size: 12px;"
            placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
-           ng-model="$ctrl.subtopicTitle" ng-change="$ctrl.resetErrorMsg()" maxlength="<[MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
+           ng-model="$ctrl.subtopicTitle" ng-change="$ctrl.resetErrorMsg()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
     <span class="oppia-input-box-subtitle">
       <i>
-        Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+        Subtopic title should be at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
       </i>
     </span>
     <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
-      <em><[errorMsg]></em>
+      <em><[$ctrl.errorMsg]></em>
     </span>
+
 
     <div class="thumbnail-editor">
       <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
@@ -27,7 +28,7 @@
                           update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
                           allowed-bg-colors="$ctrl.allowedBgColors"
                           aspect-ratio="'4:3'"
-                          preview-title="$ctrl.editableTitle"
+                          preview-title="$ctrl.subtopicTitle"
                           preview-description=""
                           preview-description-bg-color="'#BE563C'"
                           preview-footer="">

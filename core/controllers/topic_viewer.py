@@ -47,6 +47,7 @@ class TopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the topic
     viewer page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_topic_viewer_page
@@ -73,14 +74,24 @@ class TopicPageDataHandler(base.BaseHandler):
 
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
+            completed_node_titles = [
+                completed_node.title for completed_node in
+                story_fetchers.get_completed_nodes_in_story(
+                    self.user_id, story_summary.id)]
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
+            story_summary_dict['completed_node_titles'] = completed_node_titles
             canonical_story_dicts.append(story_summary_dict)
 
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
+            completed_node_titles = [
+                completed_node.title for completed_node in
+                story_fetchers.get_completed_nodes_in_story(
+                    self.user_id, story_summary.id)]
             story_summary_dict = story_summary.to_human_readable_dict()
             story_summary_dict['story_is_published'] = True
+            story_summary_dict['completed_node_titles'] = completed_node_titles
             additional_story_dicts.append(story_summary_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()

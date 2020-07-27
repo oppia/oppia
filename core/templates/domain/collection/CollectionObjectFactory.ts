@@ -23,102 +23,125 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ICollectionNodeBackendDict,
   CollectionNode,
+  CollectionNodeBackendDict,
   CollectionNodeObjectFactory
 } from 'domain/collection/collection-node-object.factory';
+import {
+  CollectionPlaythrough,
+  CollectionPlaythroughBackendDict,
+  CollectionPlaythroughObjectFactory
+} from 'domain/collection/CollectionPlaythroughObjectFactory';
 
-interface ICollectionBackendDict {
-  'id'?: string;
-  'title'?: string;
-  'objective'?: string;
-  'language_code'?: string;
-  'tags'?: string[];
-  'category'?: string;
-  'version'?: number;
-  'nodes'?: ICollectionNodeBackendDict[];
+interface ExplorationIdToNodeIndexMap {
+  [explorationId: string]: number;
+}
+
+export interface CollectionBackendDict {
+  'id': string;
+  'title': string;
+  'objective': string;
+  'language_code': string;
+  'tags': string[];
+  'schema_version': number;
+  'playthrough_dict': CollectionPlaythroughBackendDict;
+  'category': string;
+  'version': number;
+  'nodes': CollectionNodeBackendDict[];
 }
 
 export class Collection {
-  _id: string;
-  _title: string;
-  _objective: string;
-  _languageCode: string;
-  _tags: string[];
-  _category: string;
-  _version: number;
-  _nodes: CollectionNode[];
-  _explorationIdToNodeIndexMap: {};
+  id: string;
+  title: string;
+  objective: string;
+  languageCode: string;
+  tags: string[];
+  playthrough: CollectionPlaythrough;
+  category: string;
+  version: number;
+  schemaVersion: number;
+  nodes: CollectionNode[];
+  explorationIdToNodeIndexMap: ExplorationIdToNodeIndexMap = {};
 
   constructor(
-      collectionBackendObject: ICollectionBackendDict,
-      collectionNodeObjectFactory: CollectionNodeObjectFactory) {
-    this._id = collectionBackendObject.id;
-    this._title = collectionBackendObject.title;
-    this._objective = collectionBackendObject.objective;
-    this._languageCode = collectionBackendObject.language_code;
-    this._tags = collectionBackendObject.tags;
-    this._category = collectionBackendObject.category;
-    this._version = collectionBackendObject.version;
-    this._nodes = [];
+      id: string, title: string, objective: string, languageCode: string,
+      tags: string[], playthrough: CollectionPlaythrough, category: string,
+      version: number, schemaVersion: number, nodes: CollectionNode[]) {
+    this.id = id;
+    this.title = title;
+    this.objective = objective;
+    this.languageCode = languageCode;
+    this.tags = tags;
+    this.category = category;
+    this.version = version;
+    this.schemaVersion = schemaVersion;
+    this.playthrough = playthrough;
+    this.nodes = [];
 
     // This map acts as a fast way of looking up a collection node for a given
     // exploration ID.
-    this._explorationIdToNodeIndexMap = {};
-    for (var i = 0; i < collectionBackendObject.nodes.length; i++) {
-      this._nodes[i] = collectionNodeObjectFactory.create(
-        collectionBackendObject.nodes[i]);
-      var explorationId = this._nodes[i].getExplorationId();
-      this._explorationIdToNodeIndexMap[explorationId] = i;
+    this.explorationIdToNodeIndexMap = {};
+    for (var i = 0; i < nodes.length; i++) {
+      this.nodes[i] = nodes[i];
+      var explorationId = this.nodes[i].getExplorationId();
+      this.explorationIdToNodeIndexMap[explorationId] = i;
     }
   }
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getTitle(): string {
-    return this._title;
+    return this.title;
   }
 
   setTitle(title: string): void {
-    this._title = title;
+    this.title = title;
   }
 
   getCategory(): string {
-    return this._category;
+    return this.category;
+  }
+
+  getSchemaVersion(): number {
+    return this.schemaVersion;
+  }
+
+  getPlaythrough(): CollectionPlaythrough {
+    return this.playthrough;
   }
 
   setCategory(category: string) {
-    this._category = category;
+    this.category = category;
   }
 
   getObjective(): string {
-    return this._objective;
+    return this.objective;
   }
 
   setObjective(objective: string): void {
-    this._objective = objective;
+    this.objective = objective;
   }
 
   getLanguageCode(): string {
-    return this._languageCode;
+    return this.languageCode;
   }
 
   setLanguageCode(languageCode: string): void {
-    this._languageCode = languageCode;
+    this.languageCode = languageCode;
   }
 
   getTags(): string[] {
-    return this._tags;
+    return this.tags;
   }
 
   setTags(tags: string[]): void {
-    this._tags = tags;
+    this.tags = tags;
   }
 
   getVersion(): number {
-    return this._version;
+    return this.version;
   }
 
   // Adds a new frontend collection node domain object to this collection.
@@ -128,9 +151,9 @@ export class Collection {
   // be reflected in this collection.
   addCollectionNode(collectionNodeObject: CollectionNode): boolean {
     var explorationId = collectionNodeObject.getExplorationId();
-    if (!this._explorationIdToNodeIndexMap.hasOwnProperty(explorationId)) {
-      this._explorationIdToNodeIndexMap[explorationId] = this._nodes.length;
-      this._nodes.push(collectionNodeObject);
+    if (!this.explorationIdToNodeIndexMap.hasOwnProperty(explorationId)) {
+      this.explorationIdToNodeIndexMap[explorationId] = this.nodes.length;
+      this.nodes.push(collectionNodeObject);
       return true;
     }
     return false;
@@ -139,21 +162,21 @@ export class Collection {
   // This will swap 2 nodes of the collection and update the exploration id
   // to node index map accordingly.
   swapCollectionNodes(firstIndex: number, secondIndex: number): boolean {
-    if (firstIndex >= this._nodes.length ||
-        secondIndex >= this._nodes.length ||
+    if (firstIndex >= this.nodes.length ||
+        secondIndex >= this.nodes.length ||
         firstIndex < 0 ||
         secondIndex < 0) {
       return false;
     }
 
-    var firstIndexId = this._nodes[firstIndex].getExplorationId();
-    var secondIndexId = this._nodes[secondIndex].getExplorationId();
-    var temp = this._nodes[firstIndex];
-    this._nodes[firstIndex] = this._nodes[secondIndex];
-    this._nodes[secondIndex] = temp;
+    var firstIndexId = this.nodes[firstIndex].getExplorationId();
+    var secondIndexId = this.nodes[secondIndex].getExplorationId();
+    var temp = this.nodes[firstIndex];
+    this.nodes[firstIndex] = this.nodes[secondIndex];
+    this.nodes[secondIndex] = temp;
 
-    this._explorationIdToNodeIndexMap[firstIndexId] = secondIndex;
-    this._explorationIdToNodeIndexMap[secondIndexId] = firstIndex;
+    this.explorationIdToNodeIndexMap[firstIndexId] = secondIndex;
+    this.explorationIdToNodeIndexMap[secondIndexId] = firstIndex;
     return true;
   }
 
@@ -166,16 +189,16 @@ export class Collection {
     // invalidated, leading to errors if its mutated in the future. This might
     // help prevent bugs where collection nodes are stored and changed after
     // being removed from a collection.
-    if (this._explorationIdToNodeIndexMap.hasOwnProperty(explorationId)) {
-      var nodeIndex = this._explorationIdToNodeIndexMap[explorationId];
-      delete this._explorationIdToNodeIndexMap[explorationId];
-      this._nodes.splice(nodeIndex, 1);
+    if (this.explorationIdToNodeIndexMap.hasOwnProperty(explorationId)) {
+      var nodeIndex = this.explorationIdToNodeIndexMap[explorationId];
+      delete this.explorationIdToNodeIndexMap[explorationId];
+      this.nodes.splice(nodeIndex, 1);
 
       // Update all node exploration ID map references past the removed index
       // to ensure they are still pointing to correct indexes.
-      for (var i = nodeIndex; i < this._nodes.length; i++) {
-        var nodeExpId = this._nodes[i].getExplorationId();
-        this._explorationIdToNodeIndexMap[nodeExpId] = i;
+      for (var i = nodeIndex; i < this.nodes.length; i++) {
+        var nodeExpId = this.nodes[i].getExplorationId();
+        this.explorationIdToNodeIndexMap[nodeExpId] = i;
       }
       return true;
     }
@@ -187,32 +210,32 @@ export class Collection {
     // Clears the existing array in-place, since there may be Angular bindings
     // to this array and they can't be reset to empty arrays.See for context:
     // http://stackoverflow.com/a/1232046
-    this._nodes.length = 0;
-    this._explorationIdToNodeIndexMap = {};
+    this.nodes.length = 0;
+    this.explorationIdToNodeIndexMap = {};
   }
 
   // Returns whether any collection nodes in this collection reference the
   // provided exploration ID.
   containsCollectionNode(explorationId: string): boolean {
-    return this._explorationIdToNodeIndexMap.hasOwnProperty(explorationId);
+    return this.explorationIdToNodeIndexMap.hasOwnProperty(explorationId);
   }
 
   // Returns a collection node given an exploration ID, or undefined if no
   // collection node within this collection references the provided
   // exploration ID.
   getCollectionNodeByExplorationId(expId: string): CollectionNode {
-    return this._nodes[this._explorationIdToNodeIndexMap[expId]];
+    return this.nodes[this.explorationIdToNodeIndexMap[expId]];
   }
 
   // Returns a list of collection node objects for this collection. Changes to
   // nodes returned by this function will be reflected in the collection.
   // Changes to the list itself will not be reflected in this collection.
   getCollectionNodes(): CollectionNode[] {
-    return this._nodes.slice();
+    return this.nodes.slice();
   }
 
   getCollectionNodeCount(): number {
-    return this._nodes.length;
+    return this.nodes.length;
   }
 
   // Returns the reference to the internal nodes array; this function is only
@@ -222,23 +245,23 @@ export class Collection {
   // object, so changes to the array itself may internally break the domain
   // object.
   getBindableCollectionNodes(): CollectionNode[] {
-    return this._nodes;
+    return this.nodes;
   }
 
   // Returns the collection node which is initially available to play
   // by the player.
   getStartingCollectionNode(): CollectionNode {
-    if (this._nodes.length === 0) {
+    if (this.nodes.length === 0) {
       return null;
     } else {
-      return this._nodes[0];
+      return this.nodes[0];
     }
   }
 
   // Returns a list of all exploration IDs referenced by this collection.
   // Changes to the list itself will not be reflected in this collection.
   getExplorationIds(): string[] {
-    return cloneDeep(Object.keys(this._explorationIdToNodeIndexMap));
+    return cloneDeep(Object.keys(this.explorationIdToNodeIndexMap));
   }
 
   // Reassigns all values within this collection to match the existing
@@ -247,13 +270,15 @@ export class Collection {
   // the collection nodes within this collection will be completely redefined
   // as copies from the specified collection.
   copyFromCollection(otherCollection: Collection): void {
-    this._id = otherCollection.getId();
+    this.id = otherCollection.getId();
     this.setTitle(otherCollection.getTitle());
     this.setCategory(otherCollection.getCategory());
     this.setObjective(otherCollection.getObjective());
     this.setLanguageCode(otherCollection.getLanguageCode());
     this.setTags(otherCollection.getTags());
-    this._version = otherCollection.getVersion();
+    this.version = otherCollection.getVersion();
+    this.playthrough = otherCollection.getPlaythrough();
+    this.schemaVersion = otherCollection.getSchemaVersion();
     this.clearCollectionNodes();
 
     var nodes = otherCollection.getCollectionNodes();
@@ -268,19 +293,38 @@ export class Collection {
 })
 export class CollectionObjectFactory {
   constructor(
-      private collectionNodeObjectFactory: CollectionNodeObjectFactory) {}
+      private collectionNodeObjectFactory: CollectionNodeObjectFactory,
+      private collectionPlaythroughObjectFactory:
+      CollectionPlaythroughObjectFactory) { }
 
-  create(collectionBackendObject: ICollectionBackendDict): Collection {
+  create(collectionBackendObject: CollectionBackendDict): Collection {
+    let collectionNodes = collectionBackendObject.nodes.map(
+      node => this.collectionNodeObjectFactory.create(node));
+    let collectionPlaythrough = (
+      this.collectionPlaythroughObjectFactory.createFromBackendObject(
+        collectionBackendObject.playthrough_dict));
+
     return new Collection(
-      collectionBackendObject, this.collectionNodeObjectFactory);
+      collectionBackendObject.id,
+      collectionBackendObject.title,
+      collectionBackendObject.objective,
+      collectionBackendObject.language_code,
+      collectionBackendObject.tags,
+      collectionPlaythrough,
+      collectionBackendObject.category,
+      collectionBackendObject.version,
+      collectionBackendObject.schema_version,
+      collectionNodes);
   }
 
   // Create a new, empty collection. This is not guaranteed to pass validation
   // tests.
   createEmptyCollection(): Collection {
-    return new Collection({
-      nodes: [],
-    }, this.collectionNodeObjectFactory);
+    let emptyCollectionPlaythrough = this.collectionPlaythroughObjectFactory
+      .create(null, []);
+    return new Collection(
+      null, null, null, null, null, emptyCollectionPlaythrough,
+      null, null, null, []);
   }
 }
 

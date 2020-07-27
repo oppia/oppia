@@ -60,6 +60,7 @@ current_user_services = models.Registry.import_current_user_services()
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
+
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
@@ -414,7 +415,8 @@ class AdminHandler(base.BaseHandler):
             self._reload_exploration('13')
 
             story = story_domain.Story.create_default_story(
-                story_id, 'Help Jaime win the Arcade', topic_id_1)
+                story_id, 'Help Jaime win the Arcade', 'Description',
+                topic_id_1)
 
             story_node_dicts = [{
                 'exp_id': '15',
@@ -481,6 +483,11 @@ class AdminHandler(base.BaseHandler):
                     'title': 'Dummy Subtopic Title'
                 })]
             )
+
+            # Generates translation opportunities for the Contributor Dashboard.
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids_in_story)
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
         else:
@@ -772,6 +779,7 @@ class AddCommunityReviewerHandler(base.BaseHandler):
 
 class RemoveCommunityReviewerHandler(base.BaseHandler):
     """Handles removing reviewer for community dashboard."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
@@ -833,6 +841,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
 
 class CommunityReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
@@ -856,6 +865,7 @@ class CommunityReviewersListHandler(base.BaseHandler):
 
 class CommunityReviewerRightsDataHandler(base.BaseHandler):
     """Handler to show the review rights of a user."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page

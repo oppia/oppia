@@ -138,7 +138,7 @@ angular.module('oppia').factory('SearchService', [
             $log.error('Mismatch');
             $log.error('SearchQuery: ' + searchQuery);
             $log.error('Input: ' + (
-              <string><any>$('.oppia-search-bar-input').val()).trim());
+              <string>$('.oppia-search-bar-input').val()).trim());
           }
         })['catch'](function() {
           numSearchesInProgress--;
@@ -164,7 +164,7 @@ angular.module('oppia').factory('SearchService', [
         // The following will split the urlQuery into 3 components:
         // 1. query
         // 2. categories (optional)
-        // 3. language codes (default to 'en')
+        // 3. language codes (default to 'en').
         var querySegments = urlQuery.split('&');
 
         for (var i = 1; i < querySegments.length; i++) {

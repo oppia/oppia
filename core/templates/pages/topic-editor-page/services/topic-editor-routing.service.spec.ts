@@ -17,6 +17,7 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -89,5 +90,28 @@ describe('Topic editor routing service', function() {
     TopicEditorRoutingService.navigateToSkillEditorWithId('10');
     expect($window.open).toHaveBeenCalled();
     expect($window.open).toHaveBeenCalledWith('/skill_editor/10');
+  });
+
+  it('should return last tab visited', function() {
+    TopicEditorRoutingService.navigateToSubtopicEditorWithId(1);
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('subtopic');
+    TopicEditorRoutingService.navigateToMainTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastTabVisited()).toEqual('topic');
+  });
+
+  it('should return last visited subtopic id', function() {
+    TopicEditorRoutingService.navigateToSubtopicPreviewTab(1);
+    $rootScope.$apply();
+    TopicEditorRoutingService.navigateToQuestionsTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(1);
+
+    TopicEditorRoutingService.navigateToSubtopicPreviewTab(5);
+    $rootScope.$apply();
+    TopicEditorRoutingService.navigateToQuestionsTab();
+    $rootScope.$apply();
+    expect(TopicEditorRoutingService.getLastSubtopicIdVisited()).toEqual(5);
   });
 });

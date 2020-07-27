@@ -107,8 +107,8 @@ def apply_change_list(story_id, change_list):
 
     Returns:
         Story, list(str), list(str). The resulting story domain object, the
-            exploration IDs removed from story and the exploration IDs added to
-            the story.
+        exploration IDs removed from story and the exploration IDs added to
+        the story.
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
@@ -184,6 +184,9 @@ def apply_change_list(story_id, change_list):
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
+                if change.property_name == story_domain.NODE:
+                    story.rearrange_node_in_story(
+                        change.old_value, change.new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -223,7 +226,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
 
     Returns:
         list(str). The various validation error messages (if raise_error is
-            False).
+        False).
 
     Raises:
         ValidationError. Expected story to only reference valid explorations.

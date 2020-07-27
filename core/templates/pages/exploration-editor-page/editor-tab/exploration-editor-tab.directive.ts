@@ -22,13 +22,13 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
-  'exploration-graph.directive.ts');
+  'exploration-graph.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-name-editor/' +
   'state-name-editor.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-param-changes-editor/' +
-  'state-param-changes-editor.directive.ts');
+  'state-param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
   'unresolved-answers-overview.directive.ts');

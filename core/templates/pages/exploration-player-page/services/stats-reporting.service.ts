@@ -23,7 +23,7 @@ import { ContextService } from 'services/context.service';
 import { MessengerService } from 'services/messenger.service';
 import { PlaythroughService } from 'services/playthrough.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { IAggregatedStats, StatsReportingBackendApiService } from
+import { AggregatedStats, StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { Stopwatch, StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
@@ -66,7 +66,7 @@ export class StatsReportingService {
   // The following dict will contain all stats data accumulated over the
   // interval time and will be reset when the dict is sent to backend for
   // recording.
-  static aggregatedStats: IAggregatedStats = null;
+  static aggregatedStats: AggregatedStats = null;
 
   private refreshAggregatedStats(): void {
     StatsReportingService.aggregatedStats = {
@@ -356,7 +356,6 @@ export class StatsReportingService {
     this.playthroughService.recordExplorationQuitAction(
       stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
 
-    this.playthroughService.recordPlaythrough(true);
     StatsReportingService.explorationIsComplete = true;
   }
 
@@ -416,7 +415,7 @@ export class StatsReportingService {
 
     this.playthroughService.recordExplorationQuitAction(
       stateName, StatsReportingService.stateStopwatch.getTimeInSecs());
-    this.playthroughService.recordPlaythrough(false);
+    this.playthroughService.storePlaythrough();
   }
 
   recordAnswerSubmitAction(

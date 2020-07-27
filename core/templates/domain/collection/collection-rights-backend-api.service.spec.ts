@@ -25,14 +25,14 @@ import { CollectionRightsBackendApiService } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
-import { ICollectionRightsBackendDict } from
+import { CollectionRightsBackendDict } from
   'domain/collection/CollectionRightsObjectFactory';
 
 describe('Collection rights backend API service', function() {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;
   let collectionRightsObjectFactory: CollectionRightsObjectFactory;
   let httpTestingController: HttpTestingController;
-  let sampleDataResults: ICollectionRightsBackendDict;
+  let sampleDataResults: CollectionRightsBackendDict;
   let csrfService: CsrfTokenService = null;
 
   beforeEach(() => {
@@ -219,7 +219,7 @@ describe('Collection rights backend API service', function() {
         expect(collectionRightsBackendApiService.isCached('0'))
           .toBe(false);
 
-        // Cache a collection
+        // Cache a collection.
         let sampleCollectionRights =
           collectionRightsObjectFactory.create(sampleDataResults);
         collectionRightsBackendApiService.cacheCollectionRights('0',

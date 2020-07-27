@@ -20,6 +20,11 @@
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
+var dragAndDropScript = require('html-dnd').code;
+
+var dragAndDrop = async function(fromElement, toElement) {
+  await browser.executeScript(dragAndDropScript, fromElement, toElement);
+};
 
 var scrollToTop = async function() {
   await browser.executeScript('window.scrollTo(0,0);');
@@ -89,7 +94,7 @@ var getExplorationIdFromEditor = async function() {
   return await _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
 };
 
-// Likewise for the player
+// Likewise for the player.
 var getExplorationIdFromPlayer = async function() {
   return await _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
@@ -133,7 +138,7 @@ var ensurePageHasNoTranslationIds = async function() {
   var promiseValue = await element(by.css(
     '.oppia-base-container')).getAttribute('innerHTML');
   // First remove all the attributes translate and variables that are
-  // not displayed
+  // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
   var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
   var REGEX_NG_TOP_NAV_VISIBILITY = (
@@ -211,6 +216,7 @@ exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
+exports.dragAndDrop = dragAndDrop;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 

@@ -19,24 +19,42 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const nerdamer = require('nerdamer');
+import nerdamer from 'nerdamer';
+
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
+import { AlgebraicExpressionRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlgebraicExpressionInputRulesService {
-  MatchesExactlyWith(answer: string, inputs: {x: string}): boolean {
-    return nerdamer(answer).eq(inputs.x);
+  MatchesExactlyWith(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputs): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    return nerdamer(nerdamer(answer).text()).eq(nerdamer(inputs.x).text());
   }
 
-  IsEquivalentTo(answer: string, inputs: {x: string}): boolean {
-    let expandedLearnerAnswer = nerdamer(`expand(${answer})`);
-    let simplifiedLearnerAnswer = nerdamer(
-      `simplify(${expandedLearnerAnswer})`);
+  IsEquivalentTo(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputs): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting '*' signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
-    let expandedCreatorAnswer = nerdamer(`expand(${inputs.x})`);
+    let expandedLearnerAnswer = nerdamer(answer).expand().text();
+    let simplifiedLearnerAnswer = nerdamer(
+      `simplify(${expandedLearnerAnswer})`).text();
+
+    let expandedCreatorAnswer = nerdamer(inputs.x).expand().text();
     let simplifiedCreatorAnswer = nerdamer(
-      `simplify(${expandedCreatorAnswer})`);
+      `simplify(${expandedCreatorAnswer})`).text();
 
     return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
   }

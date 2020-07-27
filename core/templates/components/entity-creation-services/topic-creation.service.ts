@@ -58,6 +58,7 @@ angular.module('oppia').factory('TopicCreationService', [
             '/pages/topics-and-skills-dashboard-page/templates/' +
             'create-new-topic-modal.template.html'),
           backdrop: true,
+          windowClass: 'create-new-topic',
           controller: 'CreateNewTopicModalController'
         }).result.then(function(newlyCreatedTopic) {
           if (!newlyCreatedTopic.isValid()) {

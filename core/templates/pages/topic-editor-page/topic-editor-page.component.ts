@@ -23,6 +23,7 @@ require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
+require('domain/bottom_navbar/bottom-navbar-status.service.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
 require('pages/topic-editor-page/subtopic-editor/' +
     'subtopic-preview-tab.component.ts');
@@ -52,14 +53,14 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'AlertsService', 'ContextService',
-        'PageTitleService', 'EntityCreationService',
+        '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
+        'ContextService', 'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         'TOPIC_VIEWER_URL_TEMPLATE',
-        function($scope, $window, AlertsService, ContextService,
-            PageTitleService, EntityCreationService,
+        function($scope, $window, AlertsService, BottomNavbarStatusService,
+            ContextService, PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED,
@@ -105,10 +106,40 @@ angular.module('oppia').directive('topicEditorPage', [
             }
           };
           ctrl.selectMainTab = function() {
+            const activeTab = ctrl.getActiveTabName();
+            const subtopicId = (
+              TopicEditorRoutingService.getSubtopicIdFromUrl() ||
+                TopicEditorRoutingService.getLastSubtopicIdVisited());
+            const lastTabVisited = (
+              TopicEditorRoutingService.getLastTabVisited());
+            if (activeTab.startsWith('subtopic') ||
+                lastTabVisited === 'subtopic') {
+              TopicEditorRoutingService.navigateToSubtopicEditorWithId(
+                subtopicId);
+              return;
+            }
             TopicEditorRoutingService.navigateToMainTab();
+          };
+          ctrl.isMainEditorTabSelected = function() {
+            const activeTab = ctrl.getActiveTabName();
+            return activeTab === 'main' || activeTab === 'subtopic_editor';
           };
           ctrl.selectQuestionsTab = function() {
             TopicEditorRoutingService.navigateToQuestionsTab();
+          };
+          ctrl.getNavbarText = function() {
+            if (TopicEditorStateService.hasLoadedTopic()) {
+              const activeTab = ctrl.getActiveTabName();
+              if (activeTab === 'main') {
+                return 'Topic Editor';
+              } else if (activeTab === 'subtopic_editor') {
+                return 'Subtopic Editor';
+              } else if (activeTab === 'subtopic_preview') {
+                return 'Subtopic Preview';
+              } else if (activeTab === 'questions') {
+                return 'Question Editor';
+              }
+            }
           };
           ctrl._validateTopic = function() {
             ctrl.validationIssues = ctrl.topic.validate();
@@ -139,6 +170,7 @@ angular.module('oppia').directive('topicEditorPage', [
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
+            BottomNavbarStatusService.markBottomNavbarStatus(true);
             $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
             $scope.$on(

@@ -33,6 +33,7 @@ import re
 from core.domain import expression_parser
 from core.domain import html_cleaner
 import python_utils
+import utils
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -63,7 +64,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         schema: dict(str, *). The schema to validate and normalize the value
             against.
         apply_custom_validators: bool. Whether to validate the normalized
-             object using the validators defined in the schema.
+            object using the validators defined in the schema.
 
     Returns:
         *. The normalized object.
@@ -127,7 +128,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
         if SCHEMA_KEY_LEN in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LEN]
+            assert len(obj) == schema[SCHEMA_KEY_LEN], (
+                'Expected length of %s got %s' % (
+                    schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(item, item_schema) for item in obj
         ]
@@ -181,7 +184,7 @@ def get_validator(validator_id):
 
     Returns:
         function. The validator method corresponding to the given
-            validator_id.
+        validator_id.
     """
     return _Validators.get(validator_id)
 
@@ -212,7 +215,7 @@ class Normalizers(python_utils.OBJECT):
 
         Returns:
             function. The normalizer method corresponding to the given
-                normalizer_id.
+            normalizer_id.
 
         Raises:
             Exception: The normalizer_id is not valid.
@@ -220,11 +223,7 @@ class Normalizers(python_utils.OBJECT):
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-# TODO(ankita240796): The disable comment is required since the lint tests
-# fail on circleci with the multiple-statements error on the line even though
-# the line is empty. This is a temporary fix to unblock PRs.
-# Relevant issue: https://github.com/oppia/oppia/issues/7307.
-# pylint: disable=multiple-statements
+
     @staticmethod
     def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.
@@ -239,7 +238,7 @@ class Normalizers(python_utils.OBJECT):
 
         Raises:
             AssertionError: The string is non-empty and does not start with
-            http:// or https://
+                http:// or https://
         """
         if obj == '':
             return obj
@@ -280,6 +279,7 @@ class _Validators(python_utils.OBJECT):
     schema_utils.py and schema_utils_test.py, since these methods do
     preliminary checks on the arguments passed to the validator.
     """
+
     @classmethod
     def get(cls, validator_id):
         """Returns the validator method corresponding to the specified
@@ -291,7 +291,7 @@ class _Validators(python_utils.OBJECT):
 
         Returns:
             function. The validator method corresponding to the specified
-                validator_id.
+            validator_id.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
@@ -447,3 +447,15 @@ class _Validators(python_utils.OBJECT):
         if lhs_is_numerically_valid and rhs_is_algebraically_valid:
             return True
         return False
+
+    @staticmethod
+    def is_supported_audio_language_code(obj):
+        """Checks if the given obj (a string) represents a valid language code.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid audio language code.
+        """
+        return utils.is_supported_audio_language_code(obj)

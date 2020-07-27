@@ -94,6 +94,25 @@ class BarChart(BaseVisualization):
     }]
 
 
+class ClickHexbins(BaseVisualization):
+    """A visualization which overlays an image with a hexagonal grouping of
+    clicks.
+
+    > Why hexagons? There are many reasons for using hexagons, at least over
+      squares. Hexagons have symmetry of nearest neighbors which is lacking in
+      square bins. Hexagons are the maximum number of sides a polygon can have
+      for a regular tesselation of the plane, so in terms of packing a hexagon
+      is 13% more efficient for covering the plane than squares. This property
+      translates into better sampling efficiency at least for elliptical shapes.
+      Lastly hexagons are visually less biased for displaying densities than
+      other regular tesselations. For instance with squares our eyes are drawn
+      to the horizontal and vertical lines of the grid.
+    https://cran.r-project.org/web/packages/hexbin/vignettes/hexagon_binning.pdf
+    """
+
+    _OPTIONS_SPECS = []
+
+
 class FrequencyTable(BaseVisualization):
     """A visualization representing a two-column table with answer counts."""
 
@@ -143,8 +162,13 @@ class SortedTiles(BaseVisualization):
     """A visualization for showing a small group of answers as a sequence of
     tiles.
     """
+
     _OPTIONS_SPECS = [{
         'name': 'header',
         'description': 'Header for the tiles.',
         'schema': {'type': 'unicode'}
+    }, {
+        'name': 'use_percentages',
+        'description': 'Summarize frequency through percentages',
+        'schema': {'type': 'bool'},
     }]

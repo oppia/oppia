@@ -236,13 +236,13 @@
             </i>
             <exploration-summary-tile exploration-id="tile.id"
                                       exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
+                                      last-updated-msec="tile.lastUpdatedMsec"
                                       objective="tile.objective"
                                       category="tile.category"
                                       ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      num-views="tile.numViews"
+                                      thumbnail-icon-url="tile.thumbnailIconUrl"
+                                      thumbnail-bg-color="tile.thumbnailBgColor"
                                       class="protractor-test-exp-summary-tile">
             </exploration-summary-tile>
           </div>
@@ -285,13 +285,13 @@
                style="display: inline-block; margin-left: 1px;">
             <exploration-summary-tile exploration-id="tile.id"
                                       exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
+                                      last-updated-msec="tile.lastUpdatedMsec"
                                       objective="tile.objective"
                                       category="tile.category"
                                       ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      num-views="tile.numViews"
+                                      thumbnail-icon-url="tile.thumbnailIconUrl"
+                                      thumbnail-bg-color="tile.thumbnailBgColor"
                                       class="protractor-test-exp-summary-tile">
             </exploration-summary-tile>
           </div>
@@ -350,13 +350,13 @@
               <exploration-summary-tile style="height: 145px;"
                                         exploration-id="tile.id"
                                         exploration-title="tile.title"
-                                        last-updated-msec="tile.last_updated_msec"
+                                        last-updated-msec="tile.lastUpdatedMsec"
                                         objective="tile.objective"
                                         category="tile.category"
                                         ratings="tile.ratings"
-                                        num-views="tile.num_views"
-                                        thumbnail-icon-url="tile.thumbnail_icon_url"
-                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        num-views="tile.numViews"
+                                        thumbnail-icon-url="tile.thumbnailIconUrl"
+                                        thumbnail-bg-color="tile.thumbnailBgColor"
                                         class="protractor-test-exp-summary-tile"
                                         is-playlist-tile="true">
               </exploration-summary-tile>
@@ -403,12 +403,12 @@
             <collection-summary-tile
                                      collection-id="tile.id"
                                      collection-title="tile.title"
-                                     last-updated-msec="tile.last_updated_msec"
+                                     last-updated-msec="tile.lastUpdatedMsec"
                                      objective="tile.objective"
-                                     node-count="tile.node_count"
+                                     node-count="tile.nodeCount"
                                      category="tile.category"
-                                     thumbnail-icon-url="tile.thumbnail_icon_url"
-                                     thumbnail-bg-color="tile.thumbnail_bg_color">
+                                     thumbnail-icon-url="tile.thumbnailIconUrl"
+                                     thumbnail-bg-color="tile.thumbnailBgColor">
             </collection-summary-tile>
           </div>
 
@@ -466,12 +466,12 @@
               <collection-summary-tile style="height: 145px; display: block;"
                                        collection-id="tile.id"
                                        collection-title="tile.title"
-                                       last-updated-msec="tile.last_updated_msec"
+                                       last-updated-msec="tile.lastUpdatedMsec"
                                        objective="tile.objective"
-                                       node-count="tile.node_count"
+                                       node-count="tile.nodeCount"
                                        category="tile.category"
-                                       thumbnail-icon-url="tile.thumbnail_icon_url"
-                                       thumbnail-bg-color="tile.thumbnail_bg_color"
+                                       thumbnail-icon-url="tile.thumbnailIconUrl"
+                                       thumbnail-bg-color="tile.thumbnailBgColor"
                                        is-playlist-tile="true">
               </collection-summary-tile>
             </div>
@@ -519,12 +519,12 @@
             <collection-summary-tile
                                      collection-id="tile.id"
                                      collection-title="tile.title"
-                                     last-updated-msec="tile.last_updated_msec"
+                                     last-updated-msec="tile.lastUpdatedMsec"
                                      objective="tile.objective"
-                                     node-count="tile.node_count"
+                                     node-count="tile.nodeCount"
                                      category="tile.category"
-                                     thumbnail-icon-url="tile.thumbnail_icon_url"
-                                     thumbnail-bg-color="tile.thumbnail_bg_color">
+                                     thumbnail-icon-url="tile.thumbnailIconUrl"
+                                     thumbnail-bg-color="tile.thumbnailBgColor">
             </collection-summary-tile>
           </div>
 
@@ -556,20 +556,20 @@
           <md-card class="oppia-subscription-card"
                    ng-repeat="subscription in $ctrl.subscriptionsList | orderBy:$ctrl.getValueOfSubscriptionSortKey:$ctrl.isCurrentSubscriptionSortDescending"
                    style="margin: 0 8px 0 4px; width: 197px;">
-            <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" target="_blank" rel="noopener">
-              <img ng-src="<[subscription.creator_picture_data_url]>" class="oppia-subscription-card-profile-picture rounded-circle">
+            <a class="oppia-subscription-profile-link" href="/profile/<[subscription.username]>" target="_blank" rel="noopener">
+              <img ng-src="<[subscription.pictureDataUrl]>" class="oppia-subscription-card-profile-picture rounded-circle">
               <span class="oppia-subscription-card-summary" style="color: black;">
                 <div style="margin-bottom: 5px; font-size: 17.5px;">
                   <strong class="protractor-test-subscription-name"
                           popover-append-to-body
-                          popover-trigger="<[$ctrl.showUsernamePopover(subscription.creator_username)]>"
-                          ng-attr-uib-popover="<[subscription.creator_username]>">
-                    <[subscription.creator_username| truncate:10]>
+                          popover-trigger="<[$ctrl.showUsernamePopover(subscription.username)]>"
+                          ng-attr-uib-popover="<[subscription.username]>">
+                    <[subscription.username| truncate:10]>
                   </strong>
                 </div>
                 <div style="font-size: 14.5px;">
                   <span>Impact</span>
-                  <span><[subscription.creator_impact || 0]></span>
+                  <span><[subscription.impact || 0]></span>
                 </div>
               </span>
             </a>
@@ -601,8 +601,8 @@
               <td class="col-lg-3 col-md-3 col-sm-3" style="width: 21%;">
                 <span ng-if="thread.totalMessageCount > 1">
                   <span ng-if="thread.authorSecondLastMessage">
-                    <span ng-if="thread.secondLastMessageRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
-                    <span ng-if="!thread.secondLastMessageRead">
+                    <span ng-if="thread.secondLastMessageIsRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
+                    <span ng-if="!thread.secondLastMessageIsRead">
                       <strong><[thread.authorSecondLastMessage | truncate:7]>, </strong>
                     </span>
                   </span>
@@ -613,8 +613,8 @@
                   </span>
                 </span>
                 <span ng-if="thread.authorLastMessage">
-                  <span ng-if="thread.lastMessageRead"><[thread.authorLastMessage | truncate:7]></span>
-                  <span ng-if="!thread.lastMessageRead">
+                  <span ng-if="thread.lastMessageIsRead"><[thread.authorLastMessage | truncate:7]></span>
+                  <span ng-if="!thread.lastMessageIsRead">
                     <strong><[thread.authorLastMessage | truncate:7]></strong>
                   </span>
                 </span>
@@ -624,12 +624,12 @@
                 <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
               </td>
               <td class="col-lg-6 col-md-6 col-sm-6" style="width: 58%;">
-                <span ng-if="thread.totalMessageCount > 1 && thread.secondLastMessageRead && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
-                <span class="protractor-test-feedback-exploration" ng-if="thread.totalMessageCount === 1 && thread.lastMessageRead"><[thread.explorationTitle]> -</span>
-                <span ng-if="thread.totalMessageCount === 1 && !thread.lastMessageRead">
+                <span ng-if="thread.totalMessageCount > 1 && thread.secondLastMessageIsRead && thread.lastMessageIsRead"><[thread.explorationTitle]> -</span>
+                <span class="protractor-test-feedback-exploration" ng-if="thread.totalMessageCount === 1 && thread.lastMessageIsRead"><[thread.explorationTitle]> -</span>
+                <span ng-if="thread.totalMessageCount === 1 && !thread.lastMessageIsRead">
                   <strong><[thread.explorationTitle]> -</strong>
                 </span>
-                <span ng-if="thread.totalMessageCount > 1 && (!thread.lastMessageRead || !thread.secondLastMessageRead)">
+                <span ng-if="thread.totalMessageCount > 1 && (!thread.lastMessageIsRead || !thread.secondLastMessageIsRead)">
                   <strong><[thread.explorationTitle]> -</strong>
                 </span>
                 <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
@@ -815,7 +815,7 @@
   .oppia-learner-dashboard-submenu {
     background-color: #fff;
     border: 1px solid #d0d0d0;
-    color: #8c8c8c;
+    color: #757575;
     cursor: pointer;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 16px;
@@ -823,7 +823,7 @@
   }
 
   .oppia-learner-dashboard-section-active {
-    background-color: #009688;
+    background-color: #018477;
     color: white;
   }
 
@@ -940,7 +940,7 @@
   }
 
   .oppia-learner-dashboard-main-content-title {
-    color: #009688;
+    color: #076962;
     display: inline-block;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 1.3em;
@@ -1118,7 +1118,7 @@
   }
 
   .oppia-dashboard-tooltip-text {
-    background-color: #009688;
+    background-color: #018477;
     border-radius: 6px;
     bottom: 97%;
     color: #fff;

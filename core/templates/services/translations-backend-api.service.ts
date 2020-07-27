@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License
+// limitations under the License.
 
 /**
  * @fileoverview Translations backend api service.
@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-export interface ITranslationsDict {
+export interface TranslationsDict {
   [translation: string]: string;
 }
 
@@ -33,8 +33,8 @@ export class TranslationsBackendApiService {
 
   constructor(private http: HttpClient) {}
 
-  fetchTranslations(languageCode: string): Promise<ITranslationsDict> {
-    return this.http.get<ITranslationsDict>(
+  fetchTranslations(languageCode: string): Promise<TranslationsDict> {
+    return this.http.get<TranslationsDict>(
       `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
 }

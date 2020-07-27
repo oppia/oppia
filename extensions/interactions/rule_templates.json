@@ -121,6 +121,14 @@
       "description": "is not correct due to {{c|LogicErrorCategory}}"
     }
   },
+  "MathEquationInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|MathEquation}}"
+    }
+  },
   "MathExpressionInput": {
     "IsMathematicallyEquivalentTo": {
       "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
@@ -157,6 +165,20 @@
     },
     "IsEquivalentTo": {
         "description": "is equivalent to {{f|NumberWithUnits}}"
+    }
+  },
+  "NumericExpressionInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|NumericExpression}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|NumericExpression}}"
+    },
+    "ContainsSomeOf": {
+      "description": "contains at least one of the terms present in {{x|NumericExpression}}"
+    },
+    "OmitsSomeOf": {
+      "description": "omits at least one of the terms present in {{x|NumericExpression}}"
     }
   },
   "NumericInput": {

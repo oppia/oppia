@@ -32,6 +32,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding exploration.
     """
+
     topic_id = ndb.StringProperty(required=True, indexed=True)
     topic_name = ndb.StringProperty(required=True, indexed=True)
     story_id = ndb.StringProperty(required=True, indexed=True)
@@ -65,19 +66,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationOpportunitySummaryModel doesn't have any field with user
-        ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_all_translation_opportunities(
@@ -95,7 +89,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 are to be fetched.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(ExplorationOpportunitySummaryModel)|None. A list
@@ -134,7 +128,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 to be fetched.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(ExplorationOpportunitySummaryModel)|None. A list
@@ -182,6 +176,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     When a SkillModel's skill description changes, the corresponding instance
     of this model is also updated.
     """
+
     # The description of the opportunity's skill.
     skill_description = ndb.StringProperty(required=True, indexed=True)
     # The number of questions associated with this opportunity's skill.
@@ -205,17 +200,12 @@ class SkillOpportunityModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillOpportunityModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
@@ -229,7 +219,7 @@ class SkillOpportunityModel(base_models.BaseModel):
                 of the full list of entities.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(SkillOpportunityModel)|None. A list

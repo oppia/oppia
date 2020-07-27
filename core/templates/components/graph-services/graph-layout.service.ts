@@ -22,12 +22,47 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
+import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 
-export interface IGraphBoundaries {
+export interface GraphBoundaries {
   bottom: number;
   left: number;
   right: number;
   top: number;
+}
+
+interface NodePositionToId {
+  nodeId: string;
+  offset: number;
+}
+
+interface GraphAdjacencyLists {
+  [node: string]: string[];
+}
+
+interface AugmentedLink {
+  source: NodeData;
+  target: NodeData;
+  d?: string;
+}
+
+interface NodeData {
+  depth: number;
+  offset: number;
+  reachable: boolean;
+  y0: number;
+  x0: number;
+  yLabel: number;
+  xLabel: number;
+  height: number;
+  width: number;
+  id: string;
+  label: string;
+  reachableFromEnd: boolean;
+}
+
+interface NodeDataDict {
+  [nodeId: string]: NodeData;
 }
 
 @Injectable({
@@ -38,12 +73,10 @@ export class StateGraphLayoutService {
 
   // The last result of a call to computeLayout(). Used for determining the
   // order in which to specify states in rules.
-  lastComputedArrangement = null;
+  lastComputedArrangement: NodeDataDict = null;
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'nodes' is a complex dict whose exact type needs to be
-  // researched. Same goes for 'links' and the return type.
-  getGraphAsAdjacencyLists(nodes: any, links: any): any {
+  getGraphAsAdjacencyLists(
+      nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
     var adjacencyLists = {};
 
     for (var nodeId in nodes) {
@@ -59,10 +92,8 @@ export class StateGraphLayoutService {
     return adjacencyLists;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'adjacencyLists' is a complex dict whose exact type needs to
-  // be researched. Same goes for 'trunkNodeIds' and the return type.
-  getIndentationLevels(adjacencyLists: any, trunkNodeIds: any): any {
+  getIndentationLevels(
+      adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
     var indentationLevels = [];
 
     // Recursively find and indent the longest shortcut for the segment of
@@ -138,11 +169,9 @@ export class StateGraphLayoutService {
   //       END node.
   //   - id: a unique id for the node.
   //   - label: the full label of the node.
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'nodes' is a complex dict whose exact type needs to
-  // be researched. Same goes for the other parameters and the return type.
   computeLayout(
-      nodes: any, links: any, initNodeId: any, finalNodeIds: any): any {
+      nodes: GraphNodes, links: GraphLink[], initNodeId: string,
+      finalNodeIds: string[]): NodeDataDict {
     var adjacencyLists = this.getGraphAsAdjacencyLists(nodes, links);
 
     // Find a long path through the graph from the initial state to a
@@ -207,12 +236,21 @@ export class StateGraphLayoutService {
     var SENTINEL_DEPTH = -1;
     var SENTINEL_OFFSET = -1;
 
-    var nodeData = {};
+    var nodeData: NodeDataDict = {};
     for (var nodeId in nodes) {
       nodeData[nodeId] = {
         depth: SENTINEL_DEPTH,
         offset: SENTINEL_OFFSET,
-        reachable: false
+        reachable: false,
+        x0: null,
+        y0: null,
+        xLabel: null,
+        yLabel: null,
+        id: null,
+        label: null,
+        height: null,
+        width: null,
+        reachableFromEnd: false
       };
     }
 
@@ -298,7 +336,7 @@ export class StateGraphLayoutService {
 
     // Build the 'inverse index' -- for each row, store the (offset, nodeId)
     // pairs in ascending order of offset.
-    var nodePositionsToIds = [];
+    var nodePositionsToIds: NodePositionToId[][] = [];
     for (var i = 0; i <= maxDepth; i++) {
       nodePositionsToIds.push([]);
     }
@@ -311,9 +349,7 @@ export class StateGraphLayoutService {
       }
     }
     for (var i = 0; i <= maxDepth; i++) {
-      // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-      // 'any' because more information about the 'a' and 'b' needs to be found.
-      nodePositionsToIds[i].sort((a: any, b: any) => {
+      nodePositionsToIds[i].sort((a, b) => {
         return a.offset - b.offset;
       });
     }
@@ -453,17 +489,11 @@ export class StateGraphLayoutService {
     return nodeData;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a complex dict whose exact type needs to
-  // be researched.
-  getLastComputedArrangement(): any {
+  getLastComputedArrangement(): NodeDataDict {
     return cloneDeep(this.lastComputedArrangement);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'nodeData' is a complex dict whose exact type needs to
-  // be researched.
-  getGraphBoundaries(nodeData: any): IGraphBoundaries {
+  getGraphBoundaries(nodeData: NodeDataDict): GraphBoundaries {
     var INFINITY = 1e30;
     var BORDER_PADDING = 5;
 
@@ -493,12 +523,10 @@ export class StateGraphLayoutService {
     };
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'nodeData' is a complex dict whose exact type needs to
-  // be researched. Same goes for 'nodeLinks' and the return type.
-  getAugmentedLinks(nodeData: any, nodeLinks: any): any {
+  getAugmentedLinks(
+      nodeData: NodeDataDict, nodeLinks: GraphLink[]): AugmentedLink[] {
     var links = cloneDeep(nodeLinks);
-    var augmentedLinks = links.map((link: any) => {
+    var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
         source: cloneDeep(nodeData[link.source]),
         target: cloneDeep(nodeData[link.target])
@@ -561,11 +589,9 @@ export class StateGraphLayoutService {
     return augmentedLinks;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'nodeData' is a complex dict whose exact type needs to
-  // be researched. Same goes for the return type.
   modifyPositionValues(
-      nodeData: any, graphWidth: number, graphHeight: number): any {
+      nodeData: NodeDataDict, graphWidth: number,
+      graphHeight: number): NodeDataDict {
     var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
     var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
 
@@ -592,10 +618,7 @@ export class StateGraphLayoutService {
     return maxNodesPerRow * maxNodeLabelLength * letterWidthInPixels;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'nodeData' is a complex dict whose exact type needs to
-  // be researched.
-  getGraphHeight(nodeData: any): number {
+  getGraphHeight(nodeData: NodeDataDict): number {
     var maxDepth = 0;
     for (var nodeId in nodeData) {
       maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);

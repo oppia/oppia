@@ -22,6 +22,7 @@ import os
 from constants import constants
 from core.domain import config_services
 from core.domain import question_services
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
@@ -103,7 +104,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             if skill_dict['description'] == 'Description 3':
                 self.assertEqual(skill_dict['id'], self.linked_skill_id)
         self.assertEqual(
-            len(json_response['categorized_skills_dict']), 2)
+            len(json_response['categorized_skills_dict']), 1)
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
@@ -164,6 +165,56 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             '{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
 
         self.logout()
+
+
+class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
+
+    def test_get(self):
+        self.login(self.ADMIN_EMAIL)
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='Skill description')
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
+        self.assertEqual(len(json_response['topic_assignment_dicts']), 0)
+
+        topic_id_1 = topic_services.get_new_topic_id()
+        topic_id_2 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, name='Topic1',
+            description='Description1', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id],
+            subtopics=[], next_subtopic_id=1)
+        subtopic = topic_domain.Subtopic.from_dict({
+            'id': 1,
+            'title': 'subtopic1',
+            'skill_ids': [skill_id],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None
+        })
+        self.save_new_topic(
+            topic_id_2, self.admin_id, name='Topic2',
+            description='Description2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.UNASSIGN_SKILL_DATA_HANDLER_URL, skill_id))
+        topic_assignment_dicts = sorted(
+            json_response['topic_assignment_dicts'],
+            key=lambda i: i['topic_name'])
+
+        self.assertEqual(len(topic_assignment_dicts), 2)
+        self.assertEqual(topic_assignment_dicts[0]['topic_name'], 'Topic1')
+        self.assertEqual(topic_assignment_dicts[0]['topic_id'], topic_id_1)
+        self.assertIsNone(topic_assignment_dicts[0]['subtopic_id'])
+
+        self.assertEqual(topic_assignment_dicts[1]['topic_name'], 'Topic2')
+        self.assertEqual(topic_assignment_dicts[1]['topic_id'], topic_id_2)
+        self.assertEqual(topic_assignment_dicts[1]['subtopic_id'], 1)
 
 
 class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
@@ -447,7 +498,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -483,7 +534,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -502,7 +553,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         super(NewSkillHandlerTests, self).setUp()
         self.url = feconf.NEW_SKILL_URL
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             self.original_image_content = f.read()
 
@@ -533,7 +584,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
-            skill_services.get_skill_by_id(skill_id, strict=False))
+            skill_fetchers.get_skill_by_id(skill_id, strict=False))
         self.logout()
 
     def test_skill_creation_in_invalid_topic(self):
@@ -639,7 +690,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            mode='rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -651,7 +702,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         )
         skill_id = json_response['skillId']
         self.assertIsNotNone(
-            skill_services.get_skill_by_id(skill_id, strict=False))
+            skill_fetchers.get_skill_by_id(skill_id, strict=False))
         self.logout()
 
     def test_skill_creation_in_invalid_rubrics(self):
@@ -731,7 +782,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
-            skill_services.get_skill_by_id(skill_id, strict=False))
+            skill_fetchers.get_skill_by_id(skill_id, strict=False))
         topic = topic_fetchers.get_topic_by_id(self.topic_id)
         self.assertEqual(
             topic.uncategorized_skill_ids,

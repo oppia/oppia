@@ -145,6 +145,16 @@ angular.module('oppia').directive('rubricsEditor', [
               type: 'html',
               ui_config: {}
             };
+            ctrl.selectedRubricIndex = null;
+            ctrl.rubricsOptions = [
+              {id: 0, difficulty: 'Easy'},
+              {id: 1, difficulty: 'Medium'},
+              {id: 2, difficulty: 'Hard'}
+            ];
+          };
+
+          ctrl.onRubricSelectionChange = function() {
+            ctrl.rubric = ctrl.getRubrics()[ctrl.selectedRubricIndex];
           };
 
           // The section below is only called in the topics and skills

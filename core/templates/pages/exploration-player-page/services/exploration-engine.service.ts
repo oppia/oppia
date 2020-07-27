@@ -239,7 +239,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
       ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
         _explorationId).then(function(featuresData) {
         alwaysAskLearnersForAnswerDetails = (
-          featuresData.always_ask_learners_for_answer_details);
+          featuresData.alwaysAskLearnersForAnswerDetails);
       });
     };
 
@@ -356,7 +356,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
 
         // Use angular.copy() to clone the object
         // since classificationResult.outcome points
-        // at oldState.interaction.default_outcome
+        // at oldState.interaction.default_outcome.
         var outcome = angular.copy(classificationResult.outcome);
         var newStateName = outcome.dest;
 

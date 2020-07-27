@@ -21,24 +21,41 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { SolutionObjectFactory } from
+import { HintBackendDict, Hint, HintObjectFactory } from
+  'domain/exploration/HintObjectFactory';
+import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { SolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+import { InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { InteractionAnswer } from 'interactions/answer-defs';
+
+export interface InteractionBackendDict {
+  'default_outcome': OutcomeBackendDict;
+  'answer_groups': AnswerGroupBackendDict[];
+  'confirmed_unclassified_answers': InteractionAnswer[];
+  'customization_args': InteractionCustomizationArgs;
+  'hints': HintBackendDict[];
+  'id': string;
+  'solution': SolutionBackendDict;
+}
 
 export class Interaction {
-  answerGroups;
-  confirmedUnclassifiedAnswers;
-  customizationArgs;
-  defaultOutcome;
-  hints;
-  id;
-  solution;
+  answerGroups: AnswerGroup[];
+  confirmedUnclassifiedAnswers: InteractionAnswer[];
+  customizationArgs: InteractionCustomizationArgs;
+  defaultOutcome: Outcome;
+  hints: Hint[];
+  id: string;
+  solution: Solution;
   constructor(
-      answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-      defaultOutcome, hints, id, solution) {
+      answerGroups: AnswerGroup[],
+      confirmedUnclassifiedAnswers: InteractionAnswer[],
+      customizationArgs: InteractionCustomizationArgs,
+      defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -51,28 +68,28 @@ export class Interaction {
   setId(newValue: string): void {
     this.id = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setAnswerGroups(newValue: any): void {
+
+  setAnswerGroups(newValue: AnswerGroup[]): void {
     this.answerGroups = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setDefaultOutcome(newValue: any): void {
+
+  setDefaultOutcome(newValue: Outcome): void {
     this.defaultOutcome = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setCustomizationArgs(newValue: any): void {
+
+  setCustomizationArgs(newValue: InteractionCustomizationArgs): void {
     this.customizationArgs = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setSolution(newValue: any): void {
+
+  setSolution(newValue: Solution): void {
     this.solution = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  setHints(newValue: any): void {
+
+  setHints(newValue: Hint[]): void {
     this.hints = newValue;
   }
-  // TODO(#7165): Replace any with exact type.
-  copy(otherInteraction: any): void {
+
+  copy(otherInteraction: Interaction): void {
     this.answerGroups = cloneDeep(otherInteraction.answerGroups);
     this.confirmedUnclassifiedAnswers =
       cloneDeep(otherInteraction.confirmedUnclassifiedAnswers);
@@ -82,8 +99,8 @@ export class Interaction {
     this.id = cloneDeep(otherInteraction.id);
     this.solution = cloneDeep(otherInteraction.solution);
   }
-  // TODO(#7165): Replace any with exact type.
-  toBackendDict(): any {
+
+  toBackendDict(): InteractionBackendDict {
     return {
       answer_groups: this.answerGroups.map(function(answerGroup) {
         return answerGroup.toBackendDict();
@@ -110,11 +127,9 @@ export class InteractionObjectFactory {
     private hintFactory: HintObjectFactory,
     private solutionFactory: SolutionObjectFactory,
     private outcomeFactory: OutcomeObjectFactory) {}
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  // TODO(#7165): Replace any with exact type.
-  createFromBackendDict(interactionDict: any): Interaction {
-  /* eslint-enable dot-notation */
+
+  createFromBackendDict(
+      interactionDict: InteractionBackendDict): Interaction {
     var defaultOutcome;
     if (interactionDict.default_outcome) {
       defaultOutcome = this.outcomeFactory.createFromBackendDict(
@@ -132,22 +147,23 @@ export class InteractionObjectFactory {
       interactionDict.solution ? (
         this.generateSolutionFromBackend(interactionDict.solution)) : null);
   }
-  // TODO(#7165): Replace any with exact type.
-  generateAnswerGroupsFromBackend(answerGroupBackendDicts: any) {
+
+  generateAnswerGroupsFromBackend(
+      answerGroupBackendDicts: AnswerGroupBackendDict[]) {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
         answerGroupBackendDict);
     });
   }
-  // TODO(#7165): Replace any with exact type.
-  generateHintsFromBackend(hintBackendDicts: any) {
+
+  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]) {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
   }
-  // TODO(#7165): Replace any with exact type.
-  generateSolutionFromBackend(solutionBackendDict: any) {
+
+  generateSolutionFromBackend(solutionBackendDict: SolutionBackendDict) {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }
 }

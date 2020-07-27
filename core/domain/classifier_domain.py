@@ -498,7 +498,7 @@ class TrainingJobExplorationMapping(python_utils.OBJECT):
 
         Returns:
             A dict representation of TrainingJobExplorationMapping domain
-                object.
+            object.
         """
 
         return {

@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License
+// limitations under the License.
 
 /**
  * @fileoverview Translate service for i18n translations
@@ -19,7 +19,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { UtilsService } from './utils.service';
 
-import { ITranslationsDict, TranslationsBackendApiService } from
+import { TranslationsDict, TranslationsBackendApiService } from
   'services/translations-backend-api.service';
 
 /**
@@ -58,7 +58,7 @@ export interface LangChangeEvent {
 export class TranslateService {
   currentLang = 'en';
   fallbackLang = 'en';
-  translations: Array<ITranslationsDict> = [];
+  translations: Array<TranslationsDict> = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
 
   private onLangChangeEventEmitter = new EventEmitter<LangChangeEvent>();
@@ -73,10 +73,10 @@ export class TranslateService {
   /**
    * Function to fetch JSON file containing translations.
    * @param {string} languageCode - Code of the language
-   * @returns {Promise<ITranslationsDict>} - A promise that resolves to the
+   * @returns {Promise<TranslationsDict>} - A promise that resolves to the
    * translations
    */
-  fetchTranslations(languageCode: string): Promise<ITranslationsDict> {
+  fetchTranslations(languageCode: string): Promise<TranslationsDict> {
     return this.translationsBackendApiService.fetchTranslations(languageCode);
   }
 

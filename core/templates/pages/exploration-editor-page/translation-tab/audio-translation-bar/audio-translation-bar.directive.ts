@@ -112,7 +112,7 @@ angular.module('oppia').directive('audioTranslationBar', [
 
         $('.oppia-translation-tab').on('drop', function(evt) {
           evt.preventDefault();
-          if ((<Element><any>evt.target).classList.contains(
+          if ((<Element>evt.target).classList.contains(
             'oppia-drop-area-message') && scope.dropAreaIsAccessible) {
             var files = (<DragEvent>evt.originalEvent).dataTransfer.files;
             scope.openAddAudioTranslationModal(files);
@@ -428,7 +428,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             AudioPlayerService.stop();
             AudioPlayerService.clear();
             $scope.showRecorderWarning = false;
-            // re-initialize for unsaved recording
+            // Re-initialize for unsaved recording.
             $scope.unsavedAudioIsPlaying = false;
             $scope.waveSurfer = null;
             $scope.languageCode = TranslationLanguageService
@@ -536,7 +536,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                 return;
               }
               if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
-                // Used as shortcut key for recording
+                // Used as shortcut key for recording.
                 toggleStartAndStopRecording();
               }
             };

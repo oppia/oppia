@@ -22,11 +22,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { unit } from 'mathjs';
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-import { baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { NumberWithUnitsCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -35,15 +40,17 @@ export class NumberWithUnitsValidationService {
   constructor(
     private unitObjectFactory: NumberWithUnitsObjectFactory,
     private baseInteraction: baseInteractionValidationService) {}
-  // TODO(#7165): Replace 'any' with the exact type.
-  getCustomizationArgsWarnings(customizationArgs: any): any {
+
+  getCustomizationArgsWarnings(
+      customizationArgs: NumberWithUnitsCustomizationArgs): Warning[] {
     return [];
   }
-  // TODO(#7165): Replace 'any' with the exact type.
+
   getAllWarnings(
-      stateName: any,
-      customizationArgs: any, answerGroups: any, defaultOutcome: any): any {
-    var warningsList = [];
+      stateName: string,
+      customizationArgs: NumberWithUnitsCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));

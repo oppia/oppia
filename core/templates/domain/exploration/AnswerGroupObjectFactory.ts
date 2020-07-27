@@ -20,26 +20,26 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
-import { IOutcomeBackendDict, Outcome, OutcomeObjectFactory } from
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { IBackendRuleDict, Rule, RuleObjectFactory } from
+import { Rule, RuleBackendDict, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 
-export interface IAnswerGroupBackendDict {
-  'rule_specs': IBackendRuleDict[];
-  'outcome': IOutcomeBackendDict;
-  'training_data': Answer;
+export interface AnswerGroupBackendDict {
+  'rule_specs': RuleBackendDict[];
+  'outcome': OutcomeBackendDict;
+  'training_data': InteractionAnswer;
   'tagged_skill_misconception_id': string;
 }
 
 export class AnswerGroup {
   rules: Rule[];
   outcome: Outcome;
-  trainingData: Answer;
+  trainingData: InteractionAnswer;
   taggedSkillMisconceptionId: string;
   constructor(
-      rules: Rule[], outcome: Outcome, trainingData: Answer,
+      rules: Rule[], outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string) {
     this.rules = rules;
     this.outcome = outcome;
@@ -47,7 +47,7 @@ export class AnswerGroup {
     this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
   }
 
-  toBackendDict(): IAnswerGroupBackendDict {
+  toBackendDict(): AnswerGroupBackendDict {
     return {
       rule_specs: this.rules.map((rule: Rule) => {
         return rule.toBackendDict();
@@ -67,19 +67,19 @@ export class AnswerGroupObjectFactory {
     private outcomeObjectFactory: OutcomeObjectFactory,
     private ruleObjectFactory: RuleObjectFactory) {}
 
-  generateRulesFromBackend(ruleBackendDicts: IBackendRuleDict[]): Rule[] {
+  generateRulesFromBackend(ruleBackendDicts: RuleBackendDict[]): Rule[] {
     return ruleBackendDicts.map(this.ruleObjectFactory.createFromBackendDict);
   }
 
   createNew(
-      rules: Rule[], outcome: Outcome, trainingData: Answer,
+      rules: Rule[], outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string): AnswerGroup {
     return new AnswerGroup(
       rules, outcome, trainingData, taggedSkillMisconceptionId);
   }
 
   createFromBackendDict(
-      answerGroupBackendDict: IAnswerGroupBackendDict): AnswerGroup {
+      answerGroupBackendDict: AnswerGroupBackendDict): AnswerGroup {
     return new AnswerGroup(
       this.generateRulesFromBackend(answerGroupBackendDict.rule_specs),
       this.outcomeObjectFactory.createFromBackendDict(

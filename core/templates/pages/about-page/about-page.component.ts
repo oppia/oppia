@@ -24,8 +24,6 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 interface CreditNames {
   letter: String;
@@ -63,11 +61,8 @@ export class AboutPageComponent implements OnInit {
   ALLOWED_TABS = [
     this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
-    private translateService: TranslateService,
     private windowRef: WindowRef) {
-    translateService.use('en');
   }
 
   getCredits(startLetter: string): Array<string> {
@@ -88,11 +83,6 @@ export class AboutPageComponent implements OnInit {
 
   ngOnInit() {
     this.activeTabName = this.TAB_ID_ABOUT;
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code)
-    );
     this.allCredits = [];
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     for (const letter of letters) {

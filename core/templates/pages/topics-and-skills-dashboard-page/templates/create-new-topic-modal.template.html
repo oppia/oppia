@@ -1,7 +1,8 @@
-<div class="modal-header">
+<div class="modal-header create-new-topic-modal-header">
   <h3>
     New Topic
   </h3>
+  <i class="fa fa-times modal-close-button" ng-click="cancel()"></i>
 </div>
 <form ng-submit="save()">
   <div class="modal-body create-new-topic-form">
@@ -23,13 +24,14 @@
       </textarea>
       <div class="oppia-input-box-subtitle">
         <i>
-          Topic name should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+          Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
         </i>
       </div>
     </div>
     <div class="create-new-topic-input-field">
       <label class="create-new-topic-input-label">Topic Thumbnail</label>
-      <thumbnail-uploader aspect-ratio="'4:3'"
+      <thumbnail-uploader preview-title="newlyCreatedTopic.name"
+                          aspect-ratio="'4:3'"
                           disabled="false"
                           use-local-storage="true"
                           allowed-bg-colors="allowedBgColors"
@@ -55,5 +57,39 @@
   }
   .create-new-topic-form .create-new-topic-input-label {
     font-weight: bold;
+  }
+  .create-new-topic-modal-header .modal-close-button {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .create-new-topic .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-topic .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+    }
+    .create-new-topic .modal-header {
+      align-items: center;
+      background-color: #00609C;
+      display: flex;
+    }
+    .create-new-topic .modal-header h3 {
+      color: #FFFFFF;
+    }
+    .create-new-topic .create-new-topic-input-field {
+      margin: 25px 0;
+    }
+    .create-new-topic .modal-close-button {
+      color: #FFFFFF;
+      display: block;
+      font-size: 20px;
+    }
   }
 </style>

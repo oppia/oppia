@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ICollectionRightsBackendDict {
+export interface CollectionRightsBackendDict {
   'collection_id'?: number;
   'can_edit'?: boolean;
   'can_unpublish'?: boolean;
@@ -37,7 +37,7 @@ export class CollectionRights {
   _isPrivate: boolean;
   _ownerNames: string[];
 
-  constructor(collectionRightsObject: ICollectionRightsBackendDict) {
+  constructor(collectionRightsObject: CollectionRightsBackendDict) {
     this._collectionId = collectionRightsObject.collection_id;
     this._canEdit = collectionRightsObject.can_edit;
     this._canUnpublish = collectionRightsObject.can_unpublish;
@@ -108,7 +108,7 @@ export class CollectionRights {
   // collection rights. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this collection rights.
   // Note that the collection nodes within this collection will be completely
-  // redefined as copies from the specified collection rights
+  // redefined as copies from the specified collection rights.
   copyFromCollectionRights(otherCollectionRights: CollectionRights): void {
     this._collectionId = otherCollectionRights.getCollectionId();
     this._canEdit = otherCollectionRights.canEdit();
@@ -126,7 +126,7 @@ export class CollectionRightsObjectFactory {
   // contexts. This function takes a JSON object which represents a backend
   // collection python dict.
   create(
-      collectionRightsBackendObject: ICollectionRightsBackendDict):
+      collectionRightsBackendObject: CollectionRightsBackendDict):
       CollectionRights {
     return new CollectionRights(cloneDeep(collectionRightsBackendObject));
   }

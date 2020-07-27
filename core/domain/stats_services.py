@@ -299,7 +299,7 @@ def _handle_exp_issues_after_state_rename(
 
     old_state_name = state_name
     new_state_name = old_to_new_state_names[old_state_name]
-    if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+    if stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
             exp_issue.issue_type] == 'state_names':
         state_names = exp_issue.issue_customization_args['state_names'][
             'value']
@@ -350,7 +350,8 @@ def update_exp_issues_for_new_exp_version(
     playthrough_ids_by_state_name = collections.defaultdict(list)
 
     for i_idx, exp_issue in enumerate(exp_issues.unresolved_issues):
-        keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
+        keyname = stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+            exp_issue.issue_type]
         if keyname == 'state_names':
             state_names = exp_issue.issue_customization_args[keyname]['value']
             for state_name in state_names:
@@ -394,7 +395,7 @@ def update_exp_issues_for_new_exp_version(
 
         playthroughs = get_playthroughs_multi(playthrough_ids)
         for p_idx, playthrough in enumerate(playthroughs):
-            if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+            if stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
                     playthrough.issue_type] == 'state_names':
                 state_names = playthrough.issue_customization_args[
                     'state_names']['value']
@@ -431,7 +432,7 @@ def get_exp_issues(exp_id, exp_version):
 
     Returns:
         ExplorationIssues|None: The domain object for exploration issues or
-            None if the exp_id is invalid.
+        None if the exp_id is invalid.
     """
     exp_issues = None
     exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
@@ -449,7 +450,7 @@ def get_playthrough_by_id(playthrough_id):
 
     Returns:
         Playthrough|None: The domain object for the playthrough or None if the
-            playthrough_id is invalid.
+        playthrough_id is invalid.
     """
     playthrough = None
     playthrough_model = stats_models.PlaythroughModel.get(
@@ -528,7 +529,7 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
 
     Returns:
         list(ExplorationStats|None). List of ExplorationStats domain class
-            instances.
+        instances.
     """
     exploration_stats = []
     exploration_stats_models = (
@@ -994,7 +995,7 @@ def get_top_state_answer_stats_multi(exploration_id, state_names):
 
     Returns:
         dict(str: list(*)). Dict mapping each state name to the list of its top
-            (at most) 10 answers, sorted by decreasing frequency.
+        (at most) 10 answers, sorted by decreasing frequency.
     """
     return {
         state_name: get_top_state_answer_stats(exploration_id, state_name)
@@ -1016,7 +1017,7 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
 
     Returns:
         StateAnswersCalcOutput|None. The state answers calculation output
-            domain object or None.
+        domain object or None.
     """
     calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
         exploration_id, VERSION_ALL, state_name, calculation_id)
@@ -1084,8 +1085,8 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
             answer details model loaded from the datastore.
 
     Returns:
-        LearnerAnswerDetails. A LearnerAnswerDetails domain object
-            corresponding to the given model.
+        LearnerAnswerDetails|None. A LearnerAnswerDetails domain object
+        corresponding to the given model.
     """
     return stats_domain.LearnerAnswerDetails(
         learner_answer_details_model.state_reference,
@@ -1114,7 +1115,7 @@ def get_learner_answer_details(entity_type, state_reference):
 
     Returns:
         LearnerAnswerDetails. The learner answer domain object
-            or None if the model does not exist.
+        or None if the model does not exist.
     """
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(

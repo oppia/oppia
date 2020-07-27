@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IJobStatusSummaryBackendDict {
+export interface JobStatusSummaryBackendDict {
   'job_type': string;
   'is_queued_or_running': boolean;
 }
@@ -37,14 +37,14 @@ export class JobStatusSummary {
 @Injectable({
   providedIn: 'root'
 })
-export class JobStausSummaryObjectFactory {
+export class JobStatusSummaryObjectFactory {
   createFromBackendDict(
-      backendDict: IJobStatusSummaryBackendDict): JobStatusSummary {
+      backendDict: JobStatusSummaryBackendDict): JobStatusSummary {
     return new JobStatusSummary(
       backendDict.job_type, backendDict.is_queued_or_running);
   }
 }
 
 angular.module('oppia').factory(
-  'JobStausSummaryObjectFactory',
-  downgradeInjectable(JobStausSummaryObjectFactory));
+  'JobStatusSummaryObjectFactory',
+  downgradeInjectable(JobStatusSummaryObjectFactory));

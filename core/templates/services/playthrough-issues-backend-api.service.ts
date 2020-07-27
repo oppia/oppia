@@ -17,11 +17,11 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import {
-  IPlaythroughIssueBackendDict,
+  PlaythroughIssueBackendDict,
   PlaythroughIssue,
   PlaythroughIssueObjectFactory
 } from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
@@ -44,7 +44,7 @@ export class PlaythroughIssuesBackendApiService {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     }
-    return this.httpClient.get<IPlaythroughIssueBackendDict[]>(
+    return this.httpClient.get<PlaythroughIssueBackendDict[]>(
       this.getFetchIssuesUrl(explorationId), {
         params: { exp_version: explorationVersion.toString() }}).toPromise()
       .then(response => {
@@ -56,7 +56,7 @@ export class PlaythroughIssuesBackendApiService {
   fetchPlaythrough(
       explorationId: string,
       playthroughId: string): Promise<PlaythroughIssue> {
-    return this.httpClient.get<IPlaythroughIssueBackendDict>(
+    return this.httpClient.get<PlaythroughIssueBackendDict>(
       this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
       .then(response => {
         return this.playthroughIssueObjectFactory.createFromBackendDict(

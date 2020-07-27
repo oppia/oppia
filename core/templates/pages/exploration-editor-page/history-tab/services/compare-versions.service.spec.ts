@@ -34,7 +34,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { IExplorationSnapshot, VersionTreeService } from
+import { ExplorationSnapshot, VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -129,7 +129,7 @@ describe('Compare versions service', function() {
     //  - ruleDests: a list of strings which are state names of destinations of
     //    links
     // Only information accessed by getDiffGraphData is included in the return
-    // value
+    // value.
     var _getStatesData = function(statesDetails) {
       var statesData = {};
       for (var stateName in statesDetails) {
@@ -189,7 +189,7 @@ describe('Compare versions service', function() {
       };
     };
 
-    const testSnapshots1: IExplorationSnapshot[] = [{
+    const testSnapshots1: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',
@@ -350,7 +350,7 @@ describe('Compare versions service', function() {
     }];
 
     // Information for mock state data for getDiffGraphData() to be passed to
-    // _getStatesData
+    // _getStatesData.
     var testExplorationData1 = [{
       A: {
         contentStr: '',
@@ -470,7 +470,7 @@ describe('Compare versions service', function() {
       }
     }];
 
-    // Tests for getDiffGraphData on linear commits
+    // Tests for getDiffGraphData on linear commits.
     it('should detect changed, renamed and added states', function() {
       $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
         .respond(_getStatesData(testExplorationData1[0]));
@@ -698,7 +698,7 @@ describe('Compare versions service', function() {
       }
     );
 
-    var testSnapshots2: IExplorationSnapshot[] = [{
+    var testSnapshots2: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',
@@ -788,7 +788,7 @@ describe('Compare versions service', function() {
     }];
 
     // Information for mock state data for getDiffGraphData() to be passed to
-    // _getStatesData
+    // _getStatesData.
     var testExplorationData2 = [{
       A: {
         contentStr: '',
@@ -863,7 +863,7 @@ describe('Compare versions service', function() {
       }
     }];
 
-    // Tests for getDiffGraphData with reversions
+    // Tests for getDiffGraphData with reversions.
     it('should mark states correctly when there is 1 reversion', function() {
       $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
         .respond(_getStatesData(testExplorationData2[0]));
@@ -967,8 +967,8 @@ describe('Compare versions service', function() {
     });
 
     // Represents snapshots and exploration data for tests for links
-    // Only includes information accessed by getDiffGraphData()
-    var testSnapshots3: IExplorationSnapshot[] = [{
+    // Only includes information accessed by getDiffGraphData().
+    var testSnapshots3: ExplorationSnapshot[] = [{
       commit_type: 'create',
       version_number: 1,
       committer_id: 'admin',

@@ -20,37 +20,26 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { IFractionDict } from
-  'domain/objects/FractionObjectFactory.ts';
-/* eslint-disable max-len */
-import { INote } from 'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { IGraphBackendDict } from 'extensions/interactions/GraphInput/directives/graph-detail.service';
-/* eslint-enable max-len */
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
-export interface IBackendRuleDict {
-  'inputs': IRuleInputs;
+export interface RuleBackendDict {
+  'inputs': RuleInputs;
   'rule_type': string;
 }
 
-export type IRuleInput = (string | number | IFractionDict |
-  INumberWithUnitsBackendDict | string[] | INote[] |
-  number[] | IGraphBackendDict| string[][]);
-
-export interface IRuleInputs {
-  [propName: string]: IRuleInput;
+export interface RuleInputs {
+  [propName: string]: InteractionRuleInputs;
 }
 
 export class Rule {
   type: string;
-  inputs: IRuleInputs;
+  inputs: RuleInputs;
 
-  constructor(type: string, inputs: IRuleInputs) {
+  constructor(type: string, inputs: RuleInputs) {
     this.type = type;
     this.inputs = inputs;
   }
-  toBackendDict(): IBackendRuleDict {
+  toBackendDict(): RuleBackendDict {
     return {
       rule_type: this.type,
       inputs: this.inputs
@@ -62,11 +51,11 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  createNew(type: string, inputs: IRuleInputs): Rule {
+  createNew(type: string, inputs: RuleInputs): Rule {
     return new Rule(type, inputs);
   }
 
-  createFromBackendDict(ruleDict: IBackendRuleDict): Rule {
+  createFromBackendDict(ruleDict: RuleBackendDict): Rule {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   }
 }

@@ -28,6 +28,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
     """The domain object for the translation and voiceover opportunities summary
     available in an exploration.
     """
+
     def __init__(
             self, exp_id, topic_id, topic_name, story_id, story_title,
             chapter_title, content_count, incomplete_translation_language_codes,
@@ -80,7 +81,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
 
         Returns:
             ExplorationOpportunitySummary. The corresponding
-                ExplorationOpportunitySummary domain object.
+            ExplorationOpportunitySummary domain object.
         """
         return cls(
             exploration_opportunity_summary_dict['id'],
@@ -243,12 +244,11 @@ class SkillOpportunity(python_utils.OBJECT):
         """Return a SkillOpportunity domain object from a dict.
 
         Args:
-            skill_opportunity_dict: dict. The dict representation
-                of a SkillOpportunity object.
+            skill_opportunity_dict: dict. The dict representation of a
+                SkillOpportunity object.
 
         Returns:
-            SkillOpportunity. The corresponding
-                SkillOpportunity domain object.
+            SkillOpportunity. The corresponding SkillOpportunity domain object.
         """
         return cls(
             skill_opportunity_dict['id'],
@@ -260,9 +260,8 @@ class SkillOpportunity(python_utils.OBJECT):
         necessary information to represent an opportunity.
 
         Returns:
-            dict. A dict mapping the fields of SkillOpportunity
-            instance which are required to represent the opportunity to a
-            contributor.
+            dict. A dict mapping the fields of SkillOpportunity instance which
+            are required to represent the opportunity to a contributor.
         """
         return {
             'id': self.id,

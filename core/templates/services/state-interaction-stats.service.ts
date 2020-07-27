@@ -19,12 +19,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Answer } from 'domain/exploration/AnswerStatsObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { ContextService } from 'services/context.service';
-import { IFractionDict, FractionObjectFactory } from
+import { FractionObjectFactory } from
   'domain/objects/FractionObjectFactory';
+import { InteractionAnswer, FractionAnswer, MultipleChoiceAnswer } from
+  'interactions/answer-defs';
+import { MultipleChoiceInputCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { State } from 'domain/state/StateObjectFactory';
@@ -33,35 +35,34 @@ import { StateInteractionStatsBackendApiService } from
 
 type Option = string | string[];
 
-interface IAnswerData {
-  answer: Answer;
+interface AnswerData {
+  answer: InteractionAnswer;
   frequency: number;
   isAddressed: boolean;
 }
 
-interface IVisualizationInfo {
+interface VisualizationInfo {
   addressedInfoIsSupported: boolean;
-  data: IAnswerData[];
+  data: AnswerData[];
   id: string;
   options: {
     [option: string]: Option;
   };
 }
 
-export interface IStateRulesStats {
+export interface StateInteractionStats {
   explorationId: string;
   stateName: string;
-  visualizationsInfo: IVisualizationInfo[];
+  visualizationsInfo: VisualizationInfo[];
 }
 
 @Injectable({providedIn: 'root'})
 export class StateInteractionStatsService {
   // NOTE TO DEVELOPERS: Fulfilled promises can be reused indefinitely.
-  statsCache: Map<string, Promise<IStateRulesStats>> = new Map();
+  statsCache: Map<string, Promise<StateInteractionStats>> = new Map();
 
   constructor(
       private answerClassificationService: AnswerClassificationService,
-      private contextService: ContextService,
       private fractionObjectFactory: FractionObjectFactory,
       private interactionRulesRegistryService: InteractionRulesRegistryService,
       private stateInteractionStatsBackendApiService:
@@ -76,10 +77,16 @@ export class StateInteractionStatsService {
   }
 
   // Converts answer to a more-readable representation based on its type.
-  private getReadableAnswerString(state: State, answer: Answer): Answer {
+  private getReadableAnswerString(
+      state: State, answer: InteractionAnswer): InteractionAnswer {
     if (state.interaction.id === 'FractionInput') {
-      return (
-        this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString());
+      return this.fractionObjectFactory.fromDict(
+        <FractionAnswer> answer).toString();
+    } else if (state.interaction.id === 'MultipleChoiceInput') {
+      const customizationArgs = (
+        <MultipleChoiceInputCustomizationArgs>
+        state.interaction.customizationArgs);
+      return customizationArgs.choices.value[<MultipleChoiceAnswer> answer];
     }
     return answer;
   }
@@ -88,22 +95,21 @@ export class StateInteractionStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStats(state: State): Promise<IStateRulesStats> {
+  computeStats(expId: string, state: State): Promise<StateInteractionStats> {
     if (this.statsCache.has(state.name)) {
       return this.statsCache.get(state.name);
     }
-    const explorationId = this.contextService.getExplorationId();
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
 
     const statsPromise = this.stateInteractionStatsBackendApiService.getStats(
-      explorationId, state.name).then(vizInfo => <IStateRulesStats> {
-        explorationId: explorationId,
+      expId, state.name).then(vizInfo => <StateInteractionStats> {
+        explorationId: expId,
         stateName: state.name,
-        visualizationsInfo: vizInfo.map(info => <IVisualizationInfo> ({
+        visualizationsInfo: vizInfo.map(info => <VisualizationInfo> ({
           addressedInfoIsSupported: info.addressedInfoIsSupported,
-          data: info.data.map(datum => <IAnswerData>{
+          data: info.data.map(datum => <AnswerData>{
             answer: this.getReadableAnswerString(state, datum.answer),
             frequency: datum.frequency,
             isAddressed: (

@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IImageClickInputCustomizationArgs } from
+import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
 /* eslint-disable max-len*/
 import { ImageClickInputValidationService } from
@@ -40,7 +40,7 @@ describe('ImageClickInputValidationService', () => {
   let currentState: string;
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
-  var customizationArguments: IImageClickInputCustomizationArgs;
+  var customizationArguments: ImageClickInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
 
@@ -85,9 +85,15 @@ describe('ImageClickInputValidationService', () => {
         value: {
           imagePath: '/path/to/image',
           labeledRegions: [{
-            label: 'FirstLabel'
+            label: 'FirstLabel',
+            region: {
+              area: [[0]]
+            }
           }, {
-            label: 'SecondLabel'
+            label: 'SecondLabel',
+            region: {
+              area: [[0]]
+            }
           }]
         }
       }

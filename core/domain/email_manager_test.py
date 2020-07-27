@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import logging
 import types
 
 from constants import constants
@@ -36,7 +37,7 @@ import python_utils
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
 
-class FailedMLTest(test_utils.GenericTestBase):
+class FailedMLTest(test_utils.EmailTestBase):
     """Test that email functionality for sending failed ML Job emails
     works.
     """
@@ -57,29 +58,29 @@ class FailedMLTest(test_utils.GenericTestBase):
     def test_send_failed_ml_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
-            messages = self.mail_stub.get_sent_messages(
-                to='moderator@example.com')
+            messages = self._get_sent_email_messages(
+                'moderator@example.com')
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
             email_manager.send_job_failure_email('123ABC')
 
             # Make sure emails are sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_subject = 'Failed ML Job'
             self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].subject.decode(), expected_subject)
-            messages = self.mail_stub.get_sent_messages(
-                to='moderator@example.com')
+            self.assertEqual(messages[0].subject, expected_subject)
+            messages = self._get_sent_email_messages(
+                'moderator@example.com')
             self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].subject.decode(), expected_subject)
+            self.assertEqual(messages[0].subject, expected_subject)
 
 
-class EmailToAdminTest(test_utils.GenericTestBase):
+class EmailToAdminTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the admin."""
 
     def test_email_to_admin_is_sent_correctly(self):
@@ -97,25 +98,25 @@ class EmailToAdminTest(test_utils.GenericTestBase):
 
         with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
 
-            # Send an email to the admin.
+            # Send an email to admin.
             email_manager.send_mail_to_admin('Dummy Subject', 'Dummy Body')
 
             # Make sure emails are sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
-            self.assertEqual(messages[0].to, 'admin@system.com')
-            self.assertEqual(messages[0].subject.decode(), 'Dummy Subject')
-            self.assertIn('Dummy Body', messages[0].html.decode())
+            self.assertEqual(messages[0].to, ['admin@system.com'])
+            self.assertEqual(messages[0].subject, 'Dummy Subject')
+            self.assertIn('Dummy Body', messages[0].html)
 
 
-class DummyMailTest(test_utils.GenericTestBase):
+class DummyMailTest(test_utils.EmailTestBase):
     """Test that emails are correctly sent to the testing email id."""
 
     def test_sending_emails(self):
@@ -133,20 +134,20 @@ class DummyMailTest(test_utils.GenericTestBase):
 
         with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=dummy_receiver_address)
+            messages = self._get_sent_email_messages(
+                dummy_receiver_address)
             self.assertEqual(len(messages), 0)
 
             # Send an email.
             email_manager.send_dummy_mail_to_admin(dummy_system_name)
 
             # Make sure emails are sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=dummy_receiver_address)
+            messages = self._get_sent_email_messages(
+                dummy_receiver_address)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
-            self.assertEqual(messages[0].to, dummy_receiver_address)
+            self.assertEqual(messages[0].to, [dummy_receiver_address])
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
             self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
@@ -212,7 +213,7 @@ class EmailRightsTest(test_utils.GenericTestBase):
                 'invalid_intent', self.admin_id)
 
 
-class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
+class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     """Tests that sending exploration membership email works as expected."""
 
     EXPLORATION_TITLE = 'Title'
@@ -253,7 +254,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                     'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token=csrf_token)
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
     def test_email_is_not_sent_if_recipient_has_declined_such_emails(self):
@@ -265,7 +267,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
@@ -273,15 +276,18 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_editor_role_emails_is_false(self):
         with self.can_send_emails_ctx, self.can_not_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
-                self.exploration.id, self.exploration.title)
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+                self.editor_id, self.new_user_id,
+                rights_manager.ROLE_EDITOR, self.exploration.id,
+                self.exploration.title)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 0)
 
     def test_role_emails_sent_are_correct(self):
@@ -290,7 +296,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -368,7 +375,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             self.assertEqual(
@@ -427,7 +435,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             self.assertEqual(
@@ -487,7 +496,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 rights_manager.ROLE_VOICE_ARTIST, self.exploration.id,
                 self.exploration.title)
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             self.assertEqual(
@@ -544,7 +554,8 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
 
             self.assertEqual(
@@ -564,7 +575,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                     self.exploration.id, self.exploration.title)
 
 
-class SignupEmailTests(test_utils.GenericTestBase):
+class SignupEmailTests(test_utils.EmailTestBase):
     """Test that signup-email sending functionality works as expected."""
 
     def setUp(self):
@@ -621,7 +632,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that no email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_email_not_sent_if_content_config_is_not_modified(self):
@@ -660,7 +672,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 'emails to be sent.')
 
             # Check that no email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_email_not_sent_if_content_config_is_partially_modified(self):
@@ -707,7 +720,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 'emails to be sent.')
 
             # Check that no email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_email_with_bad_content_is_not_sent(self):
@@ -749,7 +763,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 'Original email HTML body does not match cleaned HTML body'))
 
             # Check that no email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
     def test_contents_of_signup_email_are_correct(self):
@@ -774,13 +789,14 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             self.assertEqual(
                 messages[0].sender,
                 'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertEqual(messages[0].subject, 'Welcome!')
             self.assertEqual(
                 messages[0].body.decode(), self.expected_text_email_content)
@@ -806,7 +822,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that an email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Send a second POST request.
@@ -817,7 +834,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that no new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
     def test_email_only_sent_if_signup_was_successful(self):
@@ -841,7 +859,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token, expected_status_int=400)
 
             # Check that no email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(0, len(messages))
 
             # Redo the signup process with a good username.
@@ -852,7 +871,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
     def test_record_of_sent_email_is_written_to_datastore(self):
@@ -880,7 +900,8 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -909,7 +930,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
                 sent_email_model.html_body, self.expected_html_email_content)
 
 
-class DuplicateEmailTests(test_utils.GenericTestBase):
+class DuplicateEmailTests(test_utils.EmailTestBase):
     """Test that duplicate emails are not sent."""
 
     def setUp(self):
@@ -989,7 +1010,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(0, len(messages))
 
             # Check that the content of this email was not recorded in
@@ -1022,14 +1044,14 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            # pylint: disable=protected-access
-            email_manager._send_email(
+            email_manager._send_email(  # pylint: disable=protected-access
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1040,18 +1062,18 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             # No error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 0)
 
-            email_manager._send_email(
+            email_manager._send_email(  # pylint: disable=protected-access
                 self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
-            # pylint: enable=protected-access
 
             # An error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
             self.assertRegexpMatches(logged_errors[0], 'Duplicate email')
 
             # Check that a new email was not sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was not recorded in
@@ -1086,7 +1108,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1135,7 +1158,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1184,7 +1208,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1248,7 +1273,8 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 self.new_user_id, test_for_duplicate_email=True)
 
             # Check that a new email was sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Check that the content of this email was recorded in
@@ -1267,7 +1293,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 sent_email_model1.email_hash, sent_email_model3.email_hash)
 
 
-class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
+class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     def setUp(self):
         super(FeedbackMessageBatchEmailTests, self).setUp()
@@ -1301,7 +1327,8 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
@@ -1315,7 +1342,8 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_feedback_messages_are_empty(self):
@@ -1325,7 +1353,8 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 self.editor_id, feedback_messages)
 
         # Check that email is not sent.
-        messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_correct_email_body_is_sent(self):
@@ -1379,7 +1408,8 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 self.editor_id, feedback_messages)
 
             # Check that email body is correct.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1409,7 +1439,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
                 sent_email_model.subject, self.expected_email_subject)
 
 
-class SuggestionEmailTests(test_utils.GenericTestBase):
+class SuggestionEmailTests(test_utils.EmailTestBase):
     def setUp(self):
         super(SuggestionEmailTests, self).setUp()
 
@@ -1439,7 +1469,8 @@ class SuggestionEmailTests(test_utils.GenericTestBase):
                 self.recipient_list)
 
         # Check that email is not sent.
-        messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
@@ -1449,7 +1480,8 @@ class SuggestionEmailTests(test_utils.GenericTestBase):
                 self.recipient_list)
 
         # Check that email is not sent.
-        messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.EDITOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_suggestion_emails_are_correct(self):
@@ -1489,7 +1521,8 @@ class SuggestionEmailTests(test_utils.GenericTestBase):
                 self.recipient_list)
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1517,7 +1550,7 @@ class SuggestionEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION)
 
 
-class SubscriptionEmailTests(test_utils.GenericTestBase):
+class SubscriptionEmailTests(test_utils.EmailTestBase):
     def setUp(self):
         super(SubscriptionEmailTests, self).setUp()
 
@@ -1546,7 +1579,8 @@ class SubscriptionEmailTests(test_utils.GenericTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-        messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_email_not_sent_if_can_send_subscription_emails_is_false(self):
@@ -1554,7 +1588,8 @@ class SubscriptionEmailTests(test_utils.GenericTestBase):
             email_manager.send_emails_to_subscribers(
                 self.editor_id, self.exploration.id, self.exploration.title)
 
-        messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_subscription_emails_are_correct(self):
@@ -1592,7 +1627,8 @@ class SubscriptionEmailTests(test_utils.GenericTestBase):
                 self.editor_id, self.exploration.id, self.exploration.title)
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1620,7 +1656,7 @@ class SubscriptionEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION)
 
 
-class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
+class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
     def setUp(self):
         super(FeedbackMessageInstantEmailTests, self).setUp()
 
@@ -1651,7 +1687,8 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
                 self.exploration.id, 'a subject')
 
         # Make sure correct email is sent.
-        messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_email_not_sent_if_can_send_feedback_message_emails_is_false(self):
@@ -1662,7 +1699,8 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
                 self.exploration.id, 'a subject')
 
         # Make sure correct email is sent.
-        messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.NEW_USER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_feedback_message_emails_are_correct(self):
@@ -1701,7 +1739,8 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
                 self.exploration.id, 'a subject')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1729,7 +1768,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION)
 
 
-class FlagExplorationEmailTest(test_utils.GenericTestBase):
+class FlagExplorationEmailTest(test_utils.EmailTestBase):
     """Test that emails are sent to moderators when explorations are flagged."""
 
     def setUp(self):
@@ -1770,7 +1809,8 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 self.report_text)
 
         # Make sure correct email is sent.
-        messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.MODERATOR_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_flag_exploration_emails_are_correct(self):
@@ -1809,7 +1849,8 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 self.report_text)
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1819,8 +1860,8 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 expected_email_text_body)
 
             # Make sure correct email is sent to multiple moderators.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.moderator2_email)
+            messages = self._get_sent_email_messages(
+                self.moderator2_email)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1861,8 +1902,9 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
 
 
-class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
+class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
     """Test that correct email is sent while onboarding reviewers."""
+
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
@@ -1882,7 +1924,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
                 self.reviewer_id, 'Algebra')
 
         # Make sure correct email is sent.
-        messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
@@ -1914,7 +1957,8 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
                 self.reviewer_id, 'Algebra')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -1938,8 +1982,9 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
 
 
-class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
+class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
     """Test that correct email is sent while notifying reviewers."""
+
     REVIEWER_USERNAME = 'reviewer'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
@@ -1958,7 +2003,8 @@ class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
             email_manager.send_mail_to_notify_users_to_review(
                 self.reviewer_id, 'Algebra')
 
-        messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_completion_email_is_sent(self):
@@ -1982,7 +2028,8 @@ class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
                 self.reviewer_id, 'Algebra')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2006,10 +2053,11 @@ class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS)
 
 
-class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
+class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
     """Test that email is send to submitter when query has completed
     or failed.
     """
+
     SUBMITTER_USERNAME = 'submit'
     SUBMITTER_EMAIL = 'submit@example.com'
     SENDER_USERNAME = 'sender'
@@ -2069,7 +2117,8 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
                 self.submitter_id, query_id)
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2140,7 +2189,8 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
                 self.submitter_id, query_id, query_params)
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.SUBMITTER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2166,8 +2216,8 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION)
 
             # Make sure that correct email is sent to admin.
-            admin_messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            admin_messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(admin_messages), 1)
             self.assertEqual(
                 admin_messages[0].body.decode(), expected_admin_email_text_body)
@@ -2182,12 +2232,12 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
                 email_subject,
                 email_body,
                 email_intent)
-            messages_a = self.mail_stub.get_sent_messages(
-                to=self.RECIPIENT_A_EMAIL)
+            messages_a = self._get_sent_email_messages(
+                self.RECIPIENT_A_EMAIL)
             self.assertEqual(len(messages_a), 1)
 
-            messages_b = self.mail_stub.get_sent_messages(
-                to=self.RECIPIENT_B_EMAIL)
+            messages_b = self._get_sent_email_messages(
+                self.RECIPIENT_B_EMAIL)
             self.assertEqual(len(messages_b), 1)
 
             # Make sure correct email model is stored.
@@ -2208,8 +2258,9 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
                 email_intent)
 
 
-class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
+class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to voiceover application emails."""
+
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
@@ -2228,7 +2279,8 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
             email_manager.send_accepted_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en')
 
-        messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_accepted_voiceover_application_email_is_sent(self):
@@ -2256,7 +2308,8 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
                 self.applicant_id, 'Lesson to voiceover', 'en')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2300,7 +2353,8 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
                 'A rejection message!')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2323,9 +2377,29 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
+    def test_can_send_emails_is_false_logs_error(self):
+        """When feconf.CAN_SEND_EMAILS is false,
+        send_rejected_voiceover_application_email(*args) should log an error.
+        """
+        observed_log_messages = []
 
-class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            email_manager.send_rejected_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en',
+                'A rejection message!')
+
+            expected_log_message = 'This app cannot send emails to users.'
+            self.assertEqual(
+                observed_log_messages, [expected_log_message])
+
+
+class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     """Unit test related to account deletion application emails."""
+
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
@@ -2342,7 +2416,8 @@ class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
             email_manager.send_account_deleted_email(
                 self.applicant_id, self.APPLICANT_EMAIL)
 
-        messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.APPLICANT_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_that_correct_account_deleted_email_is_sent(self):
@@ -2360,7 +2435,8 @@ class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
                 self.applicant_id, self.APPLICANT_EMAIL)
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.APPLICANT_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2383,7 +2459,7 @@ class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
                 sent_email_model.intent, feconf.EMAIL_INTENT_ACCOUNT_DELETED)
 
 
-class BulkEmailsTests(test_utils.GenericTestBase):
+class BulkEmailsTests(test_utils.EmailTestBase):
     SENDER_EMAIL = 'sender@example.com'
     SENDER_USERNAME = 'sender'
     FAKE_SENDER_EMAIL = 'fake@example.com'
@@ -2424,14 +2500,16 @@ class BulkEmailsTests(test_utils.GenericTestBase):
                 self.sender_id, self.recipient_ids, email_subject,
                 email_html_body, feconf.BULK_EMAIL_INTENT_MARKETING)
 
-        messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
+        messages_a = self._get_sent_email_messages(
+            self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 1)
         self.assertEqual(
             messages_a[0].html.decode(), email_html_body)
         self.assertEqual(
             messages_a[0].body.decode(), email_text_body)
 
-        messages_b = self.mail_stub.get_sent_messages(to=self.RECIPIENT_B_EMAIL)
+        messages_b = self._get_sent_email_messages(
+            self.RECIPIENT_B_EMAIL)
         self.assertEqual(len(messages_b), 1)
         self.assertEqual(
             messages_b[0].html.decode(), email_html_body)
@@ -2468,25 +2546,28 @@ class BulkEmailsTests(test_utils.GenericTestBase):
                 feconf.BULK_EMAIL_INTENT_MARKETING)
 
         # Check that no email was sent.
-        messages_a = self.mail_stub.get_sent_messages(
-            to=self.RECIPIENT_A_EMAIL)
+        messages_a = self._get_sent_email_messages(
+            self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 0)
 
-        messages_b = self.mail_stub.get_sent_messages(
-            to=self.RECIPIENT_B_EMAIL)
+        messages_b = self._get_sent_email_messages(
+            self.RECIPIENT_B_EMAIL)
         self.assertEqual(len(messages_b), 0)
 
     def test_that_exception_is_raised_for_unauthorised_sender(self):
-        with self.can_send_emails_ctx, self.assertRaisesRegexp(
-            Exception, 'Invalid sender_id for email'):
+        with self.can_send_emails_ctx, (
+            self.assertRaisesRegexp(
+                Exception, 'Invalid sender_id for email')):
             email_manager.send_user_query_email(
                 self.fake_sender_id, self.recipient_ids, 'email_subject',
                 'email_html_body', feconf.BULK_EMAIL_INTENT_MARKETING)
 
-        messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
+        messages_a = self._get_sent_email_messages(
+            self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 0)
 
-        messages_b = self.mail_stub.get_sent_messages(to=self.RECIPIENT_B_EMAIL)
+        messages_b = self._get_sent_email_messages(
+            self.RECIPIENT_B_EMAIL)
         self.assertEqual(len(messages_b), 0)
 
         all_models = email_models.BulkEmailModel.get_all().fetch()
@@ -2499,11 +2580,12 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             email_manager.send_test_email_for_bulk_emails(
                 self.sender_id, email_subject, email_body
             )
-        messages = self.mail_stub.get_sent_messages(to=self.SENDER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.SENDER_EMAIL)
         self.assertEqual(len(messages), 1)
 
 
-class EmailPreferencesTests(test_utils.GenericTestBase):
+class EmailPreferencesTests(test_utils.EmailTestBase):
 
     def test_can_users_receive_thread_email(self):
         gae_ids = ('someUser1', 'someUser2')
@@ -2579,7 +2661,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             user_ids, exp_id, False), msg=[True, True])
 
 
-class ModeratorActionEmailsTests(test_utils.GenericTestBase):
+class ModeratorActionEmailsTests(test_utils.EmailTestBase):
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
     RECIPIENT_EMAIL = 'a@example.com'
@@ -2631,16 +2713,19 @@ class ModeratorActionEmailsTests(test_utils.GenericTestBase):
         email_intent = 'unpublish_exploration'
         exploration_title = 'Title'
         email_html_body = 'Dummy email body.<br>'
-        with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
+        with self.can_send_emails_ctx, (
+            self.can_send_email_moderator_action_ctx):
             email_manager.send_moderator_action_email(
                 self.moderator_id, self.recipient_id,
                 email_intent, exploration_title, email_html_body)
-        messages = self.mail_stub.get_sent_messages(to=self.RECIPIENT_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.RECIPIENT_EMAIL)
         self.assertEqual(len(messages), 1)
 
 
-class CommunityReviewerEmailTest(test_utils.GenericTestBase):
+class CommunityReviewerEmailTest(test_utils.EmailTestBase):
     """Test for assignment and removal of reviewer in community."""
+
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
@@ -2677,8 +2762,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
-        messages = self.mail_stub.get_sent_messages(
-            to=self.TRANSLATION_REVIEWER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_assign_translation_reviewer_email_for_invalid_review_category(
@@ -2725,8 +2810,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.TRANSLATION_REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2771,8 +2856,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.VOICEOVER_REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.VOICEOVER_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2816,8 +2901,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 constants.REVIEW_CATEGORY_QUESTION, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.QUESTION_REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.QUESTION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2845,8 +2930,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id,
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
-        messages = self.mail_stub.get_sent_messages(
-            to=self.TRANSLATION_REVIEWER_EMAIL)
+        messages = self._get_sent_email_messages(
+            self.TRANSLATION_REVIEWER_EMAIL)
         self.assertEqual(len(messages), 0)
 
     def test_remove_translation_reviewer_email_for_invalid_review_category(
@@ -2895,8 +2980,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 constants.REVIEW_CATEGORY_TRANSLATION, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.TRANSLATION_REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.TRANSLATION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2941,8 +3026,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 constants.REVIEW_CATEGORY_VOICEOVER, language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.VOICEOVER_REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.VOICEOVER_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
@@ -2985,8 +3070,8 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
                 language_code='hi')
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.QUESTION_REVIEWER_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.QUESTION_REVIEWER_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)

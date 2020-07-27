@@ -153,10 +153,15 @@ def verify_target_version_compatible_with_latest_release(
     # This will need to be overridden if the major version changes.
     assert prev_major == curr_major, 'Unexpected major version change.'
     if prev_minor == curr_minor:
-        assert int(curr_patch) == int(prev_patch) + 1
+        assert int(curr_patch) == int(prev_patch) + 1, (
+            'The current patch version is not equal to previous patch '
+            'version plus one.')
     else:
-        assert int(curr_minor) == int(prev_minor) + 1
-        assert int(curr_patch) == 0
+        assert int(curr_minor) == int(prev_minor) + 1, (
+            'The current minor version is not equal to previous '
+            'minor version plus one.')
+        assert int(curr_patch) == 0, (
+            'The current patch version is different than 0.')
 
 
 def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
@@ -175,7 +180,7 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
 
     Raises:
         Exception: The difference between two continuous hotfix numbers
-             is not one.
+            is not one.
     """
     all_branches = subprocess.check_output([
         'git', 'branch', '-a'])[:-1].split('\n')
@@ -194,8 +199,9 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             if branch_hotfix_number > last_hotfix_number:
                 last_hotfix_number = branch_hotfix_number
 
-    assert release_branch_exists
-    assert hotfix_number == last_hotfix_number + 1
+    assert release_branch_exists, 'Release branch is missing.'
+    assert hotfix_number == last_hotfix_number + 1, (
+        'The difference between two continuous hotfix numbers is not one.')
 
 
 def _get_release_branch_type_and_name(target_version):
@@ -296,14 +302,13 @@ def execute_branch_cut(target_version, hotfix_number):
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
     # Push the new release branch to GitHub.
-    python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
-    subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
-
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'New %s branch successfully cut. You are now on branch %s' % (
-            new_branch_type, new_branch_name))
-    python_utils.PRINT('Done!')
+    if new_branch_type == release_constants.BRANCH_TYPE_RELEASE:
+        python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
+        subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
+    else:
+        python_utils.PRINT(
+            'Please cherrypick the required PRs and push the branch '
+            'to Github once this script is done.')
 
     common.ask_user_to_confirm(
         'Ask Sean (or Ben, if Sean isn\'t available) to create '
@@ -314,6 +319,12 @@ def execute_branch_cut(target_version, hotfix_number):
         '3. Checking the box: Restrict who can push to matching '
         'branches (then add the oppia/release-coordinators team)\n' % (
             new_branch_name))
+
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'New %s branch successfully cut. You are now on branch %s' % (
+            new_branch_type, new_branch_name))
+    python_utils.PRINT('Done!')
 
 
 def main(args=None):

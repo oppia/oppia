@@ -30,6 +30,8 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { ItemSelectionInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('ItemSelectionInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
@@ -38,7 +40,7 @@ describe('ItemSelectionInputValidationService', () => {
   let currentState: string = null;
   let goodAnswerGroups: AnswerGroup[] = null,
     goodDefaultOutcome: Outcome = null;
-  let customizationArguments: any = null;
+  let customizationArguments: ItemSelectionInputCustomizationArgs = null;
   let IsProperSubsetValidOption: AnswerGroup[] = null;
   let oof: OutcomeObjectFactory = null,
     agof: AnswerGroupObjectFactory = null,

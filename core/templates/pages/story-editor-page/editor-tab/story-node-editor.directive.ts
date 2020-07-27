@@ -102,6 +102,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
           var categorizedSkills = null;
+          var untriagedSkillSummaries = null;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
@@ -115,7 +116,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
-                categorizedSkills = response.categorized_skills_dict;
+                categorizedSkills = response.categorizedSkillsDict;
+                untriagedSkillSummaries = response.untriagedSkillSummaries;
               });
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
@@ -138,6 +140,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
               ui_config: {
+                startupFocusEnabled: false,
                 rows: 100
               }
             };
@@ -261,7 +264,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
                 categorizedSkills: () => categorizedSkills,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => untriagedSkillSummaries
               },
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',
@@ -297,7 +301,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
                 categorizedSkills: () => categorizedSkillsInTopic,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => null
               },
               controller: 'SelectSkillModalController',
               windowClass: 'skill-select-modal',
@@ -325,75 +330,6 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.unfinalizeOutline = function() {
             StoryUpdateService.unfinalizeStoryNodeOutline(
               $scope.story, $scope.getId());
-          };
-
-          $scope.addNewDestinationNode = function() {
-            var nodeTitles =
-              $scope.story.getStoryContents().getNodes().map(function(node) {
-                return node.getTitle();
-              });
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/modal-templates/' +
-                'new-chapter-title-modal.template.html'),
-              backdrop: true,
-              resolve: {
-                nodeTitles: () => nodeTitles
-              },
-              controller: 'NewChapterTitleModalController'
-            }).result.then(function(title) {
-              var nextNodeId =
-                $scope.story.getStoryContents().getNextNodeId();
-              StoryUpdateService.addStoryNode($scope.story, title);
-              StoryUpdateService.addDestinationNodeIdToNode(
-                $scope.story, $scope.getId(), nextNodeId);
-              _init();
-              _recalculateAvailableNodes();
-              $rootScope.$broadcast(
-                'storyGraphUpdated', $scope.story.getStoryContents());
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
-
-          $scope.addDestinationNode = function(nodeId) {
-            if (!nodeId) {
-              return;
-            }
-            if (nodeId === $scope.getId()) {
-              AlertsService.addInfoMessage(
-                'A chapter cannot lead to itself.', 3000);
-              return;
-            }
-            var nodes = $scope.story.getStoryContents().getNodes();
-            for (var i = 0; i < nodes.length; i++) {
-              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
-                StoryUpdateService.removeDestinationNodeIdFromNode(
-                  $scope.story, nodes[i].getId(), nodeId);
-              }
-            }
-            try {
-              StoryUpdateService.addDestinationNodeIdToNode(
-                $scope.story, $scope.getId(), nodeId);
-            } catch (error) {
-              AlertsService.addInfoMessage(
-                'The given chapter is already a destination for current ' +
-                'chapter', 3000);
-              return;
-            }
-            $rootScope.$broadcast(
-              'storyGraphUpdated', $scope.story.getStoryContents());
-            _recalculateAvailableNodes();
-          };
-
-          $scope.removeDestinationNodeId = function(nodeId) {
-            StoryUpdateService.removeDestinationNodeIdFromNode(
-              $scope.story, $scope.getId(), nodeId);
-            $rootScope.$broadcast(
-              'storyGraphUpdated', $scope.story.getStoryContents());
-            _recalculateAvailableNodes();
           };
 
           $scope.openNodeTitleEditor = function() {

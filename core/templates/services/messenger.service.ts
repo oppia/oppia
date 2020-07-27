@@ -25,41 +25,41 @@ import { Injectable } from '@angular/core';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-interface IHeightChangeData {
+interface HeightChangeData {
   height: number;
   scroll: number;
 }
 
-interface IExplorationLoadedData {
+interface ExplorationLoadedData {
   explorationVersion: number;
   explorationTitle: string;
 }
 
-interface IStateTransitionData {
+interface StateTransitionData {
   explorationVersion: number;
   oldStateName: string;
   jsonAnswer: string;
   newStateName: string;
 }
 
-interface IExplorationCompletedData {
+interface ExplorationCompletedData {
   explorationVersion: number;
 }
 
-interface IMessageValidatorsType {
-  heightChange(payload: IHeightChangeData): boolean;
+interface MessageValidatorsType {
+  heightChange(payload: HeightChangeData): boolean;
   explorationLoaded(): boolean;
-  stateTransition(payload: IStateTransitionData): boolean;
+  stateTransition(payload: StateTransitionData): boolean;
   explorationReset(payload: {stateName: string}): boolean;
   explorationCompleted(): boolean;
 }
 
-interface IGetPayloadType {
-  heightChange(data: IHeightChangeData): IHeightChangeData;
-  explorationLoaded(data: IExplorationLoadedData): IExplorationLoadedData;
-  stateTransition(data: IStateTransitionData): IStateTransitionData;
+interface GetPayloadType {
+  heightChange(data: HeightChangeData): HeightChangeData;
+  explorationLoaded(data: ExplorationLoadedData): ExplorationLoadedData;
+  stateTransition(data: StateTransitionData): StateTransitionData;
   explorationCompleted(
-    data: IExplorationCompletedData): IExplorationCompletedData;
+    data: ExplorationCompletedData): ExplorationCompletedData;
   explorationReset(data: string): {stateName: string};
 }
 
@@ -80,8 +80,8 @@ export class MessengerService {
   SUPPORTED_HASHDICT_VERSIONS: Set<string> = (
     new Set(['0.0.0', '0.0.1', '0.0.2', '0.0.3']));
 
-  MESSAGE_VALIDATORS: IMessageValidatorsType = {
-    heightChange(payload: IHeightChangeData): boolean {
+  MESSAGE_VALIDATORS: MessageValidatorsType = {
+    heightChange(payload: HeightChangeData): boolean {
       const {height, scroll} = payload;
       return (
         Number.isInteger(height) && height > 0 && typeof scroll === 'boolean');
@@ -89,7 +89,7 @@ export class MessengerService {
     explorationLoaded(): boolean {
       return true;
     },
-    stateTransition(payload: IStateTransitionData): boolean {
+    stateTransition(payload: StateTransitionData): boolean {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
     },
     explorationReset(payload: {stateName: string}): boolean {
@@ -100,20 +100,20 @@ export class MessengerService {
     }
   };
 
-  getPayload: IGetPayloadType = {
-    heightChange(data: IHeightChangeData): IHeightChangeData {
+  getPayload: GetPayloadType = {
+    heightChange(data: HeightChangeData): HeightChangeData {
       return {
         height: data.height,
         scroll: data.scroll
       };
     },
-    explorationLoaded(data: IExplorationLoadedData): IExplorationLoadedData {
+    explorationLoaded(data: ExplorationLoadedData): ExplorationLoadedData {
       return {
         explorationVersion: data.explorationVersion,
         explorationTitle: data.explorationTitle
       };
     },
-    stateTransition(data: IStateTransitionData): IStateTransitionData {
+    stateTransition(data: StateTransitionData): StateTransitionData {
       return {
         explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
@@ -122,12 +122,12 @@ export class MessengerService {
       };
     },
     explorationCompleted(
-        data: IExplorationCompletedData): IExplorationCompletedData {
+        data: ExplorationCompletedData): ExplorationCompletedData {
       return {
         explorationVersion: data.explorationVersion
       };
     },
-    // DEPRECATED
+    // ---- DEPRECATED ----
     explorationReset(data: string): {stateName: string} {
       return {
         stateName: data
@@ -150,7 +150,7 @@ export class MessengerService {
     let rawHash = window.location.hash.substring(1);
     if (window.parent !== window && rawHash &&
         this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
-      // Protractor tests may prepend a / to this hash, which we remove:
+      // Protractor tests may prepend a / to this hash, which we remove.
       let hash =
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
       let hashParts = hash.split('&');

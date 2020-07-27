@@ -20,11 +20,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import fs_domain
-from core.platform import models
+from core.domain import image_services
 import feconf
 import python_utils
-
-gae_image_services = models.Registry.import_gae_image_services()
 
 
 def save_original_and_compressed_versions_of_image(
@@ -60,9 +58,9 @@ def save_original_and_compressed_versions_of_image(
         entity_type, entity_id))
 
     if image_is_compressible:
-        compressed_image_content = gae_image_services.compress_image(
+        compressed_image_content = image_services.compress_image(
             original_image_content, 0.8)
-        micro_image_content = gae_image_services.compress_image(
+        micro_image_content = image_services.compress_image(
             original_image_content, 0.7)
     else:
         compressed_image_content = original_image_content
@@ -118,7 +116,7 @@ def read_classifier_data(exp_id, job_id):
 
     Returns:
         dict|None. The classifier data read from the file. Returns None
-            if no classifier data is stored for the given job.
+        if no classifier data is stored for the given job.
     """
     filepath = '%s-classifier-data.pb.xz' % (job_id)
     file_system_class = get_entity_file_system_class()

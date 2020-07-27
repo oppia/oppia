@@ -49,7 +49,7 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
 
     Raises:
         Exception: The schema version of the story_contents is outside of what
-        is supported at present.
+            is supported at present.
     """
     story_contents_schema_version = versioned_story_contents['schema_version']
     if not (1 <= story_contents_schema_version
@@ -220,8 +220,8 @@ def get_story_summaries_by_ids(story_ids):
             summaries are to be found.
 
     Returns:
-        list(StorySummary). The story summaries corresponding to given story
-            ids.
+        list(StorySummary). The story summaries corresponds to given story
+        ids.
     """
     story_summary_models = story_models.StorySummaryModel.get_multi(story_ids)
     story_summaries = [
@@ -241,8 +241,8 @@ def get_latest_completed_node_ids(user_id, story_id):
 
     Returns:
         list(str). List of the completed node ids that come latest in the story.
-            If length is larger than 3, return the last three of them.
-            If length is smaller or equal to 3, return all of them.
+        If length is larger than 3, return the last three of them. If length is
+        smaller or equal to 3, return all of them.
     """
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)

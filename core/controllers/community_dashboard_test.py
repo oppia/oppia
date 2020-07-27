@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import story_domain
@@ -96,8 +97,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(2)]
 
         for index, story in enumerate(stories):
@@ -336,8 +338,9 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(2)]
 
         for index, story in enumerate(stories):
@@ -452,3 +455,29 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': True
             })
+
+
+class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
+    """Test for the FeaturedTranslationLanguagesHandler."""
+
+    def test_get_featured_translation_languages(self):
+        response = self.get_json('/retrivefeaturedtranslationlanguages')
+        self.assertEqual(
+            response,
+            {'featured_translation_languages': []}
+        )
+
+        new_value = [
+            {'language_code': 'en', 'explanation': 'Partnership with ABC'}
+        ]
+        config_services.set_property(
+            'admin',
+            'featured_translation_languages',
+            new_value
+        )
+
+        response = self.get_json('/retrivefeaturedtranslationlanguages')
+        self.assertEqual(
+            response,
+            {'featured_translation_languages': new_value}
+        )

@@ -21,20 +21,11 @@ import { Injectable } from '@angular/core';
 
 import { AnswerStats } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { IFractionDict } from
-  'domain/objects/FractionObjectFactory.ts';
-/* eslint-disable max-len */
-import { INote } from 'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
-/* eslint-enable max-len */
+import { InteractionAnswer } from
+  'interactions/answer-defs';
 
-export interface IAnswerStatsBackendDict {
-  'answer': (
-    string | number | IFractionDict | INumberWithUnitsBackendDict | string[] |
-    INote[] | number[] | IGraphBackendDict| string[][]);
+export interface AnswerStatsBackendDict {
+  'answer': InteractionAnswer;
   'frequency': number;
 
   // N/A when the visualization can not present addressed answers.
@@ -47,9 +38,9 @@ export interface IAnswerStatsBackendDict {
 
 export type Option = string | string[];
 
-export interface IVisualizationInfoBackendDict {
+export interface VisualizationInfoBackendDict {
     'addressed_info_is_supported': boolean;
-    'data': IAnswerStatsBackendDict[];
+    'data': AnswerStatsBackendDict[];
     'id': string;
     'options': {
       [name: string]: Option
@@ -79,10 +70,10 @@ export class VisualizationInfo {
 })
 export class VisualizationInfoObjectFactory {
   createFromBackendDict(
-      backendDict: IVisualizationInfoBackendDict): VisualizationInfo {
+      backendDict: VisualizationInfoBackendDict): VisualizationInfo {
     let answerStatsDicts = backendDict.data;
     let answerStatsObjects = answerStatsDicts.map((
-        answerStatsDict: IAnswerStatsBackendDict) => {
+        answerStatsDict: AnswerStatsBackendDict) => {
       let answerHtml = (typeof answerStatsDict.answer === 'string') ?
       answerStatsDict.answer : JSON.stringify(answerStatsDict.answer);
       return new AnswerStats(

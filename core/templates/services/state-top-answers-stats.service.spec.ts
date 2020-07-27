@@ -17,469 +17,297 @@
  * statistics for a particular state.
  */
 
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { Answer } from 'domain/exploration//AnswerStatsObjectFactory';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { IAnswerStatsBackendDict } from
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { FractionInputRulesService } from
-  'interactions/FractionInput/directives/fraction-input-rules.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { AnswerStatsBackendDict } from
+  'domain/exploration/visualization-info-object.factory';
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UtilsService } from 'services/utils.service';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { StateTopAnswersStats } from
+  'domain/statistics/state-top-answers-stats-object.factory';
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
+import { StateTopAnswersStatsBackendApiService } from
+  'services/state-top-answers-stats-backend-api.service';
+import { States, StatesObjectFactory } from
+  'domain/exploration/StatesObjectFactory';
 
-require('App.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('services/state-top-answers-stats.service.ts');
+const joC = jasmine.objectContaining;
 
-class MockAnswerStats {
-  answer: Answer;
-  answerHtml: string;
-  frequency: number;
-  isAddressed: boolean;
-  constructor(
-      answer: Answer, answerHtml: string, frequency: number,
-      isAddressed: boolean) {
-    this.answer = angular.copy(answer);
-    this.answerHtml = answerHtml;
-    this.frequency = frequency;
-    this.isAddressed = isAddressed;
-  }
-  toBackendDict(): IAnswerStatsBackendDict {
-    return {
-      answer: angular.copy(this.answer),
-      frequency: this.frequency
-    };
-  }
-}
+describe('StateTopAnswersStatsService', () => {
+  let answerStatsObjectFactory: AnswerStatsObjectFactory;
+  let ruleObjectFactory: RuleObjectFactory;
+  let stateTopAnswersStatsBackendApiService:
+    StateTopAnswersStatsBackendApiService;
+  let stateTopAnswersStatsService: StateTopAnswersStatsService;
+  let statesObjectFactory: StatesObjectFactory;
 
-var joC = jasmine.objectContaining;
+  beforeEach(() => {
+    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-describe('StateTopAnswersStatsService', function() {
-  var $q = null;
-  var $rootScope = null;
-  var $uibModal = null;
-  var ChangeListService = null;
-  var ContextService = null;
-  var ExplorationStatesService = null;
-  var ruleObjectFactory = null;
-  var StateTopAnswersStatsService = null;
+    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
+    ruleObjectFactory = TestBed.get(RuleObjectFactory);
+    stateTopAnswersStatsBackendApiService = (
+      TestBed.get(StateTopAnswersStatsBackendApiService));
+    stateTopAnswersStatsService = TestBed.get(StateTopAnswersStatsService);
+    statesObjectFactory = TestBed.get(StatesObjectFactory);
+  });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('AnswerStatsObjectFactory', {
-      createFromBackendDict: function(backendDict) {
-        var answerHtml = (typeof backendDict.answer === 'string') ?
-          backendDict.answer : angular.toJson(backendDict.answer);
-        return new MockAnswerStats(
-          backendDict.answer, answerHtml, backendDict.frequency, false);
-      }
-    });
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-    $provide.value('FractionInputRulesService', new FractionInputRulesService(
-      new FractionObjectFactory(), new UtilsService()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
-      _ExplorationStatesService_, _RuleObjectFactory_,
-      _StateTopAnswersStatsService_) {
-    $q = _$q_;
-    $rootScope = _$rootScope_;
-    $uibModal = _$uibModal_;
-    ChangeListService = _ChangeListService_;
-    ContextService = _ContextService_;
-    ExplorationStatesService = _ExplorationStatesService_;
-    ruleObjectFactory = _RuleObjectFactory_;
-    StateTopAnswersStatsService = _StateTopAnswersStatsService_;
+  const expId = '7';
 
-    ExplorationStatesService.init({
-      Hola: {
-        content: {content_id: 'content', html: ''},
+  const stateBackendDict: StateBackendDict = {
+    content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
+    param_changes: [],
+    interaction: {
+      answer_groups: [{
+        rule_specs: [
+          {rule_type: 'Contains', inputs: {x: 'hola'}},
+        ],
+        outcome: {
+          dest: 'Me Llamo',
+          feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        training_data: null,
+        tagged_skill_misconception_id: null,
+      }],
+      default_outcome: {
+        dest: 'Hola',
+        feedback: {content_id: 'default_outcome', html: 'Try again!'},
+        labelled_as_correct: false,
         param_changes: [],
-        interaction: {
-          answer_groups: [{
-            rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
-            outcome: {
-              dest: 'Me Llamo',
-              feedback: {content_id: 'feedback_1', html: 'buen trabajo!'},
-              labelled_as_correct: true,
-            },
-          }],
-          default_outcome: {
-            dest: 'Hola',
-            feedback: {content_id: 'default_outcome', html: 'try again!'},
-            labelled_as_correct: false,
-          },
-          hints: [],
-          id: 'TextInput',
-        },
-        classifier_model_id: 0,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-          },
-        },
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-          },
-        },
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
       },
-    });
+      hints: [],
+      id: 'TextInput',
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      solution: null,
+    },
+    classifier_model_id: null,
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {},
+        feedback_1: {},
+      },
+    },
+    solicit_answer_details: false,
+    written_translations: {
+      translations_mapping: {
+        content: {},
+        default_outcome: {},
+        feedback_1: {},
+      },
+    },
+  };
 
-    spyOn(ContextService, 'getExplorationId').and.returnValue('7');
+  const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {
+    return statesObjectFactory.createFromBackendDict(statesBackendDict);
+  };
+
+  const spyOnBackendApiFetchStatsAsync = (
+      stateName: string,
+      answersStatsBackendDicts: AnswerStatsBackendDict[]): jasmine.Spy => {
+    const answersStats = answersStatsBackendDicts.map(
+      a => answerStatsObjectFactory.createFromBackendDict(a));
+    return spyOn(stateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
+      .and.returnValue(Promise.resolve(new StateTopAnswersStats(
+        {[stateName]: answersStats}, {[stateName]: 'TextInput'})));
+  };
+
+  it('should not contain any stats before init', () => {
+    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeFalse();
+  });
+
+  it('should identify unaddressed issues', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', [
+      {answer: 'hola', frequency: 5},
+      {answer: 'adios', frequency: 3},
+      {answer: 'ciao', frequency: 1},
+    ]);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
+
+    const stateStats = stateTopAnswersStatsService.getStateStats('Hola');
+    expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
+    expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
+    expect(stateStats).toContain(joC({answer: 'ciao', isAddressed: false}));
   }));
 
-  describe('.isInitialized', function() {
-    it('begins uninitialized', function() {
-      expect(StateTopAnswersStatsService.isInitialized()).toBe(false);
-    });
+  it('should order results by frequency', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', [
+      {answer: 'hola', frequency: 7},
+      {answer: 'adios', frequency: 4},
+      {answer: 'ciao', frequency: 2},
+    ]);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-    it('is true after call to .init', function() {
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
+    expect(stateTopAnswersStatsService.getStateStats('Hola')).toEqual([
+      joC({answer: 'hola', frequency: 7}),
+      joC({answer: 'adios', frequency: 4}),
+      joC({answer: 'ciao', frequency: 2}),
+    ]);
+  }));
 
-      expect(StateTopAnswersStatsService.isInitialized()).toBe(true);
-    });
-  });
+  it('should throw when stats for state do not exist', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', [
+      {answer: 'hola', frequency: 7},
+      {answer: 'adios', frequency: 4},
+      {answer: 'ciao', frequency: 2},
+    ]);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-  describe('.init', function() {
-    it('correctly identifies unaddressed issues', function() {
-      StateTopAnswersStatsService.init({
-        answers: {
-          Hola: [
-            {answer: 'hola', frequency: 7},
-            {answer: 'adios', frequency: 4},
-            {answer: 'que?', frequency: 2},
-          ]
-        },
-        interaction_ids: {Hola: 'TextInput'},
-      });
+    expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
+      .toThrowError('Me Llamo does not exist.');
+  }));
 
-      var stateStats = StateTopAnswersStatsService.getStateStats('Hola');
-      expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
-      expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
-      expect(stateStats).toContain(joC({answer: 'que?', isAddressed: false}));
-    });
+  it('should have stats for state provided by backend', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync(
+      'Hola', [{answer: 'hola', frequency: 3}]);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-    it('maintains frequency in order', function() {
-      StateTopAnswersStatsService.init({
-        answers: {
-          Hola: [
-            {answer: 'hola', frequency: 7},
-            {answer: 'adios', frequency: 4},
-            {answer: 'que?', frequency: 2},
-          ]
-        },
-        interaction_ids: {Hola: 'TextInput'},
-      });
+    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTrue();
+  }));
 
-      expect(StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-        joC({answer: 'hola', frequency: 7}),
-        joC({answer: 'adios', frequency: 4}),
-        joC({answer: 'que?', frequency: 2}),
-      ]);
-    });
+  it('should have stats for state without any answers', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', []);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-    it('throws when fetching stats about non-existent states', function() {
-      expect(function() {
-        StateTopAnswersStatsService.getStateStats('Me Llamo');
-      }).toThrowError('Me Llamo does not exist.');
-    });
+    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTrue();
+  }));
 
-    it('registers handlers to ExplorationStatesService', function() {
-      var expectedRegistrationFunctions = [
-        spyOn(ExplorationStatesService, 'registerOnStateAddedCallback'),
-        spyOn(ExplorationStatesService, 'registerOnStateDeletedCallback'),
-        spyOn(ExplorationStatesService, 'registerOnStateRenamedCallback'),
-        spyOn(ExplorationStatesService,
-          'registerOnStateInteractionSavedCallback')
-      ];
+  it('should not have stats for state not provided by backend',
+    fakeAsync(async() => {
+      const states = makeStates();
+      spyOnBackendApiFetchStatsAsync('Hola', []);
+      stateTopAnswersStatsService.initAsync(expId, states);
+      flushMicrotasks();
+      await stateTopAnswersStatsService.getInitPromise();
 
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
+      expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalse();
+    }));
 
-      expectedRegistrationFunctions.forEach(function(registrationFunction) {
-        expect(registrationFunction).toHaveBeenCalled();
-      });
-    });
+  it('only returns state names with stats', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', []);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-    it('does not register duplicate handlers if called again', function() {
-      var expectedRegistrationFunctions = [
-        spyOn(ExplorationStatesService, 'registerOnStateAddedCallback'),
-        spyOn(ExplorationStatesService, 'registerOnStateDeletedCallback'),
-        spyOn(ExplorationStatesService, 'registerOnStateRenamedCallback'),
-        spyOn(ExplorationStatesService,
-          'registerOnStateInteractionSavedCallback')
-      ];
+    expect(stateTopAnswersStatsService.getStateNamesWithStats())
+      .toEqual(['Hola']);
+  }));
 
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
-      // Second call should not add more callbacks.
-      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
+  it('should return empty stats for a newly added state', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', []);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-      expectedRegistrationFunctions.forEach(function(registrationFunction) {
-        expect(registrationFunction.calls.count()).toEqual(1);
-      });
-    });
-  });
+    expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
+      .toThrowError('Me Llamo does not exist.');
 
-  describe('.hasStateStats', function() {
-    it('is false when uninitialized', function() {
-      expect(StateTopAnswersStatsService.isInitialized()).toBe(false);
-      expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(false);
-    });
+    stateTopAnswersStatsService.onStateAdded('Me Llamo');
 
-    it('is true when the state contains answers', function() {
-      StateTopAnswersStatsService.init({
-        answers: {Hola: [{answer: 'hola', frequency: 3}]},
-        interaction_ids: {Hola: 'TextInput'},
-      });
+    expect(stateTopAnswersStatsService.getStateStats('Me Llamo'))
+      .toEqual([]);
+  }));
 
-      expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
-    });
+  it('should throw when accessing a deleted state', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', []);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-    it('is true even when the state contains no answers', function() {
-      StateTopAnswersStatsService.init(
-        {answers: {Hola: []}, interaction_ids: {Hola: 'TextInput'}}
-      );
+    stateTopAnswersStatsService.onStateDeleted('Hola');
+    flushMicrotasks();
 
-      expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
-    });
+    expect(() => stateTopAnswersStatsService.getStateStats('Hola'))
+      .toThrowError('Hola does not exist.');
+  }));
 
-    it('is false when the state does not exist', function() {
-      StateTopAnswersStatsService.init({
-        answers: {Hola: [{answer: 'hola', frequency: 3}]},
-        interaction_ids: {Hola: 'TextInput'},
-      });
+  it('should respond to changes in state names', fakeAsync(async() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', []);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-      expect(StateTopAnswersStatsService.hasStateStats('Me Llamo')).toBe(false);
-    });
-  });
+    const oldStats = stateTopAnswersStatsService.getStateStats('Hola');
 
-  describe('.getStateNamesWithStats', function() {
-    it('only returns state names that have stats', function() {
-      StateTopAnswersStatsService.init({
-        answers: {Hola: [{answer: 'hola', frequency: 3}]},
-        interaction_ids: {Hola: 'TextInput'},
-      });
+    stateTopAnswersStatsService.onStateRenamed('Hola', 'Bonjour');
 
-      expect(StateTopAnswersStatsService.getStateNamesWithStats())
-        .toEqual(['Hola']);
-    });
-  });
+    expect(stateTopAnswersStatsService.getStateStats('Bonjour'))
+      .toEqual(oldStats);
 
-  describe('Cache Maintenance', function() {
-    beforeEach(function() {
-      StateTopAnswersStatsService.init({
-        answers: {
-          Hola: [
-            {answer: 'hola', frequency: 7},
-            {answer: 'adios', frequency: 4},
-            {answer: 'que?', frequency: 2},
-          ]
-        },
-        interaction_ids: {Hola: 'TextInput'},
-      });
-    });
+    expect(() => stateTopAnswersStatsService.getStateStats('Hola'))
+      .toThrowError('Hola does not exist.');
+  }));
 
-    describe('State Addition', function() {
-      it('creates a new empty list of stats for the new state', function() {
-        spyOn(ChangeListService, 'addState');
-        expect(function() {
-          StateTopAnswersStatsService.getStateStats('Me Llamo');
-        }).toThrowError('Me Llamo does not exist.');
+  it('should recognize newly resolved answers', fakeAsync(async() => {
+    const states = makeStates();
 
-        ExplorationStatesService.addState('Me Llamo');
-        expect(StateTopAnswersStatsService.getStateStats('Me Llamo'))
-          .toEqual([]);
-      });
-    });
+    spyOnBackendApiFetchStatsAsync(
+      'Hola', [{answer: 'adios', frequency: 3}]);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-    describe('State Deletion', function() {
-      it('throws an error after deleting the stats', function(done) {
-        spyOn($uibModal, 'open').and.callFake(function() {
-          return {result: $q.resolve()};
-        });
-        spyOn(ChangeListService, 'deleteState');
+    expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
+      .toContain(joC({answer: 'adios'}));
 
-        ExplorationStatesService.deleteState('Hola').then(function() {
-          expect(function() {
-            StateTopAnswersStatsService.getStateStats('Hola');
-          }).toThrowError('Hola does not exist.');
-        }).then(done, done.fail);
-        $rootScope.$digest();
-      });
-    });
+    const updatedState = states.getState('Hola');
+    updatedState.interaction.answerGroups[0].rules.push(
+      ruleObjectFactory.createNew('Contains', {x: 'adios'}));
+    stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
-    describe('State Renaming', function() {
-      it('only recognizes the renamed state', function() {
-        spyOn(ChangeListService, 'renameState');
-        var oldStats = StateTopAnswersStatsService.getStateStats('Hola');
+    expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
+      .not.toContain(joC({answer: 'adios'}));
+  }));
 
-        ExplorationStatesService.renameState('Hola', 'Bonjour');
+  it('should recognize newly unresolved answers', fakeAsync(async() => {
+    const states = makeStates();
 
-        expect(StateTopAnswersStatsService.getStateStats('Bonjour'))
-          .toBe(oldStats);
+    spyOnBackendApiFetchStatsAsync(
+      'Hola', [{answer: 'hola', frequency: 3}]);
+    stateTopAnswersStatsService.initAsync(expId, states);
+    flushMicrotasks();
+    await stateTopAnswersStatsService.getInitPromise();
 
-        expect(function() {
-          StateTopAnswersStatsService.getStateStats('Hola');
-        }).toThrowError('Hola does not exist.');
-      });
-    });
+    expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
+      .not.toContain(joC({answer: 'hola'}));
 
-    describe('State Answer Groups Changes', function() {
-      beforeEach(function() {
-        spyOn(ChangeListService, 'editStateProperty');
-      });
+    const updatedState = states.getState('Hola');
+    updatedState.interaction.answerGroups[0].rules = [
+      ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
+    ];
+    stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
-      it('recognizes newly resolved answers', function() {
-        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-          .toContain(joC({answer: 'adios'}));
-
-        var newAnswerGroups = angular.copy(
-          ExplorationStatesService.getState('Hola').interaction.answerGroups);
-        newAnswerGroups[0].rules = [
-          ruleObjectFactory.createNew('Contains', {x: 'adios'})
-        ];
-        ExplorationStatesService.saveInteractionAnswerGroups(
-          'Hola', newAnswerGroups);
-
-        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-          .not.toContain(joC({answer: 'adios'}));
-      });
-
-      it('recognizes newly unresolved answers', function() {
-        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-          .not.toContain(joC({answer: 'hola'}));
-
-        var newAnswerGroups = angular.copy(
-          ExplorationStatesService.getState('Hola').interaction.answerGroups);
-        newAnswerGroups[0].rules = [
-          ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
-        ];
-        ExplorationStatesService.saveInteractionAnswerGroups(
-          'Hola', newAnswerGroups);
-
-        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
-          .toContain(joC({answer: 'hola'}));
-      });
-
-      it('removes stat answers when interaction changes', function() {
-        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
-          .toBeGreaterThan(0);
-
-        ExplorationStatesService.saveInteractionId('Hola', 'FractionInput');
-        ExplorationStatesService.saveInteractionCustomizationArgs('Hola', {
-          requireSimplestForm: false,
-          allowImproperFraction: true,
-          allowNonzeroIntegerPart: true,
-          customPlaceholder: '',
-        });
-
-        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
-          .toEqual(0);
-      });
-
-      it('permits null interaction ids', function() {
-        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
-          .toBeGreaterThan(0);
-
-        ExplorationStatesService.saveInteractionId('Hola', null);
-        ExplorationStatesService.saveInteractionCustomizationArgs('Hola', {});
-
-        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
-          .toEqual(0);
-      });
-    });
-  });
+    expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
+      .toContain(joC({answer: 'hola'}));
+  }));
 });

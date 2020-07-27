@@ -36,7 +36,7 @@ describe('Question backend Api service', () => {
     questionBackendApiService = TestBed.get(QuestionBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
 
-    // Sample question object returnable from the backend
+    // Sample question object returnable from the backend.
     sampleDataResults = {
       question_dicts: [{
         id: '0',
@@ -145,6 +145,53 @@ describe('Question backend Api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch question count from the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      let questionCountHandlerUrl = (
+        '/question_count_handler/' + encodeURIComponent(1));
+
+      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+        ['1']).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(questionCountHandlerUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        total_question_count: 2
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(2);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should use the fail handler if fetch question count fails',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      let questionCountHandlerUrl = (
+        '/question_count_handler/' + encodeURIComponent(1));
+
+      questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+        ['1']).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(questionCountHandlerUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error fetching question count.', {
+        status: 400, statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error fetching question count.');
+    }));
+
   it('should use the fail handler if the backend request failed',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
@@ -160,7 +207,7 @@ describe('Question backend Api service', () => {
       let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading questions.', {
-        status: 500, statusText: 'Invaid request'
+        status: 400, statusText: 'Invalid request'
       });
 
       flushMicrotasks();

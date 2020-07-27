@@ -35,6 +35,7 @@ import feconf
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
+
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -216,9 +217,15 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         subtopic_page_services.delete_subtopic_page(
             self.user_id, self.TOPIC_ID, 1)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            r'Entity for class SubtopicPageModel with id %s not found' % (
+                subtopic_page_id)):
             topic_models.SubtopicPageModel.get(subtopic_page_id)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            r'Entity for class SubtopicPageModel with id %s not found' % (
+                subtopic_page_id)):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
 

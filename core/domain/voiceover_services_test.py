@@ -37,6 +37,7 @@ import python_utils
 
 class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     """Provides testing of the voiceover services."""
+
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
@@ -76,8 +77,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A story',
-            corresponding_topic_id=self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)

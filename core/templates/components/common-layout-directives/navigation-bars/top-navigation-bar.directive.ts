@@ -44,14 +44,14 @@ angular.module('oppia').directive('topNavigationBar', [
       controller: [
         '$http', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
-        'NavigationService', 'SidebarStatusService', 'SiteAnalyticsService',
-        'UserService', 'WindowDimensionsService',
+        'I18nLanguageCodeService', 'NavigationService', 'SidebarStatusService',
+        'SiteAnalyticsService', 'UserService', 'WindowDimensionsService',
         'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
             $http, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
-            NavigationService, SidebarStatusService, SiteAnalyticsService,
-            UserService, WindowDimensionsService,
+            I18nLanguageCodeService, NavigationService, SidebarStatusService,
+            SiteAnalyticsService, UserService, WindowDimensionsService,
             LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
@@ -248,6 +248,8 @@ angular.module('oppia').directive('topNavigationBar', [
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
                 $translate.use(userInfo.getPreferredSiteLanguageCode());
+                I18nLanguageCodeService.setI18nLanguageCode(
+                  userInfo.getPreferredSiteLanguageCode());
               }
               ctrl.isModerator = userInfo.isModerator();
               ctrl.isAdmin = userInfo.isAdmin();
@@ -310,7 +312,7 @@ angular.module('oppia').directive('topNavigationBar', [
                 DebouncerService.debounce(truncateNavbar, 500);
 
                 // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular
+                // once the directive is migrated to angular.
                 $scope.$applyAsync();
               });
             // The function needs to be run after i18n. A timeout of 0 appears

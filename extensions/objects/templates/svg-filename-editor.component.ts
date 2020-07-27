@@ -39,12 +39,12 @@ angular.module('oppia').component('svgFilenameEditor', {
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'UrlInterpolationService',
-    'WindowDimensionsService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     function($http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, UrlInterpolationService,
-        WindowDimensionsService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
       const ctrl = this;
       // These max width and height paramameters were determined by manual
       // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
@@ -56,11 +56,14 @@ angular.module('oppia').component('svgFilenameEditor', {
       const STATUS_SAVED = 'saved';
       const DRAW_MODE_POLY = 'polygon';
       const DRAW_MODE_PENCIL = 'pencil';
+      const DRAW_MODE_BEZIER = 'bezier';
       const DRAW_MODE_NONE = 'none';
       const OPEN_POLYGON_MODE = 'open';
       const CLOSED_POLYGON_MODE = 'closed';
-      ctrl.canvasMaxWidth = 0;
-      ctrl.canvasMaxHeight = 0;
+      // The canvas height and width were determined based on the initial
+      // modal dimensions.
+      const CANVAS_WIDTH = 494;
+      const CANVAS_HEIGHT = 338;
       ctrl.drawMode = DRAW_MODE_NONE;
       ctrl.polygonMode = CLOSED_POLYGON_MODE;
       ctrl.isTouchDevice = DeviceInfoService.hasTouchEvents();
@@ -95,7 +98,6 @@ angular.module('oppia').component('svgFilenameEditor', {
       // when there are multiple RTEs in the same page.
       var randomId = Math.floor(Math.random() * 100000).toString();
       ctrl.canvasID = 'canvas' + randomId;
-      ctrl.canvasContainerId = 'canvasContainer' + randomId;
       ctrl.canvasElement = null;
       ctrl.fillPicker = null;
       ctrl.strokePicker = null;
@@ -108,6 +110,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.displayFontStyles = false;
       ctrl.objectUndoStack = [];
       ctrl.objectRedoStack = [];
+      ctrl.canvasObjects = [];
+      ctrl.undoFlag = false;
       ctrl.isRedo = false;
       ctrl.undoLimit = 5;
       ctrl.savedSVGDiagram = '';
@@ -115,26 +119,32 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.entityType = ContextService.getEntityType();
       ctrl.imageSaveDestination = ContextService.getImageSaveDestination();
       ctrl.svgContainerStyle = {};
+      ctrl.layerNum = 0;
       ctrl.fabricjsOptions = {
         stroke: 'rgba(0, 0, 0, 1)',
         fill: 'rgba(0, 0, 0, 0)',
         bg: 'rgba(0, 0, 0, 0)',
         fontFamily: 'helvetica',
-        size: '9px',
+        size: '3px',
         bold: false,
         italic: false
       };
-      ctrl.enableRemoveButton = false;
-      ctrl.resizeSubscription = null;
+      ctrl.objectIsSelected = false;
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
+          ctrl.currentDiagramWidth = ctrl.diagramWidth;
+        } else {
+          ctrl.diagramWidth = MAX_DIAGRAM_WIDTH;
           ctrl.currentDiagramWidth = ctrl.diagramWidth;
         }
       };
 
       ctrl.onHeightInputBlur = function() {
         if (ctrl.diagramHeight < MAX_DIAGRAM_HEIGHT) {
+          ctrl.currentDiagramHeight = ctrl.diagramHeight;
+        } else {
+          ctrl.diagramHeight = MAX_DIAGRAM_HEIGHT;
           ctrl.currentDiagramHeight = ctrl.diagramHeight;
         }
       };
@@ -181,6 +191,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         };
         ctrl.value = filename;
         if (setData) {
+          var dimensions = (
+            ImagePreloaderService.getDimensionsOfImage(filename));
+          ctrl.svgContainerStyle = {
+            height: dimensions.height + 'px',
+            width: dimensions.width + 'px'
+          };
+          ctrl.diagramWidth = dimensions.width;
+          ctrl.diagramHeight = dimensions.height;
           $http.get(ctrl.data.savedSVGUrl).then(function(response) {
             ctrl.savedSVGDiagram = response.data;
           });
@@ -256,7 +274,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var getSVGString = function() {
-        var svgString = ctrl.canvas.toSVG();
+        var svgString = ctrl.canvas.toSVG().replace('\t\t', '');
         var domParser = new DOMParser();
         var doc = domParser.parseFromString(svgString, 'text/xml');
         var svg = doc.querySelector('svg');
@@ -415,8 +433,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.createRect = function() {
         var size = ctrl.fabricjsOptions.size;
         var rect = new fabric.Rect({
-          top: 10,
-          left: 10,
+          top: 50,
+          left: 50,
           width: 60,
           height: 70,
           fill: ctrl.fabricjsOptions.fill,
@@ -429,7 +447,7 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createLine = function() {
         var size = ctrl.fabricjsOptions.size;
-        var line = new fabric.Line([10, 10, 50, 50], {
+        var line = new fabric.Line([50, 50, 100, 100], {
           stroke: ctrl.fabricjsOptions.stroke,
           strokeWidth: parseInt(size.substring(0, size.length - 2)),
           strokeUniform: true
@@ -440,8 +458,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.createCircle = function() {
         var size = ctrl.fabricjsOptions.size;
         var circle = new fabric.Circle({
-          top: 10,
-          left: 10,
+          top: 50,
+          left: 50,
           radius: 30,
           fill: ctrl.fabricjsOptions.fill,
           stroke: ctrl.fabricjsOptions.stroke,
@@ -459,8 +477,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.fabricjsOptions.size = '18px';
         var size = ctrl.fabricjsOptions.size;
         var text = new fabric.Textbox('Enter Text', {
-          top: 10,
-          left: 10,
+          top: 50,
+          left: 50,
           fontFamily: ctrl.fabricjsOptions.fontFamily,
           fontSize: parseInt(size.substring(0, size.length - 2)),
           fill: ctrl.fabricjsOptions.fill,
@@ -582,6 +600,118 @@ angular.module('oppia').component('svgFilenameEditor', {
         createPolygon();
       };
 
+      var createBezierControlPoints = function(left, top) {
+        // This function is used to add the control points for the quadratic
+        // bezier curve which is used to control the position of the curve.
+        var size = ctrl.fabricjsOptions.size;
+        var circle = new fabric.Circle({
+          left: left,
+          top: top,
+          radius: parseInt(size.substring(0, size.length - 2)) + 2,
+          fill: '#666666',
+          stroke: '#666666',
+          hasBorders: false,
+          hasControls: false
+        });
+        return circle;
+      };
+
+      var drawQuadraticCurve = function() {
+        var size = ctrl.fabricjsOptions.size;
+        var curve = new fabric.Path('M 40 40 Q 95, 100, 150, 40', {
+          stroke: ctrl.fabricjsOptions.stroke,
+          fill: ctrl.fabricjsOptions.fill,
+          strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          objectCaching: false,
+          selectable: false
+        });
+        ctrl.canvas.add(curve);
+
+        var p1 = createBezierControlPoints(95, 100);
+        p1.name = 'p1';
+        p1.set({
+          radius: 12,
+          fill: '#ffffff',
+          strokeWidth: 5
+        });
+        ctrl.canvas.add(p1);
+
+        var p0 = createBezierControlPoints(40, 40);
+        p0.name = 'p0';
+        ctrl.canvas.add(p0);
+
+        var p2 = createBezierControlPoints(150, 40);
+        p2.name = 'p2';
+        ctrl.canvas.add(p2);
+      };
+
+      var getQuadraticBezierCurve = function() {
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          // The order of objects being added are the path followed by
+          // three control points. Therefore the 4th from the last is the
+          // quadratic curve.
+          return ctrl.canvas.getObjects().slice(-4, -3)[0];
+        }
+      };
+
+      ctrl.createQuadraticBezier = function() {
+        if (ctrl.drawMode === DRAW_MODE_NONE) {
+          ctrl.canvas.discardActiveObject();
+          ctrl.drawMode = DRAW_MODE_BEZIER;
+          ctrl.canvas.getObjects().forEach(function(item) {
+            item.set({
+              hoverCursor: 'default',
+              selectable: false
+            });
+          });
+          drawQuadraticCurve();
+        } else {
+          // This is the case when the user clicks the tool after drawing the
+          // curve. The current path and the circles are removed and new path
+          // is added.
+          ctrl.canvas.getObjects().slice(-3).forEach(function(item) {
+            ctrl.canvas.remove(item);
+          });
+          var path = ctrl.canvas.getObjects().slice(-1)[0].get('path');
+          ctrl.canvas.remove(ctrl.canvas.getObjects().slice(-1)[0]);
+          ctrl.canvas.getObjects().forEach(function(item) {
+            item.set({
+              hoverCursor: 'move',
+              selectable: true
+            });
+          });
+          // Change mode and then add the path so that the object is added in
+          // cavasObjects array.
+          ctrl.drawMode = DRAW_MODE_NONE;
+          // Adding a new path so that the bbox is computed correctly.
+          var size = ctrl.fabricjsOptions.size;
+          var curve = new fabric.Path(path, {
+            stroke: ctrl.fabricjsOptions.stroke,
+            fill: ctrl.fabricjsOptions.fill,
+            strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          });
+          ctrl.canvas.add(curve);
+        }
+      };
+
+      ctrl.isDrawModeBezier = function() {
+        return ctrl.drawMode === DRAW_MODE_BEZIER;
+      };
+
+      ctrl.bringObjectForward = function() {
+        ctrl.canvas.bringForward(ctrl.canvas.getActiveObject());
+        if (ctrl.layerNum < ctrl.canvas._objects.length) {
+          ctrl.layerNum += 1;
+        }
+      };
+
+      ctrl.sendObjectBackward = function() {
+        ctrl.canvas.sendBackwards(ctrl.canvas.getActiveObject());
+        if (ctrl.layerNum > 1) {
+          ctrl.layerNum -= 1;
+        }
+      };
+
       var undoStackPush = function(object) {
         if (ctrl.objectUndoStack.length === ctrl.undoLimit) {
           ctrl.objectUndoStack.shift();
@@ -594,9 +724,12 @@ angular.module('oppia').component('svgFilenameEditor', {
         if (ctrl.objectUndoStack.length > 0) {
           var undoObj = ctrl.objectUndoStack.pop();
           if (undoObj.action === 'add') {
+            var shape = ctrl.canvasObjects.pop();
+            var index = ctrl.canvas._objects.indexOf(shape);
+            ctrl.canvas._objects.splice(index, 1);
             ctrl.objectRedoStack.push({
               action: 'add',
-              object: ctrl.canvas._objects.pop()
+              object: shape
             });
           } else {
             ctrl.isRedo = true;
@@ -604,10 +737,19 @@ angular.module('oppia').component('svgFilenameEditor', {
               action: 'remove',
               object: undoObj.object
             });
+            // Adding the object in the correct position according to initial
+            // order.
+            ctrl.undoFlag = true;
+            ctrl.canvasObjects.splice(undoObj.index, 0, undoObj.object);
             ctrl.canvas.add(undoObj.object);
           }
           ctrl.canvas.renderAll();
         }
+      };
+
+      ctrl.isUndoEnabled = function() {
+        return (
+          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectUndoStack.length > 0);
       };
 
       ctrl.onRedo = function() {
@@ -617,22 +759,36 @@ angular.module('oppia').component('svgFilenameEditor', {
           undoStackPush(redoObj);
           if (redoObj.action === 'add') {
             ctrl.isRedo = true;
+            // Not adding the shape to canvasObjects because it is added by the
+            // event function.
             ctrl.canvas.add(redoObj.object);
           } else {
-            ctrl.canvas._objects.pop();
+            var shape = redoObj.object;
+            var index = ctrl.canvasObjects.indexOf(shape);
+            ctrl.canvasObjects.splice(index, 1);
+            index = ctrl.canvas._objects.indexOf(shape);
+            ctrl.canvas._objects.splice(index, 1);
           }
         }
         ctrl.canvas.renderAll();
       };
 
+      ctrl.isRedoEnabled = function() {
+        return (
+          ctrl.drawMode === DRAW_MODE_NONE && ctrl.objectRedoStack.length > 0);
+      };
+
       ctrl.removeShape = function() {
         var shape = ctrl.canvas.getActiveObject();
+        var index = ctrl.canvasObjects.indexOf(shape);
         if (shape) {
           undoStackPush({
             action: 'remove',
-            object: shape
+            object: shape,
+            index: index
           });
           ctrl.objectRedoStack = [];
+          ctrl.canvasObjects.splice(index, 1);
           ctrl.canvas.remove(shape);
         }
       };
@@ -640,28 +796,49 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.onClear = function() {
         ctrl.objectUndoStack = [];
         ctrl.objectRedoStack = [];
+        ctrl.canvasObjects = [];
         ctrl.canvas.clear();
       };
 
+      ctrl.isClearEnabled = function() {
+        return (
+          ctrl.canvasObjects.length > 0 && ctrl.drawMode === DRAW_MODE_NONE);
+      };
+
       ctrl.onStrokeChange = function() {
-        var shape = ctrl.canvas.getActiveObject();
-        var strokeShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
-        if (shape && strokeShapes.indexOf(shape.get('type')) !== -1) {
-          shape.set({
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          getQuadraticBezierCurve().set({
             stroke: ctrl.fabricjsOptions.stroke
           });
           ctrl.canvas.renderAll();
+        } else {
+          var shape = ctrl.canvas.getActiveObject();
+          var strokeShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
+          ctrl.canvas.freeDrawingBrush.color = ctrl.fabricjsOptions.stroke;
+          if (shape && strokeShapes.indexOf(shape.get('type')) !== -1) {
+            shape.set({
+              stroke: ctrl.fabricjsOptions.stroke
+            });
+            ctrl.canvas.renderAll();
+          }
         }
       };
 
       ctrl.onFillChange = function() {
-        var shape = ctrl.canvas.getActiveObject();
-        var fillShapes = ['rect', 'circle', 'path', 'textbox', 'polyline'];
-        if (shape && fillShapes.indexOf(shape.get('type')) !== -1) {
-          shape.set({
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          getQuadraticBezierCurve().set({
             fill: ctrl.fabricjsOptions.fill
           });
           ctrl.canvas.renderAll();
+        } else {
+          var shape = ctrl.canvas.getActiveObject();
+          var fillShapes = ['rect', 'circle', 'path', 'textbox', 'polyline'];
+          if (shape && fillShapes.indexOf(shape.get('type')) !== -1) {
+            shape.set({
+              fill: ctrl.fabricjsOptions.fill
+            });
+            ctrl.canvas.renderAll();
+          }
         }
       };
 
@@ -701,20 +878,44 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.onSizeChange = function() {
-        var shape = ctrl.canvas.getActiveObject();
-        var size = ctrl.fabricjsOptions.size;
-        var strokeWidthShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
-        if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
-          shape.set({
-            strokeWidth: parseInt(size.substring(0, size.length - 2))
+        // This if condition is required to ensure that the size change is
+        // applied only to the curve and not to all the control points.
+        if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+          var size = ctrl.fabricjsOptions.size;
+          var actualSize = parseInt(size.substring(0, size.length - 2));
+          ctrl.canvas.getObjects().slice(-2).forEach(function(object) {
+            object.set({
+              radius: actualSize + 2
+            });
+          });
+          getQuadraticBezierCurve().set({
+            strokeWidth: actualSize
           });
           ctrl.canvas.renderAll();
-        } else if (shape && shape.get('type') === 'textbox') {
-          shape.set({
-            fontSize: parseInt(size.substring(0, size.length - 2))
-          });
-          ctrl.canvas.renderAll();
+        } else {
+          var shape = ctrl.canvas.getActiveObject();
+          var size = ctrl.fabricjsOptions.size;
+          ctrl.canvas.freeDrawingBrush.width = parseInt(
+            size.substring(0, size.length - 2));
+          var strokeWidthShapes = [
+            'rect', 'circle', 'path', 'line', 'polyline'];
+          if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
+            shape.set({
+              strokeWidth: parseInt(size.substring(0, size.length - 2))
+            });
+            ctrl.canvas.renderAll();
+          } else if (shape && shape.get('type') === 'textbox') {
+            shape.set({
+              fontSize: parseInt(size.substring(0, size.length - 2))
+            });
+            ctrl.canvas.renderAll();
+          }
         }
+      };
+
+      ctrl.isSizeVisible = function() {
+        return Boolean(
+          ctrl.objectIsSelected || ctrl.drawMode !== DRAW_MODE_NONE);
       };
 
       var createColorPicker = function(value) {
@@ -734,6 +935,13 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
         picker.onChange = function(color) {
           parent.style.background = color.rgbaString;
+          var topAlphaSquare = document.getElementById(
+            'top-' + value + '-alpha');
+          var bottomAlphaSquare = document.getElementById(
+            'bottom-' + value + '-alpha');
+          var opacity = 1 - color.rgba[3];
+          topAlphaSquare.style.opacity = opacity.toString();
+          bottomAlphaSquare.style.opacity = opacity.toString();
           ctrl.fabricjsOptions[value] = color.rgbaString;
           onChangeFunc[value]();
         };
@@ -743,7 +951,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.initializeMouseEvents = function() {
-        // Adding event listener for polygon tool
+        // Adding event listener for polygon tool.
         ctrl.canvas.on('mouse:dblclick', function() {
           if (ctrl.drawMode === DRAW_MODE_POLY) {
             ctrl.drawMode = DRAW_MODE_NONE;
@@ -759,10 +967,14 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.polyOptions.bboxPoints.push(new polyPoint(x, y));
             var points = [x, y, x, y];
             var size = ctrl.fabricjsOptions.size;
+            var stroke = ctrl.fabricjsOptions.stroke;
+            // This is to ensure that the polygon lines are visible when
+            // creating the polygon.
+            stroke = stroke.slice(0, -2) + '1)';
             var line = new fabric.Line(points, {
               strokeWidth: parseInt(size.substring(0, size.length - 2)),
               selectable: false,
-              stroke: ctrl.fabricjsOptions.stroke,
+              stroke: stroke,
               strokeLineCap: 'round'
             });
             // This function is for drawing a polygon in a device with touch
@@ -800,84 +1012,128 @@ angular.module('oppia').component('svgFilenameEditor', {
           }
         });
 
-        ctrl.canvas.on('object:added', function() {
-          if (!ctrl.isRedo) {
-            undoStackPush({
-              action: 'add',
-              object: ctrl.canvas._objects[ctrl.canvas._objects.length - 1]
-            });
-            ctrl.objectRedoStack = [];
+        ctrl.canvas.on('object:moving', function(e) {
+          if (ctrl.drawMode === DRAW_MODE_BEZIER) {
+            var pt = e.target;
+            var curve = getQuadraticBezierCurve();
+            if (e.target.name === 'p0') {
+              curve.path[0][1] = pt.left;
+              curve.path[0][2] = pt.top;
+            } else if (e.target.name === 'p1') {
+              curve.path[1][1] = pt.left;
+              curve.path[1][2] = pt.top;
+            } else if (e.target.name === 'p2') {
+              curve.path[1][3] = pt.left;
+              curve.path[1][4] = pt.top;
+            }
+            ctrl.canvas.renderAll();
           }
-          ctrl.isRedo = false;
         });
 
-        ctrl.canvas.on('selection:created', function() {
-          ctrl.fillPicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('fill')
-          });
-          ctrl.strokePicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('stroke')
-          });
-          ctrl.enableRemoveButton = true;
-          if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
-            ctrl.displayFontStyles = true;
+        ctrl.canvas.on('object:added', function() {
+          // This if condition is to ensure that the quadratic bezier control
+          // points are not added to the undoStack.
+          if (
+            ctrl.drawMode === DRAW_MODE_NONE ||
+            ctrl.drawMode === DRAW_MODE_PENCIL) {
+            var shape = ctrl.canvas._objects[ctrl.canvas._objects.length - 1];
+            if (!ctrl.undoFlag) {
+              ctrl.canvasObjects.push(shape);
+            }
+            ctrl.undoFlag = false;
+            if (!ctrl.isRedo) {
+              undoStackPush({
+                action: 'add',
+                object: shape
+              });
+              ctrl.objectRedoStack = [];
+            }
+            ctrl.isRedo = false;
           }
-          $scope.$applyAsync();
+        });
+
+        ctrl.canvas.on('object:scaling', function() {
+          if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
+            var text = ctrl.canvas.getActiveObject();
+            var scaleX = text.get('scaleX');
+            var scaleY = text.get('scaleY');
+            var width = text.get('width');
+            var height = text.get('height');
+            ctrl.canvas.getActiveObject().set({
+              width: width * scaleX,
+              height: height * scaleY,
+              scaleX: 1,
+              scaleY: 1
+            });
+          }
+        });
+
+        var onSelection = function() {
+          // This if condition is to ensure that the fabricjsOptions doesn't
+          // change when the user selects the quadratic bezier control points.
+          if (
+            ctrl.drawMode === DRAW_MODE_NONE ||
+            ctrl.drawMode === DRAW_MODE_PENCIL) {
+            var shape = ctrl.canvas.getActiveObject();
+            ctrl.layerNum = ctrl.canvas._objects.indexOf(shape) + 1;
+            ctrl.fillPicker.setOptions({
+              color: shape.get('fill')
+            });
+            ctrl.strokePicker.setOptions({
+              color: shape.get('stroke')
+            });
+            ctrl.objectIsSelected = true;
+            var strokeWidthShapes = [
+              'rect', 'circle', 'path', 'line', 'polyline'];
+            if (strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
+              ctrl.fabricjsOptions.size = (
+                shape.get('strokeWidth').toString() + 'px');
+            } else if (shape.get('type') === 'textbox') {
+              ctrl.displayFontStyles = true;
+              ctrl.fabricjsOptions.size = (
+                shape.get('fontSize').toString() + 'px');
+              ctrl.fabricjsOptions.fontFamily = shape.get('fontFamily');
+              ctrl.fabricjsOptions.italic = shape.get('fontStyle') === 'italic';
+              ctrl.fabricjsOptions.bold = shape.get('fontWeight') === 'bold';
+            }
+            $scope.$applyAsync();
+          }
+        };
+
+        ctrl.canvas.on('selection:created', function() {
+          onSelection();
         });
 
         ctrl.canvas.on('selection:updated', function() {
-          ctrl.fillPicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('fill')
-          });
-          ctrl.strokePicker.setOptions({
-            color: ctrl.canvas.getActiveObject().get('stroke')
-          });
-          if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
-            ctrl.displayFontStyles = true;
-          }
-          $scope.$applyAsync();
+          onSelection();
         });
 
         ctrl.canvas.on('selection:cleared', function() {
-          ctrl.enableRemoveButton = false;
+          ctrl.objectIsSelected = false;
           ctrl.displayFontStyles = false;
         });
         $scope.$applyAsync();
       };
 
       ctrl.setCanvasDimensions = function() {
-        ctrl.canvasContainer = document.getElementById(ctrl.canvasContainerId);
-        var width = ctrl.canvasContainer.offsetWidth;
-        var height = ctrl.canvasContainer.offsetHeight;
-        // Set the size of the canvas to be equal to that of the
-        // parent element only if it is greater than the current
-        // canvas size.
-        if (ctrl.canvasMaxHeight < height) {
-          ctrl.canvas.setHeight(height);
-          ctrl.canvasMaxHeight = height;
-        }
-        if (ctrl.canvasMaxWidth < width) {
-          ctrl.canvas.setWidth(width);
-          ctrl.canvasMaxWidth = width;
-        }
+        ctrl.canvas.setHeight(CANVAS_HEIGHT);
+        ctrl.canvas.setWidth(CANVAS_WIDTH);
         ctrl.canvas.renderAll();
       };
 
       var initializeFabricJs = function() {
         ctrl.canvas = new fabric.Canvas(ctrl.canvasID);
         ctrl.setCanvasDimensions();
-
-        ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-          subscribe(evt => {
-            ctrl.setCanvasDimensions();
-            $scope.$applyAsync();
-          });
-
         ctrl.canvas.selection = false;
         ctrl.initializeMouseEvents();
         createColorPicker('stroke');
         createColorPicker('fill');
         createColorPicker('bg');
+        // This is used to change the origin of shapes from top left corner
+        // to center of the shape. This is used to align the quadratic bezier
+        // control points correctly to the curve.
+        fabric.Object.prototype.originX = 'center';
+        fabric.Object.prototype.originY = 'center';
       };
 
       ctrl.$onInit = function() {
@@ -893,12 +1149,6 @@ angular.module('oppia').component('svgFilenameEditor', {
           angular.element(document).ready(function() {
             initializeFabricJs();
           });
-        }
-      };
-
-      ctrl.$onDestroy = function() {
-        if (ctrl.resizeSubscription) {
-          ctrl.resizeSubscription.unsubscribe();
         }
       };
     }

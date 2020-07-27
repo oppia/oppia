@@ -44,24 +44,20 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationPlayerStateService', [
-  '$q', '$rootScope', 'ContextService',
-  'EditableExplorationBackendApiService',
+  '$q', '$rootScope', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
-  'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'PlaythroughService',
-  'PretestQuestionBackendApiService',
+  'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
+  'PlaythroughService', 'PretestQuestionBackendApiService',
   'QuestionBackendApiService', 'QuestionPlayerEngineService',
   'ReadOnlyExplorationBackendApiService', 'StatsReportingService',
   'UrlInterpolationService', 'UrlService', 'EXPLORATION_MODE',
   function(
-      $q, $rootScope, ContextService,
-      EditableExplorationBackendApiService,
+      $q, $rootScope, ContextService, EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
-      PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, PlaythroughService,
-      PretestQuestionBackendApiService,
+      PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
+      PlaythroughService, PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
       ReadOnlyExplorationBackendApiService, StatsReportingService,
       UrlInterpolationService, UrlService, EXPLORATION_MODE) {

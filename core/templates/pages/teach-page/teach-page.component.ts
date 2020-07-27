@@ -16,64 +16,64 @@
  * @fileoverview Component for the teach page.
  */
 
-require('base-components/base-content.directive.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/site-analytics.service.ts');
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
-angular.module('oppia').component('teachPage', {
-  template: require('./teach-page.component.html'),
-  controller: [
-    '$timeout', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'WindowRef',
-    function(
-        $timeout, SiteAnalyticsService,
-        UrlInterpolationService, WindowRef) {
-      const ctrl = this;
-      // Define constant for each tab on the page.
-      ctrl.TAB_ID_TEACH = 'teach';
-      ctrl.TAB_ID_PARTICIPATION = 'participation';
-      ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+@Component({
+  selector: 'teach-page',
+  templateUrl: './teach-page.component.html',
+  styleUrls: []
+})
+export class TeachPageComponent implements OnInit {
+  TAB_ID_TEACH: string = 'teach';
+  TAB_ID_PARTICIPATION: string = 'participation';
+  TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+  ALLOWED_TABS: string[] = [this.TAB_ID_TEACH, this.TAB_ID_PARTICIPATION];
+  activeTabName: string = this.TAB_ID_TEACH;
 
-      const ALLOWED_TABS = [
-        ctrl.TAB_ID_TEACH, ctrl.TAB_ID_PARTICIPATION];
+  constructor(
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
+  ) {}
 
-      ctrl.activeTabName = ctrl.TAB_ID_TEACH;
-
-      ctrl.onTabClick = function(tabName) {
-        // Update hash
-        WindowRef.nativeWindow.location.hash = '#' + tabName;
-        ctrl.activeTabName = tabName;
-      };
-
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-
-      ctrl.onApplyToTeachWithOppia = function() {
-        SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();
-        $timeout(function() {
-          WindowRef.nativeWindow.location = ctrl.TEACH_FORM_URL;
-        }, 150);
-        return false;
-      };
-
-      ctrl.$onInit = function() {
-        const hash = WindowRef.nativeWindow.location.hash.slice(1);
-
-        if (ALLOWED_TABS.includes(hash)) {
-          ctrl.activeTabName = hash;
-        }
-        WindowRef.nativeWindow.onhashchange = function() {
-          const hashChange = WindowRef.nativeWindow.location.hash.slice(1);
-          if (ALLOWED_TABS.includes(hashChange)) {
-            ctrl.activeTabName = hashChange;
-          }
-        };
-      };
+  ngOnInit(): void {
+    const hash = this.windowRef.nativeWindow.location.hash.slice(1);
+    if (this.ALLOWED_TABS.includes(hash)) {
+      this.activeTabName = hash;
     }
-  ]
-});
+    this.windowRef.nativeWindow.onhashchange = () => {
+      const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
+      if (this.ALLOWED_TABS.includes(hashChange)) {
+        this.activeTabName = hashChange;
+      }
+    };
+  }
+
+  onTabClick(tabName: string): Window {
+    // Update URL hash.
+    this.windowRef.nativeWindow.location.hash = '#' + tabName;
+    this.activeTabName = tabName;
+    return this.windowRef.nativeWindow;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  onApplyToTeachWithOppia(): boolean {
+    this.siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;
+    }, 150);
+    return false;
+  }
+}
+
+angular.module('oppia').directive('teachPage',
+  downgradeComponent({component: TeachPageComponent}));

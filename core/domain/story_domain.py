@@ -50,6 +50,7 @@ STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
 
 INITIAL_NODE_ID = 'initial_node_id'
+NODE = 'node'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -113,9 +114,9 @@ class StoryChange(change_domain.BaseChange):
         STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
         STORY_NODE_PROPERTY_THUMBNAIL_FILENAME)
 
-    # The allowed list of story contente properties which can be used in
+    # The allowed list of story content properties which can be used in
     # update_story_contents_property command.
-    STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
+    STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID, NODE, )
 
     ALLOWED_COMMANDS = [{
         'name': CMD_UPDATE_STORY_PROPERTY,
@@ -265,7 +266,7 @@ class StoryNode(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -335,7 +336,7 @@ class StoryNode(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the story node are
-            invalid.
+                invalid.
         """
         if self.exploration_id:
             if not isinstance(self.exploration_id, python_utils.BASESTRING):
@@ -465,7 +466,7 @@ class StoryContents(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the story contents are
-            invalid.
+                invalid.
         """
         if not isinstance(self.nodes, list):
             raise utils.ValidationError(
@@ -565,12 +566,6 @@ class StoryContents(python_utils.OBJECT):
                             ' was unlocked.' % node_id)
                     nodes_queue.append(node_id)
 
-            for index, node_visited in enumerate(is_node_visited):
-                if not node_visited:
-                    raise utils.ValidationError(
-                        'The node with id %s is disconnected from the '
-                        'story graph.' % self.nodes[index].id)
-
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
@@ -624,7 +619,7 @@ class StoryContents(python_utils.OBJECT):
 
         Returns:
             StoryNode or None. The StoryNode object of the corresponding
-                exploration id if exist else None.
+            exploration id if exist else None.
         """
         for node in self.nodes:
             if node.exploration_id == exp_id:
@@ -735,7 +730,7 @@ class Story(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -845,7 +840,7 @@ class Story(python_utils.OBJECT):
 
         Returns:
             list(str). The union of the acquired skill IDs corresponding to
-                each of the node IDs.
+            each of the node IDs.
         """
         acquired_skill_ids = []
         for node in self.story_contents.nodes:
@@ -864,7 +859,7 @@ class Story(python_utils.OBJECT):
 
         Returns:
             list(str)|None. The list of prerequisite skill ids for the
-                exploration or None, if no node is linked to it.
+            exploration or None, if no node is linked to it.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exp_id:
@@ -906,7 +901,8 @@ class Story(python_utils.OBJECT):
         }
 
     @classmethod
-    def create_default_story(cls, story_id, title, corresponding_topic_id):
+    def create_default_story(
+            cls, story_id, title, description, corresponding_topic_id):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
@@ -914,6 +910,7 @@ class Story(python_utils.OBJECT):
         Args:
             story_id: str. The unique id of the story.
             title: str. The title for the newly created story.
+            description: str. The high level description of the story.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
 
@@ -924,9 +921,9 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title, None, None,
-            feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
-            story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            story_id, title, None, None, description,
+            feconf.DEFAULT_STORY_NOTES, story_contents,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
 
     @classmethod
@@ -1087,7 +1084,7 @@ class Story(python_utils.OBJECT):
 
         Returns:
             bool. Whether a node with the given exploration ID is already
-                present.
+            present.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exploration_id:
@@ -1291,6 +1288,41 @@ class Story(python_utils.OBJECT):
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].destination_node_ids = (
             new_destination_node_ids)
+
+    def rearrange_node_in_story(self, from_index, to_index):
+        """Rearranges or moves a node in the story content.
+
+        Args:
+            from_index: int. The index of the node to move.
+            to_index: int. The index at which to insert the moved node.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception('Expected from_index value to be a number, '
+                            'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception('Expected to_index value to be a number, '
+                            'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception('Expected from_index and to_index values '
+                            'to be different.')
+
+        story_content_nodes = self.story_contents.nodes
+        if (from_index >= len(story_content_nodes) or
+                from_index < 0):
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if (to_index >= len(story_content_nodes) or
+                to_index < 0):
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
+        del story_content_nodes[from_index]
+        story_content_nodes.insert(to_index, story_node_to_move)
 
     def update_node_exploration_id(
             self, node_id, new_exploration_id):

@@ -126,24 +126,15 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserSettingsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_verify_model_user_ids_exist(self):
-        self.assertTrue(
-            user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
-            .verify_model_user_ids_exist())
-
     def test_get_by_role(self):
         user = user_models.UserSettingsModel.get_by_role(
             feconf.ROLE_ID_ADMIN)
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
     def test_export_data_nonexistent_user(self):
-        with self.assertRaises(user_models.UserSettingsModel
-                               .EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            user_models.UserSettingsModel.EntityNotFoundError,
+            'Entity for class UserSettingsModel with id fake_user not found'):
             user_models.UserSettingsModel.export_data('fake_user')
 
     def test_export_data_trivial(self):
@@ -272,11 +263,6 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.CompletedActivitiesModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
-
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.CompletedActivitiesModel.export_data(
@@ -347,12 +333,6 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             user_models.IncompleteActivitiesModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.IncompleteActivitiesModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
 
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
@@ -450,12 +430,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.ExpUserLastPlaythroughModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
-
     def test_create_success(self):
         user_models.ExpUserLastPlaythroughModel.create(
             self.USER_ID_1, self.EXP_ID_1).put()
@@ -520,6 +494,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
 class LearnerPlaylistModelTests(test_utils.GenericTestBase):
     """Tests for the LearnerPlaylistModel."""
+
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
@@ -569,11 +544,6 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             user_models.LearnerPlaylistModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.LearnerPlaylistModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
 
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
@@ -667,11 +637,6 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserContributionsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
-
     def test_export_data_on_nonexistent_user(self):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.UserContributionsModel.export_data(
@@ -744,12 +709,6 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             user_models.UserEmailPreferencesModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserEmailPreferencesModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
 
 
 class UserSubscriptionsModelTests(test_utils.GenericTestBase):
@@ -851,71 +810,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserSubscriptionsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        user_id_1_old = 'user_id_1_old'
-        user_id_2_old = 'user_id_2_old'
-        user_id_3_old = 'user_id_3_old'
-        user_id_1_new = 'user_id_1_new'
-        user_id_2_new = 'user_id_2_new'
-        user_id_3_new = 'user_id_3_new'
-
-        user_models.UserSubscriptionsModel(id=user_id_1_old).put()
-        user_models.UserSubscriptionsModel(
-            id=user_id_2_old, creator_ids=[user_id_1_old, user_id_3_old]).put()
-        user_models.UserSubscriptionsModel(
-            id=user_id_3_old, creator_ids=[user_id_2_old]).put()
-
-        user_models.UserSubscriptionsModel.migrate_model(
-            user_id_1_old, user_id_1_new)
-        user_models.UserSubscriptionsModel.migrate_model(
-            user_id_2_old, user_id_2_new)
-        user_models.UserSubscriptionsModel.migrate_model(
-            user_id_3_old, user_id_3_new)
-
-        self.assertIsNone(
-            user_models.UserSubscriptionsModel.get_by_id(user_id_1_old))
-        self.assertIsNone(
-            user_models.UserSubscriptionsModel.get_by_id(user_id_2_old))
-        self.assertIsNone(
-            user_models.UserSubscriptionsModel.get_by_id(user_id_3_old))
-
-        migrated_model_1 = user_models.UserSubscriptionsModel.get_by_id(
-            user_id_1_new)
-        self.assertEqual(migrated_model_1.creator_ids, [])
-
-        migrated_model_2 = user_models.UserSubscriptionsModel.get_by_id(
-            user_id_2_new)
-        self.assertEqual(
-            migrated_model_2.creator_ids, [user_id_1_new, user_id_3_new])
-
-        migrated_model_3 = user_models.UserSubscriptionsModel.get_by_id(
-            user_id_3_new)
-        self.assertEqual(migrated_model_3.creator_ids, [user_id_2_new])
-
-    def test_verify_model_user_ids_exist(self):
-        model = user_models.UserSubscriptionsModel(
-            id=self.USER_ID_1, creator_ids=[self.USER_ID_2])
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.creator_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.creator_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.creator_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.creator_ids = [self.USER_ID_2, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model = user_models.UserSubscriptionsModel(
-            id='user_non_id', creator_ids=[self.USER_ID_2])
-        self.assertFalse(model.verify_model_user_ids_exist())
-
     def test_export_data_trivial(self):
         """Test if empty user data is properly exported."""
         user_data = (
@@ -1008,72 +902,6 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserSubscribersModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        user_id_1_old = 'user_id_1_old'
-        user_id_2_old = 'user_id_2_old'
-        user_id_3_old = 'user_id_3_old'
-        user_id_1_new = 'user_id_1_new'
-        user_id_2_new = 'user_id_2_new'
-        user_id_3_new = 'user_id_3_new'
-
-        user_models.UserSubscribersModel(id=user_id_1_old).put()
-        user_models.UserSubscribersModel(
-            id=user_id_2_old, subscriber_ids=[user_id_1_old, user_id_3_old]
-        ).put()
-        user_models.UserSubscribersModel(
-            id=user_id_3_old, subscriber_ids=[user_id_2_old]).put()
-
-        user_models.UserSubscribersModel.migrate_model(
-            user_id_1_old, user_id_1_new)
-        user_models.UserSubscribersModel.migrate_model(
-            user_id_2_old, user_id_2_new)
-        user_models.UserSubscribersModel.migrate_model(
-            user_id_3_old, user_id_3_new)
-
-        self.assertIsNone(
-            user_models.UserSubscribersModel.get_by_id(user_id_1_old))
-        self.assertIsNone(
-            user_models.UserSubscribersModel.get_by_id(user_id_2_old))
-        self.assertIsNone(
-            user_models.UserSubscribersModel.get_by_id(user_id_3_old))
-
-        migrated_model_1 = user_models.UserSubscribersModel.get_by_id(
-            user_id_1_new)
-        self.assertEqual(migrated_model_1.subscriber_ids, [])
-
-        migrated_model_2 = user_models.UserSubscribersModel.get_by_id(
-            user_id_2_new)
-        self.assertEqual(
-            migrated_model_2.subscriber_ids, [user_id_1_new, user_id_3_new])
-
-        migrated_model_3 = user_models.UserSubscribersModel.get_by_id(
-            user_id_3_new)
-        self.assertEqual(migrated_model_3.subscriber_ids, [user_id_2_new])
-
-    def test_verify_model_user_ids_exist(self):
-        model = user_models.UserSubscribersModel(
-            id=self.USER_ID_1, subscriber_ids=[self.USER_ID_2])
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.subscriber_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.subscriber_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.subscriber_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.subscriber_ids = [self.USER_ID_2, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model = user_models.UserSubscribersModel(
-            id='user_non_id', subscriber_ids=[self.USER_ID_2])
-        self.assertFalse(model.verify_model_user_ids_exist())
-
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
     """Tests for the UserRecentChangesBatchModel."""
@@ -1120,12 +948,6 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
             user_models.UserRecentChangesBatchModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserRecentChangesBatchModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
 
 
 class UserStatsModelTest(test_utils.GenericTestBase):
@@ -1231,10 +1053,6 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserStatsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
 
     def test_export_data_on_existing_user(self):
         """Test if export_data works when user is in data store."""
@@ -1349,11 +1167,6 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             user_models.ExplorationUserDataModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.ExplorationUserDataModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
@@ -1546,11 +1359,6 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.CollectionProgressModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
-
     def test_export_data_on_nonexistent_user(self):
         """Test export data on nonexistent user."""
         user_data = user_models.CollectionProgressModel.export_data(
@@ -1653,11 +1461,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.StoryProgressModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
-
     def test_export_data_on_nonexistent_user(self):
         user_data = user_models.StoryProgressModel.export_data(
             self.NONEXISTENT_USER_ID)
@@ -1758,19 +1561,6 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             user_models.UserQueryModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserQueryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                user_models.UserQueryModel.get_user_id_migration_field()),
-            python_utils.UNICODE(user_models.UserQueryModel.submitter_id))
 
     def test_instance_stores_correct_data(self):
         inactive_in_last_n_days = 5
@@ -1911,11 +1701,6 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserBulkEmailsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
-
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     """Tests for UserSkillMasteryModel."""
@@ -1982,11 +1767,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             user_models.UserSkillMasteryModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserSkillMasteryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_construct_model_id(self):
         constructed_model_id = (
@@ -2142,12 +1922,6 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserContributionScoringModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
-
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
         score_models = (user_models.UserContributionScoringModel
@@ -2298,11 +2072,6 @@ class UserCommunityRightsModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            user_models.UserCommunityRightsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
-
     def test_export_data_trivial(self):
         user_data = user_models.UserCommunityRightsModel.export_data(
             self.USER_ID_1)
@@ -2430,8 +2199,23 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_user_id_migration_policy(self):
+
+class PseudonymizedUserModelTests(test_utils.GenericTestBase):
+    """Tests for PseudonymizedUserModel."""
+
+    def test_get_deletion_policy(self):
         self.assertEqual(
-            user_models.PendingDeletionRequestModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+            user_models.PendingDeletionRequestModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.PseudonymizedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.PseudonymizedUserModel.get_new_id('exploration')

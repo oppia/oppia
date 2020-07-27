@@ -50,6 +50,7 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
     'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('services/alerts.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
 
 
@@ -57,8 +58,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
     '$timeout', '$http', '$rootScope', '$scope', '$uibModal', '$window',
-    'AlertsService', 'ContextService', 'ImageLocalStorageService',
-    'TopicsAndSkillsDashboardFilterObjectFactory',
+    'AlertsService', 'ContextService', 'WindowDimensionsService',
+    'ImageLocalStorageService', 'TopicsAndSkillsDashboardFilterObjectFactory',
     'RubricObjectFactory', 'SkillCreationService',
     'SkillObjectFactory', 'TopicCreationService',
     'TopicsAndSkillsDashboardBackendApiService',
@@ -72,8 +73,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
     'TOPIC_SORT_OPTIONS', 'TOPIC_PUBLISHED_OPTIONS',
     function(
         $timeout, $http, $rootScope, $scope, $uibModal, $window,
-        AlertsService, ContextService, ImageLocalStorageService,
-        TopicsAndSkillsDashboardFilterObjectFactory,
+        AlertsService, ContextService, WindowDimensionsService,
+        ImageLocalStorageService, TopicsAndSkillsDashboardFilterObjectFactory,
         RubricObjectFactory, SkillCreationService,
         SkillObjectFactory, TopicCreationService,
         TopicsAndSkillsDashboardBackendApiService,
@@ -86,6 +87,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
         TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
       var ctrl = this;
+      var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
 
       /**
            * Calls the TopicsAndSkillsDashboardBackendApiService and fetches
@@ -95,49 +97,58 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       ctrl._initDashboard = function(stayInSameTab) {
         TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
           function(response) {
-            ctrl.totalTopicSummaries = response.topic_summary_dicts;
+            ctrl.totalTopicSummaries = response.topicSummaries;
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
             ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
             ctrl.currentCount = ctrl.totalEntityCountToDisplay;
-            ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
-            ctrl.goToPageNumber(0);
+            ctrl.applyFilters();
             ctrl.editableTopicSummaries = (ctrl.topicSummaries.filter(
               function(summary) {
-                return summary.can_edit_topic === true;
+                return summary.canEditTopic === true;
               }
             ));
-            ctrl.totalSkillCount = response.total_skill_count;
+            ctrl.totalSkillCount = response.totalSkillCount;
             ctrl.skillsCategorizedByTopics = (
-              response.categorized_skills_dict);
+              response.categorizedSkillsDict);
             ctrl.untriagedSkillSummaries = (
-              response.untriaged_skill_summary_dicts);
+              response.untriagedSkillSummaries);
             ctrl.totalUntriagedSkillSummaries = (
               ctrl.untriagedSkillSummaries);
             ctrl.mergeableSkillSummaries = (
-              response.mergeable_skill_summary_dicts);
+              response.mergeableSkillSummaries);
             if (!stayInSameTab || !ctrl.activeTab) {
               ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
             }
-            ctrl.userCanCreateTopic = response.can_create_topic;
-            ctrl.userCanCreateSkill = response.can_create_skill;
+            ctrl.userCanCreateTopic = response.canCreateTopic;
+            ctrl.userCanCreateSkill = response.canCreateSkill;
             $rootScope.$broadcast(
               EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
             $rootScope.$broadcast(
               EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
-            ctrl.userCanDeleteTopic = response.can_delete_topic;
-            ctrl.userCanDeleteSkill = response.can_delete_skill;
+            ctrl.userCanDeleteTopic = response.canDeleteTopic;
+            ctrl.userCanDeleteSkill = response.canDeleteSkill;
 
             if (ctrl.topicSummaries.length === 0 &&
                       ctrl.untriagedSkillSummaries.length !== 0) {
               ctrl.activeTab = ctrl.TAB_NAME_SKILLS;
               ctrl.initSkillDashboard();
             }
-            ctrl.classrooms = response.all_classroom_names;
-            // Adding this since karma tests adds
-            // TOPIC_FILTER_CLASSROOM_ALL for every it block.
+            ctrl.classrooms = response.allClassroomNames;
+            // Adding the if checks since karma tests adds
+            // the values in the array for every it block.
+            if (!ctrl.classrooms.includes(TOPIC_CLASSROOM_UNASSIGNED)) {
+              ctrl.classrooms.unshift(TOPIC_CLASSROOM_UNASSIGNED);
+            }
             if (!ctrl.classrooms.includes(TOPIC_FILTER_CLASSROOM_ALL)) {
               ctrl.classrooms.unshift(TOPIC_FILTER_CLASSROOM_ALL);
             }
+            ctrl.skillClassrooms = angular.copy(ctrl.classrooms);
+            var unassignedValueIndex = (
+              ctrl.skillClassrooms.indexOf(TOPIC_CLASSROOM_UNASSIGNED));
+            if (unassignedValueIndex !== -1) {
+              ctrl.skillClassrooms.splice(unassignedValueIndex, 1);
+            }
+
             $rootScope.$apply();
           },
           function(errorResponse) {
@@ -175,6 +186,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
            */
       ctrl.setActiveTab = function(tabName) {
         ctrl.activeTab = tabName;
+        ctrl.filterObject.reset();
         if (ctrl.activeTab === ctrl.TAB_NAME_TOPICS) {
           ctrl.goToPageNumber(ctrl.topicPageNumber);
         } else if (ctrl.activeTab === ctrl.TAB_NAME_SKILLS) {
@@ -227,8 +239,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
               ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
               (response) => {
                 ctrl.moreSkillsPresent = response.more;
-                ctrl.nextCursor = response.next_cursor;
-                ctrl.skillSummaries.push(...response.skill_summary_dicts);
+                ctrl.nextCursor = response.nextCursor;
+                ctrl.skillSummaries.push(...response.skillSummaries);
                 ctrl.currentCount = ctrl.skillSummaries.length;
                 if (ctrl.firstTimeFetchingSkills) {
                   ctrl.goToPageNumber(0);
@@ -296,7 +308,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       // Select2 dropdown cannot automatically refresh its display
       // after being translated.
       // Use ctrl.select2DropdownIsShown in its ng-if attribute
-      // and this function to force it to reload
+      // and this function to force it to reload.
       var _forceSelect2Refresh = function() {
         ctrl.select2DropdownIsShown = false;
         $timeout(function() {
@@ -305,10 +317,28 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       };
 
       ctrl.resetFilters = function() {
+        ctrl.getUpperLimitValueForPagination();
         ctrl.topicSummaries = ctrl.totalTopicSummaries;
         ctrl.currentCount = ctrl.totalEntityCountToDisplay;
         ctrl.filterObject.reset();
         ctrl.applyFilters();
+      };
+
+      ctrl.toggleFilterBox = function() {
+        ctrl.filterBoxIsShown = !ctrl.filterBoxIsShown;
+      };
+
+      ctrl.getUpperLimitValueForPagination = function() {
+        return (
+          Math.min(((ctrl.pageNumber * ctrl.itemsPerPage) +
+            ctrl.itemsPerPage), ctrl.currentCount));
+      };
+
+      ctrl.getTotalCountValueForSkills = function() {
+        if (ctrl.skillSummaries.length > ctrl.itemsPerPage) {
+          return 'many';
+        }
+        return ctrl.skillSummaries.length;
       };
 
       ctrl.refreshPagination = function() {
@@ -328,7 +358,9 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.skillPageNumber = 0;
         ctrl.lastSkillPage = 0;
         ctrl.selectedIndex = null;
+        ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
         ctrl.itemsPerPageChoice = [10, 15, 20];
+        ctrl.filterBoxIsShown = !WindowDimensionsService.isWindowNarrow();
         ctrl.filterObject = (
           TopicsAndSkillsDashboardFilterObjectFactory.createDefault());
         ctrl.classrooms = [];

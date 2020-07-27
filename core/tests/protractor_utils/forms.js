@@ -24,6 +24,7 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
+var waitFor = require('./waitFor.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -154,7 +155,7 @@ var ListEditor = function(elem) {
     },
     addItem: addItem,
     deleteItem: deleteItem,
-    // This will add or delete list elements as necessary
+    // This will add or delete list elements as necessary.
     setLength: async function(desiredLength) {
       var startingLength = await elem.all(
         await by.repeater('item in localValue track by $index')).count();
@@ -185,6 +186,9 @@ var RichTextEditor = async function(elem) {
     await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
+    await waitFor.elementToBeClickable(
+      elem.element(by.css('.' + buttonName)),
+      'Toolbar button takes too long to be clickable.');
     await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {
@@ -238,7 +242,7 @@ var RichTextEditor = async function(elem) {
       await _clickToolbarButton(
         'cke_button__oppia' + componentName.toLowerCase());
 
-      // The currently active modal is the last in the DOM
+      // The currently active modal is the last in the DOM.
       var modal = await element.all(by.css('.modal-dialog')).last();
 
       // Need to convert arguments to an actual array; we tell the component
@@ -249,12 +253,21 @@ var RichTextEditor = async function(elem) {
       }
       await richTextComponents.getComponent(componentName)
         .customizeComponent.apply(null, args);
-      await modal.element(
-        by.css('.protractor-test-close-rich-text-component-editor')).click();
-
+      var doneButton = modal.element(
+        by.css(
+          '.protractor-test-close-rich-text-component-editor'));
+      await waitFor.elementToBeClickable(
+        doneButton,
+        'save button taking too long to be clickable');
+      await doneButton.click();
+      await waitFor.invisibilityOf(
+        modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
-      if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
+      if (
+        [
+          'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
+        ].includes(componentName)) {
         await elem.all(
           by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
       }
@@ -267,7 +280,7 @@ var RichTextEditor = async function(elem) {
 };
 
 // Used to edit entries of a set of HTML strings, specifically used in the item
-// selection interaction test to customize interaction details
+// selection interaction test to customize interaction details.
 var SetOfHtmlStringEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
@@ -499,7 +512,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 
   return {
     readPlainText: function(text) {
-      // Plain text is in a text node so not recorded in either array
+      // Plain text is in a text node so not recorded in either array.
       expect(
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
@@ -519,14 +532,28 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       var elem = await arrayOfElems.get(arrayPointer);
       expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
-      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
-
       // Need to convert arguments to an actual array; we tell the component
       // which element to act on but drop the componentName.
       var args = [elem];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
+      // TODO(#9821) :The Math rich text components are now rendered as SVGs by
+      // Math-Jax, and the XPATH_SELECTOR defined in the method expectRichText()
+      // cannot effectively parse the SVG tags, hence the elem.getText() won't
+      // work for Math components.
+      if (componentName === 'Math') {
+        // Math-Jax renders the equations with the help of a script having
+        // innerHTML equal to the latex value. In future we will have to remove
+        // the checks below because Math-Jax will be removed from learner view.
+        var mathScriptTag = elem.element(by.tagName('script'));
+        expect(await mathScriptTag.isPresent()).toBe(true);
+        expect(args.length).toBe(2);
+        expect(await mathScriptTag.getAttribute('innerHTML')).toBe(args[1]);
+      } else {
+        expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      }
+
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
@@ -551,7 +578,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 // interested in the process of interacting with the page than in the
 // information thereby conveyed.
 var toRichText = async function(text) {
-  // The 'handler' should be either a RichTextEditor or RichTextChecker
+  // The 'handler' should be either a RichTextEditor or RichTextChecker.
   return async function(handler) {
     if (handler.hasOwnProperty('setPlainText')) {
       await handler.setPlainText(text);

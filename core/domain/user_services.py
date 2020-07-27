@@ -117,8 +117,8 @@ class UserSettings(python_utils.OBJECT):
             profile_picture_data_url: str or None. User uploaded profile
                 picture as a dataURI string.
             default_dashboard: str|None. The default dashboard of the user.
-            creator_dashboard_display_pref: str. The creator dashboard
-            dashboard of the user.
+            creator_dashboard_display_pref: str. The creator dashboard of the
+                user.
             user_bio: str. User-specified biography.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.
@@ -176,6 +176,8 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
@@ -291,6 +293,26 @@ class UserSettings(python_utils.OBJECT):
                 if reserved_username in username.lower().strip():
                     raise utils.ValidationError(
                         'This username is not available.')
+
+
+def is_user_id_correct(user_id):
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
+    """
+    if user_id in feconf.SYSTEM_USERS.keys():
+        return True
+
+    return all((
+        user_id.islower(),
+        user_id.startswith('uid_'),
+        len(user_id) == user_models.USER_ID_LENGTH))
 
 
 def is_username_taken(username):
@@ -729,7 +751,7 @@ def _transform_user_settings(user_settings_model):
         user_settings_model: UserSettingsModel.
 
     Returns:
-         UserSettings. Domain object for user settings.
+        UserSettings. Domain object for user settings.
     """
     if user_settings_model:
         return UserSettings(
@@ -1087,28 +1109,15 @@ def update_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def mark_user_for_deletion(
-        user_id, exploration_ids, collection_ids):
-    """Set deleted of the user with given user_id to True and create
-    PendingDeletionRequestModel for that user.
+def mark_user_for_deletion(user_id):
+    """Set the 'deleted' property of the user with given user_id to True.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
-        exploration_ids: list(str). List of exploration ids that were soft
-            deleted and should be hard deleted later.
-        collection_ids: list(str). List of collection ids that were soft
-            deleted and should be hard deleted later.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-
-    user_models.PendingDeletionRequestModel(
-        id=user_id,
-        email=user_settings.email,
-        exploration_ids=exploration_ids,
-        collection_ids=collection_ids,
-    ).put()
 
 
 def get_human_readable_user_ids(user_ids):
@@ -1126,7 +1135,7 @@ def get_human_readable_user_ids(user_ids):
 
     Raises:
         Exception: At least one of the user_ids does not correspond to a valid
-        UserSettingsModel.
+            UserSettingsModel.
     """
     users_settings = get_users_settings(user_ids)
     usernames = []
@@ -1297,7 +1306,7 @@ def get_users_email_preferences(user_ids):
     """Get email preferences for the list of users.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
 
     Returns:
@@ -1381,7 +1390,7 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     with given user_id.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
         exploration_id: str. The exploration id.
 

@@ -361,7 +361,7 @@ class WorkedExample(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of the worked example are
-            invalid.
+                invalid.
         """
         if not isinstance(self.question, state_domain.SubtitledHtml):
             raise utils.ValidationError(
@@ -437,7 +437,7 @@ class SkillContents(python_utils.OBJECT):
 
         Raises:
             ValidationError: One or more attributes of skill contents are
-            invalid.
+                invalid.
         """
         available_content_ids = set([])
         if not isinstance(self.explanation, state_domain.SubtitledHtml):
@@ -1035,7 +1035,7 @@ class Skill(python_utils.OBJECT):
 
         Args:
             all_questions_merged: bool. Flag indicating if all questions are
-            merged to the superseding skill.
+                merged to the superseding skill.
         """
         self.all_questions_merged = all_questions_merged
 
@@ -1110,7 +1110,7 @@ class Skill(python_utils.OBJECT):
 
         Returns:
             int or None. The index of the corresponding misconception, or None
-                if there is no such misconception.
+            if there is no such misconception.
         """
         for ind, misconception in enumerate(self.misconceptions):
             if misconception.id == misconception_id:
@@ -1436,6 +1436,44 @@ class AugmentedSkillSummary(python_utils.OBJECT):
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
+        }
+
+
+class TopicAssignment(python_utils.OBJECT):
+    """Domain object for Topic Assignment, which provides the details of a
+    single topic (and, if applicable, the subtopic within that topic) to which
+    the skill is assigned.
+    """
+
+    def __init__(
+            self, topic_id, topic_name, topic_version, subtopic_id):
+        """Constructs a TopicAssignment domain object.
+
+        Args:
+            topic_id: str. The unique id of the topic.
+            topic_name: str. The name of the topic.
+            topic_version: int. The current version of the topic to which the
+                skill is assigned.
+            subtopic_id: str or None. The id of the subtopic to which the skill
+                is assigned, or None if the skill is not assigned to any
+                subtopic.
+        """
+        self.topic_id = topic_id
+        self.topic_name = topic_name
+        self.topic_version = topic_version
+        self.subtopic_id = subtopic_id
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this TopicAssignment object.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'topic_name': self.topic_name,
+            'topic_version': self.topic_version,
+            'subtopic_id': self.subtopic_id,
         }
 
 

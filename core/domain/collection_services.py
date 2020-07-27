@@ -77,7 +77,7 @@ def _migrate_collection_contents_to_latest_schema(
 
     Raises:
         Exception: The schema version of the collection is outside of what is
-        supported at present.
+            supported at present.
     """
     collection_schema_version = versioned_collection_contents['schema_version']
     if not (1 <= collection_schema_version
@@ -408,7 +408,7 @@ def get_explorations_completed_in_collections(user_id, collection_ids):
 
     Returns:
         list(list(str)). List of the exploration ids completed in each
-            collection.
+        collection.
     """
     progress_models = user_models.CollectionProgressModel.get_multi(
         user_id, collection_ids)
@@ -561,7 +561,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
             collections, to start the search from.
 
     Returns:
-        2-tuple of (returned_collection_ids, search_cursor), where:
+        2-tuple of (returned_collection_ids, search_cursor). Where:
             returned_collection_ids : list(str). A list with all collection ids
                 matching the given search query string, as well as a search
                 cursor for future fetches. The list contains exactly
@@ -604,12 +604,11 @@ def apply_change_list(collection_id, change_list):
     Args:
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
-            collection. Each entry is a dict that represents a
-            CollectionChange.
-    object.
+            collection. Each entry is a dict that represents a CollectionChange
+            object.
 
     Returns:
-      Collection. The resulting collection domain object.
+        Collection. The resulting collection domain object.
     """
     collection = get_collection_by_id(collection_id)
     try:
@@ -1100,7 +1099,12 @@ def delete_collection_summaries(collection_ids):
     """
     summary_models = (
         collection_models.CollectionSummaryModel.get_multi(collection_ids))
-    collection_models.CollectionSummaryModel.delete_multi(summary_models)
+    existing_summary_models = [
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
+    collection_models.CollectionSummaryModel.delete_multi(
+        existing_summary_models)
 
 
 def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):

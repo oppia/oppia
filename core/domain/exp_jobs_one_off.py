@@ -41,7 +41,6 @@ from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
-gae_image_services = models.Registry.import_gae_image_services()
 
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
@@ -93,7 +92,9 @@ class DragAndDropSortInputInteractionOneOffJob(
     def map(item):
         if item.deleted:
             return
-
+        exp_status = rights_manager.get_exploration_rights(item.id).status
+        if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            return
         exploration = exp_fetchers.get_exploration_from_model(item)
         validation_errors = []
         for state_name, state in exploration.states.items():
@@ -355,6 +356,11 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
 
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationJobManager, cls).enqueue(
+            job_id, shard_count=64)
+
     @staticmethod
     def map(item):
         if item.deleted:
@@ -438,6 +444,7 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks the html content of an exploration and validates all the
     Math tags in the HTML.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -519,6 +526,122 @@ class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExplorationMathRichTextInfoModelGenerationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that finds all the explorations with math rich text components and
+    creates a temporary storage model with all the information required for
+    generating math rich text component SVG images.
+    """
+
+    # A constant that will be yielded as a key by this job in the map function,
+    # When it finds an exploration with math rich text components without SVGs.
+    _SUCCESS_KEY = 'exploration-with-math-tags'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        try:
+            exploration.validate()
+        except Exception as e:
+            logging.error(
+                'Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            yield (
+                'validation_error',
+                'Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            return
+        html_strings_in_exploration = ''
+        for state in exploration.states.values():
+            html_strings_in_exploration += (
+                ''.join(state.get_all_html_content_strings()))
+        list_of_latex_strings_without_svg = (
+            html_validation_service.
+            get_latex_strings_without_svg_from_html(
+                html_strings_in_exploration))
+        if len(list_of_latex_strings_without_svg) > 0:
+            yield (
+                ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                _SUCCESS_KEY,
+                (item.id, list_of_latex_strings_without_svg))
+
+    @staticmethod
+    def reduce(key, values):
+        if key == (
+                ExplorationMathRichTextInfoModelGenerationOneOffJob.
+                _SUCCESS_KEY):
+            final_values = [ast.literal_eval(value) for value in values]
+            estimated_no_of_batches = 1
+            approx_size_of_math_svgs_bytes_in_current_batch = 0
+            exploration_math_rich_text_info_list = []
+            longest_raw_latex_string = ''
+            total_number_of_svgs_required = 0
+            for exp_id, list_of_latex_strings_without_svg in final_values:
+                math_rich_text_info = (
+                    exp_domain.ExplorationMathRichTextInfo(
+                        exp_id, True, list_of_latex_strings_without_svg))
+                exploration_math_rich_text_info_list.append(
+                    math_rich_text_info)
+
+                approx_size_of_math_svgs_bytes = (
+                    math_rich_text_info.get_svg_size_in_bytes())
+                total_number_of_svgs_required += len(
+                    list_of_latex_strings_without_svg)
+                longest_raw_latex_string = max(
+                    math_rich_text_info.get_longest_latex_expression(),
+                    longest_raw_latex_string, key=len)
+                approx_size_of_math_svgs_bytes_in_current_batch += int(
+                    approx_size_of_math_svgs_bytes)
+                if approx_size_of_math_svgs_bytes_in_current_batch > (
+                        feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
+                    approx_size_of_math_svgs_bytes_in_current_batch = 0
+                    estimated_no_of_batches += 1
+
+            exp_services.save_multi_exploration_math_rich_text_info_model(
+                exploration_math_rich_text_info_list)
+
+            final_value_dict = {
+                'estimated_no_of_batches': estimated_no_of_batches,
+                'longest_raw_latex_string': longest_raw_latex_string,
+                'number_of_explorations_having_math': (
+                    len(final_values)),
+                'total_number_of_svgs_required': total_number_of_svgs_required
+            }
+            yield (key, final_value_dict)
+        else:
+            yield (key, values)
+
+
+class ExplorationMathRichTextInfoModelDeletionOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes all instances of the ExplorationMathRichTextInfoModel
+    from the datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationMathRichTextInfoModel]
+
+    @staticmethod
+    def map(item):
+        item.delete()
+        yield ('model_deleted', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        no_of_models_deleted = (
+            sum(ast.literal_eval(v) for v in values))
+        yield (key, ['%d models successfully delelted.' % (
+            no_of_models_deleted)])
 
 
 class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
@@ -625,6 +748,7 @@ class InteractionCustomizationArgsValidationJob(
     """One-off job for validating all the customizations arguments of
     Rich Text Components.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]

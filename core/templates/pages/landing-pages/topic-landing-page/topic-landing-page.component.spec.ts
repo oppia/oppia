@@ -16,137 +16,128 @@
  * @fileoverview Unit tests for topicLandingPage.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, async, tick, fakeAsync }
+  from '@angular/core/testing';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { TopicLandingPageComponent } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
+import { PageTitleService } from 'services/page-title.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-require(
-  'pages/landing-pages/topic-landing-page/topic-landing-page.component.ts');
+class MockWindowRef {
+  _window = {
+    location: {
+      _pathname: '/math/ratios',
+      _href: '',
+      get pathname(): string {
+        return this._pathname;
+      },
+      set pathname(val: string) {
+        this._pathname = val;
+      },
+      get href(): string {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      }
+    }
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
-describe('Topic Landing Page', function() {
-  var ctrl = null;
-  var $timeout = null, $window = null;
-  var SiteAnalyticsService = null;
-  var windowRef = new WindowRef();
+class MockSiteAnalyticsService {
+  registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
+    return;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRef);
-    $provide.value('PageTitleService', {
-      setPageTitle: function() {}
-    });
+let component: TopicLandingPageComponent;
+let fixture: ComponentFixture<TopicLandingPageComponent>;
+
+describe('Topic Landing Page', () => {
+  let siteAnalyticsService = null;
+  let windowRef: MockWindowRef;
+  let pageTitleService = null;
+
+  beforeEach(async(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      declarations: [TopicLandingPageComponent],
+      providers: [
+        PageTitleService,
+        { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
+        UrlInterpolationService,
+        { provide: WindowRef, useValue: windowRef }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    pageTitleService = TestBed.get(PageTitleService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
   }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $timeout = $injector.get('$timeout');
-    $window = $injector.get('$window');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
-    ctrl = $componentController('topicLandingPage');
-  }));
-
-  it('should get information from topic identified at pathname', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/math/ratios'
-      }
-    });
-    ctrl.$onInit();
-
-    expect(ctrl.subject).toBe('math');
-    expect(ctrl.topicTitle).toBe('Ratios');
-    expect(ctrl.lessons).toEqual([
-      'What is a Ratio?',
-      'Equivalent Ratios',
-      'Ratios & Proportional Reasoning',
-      'Writing Ratios in Simplest Form'
-    ]);
-    expect(ctrl.bookImageUrl).toBe('/assets/images/splash/books.svg');
-    expect(ctrl.image1).toEqual({
-      src_png: '/assets/images/landing/math/ratios/ratios_James.png',
-      src_webp: '/assets/images/landing/math/ratios/ratios_James.webp',
-      alt: 'A boy showing 2 is to 3 ratio on a card.'
-    });
-    expect(ctrl.image2).toEqual({
-      src_png: '/assets/images/landing/math/ratios/ratios_question.png',
-      src_webp: '/assets/images/landing/math/ratios/ratios_question.webp',
-      alt: 'A smoothie shop and a card having question "What does a' +
-      ' ratio tell us?" with options.'
-    });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicLandingPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should get video url', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/math/ratios'
-      }
-    });
-    ctrl.$onInit();
 
-    expect(ctrl.getVideoUrl()).toBe(
-      '/assets/videos/landing/math/ratios/ratios_video.mp4');
+  it('should get information from topic identified at pathname', () => {
+    windowRef.nativeWindow.location.pathname = '/math/ratios';
+    component.ngOnInit();
+    expect(component.topicTitle).toBe('Ratios');
   });
 
-  it('should not get video url if it does not exist', function() {
-    expect(function() {
-      ctrl.getVideoUrl();
-    }).toThrowError(
-      'There is no video data available for this landing page.');
-  });
-
-  it('should click get started button', function() {
-    var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
-    nativeWindowSpy.and.returnValue({
-      location: {
-        pathname: '/math/ratios'
-      }
-    });
-    var analyticsSpy = spyOn(
-      SiteAnalyticsService, 'registerOpenCollectionFromLandingPageEvent')
+  it('should click get started button', fakeAsync(() => {
+    windowRef.nativeWindow.location.pathname = '/math/ratios';
+    let analyticsSpy = spyOn(
+      siteAnalyticsService, 'registerOpenCollectionFromLandingPageEvent')
       .and.callThrough();
     // Get collection id from ratios.
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    nativeWindowSpy.and.returnValue({
-      location: ''
-    });
-    ctrl.onClickGetStartedButton();
+    windowRef.nativeWindow.location.href = '';
+    component.onClickGetStartedButton();
 
-    var ratiosCollectionId = '53gXGLIR044l';
+    let ratiosCollectionId = '53gXGLIR044l';
     expect(analyticsSpy).toHaveBeenCalledWith(ratiosCollectionId);
-    $timeout.flush(150);
+    tick(150);
+    fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location).toBe(
+    expect(windowRef.nativeWindow.location.href).toBe(
       '/collection/' + ratiosCollectionId);
-  });
+  }));
 
-  it('should click learn more button', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
-    });
-    ctrl.onClickLearnMoreButton();
-    $timeout.flush(150);
+  it('should click learn more button', fakeAsync(() => {
+    windowRef.nativeWindow.location.href = '';
+    component.onClickLearnMoreButton();
+    tick(150);
+    fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location).toBe('/');
-  });
+    expect(windowRef.nativeWindow.location.href).toBe('/community-library');
+  }));
 
-  it('should click exploration lessons button', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
-    });
-    ctrl.onClickExploreLessonsButton();
-    $timeout.flush(150);
+  it('should have a tagline in the page title', fakeAsync(() => {
+    windowRef.nativeWindow.location.pathname = '/math/fractions';
+    component.ngOnInit();
+    tick(150);
+    fixture.detectChanges();
+    expect(pageTitleService.getPageTitle()).toBe('Fractions | ' +
+      'Add, Subtract, Multiply and Divide | Oppia');
+  }));
 
-    expect(windowRef.nativeWindow.location).toBe('/community-library');
-  });
+  it('should return correct lesson quality image src', function() {
+    let imageSrc = component.getLessonQualityImageSrc('someImage.png');
+    expect(imageSrc).toBe('/assets/images/landing/someImage.png');
 
-  it('should have a tagline in the page title', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/math/fractions'
-      }
-    });
-    ctrl.$onInit();
-    $timeout(() => {
-      expect($window.document.title).toBe('Fractions | ' +
-        'Add, Subtract, Multiply and Divide | Oppia');
-    }, 150, false);
+    imageSrc = component.getLessonQualityImageSrc('someOtherImage.png');
+    expect(imageSrc).toBe('/assets/images/landing/someOtherImage.png');
   });
 });

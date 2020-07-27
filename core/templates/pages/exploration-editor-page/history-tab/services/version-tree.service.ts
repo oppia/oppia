@@ -22,40 +22,40 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IRevertChangeList, IExplorationChangeList } from
+import { RevertChangeList, ExplorationChangeList } from
   'domain/exploration/ExplorationDraftObjectFactory';
 
-export interface IExplorationSnapshot {
+export interface ExplorationSnapshot {
   'commit_message': string;
   'committer_id': string;
   'commit_type': string;
   'version_number': number;
   'created_on_ms': number;
-  'commit_cmds': IExplorationChangeList[];
+  'commit_cmds': ExplorationChangeList[];
 }
 
-interface IExplorationSnapshots {
-  [version: number]: IExplorationSnapshot;
+interface ExplorationSnapshots {
+  [version: number]: ExplorationSnapshot;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class VersionTreeService {
-  private _snapshots: IExplorationSnapshots = null;
+  private _snapshots: ExplorationSnapshots = null;
   private _treeParents: {} = null;
 
-  init(snapshotsData: IExplorationSnapshot[]): void {
+  init(snapshotsData: ExplorationSnapshot[]): void {
     this._treeParents = {};
     this._snapshots = {};
     var numberOfVersions = snapshotsData.length;
 
-    // Populate _snapshots so _snapshots[i] corresponds to version i
+    // Populate _snapshots so _snapshots[i] corresponds to version i.
     for (var i = 0; i < numberOfVersions; i++) {
       this._snapshots[i + 1] = snapshotsData[i];
     }
 
-    // Generate the version tree of an exploration from its snapshots
+    // Generate the version tree of an exploration from its snapshots.
     for (var versionNum = 2; versionNum <= numberOfVersions; versionNum++) {
       if (this._snapshots[versionNum].commit_type === 'revert') {
         for (
@@ -63,7 +63,7 @@ export class VersionTreeService {
           if (this._snapshots[versionNum].commit_cmds[i].cmd ===
               'AUTO_revert_version_number') {
             this._treeParents[versionNum] =
-              (<IRevertChangeList> this._snapshots[versionNum].commit_cmds[i])
+              (<RevertChangeList> this._snapshots[versionNum].commit_cmds[i])
                 .version_number;
           }
         }
@@ -89,7 +89,7 @@ export class VersionTreeService {
 
   // Finds lowest common ancestor of v1 and v2 in the version tree.
   findLCA(v1: number, v2: number): number {
-    // Find paths from root to v1 and v2
+    // Find paths from root to v1 and v2.
     var pathToV1 = [];
     var pathToV2 = [];
     while (this._treeParents[v1] !== -1) {
@@ -112,7 +112,7 @@ export class VersionTreeService {
     pathToV2.push(1);
     pathToV2.reverse();
 
-    // Compare paths
+    // ---- Compare paths ----
     var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
     var lca = null;
     for (var i = maxIndex; i >= 0; i--) {
@@ -143,7 +143,7 @@ export class VersionTreeService {
    * for 'revert':
    *  - 'version_number': version number reverted to
    */
-  getChangeList(version: number): IExplorationChangeList[] {
+  getChangeList(version: number): ExplorationChangeList[] {
     if (this._snapshots === null) {
       throw new Error('snapshots is not initialized');
     } else if (version === 1) {

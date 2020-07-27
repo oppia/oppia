@@ -96,6 +96,14 @@ md-input-group.md-default-theme label {
   margin-bottom: 0;
 }
 
+/* The following classes' styles are overriden by Guppy's OSK stylesheet and
+they end up rotating the tooltips which are placed on the left or right. This is
+why they need to be overriden.  */
+.left, .right {
+  -webkit-transform: none !important;
+  transform: none !important;
+}
+
 .md-button {
   font-size: 16px;
   line-height: 22px;
@@ -535,6 +543,11 @@ p:last-child {
    CKEditor bug (issue #6206 on Oppia). */
 .oppia-rte p span {
   font-size: 1em !important;
+}
+
+.oppia-rte-editor {
+  border: none;
+  outline: none;
 }
 
 .oppia-rte-editor p span {
@@ -1505,7 +1518,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-placeholder {
-  color: #888;
+  color: #707070;
   font-style: italic;
 }
 
@@ -2226,6 +2239,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-readonly-rule-tile img, .oppia-rule-tab img {
   max-height: 50px;
+  object-fit: contain;
 }
 
 .oppia-rule-dest-link {
@@ -4546,4 +4560,50 @@ div.oppia-issues-learner-action {
 
 .oppia-rule-preview {
   word-wrap: break-word;
+}
+
+.fx-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.fx-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.fx-main-start {
+  justify-content: start;
+}
+
+.fx-main-center {
+  justify-content: center;
+}
+
+.fx-main-end {
+  justify-content: end;
+}
+
+.fx-main-space-evenly {
+  justify-content: space-evenly;
+}
+
+.fx-main-space-around {
+  justify-content: space-around;
+}
+
+.fx-main-pace-between {
+  justify-content: space-between;
+}
+
+.fx-cross-start {
+  align-items: start;
+}
+
+.fx-cross-center {
+  align-items: center;
+}
+
+.fx-cross-end {
+  align-items: end;
 }

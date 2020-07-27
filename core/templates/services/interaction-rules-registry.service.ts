@@ -37,8 +37,6 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { ImageClickInputRulesService } from
   'interactions/ImageClickInput/directives/image-click-input-rules.service';
-import { InteractionSpecsConstants } from
-  'pages/interaction-specs.constants';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { ItemSelectionInputRulesService } from
@@ -46,6 +44,9 @@ import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MathExpressionInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
@@ -56,6 +57,9 @@ import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
@@ -83,10 +87,13 @@ export class InteractionRulesRegistryService {
       private interactiveMapRulesService: InteractiveMapRulesService,
       private itemSelectionInputRulesService: ItemSelectionInputRulesService,
       private logicProofRulesService: LogicProofRulesService,
+      private mathEquationInputRulesService: MathEquationInputRulesService,
       private mathExpressionInputRulesService: MathExpressionInputRulesService,
       private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
       private musicNotesInputRulesService: MusicNotesInputRulesService,
       private numberWithUnitsRulesService: NumberWithUnitsRulesService,
+      private numericExpressionInputRulesService:
+        NumericExpressionInputRulesService,
       private numericInputRulesService: NumericInputRulesService,
       private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
       private setInputRulesService: SetInputRulesService,
@@ -104,10 +111,13 @@ export class InteractionRulesRegistryService {
       InteractiveMapRulesService: this.interactiveMapRulesService,
       ItemSelectionInputRulesService: this.itemSelectionInputRulesService,
       LogicProofRulesService: this.logicProofRulesService,
+      MathEquationInputRulesService: this.mathEquationInputRulesService,
       MathExpressionInputRulesService: this.mathExpressionInputRulesService,
       MultipleChoiceInputRulesService: this.multipleChoiceInputRulesService,
       MusicNotesInputRulesService: this.musicNotesInputRulesService,
       NumberWithUnitsRulesService: this.numberWithUnitsRulesService,
+      NumericExpressionInputRulesService:
+        this.numericExpressionInputRulesService,
       NumericInputRulesService: this.numericInputRulesService,
       PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
       SetInputRulesService: this.setInputRulesService,

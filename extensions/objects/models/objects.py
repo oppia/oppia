@@ -54,10 +54,10 @@ class BaseObject(python_utils.OBJECT):
 
         Returns:
             *. A normalized Python object describing the Object specified by
-                this class.
+            this class.
 
         Raises:
-          TypeError: The Python object cannot be normalized.
+            TypeError: The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
@@ -492,17 +492,17 @@ class CheckedProof(BaseObject):
 
         Returns:
             dict. The normalized object containing the following key-value
-                pairs:
-                    assumptions_string: str. The string containing the
-                        assumptions.
-                    target_string: str. The target string of the proof.
-                    proof_string: str. The proof string.
-                    correct: bool. Whether the proof is correct.
-                    error_category: str. The category of the error.
-                    error_code: str. The error code.
-                    error_message: str. The error message.
-                    error_line_number: str. The line number at which the
-                        error has occurred.
+            pairs:
+                assumptions_string: str. The string containing the
+                    assumptions.
+                target_string: str. The target string of the proof.
+                proof_string: str. The proof string.
+                correct: bool. Whether the proof is correct.
+                error_category: str. The category of the error.
+                error_code: str. The error code.
+                error_message: str. The error message.
+                error_line_number: str. The line number at which the
+                    error has occurred.
 
         Raises:
             TypeError: Cannot convert to the CheckedProof schema.
@@ -541,26 +541,26 @@ class LogicQuestion(BaseObject):
 
         Returns:
             dict. The normalized object containing the following key-value
-                pairs:
-                    assumptions: list(dict(str, *)). The list containing all the
-                        assumptions in the dict format containing following
-                        key-value pairs:
-                            top_kind_name: str. The top kind name in the
-                                expression.
-                            top_operator_name: str. The top operator name
-                                in the expression.
-                            arguments: list. A list of arguments.
-                            dummies: list. A list of dummy values.
-                    results: list(dict(str, *)). The list containing the final
-                        results of the required proof in the dict format
-                        containing following key-value pairs:
-                            top_kind_name: str. The top kind name in the
-                                expression.
-                            top_operator_name: str. The top operator name
-                                in the expression.
-                            arguments: list. A list of arguments.
-                            dummies: list. A list of dummy values.
-                    default_proof_string: str. The default proof string.
+            pairs:
+                assumptions: list(dict(str, *)). The list containing all the
+                    assumptions in the dict format containing following
+                    key-value pairs:
+                        top_kind_name: str. The top kind name in the
+                            expression.
+                        top_operator_name: str. The top operator name
+                            in the expression.
+                        arguments: list(str). A list of arguments.
+                        dummies: list. A list of dummy values.
+                results: list(dict(str, *)). The list containing the final
+                    results of the required proof in the dict format
+                    containing following key-value pairs:
+                        top_kind_name: str. The top kind name in the
+                            expression.
+                        top_operator_name: str. The top operator name
+                            in the expression.
+                        arguments: list(str). A list of arguments.
+                        dummies: list. A list of dummy values.
+                default_proof_string: str. The default proof string.
 
         Raises:
             TypeError: Cannot convert to LogicQuestion schema.
@@ -790,7 +790,7 @@ class NormalizedRectangle2D(BaseObject):
 
         Returns:
             list(list(float)). The normalized object containing list of lists of
-                float values as coordinates of the rectangle.
+            float values as coordinates of the rectangle.
 
         Raises:
             TypeError: Cannot convert to the NormalizedRectangle2D schema.
@@ -972,6 +972,7 @@ class Fraction(BaseObject):
 
 class Units(BaseObject):
     """Units class."""
+
     # Validation of the units is performed only in the frontend using math.js.
     # math.js is not available in the backend.
 
@@ -1111,6 +1112,23 @@ class MathEquation(BaseObject):
         'type': 'unicode',
         'validators': [{
             'id': 'is_valid_math_equation'
+        }]
+    }
+
+
+class NumericExpression(BaseObject):
+    """Class for numeric expressions. Stores a unicode string representing a
+    valid numeric expression.
+    """
+
+    description = 'A unicode string for an numeric expression.'
+    default_value = '1'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_math_expression',
+            'algebraic': False
         }]
     }
 

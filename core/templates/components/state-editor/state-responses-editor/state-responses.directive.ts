@@ -274,7 +274,7 @@ angular.module('oppia').directive('stateResponses', [
 
           $scope.isLinearWithNoFeedback = function(outcome) {
             // Returns false if current interaction is linear and has no
-            // feedback
+            // feedback.
             if (outcome && typeof outcome === 'object' &&
               outcome.constructor.name === 'Outcome') {
               return $scope.isCurrentInteractionLinear() &&
@@ -288,7 +288,7 @@ angular.module('oppia').directive('stateResponses', [
               return 'Self-loops should not be labelled as correct.';
             }
 
-            // Outcome tooltip depends on whether feedback is displayed
+            // Outcome tooltip depends on whether feedback is displayed.
             if ($scope.isLinearWithNoFeedback(outcome)) {
               return 'Please direct the learner to a different card.';
             } else {

@@ -39,13 +39,34 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(1, path)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-from pylint import lint  # isort:skip
-import isort  # isort:skip
-import pycodestyle # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+from pylint import lint  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.reporters import text  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+import isort  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+import pycodestyle # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+
+
+class StringMessageStream(python_utils.OBJECT):
+    """Save and return output stream."""
+
+    def __init__(self):
+        """Constructs a StringMessageStream object."""
+        self.messages = []
+
+    def write(self, message):
+        """Writes the given message to messages list.
+
+        Args:
+            message: str. The message to be written.
+        """
+        self.messages.append(message)
+
+    def read(self):
+        """Returns the output messages as a list.
+
+        Returns:
+            list(str). The list of output messages.
+        """
+        return self.messages
 
 
 class PythonLintChecksManager(python_utils.OBJECT):
@@ -55,15 +76,19 @@ class PythonLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
-            self, files_to_lint, verbose_mode_enabled):
+            self, files_to_lint, file_cache, verbose_mode_enabled):
         """Constructs a PythonLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
+            file_cache: object(FileCache). Provides thread-safe access to cached
+                file content.
             verbose_mode_enabled: bool. True if mode is enabled.
         """
         self.files_to_lint = files_to_lint
+        self.file_cache = file_cache
         self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
@@ -75,45 +100,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.py_filepaths
-
-    def _check_import_order(self):
-        """This function is used to check that each file
-        has imports placed in alphabetical order.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting import-order checks')
-            python_utils.PRINT('----------------------------------------')
-        summary_messages = []
-        files_to_check = self.py_filepaths
-        failed = False
-        stdout = sys.stdout
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in files_to_check:
-                # This line prints the error message along with file path
-                # and returns True if it finds an error else returns False
-                # If check is set to True, isort simply checks the file and
-                # if check is set to False, it autocorrects import-order errors.
-                if (isort.SortImports(
-                        filepath, check=True, show_diff=(
-                            True)).incorrectly_sorted):
-                    failed = True
-                    python_utils.PRINT('')
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s Import order checks failed, file imports should be '
-                    'alphabetized, see affect files above.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s Import order checks passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-        return summary_messages
 
     def _check_non_test_files(self):
         """This function is used to check that function
@@ -129,7 +115,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             for filepath in files_to_check:
                 if filepath.endswith('_test.py'):
                     continue
-                for line_num, line in enumerate(FILE_CACHE.readlines(
+                for line_num, line in enumerate(self.file_cache.readlines(
                         filepath)):
                     line = line.strip()
                     words = line.split()
@@ -197,7 +183,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             'DashboardStatsOneOffJob',
             'UserDeletionOneOffJob',
             'UserQueryOneOffJob',
-            'VerifyUserDeletionOneOffJob'
+            'FullyCompleteUserDeletionOneOffJob'
         ]
 
         jobs_registry = importlib.import_module('core.jobs_registry')
@@ -285,12 +271,11 @@ class PythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('There are no Python files to lint.')
             return []
 
-        import_order_check_message = self._check_import_order()
         job_registry_check_message = (
             self._check_that_all_jobs_are_listed_in_the_job_registry_file())
         test_function_check_message = self._check_non_test_files()
-        all_messages = import_order_check_message + job_registry_check_message
-        all_messages = all_messages + test_function_check_message
+        all_messages = (
+            job_registry_check_message + test_function_check_message)
         return all_messages
 
 
@@ -301,6 +286,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyPythonLintChecksManager object.
@@ -317,6 +303,41 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.files_to_lint
 
+    @staticmethod
+    def _get_trimmed_error_output(lint_messages):
+        """Remove extra bits from pylint error messages.
+
+        Args:
+            lint_messages: list(str). Messages returned by the python linter.
+
+        Returns:
+            str. A string with the trimmed error messages.
+        """
+        trimmed_error_messages = []
+        # Remove newlines and coverage report from the end of message.
+        # we need to remove last five items from the list because starting from
+        # end we have three lines with empty string(''), fourth line
+        # contains the coverage report i.e.
+        # Your code has been rated at 9.98/10 (previous run: 10.00/10, -0.02)
+        # and one line with dashes(---).
+        newlines_present = lint_messages[-1] == '\n' and (
+            lint_messages[-2] == '\n' and lint_messages[-4] == '\n')
+        coverage_present = re.search(
+            r'previous run: \d+.\d+/\d+,', lint_messages[-3])
+        dashes_present = re.search(r'-+', lint_messages[-5])
+        if newlines_present and coverage_present and dashes_present:
+            lint_messages = lint_messages[:-5]
+        for message in lint_messages:
+            # Every pylint message has a message id inside the brackets
+            # we are removing them here.
+            if message.endswith(')'):
+                # Replace message-id with empty string('').
+                trimmed_error_messages.append(
+                    re.sub(r'\((\w+-*)+\)$', '', message))
+            else:
+                trimmed_error_messages.append(message)
+        return '\n'.join(trimmed_error_messages) + '\n'
+
     def _lint_py_files(self, config_pylint, config_pycodestyle):
         """Prints a list of lint errors in the given list of Python files.
 
@@ -324,12 +345,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             config_pylint: str. Path to the .pylintrc file.
             config_pycodestyle: str. Path to the tox.ini file.
 
-        Return:
+        Returns:
             summary_messages: list(str). Summary messages of lint check.
         """
         files_to_lint = self.all_filepaths
         start_time = time.time()
-        are_there_errors = False
+        errors_found = False
         summary_messages = []
 
         num_py_files = len(files_to_lint)
@@ -352,12 +373,23 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT('Linting Python files %s to %s...' % (
                     current_batch_start_index + 1, current_batch_end_index))
 
+            # This line invokes Pylint and redirect its output
+            # to the StringMessageStream.
+            pylint_report = StringMessageStream()
+            pylinter = lint.Run(
+                current_files_to_lint + [config_pylint],
+                reporter=text.TextReporter(pylint_report),
+                exit=False).linter
+
+            if pylinter.msg_status != 0:
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
+                pylint_error_messages = (
+                    self._get_trimmed_error_output(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
+                errors_found = True
+
             with linter_utils.redirect_stdout(stdout):
-                # This line invokes Pylint and prints its output
-                # to the target stdout.
-                pylinter = lint.Run(
-                    current_files_to_lint + [config_pylint],
-                    exit=False).linter
                 # These lines invoke Pycodestyle and print its output
                 # to the target stdout.
                 style_guide = pycodestyle.StyleGuide(
@@ -365,15 +397,15 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 pycodestyle_report = style_guide.check_files(
                     paths=current_files_to_lint)
 
-            if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+            if pycodestyle_report.get_count() != 0:
                 summary_message = stdout.getvalue()
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-                are_there_errors = True
+                errors_found = True
 
             current_batch_start_index = current_batch_end_index
 
-        if are_there_errors:
+        if errors_found:
             summary_message = (
                 '%s Python linting failed' % (
                     linter_utils.FAILED_MESSAGE_PREFIX))
@@ -399,7 +431,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         start_time = time.time()
         any_errors = False
-        stdout = python_utils.string_io()
         summary_messages = []
 
         files_to_lint_for_python3_compatibility = [
@@ -434,17 +465,21 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                     'Linting Python files for Python 3 compatibility %s to %s..'
                     % (current_batch_start_index + 1, current_batch_end_index))
 
-            with linter_utils.redirect_stdout(stdout):
-                # This line invokes Pylint and prints its output
-                # to the target stdout.
-                python_utils.PRINT('Messages for Python 3 support:')
-                pylinter_for_python3 = lint.Run(
-                    current_files_to_lint + ['--py3k'], exit=False).linter
+            # This line invokes Pylint and redirect its output
+            # to the StringMessageStream.
+            pylint_report = StringMessageStream()
+            pylinter_for_python3 = lint.Run(
+                current_files_to_lint + ['--py3k'],
+                reporter=text.TextReporter(pylint_report),
+                exit=False).linter
 
             if pylinter_for_python3.msg_status != 0:
-                summary_message = stdout.getvalue()
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
+                pylint_error_messages = (
+                    self._get_trimmed_error_output(pylint_report.read()))
+                summary_messages.append(pylint_error_messages)
+                python_utils.PRINT('Messages for Python 3 support:')
+                for message in pylint_report.read():
+                    python_utils.PRINT(message)
                 any_errors = True
 
             current_batch_start_index = current_batch_end_index
@@ -465,6 +500,47 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         python_utils.PRINT(
             'Python linting for Python 3 compatibility finished.')
+        return summary_messages
+
+    def _check_import_order(self):
+        """This function is used to check that each file
+        has imports placed in alphabetical order.
+        """
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting import-order checks')
+            python_utils.PRINT('----------------------------------------')
+        summary_messages = []
+        files_to_check = self.all_filepaths
+        failed = False
+        stdout = python_utils.string_io()
+        with linter_utils.redirect_stdout(stdout):
+            for filepath in files_to_check:
+                # This line prints the error message along with file path
+                # and returns True if it finds an error else returns False
+                # If check is set to True, isort simply checks the file and
+                # if check is set to False, it autocorrects import-order errors.
+                if (isort.SortImports(
+                        filepath, check=True, show_diff=(
+                            True)).incorrectly_sorted):
+                    failed = True
+                    python_utils.PRINT('')
+
+            python_utils.PRINT('')
+            if failed:
+                summary_message = stdout.getvalue()
+                summary_messages.append(summary_message)
+                summary_message = (
+                    '%s Import order checks failed, file imports should be '
+                    'alphabetized, see affect files above.' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
+            else:
+                summary_message = (
+                    '%s Import order checks passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
         return summary_messages
 
     def perform_all_lint_checks(self):
@@ -491,15 +567,19 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         all_messages.extend(self._lint_py_files_for_python3_compatibility())
 
+        all_messages.extend(self._check_import_order())
+
         return all_messages
 
 
-def get_linters(files_to_lint, verbose_mode_enabled=False):
+def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
     """Creates PythonLintChecksManager and ThirdPartyPythonLintChecksManager
         objects and return them.
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
+        file_cache: object(FileCache). Provides thread-safe access to cached
+            file content.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -507,7 +587,7 @@ def get_linters(files_to_lint, verbose_mode_enabled=False):
         2-tuple of custom and third_party linter objects.
     """
     custom_linter = PythonLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
+        files_to_lint, file_cache, verbose_mode_enabled)
 
     third_party_linter = ThirdPartyPythonLintChecksManager(
         files_to_lint, verbose_mode_enabled)

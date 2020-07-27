@@ -331,6 +331,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
 
 class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
     """Tests for the TrainingJobExplorationMapping domain."""
+
     def setUp(self):
         super(TrainingJobExplorationMappingDomainTests, self).setUp()
 

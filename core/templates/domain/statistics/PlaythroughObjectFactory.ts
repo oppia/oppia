@@ -20,97 +20,152 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { LearnerAction, LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import {
+  LearnerActionBackendDict,
+  LearnerAction,
+  LearnerActionObjectFactory
+} from 'domain/statistics/LearnerActionObjectFactory';
+import {
+  EarlyQuitCustomizationArgs,
+  CyclicStateTransitionsCustomizationArgs,
+  MultipleIncorrectSubmissionsCustomizationArgs
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
 
-export class Playthrough {
-  playthroughId: string;
-  expId: string;
-  expVersion: number;
-  issueType: string;
-  issueCustomizationArgs: any;
-  actions: any[];
-  /**
-   * @constructor
-   * @param {string} playthroughId - ID of a playthrough.
-   * @param {string} expId - ID of an exploration.
-   * @param {number} expVersion - Version of an exploration.
-   * @param {string} issueType - type of an issue.
-   * @param {Object.<string, *>} issueCustomizationArgs - customization dict
-   *   for an issue.
-   * @param {LearnerAction[]} actions - list of learner actions.
-   */
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This type takes one of the values of the customization args based
+// on the type of IssueType.
+type IssueCustomizationArgs<IssueType> = (
+  IssueType extends 'EarlyQuit' ? EarlyQuitCustomizationArgs :
+  IssueType extends 'CyclicStateTransitions' ?
+  CyclicStateTransitionsCustomizationArgs :
+  IssueType extends 'MultipleIncorrectSubmissions' ?
+  MultipleIncorrectSubmissionsCustomizationArgs : never);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This interface takes the type of backend dict according to the IssueType
+// parameter.
+interface PlaythroughBackendDictBase<IssueType> {
+  'issue_type': IssueType;
+  'issue_customization_args': IssueCustomizationArgs<IssueType>;
+  'exp_id': string;
+  'exp_version': number;
+  'actions': LearnerActionBackendDict[];
+}
+
+export type EarlyQuitPlaythroughBackendDict = (
+  PlaythroughBackendDictBase<'EarlyQuit'>);
+
+export type MultipleIncorrectSubmissionsPlaythroughBackendDict = (
+  PlaythroughBackendDictBase<'MultipleIncorrectSubmissions'>);
+
+export type CyclicStateTransitionsPlaythroughBackendDict = (
+  PlaythroughBackendDictBase<'CyclicStateTransitions'>);
+
+export type PlaythroughBackendDict = (
+  EarlyQuitPlaythroughBackendDict |
+  MultipleIncorrectSubmissionsPlaythroughBackendDict |
+  CyclicStateTransitionsPlaythroughBackendDict);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This class takes the type according to the IssueType parameter.
+class PlaythroughBase<IssueType> {
   constructor(
-      playthroughId: string, expId: string, expVersion: number,
-      issueType: string, issueCustomizationArgs: any,
-      actions: LearnerAction[]) {
-    /** @type {string} */
-    this.playthroughId = playthroughId;
-    /** @type {string} */
-    this.expId = expId;
-    /** @type {number} */
-    this.expVersion = expVersion;
-    /** @type {string} */
-    this.issueType = issueType;
-    /** @type {Object.<string, *>} */
-    this.issueCustomizationArgs = issueCustomizationArgs;
-    /** @type {LearnerAction[]} */
-    this.actions = actions;
-  }
+    public readonly issueType: IssueType,
+    public issueCustomizationArgs: IssueCustomizationArgs<IssueType>,
+    public expId: string,
+    public expVersion: number,
+    public actions: LearnerAction[]) { }
 
-  /** @returns {PlaythroughBackendDict} */
-  toBackendDict(): any {
-    var actionDicts = this.actions.map(function(action) {
-      return action.toBackendDict();
-    });
+  toBackendDict(): PlaythroughBackendDictBase<IssueType> {
     return {
-      id: this.playthroughId,
       exp_id: this.expId,
       exp_version: this.expVersion,
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
-      actions: actionDicts
+      actions: this.actions.map(a => a.toBackendDict()),
     };
   }
 }
+
+export class EarlyQuitPlaythrough extends
+  PlaythroughBase<'EarlyQuit'> { }
+
+export class MultipleIncorrectSubmissionsPlaythrough extends
+  PlaythroughBase<'MultipleIncorrectSubmissions'> { }
+
+export class CyclicStateTransitionsPlaythrough extends
+  PlaythroughBase<'CyclicStateTransitions'> { }
+
+export type Playthrough = (
+  EarlyQuitPlaythrough |
+  MultipleIncorrectSubmissionsPlaythrough |
+  CyclicStateTransitionsPlaythrough);
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlaythroughObjectFactory {
   constructor(private learnerActionObjectFactory: LearnerActionObjectFactory) {}
-  /**
-   * @param {string} playthroughId - ID of a playthrough.
-   * @param {string} expId - ID of an exploration.
-   * @param {number} expVersion - Version of an exploration.
-   * @param {string} issueType - type of an issue.
-   * @param {Object.<string, *>} issueCustomizationArgs - customization dict
-   *   for an issue.
-   * @param {LearnerAction[]} actions - list of learner actions.
-   * @returns {Playthrough}
-   */
-  createNew(
-      playthroughId: string, expId: string, expVersion: number,
-      issueType: string, issueCustomizationArgs: any,
-      actions: LearnerAction[]): Playthrough {
-    return new Playthrough(
-      playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
-      actions);
+
+  createNewEarlyQuitPlaythrough(
+      expId: string, expVersion: number,
+      issueCustomizationArgs: EarlyQuitCustomizationArgs,
+      actions: LearnerAction[]): EarlyQuitPlaythrough {
+    return new EarlyQuitPlaythrough(
+      'EarlyQuit', issueCustomizationArgs, expId,
+      expVersion, actions);
   }
 
-  /**
-   * @typedef
-   * @param {PlaythroughBackendDict} playthroughBackendDict
-   * @returns {Playthrough}
-   */
-  createFromBackendDict(playthroughBackendDict: any): Playthrough {
+  createNewMultipleIncorrectSubmissionsPlaythrough(
+      expId: string, expVersion: number,
+      issueCustomizationArgs: MultipleIncorrectSubmissionsCustomizationArgs,
+      actions: LearnerAction[]): MultipleIncorrectSubmissionsPlaythrough {
+    return new MultipleIncorrectSubmissionsPlaythrough(
+      'MultipleIncorrectSubmissions', issueCustomizationArgs,
+      expId, expVersion, actions);
+  }
+
+  createNewCyclicStateTransitionsPlaythrough(
+      expId: string, expVersion: number,
+      issueCustomizationArgs: CyclicStateTransitionsCustomizationArgs,
+      actions: LearnerAction[]): CyclicStateTransitionsPlaythrough {
+    return new CyclicStateTransitionsPlaythrough(
+      'CyclicStateTransitions', issueCustomizationArgs,
+      expId, expVersion, actions);
+  }
+
+  createFromBackendDict(
+      playthroughBackendDict: PlaythroughBackendDict): Playthrough {
     var actions = playthroughBackendDict.actions.map(
       this.learnerActionObjectFactory.createFromBackendDict);
 
-    return new Playthrough(
-      playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
-      playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
-      playthroughBackendDict.issue_customization_args, actions);
+    switch (playthroughBackendDict.issue_type) {
+      case 'EarlyQuit':
+        return new EarlyQuitPlaythrough(
+          playthroughBackendDict.issue_type,
+          playthroughBackendDict.issue_customization_args,
+          playthroughBackendDict.exp_id,
+          playthroughBackendDict.exp_version, actions);
+      case 'CyclicStateTransitions':
+        return new CyclicStateTransitionsPlaythrough(
+          playthroughBackendDict.issue_type,
+          playthroughBackendDict.issue_customization_args,
+          playthroughBackendDict.exp_id,
+          playthroughBackendDict.exp_version, actions);
+      case 'MultipleIncorrectSubmissions':
+        return new MultipleIncorrectSubmissionsPlaythrough(
+          playthroughBackendDict.issue_type,
+          playthroughBackendDict.issue_customization_args,
+          playthroughBackendDict.exp_id,
+          playthroughBackendDict.exp_version, actions);
+      default:
+        break;
+    }
+
+    const invalidBackendDict: never = playthroughBackendDict;
+    throw new Error(
+      'Backend dict does not match any known issue type: ' +
+      angular.toJson(invalidBackendDict));
   }
 }
 

@@ -19,9 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ITopicSummaryBackendDict } from
-  // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicSummary } from
+  'domain/topic/TopicSummaryObjectFactory';
 // eslint-disable-next-line max-len
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
@@ -41,9 +40,8 @@ export class TopicsAndSkillsDashboardPageService {
    * @returns {Array} filteredTopics - The filtered Topics array
    */
   getFilteredTopics(
-      topicsArray: Array<ITopicSummaryBackendDict>,
-      filterObject: TopicsAndSkillsDashboardFilter):
-      Array<ITopicSummaryBackendDict> {
+      topicsArray: TopicSummary[],
+      filterObject: TopicsAndSkillsDashboardFilter): TopicSummary[] {
     let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
@@ -64,6 +62,9 @@ export class TopicsAndSkillsDashboardPageService {
     if (filterObject.classroom !==
         TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL) {
       filteredTopics = filteredTopics.filter((topic) => {
+        if (filterObject.classroom === 'Unassigned' && !topic.classroom) {
+          return true;
+        }
         return (
           topic.classroom && filterObject.classroom.toLowerCase() ===
             topic.classroom.toLowerCase());
@@ -73,11 +74,11 @@ export class TopicsAndSkillsDashboardPageService {
     if (filterObject.status !== EPublishedOptions.All) {
       filteredTopics = filteredTopics.filter((topic) => {
         if (filterObject.status === EPublishedOptions.Published &&
-            topic.is_published) {
+            topic.isPublished) {
           return true;
         } else if (
           filterObject.status === EPublishedOptions.NotPublished &&
-            !topic.is_published) {
+            !topic.isPublished) {
           return true;
         }
         return false;
@@ -87,19 +88,19 @@ export class TopicsAndSkillsDashboardPageService {
     switch (filterObject.sort) {
       case ESortOptions.IncreasingUpdatedOn:
         filteredTopics.sort((a, b) => (
-          b.topic_model_created_on - a.topic_model_created_on));
+          b.topicModelCreatedOn - a.topicModelCreatedOn));
         break;
       case ESortOptions.DecreasingUpdatedOn:
         filteredTopics.sort((a, b) =>
-          -(b.topic_model_created_on - a.topic_model_created_on));
+          -(b.topicModelCreatedOn - a.topicModelCreatedOn));
         break;
       case ESortOptions.IncreasingCreatedOn:
         filteredTopics.sort((a, b) =>
-          (b.topic_model_last_updated - a.topic_model_last_updated));
+          (b.topicModelLastUpdated - a.topicModelLastUpdated));
         break;
       case ESortOptions.DecreasingCreatedOn:
         filteredTopics.sort((a, b) =>
-          -(b.topic_model_last_updated - a.topic_model_last_updated));
+          -(b.topicModelLastUpdated - a.topicModelLastUpdated));
         break;
       default:
         throw new Error('Invalid filter by sort value provided.');

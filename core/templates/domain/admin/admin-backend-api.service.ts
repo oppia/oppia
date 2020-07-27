@@ -23,32 +23,32 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
-  ITopicSummaryBackendDict,
+  TopicSummaryBackendDict,
   TopicSummary,
   TopicSummaryObjectFactory
 } from 'domain/topic/TopicSummaryObjectFactory';
 import {
-  IComputationDataBackendDict,
   ComputationData,
+  ComputationDataBackendDict,
   ComputationDataObjectFactory
 } from 'domain/admin/computation-data-object.factory';
 import {
-  IJobDataBackendDict,
   Job,
+  JobDataBackendDict,
   JobDataObjectFactory
 } from 'domain/admin/job-data-object.factory';
 import {
-  IJobStatusSummaryBackendDict,
   JobStatusSummary,
-  JobStausSummaryObjectFactory
+  JobStatusSummaryBackendDict,
+  JobStatusSummaryObjectFactory
 } from 'domain/admin/job-status-summary-object.factory';
 
 
-interface IUserRoles {
+interface UserRoles {
   [role: string]: string;
 }
 
-interface IRoleGraphData {
+interface RoleGraphData {
   nodes: {
     [role: string]: string;
   };
@@ -58,25 +58,25 @@ interface IRoleGraphData {
   }[];
 }
 
-interface IConfigProperties {
+interface ConfigProperties {
   [property: string]: Object;
 }
 
-export interface IAdminPageDataBackendDict {
+export interface AdminPageDataBackendDict {
   'demo_explorations': string[][];
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
-  'one_off_job_status_summaries': IJobStatusSummaryBackendDict[];
+  'one_off_job_status_summaries': JobStatusSummaryBackendDict[];
   'human_readable_current_time': string;
-  'audit_job_status_summaries': IJobStatusSummaryBackendDict[];
-  'updatable_roles': IUserRoles;
-  'role_graph_data': IRoleGraphData;
-  'config_properties': IConfigProperties;
-  'viewable_roles': IUserRoles;
-  'unfinished_job_data': IJobDataBackendDict[];
-  'recent_job_data': IJobDataBackendDict[];
-  'continuous_computations_data': IComputationDataBackendDict[];
-  'topic_summaries': ITopicSummaryBackendDict[];
+  'audit_job_status_summaries': JobStatusSummaryBackendDict[];
+  'updatable_roles': UserRoles;
+  'role_graph_data': RoleGraphData;
+  'config_properties': ConfigProperties;
+  'viewable_roles': UserRoles;
+  'unfinished_job_data': JobDataBackendDict[];
+  'recent_job_data': JobDataBackendDict[];
+  'continuous_computations_data': ComputationDataBackendDict[];
+  'topic_summaries': TopicSummaryBackendDict[];
 }
 
 export interface AdminPageData {
@@ -86,10 +86,10 @@ export interface AdminPageData {
   oneOffJobStatusSummaries: JobStatusSummary[];
   humanReadableCurrentTime: string;
   auditJobStatusSummaries: JobStatusSummary[];
-  updatableRoles: IUserRoles;
-  roleGraphData: IRoleGraphData;
-  configProperties: IConfigProperties;
-  viewableRoles: IUserRoles;
+  updatableRoles: UserRoles;
+  roleGraphData: RoleGraphData;
+  configProperties: ConfigProperties;
+  viewableRoles: UserRoles;
   unfinishedJobData: Job[];
   recentJobData: Job[];
   continuousComputationsData: ComputationData[];
@@ -104,11 +104,11 @@ export class AdminBackendApiService {
     private http: HttpClient,
     private computationDataObjectFactory: ComputationDataObjectFactory,
     private jobDataObjectFactory: JobDataObjectFactory,
-    private jobStatusSummaryObjectFactory: JobStausSummaryObjectFactory,
+    private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
-    return this.http.get<IAdminPageDataBackendDict>(
+    return this.http.get<AdminPageDataBackendDict>(
       AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
       return {
         demoExplorations: response.demo_explorations,

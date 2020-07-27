@@ -19,33 +19,52 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { NumericInputAnswer } from 'interactions/answer-defs';
+import {
+  NumericInputEqualRuleInputs,
+  NumericInputIsInclusivelyBetweenRuleInputs,
+  NumericInputIsWithinToleranceRuleInputs
+} from 'interactions/rule-input-defs';
+
 @Injectable({
   providedIn: 'root'
 })
 export class NumericInputRulesService {
-  Equals(answer: number, inputs: {x: number}): boolean {
+  Equals(
+      answer: NumericInputAnswer,
+      inputs: NumericInputEqualRuleInputs): boolean {
     return answer === inputs.x;
   }
-  IsLessThan(answer: number, inputs: {x: number}): boolean {
+  IsLessThan(
+      answer: NumericInputAnswer,
+      inputs: NumericInputEqualRuleInputs): boolean {
     return answer < inputs.x;
   }
-  IsGreaterThan(answer: number, inputs: {x: number}): boolean {
+  IsGreaterThan(
+      answer: NumericInputAnswer,
+      inputs: NumericInputEqualRuleInputs): boolean {
     return answer > inputs.x;
   }
-  IsLessThanOrEqualTo(answer: number, inputs: {x: number}): boolean {
+  IsLessThanOrEqualTo(
+      answer: NumericInputAnswer,
+      inputs: NumericInputEqualRuleInputs): boolean {
     return answer <= inputs.x;
   }
-  IsGreaterThanOrEqualTo(answer: number, inputs: {x: number}): boolean {
+  IsGreaterThanOrEqualTo(
+      answer: NumericInputAnswer,
+      inputs: NumericInputEqualRuleInputs): boolean {
     return answer >= inputs.x;
   }
   IsInclusivelyBetween(
-      answer: number, inputs: {a: number, b: number}): boolean {
+      answer: NumericInputAnswer,
+      inputs: NumericInputIsInclusivelyBetweenRuleInputs): boolean {
     // TODO(wxy): Have frontend validation at creation time to check that
-    // inputs.a <= inputs.b
+    // inputs.a <= inputs.b.
     return answer >= inputs.a && answer <= inputs.b;
   }
   IsWithinTolerance(
-      answer: number, inputs: {x: number, tol: number}): boolean {
+      answer: NumericInputAnswer,
+      inputs: NumericInputIsWithinToleranceRuleInputs): boolean {
     return answer >= inputs.x - inputs.tol &&
       answer <= inputs.x + inputs.tol;
   }

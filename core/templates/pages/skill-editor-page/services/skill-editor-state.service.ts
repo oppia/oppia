@@ -40,6 +40,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
     var _skillRights = (
       SkillRightsObjectFactory.createInterstitialSkillRights());
     var _skillIsInitialized = false;
+    var assignedSkillTopicData = null;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
     var _groupedSkillSummaries = {
@@ -95,9 +96,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
       _skillRights.copyFromSkillRights(skillRights);
     };
 
-    var _updateSkillRights = function(newBackendSkillRightsObject) {
-      _setSkillRights(SkillRightsObjectFactory.createFromBackendDict(
-        newBackendSkillRightsObject));
+    var _updateSkillRights = function(newSkillRightsObject) {
+      _setSkillRights(newSkillRightsObject);
     };
     return {
       /**
@@ -110,6 +110,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
         SkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
+            assignedSkillTopicData = (
+              newBackendSkillObject.assignedSkillTopicData);
             _updateSkill(newBackendSkillObject.skill);
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
@@ -122,8 +124,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _skillIsBeingLoaded = false;
           });
         SkillRightsBackendApiService.fetchSkillRights(
-          skillId).then(function(newBackendSkillRightsObject) {
-          _updateSkillRights(newBackendSkillRightsObject);
+          skillId).then(function(newSkillRightsObject) {
+          _updateSkillRights(newSkillRightsObject);
           _skillIsBeingLoaded = false;
         }, function(error) {
           AlertsService.addWarning(
@@ -138,6 +140,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
        */
       isLoadingSkill: function() {
         return _skillIsBeingLoaded;
+      },
+
+      getAssignedSkillTopicData: function() {
+        return assignedSkillTopicData;
       },
 
       getGroupedSkillSummaries: function() {

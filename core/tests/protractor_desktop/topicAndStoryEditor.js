@@ -23,6 +23,7 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
@@ -41,7 +42,6 @@ describe('Topic editor functionality', function() {
   var skillEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
-  var SKILL_STATUS_UNASSIGNED = 'Unassigned';
 
   beforeAll(async function() {
     topicsAndSkillsDashboardPage = (
@@ -91,7 +91,7 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-      SKILL_STATUS_UNASSIGNED);
+      Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
     await topicEditorPage.get(topicId);
@@ -125,7 +125,8 @@ describe('Topic editor functionality', function() {
 
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
-    await topicEditorPage.createStory('Story Title');
+    await topicEditorPage.createStory(
+      'Story Title', 'Story description', '../data/test_svg.svg');
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -154,10 +155,10 @@ describe('Topic editor functionality', function() {
   it('should add and remove nodes (chapters) from a story', async function() {
     await topicEditorPage.navigateToStoryWithIndex(0);
     await storyEditorPage.expectNumberOfChaptersToBe(0);
-    await storyEditorPage.createInitialChapter('Chapter 1');
+    await storyEditorPage.createNewChapter('Chapter 1');
     await storyEditorPage.expectNumberOfChaptersToBe(1);
 
-    await storyEditorPage.createNewDestinationChapter('Chapter 2');
+    await storyEditorPage.createNewChapter('Chapter 2');
     await storyEditorPage.expectNumberOfChaptersToBe(2);
     await storyEditorPage.deleteChapterWithIndex(1);
     await storyEditorPage.expectNumberOfChaptersToBe(1);
@@ -169,6 +170,10 @@ describe('Topic editor functionality', function() {
       await (
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 2', 'Concept card explanation', true));
+      await topicsAndSkillsDashboardPage.get();
+      await (
+        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+          'Skill 3', 'Concept card explanation', true));
       var TOPIC_NAME = 'TASE2';
       var TOPIC_DESCRIPTION = 'TASE2 description';
       await topicsAndSkillsDashboardPage.get();
@@ -177,7 +182,14 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
-        SKILL_STATUS_UNASSIGNED);
+        Constants.SKILL_STATUS_UNASSIGNED);
+      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+        0, TOPIC_NAME);
+
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+        Constants.SKILL_STATUS_UNASSIGNED);
       await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
         0, TOPIC_NAME);
 
@@ -194,22 +206,22 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.saveTopic('Added subtopics.');
 
       await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.navigateToSubtopicWithIndex(0);
-      await topicEditorPage.expectSubtopicToHaveSkills([]);
+      await topicEditorPage.navigateToReassignModal();
+      await topicEditorPage.expectUncategorizedSkillsToBe(
+        ['Skill 3', 'Skill 2']);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, []);
 
-      await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.navigateToSubtopicWithIndex(1);
-      await topicEditorPage.expectSubtopicToHaveSkills([]);
-
-      await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.navigateToSubtopicWithIndex(0);
-      await topicEditorPage.dragSkillToSubtopic(0, 0);
-      await topicEditorPage.expectSubtopicToHaveSkills(['Skill 2']);
-
-      await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.navigateToSubtopicWithIndex(0);
-      await topicEditorPage.dragSkillFromSubtopicToUncategorized(0);
-      await topicEditorPage.expectSubtopicToHaveSkills([]);
+      await topicEditorPage.dragSkillToSubtopic('Skill 2', 0);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, ['Skill 2']);
+      await topicEditorPage.dragSkillToSubtopic('Skill 3', 1);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, ['Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToSubtopic(1, 0, 'Skill 3');
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(
+        0, ['Skill 2', 'Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToUncategorized(0, 'Skill 2');
+      await topicEditorPage.expectUncategorizedSkillsToBe(
+        ['Skill 2']);
     });
 
   afterEach(async function() {
@@ -272,7 +284,8 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(topicName,
       'Description', false);
-    await topicEditorPage.createStory('Story 0');
+    await topicEditorPage.createStory(
+      'Story 0', 'Story description', '../data/test_svg.svg');
     var url = await browser.getCurrentUrl();
     storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -285,7 +298,7 @@ describe('Chapter editor functionality', function() {
   });
 
   it('should create a basic chapter.', async function() {
-    await storyEditorPage.createInitialChapter('Chapter 1');
+    await storyEditorPage.createNewChapter('Chapter 1');
     await storyEditorPage.changeNodeDescription('Chapter description 1');
     await storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     await storyEditorPage.changeNodeOutline(
@@ -319,7 +332,7 @@ describe('Chapter editor functionality', function() {
     });
 
   it('should add one more chapter to the story', async function() {
-    await storyEditorPage.createNewDestinationChapter('Chapter 2');
+    await storyEditorPage.createNewChapter('Chapter 2');
     await storyEditorPage.navigateToChapterByIndex(1);
     await storyEditorPage.changeNodeDescription('Chapter description 2');
     await storyEditorPage.changeNodeOutline(
@@ -338,7 +351,7 @@ describe('Chapter editor functionality', function() {
   it('should fail to add one more chapter with existing exploration',
     async function() {
       await storyEditorPage.navigateToChapterByIndex(1);
-      await storyEditorPage.createNewDestinationChapter('Chapter 3');
+      await storyEditorPage.createNewChapter('Chapter 3');
       await storyEditorPage.navigateToChapterByIndex(2);
       await storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
       await storyEditorPage.expectExplorationIdAlreadyExistWarningAndCloseIt();
@@ -348,28 +361,27 @@ describe('Chapter editor functionality', function() {
 
   it('should add one more chapter and change the chapters sequences',
     async function() {
-      await storyEditorPage.navigateToChapterByIndex(1);
-      await storyEditorPage.createNewDestinationChapter('Chapter 3');
+      await storyEditorPage.createNewChapter('Chapter 3');
       await storyEditorPage.navigateToChapterByIndex(2);
       await storyEditorPage.setChapterExplorationId(dummyExplorationIds[2]);
-      await storyEditorPage.selectInitialChapterByName('Chapter 2');
+      await storyEditorPage.expectChaptersListToBe(
+        ['Chapter 1', 'Chapter 2', 'Chapter 3']);
 
-      // Now Chapter 2 is the initial chapter and its destination is
-      // Chapter 3. Make Chapter 2's destination to be Chapter 1
-      await storyEditorPage.navigateToChapterByIndex(0);
-      await storyEditorPage.removeDestination();
-      await storyEditorPage.selectDestinationChapterByName('Chapter 1');
-      await storyEditorPage.expectDestinationToBe('Chapter 1');
+      await storyEditorPage.dragChapterToAnotherChapter(
+        'Chapter 3', 'Chapter 1');
+      await storyEditorPage.expectChaptersListToBe(
+        ['Chapter 3', 'Chapter 1', 'Chapter 2']);
 
-      // Make chapter 1's destination to be Chapter 3
-      await storyEditorPage.navigateToChapterByIndex(1);
-      await storyEditorPage.selectDestinationChapterByName('Chapter 3');
-      await storyEditorPage.expectDestinationToBe('Chapter 3');
+      await storyEditorPage.dragChapterToAnotherChapter(
+        'Chapter 2', 'Chapter 1');
+      await storyEditorPage.expectChaptersListToBe(
+        ['Chapter 3', 'Chapter 2', 'Chapter 1']);
     }
   );
 
   it('should add one prerequisite and acquired skill to chapter 1',
     async function() {
+      await storyEditorPage.navigateToChapterByIndex(0);
       await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
       await storyEditorPage.addAcquiredSkill(dummySkills[0]);
@@ -395,12 +407,6 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     await storyEditorPage.deletePrerequisiteSkillByIndex(0);
     await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
-  });
-
-  it('should select the "Chapter 2" as initial chapter and get unreachable' +
-    ' error', async function() {
-    await storyEditorPage.selectInitialChapterByName('Chapter 2');
-    await storyEditorPage.expectDisplayUnreachableChapterWarning();
   });
 
   it('should delete one chapter and save', async function() {

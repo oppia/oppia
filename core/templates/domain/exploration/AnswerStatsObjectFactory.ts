@@ -22,27 +22,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { IFractionDict } from 'domain/objects/FractionObjectFactory';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
-import { INote } from
-  // eslint-disable-next-line max-len
-  'extensions/interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-import { INumberWithUnitsBackendDict } from
-  'domain/objects/NumberWithUnitsObjectFactory';
+import { InteractionAnswer } from
+  'interactions/answer-defs';
 
-export type Answer = (
-  string | number | IFractionDict |
-  INumberWithUnitsBackendDict | string[] | INote[] |
-  number[] | IGraphBackendDict| string[][]);
-
-export interface IAnswerStatsBackendDict {
-  answer: Answer;
+export interface AnswerStatsBackendDict {
+  answer: InteractionAnswer;
   frequency: number;
 }
 
 export class AnswerStats {
-  answer: Answer;
+  answer: InteractionAnswer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
@@ -56,7 +45,7 @@ export class AnswerStats {
    *    associated state's answer groups.
    */
   constructor(
-      answer: Answer, answerHtml: string, frequency: number,
+      answer: InteractionAnswer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
     this.answer = cloneDeep(answer);
@@ -89,7 +78,7 @@ export class AnswerStats {
   }
 
   /** @returns {answer, frequency: number} */
-  toBackendDict(): IAnswerStatsBackendDict {
+  toBackendDict(): AnswerStatsBackendDict {
     return {
       answer: cloneDeep(this.answer),
       frequency: this.frequency
@@ -111,7 +100,7 @@ export class AnswerStatsObjectFactory {
    * @returns {AnswerStats}
    */
   createFromBackendDict(
-      backendDict: IAnswerStatsBackendDict): AnswerStats {
+      backendDict: AnswerStatsBackendDict): AnswerStats {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?

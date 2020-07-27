@@ -36,20 +36,14 @@ import collections
 import re
 import string
 
+from constants import constants
 import python_utils
 
-_GREEK_LETTERS = [
-    'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta',
-    'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'pi', 'rho', 'sigma', 'tau',
-    'upsilon', 'phi', 'chi', 'psi', 'omega', 'Gamma', 'Delta', 'Theta',
-    'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Psi', 'Omega']
-_MATH_FUNCTION_NAMES = [
-    'log', 'ln', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot',
-    'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh']
 _OPENING_PARENS = ['[', '{', '(']
 _CLOSING_PARENS = [')', '}', ']']
 _VALID_OPERATORS = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
-VALID_ALGEBRAIC_IDENTIFIERS = list(string.ascii_letters) + _GREEK_LETTERS
+VALID_ALGEBRAIC_IDENTIFIERS = (
+    list(string.ascii_letters) + constants.GREEK_LETTERS)
 
 _TOKEN_CATEGORY_IDENTIFIER = 'identifier'
 _TOKEN_CATEGORY_FUNCTION = 'function'
@@ -73,8 +67,7 @@ def contains_balanced_brackets(expression):
         expression: str. A math expression (algebraic/numeric).
 
     Returns:
-        bool. Whether the given expression contains a balanced
-            bracket sequence.
+        bool. Whether the given expression contains a balanced bracket sequence.
     """
     openers, closers = '({[', ')}]'
     stack = []
@@ -98,8 +91,8 @@ def is_algebraic(expression):
         expression: str. A math expression.
 
     Returns:
-        bool. Whether the given expression contains at least one single
-            latin letter or greek symbol name.
+        bool. Whether the given expression contains at least one single latin
+        letter or greek symbol name.
 
     Raises:
         Exception: Invalid syntax.
@@ -107,10 +100,9 @@ def is_algebraic(expression):
     # This raises an exception if the syntax is invalid.
     Parser().parse(expression)
     token_list = tokenize(expression)
-    token_texts = [token.text for token in token_list]
 
     return any(
-        token_text in VALID_ALGEBRAIC_IDENTIFIERS for token_text in token_texts)
+        token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list)
 
 
 def tokenize(expression):
@@ -122,7 +114,7 @@ def tokenize(expression):
 
     Returns:
         list(Token). A list containing token objects formed from the given math
-            expression.
+        expression.
 
     Raises:
         Exception: Invalid token.
@@ -135,11 +127,17 @@ def tokenize(expression):
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(sorted(
-            _GREEK_LETTERS + _MATH_FUNCTION_NAMES, reverse=True, key=len)),
+            constants.GREEK_LETTERS + constants.MATH_FUNCTION_NAMES,
+            reverse=True, key=len)),
         '\\'.join(_VALID_OPERATORS))
 
     token_texts = re.findall(re_string, expression)
 
+    # There is a possibility that the regex string skips past an invalid
+    # character. In that case, we must raise an error and display the invalid
+    # character. The invalid character is the one who's frequency in the
+    # original expression does not match with the frequency in the tokenized
+    # expression. The counter is being used to verify that frequencies match.
     original_exp_frequency = collections.Counter(expression)
     tokenized_exp_frequency = collections.Counter(''.join(token_texts))
 
@@ -195,12 +193,12 @@ class Token(python_utils.OBJECT):
         self.text = text
 
         # Categorize the token.
-        if self.is_identifier(text):
+        if self.is_number(text):
+            self.category = _TOKEN_CATEGORY_NUMBER
+        elif self.is_identifier(text):
             self.category = _TOKEN_CATEGORY_IDENTIFIER
         elif self.is_function(text):
             self.category = _TOKEN_CATEGORY_FUNCTION
-        elif self.is_number(text):
-            self.category = _TOKEN_CATEGORY_NUMBER
         elif self.is_operator(text):
             self.category = _TOKEN_CATEGORY_OPERATOR
         else:
@@ -215,7 +213,7 @@ class Token(python_utils.OBJECT):
         Returns:
             bool. Whether the given string represents a valid math function.
         """
-        return text in _MATH_FUNCTION_NAMES
+        return text in constants.MATH_FUNCTION_NAMES
 
     def is_identifier(self, text):
         """Checks if the given token represents a valid identifier. A valid
@@ -232,7 +230,7 @@ class Token(python_utils.OBJECT):
 
     def is_number(self, text):
         """Checks if the given token represents a valid real number without a
-        '+'/'-' sign.
+        '+'/'-' sign. 'pi' and 'e' are also considered as numeric values.
 
         Args:
             text: str. String representation of the token.
@@ -240,7 +238,7 @@ class Token(python_utils.OBJECT):
         Returns:
             bool. Whether the given string represents a valid real number.
         """
-        return text.replace('.', '', 1).isdigit()
+        return text.replace('.', '', 1).isdigit() or text in ('pi', 'e')
 
     def is_operator(self, text):
         """Checks if the given token represents a valid math operator.
@@ -576,8 +574,8 @@ class Parser(python_utils.OBJECT):
 
         Returns:
             Token|None. Token at the next position. Returns None if there are no
-                more tokens left or the next token text is not in the
-                allowed_token_texts.
+            more tokens left or the next token text is not in the
+            allowed_token_texts.
         """
         if self._next_token_index < len(token_list):
             text = token_list[self._next_token_index].text

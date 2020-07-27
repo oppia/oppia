@@ -16,11 +16,13 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
+import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
 import { GuppyConfigurationService } from
   'services/guppy-configuration.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 describe('AlgebraicExpressionEditor', function() {
   var ctrl = null, $window = null;
@@ -34,6 +36,7 @@ describe('AlgebraicExpressionEditor', function() {
   var guppyConfigurationService = null;
   var mathInteractionsService = null;
   var guppyInitializationService = null;
+  let deviceInfoService = null;
 
   class MockGuppy {
     constructor(id: string, config: Object) {}
@@ -50,9 +53,11 @@ describe('AlgebraicExpressionEditor', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService();
+    guppyConfigurationService = new GuppyConfigurationService(
+      new DeviceInfoService(new WindowRef()));
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
+    deviceInfoService = new DeviceInfoService(new WindowRef());
     $provide.value('GuppyConfigurationService', guppyConfigurationService);
     $provide.value('MathInteractionsService', mathInteractionsService);
     $provide.value('GuppyInitializationService', guppyInitializationService);
@@ -87,5 +92,14 @@ describe('AlgebraicExpressionEditor', function() {
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
     expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+  });
+
+  it('should set the value of showOSK to true', function() {
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+
+    expect(guppyInitializationService.getShowOSK()).toBeFalse();
+    ctrl.showOSK();
+    expect(guppyInitializationService.getShowOSK()).toBeTrue();
   });
 });

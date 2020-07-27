@@ -47,7 +47,7 @@ def memoize(func):
 
     Returns:
         callable. The same func, but calls to it using the same arguments are
-            made exactly once.
+        made exactly once.
     """
     key_locks = {}
     lock_for_key_locks = threading.Lock()
@@ -107,7 +107,7 @@ def memoize(func):
         func_kwargs = default_func_kwargs.copy()
         func_kwargs.update(kwargs)
         key = (tuple(args), tuple(sorted(func_kwargs.items())))
-        return get_from_cache(key, factory=lambda: func(*args, **kwargs))
+        return get_from_cache(key, lambda: func(*args, **kwargs))
 
     return memoized_func
 
