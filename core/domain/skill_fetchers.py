@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
 import feconf
@@ -68,8 +69,10 @@ def get_skill_by_id(skill_id, strict=True, version=None):
     """
     skill_memcache_key = get_skill_memcache_key(
         skill_id, version=version)
-    memcached_skill = memcache_services.get_multi(
-        [skill_memcache_key]).get(skill_memcache_key)
+    cache_tuple = memcache_services.get_multi(
+        [skill_memcache_key])
+    memcached_skill = caching_services.get_object_dict_from_cache_tuple(
+        cache_tuple).get(skill_memcache_key)
 
     if memcached_skill is not None:
         return memcached_skill

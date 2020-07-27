@@ -28,6 +28,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
@@ -314,8 +315,11 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
 
     exploration_memcache_key = get_exploration_memcache_key(
         exploration_id, version=version)
-    memcached_exploration = memcache_services.get_multi(
-        [exploration_memcache_key]).get(exploration_memcache_key)
+    cache_tuple = memcache_services.get_multi(
+        [exploration_memcache_key])
+
+    memcached_exploration = caching_services.get_object_dict_from_cache_tuple(
+        cache_tuple).get(exploration_memcache_key)
 
     if memcached_exploration is not None:
         return memcached_exploration

@@ -32,6 +32,7 @@ import os
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -199,8 +200,10 @@ def get_collection_by_id(collection_id, strict=True, version=None):
     """
     collection_memcache_key = _get_collection_memcache_key(
         collection_id, version=version)
-    memcached_collection = memcache_services.get_multi(
-        [collection_memcache_key]).get(collection_memcache_key)
+    cache_tuple = memcache_services.get_multi([collection_memcache_key])
+
+    memcached_collection = caching_services.get_object_dict_from_cache_tuple(
+        cache_tuple).get(collection_memcache_key)
 
     if memcached_collection is not None:
         return memcached_collection
@@ -258,7 +261,9 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     result = {}
     uncached = []
     memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
+    cache_tuple = memcache_services.get_multi(memcache_keys)
+    cache_result = caching_services.get_object_dict_from_cache_tuple(
+        cache_tuple)
 
     for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
