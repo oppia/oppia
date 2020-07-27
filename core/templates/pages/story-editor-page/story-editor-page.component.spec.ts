@@ -108,6 +108,8 @@ describe('Story editor page', function() {
 
     expect(StoryEditorStateService.loadStory).toHaveBeenCalledWith('story_1');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+
+    ctrl.$onDestroy();
   });
 
   it('should return to topic editor page when closing confirmation modal',
