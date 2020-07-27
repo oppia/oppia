@@ -54,7 +54,9 @@ export class ExplorationFeaturesBackendApiService {
       isExplorationWhitelisted: response.is_exploration_whitelisted,
       alwaysAskLearnersForAnswerDetails: (
         response.always_ask_learners_for_answer_details),
-    }));
+    }), errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
   }
 }
 

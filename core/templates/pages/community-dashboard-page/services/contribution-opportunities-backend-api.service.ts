@@ -125,6 +125,8 @@ export class ContributionOpportunitiesBackendApiService {
         nextCursor: data.next_cursor,
         more: data.more
       };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
@@ -149,6 +151,8 @@ export class ContributionOpportunitiesBackendApiService {
         nextCursor: data.next_cursor,
         more: data.more
       };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
@@ -173,6 +177,8 @@ export class ContributionOpportunitiesBackendApiService {
         nextCursor: data.next_cursor,
         more: data.more
       };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 

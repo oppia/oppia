@@ -66,8 +66,8 @@ export class ReadOnlyCollectionBackendApiService {
 
   private _fetchCollection(
       collectionId: string,
-      successCallback: (value?: Collection) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: Collection) => void,
+      errorCallback: (reason: string) => void): void {
     var collectionDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.COLLECTION_DATA_URL_TEMPLATE, {
         collection_id: collectionId
@@ -83,7 +83,7 @@ export class ReadOnlyCollectionBackendApiService {
       }
     }, errorResponse => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }

@@ -46,27 +46,19 @@ export class SuggestionModalService {
   SUGGESTION_ACCEPTED: string = 'accepted';
   SUGGESTION_REJECTED: string = 'rejected';
 
-  // TODO(#9996): Replace 'any' with the exact type. This has been kept as
-  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
-  // have a TS interface.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  acceptSuggestion($uibModalInstance: any, paramDict: ParamDict): void {
+  acceptSuggestion(
+      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
 
-  // TODO(#9996): Replace 'any' with the exact type. This has been kept as
-  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
-  // have a TS interface.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  rejectSuggestion($uibModalInstance: any, paramDict: ParamDict): void {
+  rejectSuggestion(
+      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
+      paramDict: ParamDict): void {
     $uibModalInstance.close(paramDict);
   }
-
-  // TODO(#9996): Replace 'any' with the exact type. This has been kept as
-  // 'any' since '$uibModalInstance' is a AngularJS native object and does not
-  // have a TS interface.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cancelSuggestion($uibModalInstance: any): void {
+  cancelSuggestion(
+      $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance): void {
     $uibModalInstance.dismiss('cancel');
   }
 }

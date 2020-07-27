@@ -40,10 +40,8 @@ export class SkillMasteryBackendApiService {
     private skillMasteryObjectFactory: SkillMasteryObjectFactory) {}
 
   _fetchSkillMasteryDegrees(skillIds: string[],
-      successCallback: (
-        value?: SkillMastery | PromiseLike<SkillMastery>
-      ) => void,
-      errorCallback: (reason?: Object) => void): void {
+      successCallback: (value: SkillMastery) => void,
+      errorCallback: (reason: string) => void): void {
     this.httpClient.get<SkillMasteryBackendResponse>(
       SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, {
         params: {
@@ -58,14 +56,14 @@ export class SkillMasteryBackendApiService {
       }
     }, (errorResponse) =>{
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
   _updateSkillMasteryDegrees(masteryPerSkillMapping: {[key: string]: number},
       successCallback: () => void,
-      errorCallback: (reason?: Object) => void): void {
+      errorCallback: (reason: string) => void): void {
     let putData = {
       mastery_change_per_skill: masteryPerSkillMapping
     };
@@ -78,7 +76,7 @@ export class SkillMasteryBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error.error);
       }
     });
   }

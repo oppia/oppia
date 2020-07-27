@@ -41,8 +41,8 @@ export class SubtopicViewerBackendApiService {
 
   private _fetchSubtopicData(
       topicName: string, subtopicId: string,
-      successCallback: (value?: ReadOnlySubtopicPageData) => void,
-      errorCallback: (reason?: Object) => void): void {
+      successCallback: (value: ReadOnlySubtopicPageData) => void,
+      errorCallback: (reason: string) => void): void {
     var subtopicDataUrl = this.urlInterpolation.interpolateUrl(
       SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE, {
         topic_name: topicName,
@@ -59,7 +59,7 @@ export class SubtopicViewerBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse);
+          errorCallback(errorResponse.error.error);
         }
       });
   }

@@ -47,7 +47,7 @@ export class SkillRightsBackendApiService {
   _fetchSkillRights(
       skillId: string,
       successCallback: (value: SkillRights) => void,
-      errorCallback: (value?: Object) => void): void {
+      errorCallback: (value: string) => void): void {
     let skillRightsUrl = this.urlInterpolationService.interpolateUrl(
       SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE, {
         skill_id: skillId
@@ -61,9 +61,9 @@ export class SkillRightsBackendApiService {
         if (successCallback) {
           successCallback(skillRightsObject);
         }
-      }, (errorResponse) => {
+      }, errorResponse => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error.error);
         }
       });
   }

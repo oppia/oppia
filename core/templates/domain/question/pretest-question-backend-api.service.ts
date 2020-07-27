@@ -43,8 +43,8 @@ export class PretestQuestionBackendApiService {
   ) {}
 
   _fetchPretestQuestions(explorationId: string, storyId: string,
-      successCallback: (value?: QuestionBackendDict[]) => void,
-      errorCallback: (reason?: Object) => void): void {
+      successCallback: (value: QuestionBackendDict[]) => void,
+      errorCallback: (reason: string) => void): void {
     if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
       successCallback([]);
       return;
@@ -64,9 +64,9 @@ export class PretestQuestionBackendApiService {
       if (successCallback) {
         successCallback(pretestQuestionDicts);
       }
-    }, (error) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }

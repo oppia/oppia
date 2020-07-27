@@ -45,9 +45,8 @@ import utils
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
 
-EXPLORATION_ID_KEY = 'explorationId'
-COLLECTION_ID_KEY = 'collectionId'
-QUESTION_ID_KEY = 'questionId'
+EXPLORATION_ID_KEY = 'exploration_id'
+COLLECTION_ID_KEY = 'collection_id'
 
 
 class OldNotificationsDashboardRedirectPage(base.BaseHandler):

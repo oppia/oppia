@@ -42,8 +42,8 @@ export class CollectionRightsBackendApiService {
     private urlInterpolationService: UrlInterpolationService) { }
 
   private _fetchCollectionRights(collectionId: string,
-      successCallback: (value?: CollectionRights) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: CollectionRights) => void,
+      errorCallback: (reason: string) => void): void {
     let collectionRightsUrl = this.urlInterpolationService
       .interpolateUrl(
         CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE, {
@@ -59,9 +59,9 @@ export class CollectionRightsBackendApiService {
           );
         }
       },
-      (error) => {
+      errorResponse => {
         if (errorCallback) {
-          errorCallback(error.statusText);
+          errorCallback(errorResponse.error.error);
         }
       });
   }
@@ -69,8 +69,8 @@ export class CollectionRightsBackendApiService {
   private _setCollectionStatus(collectionId: string,
       collectionVersion: number,
       isPublic: boolean,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: Object) => void): void {
+      successCallback: (value: CollectionRights) => void,
+      errorCallback: (reason: string) => void): void {
     let collectionPublishUrl = this.urlInterpolationService
       .interpolateUrl('/collection_editor_handler/publish/<collection_id>', {
         collection_id: collectionId
@@ -98,9 +98,9 @@ export class CollectionRightsBackendApiService {
           successCallback(collectionRights);
         }
       },
-      (error) => {
+      errorResponse => {
         if (errorCallback) {
-          errorCallback(error);
+          errorCallback(errorResponse.error.error);
         }
       });
   }

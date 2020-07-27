@@ -70,7 +70,7 @@ export class ConceptCardBackendApiService {
         }
       }, errorResponse => {
         if (errorCallback) {
-          errorCallback(errorResponse.error);
+          errorCallback(errorResponse.error.error);
         }
       });
   }

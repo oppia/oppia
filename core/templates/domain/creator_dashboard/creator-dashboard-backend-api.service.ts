@@ -192,6 +192,8 @@ export class CreatorDashboardBackendApiService {
               topicSummaryDict => this.topicSummaryObjectFactory
                 .createFromBackendDict(topicSummaryDict))) : null)
       };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 

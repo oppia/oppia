@@ -46,9 +46,9 @@ export class SearchExplorationsBackendApiService {
   ) {}
 
   private _fetchExplorations(
-      searchQuery: string, successCallback: (
-      value?: ExplorationMetadata[]) => void,
-      errorCallback: (reason?: Object) => void): void {
+      searchQuery: string,
+      successCallback: (value: ExplorationMetadata[]) => void,
+      errorCallback: (reason: string) => void): void {
     var queryUrl = this.urlInterpolationService.interpolateUrl(
       LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
         query: btoa(searchQuery)
@@ -63,7 +63,7 @@ export class SearchExplorationsBackendApiService {
           createFromBackendDict(explorationMetaData));
       successCallback(explorationMetadataList);
     }, (errorResponse) => {
-      errorCallback(errorResponse);
+      errorCallback(errorResponse.error.error);
     });
   }
 

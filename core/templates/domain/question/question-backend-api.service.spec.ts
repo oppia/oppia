@@ -181,7 +181,9 @@ describe('Question backend Api service', () => {
 
       let req = httpTestingController.expectOne(questionCountHandlerUrl);
       expect(req.request.method).toEqual('GET');
-      req.flush('Error fetching question count.', {
+      req.flush({
+        error: 'Error fetching question count.'
+      }, {
         status: 400, statusText: 'Invalid request'
       });
 
@@ -206,7 +208,9 @@ describe('Question backend Api service', () => {
 
       let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading questions.', {
+      req.flush({
+        error: 'Error loading questions.'
+      }, {
         status: 400, statusText: 'Invalid request'
       });
 
@@ -341,7 +345,9 @@ describe('Question backend Api service', () => {
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?cursor=');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading questions.', {
+      req.flush({
+        error: 'Error loading questions.'
+      }, {
         status: 500, statusText: 'Invaid request'
       });
 

@@ -74,6 +74,8 @@ INVALID_THROW_WITH_STRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_throw_with_string.ts')
 INVALID_ESLINT_CAMELCASE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_eslint_camelcase.ts')
+INVALID_ESLINT_ANY_TYPE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_eslint_any_type.ts')
 
 # PY filepaths.
 INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
@@ -332,6 +334,17 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'you are using this statement to define properties in an '
             'interface for a backend dict. Wrap the property name in '
             'single quotes instead.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
+
+    def test_invalid_use_of_eslint_no_explicit_any_comment(self):
+        with self.print_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_ESLINT_ANY_TYPE_FILEPATH], FILE_CACHE, True
+            ).perform_all_lint_checks()
+        self.assert_same_list_elements([
+            'Line 21: Please do not define "any" types. You can refer '
+            'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
+            'if you\'re having trouble declaring types.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
 

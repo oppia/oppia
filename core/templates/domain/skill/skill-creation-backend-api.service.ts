@@ -64,8 +64,8 @@ export class SkillCreationBackendApiService {
    * @param {Blob} imageData.imageBlob - Image data represented as a Blob.
    */
   _createSkill(
-      successCallback: (value?: SkillCreationBackendResponse) => void,
-      errorCallback:(reason?: string) => void,
+      successCallback: (value: SkillCreationBackendResponse) => void,
+      errorCallback: (reason: string) => void,
       description: string, rubrics: RubricBackendDict, explanation: string,
       linkedTopicIds: string[], imagesData: ImageData[]): void {
     let postData:SkillCreationBackendDict = {

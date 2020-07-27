@@ -21,6 +21,7 @@
     "@types/angular": "^1.6.54",
     "@types/angular-animate": "^1.5.10",
     "@types/angular-mocks": "^1.7.0",
+    "@types/angular-ui-bootstrap": "^1.0.0",
     "@types/ckeditor": "^4.9.8",
     "@types/d3": "^5.7.2",
     "@types/d3-array": "^2.0.0",

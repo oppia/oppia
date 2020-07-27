@@ -36,8 +36,8 @@ export class TopicCreationBackendApiService {
   constructor(private http: HttpClient) { }
 
   _createTopic(
-      successCallback: (value?: TopicCreationResponse) => void,
-      errorCallback:(reason?: string) => void,
+      successCallback: (value: TopicCreationResponse) => void,
+      errorCallback:(reason: string) => void,
       topic: NewlyCreatedTopic, imagesData: ImageData[],
       bgColor: string): void {
     let postData = {
@@ -61,7 +61,7 @@ export class TopicCreationBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.error);
+          errorCallback(errorResponse.error.error);
         }
       });
   }

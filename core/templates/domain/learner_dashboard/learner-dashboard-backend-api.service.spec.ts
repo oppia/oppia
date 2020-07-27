@@ -18,7 +18,6 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerDashboardBackendApiService } from
@@ -232,17 +231,13 @@ describe('Learner Dashboard Backend API Service', () => {
       var failHandler = jasmine.createSpy('fail');
 
       learnerDashboardBackendApiService.fetchLearnerDashboardData()
-        .then(successHandler, (error: HttpErrorResponse) => {
-          // This is done because the error callback gets called with an
-          // HttpErrorResponse object, not with the error message. The following
-          // line extracts the error message and calls the failHandler with the
-          // error message as the parameter.
-          failHandler(error.error);
-        });
+        .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading dashboard data.', {
+      req.flush({
+        error: 'Error loading dashboard data.'
+      }, {
         status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
       });
 
