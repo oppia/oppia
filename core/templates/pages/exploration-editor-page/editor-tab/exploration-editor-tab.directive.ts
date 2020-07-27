@@ -31,7 +31,7 @@ require(
   'state-param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
-  'unresolved-answers-overview.component.ts');
+  'unresolved-answers-overview.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(

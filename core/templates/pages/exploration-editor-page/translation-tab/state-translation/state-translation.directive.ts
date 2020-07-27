@@ -23,7 +23,7 @@ require(
   'audio-translation-bar.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation-editor/' +
-  'state-translation-editor.component.ts'
+  'state-translation-editor.directive.ts'
 );
 
 require('domain/utilities/url-interpolation.service.ts');
