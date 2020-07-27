@@ -101,7 +101,7 @@ class HomePageRedirectPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        if self.user_id and user_services.has_fully_registered(self.user_id):
+        if self.user_id and user_services.has_account_fully_registered(self.user_id):
             user_settings = user_services.get_user_settings(
                 self.user_id)
             default_dashboard = user_settings.default_dashboard

@@ -294,7 +294,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_user_settings_by_gae_id('id_x', strict=True)
 
-    def test_fetch_gravatar_success(self):
+    def test_fetch_gravatar_by_email_success(self):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
@@ -303,19 +303,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
         with self.urlfetch_mock(content=gravatar):
-            profile_picture = user_services.fetch_gravatar(user_email)
+            profile_picture = user_services.fetch_gravatar_by_email(user_email)
             gravatar_data_url = utils.convert_png_to_data_url(
                 expected_gravatar_filepath)
             self.assertEqual(profile_picture, gravatar_data_url)
 
-    def test_fetch_gravatar_failure_404(self):
+    def test_fetch_gravatar_by_email_failure_404(self):
         user_email = 'user@example.com'
 
         error_messages = []
         def mock_log_function(message):
             error_messages.append(message)
 
-        gravatar_url = user_services.get_gravatar_url(user_email)
+        gravatar_url = user_services.get_gravatar_url_by_email(user_email)
         expected_error_message = (
             '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
         logging_error_mock = test_utils.CallCounter(mock_log_function)
@@ -324,21 +324,21 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
         fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_counter)
         with urlfetch_mock_ctx, log_swap_ctx, fetch_swap_ctx:
-            profile_picture = user_services.fetch_gravatar(user_email)
+            profile_picture = user_services.fetch_gravatar_by_email(user_email)
             self.assertEqual(urlfetch_counter.times_called, 1)
             self.assertEqual(logging_error_mock.times_called, 1)
             self.assertEqual(expected_error_message, error_messages[0])
             self.assertEqual(
                 profile_picture, user_services.DEFAULT_IDENTICON_DATA_URL)
 
-    def test_fetch_gravatar_failure_exception(self):
+    def test_fetch_gravatar_by_email_failure_exception(self):
         user_email = 'user@example.com'
 
         error_messages = []
         def mock_log_function(message):
             error_messages.append(message)
 
-        gravatar_url = user_services.get_gravatar_url(user_email)
+        gravatar_url = user_services.get_gravatar_url_by_email(user_email)
         expected_error_message = (
             'Failed to fetch Gravatar from %s' % gravatar_url)
         logging_error_mock = test_utils.CallCounter(mock_log_function)
@@ -348,7 +348,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
         fetch_swap_ctx = self.swap(urlfetch, 'fetch', urlfetch_fail_mock)
         with log_swap_ctx, fetch_swap_ctx:
-            profile_picture = user_services.fetch_gravatar(user_email)
+            profile_picture = user_services.fetch_gravatar_by_email(user_email)
             self.assertEqual(logging_error_mock.times_called, 1)
             self.assertEqual(expected_error_message, error_messages[0])
             self.assertEqual(
@@ -1333,7 +1333,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
-        self.assertFalse(user_services.has_fully_registered(None))
+        self.assertFalse(user_services.has_account_fully_registered(None))
 
     def test_cannot_create_new_user_with_existing_user_id(self):
         with self.assertRaisesRegexp(
