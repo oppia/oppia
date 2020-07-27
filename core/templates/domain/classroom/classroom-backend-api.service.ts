@@ -30,11 +30,11 @@ import {
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface IClassroomTopicSummaryBackendDict {
+interface ClassroomTopicSummaryBackendDict {
   'topic_summary_dicts': TopicSummaryBackendDict[];
 }
 
-interface IClassroomStatusBackendDict {
+interface ClassroomStatusBackendDict {
   'classroom_page_is_shown': boolean;
 }
 
@@ -50,14 +50,14 @@ export class ClassroomBackendApiService {
   ) {}
 
   _fetchClassroomData(classroomName: string,
-      successCallback: (value?: TopicSummary[]) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: TopicSummary[]) => void,
+      errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
         classroom_name: classroomName
       });
 
-    this.http.get<IClassroomTopicSummaryBackendDict>(
+    this.http.get<ClassroomTopicSummaryBackendDict>(
       classroomDataUrl).toPromise().then(data => {
       this.topicSummaryObjects = data.topic_summary_dicts.map(
         (summaryDict) => {
@@ -68,26 +68,26 @@ export class ClassroomBackendApiService {
       if (successCallback) {
         successCallback(this.topicSummaryObjects);
       }
-    }, (error: string) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
   _fetchClassroomPageIsShownStatus(
-      successCallback: (value?: boolean) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void): void {
     const classroomStatusHandlerUrl = '/classroom_page_status_handler';
 
-    this.http.get<IClassroomStatusBackendDict>(
+    this.http.get<ClassroomStatusBackendDict>(
       classroomStatusHandlerUrl).toPromise().then(data => {
       if (successCallback) {
         successCallback(data.classroom_page_is_shown);
       }
-    }, (error: string) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }

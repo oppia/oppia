@@ -20,8 +20,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+interface CollectionCreationBackendDict {
+  'collection_id': string
+}
+
 interface CollectionCreationResponse {
-  collectionId: string
+  collectionId: string;
 }
 
 @Injectable({
@@ -31,20 +35,19 @@ export class CollectionCreationBackendService {
   constructor(private http: HttpClient) {}
 
   private _createCollection(
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: string) => void): void {
-    this.http.post<CollectionCreationResponse>(
+      successCallback: (value: CollectionCreationResponse) => void,
+      errorCallback: (reason: string) => void): void {
+    this.http.post<CollectionCreationBackendDict>(
       '/collection_editor_handler/create_new', {}).toPromise()
       .then(response => {
         if (successCallback) {
-          // NOTE: The response doesn't need to return a domain object
-          // because the response just returns collectionId and the the case
-          // of the keys of the backend dict is already in camelCase.
-          successCallback(response);
+          successCallback({
+            collectionId: response.collection_id
+          });
         }
-      }, () => {
+      }, errorResponse => {
         if (errorCallback) {
-          errorCallback();
+          errorCallback(errorResponse.error.error);
         }
       });
   }

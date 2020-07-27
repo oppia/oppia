@@ -51,7 +51,10 @@ export class LearnerAnswerDetailsBackendApiService {
     };
 
     return this.httpClient.put<void>(
-      recordLearnerAnswerDetailsUrl, payload).toPromise();
+      recordLearnerAnswerDetailsUrl, payload).toPromise().then(() => {},
+      errorResponse => {
+        throw new Error(errorResponse.error.error);
+      });
   }
 }
 
