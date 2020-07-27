@@ -324,13 +324,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', topic_id)
+            self.STORY_ID, 'Title', 'Description', topic_id)
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'description': feconf.DEFAULT_STORY_DESCRIPTION,
+            'description': 'Description',
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
                 'nodes': [],

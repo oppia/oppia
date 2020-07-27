@@ -1,0 +1,66 @@
+<div class="modal-header create-new-story-header">
+  <h3>
+    New Story
+  </h3>
+</div>
+<form ng-submit="confirm(story)">
+  <div class="modal-body create-new-story">
+    <div class="story-input">
+      <div class="story-input-header">
+        <span>Title*</span>
+      </div>
+      <input class="form-control protractor-test-new-story-title-field" ng-model="story.title" maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" autofocus>
+      <div>
+        <span class="oppia-input-box-subtitle">
+          <i>
+            Story title should be at most <[MAX_CHARS_IN_STORY_TITLE]> characters.
+          </i>
+        </span>
+      </div>
+    </div>
+    <div class="story-input story-input-description">
+      <div class="story-input-header">
+        <span>Description*</span>
+      </div>
+      <textarea rows="3" cols="50" ng-model="story.description" class="form-control protractor-test-new-story-description-field"></textarea>
+    </div>
+    <div class="story-input story-input-thumbnail">
+      <div class="story-input-header">
+        <span>Thumbnail Image*</span>
+      </div>
+      <thumbnail-uploader preview-title="story.title"
+                          aspect-ratio="'4:3'"
+                          disabled="false"
+                          use-local-storage="true"
+                          allowed-bg-colors="allowedBgColors"
+                          preview-description-bg-color="'#2F6687'">
+      </thumbnail-uploader>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success protractor-test-confirm-story-creation-button" type="submit" ng-disabled="!isValid()">
+      <span>Create Story</span>
+    </button>
+  </div>
+</form>
+<style>
+  .create-new-story-header h3 {
+    font-size: 28px;
+  }
+  .create-new-story .story-input {
+    padding: 10px 10px 16px;
+  }
+  .create-new-story input {
+    width: 70%;
+  }
+  .story-input-description input {
+    width: 95%;
+  }
+  .create-new-story .story-input-header span {
+    font-weight: bold;
+  }
+  .create-new-story .story-input-thumbnail {
+    padding-top: 15px;
+  }
+</style>

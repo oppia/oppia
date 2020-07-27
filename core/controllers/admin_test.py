@@ -350,8 +350,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            story_id, 'A story',
-            topic_id)
+            story_id, 'A story', 'Description', topic_id)
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)

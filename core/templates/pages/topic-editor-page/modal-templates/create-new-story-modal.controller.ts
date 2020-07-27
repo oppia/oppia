@@ -13,24 +13,38 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for new story title editor modal.
+ * @fileoverview Controller for create new story modal.
  */
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-angular.module('oppia').controller('NewStoryTitleEditorModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'MAX_CHARS_IN_STORY_TITLE',
-  function($controller, $scope, $uibModalInstance, MAX_CHARS_IN_STORY_TITLE) {
+require('domain/topic/NewlyCreatedStoryObjectFactory.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
+
+const newStoryConstants = require('constants.ts');
+
+angular.module('oppia').controller('CreateNewStoryModalController', [
+  '$controller', '$scope', '$uibModalInstance',
+  'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
+  'MAX_CHARS_IN_STORY_TITLE',
+  function($controller, $scope, $uibModalInstance,
+      ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
+      MAX_CHARS_IN_STORY_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.storyTitle = '';
+    $scope.story = NewlyCreatedStoryObjectFactory.createDefault();
     $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
-    $scope.isStoryTitleEmpty = function(storyTitle) {
-      return (storyTitle === '');
+    $scope.allowedBgColors = (
+      newStoryConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+
+    $scope.isValid = function() {
+      return Boolean($scope.story.isValid() &&
+          ImageLocalStorageService.getStoredImagesData().length > 0);
     };
   }
 ]);

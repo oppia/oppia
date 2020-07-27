@@ -51,12 +51,12 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
 
         self.story_1 = story_domain.Story.create_default_story(
-            self.story_id_1, 'story_title', self.topic_id_1)
+            self.story_id_1, 'story_title', 'description', self.topic_id_1)
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'story_title', self.topic_id_2)
+            self.story_id_2, 'story_title', 'description', self.topic_id_2)
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
 
