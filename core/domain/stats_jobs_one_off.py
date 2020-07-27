@@ -24,8 +24,11 @@ import collections
 import copy
 
 from core import jobs
+from core.domain import action_registry
+from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import playthrough_issue_registry
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
@@ -1375,3 +1378,73 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                     exp_id, status,
                     '' if len(exp_versions_without_stats_as_strs) == 1 else 's',
                     ', '.join(exp_versions_without_stats_as_strs)))
+
+class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to check if all customization arguments stored in
+    Playthrough, and ExplorationIssues are fully populated with
+    the appropriate keys.
+    """
+
+    STATUS_MISMATCH_KEYS = 'missing or extra customization argument key(s)'
+    STATUS_MATCH_KEYS = 'the correct customization argument key(s)' 
+
+    JOB_RESULT_EXPECTED = 'EXPECTED'
+    JOB_RESULT_UNEXPECTED = 'UNEXPECTED'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            stats_models.ExplorationIssuesModel,
+            stats_models.PlaythroughModel
+        ]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, stats_models.ExplorationIssuesModel):
+            for issue in item.unresolved_issues:
+                ca_specs = playthrough_issue_registry.Registry.get_issue_by_type(
+                    issue['issue_type']).customization_arg_specs
+                all_ca_names = set([ ca_spec.name for ca_spec in ca_specs ])
+
+                yield (
+                    'ExplorationIssue',
+                    all_ca_names == set(issue['issue_customization_args']))
+        elif isinstance(item, stats_models.PlaythroughModel):
+            ca_specs = playthrough_issue_registry.Registry.get_issue_by_type(
+                item.issue_type).customization_arg_specs
+            all_ca_names = set([ ca_spec.name for ca_spec in ca_specs ])
+
+            yield (
+                'Playthrough Issue',
+                all_ca_names == set(item.issue_customization_args))
+
+            for action in item.actions:
+                ca_specs = (
+                    action_registry.Registry.get_action_by_type(
+                        action['action_type']).customization_arg_specs)
+                all_ca_names = set([ ca_spec.name for ca_spec in ca_specs ])
+                yield (
+                    'Playthrough Action',
+                    all_ca_names == set(action['action_customization_args']))
+        else:
+            raise Exception('Unrecognized entity class to map over')
+
+    @staticmethod
+    def reduce(key, values):
+        expected = sum([value == 'True' for value in values])
+        unexpected = len(values) - expected
+
+        yield (
+            '%s: %i %s objects have %s' % (
+                StatisticsCustomizationArgsAudit.JOB_RESULT_EXPECTED,
+                expected,
+                key,
+                StatisticsCustomizationArgsAudit.STATUS_MATCH_KEYS)
+        )
+        yield (
+            '%s: %i %s objects have %s' % (
+                StatisticsCustomizationArgsAudit.JOB_RESULT_UNEXPECTED,
+                unexpected,
+                key,
+                StatisticsCustomizationArgsAudit.STATUS_MISMATCH_KEYS)
+        )
