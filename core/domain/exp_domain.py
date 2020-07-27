@@ -2705,8 +2705,17 @@ class Exploration(python_utils.OBJECT):
                         correct_answer = state_dict['interaction'][
                             'solution']['correct_answer']['ascii']
                         correct_answer = clean_math_expression(correct_answer)
-                        state_dict['interaction'][
-                            'solution']['correct_answer'] = correct_answer
+                        equation_condition = (
+                            new_interaction_id == TYPE_VALID_MATH_EQUATION and (
+                                not is_valid_math_equation(correct_answer)))
+                        algebraic_condition = new_interaction_id == (
+                            TYPE_VALID_ALGEBRAIC_EXPRESSION and not (
+                                is_valid_algebraic_expression(correct_answer)))
+                        if equation_condition or algebraic_condition:
+                            state_dict['interaction']['solution'] = None
+                        else:
+                            state_dict['interaction'][
+                                'solution']['correct_answer'] = correct_answer
 
         return states_dict
 
