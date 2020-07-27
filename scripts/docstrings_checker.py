@@ -32,13 +32,9 @@ _PYLINT_PATH = os.path.join(
     _PARENT_DIR, 'oppia_tools', 'pylint-%s' % common.PYLINT_VERSION)
 sys.path.insert(0, _PYLINT_PATH)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid # isort:skip
-from pylint.checkers import utils # isort:skip
-from pylint.extensions import _check_docs_utils # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
+import astroid # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def space_indentation(s):

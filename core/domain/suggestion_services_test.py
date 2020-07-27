@@ -714,6 +714,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         def get_content_html(self, state_name, content_id):
             """Used to mock the get_content_html method for explorations."""
+            # state_name and content_id are used here to suppress the unused
+            # arguments warning. The main goal of this method is to just
+            # produce content html for the tests.
             return '<p>State name: %s, Content id: %s</p>' % (
                 state_name, content_id
             )
@@ -1046,9 +1049,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.save_new_topic(self.TOPIC_ID, self.owner_id)
 
         self.save_new_story(
-            self.STORY_ID, self.owner_id, title='A story',
-            description='Description', notes='Notes',
-            corresponding_topic_id=self.TOPIC_ID)
+            self.STORY_ID, self.owner_id, self.TOPIC_ID, title='A story',
+            description='Description', notes='Notes')
 
         # Adds the story to the topic.
         topic_services.add_canonical_story(
