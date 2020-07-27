@@ -343,7 +343,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ).perform_all_lint_checks()
         self.assert_same_list_elements([
             'Line 21: Please do not define "any" types. You can refer '
-            'https://github.com/oppia/oppia/wiki/Guide-on-defining-types'
+            'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
             'if you\'re having trouble declaring types.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
