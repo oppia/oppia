@@ -68,7 +68,7 @@ export class HtmlEscaperService {
   }
 
   /**
-   * This file is used to convert an HTML escaped string to its 
+   * This file is used to convert an HTML escaped string to its
    * unescaped counterpart.
    * @param {string} value - An escaped string.
    * @return {string} an unescaped string derived from the previous string.
