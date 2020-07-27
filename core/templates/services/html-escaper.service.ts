@@ -28,7 +28,7 @@ export class HtmlEscaperService {
   constructor(private loggerService: LoggerService) {}
 
   /**
-   * Converts an object to its JSON counterpart.
+   * This function is used to convert an object to its JSON counterpart.
    * @param {object} graph - An object.
    * @return {string} An escaped JSON version of the original string object.
    */
@@ -38,7 +38,8 @@ export class HtmlEscaperService {
 
 
   /**
-   * Converts a escaped JSON string to its object counterpart.
+   * This function is used to convert
+   * a escaped JSON string to its object counterpart.
    * @param {string} json - A JSON string.
    * @return {object} an unescaped non-JSON version of the original string.
    * @throws Will throw error if empty string is passed to JSON decoder.
@@ -52,7 +53,8 @@ export class HtmlEscaperService {
   }
 
   /**
-   * Converts an unescaped string to its HTML escaped counterpart.
+   * This function is used to convert an unescaped string to its HTML
+   * escaped counterpart.
    * @param {string} str - An unescaped string.
    * @return {string} an escaped string derived from the previous string.
    */
@@ -66,7 +68,8 @@ export class HtmlEscaperService {
   }
 
   /**
-   * Converts an HTML escaped string to its unescaped counterpart.
+   * This file is used to convert an HTML escaped string to its 
+   * unescaped counterpart.
    * @param {string} value - An escaped string.
    * @return {string} an unescaped string derived from the previous string.
    */
