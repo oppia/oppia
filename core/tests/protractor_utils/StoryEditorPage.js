@@ -441,13 +441,14 @@ var StoryEditorPage = function() {
   this.expectWarningInIndicator = async function(warning) {
     await waitFor.visibilityOf(warningIndicator,
       'Warning Indicator taking too long to appear.');
-    await (await browser.actions().mouseMove(warningIndicator)).perform();
+    await browser.actions().mouseMove(warningIndicator).perform();
     var warningElemCount = await warningTextElements.count();
-    matchFound = false;
+    var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {
-      var text = await (await warningTextElements.get(i)).getText();
+      var text = await warningTextElements.get(i).getText();
       if (warning.test(text)) {
         matchFound = true;
+        break;
       }
     }
     expect(matchFound).toBe(true);
