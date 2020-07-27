@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the Editor tab in the exploration editor page.
+ * @fileoverview Component for the Editor tab in the exploration editor page.
  */
 
 require(
@@ -22,7 +22,7 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
-  'exploration-graph.directive.ts');
+  'exploration-graph.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/state-name-editor/' +
   'state-name-editor.directive.ts');

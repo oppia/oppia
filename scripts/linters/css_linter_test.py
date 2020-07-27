@@ -42,10 +42,9 @@ class MockProcessClass(python_utils.OBJECT):
 
     kill_count = 0
 
-    # pylint: disable=missing-docstring
     def kill(self):
+        """Mock method to kill process."""
         MockProcessClass.kill_count += 1
-    # pylint: enable=missing-docstring
 
 
 class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
@@ -82,15 +81,13 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
             third_party_linter.perform_all_lint_checks()
 
     def test_perform_all_lint_checks_with_stderr(self):
-        # pylint: disable=unused-argument
-        def mock_popen(unused_commands, stdout, stderr):
+        def mock_popen(unused_commands, stdout, stderr):  # pylint: disable=unused-argument
             def mock_communicate():
                 return ('True', 'True')
             result = MockProcessClass()
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
-        # pylint: enable=unused-argument
 
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen)
