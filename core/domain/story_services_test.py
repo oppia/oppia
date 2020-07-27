@@ -1566,8 +1566,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            self.STORY_1_ID, 'Title', self.TOPIC_ID)
-        story.description = ('Description')
+            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID)
+
         self.node_1 = {
             'id': self.NODE_ID_1,
             'thumbnail_filename': 'image.svg',
