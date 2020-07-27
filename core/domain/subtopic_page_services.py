@@ -209,8 +209,6 @@ def update_subtopics_with_math_svgs(subtopic_page_id,
             convert_html_in_written_translations(
                 old_subtopic_page_contents_written_translations.to_dict(),
                 add_svg_filenames_for_latex_strings_in_html_string))
-        print("\n\n\n\n\n*****************88")
-        print(new_subtopic_page_contents_written_translations_dict)
         new_subtopic_page_contents_written_translations = (
             state_domain.WrittenTranslations.from_dict(
                 new_subtopic_page_contents_written_translations_dict))
