@@ -2140,8 +2140,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
             '<abbreviated_topic_name>/story/<story_id>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
-                webapp2.Route(story_data_url,self.MockDataHandler),
-                webapp2.Route(story_page_url,self.MockPageHandler)
+                webapp2.Route(story_data_url, self.MockDataHandler),
+                webapp2.Route(story_page_url, self.MockPageHandler)
             ],
             debug=feconf.DEBUG,
         ))
