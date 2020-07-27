@@ -28,6 +28,9 @@ import { AppConstants } from 'app.constants';
 })
 export class MathInteractionsService {
   private warningText = '';
+  // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+  // rid of the TS2339 error on AppConstants.
+  private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
 
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
@@ -115,10 +118,16 @@ export class MathInteractionsService {
         ' mentioned in the question.';
       return false;
     }
-    if (!algebraic && expressionObject.variables().length !== 0) {
-      this.warningText = 'It looks like you have entered some variables. ' +
-        'Please enter numbers only.';
-      return false;
+    if (!algebraic) {
+      for (let functionName of this.mathFunctionNames) {
+        expressionString = expressionString.replace(
+          new RegExp(functionName, 'g'), '');
+      }
+      if (/[a-zA-Z]/.test(expressionString)) {
+        this.warningText = 'It looks like you have entered some variables. ' +
+          'Please enter numbers only.';
+        return false;
+      }
     }
     this.warningText = '';
     return true;
@@ -195,10 +204,7 @@ export class MathInteractionsService {
     }
     // Inserting multiplication signs before functions. For eg. 5sqrt(x) should
     // be treated as 5*sqrt(x).
-    // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    let mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
-    for (let functionName of mathFunctionNames) {
+    for (let functionName of this.mathFunctionNames) {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
     }
@@ -210,7 +216,7 @@ export class MathInteractionsService {
     // sqrt*(4).
     let removeExtraMultiSymbol = expressionString[0] === '(';
     expressionString = expressionString.replace(new RegExp(
-      '(?<!\\*|\\+|\\/|\\-|\\^|\\(|' + mathFunctionNames.join(
+      '(?<!\\*|\\+|\\/|\\-|\\^|\\(|' + this.mathFunctionNames.join(
         '|') + ')\\(', 'g'), '*(');
     if (removeExtraMultiSymbol) {
       expressionString = expressionString.slice(1);

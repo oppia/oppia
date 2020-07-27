@@ -37,7 +37,8 @@ export class GuppyInitializationService {
   private guppyInstances: Array<GuppyObject> = [];
   private onScreenKeyboardShown = false;
 
-  init(guppyDivClassName: string, initialValue = ''): void {
+  init(guppyDivClassName: string, placeholderText: string, initialValue = ''):
+      void {
     this.onScreenKeyboardShown = false;
     let guppyDivs = document.querySelectorAll('.' + guppyDivClassName);
     let divId, guppyInstance;
@@ -49,15 +50,27 @@ export class GuppyInitializationService {
       // Create a new guppy instance for that div.
       guppyInstance = new Guppy(divId, {});
 
+      guppyInstance.configure(
+        'empty_content',
+        '\\color{grey}{\\text{\\small{' + placeholderText + '}}}');
+
       // Initialize if with a value for the creator's view.
-      if (guppyDivClassName === 'guppy-div-creator') {
+      if (guppyDivClassName === 'guppy-div-creator' &&
+        initialValue.length !== 0) {
+        if (initialValue.indexOf('=') !== -1) {
+          let splitByEquals = initialValue.split('=');
+          splitByEquals[0] = mathInteractionsService.insertMultiplicationSigns(
+            splitByEquals[0]);
+          splitByEquals[1] = mathInteractionsService.insertMultiplicationSigns(
+            splitByEquals[1]);
+          initialValue = splitByEquals.join('=');
+        } else {
+          initialValue = mathInteractionsService.insertMultiplicationSigns(
+            initialValue)
+        }
         initialValue = initialValue.replace(/abs\(/g, 'absolutevalue(');
         initialValue = initialValue.replace(/sqrt\(/g, 'squareroot(');
-        if (initialValue.length !== 0) {
-          initialValue = mathInteractionsService.insertMultiplicationSigns(
-            initialValue);
-          guppyInstance.import_text(initialValue);
-        }
+        guppyInstance.import_text(initialValue);
         guppyInstance.engine.end();
         guppyInstance.render(true);
       }

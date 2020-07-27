@@ -33,9 +33,11 @@ angular.module('oppia').component('numericExpressionEditor', {
   controller: [
     '$scope', 'GuppyConfigurationService', 'GuppyInitializationService',
     'MathInteractionsService', 'DeviceInfoService',
+    'MATH_INTERACTION_PLACEHOLDERS',
     function(
         $scope, GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService, DeviceInfoService) {
+        MathInteractionsService, DeviceInfoService,
+        MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.warningText = '';
       ctrl.hasBeenTouched = false;
@@ -44,16 +46,28 @@ angular.module('oppia').component('numericExpressionEditor', {
         // Replacing 'absolutevalue(x)' with 'abs(x)', 'neg(x)' with '-(x)'
         // and 'squareroot(x)' with 'sqrt(x)' for compatibility with nerdamer
         // and backend validators.
-        ctrl.value = ctrl.value.replace(/absolutevalue\(/g, 'abs(');
-        ctrl.value = ctrl.value.replace(/neg\(/g, '-(');
-        ctrl.value = ctrl.value.replace(/squareroot\(/g, 'sqrt(');
+        ctrl.currentValue = ctrl.currentValue.replace(
+          /absolutevalue\(/g, 'abs(');
+        ctrl.currentValue = ctrl.currentValue.replace(/neg\(/g, '-(');
+        ctrl.currentValue = ctrl.currentValue.replace(/squareroot\(/g, 'sqrt(');
+        // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
+        // is not compatible with nerdamer or with the backend validations.
+        ctrl.currentValue = MathInteractionsService.replaceAbsSymbolWithText(
+          ctrl.currentValue);
         var answerIsValid = MathInteractionsService.validateExpression(
-          ctrl.value, false);
-        ctrl.warningText = MathInteractionsService.getWarningText();
+          ctrl.currentValue, false);
+        if (GuppyInitializationService.findActiveGuppyObject() === undefined) {
+          // The warnings should only be displayed when the editor is inactive
+          // focus, i.e., the user is done typing.
+          ctrl.warningText = MathInteractionsService.getWarningText();
+        } else {
+          ctrl.warningText = '';
+        }
         if (answerIsValid) {
           // Explicitly inserting '*' signs wherever necessary.
-          ctrl.value = MathInteractionsService.insertMultiplicationSigns(
-            ctrl.value);
+          ctrl.currentValue = MathInteractionsService.insertMultiplicationSigns(
+            ctrl.currentValue);
+          ctrl.value = ctrl.currentValue;
         }
         if (!ctrl.hasBeenTouched) {
           ctrl.warningText = '';
@@ -71,20 +85,26 @@ angular.module('oppia').component('numericExpressionEditor', {
         if (ctrl.value === null) {
           ctrl.value = '';
         }
+        ctrl.currentValue = ctrl.value;
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-creator', ctrl.value);
+        GuppyInitializationService.init(
+          'guppy-div-creator',
+          MATH_INTERACTION_PLACEHOLDERS.NumericExpressionInput, ctrl.value);
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
         // We need the 'focus' event while using the on screen keyboard (only
         // for touch-based devices) to capture input from user and the 'change'
         // event while using the normal keyboard.
-        Guppy.event(eventType, () => {
+        Guppy.event(eventType, (focusObj) => {
+          if (!focusObj.focused) {
+            ctrl.isCurrentAnswerValid();
+          }
           var activeGuppyObject = (
             GuppyInitializationService.findActiveGuppyObject());
           if (activeGuppyObject !== undefined) {
             ctrl.hasBeenTouched = true;
-            ctrl.value = activeGuppyObject.guppyInstance.asciimath();
+            ctrl.currentValue = activeGuppyObject.guppyInstance.asciimath();
             if (eventType === 'change') {
               // Need to manually trigger the digest cycle to make any
               // 'watchers' aware of changes in answer.
@@ -92,6 +112,13 @@ angular.module('oppia').component('numericExpressionEditor', {
             }
           }
         });
+        if (eventType !== 'focus') {
+          Guppy.event('focus', (focusObj) => {
+            if (!focusObj.focused) {
+              ctrl.isCurrentAnswerValid();
+            }
+          });
+        }
       };
     }
   ]

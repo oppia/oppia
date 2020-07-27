@@ -36,12 +36,12 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
     '$scope', 'AlgebraicExpressionInputRulesService',
     'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService',
+    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
     function(
         $scope, AlgebraicExpressionInputRulesService,
         CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService) {
+        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
@@ -79,7 +79,9 @@ angular.module('oppia').component('oppiaInteractiveAlgebraicExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-learner');
+        GuppyInitializationService.init(
+          'guppy-div-learner',
+          MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

@@ -5325,6 +5325,13 @@ export = {
     "humanReadableName": "with reordering allowed around ="
   }],
 
+  // Placeholder texts for the math interactions.
+  "MATH_INTERACTION_PLACEHOLDERS": {
+    "AlgebraicExpressionInput": "Type an expression here.",
+    "NumericExpressionInput": "Type an expression here, using only numbers.",
+    "MathEquationInput": "Type an equation here."
+  },
+
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
