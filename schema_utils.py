@@ -109,9 +109,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_HTML:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         assert 'html' in obj, ('Expected dict with key html, received %s' % obj)
-        assert ('content_id' in obj, 
+        assert 'content_id' in obj, (
             'Expected dict with key content_id, received %s' % obj)
-        assert (len(obj.keys()) == 2,
+        assert len(obj.keys()) == 2, (
             'Expected dict with 2 keys, received %s' % obj)
 
         normalized_obj = {}
@@ -123,11 +123,11 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             {'type': SCHEMA_TYPE_UNICODE_OR_NONE})
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_UNICODE:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
-        assert ('unicode_str' in obj, 
+        assert 'unicode_str' in obj, (
             'Expected dict with key unicode_str, received %s' % obj)
-        assert ('content_id' in obj, 
+        assert 'content_id' in obj, (
             'Expected dict with key content_id, received %s' % obj)
-        assert (len(obj.keys()) == 2,
+        assert len(obj.keys()) == 2, (
             'Expected dict with 2 keys, received %s' % obj)
 
         normalized_obj = {}
