@@ -85,12 +85,12 @@ def convert_object_to_json_str(object):
 
     return result
 
-def get_object_from_json_string(key, json_string):
+def get_object_from_json_string(object_class, json_string):
     """Converts a json string back into the object it was serialized from.
 
     Args:
-        key: str. The key corresponding to the json string in the cache.
-        son_string: str. A json encoded string that can be decoded to a
+        object_class: class. The class corresponding to this json_string.
+        json_string: str. A json encoded string that can be decoded to a
             dictionary.
 
     Raises:
@@ -101,19 +101,43 @@ def get_object_from_json_string(key, json_string):
     Returns:
         *. Object to which this string corresponds to.
     """
-    correct_type_of_dict = get_correct_dict_type_of_key(key)
-    str_type = python_utils.convert_to_bytes(correct_type_of_dict)
-
-    if not hasattr(correct_type_of_dict, 'from_dict'):
+    if not hasattr(object_class, 'from_dict'):
         raise Exception(
             ('Type %s associated with key %s does not have a from_dict() ' +
              'method implemented. This method is required to decode ' +
              'object.') % (str_type, key))
 
     try:
-        value_dict = json.loads(value)
+        decoded_object_dict = json.loads(value)
     except ValueError:
         raise Exception(
-            ('Object associated with key %s cannot be decoded to' +
-                ' dictionary.') % key)
-    return correct_type_of_dict.from_dict(value_dict)
+            'Json decoding failed for object associated with key %s' % key)
+    return object_class.from_dict(decoded_object_dict)
+
+def get_object_dict_from_cache_tuple(cache_tuple):
+    """Returns the object dictionary corresponding to the serialized cache tuple
+
+
+    Args:
+        cache_tuple:tuple(list(str), list(str|None)). A tuple consisting of
+            a list of keys and a list of corresponding values returned from the
+            cache.
+
+    Returns:
+        dict(*). Object dictionary where (key, value) pairs from the cache_tuple
+        are either inserted into the dictionary as (key,value) or (key, object)
+        if the value is a json encoded string and the object is the decoded
+        object of that string.
+    """
+
+    for key, value in zip(cache_tuple[0], cache_tuple[1]):
+        if value:
+            correct_type_of_dict = get_correct_dict_type_of_key(key)
+            if correct_type_of_dict:
+                decoded_object = get_object_from_json_string(value)
+                cache_dict[key] = decoded_object
+
+    return cache_dict
+
+
+

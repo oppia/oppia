@@ -35,18 +35,15 @@ def get_multi(keys):
         keys: list(str). A list of keys (strings) to look up.
 
     Returns:
-        dict(str, str). A dict of (key,value) pairs for the keys/values that
-        were present in the Redis cache. The keys and values are both strings.
+        tuplelist(str), list(str|None)). Returns a tuple of the list of key
+        strings and the corresponding list of value strings. The keys and values
+        are both strings unless a key is not found in the cache in which case
+        the value corresponding to that key is None. More details can be found
+        here: https://redis.io/commands/mget
     """
     assert isinstance(keys, list)
     result = redis_client.mget(keys)
-    if result and (result != [None]):
-        dct = {}
-        for key, value in zip(keys, result)
-            dct[key] = value
-        return dct
-    else:
-        return {}
+    return (keys, result)
 
 
 def set_multi(key_value_mapping):
