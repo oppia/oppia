@@ -120,6 +120,14 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
+/**
+ * @param {string} url - URL to redirect 
+ */
+var urlRedirection = async function(url) {
+  // Checks that the current URL matches the expected text.
+  await browser.wait(until.urlIs(url), 15000, "URL redirection took too long");
+};
+
 var visibilityOfInfoToast = async function(errorMessage) {
   await visibilityOf(toastInfoElement, errorMessage);
 };
@@ -140,6 +148,7 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
+exports.urlRedirection = urlRedirection;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;

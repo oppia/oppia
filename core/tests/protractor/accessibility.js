@@ -26,24 +26,24 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
   var timeout = 15000;
-  var getStartedUrl = 'http://localhost:9001/get-started';
-  var communityLibraryUrl = 'http://localhost:9001/community-library';
-  var learnerDashboardUrl = 'http://localhost:9001/learner-dashboard';
-  var creatorDashboardUrl = 'http://localhost:9001/creator-dashboard';
-  var aboutUrl = 'http://localhost:9001/about';
-  var notificationsUrl = 'http://localhost:9001/notifications';
-  var preferencesUrl = 'http://localhost:9001/preferences';
+  var GET_STARTED_URL = 'http://localhost:9001/get-started';
+  var COMMUNITY_LIBRARY_URL = 'http://localhost:9001/community-library';
+  var LEARNER_DASHBOARD_URL = 'http://localhost:9001/learner-dashboard';
+  var CREATOR_DASHHBOARD_URL = 'http://localhost:9001/creator-dashboard';
+  var ABOUT_URL = 'http://localhost:9001/about';
+  var NOTIFICATIONS_URL = 'http://localhost:9001/notifications';
+  var PREFERENCES_URL = 'http://localhost:9001/preferences';
 
-  var triggerKeys = async function(key) {
+  var holdCtrlAndPressKey = async function(key) {
     await browser.actions().sendKeys(
       protractor.Key.chord(protractor.Key.CONTROL, key)).perform();
   };
 
-  var waitForUrlRedirection = async function(url) {
-    var EC = browser.ExpectedConditions;
-    // Checks that the current URL contains the expected text.
-    await browser.wait(EC.urlContains(url), timeout);
-  };
+  // var waitFor.urlRedirection = async function(url) {
+  //   var EC = browser.ExpectedConditions;
+  //   // Checks that the current URL matches the expected text.
+  //   await browser.wait(EC.urlIs(url), timeout);
+  // };
 
   beforeAll(async function() {
     // Should create a user and login.
@@ -67,311 +67,363 @@ describe('screenreader and keyboard user accessibility features', function() {
         .getAttribute('id'));
   });
 
-  it('should test navigation shortcuts for the community-library page',
-    async function() {
-      await browser.get('community-library');
-      await waitForUrlRedirection('community-library');
-
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the creator-dashboard page',
-    async function() {
-      await browser.get('creator-dashboard');
-      await waitForUrlRedirection('creator-dashboard');
-
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the get-started page',
+  it('should test the navigation shortcut ctrl+0',
     async function() {
       await browser.get('get-started');
-      await waitForUrlRedirection('get-started');
+      await waitFor.urlRedirection('http://localhost:9001/get-started');
 
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the about page',
-    async function() {
       await browser.get('about');
-      await waitForUrlRedirection('about');
+      await waitFor.urlRedirection('http://localhost:9001/about');
 
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the privacy-policy page',
-    async function() {
       await browser.get('privacy-policy');
-      await waitForUrlRedirection('privacy-policy');
+      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
 
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the donate page',
-    async function() {
-      await browser.get('donate');
-      await waitForUrlRedirection('donate');
-
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the preferences page',
-    async function() {
-      await browser.get('preferences');
-      await waitForUrlRedirection('preferences');
-
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
-
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
-
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
-
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the learner-dashboard page',
-    async function() {
       await browser.get('learner-dashboard');
-      await waitForUrlRedirection('learner-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
 
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+      await browser.get('donate');
+      await waitFor.urlRedirection('http://localhost:9001/donate');
 
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
-
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
-    });
-
-  it('should test navigation shortcuts for the notifications page',
-    async function() {
       await browser.get('notifications');
-      await waitForUrlRedirection('notifications');
+      await waitFor.urlRedirection('http://localhost:9001/notifications');
 
-      await triggerKeys('0');
-      await waitForUrlRedirection(getStartedUrl);
-      expect(await browser.getCurrentUrl()).toEqual(getStartedUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
-      await triggerKeys('1');
-      await waitForUrlRedirection(communityLibraryUrl);
-      expect(await browser.getCurrentUrl()).toEqual(communityLibraryUrl);
+      await browser.get('creator-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
 
-      await triggerKeys('2');
-      await waitForUrlRedirection(learnerDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(learnerDashboardUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
-      await triggerKeys('3');
-      await waitForUrlRedirection(creatorDashboardUrl);
-      expect(await browser.getCurrentUrl()).toEqual(creatorDashboardUrl);
+      await browser.get('community-library');
+      await waitFor.urlRedirection('http://localhost:9001/community-library');
 
-      await triggerKeys('4');
-      await waitForUrlRedirection(aboutUrl);
-      expect(await browser.getCurrentUrl()).toEqual(aboutUrl);
-
-      await triggerKeys('5');
-      await waitForUrlRedirection(notificationsUrl);
-      expect(await browser.getCurrentUrl()).toEqual(notificationsUrl);
-
-      await triggerKeys('6');
-      await waitForUrlRedirection(preferencesUrl);
-      expect(await browser.getCurrentUrl()).toEqual(preferencesUrl);
+      await holdCtrlAndPressKey('0');
+      await waitFor.urlRedirection(GET_STARTED_URL);
     });
+
+    it('should test the navigation shortcut ctrl+1',
+    async function() {
+      await browser.get('get-started');
+      await waitFor.urlRedirection('http://localhost:9001/get-started');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+
+      await browser.get('about');
+      await waitFor.urlRedirection('http://localhost:9001/about');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+
+      await browser.get('privacy-policy');
+      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+
+      await browser.get('learner-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+
+      await browser.get('donate');
+      await waitFor.urlRedirection('http://localhost:9001/donate');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+
+      await browser.get('notifications');
+      await waitFor.urlRedirection('http://localhost:9001/notifications');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+
+      await browser.get('creator-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+
+      await browser.get('community-library');
+      await waitFor.urlRedirection('http://localhost:9001/community-library');
+
+      await holdCtrlAndPressKey('1');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+    });
+
+    it('should test the navigation shortcut ctrl+2',
+    async function() {
+      await browser.get('get-started');
+      await waitFor.urlRedirection('http://localhost:9001/get-started');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+
+      await browser.get('about');
+      await waitFor.urlRedirection('http://localhost:9001/about');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+
+      await browser.get('privacy-policy');
+      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+
+      await browser.get('learner-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+
+      await browser.get('donate');
+      await waitFor.urlRedirection('http://localhost:9001/donate');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+
+      await browser.get('notifications');
+      await waitFor.urlRedirection('http://localhost:9001/notifications');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+
+      await browser.get('creator-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+
+      await browser.get('community-library');
+      await waitFor.urlRedirection('http://localhost:9001/community-library');
+
+      await holdCtrlAndPressKey('2');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+    });
+
+    it('should test the navigation shortcut ctrl+3',
+    async function() {
+      await browser.get('get-started');
+      await waitFor.urlRedirection('http://localhost:9001/get-started');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+
+      await browser.get('about');
+      await waitFor.urlRedirection('http://localhost:9001/about');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+
+      await browser.get('privacy-policy');
+      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+
+      await browser.get('learner-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+
+      await browser.get('donate');
+      await waitFor.urlRedirection('http://localhost:9001/donate');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+
+      await browser.get('notifications');
+      await waitFor.urlRedirection('http://localhost:9001/notifications');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+
+      await browser.get('creator-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+
+      await browser.get('community-library');
+      await waitFor.urlRedirection('http://localhost:9001/community-library');
+
+      await holdCtrlAndPressKey('3');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+    });
+
+    it('should test the navigation shortcut ctrl+4',
+    async function() {
+      await browser.get('get-started');
+      await waitFor.urlRedirection('http://localhost:9001/get-started');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+
+      await browser.get('about');
+      await waitFor.urlRedirection('http://localhost:9001/about');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+
+      await browser.get('privacy-policy');
+      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+
+      await browser.get('learner-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+
+      await browser.get('donate');
+      await waitFor.urlRedirection('http://localhost:9001/donate');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+
+      await browser.get('notifications');
+      await waitFor.urlRedirection('http://localhost:9001/notifications');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+
+      await browser.get('creator-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+
+      await browser.get('community-library');
+      await waitFor.urlRedirection('http://localhost:9001/community-library');
+
+      await holdCtrlAndPressKey('4');
+      await waitFor.urlRedirection(ABOUT_URL);
+    });
+
+    it('should test the navigation shortcut ctrl+5',
+    async function() {
+      await browser.get('get-started');
+      await waitFor.urlRedirection('http://localhost:9001/get-started');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+
+      await browser.get('about');
+      await waitFor.urlRedirection('http://localhost:9001/about');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+
+      await browser.get('privacy-policy');
+      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+
+      await browser.get('learner-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+
+      await browser.get('donate');
+      await waitFor.urlRedirection('http://localhost:9001/donate');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+
+      await browser.get('notifications');
+      await waitFor.urlRedirection('http://localhost:9001/notifications');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+
+      await browser.get('creator-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+
+      await browser.get('community-library');
+      await waitFor.urlRedirection('http://localhost:9001/community-library');
+
+      await holdCtrlAndPressKey('5');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
+    });
+    
+    it('should test the navigation shortcut ctrl+6',
+    async function() {
+      await browser.get('get-started');
+      await waitFor.urlRedirection('http://localhost:9001/get-started');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+
+      await browser.get('about');
+      await waitFor.urlRedirection('http://localhost:9001/about');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+
+      await browser.get('privacy-policy');
+      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+
+      await browser.get('learner-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+
+      await browser.get('donate');
+      await waitFor.urlRedirection('http://localhost:9001/donate');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+
+      await browser.get('notifications');
+      await waitFor.urlRedirection('http://localhost:9001/notifications');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+
+      await browser.get('creator-dashboard');
+      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+
+      await browser.get('community-library');
+      await waitFor.urlRedirection('http://localhost:9001/community-library');
+
+      await holdCtrlAndPressKey('6');
+      await waitFor.urlRedirection(PREFERENCES_URL);
+    });
+
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
