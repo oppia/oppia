@@ -47,9 +47,11 @@ export class KeyboardShortcutService {
         '.protractor-test-continue-button');
       if (nextButton !== null) {
         nextButton.focus();
-      } else if (continueToNextCardButton !== null) {
+      }
+      if (continueToNextCardButton !== null) {
         continueToNextCardButton.focus();
-      } else if (continueButton !== null) {
+      }
+      if (continueButton !== null) {
         continueButton.focus();
       }
       return false;
