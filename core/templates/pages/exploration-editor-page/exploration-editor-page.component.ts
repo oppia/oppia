@@ -36,7 +36,7 @@ require(
   'editor-navbar-breadcrumb.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.component.ts');
+  'editor-navigation.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.component.ts');
@@ -62,7 +62,7 @@ require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.component.ts');
-require('pages/exploration-editor-page/preview-tab/preview-tab.component.ts');
+require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.ts');
