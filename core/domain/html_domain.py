@@ -40,6 +40,10 @@ class LatexStringSvgImageDimensions(python_utils.OBJECT):
         Args:
             encoded_height_string: str. The string from which the actual height
                 can be derived. The actual height for math SVGs are in units ex.
+                For example: If the actual height of the SVG is '1.234ex', then
+                the encoded_height_string will  be '1d234'.We have replaced the
+                decimal point with an alphabet because this string will be used
+                in generating the filename for the SVGs.
             encoded_width_string: str. The string from which the actual width
                 can be derived. The actual width for math SVGs are in units ex.
             encoded_vertical_padding_string: str. The string from which the
