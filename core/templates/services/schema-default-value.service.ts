@@ -26,7 +26,6 @@ import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
-import { cloneDeep } from 'lodash';
 
 
 interface BoolSchema {
