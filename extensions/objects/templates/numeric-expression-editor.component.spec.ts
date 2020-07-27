@@ -39,13 +39,15 @@ describe('NumericExpressionEditor', function() {
   let deviceInfoService = null;
 
   class MockGuppy {
+    static focused = true;
     constructor(id: string, config: Object) {}
 
     asciimath() {
       return 'Dummy value';
     }
+    configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler();
+      handler({focused: MockGuppy.focused});
     }
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
@@ -66,6 +68,7 @@ describe('NumericExpressionEditor', function() {
     $window = $injector.get('$window');
     ctrl = $componentController('numericExpressionEditor');
     $window.Guppy = MockGuppy;
+    ctrl.currentValue = '';
   }));
 
   it('should add the change handler to guppy', function() {
@@ -73,6 +76,14 @@ describe('NumericExpressionEditor', function() {
       mockGuppyObject);
     ctrl.$onInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
+  });
+
+  it('should not show warnings if the editor is active', function() {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
+      ctrl.warningText = '';
+    ctrl.isCurrentAnswerValid();
+    expect(ctrl.warningText).toBe('');
   });
 
   it('should initialize ctrl.value with an empty string', function() {
@@ -83,17 +94,17 @@ describe('NumericExpressionEditor', function() {
 
   it('should correctly validate current answer', function() {
     // This should not show warnings if the editor hasn't been touched.
-    ctrl.value = '';
+    ctrl.currentValue = '';
     ctrl.isCurrentAnswerValid();
     expect(ctrl.warningText).toBe('');
 
     ctrl.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
-    ctrl.value = '';
+    ctrl.currentValue = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Your answer seems to be empty.');
+    expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
 
-    ctrl.value = '45/2';
+    ctrl.currentValue = '45/2';
     expect(ctrl.isCurrentAnswerValid()).toBeTrue();
     expect(ctrl.warningText).toBe('');
   });
@@ -105,5 +116,8 @@ describe('NumericExpressionEditor', function() {
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
     ctrl.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
+
+    MockGuppy.focused = false;
+    ctrl.$onInit();
   });
 });

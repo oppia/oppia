@@ -1074,7 +1074,7 @@ class AlgebraicExpression(BaseObject):
     """
 
     description = 'A unicode string for an algebraic expression.'
-    default_value = 'x'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',
@@ -1105,7 +1105,7 @@ class MathEquation(BaseObject):
     """
 
     description = 'A unicode string for a math equation.'
-    default_value = 'x=y'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',
@@ -1121,7 +1121,7 @@ class NumericExpression(BaseObject):
     """
 
     description = 'A unicode string for an numeric expression.'
-    default_value = '1'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',

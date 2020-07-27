@@ -80,14 +80,6 @@ export class MathInteractionsService {
         'Your answer has two symbols next to each other: "' + symbol1 +
         '" and "' + symbol2 + '".');
     }
-    if (errorMessage === 'Invalid integer.') {
-      let invalidIntegers = expressionString.match(
-        /(\d*\.\d*\.\d*)|(\d+\.\D)|(\D+\.\d)/g);
-      if (invalidIntegers !== null) {
-        errorMessage = (
-          'Your answer contains an invalid integer: ' + invalidIntegers[0]);
-      }
-    }
     return errorMessage;
   }
 
@@ -95,7 +87,7 @@ export class MathInteractionsService {
     expressionString = expressionString.replace(/\s/g, '');
     let expressionObject;
     if (expressionString.length === 0) {
-      this.warningText = 'Your answer seems to be empty.';
+      this.warningText = 'Please enter an answer before submitting.';
       return false;
     } else if (expressionString.indexOf('=') !== -1 || expressionString.indexOf(
       '<') !== -1 || expressionString.indexOf('>') !== -1) {
@@ -104,6 +96,13 @@ export class MathInteractionsService {
       return false;
     } else if (expressionString.indexOf('_') !== -1) {
       this.warningText = 'Your answer contains an invalid character: "_".';
+      return false;
+    }
+    let invalidIntegers = expressionString.match(
+      /(\d*\.\d*\.\d*)|(\d+\.\D)|(\D\.\d+)|(\d+\.$)/g);
+    if (invalidIntegers !== null) {
+      this.warningText = (
+        'Your answer contains an invalid term: ' + invalidIntegers[0]);
       return false;
     }
     try {
@@ -136,7 +135,7 @@ export class MathInteractionsService {
   validateEquation(equationString: string): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
-      this.warningText = 'Your answer seems to be empty.';
+      this.warningText = 'Please enter an answer before submitting.';
       return false;
     } else if (equationString.indexOf(
       '<') !== -1 || equationString.indexOf('>') !== -1) {

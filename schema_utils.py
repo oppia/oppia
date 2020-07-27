@@ -403,6 +403,8 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object is a valid expression.
         """
+        if len(obj) == 0:
+            return True
 
         if not expression_parser.is_valid_expression(obj):
             return False
@@ -449,6 +451,8 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object is a valid math equation.
         """
+        if len(obj) == 0:
+            return True
         if obj.count('=') != 1:
             return False
 

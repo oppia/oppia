@@ -38,7 +38,7 @@ class MockGuppy {
   }
   configure(name: string, val: Object): void {}
   static event(name: string, handler: Function): void {
-    handler();
+    handler({focused: true});
   }
   static configure(name: string, val: Object): void {}
   static 'remove_global_symbol'(symbol: string): void {}

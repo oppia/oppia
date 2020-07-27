@@ -43,13 +43,9 @@ angular.module('oppia').component('numericExpressionEditor', {
       ctrl.hasBeenTouched = false;
 
       ctrl.isCurrentAnswerValid = function() {
-        // Replacing 'absolutevalue(x)' with 'abs(x)', 'neg(x)' with '-(x)'
-        // and 'squareroot(x)' with 'sqrt(x)' for compatibility with nerdamer
-        // and backend validators.
-        ctrl.currentValue = ctrl.currentValue.replace(
-          /absolutevalue\(/g, 'abs(');
-        ctrl.currentValue = ctrl.currentValue.replace(/neg\(/g, '-(');
-        ctrl.currentValue = ctrl.currentValue.replace(/squareroot\(/g, 'sqrt(');
+        if (ctrl.currentValue === undefined) {
+          ctrl.currentValue = '';
+        }
         // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
         // is not compatible with nerdamer or with the backend validations.
         ctrl.currentValue = MathInteractionsService.replaceAbsSymbolWithText(

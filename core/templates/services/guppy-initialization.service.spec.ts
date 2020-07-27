@@ -43,7 +43,7 @@ class MockGuppy {
   }
   configure(name: string, val: Object): void {}
   static event(name: string, handler: Function): void {
-    handler();
+    handler({focused: true});
   }
   static configure(name: string, val: Object): void {}
   static 'remove_global_symbol'(symbol: string): void {}
@@ -61,12 +61,12 @@ describe('GuppyInitializationService', () => {
 
   it('should assign a random id to the guppy divs', function() {
     let mockDocument = document.createElement('div');
-    mockDocument.classList.add('guppy-div', 'guppy_active');
+    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
     angular.element(document).find('body').append(mockDocument.outerHTML);
 
-    guppyInitializationService.init('guppy-div');
+    guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x=y');
 
-    let guppyDivs = document.querySelectorAll('.guppy-div');
+    let guppyDivs = document.querySelectorAll('.guppy-div-creator');
     for (let i = 0; i < guppyDivs.length; i++) {
       expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
     }
@@ -77,7 +77,7 @@ describe('GuppyInitializationService', () => {
     mockDocument.classList.add('guppy-div-creator', 'guppy_active');
     angular.element(document).find('body').append(mockDocument.outerHTML);
 
-    guppyInitializationService.init('guppy-div-creator', 'x');
+    guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x');
 
     expect(guppyInitializationService.findActiveGuppyObject()).not.toBe(
       undefined);

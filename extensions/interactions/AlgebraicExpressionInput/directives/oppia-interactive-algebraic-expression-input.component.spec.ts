@@ -61,8 +61,9 @@ describe('AlgebraicExpressionInputInteractive', function() {
     asciimath() {
       return 'Dummy value';
     }
+    configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler();
+      handler({focused: true});
     }
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
@@ -119,7 +120,7 @@ describe('AlgebraicExpressionInputInteractive', function() {
     // This should be validated as false if the editor has been touched.
     ctrl.value = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Your answer seems to be empty.');
+    expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
   });
 
   it('should set the value of showOSK to true', function() {

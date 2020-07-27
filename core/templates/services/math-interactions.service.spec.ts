@@ -85,7 +85,7 @@ describe('MathInteractionsService', () => {
     // Failure cases.
     expect(mathInteractionsService.validateExpression('')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer seems to be empty.');
+      'Please enter an answer before submitting.');
 
     expect(mathInteractionsService.validateExpression('a/')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
@@ -142,7 +142,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateExpression(
       '3.4.5 + 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer contains an invalid integer: 3.4.5');
+      'Your answer contains an invalid term: 3.4.5');
 
     expect(mathInteractionsService.validateExpression(
       'a/2', false)).toBeFalse();
@@ -186,7 +186,7 @@ describe('MathInteractionsService', () => {
     // Failure cases.
     expect(mathInteractionsService.validateEquation('')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer seems to be empty.');
+      'Please enter an answer before submitting.');
 
     expect(mathInteractionsService.validateEquation('a+b = ')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
@@ -247,7 +247,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateEquation(
       '3.4.5 = 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer contains an invalid integer: 3.4.5');
+      'Your answer contains an invalid term: 3.4.5');
   });
 
   it('should insert missing multiplication signs', function() {

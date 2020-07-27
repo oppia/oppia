@@ -5313,10 +5313,10 @@ export = {
   // Name to human readable form mapping of the position of terms object.
   "POSITION_OF_TERMS_MAPPING": [{
     "name": "lhs",
-    "humanReadableName": "on LHS"
+    "humanReadableName": "on Left Hand Side"
   }, {
     "name": "rhs",
-    "humanReadableName": "on RHS"
+    "humanReadableName": "on Right Hand Side"
   }, {
     "name": "both",
     "humanReadableName": "on both sides"

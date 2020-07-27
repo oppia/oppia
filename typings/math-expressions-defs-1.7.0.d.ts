@@ -4,7 +4,6 @@ interface Expression {
   derivative: (variable: string) => string;
   equals: (expression: Expression) => boolean;
   toLatex: () => string;
-  toXML: () => string;
   toString: () => string;
   variables: () => string[];
 }
