@@ -187,7 +187,13 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ltt = latex2text.LatexNodes2Text()
 
         if not item.deleted:
-            exploration = exp_fetchers.get_exploration_from_model(item)
+            try:
+                exploration = exp_fetchers.get_exploration_from_model(item)
+            except Exception:
+                output_values = (
+                    'Exploration with ID: %s has solution(s) that cause the '
+                    'upgraded exploration to be invalid.' % item.id)
+                return (exp_domain.TYPE_INVALID_EXPRESSION, output_values)
             for state_name, state in exploration.states.items():
                 if state.interaction.id == 'MathExpressionInput':
                     types_of_input = set()
@@ -221,18 +227,20 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if state.interaction.solution and (
                             exp_domain.TYPE_INVALID_EXPRESSION not in (
                                 types_of_input)):
-                        correct_answer = state.interaction.solution.correct_answer['ascii']
+                        correct_answer = (
+                            state.interaction.solution.correct_answer['ascii'])
                         correct_answer = exp_domain.clean_math_expression(
                             correct_answer)
 
                         equation_condition = (
                             exp_domain.TYPE_VALID_MATH_EQUATION in (
                                 types_of_input) and not (
-                                is_valid_math_equation(correct_answer)))
+                                    is_valid_math_equation(correct_answer)))
                         algebraic_condition = (
                             exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION in (
                                 types_of_input) and not (
-                                is_valid_algebraic_expression(correct_answer)))
+                                    is_valid_algebraic_expression(
+                                        correct_answer)))
 
                         if equation_condition or algebraic_condition:
                             if equation_condition:
