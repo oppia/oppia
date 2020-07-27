@@ -48,7 +48,7 @@ export class AdminDataService {
   }
 
   // TODO(#10045): Remove this function once all the math-rich text
-  // components in explorations have a valid math SVG stored in the
+  // components in new structures have a valid math SVG stored in the
   // datastore.
   sendNewStructuresMathSvgsToBackendAsync(
       newStructuresLatexToSvgMapping, entityType): Promise<Object> {

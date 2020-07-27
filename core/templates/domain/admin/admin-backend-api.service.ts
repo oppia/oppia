@@ -136,7 +136,7 @@ export class AdminBackendApiService {
   }
 
   // TODO(#10045): Remove this function once all the math-rich text
-  // components in explorations have a valid math SVG stored in the
+  // components in new structures have a valid math SVG stored in the
   // datastore.
   sendNewStructuresMathSvgsToBackend(
       newStructuresLatexToSvgMapping, entityType): Promise<Object> {
@@ -159,7 +159,7 @@ export class AdminBackendApiService {
     body.append(
       'payload', JSON.stringify(
         {
-          latexMapping: latexToSvgMapping,
+          newStructuresLatexToSvgMapping: newStructuresLatexToSvgMapping,
           entityType: entityType
         }));
     return this.http.post('/newstructureslatexsvghandler', body).toPromise();

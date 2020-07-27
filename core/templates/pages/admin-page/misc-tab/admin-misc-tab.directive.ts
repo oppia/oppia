@@ -169,7 +169,7 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         // TODO(#10045): Remove this function once all the math-rich text
-        // components in explorations have a valid math SVG stored in the
+        // components in all the entities have a valid math SVG stored in the
         // datastore.
         var convertLatexToSvgFile = function(inputLatexString) {
           return new Promise((resolve, reject) => {

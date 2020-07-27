@@ -722,7 +722,8 @@ class NewStructuresLatexSvgHandler(base.BaseHandler):
                 subtopic_page_services.update_subtopics_with_math_svgs(
                     subtopic_id, latex_to_svg_mappings[subtopic_id])
             self.render_json({
-                'no_of_subtopics_updated': '%d' % (
+                'entity_type': entity_type,
+                'no_of_entities_updated': '%d' % (
                     len(latex_to_svg_mappings.keys()))
             })
 

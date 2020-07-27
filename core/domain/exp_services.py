@@ -44,10 +44,8 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
-from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rights_manager
