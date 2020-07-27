@@ -25,7 +25,6 @@ import copy
 
 from core import jobs
 from core.domain import action_registry
-from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import playthrough_issue_registry
@@ -1386,7 +1385,7 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
     """
 
     STATUS_MISMATCH_KEYS = 'missing or extra customization argument key(s)'
-    STATUS_MATCH_KEYS = 'the correct customization argument key(s)' 
+    STATUS_MATCH_KEYS = 'the correct customization argument key(s)'
 
     JOB_RESULT_EXPECTED = 'EXPECTED'
     JOB_RESULT_UNEXPECTED = 'UNEXPECTED'
@@ -1402,9 +1401,10 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if isinstance(item, stats_models.ExplorationIssuesModel):
             for issue in item.unresolved_issues:
-                ca_specs = playthrough_issue_registry.Registry.get_issue_by_type(
-                    issue['issue_type']).customization_arg_specs
-                all_ca_names = set([ ca_spec.name for ca_spec in ca_specs ])
+                ca_specs = (
+                    playthrough_issue_registry.Registry.get_issue_by_type(
+                        issue['issue_type']).customization_arg_specs)
+                all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
 
                 yield (
                     'ExplorationIssue',

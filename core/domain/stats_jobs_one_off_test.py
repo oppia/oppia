@@ -1779,16 +1779,16 @@ class StatisticsCustomizationArgsAuditTests(OneOffJobTestBase):
             self.run_one_off_job(),
             [
                 'EXPECTED: 1 Playthrough Issue objects have the correct ' +
-                    'customization argument key(s)',
+                'customization argument key(s)',
                 'UNEXPECTED: 1 Playthrough Issue objects have missing or ' +
-                    'extra customization argument key(s)',
+                'extra customization argument key(s)',
                 'EXPECTED: 1 ExplorationIssue objects have the correct ' +
-                    'customization argument key(s)',
+                'customization argument key(s)',
                 'UNEXPECTED: 1 ExplorationIssue objects have missing or ' +
-                    'extra customization argument key(s)',
+                'extra customization argument key(s)',
                 'EXPECTED: 1 Playthrough Action objects have the correct ' +
-                    'customization argument key(s)',
+                'customization argument key(s)',
                 'UNEXPECTED: 1 Playthrough Action objects have missing or ' +
-                    'extra customization argument key(s)'
+                'extra customization argument key(s)'
             ]
         )
