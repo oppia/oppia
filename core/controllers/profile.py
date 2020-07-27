@@ -296,7 +296,8 @@ class SignupHandler(base.BaseHandler):
             'can_receive_email_updates')
 
         has_ever_registered = user_services.has_ever_registered(self.user_id)
-        has_account_fully_registered = user_services.has_account_fully_registered(self.user_id)
+        has_account_fully_registered = (
+            user_services.has_account_fully_registered(self.user_id))
 
         if has_account_fully_registered:
             self.render_json({})
