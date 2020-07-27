@@ -714,6 +714,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         def get_content_html(self, state_name, content_id):
             """Used to mock the get_content_html method for explorations."""
+            # state_name and content_id are used here to suppress the unused
+            # arguments warning. The main goal of this method is to just
+            # produce content html for the tests. 
             return '<p>State name: %s, Content id: %s</p>' % (
                 state_name, content_id
             )
