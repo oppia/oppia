@@ -22,9 +22,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { EditableExplorationBackendApiService } from
-    'domain/exploration/editable-exploration-backend-api.service';
+  'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from
-    'domain/exploration/read-only-exploration-backend-api.service';
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -37,26 +37,26 @@ require('services/services.constants.ajs.ts');
   providedIn: 'root'
 })
 export class ExplorationDataService {
-
-    // The pathname (without the hash) should be: .../create/{exploration_id}
+  // The pathname (without the hash) should be: .../create/{exploration_id}
   private explorationId: string;
-  private draftChangeListId: any;
+  private draftChangeListId: string[];
   private pathname: string = this.urlService.getPathname();
   private pathnameArray: string[];
   private resolvedAnswersUrlPrefix: string;
   private explorationDraftAutosaveUrl: string;
-  private data: any;
+  private data: object;
 
   constructor(
     private alertsService: AlertsService,
-    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
+    private editableExplorationBackendApiService:
+    EditableExplorationBackendApiService,
     private http: HttpClient,
     private loggerService: LoggerService,
     private localStorageService: LocalStorageService,
-    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
     private windowRef: WindowRef) {
-
     this.draftChangeListId = null;
     this.pathname = urlService.getPathname();
     this.pathnameArray = this.pathname.split('/');
@@ -74,7 +74,8 @@ export class ExplorationDataService {
 
     if (!this.explorationId) {
       loggerService.error(
-        'Unexpected call to ExplorationDataService for pathname ' + this.pathname);
+        'Unexpected call to ExplorationDataService for pathname ' +
+        this.pathname);
       // Note: if we do not return anything, Karma unit tests fail.
       throw {};
     } else {
@@ -110,20 +111,21 @@ export class ExplorationDataService {
         errorCallback();
       }
     });
-  };
+  }
 
   discardDraft(successCallback, errorCallback): void {
-    this.http.post(this.explorationDraftAutosaveUrl, {}).toPromise().then(function() {
-      this.localStorageService.removeExplorationDraft(this.explorationId);
-      if (successCallback) {
-        successCallback();
-      }
-    }, function() {
-      if (errorCallback) {
-        errorCallback();
-      }
-    });
-  };
+    this.http.post(this.explorationDraftAutosaveUrl, {}).toPromise().then(
+      function() {
+        this.localStorageService.removeExplorationDraft(this.explorationId);
+        if (successCallback) {
+          successCallback();
+        }
+      }, function() {
+        if (errorCallback) {
+          errorCallback();
+        }
+      });
+  }
 
   // Returns a promise that supplies the data for the current exploration.
   getData(errorCallback): Promise<Object> {
@@ -132,7 +134,6 @@ export class ExplorationDataService {
       return new Promise((resolve, reject) => {
         resolve(this.data);
       });
-      // return $q.resolve(this.explorationData.data);
     } else {
       // Retrieve data from the server.
       // WARNING: Note that this is a version of the exploration with draft
@@ -169,7 +170,7 @@ export class ExplorationDataService {
         })
       );
     }
-  };
+  }
 
   // Returns a promise supplying the last saved version for the current
   // exploration.
@@ -181,7 +182,7 @@ export class ExplorationDataService {
 
       return response.exploration;
     });
-  };
+  }
 
   resolveAnswers(stateName, resolvedAnswersList) {
     this.alertsService.clearWarnings();
@@ -190,7 +191,7 @@ export class ExplorationDataService {
         resolved_answers: resolvedAnswersList
       }
     );
-  };
+  }
 
   /**
    * Saves the exploration to the backend, and, on a success callback,
@@ -203,9 +204,12 @@ export class ExplorationDataService {
    *   this save operation.
    */
   save(
-      changeList, commitMessage, successCallback, errorCallback): Promise<Object> {
-    this.editableExplorationBackendApiService.updateExploration(this.explorationId,
-      this.data ? this.data.version : null,
+      changeList,
+      commitMessage,
+      successCallback,
+      errorCallback): Promise<Object> {
+    this.editableExplorationBackendApiService.updateExploration(
+      this.explorationId, this.data ? this.data.version : null,
       commitMessage, changeList).then(
       function(response) {
         this.alertsService.clearWarnings();
@@ -222,8 +226,7 @@ export class ExplorationDataService {
       }
     );
   }
-
-};
+}
 
 angular.module('oppia').factory(
-    'ExplorationDataService', downgradeInjectable(ExplorationDataService));
+  'ExplorationDataService', downgradeInjectable(ExplorationDataService));
