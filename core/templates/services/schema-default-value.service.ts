@@ -28,7 +28,6 @@ import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
 import { cloneDeep } from 'lodash';
 
-const OBJECT_DEFAULTS = require('objects/object_defaults.json');
 
 interface BoolSchema {
   type: 'bool';
@@ -145,11 +144,13 @@ export class SchemaDefaultValueService {
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_HTML) {
-      return this.subtitledHtmlObjectFactory.createFromBackendDict(
-        cloneDeep(OBJECT_DEFAULTS[schema.type]));
+      return this.subtitledHtmlObjectFactory.createFromBackendDict({
+        html: '', content_id: null
+      });
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_UNICODE) {
-      return this.subtitledUnicodeObjectFactory.createFromBackendDict(
-        cloneDeep(OBJECT_DEFAULTS[schema.type]));
+      return this.subtitledUnicodeObjectFactory.createFromBackendDict({
+        unicode_str: '', content_id: null
+      });
     } else {
       // TS Ignore is used here to log an error in case of a
       // invalid schema.

@@ -493,25 +493,21 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'translations_mapping': {
                         'content1': {
                             'en': {
-                                'data_format': 'html',
-                                'translation': html_content,
+                                'html': html_content,
                                 'needs_update': True
                             },
                             'hi': {
-                                'data_format': 'html',
-                                'translation': 'Hey!',
+                                'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
                             'hi': {
-                                'data_format': 'html',
-                                'translation': html_content,
+                                'html': html_content,
                                 'needs_update': False
                             },
                             'en': {
-                                'data_format': 'html',
-                                'translation': 'hello!',
+                                'html': 'hello!',
                                 'needs_update': False
                             }
                         }
@@ -698,25 +694,21 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'translations_mapping': {
                         'content1': {
                             'en': {
-                                'data_format': 'html',
-                                'translation': expected_html_content,
+                                'html': expected_html_content,
                                 'needs_update': True
                             },
                             'hi': {
-                                'data_format': 'html',
-                                'translation': 'Hey!',
+                                'html': 'Hey!',
                                 'needs_update': False
                             }
                         },
                         'feedback_1': {
                             'hi': {
-                                'data_format': 'html',
-                                'translation': expected_html_content,
+                                'html': expected_html_content,
                                 'needs_update': False
                             },
                             'en': {
-                                'data_format': 'html',
-                                'translation': 'hello!',
+                                'html': 'hello!',
                                 'needs_update': False
                             }
                         }

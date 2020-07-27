@@ -24,8 +24,6 @@
     "SetOfHtmlString": [],
     "SetOfNormalizedString": [],
     "SetOfUnicodeString": [],
-    "SubtitledHtml": {"content_id": null, "html": ""},
-    "SubtitledUnicode": {"content_id": null, "unicode_str": ""},
     "UnicodeString": "",
     "Fraction": {
       "isNegative": false,

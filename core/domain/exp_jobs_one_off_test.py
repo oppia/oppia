@@ -2901,15 +2901,20 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'content_id': 'content',
             'html': valid_html_content1
         }
-        customization_args_dict = {
-            'choices': {
-                'value': [
-                    valid_html_content1,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    valid_html_content2
-                ]
-            }
+        choices_customization_arg = {
+            'value': [{
+                'content_id': 'ca_choices_0',
+                'html': valid_html_content1
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': valid_html_content2
+            }]
         }
 
         drag_and_drop_answer_group_dict = {
@@ -2994,22 +2999,29 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
         exploration1_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration1_state.update_interaction_id('DragAndDropSortInput')
-        exploration1_state.update_interaction_customization_args(
-            customization_args_dict)
+        exploration1_state.update_interaction_customization_args({
+            'choices': choices_customization_arg,
+            'allowMultipleItemsInSamePosition': {'value': True}
+        })
         exploration1_state.update_interaction_answer_groups(
             [drag_and_drop_answer_group_dict])
         exploration2_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration2_state.update_interaction_id('ItemSelectionInput')
-        exploration2_state.update_interaction_customization_args(
-            customization_args_dict)
+        exploration2_state.update_interaction_customization_args({
+            'choices': choices_customization_arg,
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 1}
+        })
         exploration2_state.update_interaction_answer_groups(
             [item_selection_answer_group])
         exploration3_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration3_state.update_interaction_id('DragAndDropSortInput')
-        exploration3_state.update_interaction_customization_args(
-            customization_args_dict)
+        exploration3_state.update_interaction_customization_args({
+            'choices': choices_customization_arg,
+            'allowMultipleItemsInSamePosition': {'value': True}
+        })
         exploration3_state.update_interaction_answer_groups(
             [drag_and_drop_answer_group_dict])
 
