@@ -41,13 +41,25 @@ export class PlayerPositionService {
   }
 
   /**
-   * This function is used to get the name of the current state.
+   * This function is used to find the name of the current state.
    * @return {string} a string that shows the name of the current state.
    */
   getCurrentStateName(): string {
-    return (
-      this.playerTranscriptService.getCard(
-        this.displayedCardIndex).getStateName());
+    try {
+      return (
+        this.playerTranscriptService.getCard(
+          this.displayedCardIndex).getStateName());
+    } catch (e) {
+      let additionalInfo = ('\nUndefined card error debug logs:' +
+          '\nRequested card index: ' + this.displayedCardIndex +
+          '\nExploration ID: ' + this.contextService.getExplorationId() +
+          '\nTotal cards: ' + this.playerTranscriptService.getNumCards() +
+          '\nLast state name: ' +
+          this.playerTranscriptService.getLastStateName()
+      );
+      e.message += additionalInfo;
+      throw e;
+    }
   }
 
   /**
@@ -64,7 +76,7 @@ export class PlayerPositionService {
   }
 
   /**
-   * This function is used to get the index of the displayed card.
+   * This function is used to find the index of the displayed card.
    * @return {number} The index of the displayed card.
    */
   getDisplayedCardIndex(): number {
