@@ -87,7 +87,7 @@ describe('Story editor page', function() {
     });
   }));
 
-  fit('should load story based on its id on url when component is initialized' +
+  it('should load story based on its id on url when component is initialized' +
     ' and set page title', function() {
     let storyInitializedEventEmitter = new EventEmitter();
     let storyReinitializedEventEmitter = new EventEmitter();

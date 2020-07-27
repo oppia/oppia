@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from 'rxjs';
-
 /**
  * @fileoverview Controller for the main story editor.
  */
@@ -38,6 +36,8 @@ require('services/alerts.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('pages/topic-editor-page/modal-templates/' +
     'preview-thumbnail.component.ts');
+
+import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.

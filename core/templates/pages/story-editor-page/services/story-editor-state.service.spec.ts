@@ -29,6 +29,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -42,6 +43,10 @@ describe('Story editor state service', function() {
   var $rootScope = null;
   var $scope = null;
   var $q = null;
+  var testSubscriptions: Subscription;
+
+  const storyInitializedSpy = jasmine.createSpy('storyInitialized');
+  const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
 
   var FakeEditableStoryBackendApiService = function() {
     var self = {
@@ -167,6 +172,19 @@ describe('Story editor state service', function() {
     };
   }));
 
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(StoryEditorStateService.onStoryInitialized.subscribe(
+      storyInitializedSpy));
+    testSubscriptions.add(
+      StoryEditorStateService.onStoryReinitialized.subscribe(
+        storyReinitializedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should request to load the story from the backend', function() {
     spyOn(
       fakeEditableStoryBackendApiService, 'fetchStory').and.callThrough();
@@ -181,6 +199,7 @@ describe('Story editor state service', function() {
       StoryEditorStateService.loadStory('storyId_0');
       $rootScope.$apply();
       expect(StoryEditorStateService.getTopicName()).toEqual('Topic Name');
+      expect(storyInitializedSpy).toHaveBeenCalled();
     }
   );
 
@@ -189,10 +208,10 @@ describe('Story editor state service', function() {
     StoryEditorStateService.loadStory('storyId_0');
     $rootScope.$apply();
 
-
     // Load a second story.
     StoryEditorStateService.loadStory('storyId_1');
     $rootScope.$apply();
+    expect(storyReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the story', function() {
@@ -341,6 +360,7 @@ describe('Story editor state service', function() {
 
     StoryEditorStateService.saveStory('Commit message');
     $rootScope.$apply();
+    expect(storyReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently saving the story', function() {
