@@ -253,7 +253,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id.IN(exp_ids))
             .fetch(feconf.DEFAULT_QUERY_LIMIT)
-            )
+        )
 
 
     @classmethod
