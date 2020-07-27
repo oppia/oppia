@@ -62,6 +62,8 @@ var AdminPage = function() {
     '.protractor-test-reviewer-role-value'));
   var viewReviewerRoleButton = element(by.css(
     '.protractor-test-view-reviewer-role-button'));
+  var reviewerUsernamesResult = element(by.css(
+    '.protractor-test-reviewer-roles-result'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -313,10 +315,12 @@ var AdminPage = function() {
 
   this.expectReviewerUsernamesStrToMatch = async function(
       expectedUsernamesArrayStr) {
-    // The usernames are displayed as a
-    // 'Usernames: ["username1", "username2"]' string.
-    var reviewerUsernamesArrayStr = await element(by.css(
-      '.protractor-test-reviewer-roles-result')).getText();
+    // The reviewer usernames that are shown after a user views reviewers by
+    // role in the 'view community reviewers' section. The result is displayed
+    // as a 'Usernames: ["username1", "username2"]' string.
+    await waitFor.visibilityOf(
+      reviewerUsernamesResult, 'Reviewer usernames result not visible.');
+    var reviewerUsernamesArrayStr = await reviewerUsernamesResult.getText();
     expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
   };
 };
