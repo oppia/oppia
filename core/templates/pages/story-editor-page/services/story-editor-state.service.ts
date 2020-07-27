@@ -25,7 +25,7 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
-import { Subject } from 'rxjs';
+import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('StoryEditorStateService', [
   'AlertsService', 'EditableStoryBackendApiService',
@@ -42,15 +42,15 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _skillSummaries = [];
     var _expIdsChanged = false;
 
-    var _storyInitializedSubject = new Subject();
-    var _storyReinitializedSubject = new Subject();
+    var _storyInitializedEventEmitter = new EventEmitter();
+    var _storyReinitializedEventEmitter = new EventEmitter();
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
       if (_storyIsInitialized) {
-        _storyReinitializedSubject.next();
+        _storyReinitializedEventEmitter.emit();
       } else {
-        _storyInitializedSubject.next();
+        _storyInitializedEventEmitter.emit();
         _storyIsInitialized = true;
       }
     };
@@ -144,9 +144,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
        * Sets the story stored within this service, propogating changes to
        * all bindings to the story returned by getStory(). The first
        * time this is called it will fire a global event based on the
-       * next() function of the _storyInitializedSubject. All subsequent
+       * next() function of the _storyInitializedEventEmitter. All subsequent
        * calls will similarly fire a next() function of the
-       * _storyReinitializedSubject.
+       * _storyReinitializedEventEmitter.
        */
       setStory: function(story) {
         _setStory(story);
@@ -227,12 +227,12 @@ angular.module('oppia').factory('StoryEditorStateService', [
         return _storyIsBeingSaved;
       },
 
-      get onStoryInitializedSubject() {
-        return _storyInitializedSubject;
+      get onStoryInitialized() {
+        return _storyInitializedEventEmitter;
       },
 
-      get onStoryReinitializedSubject() {
-        return _storyReinitializedSubject;
+      get onStoryReinitialized() {
+        return _storyReinitializedEventEmitter;
       }
     };
   }

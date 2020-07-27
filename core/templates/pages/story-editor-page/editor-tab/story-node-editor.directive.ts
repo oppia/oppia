@@ -363,12 +363,12 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.expIdCanBeSaved = true;
             const storyInitializedSubscription =
-              StoryEditorStateService.onStoryInitializedSubject.subscribe(
+              StoryEditorStateService.onStoryInitialized.subscribe(
                 () => _init()
               );
             ctrl.attachedSubscriptions.add(storyInitializedSubscription);
             const storyReinitializedSubscription =
-              StoryEditorStateService.onStoryReinitializedSubject.subscribe(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _init()
               );
             ctrl.attachedSubscriptions.add(storyReinitializedSubscription);

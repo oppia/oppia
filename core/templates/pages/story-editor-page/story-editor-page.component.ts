@@ -82,12 +82,12 @@ angular.module('oppia').component('storyEditorPage', {
 
       ctrl.$onInit = function() {
         const storyInitializedSubscription =
-        StoryEditorStateService.onStoryInitializedSubject.subscribe(
+        StoryEditorStateService.onStoryInitialized.subscribe(
           () => setPageTitle()
         );
         ctrl.attachedSubscriptions.add(storyInitializedSubscription);
         const storyReinitializedSubscription =
-          StoryEditorStateService.onStoryReinitializedSubject.subscribe(
+          StoryEditorStateService.onStoryReinitialized.subscribe(
             () => setPageTitle()
           );
         ctrl.attachedSubscriptions.add(storyReinitializedSubscription);

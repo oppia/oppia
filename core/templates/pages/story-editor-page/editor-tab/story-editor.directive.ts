@@ -243,12 +243,12 @@ angular.module('oppia').directive('storyEditor', [
             });
 
             const storyInitializedSubscription =
-              StoryEditorStateService.onStoryInitializedSubject.subscribe(
+              StoryEditorStateService.onStoryInitialized.subscribe(
                 () => _init()
               );
             ctrl.attachedSubscriptions.add(storyInitializedSubscription);
             const storyReinitializedSubscription =
-              StoryEditorStateService.onStoryReinitializedSubject.subscribe(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _initEditor()
               );
             ctrl.attachedSubscriptions.add(storyReinitializedSubscription);

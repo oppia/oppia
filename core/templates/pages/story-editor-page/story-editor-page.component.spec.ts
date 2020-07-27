@@ -19,7 +19,8 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-import { Subject } from 'rxjs';
+
+import { EventEmitter } from '@angular/core';
 
 // ^^^ This block is to be removed.
 
@@ -88,16 +89,18 @@ describe('Story editor page', function() {
 
   fit('should load story based on its id on url when component is initialized' +
     ' and set page title', function() {
-    let sampleSubject = new Subject();
-    let sampleSubject2 = new Subject();
+    let storyInitializedEventEmitter = new EventEmitter();
+    let storyReinitializedEventEmitter = new EventEmitter();
     spyOn(StoryEditorStateService, 'loadStory').and.callFake(function() {
-      sampleSubject.next();
-      sampleSubject2.next();
+      storyInitializedEventEmitter.emit();
+      storyReinitializedEventEmitter.emit();
     });
-    spyOn(StoryEditorStateService,
-      'getStoryInitializedSubject').and.returnValue(sampleSubject);
-    spyOn(StoryEditorStateService,
-      'getStoryReinitializedSubject').and.returnValue(sampleSubject2);
+    spyOnProperty(StoryEditorStateService,
+      'onStoryInitialized').and.returnValue(
+      storyInitializedEventEmitter);
+    spyOnProperty(StoryEditorStateService,
+      'onStoryReinitialized').and.returnValue(
+      storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 

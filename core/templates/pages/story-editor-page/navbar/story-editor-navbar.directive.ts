@@ -172,12 +172,12 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             const storyInitializedSubscription =
-              StoryEditorStateService.onStoryInitializedSubject.subscribe(
+              StoryEditorStateService.onStoryInitialized.subscribe(
                 () => _validateStory()
               );
             ctrl.attachedSubscriptions.add(storyInitializedSubscription);
             const storyReinitializedSubscription =
-              StoryEditorStateService.onStoryReinitializedSubject.subscribe(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _validateStory()
               );
             ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
