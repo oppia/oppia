@@ -20,6 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AppConstants } from 'app.constants';
+
 export class NewlyCreatedTopic {
   name: string;
   description: string;
@@ -38,7 +40,13 @@ export class NewlyCreatedTopic {
    * @returns {Boolean} - A boolean indicating if the topic is valid.
    */
   isValid(): boolean {
-    return Boolean(this.name && this.description && this.abbreviatedName);
+    let validUrlFragmentRegex = new RegExp(
+      // @ts-ignore: TODO(#7434): Remove this ignore after we find
+      // a way to get rid of the TS2339 error on AppConstants.
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
+    return Boolean(
+      this.name && this.description && this.abbreviatedName &&
+      validUrlFragmentRegex.test(this.abbreviatedName));
   }
 }
 

@@ -18,11 +18,11 @@
 
 export class ReviewTestPageConstants {
   public static REVIEW_TEST_DATA_URL = (
-    '/review_test_handler/data/<abbrev_topic_name>/<story_id>');
+    '/review_test_handler/data/<abbreviated_topic_name>/<story_id>');
 
   public static REVIEW_TESTS_URL = (
-    '/learn/<classroom_name>/<abbrev_topic_name>/review-test/<story_id>');
+    '/learn/<classroom_name>/<abbreviated_topic_name>/review-test/<story_id>');
 
   public static STORY_VIEWER_PAGE = (
-    '/learn/<classroom_name>/<abbrev_topic_name>/story/<story_id>');
+    '/learn/<classroom_name>/<abbreviated_topic_name>/story/<story_id>');
 }

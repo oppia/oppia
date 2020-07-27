@@ -109,14 +109,14 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_abbreviated_name(self):
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, 'abbrev2', 'description')
+            self.TOPIC_ID, self.TOPIC_NAME, 'abbrev-two', 'description')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(
-            topic_models.TopicModel.get_by_abbreviated_name('abbrev2').name,
+            topic_models.TopicModel.get_by_abbreviated_name('abbrev-two').name,
             self.TOPIC_NAME
         )
         self.assertEqual(
-            topic_models.TopicModel.get_by_abbreviated_name('abbrev2').id,
+            topic_models.TopicModel.get_by_abbreviated_name('abbrev-two').id,
             self.TOPIC_ID
         )
 

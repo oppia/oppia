@@ -18,7 +18,7 @@
 
 export class SubtopicViewerDomainConstants {
   public static SUBTOPIC_DATA_URL_TEMPLATE =
-    '/subtopic_data_handler/<abbrev_topic_name>/<subtopic_id>';
+    '/subtopic_data_handler/<abbreviated_topic_name>/<subtopic_id>';
   public static TOPIC_VIEWER_URL_TEMPLATE = (
-    '/learn/<classroom_name>/<abbrev_topic_name>');
+    '/learn/<classroom_name>/<abbreviated_topic_name>');
 }

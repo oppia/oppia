@@ -45,7 +45,7 @@ export class ReviewTestBackendApiService {
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
         {
-          abbrev_topic_name: (
+          abbreviated_topic_name: (
             this.urlService.getAbbrevTopicNameFromLearnerUrl()),
           classroom_name: this.urlService.getClassroomNameFromLearnerUrl(),
           story_id: storyId

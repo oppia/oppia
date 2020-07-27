@@ -17,7 +17,9 @@ export = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
-  "CLASSROOM_STATUS_STAGING": "staging",
+  // The term 'staging' is used instead of the classroom name field
+  // in the URL for topics that are not yet attached to a classroom.
+  "DUMMY_CLASSROOM_NAME": "staging",
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
@@ -5288,6 +5290,9 @@ export = {
 
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
+
+  // A regular expression for allowed characters in URL fragment fields.
+  "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
   // Invalid names for parameters used in expressions.
   "INVALID_PARAMETER_NAMES": [

@@ -587,22 +587,9 @@ class Topic(python_utils.OBJECT):
         Args:
             name: str. The abbreviated name to validate.
         """
-        if not isinstance(name, python_utils.BASESTRING):
-            raise utils.ValidationError('Abbreviated name should be a string.')
-
-        if name == '':
-            raise utils.ValidationError(
-                'Abbreviated name field should not be empty.')
-        if '-' in name:
-            raise utils.ValidationError(
-                'Abbreviated name field should not contain hyphens.')
-
-        abbreviated_name_limit = (
+        utils.require_valid_url_fragment(
+            name, 'Topic URL Fragment',
             android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
-        if len(name) > abbreviated_name_limit:
-            raise utils.ValidationError(
-                'Abbreviated name field should not exceed %d characters, '
-                'received %s.' % (abbreviated_name_limit, name))
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -1483,22 +1470,9 @@ class TopicSummary(python_utils.OBJECT):
         Args:
             name: str. The abbreviated name to validate.
         """
-        if not isinstance(name, python_utils.BASESTRING):
-            raise utils.ValidationError('Abbreviated name should be a string.')
-
-        if name == '':
-            raise utils.ValidationError(
-                'Abbreviated name field should not be empty.')
-        if '-' in name:
-            raise utils.ValidationError(
-                'Abbreviated name field should not contain hyphens.')
-
-        abbreviated_name_limit = (
+        utils.require_valid_url_fragment(
+            name, 'Topic URL Fragment',
             android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
-        if len(name) > abbreviated_name_limit:
-            raise utils.ValidationError(
-                'Abbreviated name field should not exceed %d characters, '
-                'received %s.' % (abbreviated_name_limit, name))
 
     def validate(self):
         """Validates all properties of this topic summary.

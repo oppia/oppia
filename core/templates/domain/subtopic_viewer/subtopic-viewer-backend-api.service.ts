@@ -45,7 +45,7 @@ export class SubtopicViewerBackendApiService {
       errorCallback: (reason?: Object) => void): void {
     var subtopicDataUrl = this.urlInterpolation.interpolateUrl(
       SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE, {
-        abbrev_topic_name: abbreviatedTopicName,
+        abbreviated_topic_name: abbreviatedTopicName,
         subtopic_id: subtopicId
       });
 

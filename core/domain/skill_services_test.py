@@ -414,6 +414,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
+            abbreviated_name='topic-one',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -457,6 +458,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='topic1',
+            abbreviated_name='topic-two',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -554,6 +556,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-three',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -569,6 +572,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         })
         self.save_new_topic(
             topic_id_1, self.USER_ID, name='Topic2',
+            abbreviated_name='topic-four',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
@@ -594,6 +598,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='Topic1',
+            abbreviated_name='topic-five',
             description='Description',
             canonical_story_ids=[],
             additional_story_ids=[],
@@ -609,6 +614,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         })
         self.save_new_topic(
             topic_id_1, self.USER_ID, name='Topic2',
+            abbreviated_name='topic-six',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],

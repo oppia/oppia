@@ -37,7 +37,7 @@ angular.module('oppia').component('subtopicViewerNavbarPreLogoAction', {
 
         ctrl.topicUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
-            abbrev_topic_name: ctrl.abbreviatedTopicName,
+            abbreviated_topic_name: ctrl.abbreviatedTopicName,
             classroom_name: UrlService.getClassroomNameFromLearnerUrl()
           });
       };

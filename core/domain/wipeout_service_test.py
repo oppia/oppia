@@ -496,6 +496,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_1_ID,
             self.user_1_id,
+            abbreviated_name='topic-one',
             canonical_story_ids=[self.STORY_1_ID])
         self.save_new_story(self.STORY_1_ID, self.user_1_id, self.TOPIC_1_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -597,7 +598,9 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             pending_deletion_model.story_mappings[self.STORY_1_ID])
 
     def test_multiple_stories_are_pseudonymized(self):
-        self.save_new_topic(self.TOPIC_1_ID, self.user_1_id, name='Topic 2')
+        self.save_new_topic(
+            self.TOPIC_1_ID, self.user_1_id, name='Topic 2',
+            abbreviated_name='topic-two')
         self.save_new_story(self.STORY_2_ID, self.user_1_id, self.TOPIC_1_ID)
 
         wipeout_service.delete_user(
@@ -627,7 +630,9 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             pending_deletion_model.story_mappings[self.STORY_2_ID])
 
     def test_multiple_stories_with_multiple_users_are_pseudonymized(self):
-        self.save_new_topic(self.TOPIC_1_ID, self.user_2_id, name='Topic 2')
+        self.save_new_topic(
+            self.TOPIC_1_ID, self.user_2_id, name='Topic 2',
+            abbreviated_name='topic-three')
         self.save_new_story(self.STORY_2_ID, self.user_2_id, self.TOPIC_1_ID)
 
         wipeout_service.delete_user(
@@ -745,12 +750,14 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.save_new_topic(self.TOPIC_1_ID, self.user_1_id)
+        self.save_new_topic(
+            self.TOPIC_1_ID, self.user_1_id, abbreviated_name='topic-four')
         self.save_new_story(self.STORY_1_ID, self.user_1_id, self.TOPIC_1_ID)
         self.save_new_topic(
             self.TOPIC_2_ID,
             self.user_2_id,
             name='Topic 2',
+            abbreviated_name='topic-five',
             canonical_story_ids=[self.STORY_2_ID])
         self.save_new_story(self.STORY_2_ID, self.user_2_id, self.TOPIC_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)

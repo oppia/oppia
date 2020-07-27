@@ -206,23 +206,23 @@ def _check_topic_name_uniqueness(topic_name):
             'Topic with name \'%s\' already exists' % topic_name)
 
 
-def _check_abbrev_topic_name_uniqueness(abbrev_topic_name):
+def _check_abbrev_topic_name_uniqueness(abbreviated_topic_name):
     """Checks if the abbreviated topic name provided is unique.
 
     Args:
-        abbrev_topic_name: str. The abbreviated topic name.
+        abbreviated_topic_name: str. The abbreviated topic name.
 
     Raises:
         Exception. Topic with same abbreviated name already exists.
     """
-    if not isinstance(abbrev_topic_name, python_utils.BASESTRING):
-        raise utils.ValidationError('Abbreviated name should be a string.')
+    if not isinstance(abbreviated_topic_name, python_utils.BASESTRING):
+        raise utils.ValidationError('Topic URL Fragment should be a string.')
     existing_topic = (
-        topic_fetchers.get_topic_by_abbreviated_name(abbrev_topic_name))
+        topic_fetchers.get_topic_by_abbreviated_name(abbreviated_topic_name))
     if existing_topic is not None:
         raise utils.ValidationError(
-            'Topic with abbreviated name \'%s\' already exists'
-            % abbrev_topic_name)
+            'Topic with URL Fragment \'%s\' already exists'
+            % abbreviated_topic_name)
 
 
 def save_new_topic(committer_id, topic):

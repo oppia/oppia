@@ -56,7 +56,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
-        abbrev_topic_name: this.abbreviatedTopicName
+        abbreviated_topic_name: this.abbreviatedTopicName
       });
   }
 }

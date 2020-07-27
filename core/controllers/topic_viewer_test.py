@@ -82,7 +82,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story_2)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name', 'abbrev', 'description')
+            self.topic_id_1, 'private_topic_name',
+            'private_topic_name', 'description')
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -250,12 +251,13 @@ class TopicPageDataHandlerTests(
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_with_no_skills', 'abbrev3', 'description')
+            self.topic_id, 'topic_with_no_skills',
+            'topic-with-no-skills', 'description')
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'abbrev3'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic-with-no-skills'))
             expected_dict = {
                 'topic_name': 'topic_with_no_skills',
                 'topic_id': self.topic_id,
@@ -274,7 +276,7 @@ class TopicPageDataHandlerTests(
         self.topic_id = 'new_topic'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'abbrev0', 'description')
+            self.topic_id, 'new_topic', 'new-topic', 'description')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -292,7 +294,7 @@ class TopicPageDataHandlerTests(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'abbrev0'))
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,

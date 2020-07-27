@@ -34,14 +34,14 @@
           </span>
         </div>
         <div class="topic-name">
-          <label for="abbreviatedTopicName" class="form-heading protractor-test-abbrev-topic-name-heading">Abbreviated Topic Name</label>
+          <label for="abbreviatedTopicName" class="form-heading protractor-test-abbrev-topic-name-heading">Topic URL Name</label>
           <input id="abbreviatedTopicName" type="text" class="form-control protractor-test-abbrev-topic-name-field"
                  ng-disabled="!topicRights.canEditTopic()"
                  ng-model="editableAbbreviatedName" ng-blur="updateAbbreviatedTopicName(editableAbbreviatedName)"
-                 placeholder="Enter an abbreviated name for the topic." maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>" ng-trim="true">
+                 maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>" ng-trim="true">
           <span class="oppia-input-box-subtitle">
             <i>
-              Abbreviated Topic name should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
+              Topic URL fragment should be a short word or set of words in lowercase and separated by hyphens (-). Please use meaningful keywords and avoid using words like "and", "of", or "the". This will be used to uniquely access the topic viewer page. It should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
             </i>
           </span>
         </div>

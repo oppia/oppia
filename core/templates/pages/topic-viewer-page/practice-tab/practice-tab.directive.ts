@@ -53,7 +53,7 @@ angular.module('oppia').directive('practiceTab', [
             }
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
-                abbrev_topic_name: (
+                abbreviated_topic_name: (
                   UrlService.getAbbrevTopicNameFromLearnerUrl()),
                 classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
                 comma_separated_subtopic_ids: selectedSubtopicIds.join(',')

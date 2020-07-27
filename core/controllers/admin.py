@@ -393,9 +393,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'abbrev', 'description')
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'abbrev', 'description')
+                topic_id_2, 'Empty Topic', 'empty-topic', 'description')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)

@@ -16,11 +16,11 @@
       </div>
     </div>
     <div class="create-new-topic-input-field">
-      <div><span class="create-new-topic-input-label">Abbreviated Topic Name</span></div>
-      <input class="protractor-test-new-topic-short-name-field" ng-model="newlyCreatedTopic.abbreviatedName" maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>">
+      <div><span class="create-new-topic-input-label">Topic URL Fragment</span></div>
+      <input class="protractor-test-new-topic-url-fragment-field" ng-model="newlyCreatedTopic.abbreviatedName" maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>">
       <div class="oppia-input-box-subtitle">
         <i>
-          Abbreviated topic name should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
+          Topic URL fragment should be a short word or set of words in lowercase and separated by hyphens (-). Please use meaningful keywords and avoid using words like "and", "of", or "the". This will be used to uniquely access the topic viewer page. It should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
         </i>
       </div>
     </div>

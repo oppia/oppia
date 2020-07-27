@@ -41,7 +41,7 @@ class ClassroomPageTests(BaseClassroomControllerTests):
             'classroom_page_is_shown')
         config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response('/math')
+            response = self.get_html_response('/learn/math')
             self.assertIn('<classroom-page></classroom-page>', response)
         config_property.set_value('committer_id', False)
 
@@ -50,12 +50,12 @@ class ClassroomPageTests(BaseClassroomControllerTests):
             'classroom_page_is_shown')
         config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response('/math', expected_status_int=404)
+            self.get_html_response('/learn/math', expected_status_int=404)
         config_property.set_value('committer_id', False)
 
     def test_get_fails_when_classroom_page_is_shown_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response('/math', expected_status_int=404)
+            self.get_html_response('/learn/math', expected_status_int=404)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
@@ -69,10 +69,12 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_id_1 = topic_services.get_new_topic_id()
         topic_id_2 = topic_services.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
-            topic_id_1, 'private_topic_name', 'abbrev', 'description')
+            topic_id_1, 'private_topic_name',
+            'private-topic-name', 'description')
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
-            topic_id_2, 'public_topic_name', 'abbrev', 'description')
+            topic_id_2, 'public_topic_name',
+            'public-topic-name', 'description')
         public_topic.thumbnail_filename = 'Topic.svg'
         public_topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])

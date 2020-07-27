@@ -260,6 +260,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
+        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
+        custom_landing_pages.FractionLandingRedirectPage),
+    get_redirect_route(
+        r'/learn/maths/<topic>', custom_landing_pages.TopicLandingRedirectPage),
+    get_redirect_route(
         r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
         community_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
@@ -287,27 +292,28 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/practice/session' % feconf.TOPIC_VIEWER_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
-        r'%s/<abbrev_topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
+        r'%s/<abbreviated_topic_name>' %
+        feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
-        r'%s/<abbrev_topic_name>/<story_id>' %
+        r'%s/<abbreviated_topic_name>/<story_id>' %
         feconf.REVIEW_TEST_DATA_URL_PREFIX,
         review_tests.ReviewTestsPageDataHandler),
     get_redirect_route(
         r'%s/review-test/<story_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         review_tests.ReviewTestsPage),
     get_redirect_route(
-        r'%s/<abbrev_topic_name>/<story_id>' % feconf.STORY_DATA_HANDLER,
+        r'%s/<abbreviated_topic_name>/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
         r'%s/story/<story_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
-        r'%s/<abbrev_topic_name>/<story_id>/<node_id>' %
+        r'%s/<abbreviated_topic_name>/<story_id>/<node_id>' %
         feconf.STORY_PROGRESS_URL_PREFIX,
         story_viewer.StoryProgressHandler),
     get_redirect_route(
-        r'%s/<abbrev_topic_name>/<subtopic_id>' %
+        r'%s/<abbreviated_topic_name>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
@@ -324,7 +330,7 @@ URLS = MAPREDUCE_HANDLERS + [
         % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
-        r'%s/<abbrev_topic_name>' % feconf.TOPIC_DATA_HANDLER,
+        r'%s/<abbreviated_topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
     get_redirect_route(
         r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
@@ -384,12 +390,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
-
-    get_redirect_route(
-        r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
-        custom_landing_pages.FractionLandingRedirectPage),
-    get_redirect_route(
-        r'/learn/maths/<topic>', custom_landing_pages.TopicLandingRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),

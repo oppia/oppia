@@ -668,7 +668,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME,
             'old_value': '',
-            'new_value': 'short name'
+            'new_value': 'short-name'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -686,7 +686,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
-        self.assertEqual(topic.abbreviated_name, 'short name')
+        self.assertEqual(topic.abbreviated_name, 'short-name')
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
@@ -1305,7 +1305,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
         with self.assertRaisesRegexp(
             Exception,
-            'Topic with abbreviated name \'abbrev\' already exists'):
+            'Topic with URL Fragment \'abbrev\' already exists'):
             self.save_new_topic(
                 'topic_2', self.user_id, name='original',
                 abbreviated_name='abbrev',
@@ -1425,13 +1425,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
             'topic_2', self.user_id, name='Name 2',
-            abbreviated_name='name2',
+            abbreviated_name='name-two',
             description='Description 2',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             'topic_3', self.user_id, name='Name 3',
-            abbreviated_name='name3',
+            abbreviated_name='name-three',
             description='Description 3',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)

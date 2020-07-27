@@ -56,11 +56,13 @@ describe('Topic editor functionality', function() {
   it('should edit topic name, thumbnail and description ' +
     'correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_1';
+    var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-one';
     var TOPIC_DESCRIPTION = 'TASEFUF_1 description';
     var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
     var NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME,
       TOPIC_DESCRIPTION, false);
     await topicEditorPage.changeTopicName(NEW_TOPIC_NAME);
     var defaultThumbnailImageSrc = (
@@ -82,10 +84,11 @@ describe('Topic editor functionality', function() {
 
   it('should edit subtopic page contents correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_2';
+    var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-two';
     var TOPIC_DESCRIPTION = 'TASEFUF_2 description';
 
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAME, TOPIC_DESCRIPTION, false);
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
     var defaultThumbnailSrc = (
       await topicEditorPage.getTopicThumbnailSource());
     await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
@@ -124,9 +127,10 @@ describe('Topic editor functionality', function() {
 
   it('should publish and unpublish a story correctly', async function() {
     var TOPIC_NAME = 'TASEFUF_3';
+    var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-three';
     var TOPIC_DESCRIPTION = 'TASEFUF_3 description';
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
-      TOPIC_DESCRIPTION, false);
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
 
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
@@ -206,8 +210,9 @@ describe('Chapter editor functionality', function() {
   it('should create a basic chapter with a thumbnail.', async function() {
     await topicsAndSkillsDashboardPage.get();
     var defaultThumbnailImageSrc = null;
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
-      'Topic description', false);
+    var TOPIC_URL_FRAGMENT_NAME = 'tasefuf-four';
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, 'Topic description', false);
     defaultThumbnailImageSrc = await topicEditorPage.getTopicThumbnailSource();
     await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
     expect(await topicEditorPage.getTopicThumbnailSource()).not.toEqual(

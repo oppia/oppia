@@ -66,7 +66,7 @@ export class StoryViewerBackendApiService {
       errorCallback: (reason?: Object) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
-        abbrev_topic_name: abbreviatedTopicName,
+        abbreviated_topic_name: abbreviatedTopicName,
         story_id: storyId
       });
 
@@ -90,7 +90,7 @@ export class StoryViewerBackendApiService {
       errorCallback: (reason?: Object) => void): void {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
-        abbrev_topic_name: abbreviatedTopicName,
+        abbreviated_topic_name: abbreviatedTopicName,
         story_id: storyId,
         node_id: nodeId
       });

@@ -60,6 +60,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
+            abbreviated_name='topic-one',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
@@ -308,6 +309,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='A New Topic',
+            abbreviated_name='new-topic',
             description='A new topic description.',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
@@ -1194,6 +1196,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
             topic_id, self.USER_ID, name='A different topic',
+            abbreviated_name='different-topic',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[],
@@ -1561,6 +1564,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='New Topic',
+            abbreviated_name='topic-two',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[],
@@ -1795,6 +1799,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         user_id = 'user_id'
         self.save_new_topic(
             topic_id, user_id, name='Topic',
+            abbreviated_name='topic-three',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)

@@ -239,7 +239,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
-        classroom_name = constants.CLASSROOM_STATUS_STAGING
+        classroom_name = constants.DUMMY_CLASSROOM_NAME
         for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
             if topic_id in classroom_dict['topic_ids']:
                 classroom_name = classroom_dict['name']

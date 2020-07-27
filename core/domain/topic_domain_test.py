@@ -591,20 +591,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_abbreviated_name(self):
         self.topic.abbreviated_name = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Abbreviated name should be a string.'):
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
             self.topic.validate()
 
     def test_validation_fails_with_empty_abbreviated_name(self):
         self.topic.abbreviated_name = ''
-        validation_message = 'Abbreviated name field should not be empty'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, validation_message):
-            self.topic.validate()
-
-    def test_validation_fails_with_hyphenated_abbreviated_name(self):
-        self.topic.abbreviated_name = 'a-b-c'
-        validation_message = (
-            'Abbreviated name field should not contain hyphens.')
+        validation_message = 'Topic URL Fragment field should not be empty.'
         with self.assertRaisesRegexp(
             utils.ValidationError, validation_message):
             self.topic.validate()
@@ -614,7 +607,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         abbreviated_name_limit = (
             android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
         validation_message = (
-            'Abbreviated name field should not exceed %d characters, '
+            'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (
                 abbreviated_name_limit, self.topic.abbreviated_name))
         with self.assertRaisesRegexp(
@@ -1225,20 +1218,13 @@ class TopicSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_abbreviated_name(self):
         self.topic_summary.abbreviated_name = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Abbreviated name should be a string.'):
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
             self.topic_summary.validate()
 
     def test_validation_fails_with_empty_abbreviated_name(self):
         self.topic_summary.abbreviated_name = ''
-        validation_message = 'Abbreviated name field should not be empty'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, validation_message):
-            self.topic_summary.validate()
-
-    def test_validation_fails_with_hyphenated_abbreviated_name(self):
-        self.topic_summary.abbreviated_name = 'a-b-c'
-        validation_message = (
-            'Abbreviated name field should not contain hyphens.')
+        validation_message = 'Topic URL Fragment field should not be empty.'
         with self.assertRaisesRegexp(
             utils.ValidationError, validation_message):
             self.topic_summary.validate()
@@ -1248,7 +1234,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         abbreviated_name_limit = (
             android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
         validation_message = (
-            'Abbreviated name field should not exceed %d characters, '
+            'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (
                 abbreviated_name_limit, self.topic_summary.abbreviated_name))
         with self.assertRaisesRegexp(

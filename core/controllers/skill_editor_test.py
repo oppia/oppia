@@ -59,6 +59,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         subtopic.skill_ids = [self.skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
@@ -185,6 +186,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='TopicName1',
+            abbreviated_name='topicname',
             description='DescriptionTopic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[skill_id],
             subtopics=[], next_subtopic_id=1)
@@ -226,6 +228,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Maths',
+            abbreviated_name='maths',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
@@ -236,6 +239,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Science',
+            abbreviated_name='science',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
@@ -334,6 +338,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Topic1',
+            abbreviated_name='topic-one',
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id],

@@ -21,9 +21,9 @@ export class ClassroomDomainConstants {
     '/classroom_data_handler/<classroom_name>';
 
   public static TOPIC_VIEWER_URL_TEMPLATE = (
-    '/learn/<classroom_name>/<abbrev_topic_name>');
+    '/learn/<classroom_name>/<abbreviated_topic_name>');
   public static TOPIC_VIEWER_REVISION_URL_TEMPLATE = (
-    '/learn/<classroom_name>/<abbrev_topic_name>/revision');
+    '/learn/<classroom_name>/<abbreviated_topic_name>/revision');
   public static TOPIC_VIEWER_STORY_URL_TEMPLATE = (
-    '/learn/<classroom_name>/<abbrev_topic_name>/story');
+    '/learn/<classroom_name>/<abbreviated_topic_name>/story');
 }

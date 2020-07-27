@@ -108,7 +108,7 @@ angular.module('oppia').directive('storyViewerPage', [
           ctrl.getExplorationUrl = function(node) {
             var result = '/explore/' + node.getExplorationId();
             result = UrlService.addField(
-              result, 'abbrev_topic_name',
+              result, 'abbreviated_topic_name',
               UrlService.getAbbrevTopicNameFromLearnerUrl());
             result = UrlService.addField(
               result, 'classroom_name',
