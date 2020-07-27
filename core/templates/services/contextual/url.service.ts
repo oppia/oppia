@@ -254,7 +254,7 @@ export class UrlService {
   }
 
   /**
-   * This function is used to find the hashed value 
+   * This function is used to find the hashed value
    * from the current location.
    */
   getHash(): string {
