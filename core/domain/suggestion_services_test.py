@@ -1240,6 +1240,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_delete_story_rejects_translation_suggestion(self):
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id)
+        self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
 
         story_services.delete_story(self.author_id, self.STORY_ID)
 
@@ -1253,6 +1254,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_remove_exp_from_story_rejects_translation_suggestion(self):
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id)
+        self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
 
         # Removes the exploration from the story.
         story_services.update_story(
