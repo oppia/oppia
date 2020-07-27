@@ -63,12 +63,10 @@ class SetupGaeTests(test_utils.GenericTestBase):
         self.print_arr = []
         def mock_print(msg):
             self.print_arr.append(msg)
-        # pylint: disable=unused-argument
-        def mock_url_retrieve(unused_url, filename):
+        def mock_url_retrieve(unused_url, filename):  # pylint: disable=unused-argument
             self.check_function_calls['url_retrieve_is_called'] = True
             if self.raise_error:
                 raise Exception
-        # pylint: enable=unused-argument
         self.walk_swap = self.swap(os, 'walk', mock_walk)
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
@@ -106,10 +104,8 @@ class SetupGaeTests(test_utils.GenericTestBase):
             if path == common.GOOGLE_APP_ENGINE_HOME:
                 return False
             return True
-        # pylint: disable=unused-argument
-        def mock_extractall(unused_self, path):
+        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
-        # pylint: enable=unused-argument
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         zipfile_swap = self.swap(
             setup_gae, 'GAE_DOWNLOAD_ZIP_PATH', MOCK_TMP_UNZIP_PATH)
@@ -158,13 +154,11 @@ class SetupGaeTests(test_utils.GenericTestBase):
                 return False
             return True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        # pylint: disable=unused-argument
-        def mock_open(name):
+        def mock_open(name):  # pylint: disable=unused-argument
             self.check_function_calls['open_is_called'] = True
             return temp_file
-        def mock_extractall(unused_self, path):
+        def mock_extractall(unused_self, path):  # pylint: disable=unused-argument
             self.check_function_calls['extractall_is_called'] = True
-        # pylint: enable=unused-argument
         def mock_close(unused_self):
             self.check_function_calls['close_is_called'] = True
         exists_swap = self.swap(os.path, 'exists', mock_exists)
