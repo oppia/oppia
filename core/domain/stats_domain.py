@@ -1630,8 +1630,8 @@ class LearnerAnswerInfo(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The answer details submitted cannot be an empty string.')
         if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
-            raise utils.ValidationError('The answer details size is to large '
-                                        'to be stored')
+            raise utils.ValidationError(
+                'The answer details size is to large to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s'

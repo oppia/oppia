@@ -74,7 +74,8 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
    bash scripts/run_e2e_tests.sh
 

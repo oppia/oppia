@@ -54,7 +54,8 @@ from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position
 from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Installation script for Oppia third-party libraries.
 """)
 

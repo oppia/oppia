@@ -48,11 +48,13 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         (
             func_call_node_one, func_call_node_two, func_call_node_three,
             func_call_node_four, func_call_node_five, func_call_node_six,
-            class_call_node) = astroid.extract_node("""
+            class_call_node) = astroid.extract_node(
+                """
         class TestClass():
             pass
 
-        def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"):
+        def test(test_var_one, test_var_two=4, test_var_three=5,
+                test_var_four="test_checker"):
             test_var_five = test_var_two + test_var_three
             return test_var_five
 
@@ -180,11 +182,14 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
 class HangingIndentCheckerTests(unittest.TestCase):
 
-    def test_finds_hanging_indent(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(HangingIndentCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.HangingIndentChecker)
-        checker_test_object.setup_method()
+        self.checker_test_object.setup_method()
+
+    def test_no_break_after_hanging_indentation(self):
         node_break_after_hanging_indent = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -192,23 +197,50 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""self.post_json('/ml/trainedclassifierhandler',
+                u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
+                if (a > 1 and
+                        b > 2):
                 """)
         node_break_after_hanging_indent.file = filename
         node_break_after_hanging_indent.path = filename
 
-        checker_test_object.checker.process_module(
-            node_break_after_hanging_indent)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_break_after_hanging_indent))
 
-        with checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='no-break-after-hanging-indent',
-                line=1
-            ),
-        ):
+        message = testutils.Message(
+            msg_id='no-break-after-hanging-indent', line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
+    def test_no_break_after_hanging_indentation_with_comment(self):
+        node_break_after_hanging_indent = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""self.post_json('/ml/\\trainedclassifierhandler',  # pylint: disable=invalid-name
+                self.payload, expect_errors=True, expected_status_int=401)
+
+                if (a > 1 and
+                        b > 2):  # pylint: disable=invalid-name
+                """)
+        node_break_after_hanging_indent.file = filename
+        node_break_after_hanging_indent.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_break_after_hanging_indent))
+
+        message = testutils.Message(
+            msg_id='no-break-after-hanging-indent', line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_break_after_hanging_indentation(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -217,9 +249,9 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""\"""Some multiline
+                u"""\"\"\"Some multiline
                 docstring.
-                \"""
+                \"\"\"
                 # Load JSON.
                 master_translation_dict = json.loads(
                 utils.get_file_contents(os.path.join(
@@ -228,11 +260,13 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_with_no_error_message)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_hanging_indentation_with_a_comment_after_bracket(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -241,14 +275,37 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""self.post_json('/',
+                u"""self.post_json(  # pylint-disable=invalid-name
+                '(',
                 self.payload, expect_errors=True, expected_status_int=401)""")
         node_with_no_error_message.file = filename
         node_with_no_error_message.path = filename
 
-        checker_test_object.checker.process_module(node_with_no_error_message)
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
 
-        with checker_test_object.assertNoMessages():
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_hanging_indentation_with_a_comment_after_two_or_more_bracket(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""self.post_json(func(  # pylint-disable=invalid-name
+                '(',
+                self.payload, expect_errors=True, expected_status_int=401))""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            utils.tokenize_module(node_with_no_error_message))
+
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
 
@@ -266,7 +323,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
         self.checker_test_object.setup_method()
-        invalid_args_description_node = astroid.extract_node("""
+        invalid_args_description_node = astroid.extract_node(
+            """
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -291,7 +349,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_args_description_node)
 
-        invalid_param_indentation_node = astroid.extract_node("""
+        invalid_param_indentation_node = astroid.extract_node(
+            """
         def func(test_var_one): #@
             \"\"\"Function to test docstring parameters.
 
@@ -314,7 +373,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_param_indentation_node)
 
-        invalid_header_indentation_node = astroid.extract_node("""
+        invalid_header_indentation_node = astroid.extract_node(
+            """
         def func(test_var_one): #@
             \"\"\"Function to test docstring parameters.
 
@@ -341,7 +401,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
         self.checker_test_object.setup_method()
-        valid_free_form_node = astroid.extract_node("""
+        valid_free_form_node = astroid.extract_node(
+            """
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -363,7 +424,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 valid_free_form_node)
 
-        valid_indentation_node = astroid.extract_node("""
+        valid_indentation_node = astroid.extract_node(
+            """
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -387,7 +449,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DocstringParameterChecker)
         self.checker_test_object.setup_method()
-        valid_func_node, valid_return_node = astroid.extract_node("""
+        valid_func_node, valid_return_node = astroid.extract_node(
+            """
         def test(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -406,7 +469,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_return(valid_return_node)
 
-        valid_func_node, valid_yield_node = astroid.extract_node("""
+        valid_func_node, valid_yield_node = astroid.extract_node(
+            """
         def test(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.\"\"\"
             result = test_var_one + test_var_two
@@ -421,7 +485,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         (
             missing_yield_type_func_node,
-            missing_yield_type_yield_node) = astroid.extract_node("""
+            missing_yield_type_yield_node) = astroid.extract_node(
+                """
         class Test(python_utils.OBJECT):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
@@ -461,7 +526,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         (
             missing_return_type_func_node,
-            missing_return_type_return_node) = astroid.extract_node("""
+            missing_return_type_return_node) = astroid.extract_node(
+                """
         class Test(python_utils.OBJECT):
             def __init__(self, test_var_one, test_var_two): #@
                 \"\"\"Function to test docstring parameters.
@@ -499,7 +565,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_yield(
                 missing_return_type_return_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         def func(test_var_one, test_var_two):
             \"\"\"Function to test docstring parameters.
 
@@ -517,7 +584,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
         (
             missing_raise_type_func_node,
-            missing_raise_type_raise_node) = astroid.extract_node("""
+            missing_raise_type_raise_node) = astroid.extract_node(
+                """
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test raising exceptions.
 
@@ -537,14 +605,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_raise(
                 missing_raise_type_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         class Test(python_utils.OBJECT):
             raise Exception #@
         """)
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         class Test():
             @property
             def decorator_func(self):
@@ -558,7 +628,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         class Test():
             def func(self):
                 raise Exception #@
@@ -566,7 +637,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         def func():
             try:
                 raise Exception #@
@@ -576,7 +648,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         def func():
             \"\"\"Function to test raising exceptions.\"\"\"
             raise Exception #@
@@ -584,7 +657,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         def my_func(self):
             \"\"\"This is a docstring.
             :raises NameError: Never.
@@ -597,7 +671,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         from unknown import Unknown
         def my_func(self):
             \"\"\"This is a docstring.
@@ -609,7 +684,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_raise_node = astroid.extract_node("""
+        valid_raise_node = astroid.extract_node(
+            """
         def my_func(self):
             \"\"\"This is a docstring.
             :raises NameError: Never.
@@ -624,7 +700,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_raise(valid_raise_node)
 
-        valid_return_node = astroid.extract_node("""
+        valid_return_node = astroid.extract_node(
+            """
         def func():
             \"\"\"Function to test return values.\"\"\"
             return None #@
@@ -632,7 +709,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_return(valid_return_node)
 
-        valid_return_node = astroid.extract_node("""
+        valid_return_node = astroid.extract_node(
+            """
         def func():
             \"\"\"Function to test return values.\"\"\"
             return #@
@@ -640,7 +718,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_return(valid_return_node)
 
-        missing_param_func_node = astroid.extract_node("""
+        missing_param_func_node = astroid.extract_node(
+            """
         def func(test_var_one, test_var_two, *args, **kwargs): #@
             \"\"\"Function to test docstring parameters.
 
@@ -664,7 +743,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 missing_param_func_node)
 
-        missing_param_func_node = astroid.extract_node("""
+        missing_param_func_node = astroid.extract_node(
+            """
         def func(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
@@ -705,7 +785,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 missing_param_func_node)
 
-        class_node, multiple_constructor_func_node = astroid.extract_node("""
+        class_node, multiple_constructor_func_node = astroid.extract_node(
+            """
         class Test(): #@
             \"\"\"Function to test docstring parameters.
 
@@ -742,7 +823,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_visit_raise_warns_unknown_style(self):
         self.checker_test_object.checker.config.accept_no_raise_doc = False
-        node = astroid.extract_node("""
+        node = astroid.extract_node(
+            """
         def my_func(self):
             \"\"\"This is a docstring.\"\"\"
             raise RuntimeError('hi')
@@ -766,14 +848,16 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.ImportOnlyModulesChecker)
         checker_test_object.setup_method()
-        importfrom_node1 = astroid.extract_node("""
+        importfrom_node1 = astroid.extract_node(
+            """
             from os import path #@
             import sys
         """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node1)
 
-        importfrom_node2 = astroid.extract_node("""
+        importfrom_node2 = astroid.extract_node(
+            """
             from os import error #@
             import sys
         """)
@@ -787,19 +871,22 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
             checker_test_object.checker.visit_importfrom(
                 importfrom_node2)
 
-        importfrom_node3 = astroid.extract_node("""
+        importfrom_node3 = astroid.extract_node(
+            """
             from invalid_module import invalid_module #@
         """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node3)
 
-        importfrom_node4 = astroid.extract_node("""
+        importfrom_node4 = astroid.extract_node(
+            """
             from constants import constants #@
         """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node4)
 
-        importfrom_node5 = astroid.extract_node("""
+        importfrom_node5 = astroid.extract_node(
+            """
             from os import invalid_module #@
         """)
         with checker_test_object.assertAddsMessages(
@@ -811,7 +898,8 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_importfrom(importfrom_node5)
 
-        importfrom_node6 = astroid.extract_node("""
+        importfrom_node6 = astroid.extract_node(
+            """
             from .constants import constants #@
         """, module_name='.constants')
         with checker_test_object.assertNoMessages():
@@ -866,7 +954,8 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.FunctionArgsOrderChecker)
         checker_test_object.setup_method()
-        functiondef_node1 = astroid.extract_node("""
+        functiondef_node1 = astroid.extract_node(
+            """
         def test(self,test_var_one, test_var_two): #@
             result = test_var_one + test_var_two
             return result
@@ -874,7 +963,8 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_functiondef(functiondef_node1)
 
-        functiondef_node2 = astroid.extract_node("""
+        functiondef_node2 = astroid.extract_node(
+            """
         def test(test_var_one, test_var_two, self): #@
             result = test_var_one + test_var_two
             return result
@@ -887,7 +977,8 @@ class FunctionArgsOrderCheckerTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_functiondef(functiondef_node2)
 
-        functiondef_node3 = astroid.extract_node("""
+        functiondef_node3 = astroid.extract_node(
+            """
         def test(test_var_one, test_var_two, cls): #@
             result = test_var_one + test_var_two
             return result
@@ -911,7 +1002,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein storage layer imports domain layer
         # in import statements.
-        node_err_import = astroid.extract_node("""
+        node_err_import = astroid.extract_node(
+            """
             import core.domain.activity_domain #@
         """)
         node_err_import.root().name = 'oppia.core.storage.topic'
@@ -926,7 +1018,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein storage layer does not import domain layer
         # in import statements.
-        node_no_err_import = astroid.extract_node("""
+        node_no_err_import = astroid.extract_node(
+            """
             import core.platform.email.mailgun_email_services #@
         """)
         node_no_err_import.root().name = 'oppia.core.storage.topic'
@@ -935,7 +1028,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein storage layer imports domain layer
         # in import-from statements.
-        node_err_importfrom = astroid.extract_node("""
+        node_err_importfrom = astroid.extract_node(
+            """
             from core.domain import activity_domain #@
         """)
         node_err_importfrom.root().name = 'oppia.core.storage.topic'
@@ -950,7 +1044,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein storage layer does not import domain layer
         # in import-from statements.
-        node_no_err_importfrom = astroid.extract_node("""
+        node_no_err_importfrom = astroid.extract_node(
+            """
             from core.platform.email import mailgun_email_services #@
         """)
         node_no_err_importfrom.root().name = 'oppia.core.storage.topicl'
@@ -959,7 +1054,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein domain layer imports controller layer
         # in import statements.
-        node_err_import = astroid.extract_node("""
+        node_err_import = astroid.extract_node(
+            """
             import core.controllers.acl_decorators #@
         """)
         node_err_import.root().name = 'oppia.core.domain'
@@ -974,7 +1070,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein domain layer does not import controller layer
         # in import statements.
-        node_no_err_import = astroid.extract_node("""
+        node_no_err_import = astroid.extract_node(
+            """
             import core.platform.email.mailgun_email_services_test #@
         """)
         node_no_err_import.root().name = 'oppia.core.domain'
@@ -983,7 +1080,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein domain layer imports controller layer
         # in import-from statements.
-        node_err_importfrom = astroid.extract_node("""
+        node_err_importfrom = astroid.extract_node(
+            """
             from core.controllers import acl_decorators #@
         """)
         node_err_importfrom.root().name = 'oppia.core.domain'
@@ -998,7 +1096,8 @@ class RestrictedImportCheckerTests(unittest.TestCase):
 
         # Tests the case wherein domain layer does not import controller layer
         # in import-from statements.
-        node_no_err_importfrom = astroid.extract_node("""
+        node_no_err_importfrom = astroid.extract_node(
+            """
             from core.platform.email import mailgun_email_services_test #@
         """)
         node_no_err_importfrom.root().name = 'oppia.core.domain'

@@ -1924,8 +1924,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_scores_of_user('user1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('user1'))
         self.assertEqual(len(score_models), 1)
         self.assertEqual(score_models[0].id, 'category1.user1')
         self.assertEqual(score_models[0].user_id, 'user1')
@@ -1954,9 +1955,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.create('user3', 'category2', 1)
         user_models.UserContributionScoringModel.create('user4', 'category2', 1)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_users_with_score_above_minimum_for_category(
-                            'category1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category1'))
 
         self.assertEqual(len(score_models), 3)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
@@ -1966,9 +1967,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category1.user4'), score_models)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_users_with_score_above_minimum_for_category(
-                            'category2'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category2'))
 
         self.assertEqual(len(score_models), 1)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
@@ -1977,8 +1978,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     def test_get_score_of_user_for_category(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
 
-        score = (user_models.UserContributionScoringModel
-                 .get_score_of_user_for_category('user1', 'category1'))
+        score = (
+            user_models.UserContributionScoringModel
+            .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 1)
 
@@ -1988,8 +1990,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.increment_score_for_user(
             'user1', 'category1', 2)
 
-        score = (user_models.UserContributionScoringModel
-                 .get_score_of_user_for_category('user1', 'category1'))
+        score = (
+            user_models.UserContributionScoringModel
+            .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 3)
 
@@ -1998,8 +2001,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.create('user1', 'category2', 1)
         user_models.UserContributionScoringModel.create('user1', 'category3', 1)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_scores_of_user('user1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('user1'))
         self.assertEqual(len(score_models), 3)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category1.user1'), score_models)

@@ -213,9 +213,10 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Number of skills to fetch should be a number.')
 
-        if (keywords is not None and (not isinstance(keywords, list) or not all(
-                [isinstance(keyword, python_utils.BASESTRING)
-                 for keyword in keywords]))):
+        if (keywords is not None and (not isinstance(keywords, list) or (
+                not all(
+                    [isinstance(keyword, python_utils.BASESTRING)
+                     for keyword in keywords])))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 

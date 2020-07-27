@@ -27,7 +27,8 @@ import python_utils
 
 from . import common
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Python execution environment setup for scripts that require GAE.
 """)
 

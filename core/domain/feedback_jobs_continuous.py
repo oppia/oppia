@@ -184,14 +184,18 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             feedback_models.FeedbackAnalyticsModel.get_multi(exploration_ids))
         return [feedback_domain.FeedbackAnalytics(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_ids[i],
-            (realtime_models[i].num_open_threads
-             if realtime_models[i] is not None else 0) +
-            (feedback_thread_analytics_models[i].num_open_threads
-             if feedback_thread_analytics_models[i] is not None else 0),
-            (realtime_models[i].num_total_threads
-             if realtime_models[i] is not None else 0) +
-            (feedback_thread_analytics_models[i].num_total_threads
-             if feedback_thread_analytics_models[i] is not None else 0)
+            (
+                realtime_models[i].num_open_threads
+                if realtime_models[i] is not None else 0) +
+            (
+                feedback_thread_analytics_models[i].num_open_threads
+                if feedback_thread_analytics_models[i] is not None else 0),
+            (
+                realtime_models[i].num_total_threads
+                if realtime_models[i] is not None else 0) +
+            (
+                feedback_thread_analytics_models[i].num_total_threads
+                if feedback_thread_analytics_models[i] is not None else 0)
         ) for i in python_utils.RANGE(len(exploration_ids))]
 
     @classmethod

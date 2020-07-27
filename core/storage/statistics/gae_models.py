@@ -332,9 +332,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -459,9 +459,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -577,9 +577,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
@@ -761,9 +761,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
     # playthroughs no longer emit events.
-    play_type = ndb.StringProperty(indexed=True,
-                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_NORMAL])
+    play_type = ndb.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 

@@ -764,10 +764,11 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(ExpSummaryModel.owner_ids == user_id,
-                   ExpSummaryModel.editor_ids == user_id,
-                   ExpSummaryModel.voice_artist_ids == user_id,
-                   ExpSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                ExpSummaryModel.owner_ids == user_id,
+                ExpSummaryModel.editor_ids == user_id,
+                ExpSummaryModel.voice_artist_ids == user_id,
+                ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -784,8 +785,9 @@ class ExpSummaryModel(base_models.BaseModel):
             editable by the given user.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(ExpSummaryModel.owner_ids == user_id,
-                   ExpSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                ExpSummaryModel.owner_ids == user_id,
+                ExpSummaryModel.editor_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

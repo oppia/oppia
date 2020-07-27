@@ -147,5 +147,6 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.thread_id,
                 self.message_id))
 
-        self.assertDictEqual(observed_feedback_message_reference.to_dict(),
-                             expected_feedback_message_reference)
+        self.assertDictEqual(
+            observed_feedback_message_reference.to_dict(),
+            expected_feedback_message_reference)

@@ -371,8 +371,9 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             exploration = get_exploration_from_model(model)
             db_results_dict[eid] = exploration
         else:
-            logging.info('Tried to fetch exploration with id %s, but no such '
-                         'exploration exists in the datastore' % eid)
+            logging.info(
+                'Tried to fetch exploration with id %s, but no such '
+                'exploration exists in the datastore' % eid)
             not_found.append(eid)
 
     if strict and not_found:

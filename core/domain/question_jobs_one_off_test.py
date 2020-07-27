@@ -78,8 +78,9 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(question.question_state_data.to_dict(),
-                         updated_question.question_state_data.to_dict())
+        self.assertEqual(
+            question.question_state_data.to_dict(),
+            updated_question.question_state_data.to_dict())
 
         output = (
             question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))

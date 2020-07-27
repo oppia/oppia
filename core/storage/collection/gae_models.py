@@ -596,9 +596,10 @@ class CollectionSummaryModel(base_models.BaseModel):
         return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id,
-                   CollectionSummaryModel.viewer_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id,
+                CollectionSummaryModel.viewer_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -616,8 +617,9 @@ class CollectionSummaryModel(base_models.BaseModel):
             least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            ndb.OR(CollectionSummaryModel.owner_ids == user_id,
-                   CollectionSummaryModel.editor_ids == user_id)
+            ndb.OR(
+                CollectionSummaryModel.owner_ids == user_id,
+                CollectionSummaryModel.editor_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

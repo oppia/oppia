@@ -277,8 +277,9 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             collection = get_collection_from_model(model)
             db_results_dict[cid] = collection
         else:
-            logging.info('Tried to fetch collection with id %s, but no such '
-                         'collection exists in the datastore' % cid)
+            logging.info(
+                'Tried to fetch collection with id %s, but no such '
+                'collection exists in the datastore' % cid)
             not_found.append(cid)
 
     if strict and not_found:
@@ -638,9 +639,8 @@ def apply_change_list(collection_id, change_list):
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_TAGS):
                     collection.update_tags(change.new_value)
-            elif (
-                    change.cmd ==
-                    collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -1145,8 +1145,9 @@ def delete_demo(collection_id):
 
     collection = get_collection_by_id(collection_id, strict=False)
     if not collection:
-        logging.info('Collection with id %s was not deleted, because it '
-                     'does not exist.' % collection_id)
+        logging.info(
+            'Collection with id %s was not deleted, because it '
+            'does not exist.' % collection_id)
     else:
         delete_collection(
             feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)

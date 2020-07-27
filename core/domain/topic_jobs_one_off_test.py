@@ -84,8 +84,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
-        self.assertEqual(topic.subtopics[0].to_dict(),
-                         updated_topic.subtopics[0].to_dict())
+        self.assertEqual(
+            topic.subtopics[0].to_dict(), updated_topic.subtopics[0].to_dict())
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_migrated',

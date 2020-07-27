@@ -385,9 +385,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state_1',
             'new_value': {
                 'content_id': 'content',
-                'html': ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>')
+                'html': (
+                    '<oppia-noninteractive-math raw_latex-with-value="&am'
+                    'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                    'uot;"></oppia-noninteractive-math>')
             }
         }
         with self.swap(

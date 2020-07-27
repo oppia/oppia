@@ -32,7 +32,8 @@ from . import run_backend_tests
 from . import run_frontend_tests
 from .linters import pre_commit_linter
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder prior to opening a PR:
     python -m scripts.run_presubmit_checks
 Set the origin branch to compare against by adding

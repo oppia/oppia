@@ -90,8 +90,8 @@ def install_hook():
 
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
 
@@ -176,8 +176,9 @@ def main(args=None):
     in a commit.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--install', action='store_true', default=False,
-                        help='Install pre_commit_hook to the .git/hooks dir')
+    parser.add_argument(
+        '--install', action='store_true', default=False,
+        help='Install pre_commit_hook to the .git/hooks dir')
     args = parser.parse_args(args=args)
     if args.install:
         install_hook()
