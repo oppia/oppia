@@ -24,8 +24,11 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-tab-active-content-id.service.ts');
+import { Subscription } from 'rxjs';
 
 describe('Translation tab active content id service', function() {
+  let testSubscriptions: Subscription;
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -47,9 +50,22 @@ describe('Translation tab active content id service', function() {
     ttacis = $injector.get('TranslationTabActiveContentIdService');
   }));
 
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
+
   it('should correctly set and get active content id', function() {
+    const x = jasmine.createSpy('x');
+    testSubscriptions.add(ttacis.onActiveContentIdChange
+      .subscribe(x));
     expect(ttacis.getActiveContentId()).toBeNull();
     ttacis.setActiveContentId('content');
+    expect(x).toHaveBeenCalled();
     expect(ttacis.getActiveContentId()).toBe('content');
   });
 

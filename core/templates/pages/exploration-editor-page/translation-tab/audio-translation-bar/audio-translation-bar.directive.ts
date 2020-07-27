@@ -554,9 +554,8 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.audioBlob = null;
             });
 
-            $scope.$on('activeContentIdChanged', function() {
-              $scope.initAudioBar();
-            });
+            TranslationTabActiveContentIdService.onActiveContentIdChange.
+              subscribe(() => $scope.initAudioBar());
             $scope.$on('activeLanguageChanged', function() {
               $scope.initAudioBar();
             });

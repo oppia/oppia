@@ -22,11 +22,13 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
+import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('TranslationTabActiveContentIdService', [
-  '$rootScope', 'StateRecordedVoiceoversService',
-  function($rootScope, StateRecordedVoiceoversService) {
+  'StateRecordedVoiceoversService',
+  function(StateRecordedVoiceoversService) {
     var activeContentId = null;
+    var _activeContentIdEventEmitter = new EventEmitter();
     return {
       getActiveContentId: function() {
         return activeContentId;
@@ -38,7 +40,10 @@ angular.module('oppia').factory('TranslationTabActiveContentIdService', [
           throw new Error('Invalid active content id: ' + contentId);
         }
         activeContentId = contentId;
-        $rootScope.$broadcast('activeContentIdChanged');
+        _activeContentIdEventEmitter.emit();
+      },
+      get onActiveContentIdChange() {
+        return _activeContentIdEventEmitter;
       }
     };
   }]);
