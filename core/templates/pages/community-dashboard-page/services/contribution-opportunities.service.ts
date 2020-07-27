@@ -21,21 +21,45 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ContributionOpportunitiesBackendApiService } from
-'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
+  // eslint-disable-next-line max-len
+  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { ExplorationOpportunitySummary } from
+  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { SkillOpportunity } from
+  'domain/opportunity/SkillOpportunityObjectFactory';
+
+
+interface SkillContributionOpportunities {
+  opportunities: SkillOpportunity[];
+  nextCursor: string;
+  more: boolean;
+}
+
+interface TranslationContributionOpportunities {
+  opportunities: ExplorationOpportunitySummary[];
+  nextCursor: string;
+  more: boolean;
+}
+
+interface VoiceoverContributionOpportunities {
+  opportunities: ExplorationOpportunitySummary[];
+  nextCursor: string;
+  more: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContributionOpportunitiesService {
   private skillOpportunitiesCursor: string;
-  private translationOpportunitiesCursor: string; 
+  private translationOpportunitiesCursor: string;
   private voiceoverOpportunitiesCursor: string;
   private moreSkillOpportunitiesAvailable: boolean;
   private moreTranslationOpportunitiesAvailable: boolean;
   private moreVoiceoverOpportunitiesAvailable: boolean;
 
   constructor(
-    private contributionOpportunitiesBackendApiService: 
+    private contributionOpportunitiesBackendApiService:
       ContributionOpportunitiesBackendApiService
   ) {
     this.skillOpportunitiesCursor = null;
@@ -47,74 +71,77 @@ export class ContributionOpportunitiesService {
   }
 
   private _getSkillOpportunities(
-      cursor: string, 
+      cursor: string,
       successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     this.contributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-      cursor).then((data: any) => {
+      cursor).then((data: SkillContributionOpportunities) => {
       this.skillOpportunitiesCursor = data.nextCursor;
       this.moreSkillOpportunitiesAvailable = data.more;
       successCallback(data.opportunities, data.more);
     });
-  };
+  }
 
   private _getTranslationOpportunities(
-      languageCode: string, 
-      cursor: string, 
+      languageCode: string,
+      cursor: string,
       successCallback: (opportunities: Object, more: boolean) => void
   ): void {
-    this.contributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-      languageCode, cursor).then((data:any) => {
-      this.translationOpportunitiesCursor = data.nextCursor;
-      this.moreTranslationOpportunitiesAvailable = data.more;
-      successCallback(data.opportunities, data.more);
-    });
-  };
+    this.contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunities(languageCode, cursor)
+      .then((data: TranslationContributionOpportunities) => {
+        this.translationOpportunitiesCursor = data.nextCursor;
+        this.moreTranslationOpportunitiesAvailable = data.more;
+        successCallback(data.opportunities, data.more);
+      });
+  }
 
   private _getVoiceoverOpportunities(
-      languageCode: string, 
-      cursor: string, 
+      languageCode: string,
+      cursor: string,
       successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     this.contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-      languageCode, cursor).then((data: any) => {
+      languageCode, cursor).then((data: VoiceoverContributionOpportunities) => {
       this.voiceoverOpportunitiesCursor = data.nextCursor;
       this.moreVoiceoverOpportunitiesAvailable = data.more;
       successCallback(data.opportunities, data.more);
     });
-  };
+  }
 
   getSkillOpportunities(
-    successCallback: (opportunities: Object, more: boolean) => void
+      successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     this._getSkillOpportunities('', successCallback);
   }
 
   getTranslationOpportunities(
-    languageCode: string, 
-    successCallback: (opportunities: Object, more: boolean) => void
+      languageCode: string,
+      successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     this._getTranslationOpportunities(languageCode, '', successCallback);
   }
 
   getVoiceoverOpportunities(
-    languageCode: string, 
-    successCallback: (opportunities: Object, more: boolean) => void
+      languageCode: string,
+      successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     this._getVoiceoverOpportunities(languageCode, '', successCallback);
   }
 
   getMoreSkillOpportunities(
-    successCallback: (opportunities: Object, more: boolean) => void
+      successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     if (this.moreSkillOpportunitiesAvailable) {
-      this._getSkillOpportunities(this.skillOpportunitiesCursor, successCallback);
+      this._getSkillOpportunities(
+        this.skillOpportunitiesCursor, successCallback
+      );
     }
   }
 
   getMoreTranslationOpportunities(
-    languageCode: string, 
-    successCallback: (opportunities: Object, more: boolean) => void
+      languageCode: string,
+      successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     if (this.moreTranslationOpportunitiesAvailable) {
       this._getTranslationOpportunities(
@@ -123,8 +150,8 @@ export class ContributionOpportunitiesService {
   }
 
   getMoreVoiceoverOpportunities(
-    languageCode: string, 
-    successCallback: (opportunities: Object, more: boolean) => void
+      languageCode: string,
+      successCallback: (opportunities: Object, more: boolean) => void
   ): void {
     if (this.moreVoiceoverOpportunitiesAvailable) {
       this._getVoiceoverOpportunities(
