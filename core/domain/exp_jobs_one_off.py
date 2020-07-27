@@ -34,10 +34,7 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
-import schema_utils
 import utils
-
-from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -180,7 +177,7 @@ class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if not item.deleted:
             try:
-                exploration = exp_fetchers.get_exploration_from_model(item)
+                exp_fetchers.get_exploration_from_model(item)
             except Exception:
                 yield (
                     exp_domain.TYPE_INVALID_EXPRESSION,

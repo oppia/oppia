@@ -532,8 +532,6 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output is produced only for desired interactions."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
 
         answer_groups_1 = [{
             'outcome': {
