@@ -33,7 +33,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppConstants } from 'app.constants';
-
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -53,7 +52,6 @@ import { StoriesListComponent } from
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
 
 @NgModule({
   imports: [
