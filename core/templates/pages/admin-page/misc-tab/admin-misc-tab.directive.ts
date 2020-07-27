@@ -22,6 +22,7 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('services/image-upload-helper.service.ts');
 require('services/alerts.service.ts');
+require('services/contextual/logger.service');
 require('mathjaxConfig.ts');
 require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
@@ -29,12 +30,12 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 angular.module('oppia').directive('adminMiscTab', [
   '$http', '$rootScope', '$window', 'AdminDataService',
   'AdminTaskManagerService', 'AlertsService', 'ImageUploadHelperService',
-  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  'LoggerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
       $http, $rootScope, $window, AdminDataService,
       AdminTaskManagerService, AlertsService, ImageUploadHelperService,
-      UrlInterpolationService, ADMIN_HANDLER_URL,
+      LoggerService, UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
@@ -226,14 +227,24 @@ angular.module('oppia').directive('adminMiscTab', [
                   latexId: latexId
                 });
               } else {
-                AlertsService.addWarning('SVG failed validation.');
+                AlertsService.addWarning(
+                  'SVG failed validation for LaTeX ' + 'inputLatexString');
+                reject();
               }
             });
+            // This will catch and log any error that occurs internally in
+            // MathJax.
+            MathJax.Hub.Register.MessageHook(
+              'Math Processing Error', function(message) {
+                LoggerService.error(message[2]);
+                reject();
+              });
           });
         };
 
         var latexMapping = {};
         var expIdToLatexMapping = null;
+        var numberOfLatexStrings = 0;
         ctrl.generateSvgs = async function() {
           var countOfSvgsGenerated = 0;
           for (var expId in expIdToLatexMapping) {
@@ -241,10 +252,17 @@ angular.module('oppia').directive('adminMiscTab', [
             latexMapping[expId] = {};
             for (var i = 0; i < latexStrings.length; i++) {
               var svgFile = await convertLatexToSvgFile(latexStrings[i]);
+              countOfSvgsGenerated++;
+              LoggerService.info(
+                'generated ' + countOfSvgsGenerated.toString() + ' SVGs');
               latexMapping[expId][latexStrings[i]] = svgFile;
             }
-            ctrl.setStatusMessage('LaTeX strings generated.');
-            $rootScope.$apply();
+            if (numberOfLatexStrings === countOfSvgsGenerated) {
+              ctrl.setStatusMessage(
+                'SVGs generated for ' + countOfSvgsGenerated.toString() +
+                ' LaTeX strings .');
+              $rootScope.$apply();
+            }
           }
         };
 
@@ -254,9 +272,19 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.fetchAndGenerateSvgsForExplorations = function() {
           $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
             function(response) {
+              var numberOfExplorationsFetched = 0;
               expIdToLatexMapping = (
                 response.data.latex_strings_to_exp_id_mapping);
-              ctrl.setStatusMessage('LaTeX strings fetched from backend.');
+              for (var expId in expIdToLatexMapping) {
+                numberOfExplorationsFetched++;
+                numberOfLatexStrings += Object.keys(
+                  expIdToLatexMapping[expId]).length;
+              }
+              ctrl.setStatusMessage(
+                numberOfLatexStrings.toString() +
+                ' LaTeX strings fetched from backend for ' +
+                numberOfExplorationsFetched.toString() + ' explorations.' +
+                ' Generating SVGs.....');
               ctrl.generateSvgs();
             });
         };
