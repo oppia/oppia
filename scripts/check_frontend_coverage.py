@@ -374,6 +374,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'story-creation.service.ts',
     'story-editor-navbar-breadcrumb.directive.ts',
     'story-editor-navbar.directive.ts',
+    'story-editor-page.component.ts',
     'story-editor-state.service.ts',
     'story-editor.directive.ts',
     'story-node-editor.directive.ts',
