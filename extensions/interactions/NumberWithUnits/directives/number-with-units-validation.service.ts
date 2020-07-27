@@ -25,12 +25,12 @@ import { unit } from 'mathjs';
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { INumberWithUnitsCustomizationArgs } from
+import { NumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';
 
 @Injectable({
@@ -42,15 +42,15 @@ export class NumberWithUnitsValidationService {
     private baseInteraction: baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: INumberWithUnitsCustomizationArgs): IWarning[] {
+      customizationArgs: NumberWithUnitsCustomizationArgs): Warning[] {
     return [];
   }
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: INumberWithUnitsCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
-    var warningsList: IWarning[] = [];
+      customizationArgs: NumberWithUnitsCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));

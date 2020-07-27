@@ -591,7 +591,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        exp_versions_diff, None)
 
     stats_services.create_stats_model(new_exp_stats)
 
@@ -616,8 +616,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff=exp_versions_diff,
-        revert_to_version=None)
+        exploration, exp_versions_diff, None)
 
 
 def _create_exploration(
@@ -1197,14 +1196,13 @@ def revert_exploration(
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
+        None, revert_to_version)
     stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
     stats_services.update_exp_issues_for_new_exp_version(
-        current_exploration, exp_versions_diff=None,
-        revert_to_version=revert_to_version)
+        current_exploration, None, revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
@@ -1761,3 +1759,37 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def save_multi_exploration_math_rich_text_info_model(
+        exploration_math_rich_text_info_list):
+    """Saves multiple instances of ExplorationMathRichTextInfoModel to the
+    datastore.
+
+    Args:
+        exploration_math_rich_text_info_list:
+        list(ExplorationMathRichTextInfoModel). A list of
+            ExplorationMathRichTextInfoModel domain objects.
+    """
+
+    exploration_math_rich_text_info_models = []
+    for exploration_math_rich_text_info in (
+            exploration_math_rich_text_info_list):
+        latex_strings_without_svg = (
+            exploration_math_rich_text_info.latex_strings_without_svg)
+        math_images_generation_required = (
+            exploration_math_rich_text_info.math_images_generation_required)
+        exp_id = (
+            exploration_math_rich_text_info.exp_id)
+        estimated_max_size_of_images_in_bytes = (
+            exploration_math_rich_text_info.get_svg_size_in_bytes())
+        exploration_math_rich_text_info_models.append(
+            exp_models.ExplorationMathRichTextInfoModel(
+                id=exp_id,
+                math_images_generation_required=math_images_generation_required,
+                latex_strings_without_svg=latex_strings_without_svg,
+                estimated_max_size_of_images_in_bytes=(
+                    estimated_max_size_of_images_in_bytes)))
+
+    exp_models.ExplorationMathRichTextInfoModel.put_multi(
+        exploration_math_rich_text_info_models)

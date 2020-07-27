@@ -786,10 +786,6 @@ class Registry(python_utils.OBJECT):
             default = ''
         else:
             raise Exception('Unsupported data type %s.' % data_type)
-        if is_feature and feature_stage is None:
-            raise Exception(
-                'feature_stage must be specified when is_feature '
-                'is set to True.')
 
         parameter_dict = {
             'name': name,
@@ -810,6 +806,29 @@ class Registry(python_utils.OBJECT):
         }
         parameter = cls.create_platform_parameter_from_dict(parameter_dict)
         return parameter
+
+    @classmethod
+    def create_feature_flag(
+            cls, name, description, stage):
+        """Creates, registers and returns a platform parameter that is also a
+        feature flag.
+
+        Args:
+            name: str. The name of the platform parameter.
+            description: str. The description of the platform parameter.
+            stage: str. The stage of the feature.
+
+        Returns:
+            PlatformParameter. The created feature flag.
+        """
+        feature = cls.create_platform_parameter(
+            name=name,
+            description=description,
+            data_type='bool',
+            is_feature=True,
+            feature_stage=stage,
+        )
+        return feature
 
     @classmethod
     def init_platform_parameter(cls, name, instance):
@@ -960,3 +979,14 @@ class Registry(python_utils.OBJECT):
         cached_parameter = memcache_services.get_multi([memcache_key]).get(
             memcache_key)
         return cached_parameter
+
+
+# Platform parameters should all be defined below.
+
+# This is a dummy feature flag demostrating the definition of features,
+# it can be safely removed once more realistic features are added here.
+Registry.create_feature_flag(
+    name='Dummy_Feature',
+    description='This is a dummy feature flag',
+    stage='dev',
+)

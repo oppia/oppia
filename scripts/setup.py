@@ -67,7 +67,7 @@ def test_python_version():
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
                 'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
-        raise Exception
+        raise Exception('No suitable python version found.')
 
 
 def download_and_install_package(url_to_retrieve, filename):
@@ -114,7 +114,7 @@ def download_and_install_node():
             common.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
             common.NODE_VERSION, node_file_name, extension)
-        python_utils.url_retrieve(url_to_retrieve, outfile_name)
+        python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',
@@ -154,7 +154,7 @@ def main(args=None):
         python_utils.PRINT(
             'WARNING   This script should be run from the oppia/ root folder.')
         python_utils.PRINT('')
-        raise Exception
+        raise Exception('Invalid root directory.')
 
     # Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
     # is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
@@ -238,7 +238,7 @@ def main(args=None):
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
     else:
         python_utils.PRINT('Chrome is not found, stopping ...')
-        raise Exception
+        raise Exception('Chrome not found.')
 
     os.environ['CHROME_BIN'] = chrome_bin
     python_utils.PRINT('Environment setup completed.')

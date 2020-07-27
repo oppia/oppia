@@ -34,10 +34,7 @@ memcache_services = models.Registry.import_memcache_services()
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterChange class."""
 
-    CMD_EDIT_RULES = (
-        parameter_domain
-        .PlatformParameterChange
-        .CMD_EDIT_RULES)
+    CMD_EDIT_RULES = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
 
     def test_param_change_object_with_missing_cmd_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -52,9 +49,8 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_missing_attribute_in_cmd_raises_exception(
             self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following required attributes are missing: '
-                'new_rules')):
+            utils.ValidationError,
+            'The following required attributes are missing: new_rules'):
             parameter_domain.PlatformParameterChange({
                 'cmd': self.CMD_EDIT_RULES
             })
@@ -62,8 +58,8 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
             self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
+            utils.ValidationError,
+            'The following extra attributes are present: invalid'):
             parameter_domain.PlatformParameterChange({
                 'cmd': self.CMD_EDIT_RULES,
                 'new_rules': [],
@@ -87,9 +83,8 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': []
         }
-        param_change_object = (
-            parameter_domain.PlatformParameterChange(
-                param_change_dict))
+        param_change_object = parameter_domain.PlatformParameterChange(
+            param_change_dict)
         self.assertEqual(
             param_change_object.to_dict(),
             param_change_dict)
@@ -1013,6 +1008,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(PlatformParameterRegistryTests, self).setUp()
+
+        self.original_param_registry = (
+            parameter_domain.Registry.parameter_registry)
         parameter_domain.Registry.parameter_registry.clear()
 
         # Parameter names that might be used in following tests.
@@ -1021,6 +1019,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             parameter_domain.PlatformParameter.get_memcache_key(name)
             for name in parameter_names]
         memcache_services.delete_multi(memcache_keys)
+
+    def tearDown(self):
+        super(PlatformParameterRegistryTests, self).tearDown()
+
+        parameter_domain.Registry.parameter_registry = (
+            self.original_param_registry)
 
     def create_example_parameter_with_name(self, name):
         """Creates and returns an example parameter with the given name."""
@@ -1065,15 +1069,16 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 data_type='Invalid'
             )
 
-    def test_create_feature_without_stage(self):
-        with self.assertRaisesRegexp(
-            Exception, 'feature_stage must be specified'):
-            parameter_domain.Registry.create_platform_parameter(
-                name='parameter_a',
-                description='test',
-                data_type='bool',
-                is_feature=True,
-            )
+    def test_create_feature_flag(self):
+        feature = parameter_domain.Registry.create_feature_flag(
+            name='parameter_a',
+            description='test',
+            stage='dev',
+        )
+        self.assertEqual(feature.data_type, 'bool')
+        self.assertTrue(feature.metadata.is_feature)
+        self.assertEqual(feature.metadata.stage, 'dev')
+        feature.validate()
 
     def test_default_value_of_bool_platform_parameter(self):
         parameter = parameter_domain.Registry.create_platform_parameter(
@@ -1254,3 +1259,16 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'parameter_b': False,
             }
         )
+
+
+class ExistingPlatformParameterValidityTest(test_utils.GenericTestBase):
+    """Tests to validate all platform parameter registered in
+    core/domain/platform_parameter_domain.py.
+    """
+
+    def test_all_parameters_are_valid(self):
+        all_names = (
+            parameter_domain.Registry.get_all_platform_parameter_names())
+        for name in all_names:
+            param = parameter_domain.Registry.get_platform_parameter(name)
+            param.validate()
