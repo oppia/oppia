@@ -536,6 +536,10 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 # gives the maximum size for a batch of Math SVGs in bytes.
 MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
 
+# We generate images for existing math rich text components in batches. This
+# gives the maximum number of entities in a batch.
+MAX_NUMBER_OF_ENTITIES_IN_A_BATCH_FOR_MATH_SVG_GENERATION = 10
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
@@ -677,7 +681,6 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler'
 NEW_STRUCTURES_LATEX_SVG_HANDLER = '/newstructureslatexsvghandler'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'

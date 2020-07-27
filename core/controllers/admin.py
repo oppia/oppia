@@ -684,10 +684,17 @@ class NewStructuresLatexSvgHandler(base.BaseHandler):
         entity_type = self.request.get('entity_type')
         if entity_type == feconf.ENTITY_TYPE_TOPIC:
             self.render_json({
-                'entity_type': entity_type,
+                'entity_type': feconf.ENTITY_TYPE_TOPIC,
                 'latex_strings_to_entity_id_mapping': (
                     subtopic_page_services.
                     get_batch_of_subtopic_pages_for_latex_svg_generation())
+            })
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            self.render_json({
+                'entity_type': feconf.ENTITY_TYPE_QUESTION,
+                'latex_strings_to_entity_id_mapping': (
+                    question_services.
+                    get_batch_of_questions_for_latex_svg_generation())
             })
 
     @acl_decorators.can_access_admin_page
@@ -705,7 +712,8 @@ class NewStructuresLatexSvgHandler(base.BaseHandler):
                         'SVG for LaTeX string %s in %s %s is not '
                         'supplied.' % (latex_string, entity_id, entity_type))
                 dimensions = (
-                    latex_to_svg_mappings[exp_id][latex_string]['dimensions'])
+                    latex_to_svg_mappings[entity_id][latex_string][
+                        'dimensions'])
                 latex_string_svg_image_dimensions = (
                     html_domain.LatexStringSvgImageDimensions(
                         dimensions['encoded_height_string'],
@@ -713,19 +721,25 @@ class NewStructuresLatexSvgHandler(base.BaseHandler):
                         dimensions['encoded_vertical_padding_string']))
                 latex_string_svg_image_data = (
                     html_domain.LatexStringSvgImageData(
-                        svg_image, latex_string_svg_image_dimensions))
+                        latex_string, svg_image,
+                        latex_string_svg_image_dimensions))
                 latex_to_svg_mappings[entity_id][latex_string] = (
                     latex_string_svg_image_data)
 
-         if entity_type == feconf.ENTITY_TYPE_TOPIC:
+        if entity_type == feconf.ENTITY_TYPE_TOPIC:
             for subtopic_id in latex_to_svg_mappings.keys():
                 subtopic_page_services.update_subtopics_with_math_svgs(
                     subtopic_id, latex_to_svg_mappings[subtopic_id])
-            self.render_json({
-                'entity_type': entity_type,
-                'no_of_entities_updated': '%d' % (
-                    len(latex_to_svg_mappings.keys()))
-            })
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            for question_id in latex_to_svg_mappings.keys():
+                question_services.update_question_with_math_svgs(
+                    question_id, latex_to_svg_mappings[question_id])
+
+        self.render_json({
+            'entity_type': entity_type,
+            'no_of_entities_updated': '%d' % (
+                len(latex_to_svg_mappings.keys()))
+        })
 
 
 class AdminTopicsCsvFileDownloader(base.BaseHandler):

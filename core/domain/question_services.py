@@ -18,9 +18,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import functools
 import logging
 
 from constants import constants
+from core.domain import fs_services
+from core.domain import html_validation_service
+from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
@@ -28,6 +32,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
@@ -686,3 +691,111 @@ def get_interaction_id_for_question(question_id):
     if question is None:
         raise Exception('No questions exists with the given question id.')
     return question.question_state_data.interaction.id
+
+
+def get_batch_of_questions_for_latex_svg_generation():
+    """Returns a batch of LaTeX strings from QuestionSummary which have LaTeX
+    strings without SVGs.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    questions have a valid math SVG stored in the datastore.
+
+    Returns:
+        dict(str, list(str)). The dict having each key as an question ID
+        and value as a list of LaTeX string. Each list has all the LaTeX strings
+        in that particular question ID.
+    """
+
+    question_model_list = question_models.QuestionModel.get_all()
+    number_of_questions_in_current_batch = 0
+    latex_strings_mapping = {}
+
+    for question_model in question_model_list:
+        question = question_fetchers.get_question_from_model(question_model)
+        html_in_question = ''.join(
+            question.question_state_data.
+            get_all_html_content_strings())
+
+        latex_strings_without_svg = (
+            html_validation_service.get_latex_strings_without_svg_from_html(
+                html_in_question))
+        if len(latex_strings_without_svg) == 0:
+            continue
+        latex_strings_mapping[question.id] = latex_strings_without_svg
+        number_of_questions_in_current_batch += 1
+        if (number_of_questions_in_current_batch + 1) > (
+                feconf.
+                MAX_NUMBER_OF_ENTITIES_IN_A_BATCH_FOR_MATH_SVG_GENERATION):
+            break
+    return latex_strings_mapping
+
+
+def update_question_with_math_svgs(question_id, raw_latex_to_image_data_dict):
+    """Saves an SVG for each LaTeX string without an SVG in a question
+    and updates the question.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    questions have a valid math SVG stored in the datastore.
+
+    Args:
+        raw_latex_to_image_data_dict: dict(str, LatexStringSvgImageData). The
+            dictionary having the key as a LaTeX string and the corresponding
+            value as the SVG image data for that LaTeX string.
+        question_id: str. The ID of the question_id to update.
+
+    Raises:
+        Exception: If any of the SVG images provided fail validation.
+    """
+
+    change_list = []
+    add_svg_filenames_for_latex_strings_in_html_string = (
+        functools.partial(
+            html_validation_service.
+            add_svg_filenames_for_latex_strings_in_html_string,
+            raw_latex_to_image_data_dict))
+
+    question_model = question_models.QuestionModel.get(question_id)
+    question = question_fetchers.get_question_from_model(question_model)
+    question_state_data_before_conversion = question.question_state_data
+    converted_question_state_data_dict = (
+        state_domain.State.convert_html_fields_in_state(
+            question_state_data_before_conversion.to_dict(),
+            add_svg_filenames_for_latex_strings_in_html_string))
+
+
+    converted_question_state_data = state_domain.State.from_dict(
+        converted_question_state_data_dict)
+    html_in_question_after_conversion = (
+        ''.join(converted_question_state_data.get_all_html_content_strings()))
+    filenames_mapping = (
+        html_validation_service.
+        extract_svg_filename_latex_mapping_in_math_rte_components(
+            html_in_question_after_conversion))
+
+    for filename, raw_latex in filenames_mapping:
+        image_file = raw_latex_to_image_data_dict[raw_latex].raw_image
+        image_validation_error_message_suffix = (
+            'SVG image provided for latex %s failed validation' % raw_latex)
+        try:
+            file_format = (
+                image_validation_services.validate_image_and_filename(
+                    image_file, filename))
+        except utils.ValidationError as e:
+            e = '%s %s' % (e, image_validation_error_message_suffix)
+            raise Exception(e)
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        fs_services.save_original_and_compressed_versions_of_image(
+            filename, feconf.ENTITY_TYPE_QUESTION, question_id, image_file,
+            'image', image_is_compressible)
+
+    change_dict = {
+        'cmd': 'update_question_property',
+        'property_name': 'question_state_data',
+        'new_value': converted_question_state_data_dict,
+        'old_value': question_state_data_before_conversion.to_dict()
+    }
+    change_list = [question_domain.QuestionChange(change_dict)]
+    update_question(
+        feconf.MIGRATION_BOT_USER_ID, question_id, change_list,
+        'Added SVGs for math rich-text components')

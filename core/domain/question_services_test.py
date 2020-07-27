@@ -19,10 +19,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from core.domain import html_domain
+from core.domain import html_validation_service
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -1119,3 +1122,254 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             migrated_answer_group.outcome.feedback.html,
             expected_feeedback_html_content)
+
+
+class QuestionLatexSvgGenerationTests(test_utils.GenericTestBase):
+    def test_get_batch_of_questions_for_latex_svg_generation(self):
+        html = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val'
+            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,'
+            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi'
+            'a-noninteractive-math>')
+
+        content_dict = {
+            'content_id': 'content_1',
+            'html': html
+        }
+        question_state = (
+            question_domain.Question.create_default_question_state())
+        question_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state.to_dict(),
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=33))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        html2 = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val'
+            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;,'
+            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi'
+            'a-noninteractive-math>')
+
+        content_dict2 = {
+            'content_id': 'content_1',
+            'html': html2
+        }
+        question_state2 = (
+            question_domain.Question.create_default_question_state())
+        question_state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict2))
+
+        question_model2 = (
+            question_models.QuestionModel(
+                id='question_id2',
+                question_state_data=question_state2.to_dict(),
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=33))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model2.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question_state3 = (
+            question_domain.Question.create_default_question_state())
+
+        question_model3 = (
+            question_models.QuestionModel(
+                id='question_id3',
+                question_state_data=question_state3.to_dict(),
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=33))
+
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model3.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        html4 = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val'
+            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^4&amp;quot;,'
+            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi'
+            'a-noninteractive-math>')
+
+        content_dict4 = {
+            'content_id': 'content_1',
+            'html': html4
+        }
+        question_state4 = (
+            question_domain.Question.create_default_question_state())
+        question_state4.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict4))
+
+        question_model4 = (
+            question_models.QuestionModel(
+                id='question_id4',
+                question_state_data=question_state4.to_dict(),
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=33))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model4.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        expected_dict = {
+            'question_id': [b'+,-,-,+'],
+            'question_id2': [b'x^2']
+        }
+        with self.swap(
+            feconf, 'MAX_NUMBER_OF_ENTITIES_IN_A_BATCH_FOR_MATH_SVG_GENERATION',
+            2):
+            self.assertEqual(
+                question_services.
+                get_batch_of_questions_for_latex_svg_generation(),
+                expected_dict)
+
+
+    def test_update_question_with_math_svgs(self):
+        html = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val'
+            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,'
+            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi'
+            'a-noninteractive-math>')
+
+        content_dict = {
+            'content_id': 'content',
+            'html': html
+        }
+        question_state = self._create_valid_question_data('DEF')
+        question_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state.to_dict(),
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=33))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        svg_file = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data = (
+            html_domain.LatexStringSvgImageData(
+                '+,-,-,+', svg_file, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        raw_latex_to_image_data_dict = {
+            '+,-,-,+': latex_string_svg_image_data
+        }
+        question_services.update_question_with_math_svgs(
+            'question_id', raw_latex_to_image_data_dict)
+
+        updated_question_model = question_models.QuestionModel.get(
+            'question_id')
+        updated_question = question_fetchers.get_question_from_model(
+            updated_question_model)
+        updated_html_string = ''.join(
+            updated_question.question_state_data.get_all_html_content_strings())
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(updated_html_string))
+
+        self.assertEqual(len(filenames), 1)
+        error_list = (
+            html_validation_service.validate_svg_filenames_in_math_rich_text(
+                'question', 'question_id', updated_html_string))
+        self.assertEqual(error_list, [])
+
+    def test_update_question_with_invalid_math_svgs(self):
+        html = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-val'
+            'ue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,'
+            ' &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppi'
+            'a-noninteractive-math>')
+
+        content_dict = {
+            'content_id': 'content',
+            'html': html
+        }
+        question_state = self._create_valid_question_data('DEF')
+        question_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state.to_dict(),
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=33))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        invalid_svg_file = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><invalid tag stroke="currentColor" fill="c'
+            'urrentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">'
+            '<path stroke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442'
+            ' 2864Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 3'
+            '8T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 15'
+            '3 504 145284 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data = (
+            html_domain.LatexStringSvgImageData(
+                '+,-,-,+', invalid_svg_file,
+                html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        raw_latex_to_image_data_dict = {
+            '+,-,-,+': latex_string_svg_image_data
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'Image not recognized SVG image provided for latex'):
+            question_services.update_question_with_math_svgs(
+                'question_id', raw_latex_to_image_data_dict)

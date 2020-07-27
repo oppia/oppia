@@ -213,8 +213,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
-        r'/adminmathsvghandler', admin.ExplorationsLatexSvgHandler),
-    get_redirect_route(
         r'/newstructureslatexsvghandler', admin.NewStructuresLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(

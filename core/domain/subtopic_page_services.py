@@ -21,8 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import functools
+import logging
 
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import image_validation_services
@@ -30,6 +30,7 @@ from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.platform import models
 import feconf
+import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -107,7 +108,7 @@ def get_batch_of_subtopic_pages_for_latex_svg_generation():
     """
 
     subtopic_models = topic_models.SubtopicPageModel.get_all()
-    number_of_subtopics_in_current_batch = 0;
+    number_of_subtopics_in_current_batch = 0
     latex_strings_mapping = {}
 
     for subtopic_model in subtopic_models:
@@ -124,7 +125,9 @@ def get_batch_of_subtopic_pages_for_latex_svg_generation():
                 html_in_subtopic_page))
         if len(latex_strings_without_svg) == 0:
             continue
-        if number_of_subtopics_in_current_batch <= 10:
+        if (number_of_subtopics_in_current_batch + 1) <= (
+                feconf.
+                MAX_NUMBER_OF_ENTITIES_IN_A_BATCH_FOR_MATH_SVG_GENERATION):
             latex_strings_mapping[subtopic_page.id] = latex_strings_without_svg
             number_of_subtopics_in_current_batch += 1
         else:
@@ -132,11 +135,10 @@ def get_batch_of_subtopic_pages_for_latex_svg_generation():
     return latex_strings_mapping
 
 
-def update_subtopics_with_math_svgs(subtopic_page_id,
-        raw_latex_to_image_data_dict):
-    """Saves an SVG for each LaTeX string without an SVG in an exploration
-    and updates the exploration. Also the corresponding valid draft changes are
-    updated.
+def update_subtopics_with_math_svgs(
+        subtopic_page_id, raw_latex_to_image_data_dict):
+    """Saves an SVG for each LaTeX string without an SVG in an subtopic
+    and updates the subtopic.
 
     TODO(#10045): Remove this function once all the math-rich text components in
     explorations have a valid math SVG stored in the datastore.
