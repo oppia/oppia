@@ -10,6 +10,37 @@
     <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
       <canvas ng-attr-id="<[$ctrl.canvasID]>" class="fabric-canvas-container"></canvas>
     </div>
+    <div ng-if="$ctrl.isDrawModePieChart()" class="fabric-canvas" style="background-color: #ffffff; overflow: auto; bottom: 0px;">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-5 col-sm-5 col-4">
+            Name:
+          </div>
+          <div class="col-md-5 col-sm-4 col-4">
+            Value:
+          </div>
+          <div class="col-md-2 col-sm-3 col-4">
+            Color:
+          </div>
+        </div>
+        <div ng-repeat="inputTag in $ctrl.pieChartDataInput track by $index">
+          <div class="form-row form-group">
+            <div class="col-md-5 col-sm-5 col-4">
+              <input type="text" class="form-control" name="input_0_{{$index}}" ng-model="inputTag.name">
+            </div>
+            <div class="col-md-5 col-sm-4 col-4">
+              <input type="number" class="form-control" name="input_1_{{$index}}" ng-model="inputTag.data">
+            </div>
+            <div class="col-md-2 col-sm-3 col-4">
+              <input type="color" class="form-control" name="input_2_{{$index}}" ng-model="inputTag.color">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="btn btn-outline-secondary btn-block" ng-click="$ctrl.onAddItem()">Add item +</button>
+        </div>
+      </div>
+    </div>
     <div class="vertical-toolbar">
       <div>
         <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isPencilEnabled()}"
@@ -51,6 +82,11 @@
                 ng-class="{'disabled' : !($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())}" ng-click="$ctrl.createQuadraticBezier()"
                 tooltip-placement="right" uib-tooltip="Quadratic Bezier curve" ng-disabled="!($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())">
           <i class="fas fa-bezier-curve bezier-curve"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button"
+                ng-class="{'disabled' : !$ctrl.isPieChartEnabled()}" ng-click="$ctrl.createPieChart()"
+                tooltip-placement="left" uib-tooltip="Pie Chart" ng-disabled="!$ctrl.isPieChartEnabled()">
+          <i class="fas fa-chart-pie" style="font-size: 22px;"></i>
         </button>
         <div class="vert-bottom-toolbar">
           <div>
@@ -110,6 +146,9 @@
       </div>
     </div>
     <div class="horizontal-toolbar top-toolbar">
+      <div class="info-tag" ng-if="$ctrl.isDrawModePieChart()">
+        Click the PieChart button once the data is entered.
+      </div>
       <div class="info-tag" ng-if="$ctrl.isDrawModePencil()">
         Click the pencil button to exit free drawing mode.
       </div>
@@ -136,7 +175,7 @@
         </select>
       </div>
     </div>
-    <div class="horizontal-toolbar bottom-toolbar">
+    <div class="horizontal-toolbar bottom-toolbar" ng-if="!$ctrl.isDrawModePieChart()">
       <div class="input-tag" ng-if="$ctrl.isSizeVisible()">
         <select ng-model="$ctrl.fabricjsOptions.size" ng-options="size for size in $ctrl.sizes"
                 ng-change="$ctrl.onSizeChange()">
@@ -182,7 +221,7 @@
 
   .svg-editor {
     background-color: #ffffff;
-    min-height: 400px;
+    min-height: 430px;
     position: relative;
   }
 
@@ -211,6 +250,7 @@
   .svg-editor .fabric-canvas::-webkit-scrollbar {
     -webkit-appearance: none;
     height: 7px;
+    width: 7px;
   }
 
   .svg-editor .fabric-canvas::-webkit-scrollbar-thumb {
@@ -219,7 +259,7 @@
   }
 
   .svg-editor .fabric-canvas .fabric-canvas-container {
-    height: 338px;
+    height: 368px;
     width: 494px;
   }
 
@@ -321,7 +361,7 @@
     right: 0
   }
 
-  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well {
+  .svg-editor .color-well {
     float: left;
     font-size: 10px;
     padding-bottom: 3px;
@@ -329,7 +369,7 @@
     width: 60px
   }
 
-  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well .colorPicker {
+  .svg-editor .color-well .colorPicker {
     background-color: #000000;
     border: 1px solid #000000;
     border-radius: 3px;
@@ -339,13 +379,13 @@
     width: 28px;
   }
 
-  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well .alphaSquare {
+  .svg-editor .color-well .alphaSquare {
     background-color: #000000;
     height: 13px;
     width: 13px;
   }
 
-  .svg-editor .vertical-toolbar .vert-bottom-toolbar .color-well .alphaSquare.bottom {
+  .svg-editor .color-well .alphaSquare.bottom {
     left: 50%;
     position: absolute;
   }
