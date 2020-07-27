@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import config_domain
+from core.domain import exp_services
 from core.domain import improvements_domain
 from core.domain import improvements_services
 from core.platform import models
@@ -528,3 +530,127 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
                 'State 10', 'State 9', 'State 8', 'State 7', 'State 6',
                 'State 5', 'State 4', 'State 3', 'State 2', 'State 1',
             ])
+
+
+class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        super(ExplorationImprovementsConfigHandlerTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+
+    def get_url(self, exp_id=None):
+        """Returns the URL corresponding to the handler.
+
+        Args:
+            exp_id: str. The exploration id to fetch. Uses self's EXP_ID
+                constant by default.
+
+        Returns:
+            str. The URL of the handler.
+        """
+        return '%s/%s/%s' % (
+            feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
+            improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+            self.EXP_ID if exp_id is None else exp_id)
+
+    def test_get_for_public_exploration_as_non_owning_user_fails(self):
+        self.publish_exploration(self.owner_id, self.EXP_ID)
+        with self.login_context(self.VIEWER_EMAIL):
+            self.get_json(self.get_url(), expected_status_int=401)
+
+    def test_get_for_private_exploration_as_non_owning_user_fails(self):
+        # Fail to call `publish_exploration`.
+        with self.login_context(self.VIEWER_EMAIL):
+            self.get_json(self.get_url(), expected_status_int=401)
+
+    def test_get_for_non_existing_exploration_fails(self):
+        with self.login_context(self.OWNER_EMAIL):
+            self.get_json(
+                self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
+
+    def test_get_returns_exploration_id(self):
+        self.set_config_property(
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertEqual(json_response['exploration_id'], self.EXP_ID)
+
+    def test_get_returns_exploration_version(self):
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertEqual(json_response['exploration_version'], 1)
+
+        # Update to version 2.
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, None, '')
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertEqual(json_response['exploration_version'], 2)
+
+    def test_improvements_tab_disabled(self):
+        self.set_config_property(
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertFalse(json_response['is_improvements_tab_enabled'])
+
+    def test_improvements_tab_enabled(self):
+        self.set_config_property(
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, True)
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertTrue(json_response['is_improvements_tab_enabled'])
+
+    def test_custom_high_bounce_rate_creation_threshold(self):
+        self.set_config_property(
+            (config_domain
+             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD),
+            0.35)
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertAlmostEqual(
+            json_response[
+                'high_bounce_rate_task_state_bounce_rate_creation_threshold'],
+            0.35)
+
+    def test_custom_high_bounce_rate_obsoletion_threshold(self):
+        self.set_config_property(
+            (config_domain
+             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
+            0.05)
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertAlmostEqual(
+            json_response[
+                'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold'],
+            0.05)
+
+    def test_custom_high_bounce_rate_task_minimum_exploration_starts(self):
+        self.set_config_property(
+            config_domain.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
+            20)
+
+        with self.login_context(self.OWNER_EMAIL):
+            json_response = self.get_json(self.get_url())
+
+        self.assertAlmostEqual(
+            json_response['high_bounce_rate_task_minimum_exploration_starts'],
+            20)

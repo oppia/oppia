@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models relating to configuration properties."""
+"""Models relating to configuration properties and platform parameters."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -61,3 +61,69 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+
+
+class PlatformParameterSnapshotMetadataModel(
+        base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a platform parameter snapshot."""
+
+    pass
+
+
+class PlatformParameterSnapshotContentModel(
+        base_models.BaseSnapshotContentModel):
+    """Storage model for the content for a platform parameter snapshot."""
+
+    pass
+
+
+class PlatformParameterModel(base_models.VersionedModel):
+    """A class that represents a named dynamic platform parameter.
+    This model only stores fields that can be updated in run time.
+
+    The id is the name of the parameter.
+    """
+
+    SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
+
+    rules = ndb.JsonProperty(repeated=True)
+    rule_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """PlatformParameterModel is not related to users."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def create(cls, param_name, rule_dicts, rule_schema_version):
+        """Creates a PlatformParameterModel instance.
+
+        Args:
+            param_name: str. The name of the parameter, which is immutable.
+            rule_dicts: list(dict). List of dict representation of
+                PlatformParameterRule objects, which have the following
+                structure:
+                    - value_when_matched: *. The result of the rule when it's
+                        matched.
+                    - filters: list(dict). List of dict representation of
+                        PlatformParameterFilter objects, having the following
+                        structure:
+                            - type: str. The type of the filter.
+                            - value: *. The value of the filter to match
+                                against.
+            rule_schema_version: int. The schema version for the rule dicts.
+
+        Returns:
+            PlatformParameterModel. The created PlatformParameterModel
+            instance.
+        """
+        return cls(
+            id=param_name,
+            rules=rule_dicts,
+            rule_schema_version=rule_schema_version)
