@@ -23,14 +23,20 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import python_utils
 import utils
 
+
 class LatexStringSvgImageDimensions(python_utils.OBJECT):
     """Value object representing the information related to the SVG file's
     dimensions.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
     """
+
     def __init__(
-        self, encoded_height_string, encoded_width_string,
-        encoded_vertical_padding_string):
+            self, encoded_height_string, encoded_width_string,
+            encoded_vertical_padding_string):
         """Initializes an LatexStringSvgImageDimensions domain object.
+
         Args:
             encoded_height_string: str. The string from which the actual height
                 can be derived. The actual height for math SVGs are in units ex.
@@ -50,6 +56,7 @@ class LatexStringSvgImageDimensions(python_utils.OBJECT):
     def to_dict(self):
         """Returns a dict representing this LatexStringSvgImageDimensions domain
         object.
+
         Returns:
             dict. A dict, mapping all fields of LatexStringSvgImageDimensions
             instance.
@@ -62,6 +69,13 @@ class LatexStringSvgImageDimensions(python_utils.OBJECT):
         }
 
     def validate(self):
+        """Validates properties of the LatexStringSvgImageDimensions.
+
+        Raises:
+            ValidationError: attributes of the LatexStringSvgImageDimensions
+                are invalid.
+        """
+
         if not isinstance(self.encoded_height_string, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected encoded_height_string to be a str, received %s' % (
@@ -82,11 +96,15 @@ class LatexStringSvgImageDimensions(python_utils.OBJECT):
 class LatexStringSvgImageData(python_utils.OBJECT):
     """Value object representing all the information related to the SVG file
     for a LaTeX string.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
     """
 
     def __init__(
             self, raw_image, latex_string_svg_image_dimensions):
         """Initializes an LatexStringSvgImageData domain object.
+
         Args:
             raw_image: bool. SVG image content for the LaTeX string.
             latex_string_svg_image_dimensions: LatexStringSvgImageDimensions.
@@ -101,6 +119,7 @@ class LatexStringSvgImageData(python_utils.OBJECT):
     def to_dict(self):
         """Returns a dict representing this LatexStringSvgImageData domain
         object.
+
         Returns:
             dict. A dict, mapping all fields of LatexStringSvgImageData
             instance.
@@ -112,6 +131,12 @@ class LatexStringSvgImageData(python_utils.OBJECT):
         }
 
     def validate(self):
+        """Validates properties of the LatexStringSvgImageData.
+
+        Raises:
+            ValidationError: attributes of the LatexStringSvgImageData
+                are invalid.
+        """
         if not isinstance(self.raw_image, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected raw_image to be a str, received %s' % self.raw_image)
