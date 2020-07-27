@@ -66,7 +66,7 @@ export class GuppyInitializationService {
           initialValue = splitByEquals.join('=');
         } else {
           initialValue = mathInteractionsService.insertMultiplicationSigns(
-            initialValue)
+            initialValue);
         }
         initialValue = initialValue.replace(/abs\(/g, 'absolutevalue(');
         initialValue = initialValue.replace(/sqrt\(/g, 'squareroot(');

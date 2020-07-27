@@ -81,7 +81,7 @@ describe('MathEquationEditor', function() {
   it('should not show warnings if the editor is active', function() {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject);
-      ctrl.warningText = '';
+    ctrl.warningText = '';
     ctrl.isCurrentAnswerValid();
     expect(ctrl.warningText).toBe('');
   });
