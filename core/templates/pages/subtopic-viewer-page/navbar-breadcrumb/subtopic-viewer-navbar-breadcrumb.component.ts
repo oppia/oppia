@@ -44,7 +44,8 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
     private urlService: UrlService
   ) {}
   ngOnInit(): void {
-    this.abbreviatedTopicName = this.urlService.getAbbrevTopicNameFromLearnerUrl();
+    this.abbreviatedTopicName = (
+      this.urlService.getAbbrevTopicNameFromLearnerUrl());
     this.subtopicViewerBackendApiService.fetchSubtopicData(
       this.abbreviatedTopicName,
       this.urlService.getSubtopicIdFromUrl()).then(

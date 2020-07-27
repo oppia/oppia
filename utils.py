@@ -551,6 +551,7 @@ def require_valid_name(name, name_type, allow_empty=False):
                 'Invalid character %s in %s: %s' %
                 (character, name_type, name))
 
+
 def require_valid_url_fragment(name, name_type, allowed_length):
     """Generic URL fragment validation.
 

@@ -80,8 +80,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 TOPIC_VIEWER_URL_TEMPLATE, {
-                  abbreviated_topic_name: (
-                    abbreviatedName.toLowerCase().replace(/ /g, '-')),
+                  abbreviated_topic_name: abbreviatedName,
                   classroom_name: (
                     classroomName.toLowerCase().replace(/ /g, '-'))
                 }

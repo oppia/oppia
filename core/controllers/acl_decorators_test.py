@@ -2140,12 +2140,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
             '<abbreviated_topic_name>/story/<story_id>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
-            webapp2.Route(
-                story_data_url,
-                self.MockDataHandler),
-            webapp2.Route(
-                story_page_url,
-                self.MockPageHandler),
+                webapp2.Route(story_data_url,self.MockDataHandler),
+                webapp2.Route(story_page_url,self.MockPageHandler)
             ],
             debug=feconf.DEBUG,
         ))
@@ -2191,7 +2187,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
+            self.get_html_response(
                 '/mock_story_page/staging/topic/story/%s' % self.story_id,
                 expected_status_int=200)
 
@@ -2270,12 +2266,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             '<abbreviated_topic_name>/revision/<subtopic_id>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
-            webapp2.Route(
-                subtopic_data_url,
-                self.MockDataHandler),
-            webapp2.Route(
-                subtopic_page_url,
-                self.MockPageHandler),
+                webapp2.Route(subtopic_data_url, self.MockDataHandler),
+                webapp2.Route(subtopic_page_url, self.MockPageHandler)
             ],
             debug=feconf.DEBUG,
         ))
@@ -2325,7 +2317,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
+            self.get_html_response(
                 '/mock_subtopic_page/staging/topic/revision/1',
                 expected_status_int=200)
 
@@ -2392,12 +2384,8 @@ class TopicViewerTests(test_utils.GenericTestBase):
             '/mock_topic_page/<classroom_name>/<abbreviated_topic_name>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
-            webapp2.Route(
-                topic_data_url,
-                self.MockDataHandler),
-            webapp2.Route(
-                topic_page_url,
-                self.MockPageHandler),
+                webapp2.Route(topic_data_url, self.MockDataHandler),
+                webapp2.Route(topic_page_url, self.MockPageHandler)
             ],
             debug=feconf.DEBUG,
         ))
@@ -2430,7 +2418,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
     def test_can_access_topic_when_all_url_fragments_are_valid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_html_response(
+            self.get_html_response(
                 '/mock_topic_page/staging/topic',
                 expected_status_int=200)
 

@@ -48,7 +48,7 @@ export class TopicViewerBackendApiService {
   ): void {
     const topicDataUrl = this.urlInterpolation.interpolateUrl(
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
-        abbreviated_topic_name: abbrevTopicName.toLowerCase().replace(/ /g, '-')
+        abbreviated_topic_name: abbrevTopicName
       });
     var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
       new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),

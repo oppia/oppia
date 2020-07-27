@@ -281,7 +281,8 @@ class UtilsTests(test_utils.GenericTestBase):
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. '
             'Received name with spaces.')
-        with self.assertRaisesRegexp(Exception, name_with_spaces_expected_error):
+        with self.assertRaisesRegexp(
+            Exception, name_with_spaces_expected_error):
             utils.require_valid_url_fragment(
                 name_with_spaces, 'name-type', 20)
 

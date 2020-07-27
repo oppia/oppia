@@ -48,18 +48,21 @@ angular.module('oppia').component('practiceSessionPage', {
         var practiceSessionsDataUrl = UrlInterpolationService
           .interpolateUrl(
             PRACTICE_SESSIONS_DATA_URL, {
-              abbreviated_topic_name: UrlService.getAbbrevTopicNameFromLearnerUrl(),
+              abbreviated_topic_name: (
+                UrlService.getAbbrevTopicNameFromLearnerUrl()),
               comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
             });
         var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
           PRACTICE_SESSIONS_URL, {
-            abbreviated_topic_name: UrlService.getAbbrevTopicNameFromLearnerUrl(),
+            abbreviated_topic_name: (
+              UrlService.getAbbrevTopicNameFromLearnerUrl()),
             classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
             comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
           });
         var topicViewerUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_PAGE, {
-            abbreviated_topic_name: UrlService.getAbbrevTopicNameFromLearnerUrl(),
+            abbreviated_topic_name: (
+              UrlService.getAbbrevTopicNameFromLearnerUrl()),
             classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
           });
         $http.get(practiceSessionsDataUrl).then(function(result) {
