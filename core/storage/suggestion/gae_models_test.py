@@ -294,7 +294,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
                 queries)), 1)
 
-    def test_get_translation_suggestions_with_exp_ids(self):
+    def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -302,6 +302,16 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6')
+
+        # Assert that there is one translation suggestion with the given
+        # exploration id found.
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['exp1'])), 1)
+
+    def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
+            self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -312,27 +322,26 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp2', self.target_version_at_submission,
+            'exp3', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_8')
 
+        # Assert that there are two translation suggestions with the given
+        # exploration ids found.
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_with_exp_ids(
-                ['exp'])), 0)
+                ['exp2', 'exp3'])), 2)
+
+    def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
+            self):
+        # Assert that there are no translation suggestions with an invalid
+        # exploration id found.
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_with_exp_ids(
-                ['exp2'])), 2)
-        self.assertEqual(len(
-            suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_with_exp_ids(
-                ['exp1'])), 1)
-        self.assertEqual(len(
-            suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_with_exp_ids(
-                ['exp2', 'exp1'])), 3)
+                ['invalid_exp'])), 0)
 
     def test_get_all_stale_suggestions(self):
         with self.swap(
