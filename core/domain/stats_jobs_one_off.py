@@ -1412,7 +1412,7 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(item, stats_models.PlaythroughModel):
             ca_specs = playthrough_issue_registry.Registry.get_issue_by_type(
                 item.issue_type).customization_arg_specs
-            all_ca_names = set([ ca_spec.name for ca_spec in ca_specs ])
+            all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
 
             yield (
                 'Playthrough Issue',
@@ -1422,7 +1422,7 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
                 ca_specs = (
                     action_registry.Registry.get_action_by_type(
                         action['action_type']).customization_arg_specs)
-                all_ca_names = set([ ca_spec.name for ca_spec in ca_specs ])
+                all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
                 yield (
                     'Playthrough Action',
                     all_ca_names == set(action['action_customization_args']))

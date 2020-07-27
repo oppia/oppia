@@ -1695,6 +1695,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
                 ['EXPECTED', '1 ExplorationStats model is valid']
             ])
 
+
 class StatisticsCustomizationArgsAuditTests(OneOffJobTestBase):
 
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.StatisticsCustomizationArgsAudit
