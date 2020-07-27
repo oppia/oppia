@@ -129,12 +129,12 @@ class EvaluationContext(python_utils.OBJECT):
             object.
         """
         return cls(
-            client_platform=client_context_dict.get('client_platform'),
-            client_type=client_context_dict.get('client_type'),
-            browser_type=client_context_dict.get('browser_type'),
-            app_version=client_context_dict.get('app_version'),
-            user_locale=client_context_dict.get('user_locale'),
-            mode=server_context_dict.get('mode'),
+            client_context_dict.get('client_platform'),
+            client_context_dict.get('client_type'),
+            client_context_dict.get('browser_type'),
+            client_context_dict.get('app_version'),
+            client_context_dict.get('user_locale'),
+            server_context_dict.get('mode'),
         )
 
 
@@ -213,9 +213,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
         elif self._type == 'app_version':
             if context.app_version is not None:
                 matched = self._match_version_expression(
-                    expr=value,
-                    client_version=context.app_version,
-                )
+                    value, context.app_version)
         return matched
 
     def to_dict(self):
@@ -258,10 +256,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
             PlatformParameterFilter. The corresponding PlatformParameterFilter
             domain object.
         """
-        return cls(
-            filter_type=filter_dict['type'],
-            filter_value=filter_dict['value'],
-        )
+        return cls(filter_dict['type'], filter_dict['value'])
 
     @classmethod
     def _match_version_expression(cls, expr, client_version):
@@ -424,10 +419,10 @@ class PlatformParameterRule(python_utils.OBJECT):
                     schema_version))
 
         return cls(
-            filters=[
+            [
                 PlatformParameterFilter.create_from_dict(filter_dict)
                 for filter_dict in rule_dict['filters']],
-            value_when_matched=rule_dict['value_when_matched'],
+            rule_dict['value_when_matched'],
         )
 
 
@@ -484,8 +479,8 @@ class PlatformParameterMetadata(python_utils.OBJECT):
             PlatformParameterMetadata domain object.
         """
         return cls(
-            is_feature=metadata_dict.get('is_feature', False),
-            stage=metadata_dict.get('stage', None),
+            metadata_dict.get('is_feature', False),
+            metadata_dict.get('stage', None),
         )
 
 
@@ -600,17 +595,14 @@ class PlatformParameter(python_utils.OBJECT):
             self._name, strict=False)
         if model_instance is None:
             model_instance = config_models.PlatformParameterModel.create(
-                param_name=self._name,
-                rule_dicts=[rule.to_dict() for rule in self._rules],
-                rule_schema_version=(
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION)
+                self._name,
+                [rule.to_dict() for rule in self._rules],
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
             )
 
         self._rules = [
             PlatformParameterRule.create_from_dict(
-                rule_dict=rule_dict,
-                schema_version=self._rule_schema_version,
-            )
+                rule_dict, self._rule_schema_version)
             for rule_dict in new_rule_dicts]
         model_instance.rules = [rule.to_dict() for rule in self._rules]
 
@@ -726,15 +718,15 @@ class PlatformParameter(python_utils.OBJECT):
             object.
         """
         return cls(
-            name=param_dict['name'],
-            description=param_dict['description'],
-            data_type=param_dict['data_type'],
-            rules=[
+            param_dict['name'],
+            param_dict['description'],
+            param_dict['data_type'],
+            [
                 PlatformParameterRule.create_from_dict(
                     rule_dict, param_dict['rule_schema_version'])
                 for rule_dict in param_dict['rules']],
-            rule_schema_version=param_dict['rule_schema_version'],
-            metadata=PlatformParameterMetadata.create_from_dict(
+            param_dict['rule_schema_version'],
+            PlatformParameterMetadata.create_from_dict(
                 param_dict.get('metadata', {})),
         )
 
@@ -822,12 +814,7 @@ class Registry(python_utils.OBJECT):
             PlatformParameter. The created feature flag.
         """
         feature = cls.create_platform_parameter(
-            name=name,
-            description=description,
-            data_type='bool',
-            is_feature=True,
-            feature_stage=stage,
-        )
+            name, description, 'bool', is_feature=True, feature_stage=stage)
         return feature
 
     @classmethod
@@ -951,6 +938,7 @@ class Registry(python_utils.OBJECT):
         """
         parameter_model = config_models.PlatformParameterModel.get(
             name, strict=False)
+
         if parameter_model:
             parameter_with_init_settings = cls.parameter_registry.get(name)
             return PlatformParameter.create_from_dict({
@@ -986,7 +974,7 @@ class Registry(python_utils.OBJECT):
 # This is a dummy feature flag demostrating the definition of features,
 # it can be safely removed once more realistic features are added here.
 Registry.create_feature_flag(
-    name='Dummy_Feature',
-    description='This is a dummy feature flag',
-    stage='dev',
+    'Dummy_Feature',
+    'This is a dummy feature flag',
+    'dev',
 )
