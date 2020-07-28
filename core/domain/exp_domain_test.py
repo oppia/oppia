@@ -24,6 +24,7 @@ import os
 import re
 
 from constants import constants
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -890,12 +891,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         """Test that titles, categories and objectives are validated only in
         'strict' mode.
         """
+        caching_services.flush_memory_cache()
         self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         exploration.validate()
-
         with self.assertRaisesRegexp(
             utils.ValidationError, 'title must be specified'
             ):

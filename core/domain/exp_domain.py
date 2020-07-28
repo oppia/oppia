@@ -684,13 +684,10 @@ class Exploration(python_utils.OBJECT):
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
 
-        print('version' in exploration_dict)
-
         exploration.version = (
             exploration_dict['version'] if 'version' in exploration_dict
             else exploration_version)
-        print("@@@@@")
-        print(exploration.version)
+
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
@@ -950,7 +947,6 @@ class Exploration(python_utils.OBJECT):
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
                 warnings_list.append(python_utils.UNICODE(e))
-
             if not self.title:
                 warnings_list.append(
                     'A title must be specified (in the \'Settings\' tab).')
