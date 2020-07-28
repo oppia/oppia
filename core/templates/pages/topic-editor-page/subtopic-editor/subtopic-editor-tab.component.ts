@@ -42,6 +42,7 @@ angular.module('oppia').component('subtopicEditorTab', {
     '$scope', 'EntityCreationService', 'QuestionBackendApiService',
     'SubtopicValidationService', 'TopicEditorStateService',
     'TopicEditorRoutingService', 'TopicUpdateService',
+    'UndoRedoService',
     'UrlInterpolationService', 'WindowDimensionsService',
     'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
     'EVENT_TOPIC_REINITIALIZED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
@@ -49,6 +50,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         $scope, EntityCreationService, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
+        UndoRedoService,
         UrlInterpolationService, WindowDimensionsService,
         EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
         EVENT_TOPIC_REINITIALIZED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
@@ -146,6 +148,7 @@ angular.module('oppia').component('subtopicEditorTab', {
       };
 
       ctrl.updateHtmlData = function() {
+        console.log('Called');
         if (ctrl.htmlData !==
                 ctrl.subtopicPage.getPageContents().getHtml()) {
           var subtitledHtml = angular.copy(
@@ -158,8 +161,18 @@ angular.module('oppia').component('subtopicEditorTab', {
         }
       };
 
+      ctrl.cancelHtmlDataChange = function() {
+        ctrl.htmlData = ctrl.htmlDataBeforeUpdate;
+        ctrl.updateHtmlData();
+        ctrl.schemaEditorIsShown = false;
+      };
       ctrl.showSchemaEditor = function() {
         ctrl.schemaEditorIsShown = true;
+        ctrl.htmlDataBeforeUpdate = angular.copy(ctrl.htmlData);
+      };
+
+      ctrl.undoChange = function() {
+        UndoRedoService.undoChange();
       };
 
       ctrl.onRearrangeMoveSkillFinish = function(toIndex) {

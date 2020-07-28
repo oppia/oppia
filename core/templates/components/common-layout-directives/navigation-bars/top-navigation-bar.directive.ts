@@ -33,7 +33,9 @@ angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        headerText: '='
+      },
       bindToController: {
         backButtonShown: '<'
       },
@@ -257,6 +259,7 @@ angular.module('oppia').directive('topNavigationBar', [
               ctrl.isSuperAdmin = userInfo.isSuperAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               ctrl.username = userInfo.getUsername();
+              console.log($scope.headerText());
               if (ctrl.username) {
                 ctrl.profilePageUrl = UrlInterpolationService.interpolateUrl(
                   '/profile/<username>', {

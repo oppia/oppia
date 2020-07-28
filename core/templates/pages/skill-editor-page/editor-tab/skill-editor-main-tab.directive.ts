@@ -63,6 +63,10 @@ angular.module('oppia').directive('skillEditorMainTab', [
             }
             $scope.assignedSkillTopicData = (
               SkillEditorStateService.getAssignedSkillTopicData());
+
+            if ($scope.assignedSkillTopicData) {
+              $scope.topicName = Object.keys($scope.assignedSkillTopicData)[0];
+            }
             return $scope.assignedSkillTopicData;
           };
 

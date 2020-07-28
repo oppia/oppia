@@ -16,6 +16,10 @@
  * @fileoverview Directive for the Base Transclusion Component.
  */
 
+
+
+require('services/page-title.service.ts');
+
 require('base-components/loading-message.component.ts');
 require('base-components/warnings-and-alerts.directive.ts');
 require('pages/OppiaFooterDirective.ts');
@@ -28,7 +32,9 @@ angular.module('oppia').directive('baseContent', [
   function() {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        getHeaderText: '&getHeaderText'
+      },
       bindToController: {
         backButtonShown: '<'
       },
@@ -42,11 +48,11 @@ angular.module('oppia').directive('baseContent', [
       },
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'BottomNavbarStatusService', 'SidebarStatusService', 'LoaderService',
+      controller: ['$rootScope', '$scope', '$window', 'BackgroundMaskService',
+        'BottomNavbarStatusService', 'PageTitleService', 'SidebarStatusService', 'LoaderService',
         'UrlService',
-        function($rootScope, $window, BackgroundMaskService,
-            BottomNavbarStatusService, SidebarStatusService, LoaderService,
+        function($rootScope, $scope, $window, BackgroundMaskService,
+            BottomNavbarStatusService, PageTitleService, SidebarStatusService, LoaderService,
             UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
@@ -68,6 +74,9 @@ angular.module('oppia').directive('baseContent', [
           };
           ctrl.isBackgroundMaskActive = () => (
             BackgroundMaskService.isMaskActive());
+          $scope.getHeaderText = () => {
+            return PageTitleService.getPageTitleForMobileView();
+          };
           ctrl.skipToMainContent = function() {
             var mainContentElement = document.getElementById(
               'oppia-main-content');

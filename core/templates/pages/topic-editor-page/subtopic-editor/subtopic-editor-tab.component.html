@@ -49,8 +49,8 @@
                                    class="protractor-test-edit-subtopic-page-contents"
                                    local-value="$ctrl.htmlData">
               </schema-based-editor>
-              <button class="btn btn-success btn-sm protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()"> Save
-              </button>
+              <button class="btn btn-danger" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
+              <button class="btn btn-success protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
             </div>
             <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="subtopic-html-content protractor-test-edit-html-content">
               <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">
@@ -61,9 +61,9 @@
             <p>
               <strong>Thumbnail Image*</strong>
             </p>
-            <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
+            <thumbnail-uploader filename="$ctrl.subtopic.getThumbnailFilename()"
                                 update-filename="$ctrl.updateSubtopicThumbnailFilename"
-                                bg-color="$ctrl.editableThumbnailBgColor"
+                                bg-color="$ctrl.subtopic.getThumbnailBgColor()"
                                 update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
                                 allowed-bg-colors="$ctrl.allowedBgColors"
                                 aspect-ratio="'4:3'"
@@ -87,6 +87,7 @@
           </div>
           <div ng-if="$ctrl.subtopicPreviewCardIsShown">
             <preview-thumbnail name="$ctrl.editableTitle"
+                               aspect-ratio="'4:3'"
                                filename = "$ctrl.editableThumbnailFilename"
                                thumbnail-bg-color="$ctrl.editableThumbnailBgColor"
                                bg-color="'#2F6687'">

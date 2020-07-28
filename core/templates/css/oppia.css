@@ -4293,6 +4293,10 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-about-otter-speech-bubble {
     padding: 10px;
   }
+  .oppia-mobile-collapsible-card {
+    margin-top: 40px;
+    padding: 15px;
+  }
 }
 
 @media only screen and (max-width: 500px) {

@@ -17,7 +17,7 @@
     </picture>
   </a>
 </div>
-
+<span class="nav-mobile-header-text"><[headerText()]></span>
 <div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown">
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <li>
@@ -320,6 +320,9 @@
     position: absolute;
     right: 4px;
   }
+  top-navigation-bar .nav-mobile-header-text {
+    display: none;
+  }
   top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.uib-dropdown-menu {
     display: block;
   }
@@ -380,4 +383,14 @@
   .oppia-navbar-profile > li:hover {
     background-color: #fff;
    }
+  @media screen and (max-width: 768px) {
+    top-navigation-bar .nav-mobile-header-text {
+      color: #FFF;
+      display: inline-block;
+      font-size: 22px;
+      font-weight: bold;
+      margin-left: 5px;
+      margin-top: 10px;
+    }
+  }
 </style>

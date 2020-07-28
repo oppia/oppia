@@ -132,6 +132,7 @@ angular.module('oppia').directive('historyTab', [
 
               $http.get(ctrl.explorationAllSnapshotsUrl).then(
                 function(response) {
+                  console.log(response);
                   explorationSnapshots = response.data.snapshots;
                   VersionTreeService.init(explorationSnapshots);
 

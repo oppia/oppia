@@ -83,9 +83,15 @@ angular.module('oppia').directive('topicEditorPage', [
           ctrl.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
           };
+          ctrl.isInTopicEditorTabs = function() {
+            var activeTab = TopicEditorRoutingService.getActiveTabName();
+            return !activeTab.startsWith('subtopic');
+          };
           ctrl.openTopicViewer = function() {
             var activeTab = TopicEditorRoutingService.getActiveTabName();
-            if (activeTab !== 'subtopic_editor') {
+            var lastSubtopicIdVisited = (
+              TopicEditorRoutingService.getLastSubtopicIdVisited());
+            if (activeTab !== 'subtopic_editor' && !lastSubtopicIdVisited) {
               if (ctrl.getChangeListLength() > 0) {
                 AlertsService.addInfoMessage(
                   'Please save all pending changes to preview the topic ' +
@@ -93,12 +99,11 @@ angular.module('oppia').directive('topicEditorPage', [
                 return;
               }
               var topicName = ctrl.topic.getName();
-              $window.open(
-                UrlInterpolationService.interpolateUrl(
-                  TOPIC_VIEWER_URL_TEMPLATE, {
-                    topic_name: topicName
-                  }
-                ), 'blank');
+              var newTab = $window.open();
+              newTab.location.href = UrlInterpolationService.interpolateUrl(
+                TOPIC_VIEWER_URL_TEMPLATE, {
+                  topic_name: topicName
+                });
             } else {
               var subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
               TopicEditorRoutingService.navigateToSubtopicPreviewTab(
@@ -167,6 +172,7 @@ angular.module('oppia').directive('topicEditorPage', [
 
           ctrl.$onInit = function() {
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+            PageTitleService.setPageTitleForMobileView('Topic Editor');
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
