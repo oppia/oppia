@@ -79,9 +79,9 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
 };
 
 /**
- * @param {Object} element - Element is expected to be present on the DOM of a page. 
- *                           This does not necessarily mean that the element is visible.
- * @param {string} errorMessage - Error message when element is invisible.
+ * @param {Object} element - Element is expected to be present on the DOM but
+ *                           This does not mean that the element is visible.
+ * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
   await browser.wait(

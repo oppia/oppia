@@ -78,7 +78,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   var checkActionShortcuts = async function(key, elementToFocus) {
     await waitFor.presenceOf(elementToFocus, 'Element took too long to load');
-    
+
     if (await elementToFocus.getAttribute('id') === '') {
       // Should move the focus to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
@@ -171,10 +171,10 @@ describe('screenreader and keyboard user accessibility features', function() {
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');
       await libraryPage.playExploration('A new exploration');
-      // Do not change order of actions below. The exploration
-      // needs to be navigated in a specific order
+      // Do not change order of actions below.
+      // The exploration needs to be navigated in a specific order.
 
-      // Should press 'j' key to navigate to the next card
+      // Should press 'j' key to navigate to the next card.
       await waitFor.elementToBeClickable(continueButton);
       await checkActionShortcuts('j', continueButton);
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
