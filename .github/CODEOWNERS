@@ -359,22 +359,22 @@
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
-/core/templates/components/entity-creation-services/skill-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/skill-creation.service.ts @Showtim3
 /core/templates/components/question-difficulty-selector/ @aks681
-/core/templates/components/review-material-editor/ @kevintab95
-/core/templates/components/rubrics-editor/ @kevintab95
-/core/templates/components/skill-selector/ @kevintab95
-/core/templates/domain/skill/ @kevintab95
-/core/templates/pages/skill-editor-page/ @kevintab95
+/core/templates/components/review-material-editor/ @Showtim3
+/core/templates/components/rubrics-editor/ @Showtim3
+/core/templates/components/skill-selector/ @Showtim3
+/core/templates/domain/skill/ @Showtim3
+/core/templates/pages/skill-editor-page/ @Showtim3
 
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
 /core/storage/story/ @aks681
-/core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
-/core/templates/domain/story/ @kevintab95
+/core/templates/components/entity-creation-services/story-creation.service.ts @Showtim3
+/core/templates/domain/story/ @Showtim3
 /core/templates/domain/story_viewer/ @kevintab95
-/core/templates/pages/story-editor-page/ @kevintab95
+/core/templates/pages/story-editor-page/ @Showtim3
 /core/templates/pages/story-viewer-page/ @kevintab95
 
 # Topic project.
@@ -385,21 +385,21 @@
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
-/core/templates/components/entity-creation-services/topic-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/topic-creation.service.ts @Showtim3
 /core/templates/domain/classroom/ @kevintab95
 /core/templates/domain/subtopic_viewer/ @kevintab95
-/core/templates/domain/topic/ @kevintab95
+/core/templates/domain/topic/ @Showtim3
 /core/templates/domain/topic_viewer @kevintab95
 /core/templates/pages/classroom-page/ @kevintab95
 /core/templates/pages/subtopic-viewer-page/ @kevintab95
-/core/templates/pages/topic-editor-page/ @kevintab95
+/core/templates/pages/topic-editor-page/ @Showtim3
 /core/templates/pages/topic-viewer-page/ @kevintab95
 
 # Topics and skills dashboard project.
 /core/controllers/subtopic_viewer*.py @aks681
 /core/controllers/topics_and_skills_dashboard*.py @aks681
-/core/templates/domain/topics_and_skills_dashboard/ @kevintab95
-/core/templates/pages/topics-and-skills-dashboard-page/ @kevintab95
+/core/templates/domain/topics_and_skills_dashboard/ @Showtim3
+/core/templates/pages/topics-and-skills-dashboard-page/ @Showtim3
 
 
 # Infrastructure.
