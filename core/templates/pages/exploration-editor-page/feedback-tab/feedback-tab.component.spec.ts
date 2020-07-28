@@ -24,6 +24,7 @@ import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -46,6 +47,12 @@ describe('Feedback Tab Component', function() {
     alertsService = TestBed.get(AlertsService);
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
     suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
+  });
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
