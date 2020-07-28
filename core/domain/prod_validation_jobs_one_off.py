@@ -6330,6 +6330,17 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
         return [cls._validate_user_settings_with_same_id_not_exist]
 
 
+class UserAuthModelValidator(BaseUserModelValidator):
+    """Class for validating UserAuthModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id])
+            ]
+
+
 class PlatformParameterModelValidator(BaseModelValidator):
     """Class for validating PlatformParameterModel."""
 
@@ -6551,7 +6562,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator),
     stats_models.PlaythroughModel: PlaythroughModelValidator,
-    user_models.PseudonymizedUserModel: PseudonymizedUserModelValidator
+    user_models.PseudonymizedUserModel: PseudonymizedUserModelValidator,
+    user_models.UserAuthModel: UserAuthModelValidator
 }
 
 
@@ -7424,6 +7436,14 @@ class PseudonymizedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PseudonymizedUserModel]
+
+
+class UserAuthModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserAuthModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserAuthModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
