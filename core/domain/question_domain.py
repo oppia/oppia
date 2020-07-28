@@ -421,6 +421,31 @@ class Question(python_utils.OBJECT):
                     answer_group for answer_group in new_answer_groups if (
                         len(answer_group['rule_specs']) != 0)]
 
+                # Removing feedback keys, from voiceovers_mapping and
+                # translations_mapping, that correspond to the rules that
+                # got deleted.
+                old_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            question_state_dict[
+                                'interaction']['answer_groups'])]
+                new_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            new_answer_groups)]
+                content_ids_to_delete = set(
+                    old_answer_groups_feedback_keys) - set(
+                        new_answer_groups_feedback_keys)
+                for content_id in content_ids_to_delete:
+                    if content_id in question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping']:
+                        del question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping'][content_id]
+                    if content_id in question_state_dict[
+                            'written_translations']['translations_mapping']:
+                        del question_state_dict['written_translations'][
+                            'translations_mapping'][content_id]
+
                 question_state_dict['interaction']['id'] = new_interaction_id
                 question_state_dict['interaction']['answer_groups'] = (
                     new_answer_groups)

@@ -1442,3 +1442,127 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
+
+        answer_groups_list = [{
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }, {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'feedback_3': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'feedback_3': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': answer_groups_list,
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'feedback_3',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': None,
+                'id': 'MathExpressionInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=34)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
+
+        with current_schema_version_swap:
+            question = question_fetchers.get_question_from_model(question_model)
+
+        self.assertEqual(question.question_state_data_schema_version, 35)
+
+        answer_groups = question.question_state_data.interaction.answer_groups
+        self.assertEqual(
+            question.question_state_data.interaction.id,
+            'AlgebraicExpressionInput')
+        self.assertEqual(len(answer_groups), 1)
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+        state_data = question.question_state_data
+        self.assertEqual(sorted(
+            state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
+                'content_1', 'feedback_1', 'feedback_3'])
+        self.assertEqual(sorted(
+            state_data.written_translations.translations_mapping.keys()), [
+                'content_1', 'feedback_1', 'feedback_3'])
