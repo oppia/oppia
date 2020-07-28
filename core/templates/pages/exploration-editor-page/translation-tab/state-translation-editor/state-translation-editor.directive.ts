@@ -19,6 +19,7 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateTranslationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -40,6 +41,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
             TranslationTabActiveContentIdService,
             WrittenTranslationObjectFactory) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var showMarkAudioAsNeedingUpdateModalIfRequired = function(
               contentId, languageCode) {
             var stateName = StateEditorService.getActiveStateName();
@@ -158,8 +160,9 @@ angular.module('oppia').directive('stateTranslationEditor', [
             $scope.HTML_SCHEMA = {
               type: 'html'
             };
-            TranslationTabActiveContentIdService.onActiveContentIdChange
-              .subscribe(() => initEditor());
+            ctrl.directiveSubscriptions.add(
+              TranslationTabActiveContentIdService.onActiveContentIdChange
+                .subscribe(() => initEditor()));
             $scope.$on('activeLanguageChanged', function() {
               initEditor();
             });
@@ -169,6 +172,10 @@ angular.module('oppia').directive('stateTranslationEditor', [
                 saveTranslation();
               }
             });
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

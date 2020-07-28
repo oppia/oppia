@@ -59,6 +59,7 @@ require('services/editability.service.ts');
 require('services/id-generation.service.ts');
 require('services/user.service.ts');
 
+import { Subscription } from 'rxjs';
 import WaveSurfer from 'wavesurfer.js';
 
 require(
@@ -144,6 +145,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             TranslationTabActiveContentIdService, VoiceoverRecordingService,
             RECORDING_TIME_LIMIT) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var saveRecordedVoiceoversChanges = function() {
             StateRecordedVoiceoversService.saveDisplayedValue();
             var stateName = StateEditorService.getActiveStateName();
@@ -553,9 +555,9 @@ angular.module('oppia').directive('audioTranslationBar', [
               AudioPlayerService.clear();
               $scope.audioBlob = null;
             });
-
-            TranslationTabActiveContentIdService.onActiveContentIdChange
-              .subscribe(() => $scope.initAudioBar());
+            ctrl.directiveSubscriptions.add(
+              TranslationTabActiveContentIdService.onActiveContentIdChange
+                .subscribe(() => $scope.initAudioBar()));
             $scope.$on('activeLanguageChanged', function() {
               $scope.initAudioBar();
             });
@@ -572,6 +574,10 @@ angular.module('oppia').directive('audioTranslationBar', [
               }
             };
             $scope.initAudioBar();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }]
     };
