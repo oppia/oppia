@@ -62,7 +62,7 @@ angular.module('oppia').directive('previewTab', [
         'preview-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
+        '$q', '$scope', '$rootScope', '$timeout', '$uibModal', 'ContextService',
         'EditableExplorationBackendApiService',
         'ExplorationDataService', 'ExplorationEngineService',
         'ExplorationFeaturesService', 'ExplorationInitStateNameService',
@@ -71,7 +71,7 @@ angular.module('oppia').directive('previewTab', [
         'PlayerCorrectnessFeedbackEnabledService', 'StateEditorService',
         'UrlInterpolationService',
         function(
-            $q, $scope, $timeout, $uibModal, ContextService,
+            $q, $scope, $rootScope, $timeout, $uibModal, ContextService,
             EditableExplorationBackendApiService,
             ExplorationDataService, ExplorationEngineService,
             ExplorationFeaturesService, ExplorationInitStateNameService,
@@ -170,7 +170,7 @@ angular.module('oppia').directive('previewTab', [
               ctrl.allParams = LearnerParamsService.getAllParams();
             });
             ctrl.isExplorationPopulated = false;
-            ExplorationDataService.getData().then(function() {
+            ExplorationDataService.getData().then(() => {
               var initStateNameForPreview = StateEditorService
                 .getActiveStateName();
               var manualParamChanges = [];
@@ -193,6 +193,7 @@ angular.module('oppia').directive('previewTab', [
                   ctrl.loadPreviewState(
                     initStateNameForPreview, manualParamChanges);
                 });
+              $rootScope.$apply();
             });
             ctrl.allParams = {};
           };

@@ -46,12 +46,12 @@ angular.module('oppia').directive('historyTab', [
         'history-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$scope', 'LoaderService',
+        '$http', '$log', '$scope', '$rootScope', 'LoaderService',
         '$uibModal', '$window', 'CompareVersionsService',
         'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
         'UrlInterpolationService', 'VersionTreeService',
         function(
-            $http, $log, $scope, LoaderService,
+            $http, $log, $scope, $rootScope, LoaderService,
             $uibModal, $window, CompareVersionsService,
             DateTimeFormatService, EditabilityService, ExplorationDataService,
             UrlInterpolationService, VersionTreeService) {
@@ -106,7 +106,7 @@ angular.module('oppia').directive('historyTab', [
           // Refreshes the displayed version history log.
           ctrl.refreshVersionHistory = function() {
             LoaderService.showLoadingScreen('Loading');
-            ExplorationDataService.getData().then(function(data) {
+            ExplorationDataService.getData().then((data) => {
               var currentVersion = data.version;
               ctrl.currentVersion = currentVersion;
               // The ctrl.compareVersionMetadata is an object with keys
@@ -160,6 +160,7 @@ angular.module('oppia').directive('historyTab', [
                   LoaderService.hideLoadingScreen();
                   ctrl.computeVersionsToDisplay();
                 });
+              $rootScope.$apply();
             });
           };
 

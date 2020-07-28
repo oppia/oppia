@@ -144,7 +144,7 @@ angular.module('oppia').directive('settingsTab', [
             // /settings) results in a console error.
 
             ctrl.hasPageLoaded = false;
-            ExplorationDataService.getData().then(function() {
+            ExplorationDataService.getData().then(() => {
               if (ExplorationStatesService.isInitialized()) {
                 var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
                   function(categoryItem) {
@@ -166,6 +166,7 @@ angular.module('oppia').directive('settingsTab', [
                 ctrl.stateNames = ExplorationStatesService.getStateNames();
               }
               ctrl.hasPageLoaded = true;
+              $rootScope.$apply();
             });
           };
 

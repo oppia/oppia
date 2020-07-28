@@ -39,7 +39,7 @@ require('services/services.constants.ajs.ts');
 export class ExplorationDataService {
   // The pathname (without the hash) should be: .../create/{exploration_id}
   private explorationId: string;
-  private draftChangeListId: string[];
+  private draftChangeListId: number;
   private pathname: string = this.urlService.getPathname();
   private pathnameArray: string[];
   private resolvedAnswersUrlPrefix: string;
@@ -91,14 +91,14 @@ export class ExplorationDataService {
   autosaveChangeList(
       changeList,
       successCallback,
-      errorCallback = function() {}): void {
+      errorCallback = () => {}): void {
     // First save locally to be retrieved later if save is unsuccessful.
     this.localStorageService.saveExplorationDraft(
       this.explorationId, changeList, this.draftChangeListId);
     this.http.put(this.explorationDraftAutosaveUrl, {
       change_list: changeList,
       version: this.data.version
-    }).toPromise().then(function(response) {
+    }).toPromise().then((response) => {
       this.draftChangeListId = response.body.draft_change_list_id;
       // We can safely remove the locally saved draft copy if it was saved
       // to the backend.
@@ -106,7 +106,7 @@ export class ExplorationDataService {
       if (successCallback) {
         successCallback(response);
       }
-    }, function() {
+    }, () => {
       if (errorCallback) {
         errorCallback();
       }
@@ -115,12 +115,12 @@ export class ExplorationDataService {
 
   discardDraft(successCallback, errorCallback): void {
     this.http.post(this.explorationDraftAutosaveUrl, {}).toPromise().then(
-      function() {
+      () => {
         this.localStorageService.removeExplorationDraft(this.explorationId);
         if (successCallback) {
           successCallback();
         }
-      }, function() {
+      }, () => {
         if (errorCallback) {
           errorCallback();
         }
@@ -142,7 +142,7 @@ export class ExplorationDataService {
       // (which is cached here) will be reused.
       return (
         this.editableExplorationBackendApiService.fetchApplyDraftExploration(
-          this.explorationId).then(function(response) {
+          this.explorationId).then((response) => {
           this.loggerService.info('Retrieved exploration data.');
           this.loggerService.info(response);
           this.draftChangeListId = response.draft_change_list_id;
@@ -152,7 +152,7 @@ export class ExplorationDataService {
           if (draft) {
             if (draft.isValid(this.draftChangeListId)) {
               var changeList = draft.getChanges();
-              this.autosaveChangeList(changeList, function() {
+              this.autosaveChangeList(changeList, () => {
                 // A reload is needed so that the changelist just saved is
                 // loaded as opposed to the exploration returned by this
                 // response.
@@ -165,7 +165,7 @@ export class ExplorationDataService {
             }
           }
           return response;
-        })['catch'](function(error) {
+        })['catch']((error) => {
           errorCallback(error);
         })
       );
@@ -176,7 +176,7 @@ export class ExplorationDataService {
   // exploration.
   getLastSavedData() {
     return this.readOnlyExplorationBackendApiService.loadLatestExploration(
-      this.explorationId).then(function(response) {
+      this.explorationId).then((response) => {
       this.loggerService.info('Retrieved saved exploration data.');
       this.loggerService.info(response);
 
@@ -207,11 +207,11 @@ export class ExplorationDataService {
       changeList,
       commitMessage,
       successCallback,
-      errorCallback): Promise<Object> {
+      errorCallback): void {
     this.editableExplorationBackendApiService.updateExploration(
       this.explorationId, this.data ? this.data.version : null,
       commitMessage, changeList).then(
-      function(response) {
+      (response) => {
         this.alertsService.clearWarnings();
         this.explorationData.data = response;
         if (successCallback) {
@@ -219,7 +219,7 @@ export class ExplorationDataService {
             response.is_version_of_draft_valid,
             response.draft_changes);
         }
-      }, function() {
+      }, () => {
         if (errorCallback) {
           errorCallback();
         }

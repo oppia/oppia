@@ -1527,6 +1527,16 @@ export class UpgradedServices {
         upgradedServices['InteractionSpecsService'],
         upgradedServices['PredictionAlgorithmRegistryService'],
         upgradedServices['StateClassifierMappingService']);
+    upgradedServices['ExplorationDataService'] =
+      new ExplorationDataService(
+        upgradedServices['AlertsService'],
+        upgradedServices['EditableExplorationBackendApiService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['LoggerService'],
+        upgradedServices['LocalStorageService'],
+        upgradedServices['ReadOnlyExplorationBackendApiService'],
+        upgradedServices['UrlService'],
+        upgradedServices['WindowRef']);
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
       upgradedServices['HintObjectFactory'],

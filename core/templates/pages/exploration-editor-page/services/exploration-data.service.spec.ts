@@ -18,6 +18,9 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { ExplorationDataService } from
+  'pages/exploration-editor-page/services/exploration-data.service';
+import { TestBed } from '@angular/core/testing';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -26,7 +29,7 @@ require('services/local-storage.service');
 require('services/alerts.service');
 require('services/contextual/logger.service');
 
-describe('Exploration data service', function() {
+describe('Exploration data service', () => {
   var eds = null;
   var lss = null;
   var ls = null;
@@ -372,7 +375,7 @@ describe('Exploration data service', function() {
     });
 });
 
-describe('Exploration data service', function() {
+describe('Exploration data service', () => {
   var eds = null;
   var ls = null;
   var logErrorSpy;

@@ -344,7 +344,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           return;
         }
 
-        ExplorationDataService.getLastSavedData().then(function(data) {
+        ExplorationDataService.getLastSavedData().then((data) => {
           var oldStates = StatesObjectFactory.createFromBackendDict(
             data.states).getStateObjects();
           var newStates = ExplorationStatesService.getStates()
@@ -421,6 +421,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             modalIsOpen = false;
             whenModalClosed.resolve();
           });
+          $rootScope.$apply();
         });
         return whenModalClosed.promise;
       }
