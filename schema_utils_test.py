@@ -423,7 +423,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'id': 'is_at_least',
                     'min_value': 'value_of_wrong_type',
                 }]
-            }, 'could not convert string to float: value_of_wrong_type'),
+            }, 'Could not convert unicode to float: value_of_wrong_type'),
             ({
                 'type': 'unicode',
                 'ui_config': {
@@ -649,9 +649,21 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [(1.2, 1.2), (3, 3.0), (-1, -1.0), ('1', 1.0)]
         invalid_values_with_error_messages = [
-            ([13], r'float\(\) argument must be a string or a number'),
-            ('abc', 'could not convert string to float: abc'),
-            (None, r'float\(\) argument must be a string or a number')]
+            ([13], r'Could not convert list to float: \[13\]'),
+            ('abc', 'Could not convert unicode to float: abc'),
+            (None, 'Could not convert NoneType to float: None')]
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
+    def test_int_schema(self):
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_INT,
+        }
+        mappings = [(1.2, 1), (3.7, 3), (-1, -1), ('1', 1)]
+        invalid_values_with_error_messages = [
+            ([13], r'Could not convert list to int: \[13\]'),
+            ('abc', 'Could not convert unicode to int: abc'),
+            (None, 'Could not convert NoneType to int: None')]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 

@@ -104,12 +104,20 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             normalized_obj[key] = normalize_against_schema(
                 obj[key], prop[SCHEMA_KEY_SCHEMA])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
-        obj = float(obj)
+        try:
+            obj = float(obj)
+        except Exception:
+            raise Exception('Could not convert %s to float: %s' % (
+                type(obj).__name__, obj))
         assert isinstance(obj, numbers.Real), (
             'Expected float, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
-        obj = int(obj)
+        try:
+            obj = int(obj)
+        except Exception:
+            raise Exception('Could not convert %s to int: %s' % (
+                type(obj).__name__, obj))
         assert isinstance(obj, numbers.Integral), (
             'Expected int, received %s' % obj)
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
