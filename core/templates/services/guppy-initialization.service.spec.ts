@@ -20,6 +20,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuppyInitializationService } from
   'services/guppy-initialization.service';
+import { MathInteractionsService } from
+  'services/math-interactions.service';
 
 declare global {
   interface Window {
@@ -30,33 +32,42 @@ declare global {
 class MockGuppy {
   constructor(id: string, config: Object) {}
 
+  engine = {
+    end: () => {}
+  };
+
+  render(_): void {}
+  'import_text'(): void {}
   asciimath(): string {
     return 'Dummy value';
   }
   configure(name: string, val: Object): void {}
   static event(name: string, handler: Function): void {
-    handler();
+    handler({focused: true});
   }
   static configure(name: string, val: Object): void {}
   static 'remove_global_symbol'(symbol: string): void {}
+  static 'add_global_symbol'(name: string, symbol: Object): void {}
 }
 
 describe('GuppyInitializationService', () => {
   let guppyInitializationService: GuppyInitializationService = null;
+  let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
     guppyInitializationService = TestBed.get(GuppyInitializationService);
+    mathInteractionsService = TestBed.get(MathInteractionsService);
     window.Guppy = MockGuppy;
   });
 
   it('should assign a random id to the guppy divs', function() {
     let mockDocument = document.createElement('div');
-    mockDocument.classList.add('guppy-div', 'guppy_active');
+    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
     angular.element(document).find('body').append(mockDocument.outerHTML);
 
-    guppyInitializationService.init('guppy-div');
+    guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x=y');
 
-    let guppyDivs = document.querySelectorAll('.guppy-div');
+    let guppyDivs = document.querySelectorAll('.guppy-div-creator');
     for (let i = 0; i < guppyDivs.length; i++) {
       expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
     }
@@ -64,10 +75,10 @@ describe('GuppyInitializationService', () => {
 
   it('should find active guppy div', function() {
     let mockDocument = document.createElement('div');
-    mockDocument.classList.add('guppy-div', 'guppy_active');
+    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
     angular.element(document).find('body').append(mockDocument.outerHTML);
 
-    guppyInitializationService.init('guppy-div');
+    guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x');
 
     expect(guppyInitializationService.findActiveGuppyObject()).not.toBe(
       undefined);

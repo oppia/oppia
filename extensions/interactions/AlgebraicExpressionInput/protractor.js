@@ -32,7 +32,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
   expect(
     await objects.MathEditor(elem.element(by.tagName(
       'oppia-interactive-algebraic-expression-input'))).getValue()
-  ).toBe('\\color{grey}{\\text{\\small{Type a formula here.}}}');
+  ).toBe('\\color{grey}{\\text{\\small{Type an expression here.}}}');
 };
 
 var submitAnswer = async function(elem, answer) {

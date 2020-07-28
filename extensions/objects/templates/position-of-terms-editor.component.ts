@@ -25,36 +25,26 @@ angular.module('oppia').component('positionOfTermsEditor', {
     value: '='
   },
   template: require('./position-of-terms-editor.component.html'),
-  controller: ['$scope', function($scope) {
-    const ctrl = this;
+  controller: ['$scope', 'POSITION_OF_TERMS_MAPPING',
+    function($scope, POSITION_OF_TERMS_MAPPING) {
+      const ctrl = this;
 
-    ctrl.onChangePosition = function() {
-      ctrl.value = ctrl.localValue.name;
-    };
+      ctrl.onChangePosition = function() {
+        ctrl.value = ctrl.localValue.name;
+      };
 
-    ctrl.$onInit = function() {
-      ctrl.alwaysEditable = true;
+      ctrl.$onInit = function() {
+        ctrl.alwaysEditable = true;
 
-      ctrl.positionOfTerms = [{
-        name: 'lhs',
-        humanReadableName: 'on LHS'
-      }, {
-        name: 'rhs',
-        humanReadableName: 'on RHS'
-      }, {
-        name: 'both',
-        humanReadableName: 'on both sides'
-      }, {
-        name: 'irrelevant',
-        humanReadableName: 'with reordering allowed around ='
-      }];
+        ctrl.positionOfTerms = POSITION_OF_TERMS_MAPPING;
 
-      ctrl.localValue = ctrl.positionOfTerms[2];
-      for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
-        if (ctrl.positionOfTerms[i].name === ctrl.value) {
-          ctrl.localValue = ctrl.positionOfTerms[i];
+        ctrl.localValue = ctrl.positionOfTerms[2];
+        for (var i = 0; i < ctrl.positionOfTerms.length; i++) {
+          if (ctrl.positionOfTerms[i].name === ctrl.value) {
+            ctrl.localValue = ctrl.positionOfTerms[i];
+          }
         }
-      }
-    };
-  }]
+      };
+    }
+  ]
 });

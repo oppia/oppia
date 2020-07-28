@@ -36,19 +36,21 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
     '$scope', 'NumericExpressionInputRulesService',
     'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService',
+    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
     function(
         $scope, NumericExpressionInputRulesService,
         CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService) {
+        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
       ctrl.warningText = '';
 
       ctrl.isCurrentAnswerValid = function() {
-        if (ctrl.hasBeenTouched) {
+        let activeGuppyObject = (
+          GuppyInitializationService.findActiveGuppyObject());
+        if (ctrl.hasBeenTouched && activeGuppyObject === undefined) {
           // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
           // is not compatible with nerdamer or with the backend validations.
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
@@ -82,7 +84,9 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        GuppyInitializationService.init('guppy-div-learner');
+        GuppyInitializationService.init(
+          'guppy-div-learner',
+          MATH_INTERACTION_PLACEHOLDERS.NumericExpressionInput);
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&
           DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
