@@ -5129,3 +5129,125 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             ' failed validation'):
             exp_services.update_exploration_with_math_svgs(
                 'exp_id1', image_data)
+
+    def test_get_all_latex_strings_from_explorations(self):
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '-,-,-,-'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id2',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['x^2', 'x^3'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id3',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['x^2', '(x-1)'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['State1', 'State2'])
+        state1 = exploration1.states['State1']
+        state2 = exploration1.states['State2']
+        html_content1 = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>')
+        html_content2 = (
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>')
+        content1_dict = {
+            'content_id': 'content',
+            'html': html_content1
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': html_content2
+        }
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+
+        exploration2 = exp_domain.Exploration.create_default_exploration(
+            'exp_id2', title='title2', category='category')
+        exploration2.add_states(['State1', 'State2'])
+        state1 = exploration2.states['State1']
+        state2 = exploration2.states['State2']
+        html_content1 = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>')
+        html_content2 = (
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^3'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>')
+        content1_dict = {
+            'content_id': 'content',
+            'html': html_content1
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': html_content2
+        }
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+
+        exp_services.save_new_exploration(self.admin_id, exploration2)
+
+        exploration3 = exp_domain.Exploration.create_default_exploration(
+            'exp_id3', title='title3', category='category')
+        exploration3.add_states(['State1', 'State2'])
+        state1 = exploration3.states['State1']
+        state2 = exploration3.states['State2']
+        html_content1 = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;x^2'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>')
+        html_content2 = (
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;(x-1)'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>')
+        content1_dict = {
+            'content_id': 'content',
+            'html': html_content1
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': html_content2
+        }
+        state1.update_content(
+            state_domain.SubtitledHtml.from_dict(content1_dict))
+        state2.update_content(
+            state_domain.SubtitledHtml.from_dict(content2_dict))
+        exp_services.save_new_exploration(self.admin_id, exploration3)
+        expected_output = {
+            'exp_id1': {
+                'State1': [b'+,-,-,+'],
+                'State2': [b'-,-,-,-']
+            },
+            'exp_id2': {
+                'State1': [b'x^2'],
+                'State2': [b'x^3']
+            },
+            'exp_id3': {
+                'State1': [b'x^2'],
+                'State2': [b'(x-1)']
+            }
+        }
+        self.assertEqual(
+            exp_services.get_all_latex_strings_from_explorations(),
+            expected_output)
