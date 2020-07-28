@@ -52,29 +52,29 @@ describe('KeyboardShortcutService', () => {
     var libraryShortcutTriggered = false;
     var learnerShortcutTriggered = false;
     var creatorShortcutTriggered = false;
-    var preferencesShortcutTriggered = false;
+    var preferenceShortcutTriggered = false;
     var aboutShortcutTriggered = false;
     var notificationShortcutTriggered = false;
 
     keyboardShortcutService.setHref('#foo');
     const reloadSpy = jasmine.createSpy('reload');
     spyOn(keyboardShortcutService, 'setHref').and.callFake(function(href) {
-      if(href == '/get-started') {
+      if (href === '/get-started') {
         getStartedShortcutTriggered = true;
-      } else if (href == '/community-library') {
+      } else if (href === '/community-library') {
         learnerShortcutTriggered = true;
-      } else if (href =='/learner-dashboard') {
+      } else if (href === '/learner-dashboard') {
         libraryShortcutTriggered = true;
-      } else if (href == '/creator-dashboard') {
+      } else if (href === '/creator-dashboard') {
         creatorShortcutTriggered = true;
-      } else if (href == '/preferences') {
-        preferencesShortcutTriggered = true;
-      } else if (href == '/about') {
+      } else if (href === '/preferences') {
+        preferenceShortcutTriggered = true;
+      } else if (href === '/about') {
         aboutShortcutTriggered = true;
-      } else if (href =='/notifications') {
+      } else if (href === '/notifications') {
         notificationShortcutTriggered = true;
       }
-    })
+    });
     keyboardShortcutService.bindNavigationShortcuts();
     Mousetrap.trigger('ctrl+0');
     Mousetrap.trigger('ctrl+1');
@@ -87,7 +87,7 @@ describe('KeyboardShortcutService', () => {
     expect(libraryShortcutTriggered).toBe(true);
     expect(learnerShortcutTriggered).toBe(true);
     expect(creatorShortcutTriggered).toBe(true);
-    expect(preferencesShortcutTriggered).toBe(true);
+    expect(preferenceShortcutTriggered).toBe(true);
     expect(aboutShortcutTriggered).toBe(true);
     expect(notificationShortcutTriggered).toBe(true);
   });
