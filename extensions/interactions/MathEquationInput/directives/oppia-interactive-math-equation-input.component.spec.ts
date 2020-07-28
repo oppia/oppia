@@ -67,6 +67,7 @@ describe('MathEquationInputInteractive', function() {
     }
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
+    static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
