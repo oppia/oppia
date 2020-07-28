@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -24,7 +25,6 @@ import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
