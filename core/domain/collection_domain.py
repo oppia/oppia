@@ -358,6 +358,7 @@ class Collection(python_utils.OBJECT):
         # The ID is the only property which should not be stored within the
         # YAML representation.
         del collection_dict['id']
+        del collection_dict['version']
 
         return python_utils.yaml_from_dict(collection_dict)
 
