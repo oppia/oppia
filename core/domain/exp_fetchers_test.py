@@ -761,3 +761,122 @@ title: Old Title
             answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
+
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id_4')
+
+        exploration.add_states(['State4'])
+
+        answer_groups_4 = [{
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }, {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        exploration.states['State4'] = state_domain.State.from_dict({
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'feedback_3': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_1': {},
+                    'feedback_1': {},
+                    'feedback_2': {},
+                    'feedback_3': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': answer_groups_4,
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'feedback_3',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': None,
+                'id': 'MathExpressionInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        })
+
+        exploration.states_schema_version = 34
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        # Ensure the exploration was converted.
+        exploration = exp_fetchers.get_exploration_by_id('exp_id_4')
+        self.assertEqual(
+            exploration.states_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        answer_groups = exploration.states['State4'].interaction.answer_groups
+
+        self.assertEqual(
+            exploration.states['State4'].interaction.id,
+            'AlgebraicExpressionInput')
+        self.assertEqual(len(answer_groups), 1)
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+        self.assertEqual(sorted(exploration.states[
+            'State4'].recorded_voiceovers.voiceovers_mapping.keys()),
+            ['content_1', 'feedback_1', 'feedback_3'])
+        self.assertEqual(sorted(exploration.states[
+            'State4'].written_translations.translations_mapping.keys()),
+            ['content_1', 'feedback_1', 'feedback_3'])
