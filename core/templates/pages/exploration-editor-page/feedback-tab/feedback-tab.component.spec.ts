@@ -85,7 +85,6 @@ describe('Feedback Tab Component', function() {
     $scope = $rootScope.$new();
     ctrl = $componentController('feedbackTab', {
       $rootScope: $scope,
-      $scope: $scope,
       AlertsService: alertsService
     });
     ctrl.$onInit();
