@@ -94,44 +94,13 @@
     </md-card>
     <button class="btn btn-success btn-sm protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">Add Acquired Skill</button>
   </div>
-  <div class="node-field">
-    <div ng-if="getDestinationNodeIds().length > 0">
-      <label class="form-heading"> Next Chapter </label>
-      <md-card class="destination-node-id"
-               ng-repeat="nodeId in getDestinationNodeIds()"
-               ng-click="viewNodeEditor(nodeId)">
-        <div class="repeating-card-wrapper protractor-test-next-chapter-card">
-          <[nodeIdToTitleMap[nodeId]]>
-          <span class="protractor-test-remove-destination-button" style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
-            <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-          </span>
-        </div>
-      </md-card>
-    </div>
-    <div style="margin-top: 1em;" ng-if="getDestinationNodeIds().length === 0">
-      <label> Select destination chapter </label>
-      <div>
-        <select class="form-control protractor-test-destination-select"
-                ng-model="newNodeId"
-                ng-if="availableNodes.length > 0"
-                ng-options="node.id as node.text for node in availableNodes"
-                style="width: 300px; margin-bottom: 10px;"
-                ng-click="addDestinationNode(newNodeId)">
-          <option value="">Pick an already existing chapter</option>
-        </select>
-        <button class="btn btn-success protractor-test-add-destination-chapter-button"
-                ng-click="addNewDestinationNode()"> Add a new Destination Chapter
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <style>
   story-editor .repeating-card-wrapper {
       height: 2.5em;
-      padding-top: 0.5em;
       padding-left: 0.5em;
+      padding-top: 0.5em;
   }
 
   story-editor .oppia-placeholder {
@@ -143,8 +112,8 @@
   }
 
   story-editor .node-field {
-    margin-top: 3%;
     height: auto;
+    margin-top: 3%;
   }
   story-editor .skill-description-card {
     max-height: 10em;

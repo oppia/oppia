@@ -34,9 +34,7 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github # isort:skip  pylint: disable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
@@ -187,8 +185,8 @@ def get_changelog_categories(pulls):
 
     Returns:
         dict(str, list(str)). A list where the keys are the various changelog
-            labels, and the values are the titles of the PRs that fall under
-            that category.
+        labels, and the values are the titles of the PRs that fall under
+        that category.
     """
     result = collections.defaultdict(list)
     for pull in pulls:
@@ -223,10 +221,10 @@ def check_versions(current_release):
     with python_utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
         new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
-        old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 old_feconf)[0]
-        new_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 new_feconf)[0]
+        old_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, old_feconf)[0]
+        new_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, new_feconf)[0]
         if old_version != new_version:
             feconf_changed_version.append(variable)
     return feconf_changed_version
@@ -256,7 +254,7 @@ def check_setup_scripts(base_release_tag, changed_only=True):
 
     Returns:
         dict consisting of script --> boolean indicating whether or not it has
-            changed (filtered by default to those that are modified).
+        changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
                      ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',
@@ -324,8 +322,9 @@ def main(personal_access_token):
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
-            out.write('\n### Feconf version changes:\nThis indicates that a '
-                      'migration may be needed\n\n')
+            out.write(
+                '\n### Feconf version changes:\nThis indicates that a '
+                'migration may be needed\n\n')
             for var in feconf_version_changes:
                 out.write('* %s\n' % var)
 
@@ -353,7 +352,7 @@ def main(personal_access_token):
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
-        # TODO(apb7): duplicate author handling due to email changes.
+        # TODO(apb7): Duplicate author handling due to email changes.
         out.write('\n%s' % release_constants.NEW_AUTHORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))

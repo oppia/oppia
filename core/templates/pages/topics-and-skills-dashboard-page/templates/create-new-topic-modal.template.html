@@ -1,0 +1,95 @@
+<div class="modal-header create-new-topic-modal-header">
+  <h3>
+    New Topic
+  </h3>
+  <i class="fa fa-times modal-close-button" ng-click="cancel()"></i>
+</div>
+<form ng-submit="save()">
+  <div class="modal-body create-new-topic-form">
+    <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
+      <div><span class="create-new-topic-input-label">Name</span></div>
+      <input class="protractor-test-new-topic-name-field" ng-model="newlyCreatedTopic.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" autofocus>
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+        </i>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <div><span class="create-new-topic-input-label">Description</span></div>
+      <textarea class="protractor-test-new-topic-description-field"
+                rows="4" cols="50" placeholder="Enter description"
+                maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                ng-model="newlyCreatedTopic.description">
+      </textarea>
+      <div class="oppia-input-box-subtitle">
+        <i>
+          Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+        </i>
+      </div>
+    </div>
+    <div class="create-new-topic-input-field">
+      <label class="create-new-topic-input-label">Topic Thumbnail</label>
+      <thumbnail-uploader preview-title="newlyCreatedTopic.name"
+                          aspect-ratio="'4:3'"
+                          disabled="false"
+                          use-local-storage="true"
+                          allowed-bg-colors="allowedBgColors"
+                          preview-description-bg-color="'#2F6687'">
+      </thumbnail-uploader>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isValid()">
+      <span>Create Topic</span>
+    </button>
+  </div>
+</form>
+<style>
+  .create-new-topic-form .create-new-topic-input-field {
+     margin: 10px 0;
+  }
+  .create-new-topic-form .create-new-topic-input-field input, .create-new-topic-input-field textarea,.create-new-topic-input-field select {
+    border: 1px solid #b9b5b5;
+    border-radius: 5px;
+  }
+  .create-new-topic-form .create-new-topic-input-label {
+    font-weight: bold;
+  }
+  .create-new-topic-modal-header .modal-close-button {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .create-new-topic .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-topic .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+    }
+    .create-new-topic .modal-header {
+      align-items: center;
+      background-color: #00609C;
+      display: flex;
+    }
+    .create-new-topic .modal-header h3 {
+      color: #FFFFFF;
+    }
+    .create-new-topic .create-new-topic-input-field {
+      margin: 25px 0;
+    }
+    .create-new-topic .modal-close-button {
+      color: #FFFFFF;
+      display: block;
+      font-size: 20px;
+    }
+  }
+</style>

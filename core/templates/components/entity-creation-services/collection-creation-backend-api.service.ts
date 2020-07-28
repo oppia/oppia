@@ -20,6 +20,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+interface CollectionCreationBackendDict {
+  'collection_id': string
+}
+
+interface CollectionCreationResponse {
+  collectionId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,22 +35,25 @@ export class CollectionCreationBackendService {
   constructor(private http: HttpClient) {}
 
   private _createCollection(
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
-    this.http.post('/collection_editor_handler/create_new', {}).toPromise()
-      .then((response) => {
+      successCallback: (value: CollectionCreationResponse) => void,
+      errorCallback: (reason: string) => void): void {
+    this.http.post<CollectionCreationBackendDict>(
+      '/collection_editor_handler/create_new', {}).toPromise()
+      .then(response => {
         if (successCallback) {
-          successCallback(response);
+          successCallback({
+            collectionId: response.collection_id
+          });
         }
-      }, () => {
+      }, errorResponse => {
         if (errorCallback) {
-          errorCallback();
+          errorCallback(errorResponse.error.error);
         }
       });
   }
 
 
-  createCollection(): Promise<object> {
+  createCollection(): Promise<CollectionCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createCollection(resolve, reject);
     });

@@ -4,38 +4,39 @@
     @load('base-components/header.template.html', {"title": "Pending Account Deletion - Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-            <li>
-              <span class="oppia-navbar-breadcrumb-separator"></span>
-              Pending Account Deletion
-            </li>
-          </ul>
-        </navbar-breadcrumb>
-        <content>
-          <div class="oppia-static-header">
-            <h1 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING"></h1>
-          </div>
-          <background-banner></background-banner>
-          <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-            <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-pending-account-deletion">
-              <h2 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1_HEADING"></h2>
-              <p translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1"></p>
-
-              <h2 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2_HEADING"></h2>
-              <p translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2"></p>
-
-              <p translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4"></p>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                Pending Account Deletion
+              </li>
+            </ul>
+          </navbar-breadcrumb>
+          <content>
+            <div class="oppia-static-header">
+              <h1 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING"></h1>
             </div>
-          </div>
-          <div class="oppia-footer-padding-below-banner">
-          </div>
-        </content>
-      </base-content>
-    </div>
+            <background-banner></background-banner>
+            <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
+              <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-pending-account-deletion">
+                <h2 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1_HEADING"></h2>
+                <p translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1"></p>
+
+                <h2 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2_HEADING"></h2>
+                <p translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2"></p>
+
+                <p translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4"></p>
+              </div>
+            </div>
+            <div class="oppia-footer-padding-below-banner">
+            </div>
+          </content>
+        </base-content>
+      </div>
+    </oppia-root>
     @load('pages/footer_js_libs.html')
     <style>
       .oppia-pending-account-deletion h2 {

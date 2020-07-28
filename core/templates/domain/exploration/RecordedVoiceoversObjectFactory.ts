@@ -16,34 +16,32 @@
  * @fileoverview Factory for creating new frontend instances of
  * RecordedVoiceovers domain objects.
  */
-export interface IRecordedVoiceOverBackendDict {
+export interface RecordedVoiceOverBackendDict {
   'voiceovers_mapping': {
     [propName: string]: {
-      [propName: string]: IVoiceoverDict
+      [propName: string]: VoiceoverBackendDict
     }
   }
 }
-export interface IVoice {
-  filename: string;
-  fileSizeBytes: number;
-  needsUpdate: boolean;
+
+export interface VoiceoverMapping {
+  [propName: string]: BindableVoiceovers;
 }
-export interface IVoiceoverMapping {
-  [propName: string]: {
-    [propName: string]: Voiceover
-  }
+
+export interface BindableVoiceovers {
+  [propName: string]: Voiceover;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { VoiceoverObjectFactory, IVoiceoverDict, Voiceover } from
+import { VoiceoverObjectFactory, VoiceoverBackendDict, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 export class RecordedVoiceovers {
-  voiceoversMapping: IVoiceoverMapping;
+  voiceoversMapping: VoiceoverMapping;
   _voiceoverObjectFactory: VoiceoverObjectFactory;
   constructor(
-      voiceoversMapping: IVoiceoverMapping,
+      voiceoversMapping: VoiceoverMapping,
       voiceoverObjectFactory: VoiceoverObjectFactory) {
     this.voiceoversMapping = voiceoversMapping;
     this._voiceoverObjectFactory = voiceoverObjectFactory;
@@ -53,11 +51,11 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  getBindableVoiceovers(contentId: string): {[propName: string]: IVoice} {
+  getBindableVoiceovers(contentId: string): BindableVoiceovers {
     return this.voiceoversMapping[contentId];
   }
 
-  getVoiceover(contentId: string, langCode: string): IVoice {
+  getVoiceover(contentId: string, langCode: string): Voiceover {
     return this.voiceoversMapping[contentId][langCode];
   }
 
@@ -128,7 +126,7 @@ export class RecordedVoiceovers {
   }
 
 
-  toBackendDict(): IRecordedVoiceOverBackendDict {
+  toBackendDict(): RecordedVoiceOverBackendDict {
     var voiceoversMappingDict = {};
     for (var contentId in this.voiceoversMapping) {
       var languageCodeToVoiceover = this.voiceoversMapping[contentId];
@@ -152,7 +150,7 @@ export class RecordedVoiceoversObjectFactory {
   constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
 
   createFromBackendDict(
-      recordedVoiceoversDict: IRecordedVoiceOverBackendDict):
+      recordedVoiceoversDict: RecordedVoiceOverBackendDict):
         RecordedVoiceovers {
     var voiceoversMapping = {};
     var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;

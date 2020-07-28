@@ -22,10 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import collections
 import copy
-import datetime
 
 from core import jobs
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import stats_domain
@@ -38,9 +36,6 @@ import python_utils
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
 ])
-
-
-PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
 
 
 def require_non_negative(
@@ -64,111 +59,6 @@ def require_non_negative(
         require_non_negative_messages.append(
             'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
                 exp_id, exp_version, state_name, property_name, value))
-
-
-class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
-    """Performs a brief audit of playthrough recordings to make sure they pass
-    simple sanity checks.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.PlaythroughModel]
-
-    @staticmethod
-    def map(playthrough_model):
-        """Builds audit data for inspection. Must be declared @staticmethod.
-
-        Args:
-            playthrough_model: PlaythroughModel.
-
-        Yields:
-            A 2-tuple of the form (playthrough_model.id, audit_data), where the
-            structure of audit_data is:
-                exp_id: str. The exploration the playthrough records.
-                created_on: str. The date the model was created in YYYY-MM-DD
-                    format.
-                validate_error: str | None. Stringified exception raised by
-                    trying to create the model as a domain object, or None if no
-                    error occurred.
-        """
-        try:
-            playthrough = (
-                stats_services.get_playthrough_from_model(playthrough_model))
-            playthrough.validate()
-        except Exception as e:
-            validate_error = python_utils.UNICODE(e)
-        else:
-            validate_error = None
-
-        exp_id = playthrough_model.exp_id
-        exp_version = playthrough_model.exp_version
-        exp_issues = (
-            stats_models.ExplorationIssuesModel.get_model(exp_id, exp_version))
-        reference_error = (
-            'This playthrough was not found as a reference in the containing '
-            'ExplorationIssuesModel (id=%s)' % (exp_issues.id))
-        for exp_issue_dict in exp_issues.unresolved_issues:
-            if playthrough_model.id in exp_issue_dict['playthrough_ids']:
-                reference_error = None
-                break
-
-        audit_data = {
-            'exp_id': playthrough_model.exp_id,
-            'created_on': playthrough_model.created_on.strftime('%Y-%m-%d'),
-            'validate_error': validate_error,
-            'reference_error': reference_error,
-        }
-        yield (playthrough_model.id, audit_data)
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        """Yields errors in playthrough models. Must be declared @staticmethod.
-
-        Args:
-            key: str. The id of the playthrough.
-            stringified_values: list(str). Each string is a stringified dict
-                with the following structure:
-                    exp_id: str. The exploration the playthrough records.
-                    created_on: str. The date the model was created in
-                        YYYY-MM-DD format.
-                    validate_error: str | None. Stringified exception raised by
-                        trying to create the model as a domain object, or None
-                        if no error occurred.
-
-        Yields:
-            tuple(str). A 1-tuple whose only element is an error message.
-        """
-        whitelisted_exp_ids_for_playthroughs = (
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS.value)
-
-        for stringified_value in stringified_values:
-            audit_data = ast.literal_eval(stringified_value)
-
-            if audit_data['validate_error'] is not None:
-                yield (
-                    'playthrough_id:%s could not be validated as a domain '
-                    'object because of the error: %s.' % (
-                        key, audit_data['validate_error']),)
-
-            if audit_data['exp_id'] not in whitelisted_exp_ids_for_playthroughs:
-                yield (
-                    'playthrough_id:%s was recorded in exploration_id:%s which '
-                    'has not been curated for recording.' % (
-                        key, audit_data['exp_id']),)
-
-            created_on_datetime = datetime.datetime.strptime(
-                audit_data['created_on'], '%Y-%m-%d')
-            if created_on_datetime < PLAYTHROUGH_PROJECT_RELEASE_DATETIME:
-                yield (
-                    'playthrough_id:%s was released on %s, which is before the '
-                    'GSoC 2018 submission deadline (2018-09-01) and should '
-                    'therefore not exist.' % (key, audit_data['created_on']),)
-
-            if audit_data['reference_error'] is not None:
-                yield (
-                    'playthrough_id:%s is not referenced by any issue. '
-                    'Details: %s.' % (key, audit_data['reference_error']),)
 
 
 class RegenerateMissingV1StatsModelsOneOffJob(
@@ -326,14 +216,24 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         Returns:
             tuple(str, dict(str, str)). The first element of the tuple is the
-                exploration id corresponding to the item. The second element of
-                the tuple is the dict containing information about the event
-                associated with the map.
+            exploration id corresponding to the item. The second element of
+            the tuple is the dict containing information about the event
+            associated with the map.
 
         Raises:
             Exception: The item type is wrong.
         """
-        # pylint: disable=too-many-return-statements
+        class_name_to_event_type = {
+            'CompleteExplorationEventLogEntryModel':
+                feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            'StateHitEventLogEntryModel': feconf.EVENT_TYPE_STATE_HIT,
+            'StartExplorationEventLogEntryModel':
+                feconf.EVENT_TYPE_START_EXPLORATION,
+            'SolutionHitEventLogEntryModel': feconf.EVENT_TYPE_SOLUTION_HIT,
+            'ExplorationActualStartEventLogEntryModel':
+                feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
+        }
+
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             return (
                 item.exp_id,
@@ -356,65 +256,37 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'created_on': python_utils.UNICODE(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
-        elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_STATE_HIT,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-            return (
-                item.exp_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(
-                item, stats_models.StartExplorationEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(
-                item, stats_models.ExplorationActualStartEventLogEntryModel):
-            return (
-                item.exp_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(
-                item, stats_models.CompleteExplorationEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        # pylint: enable=too-many-return-statements
+        elif (
+                isinstance(
+                    item, (
+                        stats_models.CompleteExplorationEventLogEntryModel,
+                        stats_models.StartExplorationEventLogEntryModel,
+                        stats_models.StateHitEventLogEntryModel))):
+            event_dict = {
+                'event_type': class_name_to_event_type[
+                    item.__class__.__name__],
+                'version': item.exploration_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
+            return (item.exploration_id, event_dict)
+
+        elif (
+                isinstance(item, (
+                    stats_models.SolutionHitEventLogEntryModel,
+                    stats_models.ExplorationActualStartEventLogEntryModel))):
+            event_dict = {
+                'event_type': class_name_to_event_type[
+                    item.__class__.__name__],
+                'version': item.exp_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
+            return (item.exp_id, event_dict)
 
     @staticmethod
     def map(item):
@@ -521,8 +393,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
-                for state_stats in (list(datastore_stats_for_version.
-                                         state_stats_mapping.values())):
+                for state_stats in list(
+                        datastore_stats_for_version.
+                        state_stats_mapping.values()):
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0
@@ -631,8 +504,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 the old_stats_model up to the next version.
 
         Returns:
-            dict. A dict representation of an ExplorationStatsModel
-                with updated state_stats_mapping and version.
+            dict. A dict representation of an ExplorationStatsModel with
+            updated state_stats_mapping and version.
         """
         relevant_commit_cmds = [
             exp_domain.CMD_ADD_STATE,
@@ -723,28 +596,28 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
-                (exp_id, value) where value is of the form:
-                    {
-                        'version': int. Version of the exploration.
-                        'num_starts_v1': int. # of times exploration was
-                            started.
-                        'num_completions_v1': int. # of times exploration was
-                            completed.
-                        'num_actual_starts_v1': int. # of times exploration was
-                            actually started.
-                        'state_stats_mapping': A dict containing the values of
-                            stats for the states of the exploration. It is
-                            formatted as follows:
-                            {
-                                state_name: {
-                                    'total_answers_count_v1',
-                                    'useful_feedback_count_v1',
-                                    'total_hit_count_v1',
-                                    'first_hit_count_v1',
-                                    'num_completions_v1'
-                                }
+            (exp_id, value) where value is of the form:
+                {
+                    'version': int. Version of the exploration.
+                    'num_starts_v1': int. # of times exploration was
+                        started.
+                    'num_completions_v1': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v1': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v1',
+                                'useful_feedback_count_v1',
+                                'total_hit_count_v1',
+                                'first_hit_count_v1',
+                                'num_completions_v1'
                             }
-                    }
+                        }
+                }
         """
         reduced_state_stats_mapping = {
             state_name: {
@@ -899,29 +772,29 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
-                (exp_id, value) where value is of the form:
-                    {
-                        'version': int. Version of the exploration.
-                        'num_starts_v2': int. # of times exploration was
-                            started.
-                        'num_completions_v2': int. # of times exploration was
-                            completed.
-                        'num_actual_starts_v2': int. # of times exploration was
-                            actually started.
-                        'state_stats_mapping': A dict containing the values of
-                            stats for the states of the exploration. It is
-                            formatted as follows:
-                            {
-                                state_name: {
-                                    'total_answers_count_v2',
-                                    'useful_feedback_count_v2',
-                                    'total_hit_count_v2',
-                                    'first_hit_count_v2',
-                                    'num_times_solution_viewed_v2',
-                                    'num_completions_v2'
-                                }
+            (exp_id, value) where value is of the form:
+                {
+                    'version': int. Version of the exploration.
+                    'num_starts_v2': int. # of times exploration was
+                        started.
+                    'num_completions_v2': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v2': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v2',
+                                'useful_feedback_count_v2',
+                                'total_hit_count_v2',
+                                'first_hit_count_v2',
+                                'num_times_solution_viewed_v2',
+                                'num_completions_v2'
                             }
-                    }
+                        }
+                }
         """
         reduced_state_stats_mapping = {
             state_name: {
@@ -1081,6 +954,7 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
     make sure they match counts stored in StateCounterModel. It also checks for
     some possible error cases like negative counts.
     """
+
     _STATE_COUNTER_ERROR_KEY = 'State Counter ERROR'
 
     @classmethod
@@ -1098,9 +972,10 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 StateCounterModel.
 
         Yields:
-            tuple. For StateCounterModel, a 2-tuple in the form
+            tuple. Different for different models:
+            For StateCounterModel, a 2-tuple in the form
                 (_STATE_COUNTER_ERROR_KEY, error message).
-            tuple. For ExplorationAnnotationModel, a 2-tuple in the form
+            For ExplorationAnnotationModel, a 2-tuple in the form
                 ('exploration_id', value).
                 'exploration_id': str. The id of the exploration.
                 'value': dict. Its structure is as follows:
@@ -1378,9 +1253,11 @@ class RegenerateMissingV2StatsModelsOneOffJob(
 class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for finding explorations that are missing stats models."""
 
-    STATS_DELETED_KEY = 'deleted'
-    STATS_MISSING_KEY = 'missing'
-    STATS_PRESENT_KEY = 'present'
+    STATUS_DELETED_KEY = 'deleted'
+    STATUS_MISSING_KEY = 'missing'
+    STATUS_VALID_KEY = 'valid'
+    STATUS_STATE_MISSING_KEY = 'missing state'
+    STATUS_STATE_UNKNOWN_KEY = 'unknown state'
 
     JOB_RESULT_EXPECTED = 'EXPECTED'
     JOB_RESULT_UNEXPECTED = 'UNEXPECTED'
@@ -1390,53 +1267,112 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
         return [exp_models.ExplorationModel]
 
     @staticmethod
-    def map(exp):
-        if exp.deleted:
+    def map(latest_exp_model):
+        if latest_exp_model.deleted:
             return
 
-        exp_versions = list(python_utils.RANGE(1, exp.version + 1))
-        exp_stats_model_ids = (
-            stats_models.ExplorationStatsModel.get_entity_id(exp.id, version)
-            for version in exp_versions)
-        exp_stats_models = stats_models.ExplorationStatsModel.get_multi(
-            exp_stats_model_ids, include_deleted=True)
+        exp_id = latest_exp_model.id
+        exp_versions_with_states = collections.defaultdict(set)
 
-        for exp_stats_model, exp_version in python_utils.ZIP(
-                exp_stats_models, exp_versions):
+        for version in python_utils.RANGE(1, latest_exp_model.version + 1):
+            exp_model = (
+                latest_exp_model if version == latest_exp_model.version else
+                exp_models.ExplorationModel.get_version(
+                    exp_id, version, strict=False))
+            exp_stats_model = stats_models.ExplorationStatsModel.get_by_id(
+                stats_models.ExplorationStatsModel.get_entity_id(
+                    exp_id, version))
+
+            for state_name in exp_model.states:
+                exp_versions_with_states[state_name].add(version)
+
             if exp_stats_model is None:
-                yield (
-                    ExplorationMissingStatsAudit.STATS_MISSING_KEY,
-                    (exp.id, exp_version))
+                key = '%s:%s' % (
+                    exp_id, ExplorationMissingStatsAudit.STATUS_MISSING_KEY)
+                yield (key.encode('utf-8'), exp_model.version)
+
             elif exp_stats_model.deleted:
-                yield (
-                    ExplorationMissingStatsAudit.STATS_DELETED_KEY,
-                    (exp.id, exp_version))
+                key = '%s:%s' % (
+                    exp_id, ExplorationMissingStatsAudit.STATUS_DELETED_KEY)
+                yield (key.encode('utf-8'), exp_model.version)
+
             else:
-                yield (
-                    ExplorationMissingStatsAudit.STATS_PRESENT_KEY,
-                    (exp.id, exp_version))
+                exp_states = set(exp_model.states)
+                exp_stats_states = set(exp_stats_model.state_stats_mapping)
+
+                for state_name in exp_states - exp_stats_states:
+                    key = '%s:%s:%s' % (
+                        exp_id,
+                        state_name,
+                        ExplorationMissingStatsAudit.STATUS_STATE_MISSING_KEY)
+                    state_version_occurrences = tuple(
+                        python_utils.UNICODE(v) for v in sorted(
+                            exp_versions_with_states[state_name]))
+                    yield (
+                        key.encode('utf-8'),
+                        (exp_model.version, state_version_occurrences))
+
+                for state_name in exp_stats_states - exp_states:
+                    key = '%s:%s:%s' % (
+                        exp_id,
+                        state_name,
+                        ExplorationMissingStatsAudit.STATUS_STATE_UNKNOWN_KEY)
+                    state_version_occurrences = tuple(
+                        python_utils.UNICODE(v) for v in sorted(
+                            exp_versions_with_states[state_name]))
+                    yield (
+                        key.encode('utf-8'),
+                        (exp_model.version, state_version_occurrences))
+
+                if exp_states == exp_stats_states:
+                    key = ExplorationMissingStatsAudit.STATUS_VALID_KEY
+                    yield (key, exp_model.version)
 
     @staticmethod
-    def reduce(stats_model_status, exp_id_version_pair_strs):
-        if stats_model_status == ExplorationMissingStatsAudit.STATS_PRESENT_KEY:
+    def reduce(encoded_key, str_escaped_values):
+        key = encoded_key.decode('utf-8')
+
+        if ExplorationMissingStatsAudit.STATUS_VALID_KEY in key:
             yield (
                 ExplorationMissingStatsAudit.JOB_RESULT_EXPECTED,
-                '%d ExplorationStats %s present' % (
-                    len(exp_id_version_pair_strs),
-                    'models' if len(exp_id_version_pair_strs) > 1 else 'model'))
-            return
+                '%d ExplorationStats model%s valid' % (
+                    len(str_escaped_values),
+                    ' is' if len(str_escaped_values) == 1 else 's are'))
 
-        exp_versions_without_stats_models = collections.defaultdict(list)
-        for exp_id, exp_version in (
-                ast.literal_eval(s) for s in exp_id_version_pair_strs):
-            exp_versions_without_stats_models[exp_id].append(exp_version)
+        elif ExplorationMissingStatsAudit.STATUS_STATE_MISSING_KEY in key:
+            exp_id, state_name, _ = key.split(':')
+            for exp_version, state_version_occurrences in (
+                    ast.literal_eval(s) for s in str_escaped_values):
+                error_str = 'but card appears in version%s: %s' % (
+                    '' if len(state_version_occurrences) == 1 else 's',
+                    ', '.join(state_version_occurrences))
+                yield (
+                    ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
+                    'ExplorationStats "%s" v%s does not have stats for card '
+                    '"%s", %s.' % (exp_id, exp_version, state_name, error_str))
 
-        for exp_id, exp_versions in exp_versions_without_stats_models.items():
-            sorted_version_strs = [
-                python_utils.UNICODE(v) for v in sorted(exp_versions)]
+        elif ExplorationMissingStatsAudit.STATUS_STATE_UNKNOWN_KEY in key:
+            exp_id, state_name, _ = key.split(':')
+            for exp_version, state_version_occurrences in (
+                    ast.literal_eval(s) for s in str_escaped_values):
+                if state_version_occurrences:
+                    error_str = 'but card only appears in version%s: %s' % (
+                        '' if len(state_version_occurrences) == 1 else 's',
+                        ', '.join(state_version_occurrences))
+                else:
+                    error_str = 'but card never existed'
+                yield (
+                    ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
+                    'ExplorationStats "%s" v%s has stats for card "%s", %s.' % (
+                        exp_id, exp_version, state_name, error_str))
+
+        else:
+            exp_id, status = key.split(':')
+            exp_versions_without_stats_as_strs = sorted(str_escaped_values)
+
             yield (
                 ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
-                'ExplorationStats for Exploration "%s" %s at %s: %s' % (
-                    exp_id, stats_model_status,
-                    'versions' if len(sorted_version_strs) > 1 else 'version',
-                    ', '.join(sorted_version_strs)))
+                'ExplorationStats for Exploration "%s" %s at version%s: %s' % (
+                    exp_id, status,
+                    '' if len(exp_versions_without_stats_as_strs) == 1 else 's',
+                    ', '.join(exp_versions_without_stats_as_strs)))

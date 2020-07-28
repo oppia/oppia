@@ -94,8 +94,13 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
     THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
 
 # The default message to be shown when accepting stale suggestions.
-DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
-                                     ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
+DEFAULT_SUGGESTION_ACCEPT_MESSAGE = (
+    'Automatically accepting suggestion after'
+    ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
+
+# The message to be shown when rejecting a suggestion with a target ID of a
+# deleted skill.
+DELETED_SKILL_REJECT_MESSAGE = 'The associated skill no longer exists.'
 
 # The amount to increase the score of the author by after successfuly getting an
 # accepted suggestion.
@@ -164,32 +169,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
         ).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """GeneralSuggestionModel has two fields that contain user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the author_id and
-        final_reviewer_id.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.author_id == old_user_id,
-                cls.final_reviewer_id == old_user_id)).fetch():
-            if model.author_id == old_user_id:
-                model.author_id = new_user_id
-            if model.final_reviewer_id == old_user_id:
-                model.final_reviewer_id = new_user_id
-            migrated_models.append(model)
-        GeneralSuggestionModel.put_multi(
-            migrated_models, update_last_updated_time=False)
-
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
@@ -219,10 +198,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
         instance_id = thread_id
 
         if cls.get_by_id(instance_id):
-            raise Exception('There is already a suggestion with the given'
-                            ' id: %s' % instance_id)
+            raise Exception(
+                'There is already a suggestion with the given'
+                ' id: %s' % instance_id)
 
-        cls(id=instance_id, suggestion_type=suggestion_type,
+        cls(
+            id=instance_id, suggestion_type=suggestion_type,
             target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
@@ -279,8 +260,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are in the given
-                score categories, which are in review, but not created by the
-                given user.
+            score categories, which are in review, but not created by the
+            given user.
         """
         if len(score_categories) == 0:
             raise Exception('Received empty list of score categories')
@@ -303,7 +284,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are of the given
-                type, which are in review, but not created by the given user.
+            type, which are in review, but not created by the given user.
         """
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.suggestion_type == suggestion_type).filter(
@@ -320,7 +301,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of suggestions that are of the given
-                type, which the given user has created.
+            type, which the given user has created.
         """
         return cls.get_all().filter(
             cls.suggestion_type == suggestion_type).filter(
@@ -369,26 +350,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         return user_data
 
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for author_id and
-        final_reviewer_id.
-        """
-        user_ids = [self.author_id]
-        # We don't need to check final_reviewer_id if it is None.
-        if self.final_reviewer_id is not None:
-            user_ids.append(self.final_reviewer_id)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
-
 
 class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     """A general model for voiceover application of an entity.
 
     The ID of the voiceover application will be a random hashed value.
     """
+
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
     target_type = ndb.StringProperty(required=True, indexed=True)
@@ -424,42 +392,16 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralVoiceoverApplicationModel exists for the user.
+
         Args:
             user_id: str. The ID of the user whose data should be checked.
+
         Returns:
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
         ).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """GeneralVoiceoverApplicationModel has two fields that contain user
-        ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the author_id and
-        final_reviewer_id.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(ndb.OR(
-                cls.author_id == old_user_id,
-                cls.final_reviewer_id == old_user_id)).fetch():
-            if model.author_id == old_user_id:
-                model.author_id = new_user_id
-            if model.final_reviewer_id == old_user_id:
-                model.final_reviewer_id = new_user_id
-            migrated_models.append(model)
-        GeneralVoiceoverApplicationModel.put_multi(
-            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):
@@ -474,7 +416,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-                application submitted by the given user.
+            applications submitted by the given user.
         """
         if status in STATUS_CHOICES:
             return cls.query(ndb.AND(
@@ -494,7 +436,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
         Returns:
             list(GeneralVoiceoverApplicationModel). The list of voiceover
-                application which the given user can review.
+            applications which the given user can review.
         """
         return cls.query(ndb.AND(
             cls.author_id != user_id,
@@ -551,17 +493,3 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 'rejection_message': voiceover_model.rejection_message
             }
         return user_data
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for author_id and
-        final_reviewer_id.
-        """
-        user_ids = [self.author_id]
-        # We don't need to check final_reviewer_id if it is None.
-        if self.final_reviewer_id is not None:
-            user_ids.append(self.final_reviewer_id)
-        user_ids = [user_id for user_id in user_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)

@@ -17,6 +17,7 @@
  * tests.
  */
 var waitFor = require('./waitFor.js');
+var action = require('./action.js')
 
 var CommunityDashboardTranslateTextTab = require(
   '../protractor_utils/CommunityDashboardTranslateTextTab.js');
@@ -31,28 +32,32 @@ var CommunityDashboardPage = function() {
     by.css('.protractor-test-opportunity-list-empty-availability-message'));
   var opportunityListItems = element.all(
     by.css('.protractor-test-opportunity-list-item'));
-  var opportunityListItemHeadings = element.all(
-    by.css('.protractor-test-opportunity-list-item-heading'));
-  var opportunityListItemSubheadings = element.all(
-    by.css('.protractor-test-opportunity-list-item-subheading'));
-  var opportunityListItemButtons = element.all(
-    by.css('.protractor-test-opportunity-list-item-button'));
-  var opportunityListItemLabels = element.all(
-    by.css('.protractor-test-opportunity-list-item-label'));
-  var opportunityListItemProgressPercentages = element.all(
-    by.css('.protractor-test-opportunity-list-item-progress-percentage'));
+  var opportunityHeadingCss = by.css(
+    '.protractor-test-opportunity-list-item-heading');
+  var opportunitySubheadingCss = by.css(
+    '.protractor-test-opportunity-list-item-subheading');
+  var opportunityActionButtonCss = by.css(
+    '.protractor-test-opportunity-list-item-button');
+  var opportunityLabelCss = by.css(
+    '.protractor-test-opportunity-list-item-label');
+  var opportunityProgressPercentageCss = by.css(
+    '.protractor-test-opportunity-list-item-progress-percentage');
   var acceptQuestionSuggestionButton = element(
     by.css('.protractor-test-question-suggestion-review-accept-button'));
   var rejectQuestionSuggestionButton = element(
     by.css('.protractor-test-question-suggestion-review-reject-button'));
   var questionSuggestionReviewMessageInput = element(
     by.css('.protractor-test-suggestion-review-message'));
+  var questionReviewModalHeader = element(by.css(
+    '.protractor-test-question-suggestion-review-modal-header'));
+  var usernameContainer = element(by.css('.protractor-test-username'));
 
   var reviewRightsDiv = element(by.css('.protractor-test-review-rights'));
 
-  this.get = function() {
-    browser.get('/community_dashboard');
-    waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get('/community_dashboard');
+    await waitFor.visibilityOf(
+      usernameContainer, 'Username takes too much time to load');
   };
 
   this.getTranslateTextTab = function() {
@@ -60,27 +65,33 @@ var CommunityDashboardPage = function() {
       .CommunityDashboardTranslateTextTab();
   };
 
-  this.waitForOpportunitiesToLoad = function() {
-    waitFor.invisibilityOf(
+  this.waitForOpportunitiesToLoad = async function() {
+    await waitFor.invisibilityOf(
       opportunityLoadingPlaceholder,
       'Opportunity placeholders take too long to become invisible.');
   };
 
-  this.expectUserToBeTranslationReviewer = function(language) {
-    waitFor.visibilityOf(
+  this.waitForQuestionSuggestionReviewModalToAppear = async function(){
+    await waitFor.visibilityOf(
+      questionReviewModalHeader,
+      'Question suggestion review modal takes too long to appear');
+  };
+
+  this.expectUserToBeTranslationReviewer = async function(language) {
+    await waitFor.visibilityOf(
       reviewRightsDiv, 'User does not have rights to review translation');
 
     var translationReviewRightsElement = element(by.css(
       '.protractor-test-translation-' + language + '-reviewer'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       translationReviewRightsElement,
       'User does not have rights to review translation in language: ' + language
     );
   };
 
-  var _expectUserToBeReviewer = function(
+  var _expectUserToBeReviewer = async function(
       reviewCategory, langaugeDescription = null) {
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       reviewRightsDiv,
       'Review rights div is not visible, so user does not have rights to ' +
       'review ' + reviewCategory);
@@ -92,96 +103,121 @@ var CommunityDashboardPage = function() {
     reviewRightsElementClassName += '-reviewer';
 
     var reviewRightsElement = element(by.css(reviewRightsElementClassName));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       reviewRightsElement,
       'Review right element ' + reviewCategory + ' is not visible');
   };
 
-  this.expectUserToBeTranslationReviewer = function(langaugeDescription) {
-    _expectUserToBeReviewer('translation', langaugeDescription);
+  this.expectUserToBeTranslationReviewer = async function(langaugeDescription) {
+    await _expectUserToBeReviewer('translation', langaugeDescription);
   };
 
-  this.expectUserToBeVoiceoverReviewer = function(langaugeDescription) {
-    _expectUserToBeReviewer('voiceover', langaugeDescription);
+  this.expectUserToBeVoiceoverReviewer = async function(langaugeDescription) {
+    await _expectUserToBeReviewer('voiceover', langaugeDescription);
   };
 
-  this.expectUserToBeQuestionReviewer = function() {
-    _expectUserToBeReviewer('question');
+  this.expectUserToBeQuestionReviewer = async function() {
+    await _expectUserToBeReviewer('question');
   };
 
-  this.expectNumberOfOpportunitiesToBe = function(number) {
-    opportunityListItems.then(function(items) {
-      expect(items.length).toBe(number);
-    });
+  this.expectNumberOfOpportunitiesToBe = async function(number) {
+    var opportunityCount = await opportunityListItems.count();
+    expect(opportunityCount).toBe(number);
   };
 
-  this.expectEmptyOpportunityAvailabilityMessage = function() {
-    waitFor.visibilityOf(
+  this.expectEmptyOpportunityAvailabilityMessage = async function() {
+    await waitFor.visibilityOf(
       opportunityListEmptyAvailabilityMessage,
       'Opportunity list is not empty');
   };
 
-  this.expectOpportunityHeadingToBe = function(opportunityHeading) {
-    opportunityListItemHeadings.map(function(headingElement) {
-      return headingElement.getText();
-    }).then(function(headings) {
-      expect(headings).toContain(opportunityHeading);
-    });
+  var _getOpportunityWithHeadingAndSubheading = async function(
+      expectedHeading, expectedSubheading){
+    var opportunityCount = await opportunityListItems.count();
+    for (var i = 0; i < opportunityCount; i++) {
+      var opportunity = await opportunityListItems.get(i);
+
+      var headingElement = opportunity.element(opportunityHeadingCss);
+      await waitFor.visibilityOf(
+        headingElement,
+        'Opportunity heading is taking too much time to appear');
+      var heading = await headingElement.getText();
+
+      var subheadingElement = opportunity.element(opportunitySubheadingCss);
+      await waitFor.visibilityOf(
+        subheadingElement,
+        'Opportunity subheading is taking too much time to appear');
+      var subheading = await subheadingElement.getText();
+
+      if(expectedHeading === heading && expectedSubheading === subheading) {
+        return opportunity;
+      }
+    }
+
+    return null;
   };
 
-  this.expectOpportunityListItemSubheadingToBe = function(subheading, index) {
-    opportunityListItemSubheadings.then(function(subheadings) {
-      expect(subheadings[index].getText()).toEqual(subheading);
-    });
+  this.expectOpportunityPropertiesToBe = async function(
+      expectedHeading, expectedSubheading, expectedLabel, expectedPercentage) {
+    var opportunity = await _getOpportunityWithHeadingAndSubheading(
+      expectedHeading, expectedSubheading);
+    expect(opportunity).not.toBe(null);
+
+    if (expectedLabel !== null) {
+      var labelElement = opportunity.element(opportunityLabelCss);
+      await waitFor.visibilityOf(
+        labelElement, 'Opportunity label is taking too much time to appear');
+      var label = await labelElement.getText();
+      expect(expectedLabel).toBe(label);
+    }
+
+    if (expectedPercentage !== null) {
+      var percentageElement = opportunity.element(
+        opportunityProgressPercentageCss);
+      await waitFor.visibilityOf(
+        percentageElement,
+        'Opportunity percentage is taking too much time to appear');
+      percentage = await percentageElement.getText();
+      expect(expectedPercentage).toBe(percentage);
+    }
   };
 
-  this.expectOpportunityListItemLabelToBe = function(label, index) {
-    opportunityListItemLabels.then(function(labels) {
-      expect(labels[index].getText()).toEqual(label);
-    });
+  this.clickOpportunityActionButton = async function(
+    opportunityHeading, opportunitySubheading) {
+    var opportunity = await _getOpportunityWithHeadingAndSubheading(
+      opportunityHeading, opportunitySubheading);
+    expect(opportunity).not.toBe(null);
+    await action.click(
+      'Opportunity action button',
+      opportunity.element(opportunityActionButtonCss));
   };
 
-  this.expectOpportunityListItemProgressPercentageToBe = function(
-      percentage, index) {
-    opportunityListItemProgressPercentages.then(function(percentages) {
-      expect(percentages[index].getText()).toEqual(percentage);
-    });
+  this.clickAcceptQuestionSuggestionButton = async function() {
+    await action.click(
+      'Question suggestion accept button', acceptQuestionSuggestionButton);
   };
 
-  this.clickOpportunityListItemButton = function(index) {
-    opportunityListItemButtons.then(function(buttons) {
-      buttons[index].click();
-    });
+  this.clickRejectQuestionSuggestionButton = async function() {
+    await action.click(
+      'Reject question suggestion button', rejectQuestionSuggestionButton);
   };
 
-  this.clickAcceptQuestionSuggestionButton = function() {
-    acceptQuestionSuggestionButton.click();
+  this.setQuestionSuggestionReviewMessage = async function(message) {
+    await action.sendKeys(
+      'Question suggestion review message input field',
+      questionSuggestionReviewMessageInput, message);
   };
 
-  this.clickRejectQuestionSuggestionButton = function() {
-    rejectQuestionSuggestionButton.click();
+  this.navigateToTranslateTextTab = async function() {
+    await action.click(
+      'Translate text tab button', navigateToTranslateTextTabButton);
+    await this.waitForOpportunitiesToLoad();
   };
 
-  this.setQuestionSuggestionReviewMessage = function(message) {
-    waitFor.elementToBeClickable(
-      questionSuggestionReviewMessageInput,
-      'Question suggestion review message input field not visible');
-    questionSuggestionReviewMessageInput.click();
-    questionSuggestionReviewMessageInput.sendKeys(message);
-  };
-
-  this.navigateToTranslateTextTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToTranslateTextTabButton, 'Translate text tab is not clickable');
-    navigateToTranslateTextTabButton.click();
-    waitFor.pageToFullyLoad();
-  };
-
-  this.navigateToSubmitQuestionTab = function() {
-    waitFor.elementToBeClickable(
-      submitQuestionTabButton, 'Submit Question tab is not clickable');
-    submitQuestionTabButton.click();
-    waitFor.pageToFullyLoad();
+  this.navigateToSubmitQuestionTab = async function() {
+    await action.click(
+      'Submit question tab button', submitQuestionTabButton);
+    await this.waitForOpportunitiesToLoad();
   };
 };
 

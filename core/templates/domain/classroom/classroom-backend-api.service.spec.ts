@@ -33,19 +33,31 @@ describe('Classroom backend API service', function() {
     TopicSummaryObjectFactory = null;
   let responseDictionaries = {
     topic_summary_dicts: [{
+      id: 'topic1',
       name: 'Topic name',
       description: 'Topic description',
       canonical_story_count: 4,
       subtopic_count: 5,
       total_skill_count: 20,
-      uncategorized_skill_count: 5
+      uncategorized_skill_count: 5,
+      language_code: 'en',
+      version: 1,
+      additional_story_count: 0,
+      topic_model_created_on: 231241343,
+      topic_model_last_updated: 3454354354
     }, {
+      id: 'topic2',
       name: 'Topic name 2',
       description: 'Topic description 2',
       canonical_story_count: 3,
       subtopic_count: 2,
       total_skill_count: 10,
-      uncategorized_skill_count: 3
+      uncategorized_skill_count: 3,
+      language_code: 'en',
+      version: 1,
+      additional_story_count: 0,
+      topic_model_created_on: 231241343,
+      topic_model_last_updated: 3454354354
     }]
   };
 
@@ -59,7 +71,7 @@ describe('Classroom backend API service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
     topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
 
-    // Sample topic object returnable from the backend
+    // Sample topic object returnable from the backend.
     sampleDataResultsObjects = {
       topic_summary_objects: [
         topicSummaryObjectFactory.createFromBackendDict(
@@ -79,11 +91,11 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomData('0').then(
+      classroomBackendApiService.fetchClassroomData('math').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/classroom_data_handler/0');
+        '/classroom_data_handler/math');
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
 
@@ -133,6 +145,49 @@ describe('Classroom backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResultsObjects.topic_summary_objects);
       expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should handle successCallback for fetch classroom page is shown status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_page_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({classroom_page_is_shown: false});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should handle errorCallback for fetch classroom page is shown status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_page_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
     })
   );
 });

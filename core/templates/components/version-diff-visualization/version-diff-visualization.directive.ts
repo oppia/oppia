@@ -19,18 +19,18 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require(
   'components/version-diff-visualization/codemirror-mergeview.directive.ts');
+require(
+  'pages/exploration-editor-page/modal-templates/' +
+  'state-diff-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('versionDiffVisualization', [
-  '$timeout', 'UrlInterpolationService',
-  function($timeout, UrlInterpolationService) {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -52,7 +52,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
         //     later version
         // - v1States: the states dict for the earlier version of the
         // exploration
-        // - v2States: the states dict for the later version of the exploration
+        // - v2States: the states dict for the later version of the exploration.
         getDiffData: '&diffData',
         // The header for the pane of the state comparison modal corresponding
         // to the earlier version of the exploration.
@@ -67,14 +67,14 @@ angular.module('oppia').directive('versionDiffVisualization', [
       controllerAs: '$ctrl',
       controller: ['$uibModal', function($uibModal) {
         var ctrl = this;
-        // Constants for color of nodes in diff graph
+        // Constants for color of nodes in diff graph.
         var COLOR_ADDED = '#4EA24E';
         var COLOR_DELETED = '#DC143C';
         var COLOR_CHANGED = '#1E90FF';
         var COLOR_UNCHANGED = 'beige';
         var COLOR_RENAMED_UNCHANGED = '#FFD700';
 
-        // Constants for names in legend
+        // Constants for names in legend.
         var NODE_TYPE_ADDED = 'Added';
         var NODE_TYPE_DELETED = 'Deleted';
         var NODE_TYPE_CHANGED = 'Changed';
@@ -89,7 +89,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
 
         // Object whose keys are legend node names and whose values are
         // 'true' or false depending on whether the state property is used in
-        // the diff graph. (Will be used to generate legend)
+        // the diff graph. (Will be used to generate legend).
         var _stateTypeUsed = {};
         var diffGraphNodes = {};
         var nodesData;
@@ -156,77 +156,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
                 };
               }
             },
-            controller: [
-              '$controller', '$scope', '$http', '$uibModalInstance',
-              'newStateName', 'oldStateName', 'newState', 'oldState',
-              'headers', 'ContextService',
-              'UrlInterpolationService',
-              function(
-                  $controller, $scope, $http, $uibModalInstance,
-                  newStateName, oldStateName, newState, oldState,
-                  headers, ContextService,
-                  UrlInterpolationService) {
-                $controller('ConfirmOrCancelModalController', {
-                  $scope: $scope,
-                  $uibModalInstance: $uibModalInstance
-                });
-                var STATE_YAML_URL = UrlInterpolationService.interpolateUrl(
-                  '/createhandler/state_yaml/<exploration_id>', {
-                    exploration_id: (
-                      ContextService.getExplorationId())
-                  });
-
-                $scope.headers = headers;
-                $scope.newStateName = newStateName;
-                $scope.oldStateName = oldStateName;
-                /*
-                 * $scope.yamlStrs is an object with keys 'earlierVersion' and
-                 * 'laterVersion', whose values are the YAML representations of
-                 * the compared versions.
-                 */
-                $scope.yamlStrs = {};
-
-                if (newState) {
-                  $http.post(STATE_YAML_URL, {
-                    state_dict: newState.toBackendDict(),
-                    width: 50
-                  }).then(function(response) {
-                    $scope.yamlStrs.leftPane = response.data.yaml;
-                  });
-                } else {
-                  // Note: the timeout is needed or the string will be sent
-                  // before codemirror has fully loaded and will not be
-                  // displayed. This causes issues with the e2e tests.
-                  $timeout(function() {
-                    $scope.yamlStrs.leftPane = '';
-                  }, 200);
-                }
-
-                if (oldState) {
-                  $http.post(STATE_YAML_URL, {
-                    state_dict: oldState.toBackendDict(),
-                    width: 50
-                  }).then(function(response) {
-                    $scope.yamlStrs.rightPane = response.data.yaml;
-                  });
-                } else {
-                  // Note: the timeout is needed or the string will be sent
-                  // before codemirror has fully loaded and will not be
-                  // displayed. This causes issues with the e2e tests.
-                  $timeout(function() {
-                    $scope.yamlStrs.rightPane = '';
-                  }, 200);
-                }
-
-                // Options for the codemirror mergeview.
-                $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
-                  lineNumbers: true,
-                  readOnly: true,
-                  mode: 'yaml',
-                  viewportMargin: 20
-                };
-              }
-            ]
+            controller: 'StateDiffModalController'
           }).result.then(function() {}, function() {
             // Note to developers:
             // This callback is triggered when the Cancel button is clicked.
@@ -317,7 +247,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
             finalStateIds: ctrl.getDiffData().finalStateIds
           };
 
-          // Generate the legend graph
+          // Generate the legend graph.
           ctrl.legendGraph = {
             nodes: {},
             links: []

@@ -24,6 +24,7 @@ import datetime
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
@@ -181,7 +182,7 @@ class Question(python_utils.OBJECT):
         """Converts from version 27 to 28. Version 28 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 
-         Args:
+        Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
 
@@ -201,7 +202,7 @@ class Question(python_utils.OBJECT):
         allows the creator to ask for answer details from the learner
         about why they landed on a particular answer.
 
-         Args:
+        Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
 
@@ -246,8 +247,8 @@ class Question(python_utils.OBJECT):
             dict. The converted question_state_dict.
         """
         # Get the voiceovers_mapping metadata.
-        voiceovers_mapping = (question_state_dict['recorded_voiceovers']
-                              ['voiceovers_mapping'])
+        voiceovers_mapping = (
+            question_state_dict['recorded_voiceovers']['voiceovers_mapping'])
         language_codes_to_audio_metadata = voiceovers_mapping.values()
         for language_codes in language_codes_to_audio_metadata:
             for audio_metadata in language_codes.values():
@@ -306,6 +307,25 @@ class Question(python_utils.OBJECT):
                 }
             })
 
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v33_dict_to_v34_dict(cls, question_state_dict):
+        """Converts from version 33 to 34. Version 34 adds a new
+        attribute for math components. The new attribute has an additional field
+        to for storing SVG filenames.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict = state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.add_math_content_to_math_rte_components)
         return question_state_dict
 
     @classmethod
@@ -492,6 +512,7 @@ class Question(python_utils.OBJECT):
 
 class QuestionSummary(python_utils.OBJECT):
     """Domain object for Question Summary."""
+
     def __init__(
             self, question_id, question_content,
             question_model_created_on=None, question_model_last_updated=None):

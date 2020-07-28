@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_services
@@ -24,6 +26,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
@@ -134,6 +137,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = 'abc123456789'
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -146,6 +150,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         del question_dict['question_state_data']['content']
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -158,6 +163,19 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
+        self.post_json(
+            feconf.NEW_QUESTION_URL, {
+                'question_dict': question_dict,
+                'skill_ids': [self.skill_id]
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_post_with_incorrect_version_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        question_dict = self.question.to_dict()
+        question_dict['version'] = 1
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -170,6 +188,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -183,6 +202,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -196,6 +216,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -209,6 +230,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -228,6 +250,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -248,6 +271,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         question_dict = self.question.to_dict()
         question_dict['id'] = None
         question_dict['question_state_data'] = 'invalid_question_state_data'
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -263,6 +287,84 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             feconf.NEW_QUESTION_URL, {
                 'skill_ids': skill_ids
             }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_post_with_valid_images(self):
+        """Test question creation with valid images."""
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        filename = 'img.png'
+        question_dict = self.question.to_dict()
+        question_dict['id'] = None
+        question_dict['version'] = 0
+        content_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        question_dict['question_state_data']['content']['html'] = content_html
+        post_data = {
+            'question_dict': question_dict,
+            'skill_ids': [self.skill_id],
+            'skill_difficulties': [0.6]
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        self.post_json(
+            feconf.NEW_QUESTION_URL, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                (filename, filename, raw_image), )
+        )
+        all_models = question_models.QuestionModel.get_all()
+        questions = [
+            question_fetchers.get_question_from_model(model)
+            for model in all_models
+        ]
+        self.assertEqual(len(questions), 2)
+        self.logout()
+
+    def test_post_with_invalid_images(self):
+        """Test question creation with invalid images."""
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        question_dict = self.question.to_dict()
+        question_dict['id'] = None
+        question_dict['version'] = 0
+        content_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.svg&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        question_dict['question_state_data']['content']['html'] = content_html
+        post_data = {
+            'question_dict': question_dict,
+            'skill_ids': [self.skill_id],
+            'skill_difficulties': [0.6]
+        }
+
+        response_dict = self.post_json(
+            feconf.NEW_QUESTION_URL, post_data,
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'No image data provided for file with name img.svg.',
+            response_dict['error'])
+
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+        response_dict = self.post_json(
+            feconf.NEW_QUESTION_URL, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                ('img.svg', 'img.svg', large_image),
+            ), expected_status_int=400)
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
         self.logout()
 
 

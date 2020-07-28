@@ -3,8 +3,8 @@
 </div>
 
 <div class="modal-body">
-  <skill-mastery-viewer skill-id="skillId"
-                        mastery-change="masteryChange"
+  <skill-mastery-viewer [skill-id]="skillId"
+                        [mastery-change]="masteryChange"
                         ng-if="userIsLoggedIn">
   </skill-mastery-viewer>
   <div ng-if="!userIsLoggedIn">
@@ -14,5 +14,5 @@
 
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()"> Close </button>
-  <button class="btn btn-success" ng-click="openConceptCardModal(skillId)"> View Concept Card </button>
+  <button class="btn btn-success" ng-click="openConceptCardModal()"> View Concept Card </button>
 </div>

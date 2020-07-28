@@ -19,12 +19,18 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface AudioLanguageBackendDict {
+  id: string;
+  description: string;
+  relatedLanguages: string[];
+}
+
 export class AudioLanguage {
   id: string;
   description: string;
-  relatedLanguages: string;
+  relatedLanguages: string[];
 
-  constructor(id: string, description: string, relatedLanguages: string) {
+  constructor(id: string, description: string, relatedLanguages: string[]) {
     this.id = id;
     this.description = description;
     this.relatedLanguages = relatedLanguages;
@@ -35,11 +41,7 @@ export class AudioLanguage {
   providedIn: 'root'
 })
 export class AudioLanguageObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'audioLanguageDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromDict(audioLanguageDict: any): AudioLanguage {
+  createFromDict(audioLanguageDict: AudioLanguageBackendDict): AudioLanguage {
     return new AudioLanguage(
       audioLanguageDict.id,
       audioLanguageDict.description,

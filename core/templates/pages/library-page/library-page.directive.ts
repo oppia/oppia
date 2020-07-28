@@ -18,11 +18,12 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.directive.ts');
 
+require('domain/classroom/classroom-backend-api.service');
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
 require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
@@ -48,31 +49,35 @@ angular.module('oppia').directive('libraryPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
-        '$window', 'AlertsService', 'LearnerDashboardActivityIdsObjectFactory',
+        '$window', 'AlertsService', 'ClassroomBackendApiService',
+        'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-        'LIBRARY_TILE_WIDTH_PX', 'SHOW_CLASSROOM_CALLOUT',
+        'LIBRARY_TILE_WIDTH_PX',
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
-            $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
+            $window, AlertsService, ClassroomBackendApiService,
+            LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES,
-            LIBRARY_TILE_WIDTH_PX, SHOW_CLASSROOM_CALLOUT) {
+            LIBRARY_TILE_WIDTH_PX) {
           var ctrl = this;
           var possibleBannerFilenames = [
             'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
           // If the value below is changed, the following CSS values in
           // oppia.css must be changed:
           // - .oppia-exp-summary-tiles-container: max-width
-          // - .oppia-library-carousel: max-width
+          // - .oppia-library-carousel: max-width.
           var MAX_NUM_TILES_PER_ROW = 4;
           var isAnyCarouselCurrentlyScrolling = false;
+
+          ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
 
           ctrl.setActiveGroup = function(groupIndex) {
             ctrl.activeGroupIndex = groupIndex;
@@ -106,7 +111,7 @@ angular.module('oppia').directive('libraryPage', [
             for (var i = 0; i < ctrl.libraryGroups.length; i++) {
               var carouselJQuerySelector = (
                 '.oppia-library-carousel-tiles:eq(n)'.replace(
-                  'n', <string><any>i));
+                  'n', String(i)));
               var carouselScrollPositionPx = $(
                 carouselJQuerySelector).scrollLeft();
               var index = Math.ceil(
@@ -207,13 +212,17 @@ angular.module('oppia').directive('libraryPage', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.SHOW_CLASSROOM_CALLOUT = (SHOW_CLASSROOM_CALLOUT);
             LoaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
             ctrl.bannerImageFilename = possibleBannerFilenames[
               Math.floor(Math.random() * possibleBannerFilenames.length)];
 
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/library/' + ctrl.bannerImageFilename);
+
+            ClassroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+              function(classroomIsShown) {
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+              });
 
             ctrl.activeGroupIndex = null;
 
@@ -224,7 +233,7 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
             ctrl.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
-            var title = 'Exploration Library - Oppia';
+            var title = 'Community Library Lessons | Oppia';
             if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP ||
                 ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
               title = 'Find explorations to learn from - Oppia';
@@ -336,7 +345,7 @@ angular.module('oppia').directive('libraryPage', [
                 }, 3000);
                 // The following initializes the tracker to have all
                 // elements flush left.
-                // Transforms the group names into translation ids
+                // Transforms the group names into translation ids.
                 ctrl.leftmostCardIndices = [];
                 for (var i = 0; i < ctrl.libraryGroups.length; i++) {
                   ctrl.leftmostCardIndices.push(0);
@@ -359,11 +368,17 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              ctrl.libraryWindowIsNarrow = (
-                WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-              $scope.$applyAsync();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                ctrl.libraryWindowIsNarrow = (
+                  WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+                $scope.$applyAsync();
+              });
+          };
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]

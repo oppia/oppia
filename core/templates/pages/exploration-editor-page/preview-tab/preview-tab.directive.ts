@@ -18,8 +18,9 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'pages/exploration-editor-page/preview-tab/templates/' +
+  'preview-set-parameters-modal.controller.ts');
+
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -85,7 +86,7 @@ angular.module('oppia').directive('previewTab', [
             var unsetParametersInfo = ParameterMetadataService
               .getUnsetParametersInfo([initStateNameForPreview]);
 
-            // Construct array to hold required parameter changes
+            // Construct array to hold required parameter changes.
             var manualParamChanges = [];
             for (var i = 0; i < unsetParametersInfo.length; i++) {
               var newParamChange = ParamChangeObjectFactory.createEmpty(
@@ -93,7 +94,7 @@ angular.module('oppia').directive('previewTab', [
               manualParamChanges.push(newParamChange);
             }
 
-            // Use modal to populate parameter change values
+            // Use modal to populate parameter change values.
             if (manualParamChanges.length > 0) {
               ctrl.showSetParamsModal(manualParamChanges, function() {
                 deferred.resolve(manualParamChanges);
@@ -117,16 +118,10 @@ angular.module('oppia').directive('previewTab', [
                 'preview-set-parameters-modal.template.html'),
               backdrop: 'static',
               windowClass: 'oppia-preview-set-params-modal',
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.manualParamChanges = manualParamChanges;
-                }
-              ]
+              resolve: {
+                manualParamChanges: () => manualParamChanges
+              },
+              controller: 'PreviewSetParametersModalController'
             }).result.then(function() {
               if (callback) {
                 callback();

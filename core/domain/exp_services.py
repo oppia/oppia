@@ -43,6 +43,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rights_manager
@@ -215,8 +216,8 @@ def get_recently_published_exp_summaries(limit):
 
     Returns:
         dict. The dict contains recently published ExplorationSummary model
-            instances as a value keyed by their exploration id. At most 'limit'
-            entries are returned.
+        instances as a value keyed by their exploration id. At most 'limit'
+        entries are returned.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published(limit))
@@ -231,7 +232,7 @@ def get_story_id_linked_to_exploration(exp_id):
 
     Returns:
         str|None. The ID of the story if the exploration is linked to some
-            story, otherwise None.
+        story, otherwise None.
     """
     exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
         exp_id)
@@ -266,13 +267,15 @@ def export_to_zip_file(exploration_id, version=None):
         str. The contents of the ZIP archive of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
+    # Asset directories that need to be included in exploration download.
+    asset_dirs_to_include_in_downloads = ('image',)
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = python_utils.string_io()
+    temp_file = python_utils.string_io()
     with zipfile.ZipFile(
-        memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
@@ -283,6 +286,8 @@ def export_to_zip_file(exploration_id, version=None):
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
+            if not filepath.startswith(asset_dirs_to_include_in_downloads):
+                continue
             file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
@@ -290,7 +295,7 @@ def export_to_zip_file(exploration_id, version=None):
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
-    return memfile.getvalue()
+    return temp_file.getvalue()
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):
@@ -359,62 +364,57 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     state.update_interaction_answer_groups(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
                         )
                     state.update_interaction_default_outcome(new_outcome)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if not isinstance(change.new_value, list):
-                        raise Exception('Expected hints_list to be a list,'
-                                        ' received %s' % change.new_value)
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
                     new_hints_list = [state_domain.Hint.from_dict(hint_dict)
                                       for hint_dict in change.new_value]
                     state.update_interaction_hints(new_hints_list)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    state.update_interaction_solution(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    new_solution = None
+                    if change.new_value is not None:
+                        new_solution = state_domain.Solution.from_dict(
+                            state.interaction.id, change.new_value)
+                    state.update_interaction_solution(new_solution)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
@@ -439,9 +439,8 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected written_translations to be a dict, '
@@ -489,8 +488,18 @@ def apply_change_list(exploration_id, change_list):
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
                 # resaving the exploration is sufficient to apply the states
-                # schema update.
-                continue
+                # schema update. Thus, no action is needed here other than
+                # to make sure that the version that the user is trying to
+                # migrate to is the latest version.
+                target_version_is_current_state_schema_version = (
+                    change.to_version ==
+                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                if not target_version_is_current_state_schema_version:
+                    raise Exception(
+                        'Expected to migrate to the latest state schema '
+                        'version %s, received %s' % (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION,
+                            change.to_version))
         return exploration
 
     except Exception as e:
@@ -572,7 +581,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        exp_versions_diff, None)
 
     stats_services.create_stats_model(new_exp_stats)
 
@@ -597,8 +606,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff=exp_versions_diff,
-        revert_to_version=None)
+        exploration, exp_versions_diff, None)
 
 
 def _create_exploration(
@@ -1070,33 +1078,38 @@ def save_exploration_summary(exp_summary):
     Args:
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
-    exp_summary_model = exp_models.ExpSummaryModel(
-        id=exp_summary.id,
-        title=exp_summary.title,
-        category=exp_summary.category,
-        objective=exp_summary.objective,
-        language_code=exp_summary.language_code,
-        tags=exp_summary.tags,
-        ratings=exp_summary.ratings,
-        scaled_average_rating=exp_summary.scaled_average_rating,
-        status=exp_summary.status,
-        community_owned=exp_summary.community_owned,
-        owner_ids=exp_summary.owner_ids,
-        editor_ids=exp_summary.editor_ids,
-        voice_artist_ids=exp_summary.voice_artist_ids,
-        viewer_ids=exp_summary.viewer_ids,
-        contributor_ids=exp_summary.contributor_ids,
-        contributors_summary=exp_summary.contributors_summary,
-        version=exp_summary.version,
-        exploration_model_last_updated=(
+    exp_summary_dict = {
+        'title': exp_summary.title,
+        'category': exp_summary.category,
+        'objective': exp_summary.objective,
+        'language_code': exp_summary.language_code,
+        'tags': exp_summary.tags,
+        'ratings': exp_summary.ratings,
+        'scaled_average_rating': exp_summary.scaled_average_rating,
+        'status': exp_summary.status,
+        'community_owned': exp_summary.community_owned,
+        'owner_ids': exp_summary.owner_ids,
+        'editor_ids': exp_summary.editor_ids,
+        'voice_artist_ids': exp_summary.voice_artist_ids,
+        'viewer_ids': exp_summary.viewer_ids,
+        'contributor_ids': exp_summary.contributor_ids,
+        'contributors_summary': exp_summary.contributors_summary,
+        'version': exp_summary.version,
+        'exploration_model_last_updated': (
             exp_summary.exploration_model_last_updated),
-        exploration_model_created_on=(
+        'exploration_model_created_on': (
             exp_summary.exploration_model_created_on),
-        first_published_msec=(
+        'first_published_msec': (
             exp_summary.first_published_msec)
-    )
+    }
 
-    exp_summary_model.put()
+    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    if exp_summary_model is not None:
+        exp_summary_model.populate(**exp_summary_dict)
+        exp_summary_model.put()
+    else:
+        exp_summary_dict['id'] = exp_summary.id
+        exp_models.ExpSummaryModel(**exp_summary_dict).put()
 
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the
@@ -1113,7 +1126,11 @@ def delete_exploration_summaries(exploration_ids):
             deleted.
     """
     summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
-    exp_models.ExpSummaryModel.delete_multi(summary_models)
+    existing_summary_models = [
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
+    exp_models.ExpSummaryModel.delete_multi(existing_summary_models)
 
 
 def revert_exploration(
@@ -1169,14 +1186,13 @@ def revert_exploration(
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
+        None, revert_to_version)
     stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
     stats_services.update_exp_issues_for_new_exp_version(
-        current_exploration, exp_versions_diff=None,
-        revert_to_version=revert_to_version)
+        current_exploration, None, revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
@@ -1296,8 +1312,9 @@ def delete_demo(exploration_id):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if not exploration:
-        logging.info('Exploration with id %s was not deleted, because it '
-                     'does not exist.' % exploration_id)
+        logging.info(
+            'Exploration with id %s was not deleted, because it '
+            'does not exist.' % exploration_id)
     else:
         delete_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
@@ -1362,6 +1379,7 @@ def get_next_page_of_all_non_private_commits(
             - bool. indicating whether there are (likely) more results after
               this batch. If False, there are no more results; if True, there
               are probably more results.
+
     Raises:
         ValueError: The argument max_age is not datetime.timedelta or None.
     """
@@ -1374,7 +1392,7 @@ def get_next_page_of_all_non_private_commits(
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.created_on, entry.last_updated, entry.user_id,
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
@@ -1388,7 +1406,7 @@ def get_image_filenames_from_exploration(exploration):
         exploration: Exploration object. The exploration itself.
 
     Returns:
-       list(str). List containing the name of the image files in exploration.
+        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
     for state in exploration.states.values():
@@ -1397,18 +1415,9 @@ def get_image_filenames_from_exploration(exploration):
                 'imageAndRegions']['value']['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
-    rte_components_in_exp = []
-    for html_string in html_list:
-        rte_components_in_exp = (
-            rte_components_in_exp + html_cleaner.get_rte_components(
-                html_string))
-
-    for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
-            filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
-    # This is done because the ItemSelectInput may repeat the image names.
-    return list(set(filenames))
+    filenames.extend(
+        html_cleaner.get_image_filenames_from_html_strings(html_list))
+    return filenames
 
 
 def get_number_of_ratings(ratings):
@@ -1553,10 +1562,11 @@ def get_user_exploration_data(
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                     and exp_user_data.draft_change_list else None)
-    draft_change_list_id = (exp_user_data.draft_change_list_id
-                            if exp_user_data else 0)
+    draft_changes = (
+        exp_user_data.draft_change_list if exp_user_data
+        and exp_user_data.draft_change_list else None)
+    draft_change_list_id = (
+        exp_user_data.draft_change_list_id if exp_user_data else 0)
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
@@ -1668,8 +1678,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]
-            if (
-                    exploration.version >
+            if (exploration.version >
                     exp_user_data.draft_change_list_exp_version):
                 logging.info(
                     'Exploration and draft versions out of sync, trying '
@@ -1682,12 +1691,27 @@ def get_exp_with_draft_applied(exp_id, user_id):
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
+    updated_exploration = None
 
-    return (
-        apply_change_list(exp_id, draft_change_list)
-        if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid(exp_id, draft_change_list_exp_version)
-        else None)
+    if (exp_user_data and exp_user_data.draft_change_list and
+            is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
+        updated_exploration = apply_change_list(exp_id, draft_change_list)
+        updated_exploration_has_no_invalid_math_tags = True
+        # verify that all the math-tags are valid before returning the
+        # updated exploration.
+        for state in updated_exploration.states.values():
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_with_attribute_math_content(
+                    html_string))
+            if len(error_list) > 0:
+                updated_exploration_has_no_invalid_math_tags = False
+                break
+        if not updated_exploration_has_no_invalid_math_tags:
+            updated_exploration = None
+
+    return updated_exploration
 
 
 def discard_draft(exp_id, user_id):
@@ -1726,3 +1750,37 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def save_multi_exploration_math_rich_text_info_model(
+        exploration_math_rich_text_info_list):
+    """Saves multiple instances of ExplorationMathRichTextInfoModel to the
+    datastore.
+
+    Args:
+        exploration_math_rich_text_info_list:
+        list(ExplorationMathRichTextInfoModel). A list of
+            ExplorationMathRichTextInfoModel domain objects.
+    """
+
+    exploration_math_rich_text_info_models = []
+    for exploration_math_rich_text_info in (
+            exploration_math_rich_text_info_list):
+        latex_strings_without_svg = (
+            exploration_math_rich_text_info.latex_strings_without_svg)
+        math_images_generation_required = (
+            exploration_math_rich_text_info.math_images_generation_required)
+        exp_id = (
+            exploration_math_rich_text_info.exp_id)
+        estimated_max_size_of_images_in_bytes = (
+            exploration_math_rich_text_info.get_svg_size_in_bytes())
+        exploration_math_rich_text_info_models.append(
+            exp_models.ExplorationMathRichTextInfoModel(
+                id=exp_id,
+                math_images_generation_required=math_images_generation_required,
+                latex_strings_without_svg=latex_strings_without_svg,
+                estimated_max_size_of_images_in_bytes=(
+                    estimated_max_size_of_images_in_bytes)))
+
+    exp_models.ExplorationMathRichTextInfoModel.put_multi(
+        exploration_math_rich_text_info_models)

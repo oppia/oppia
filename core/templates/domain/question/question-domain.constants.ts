@@ -25,7 +25,7 @@ export class QuestionDomainConstants {
     '/manage_question_skill_link/<question_id>';
 
   public static PRETEST_QUESTIONS_URL_TEMPLATE =
-    '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>';
+    '/pretest_handler/<exploration_id>?story_id=<story_id>';
 
   public static QUESTION_PLAYER_URL_TEMPLATE =
     '/question_player_handler?skill_ids=<skill_ids>&question_count' +
@@ -33,6 +33,9 @@ export class QuestionDomainConstants {
 
   public static QUESTIONS_LIST_URL_TEMPLATE =
     '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>';
+
+  public static QUESTION_COUNT_URL_TEMPLATE =
+    '/question_count_handler/<comma_separated_skill_ids>';
 
   public static QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code';
   public static QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data';

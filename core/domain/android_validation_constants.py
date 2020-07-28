@@ -23,14 +23,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 # changed, just this array has to be modified to include the new
 # interactions or remove existing ones.
 VALID_INTERACTION_IDS = [
-    'Continue', 'EndExploration', 'NumericInput', 'TextInput',
-    'FractionInput', 'NumberWithUnits', 'MultipleChoiceInput',
-    'ItemSelectionInput']
+    'Continue', 'DragAndDropSortInput', 'EndExploration', 'FractionInput',
+    'ItemSelectionInput', 'MultipleChoiceInput', 'NumericInput',
+    'NumberWithUnits', 'TextInput'
+]
 
 SUPPORTED_LANGUAGES = ['en']
 
-INVALID_RTE_COMPONENTS = [
-    'collapsible', 'math', 'skillreview', 'tabs', 'video']
+VALID_RTE_COMPONENTS = ['image', 'link', 'skillreview']
 
 # If any of the following values are changed, edit the corresponding value in
 # app.constants.ts as well.

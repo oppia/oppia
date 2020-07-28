@@ -22,33 +22,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
 import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
-
-
-def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
-    """Checks whether the given target_type and suggestion_type are valid.
-
-    Args:
-        target_type: str. The type of the suggestion target.
-        suggestion_type: str. The type of the suggestion.
-
-    Raises:
-        InvalidInputException: If the given target_type of suggestion_type are
-            invalid.
-    """
-    if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
-        raise utils.InvalidInputException(
-            'Invalid target_type: %s' % target_type)
-
-    if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
-        raise utils.InvalidInputException(
-            'Invalid suggestion_type: %s' % suggestion_type)
 
 
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
@@ -60,7 +40,7 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
 
     Returns:
         dict. Dict mapping target_id to corresponding exploration opportunity
-            summary dict.
+        summary dict.
     """
     target_ids = set([s.target_id for s in suggestions])
     opportunities = (
@@ -85,7 +65,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     opportunity_skill_ids = [opp.id for opp in opportunities]
     opportunity_id_to_skill = {
         skill.id: skill
-        for skill in skill_services.get_multi_skills(opportunity_skill_ids)
+        for skill in skill_fetchers.get_multi_skills(opportunity_skill_ids)
     }
     opportunity_id_to_opportunity = {}
     for opp in opportunities:
@@ -103,13 +83,15 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        suggestion_services.create_suggestion(
-            self.payload.get('suggestion_type'),
-            self.payload.get('target_type'), self.payload.get('target_id'),
-            self.payload.get('target_version_at_submission'),
-            self.user_id, self.payload.get('change'),
-            self.payload.get('description'),
-            self.payload.get('final_reviewer_id'))
+        try:
+            suggestion_services.create_suggestion(
+                self.payload.get('suggestion_type'),
+                self.payload.get('target_type'), self.payload.get('target_id'),
+                self.payload.get('target_version_at_submission'),
+                self.user_id, self.payload.get('change'),
+                self.payload.get('description'))
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
         self.render_json(self.values)
 
 
@@ -122,21 +104,21 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
-            raise self.InvalidInputException('This handler allows actions only'
-                                             ' on suggestions to explorations.')
+            raise self.InvalidInputException(
+                'This handler allows actions only'
+                ' on suggestions to explorations.')
 
         if suggestion_id.split('.')[1] != target_id:
-            raise self.InvalidInputException('The exploration id provided does '
-                                             'not match the exploration id '
-                                             'present as part of the '
-                                             'suggestion_id')
+            raise self.InvalidInputException(
+                'The exploration id provided does not match the exploration id '
+                'present as part of the suggestion_id')
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
-            raise self.UnauthorizedUserException('You cannot accept/reject your'
-                                                 ' own suggestion.')
+            raise self.UnauthorizedUserException(
+                'You cannot accept/reject your own suggestion.')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             suggestion_services.accept_suggestion(
@@ -205,6 +187,26 @@ class SuggestionsProviderHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    def _require_valid_suggestion_and_target_types(
+            self, target_type, suggestion_type):
+        """Checks whether the given target_type and suggestion_type are valid.
+
+        Args:
+            target_type: str. The type of the suggestion target.
+            suggestion_type: str. The type of the suggestion.
+
+        Raises:
+            InvalidInputException: If the given target_type of suggestion_type
+                are invalid.
+        """
+        if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+            raise self.InvalidInputException(
+                'Invalid target_type: %s' % target_type)
+
+        if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
+            raise self.InvalidInputException(
+                'Invalid suggestion_type: %s' % suggestion_type)
+
     def _render_suggestions(self, target_type, suggestions):
         """Renders retrieved suggestions.
 
@@ -240,14 +242,11 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-            suggestions = suggestion_services.get_reviewable_suggestions(
-                self.user_id, suggestion_type)
-            self._render_suggestions(target_type, suggestions)
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        self._require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
@@ -258,14 +257,11 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-            suggestions = suggestion_services.get_submitted_suggestions(
-                self.user_id, suggestion_type)
-            self._render_suggestions(target_type, suggestions)
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        self._require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_submitted_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class SuggestionListHandler(base.BaseHandler):

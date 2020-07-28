@@ -20,12 +20,25 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 import feconf
 import utils
+
+
+class CommunityDashboardPage(base.BaseHandler):
+    """Page showing the community dashboard."""
+
+    @acl_decorators.open_access
+    def get(self):
+        # TODO(#7402): Serve this page statically through app.yaml once
+        # the COMMUNITY_DASHBOARD_ENABLED flag is removed.
+        if not feconf.COMMUNITY_DASHBOARD_ENABLED:
+            raise self.PageNotFoundException
+        self.render_template('community-dashboard-page.mainpage.html')
 
 
 class ContributionOpportunitiesHandler(base.BaseHandler):
@@ -36,6 +49,8 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, opportunity_type):
         """Handles GET requests."""
+        if not feconf.COMMUNITY_DASHBOARD_ENABLED:
+            raise self.PageNotFoundException
         search_cursor = self.request.get('cursor', None)
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
@@ -218,4 +233,18 @@ class UserCommunityRightsDataHandler(base.BaseHandler):
             'can_review_questions': (
                 community_rights.can_review_questions
                 if community_rights else False)
+        })
+
+
+class FeaturedTranslationLanguagesHandler(base.BaseHandler):
+    """Provides featured translation languages set in admin config."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'featured_translation_languages':
+                config_domain.FEATURED_TRANSLATION_LANGUAGES.value
         })

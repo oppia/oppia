@@ -19,25 +19,25 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeComponent = function(
+var customizeComponent = async function(
     modal, youtubeId, startTime, endTime, ifAutoplay) {
-  objects.UnicodeStringEditor(
+  await objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(youtubeId);
-  objects.IntEditor(
+  await objects.IntEditor(
     modal.all(by.tagName('schema-based-int-editor')).first()
   ).setValue(startTime);
-  objects.IntEditor(
+  await objects.IntEditor(
     modal.all(by.tagName('schema-based-int-editor')).last()
   ).setValue(endTime);
-  objects.BooleanEditor(
+  await objects.BooleanEditor(
     modal.element(by.tagName('schema-based-bool-editor'))
   ).setValue(ifAutoplay);
 };
 
-var expectComponentDetailsToMatch = function(
+var expectComponentDetailsToMatch = async function(
     elem, youtubeId, startTime, endTime, ifAutoplay) {
-  var videoInfo = elem.element(by.tagName('iframe')).getAttribute('src');
+  var videoInfo = await elem.element(by.tagName('iframe')).getAttribute('src');
   expect(videoInfo).toMatch(youtubeId);
   expect(videoInfo).toMatch('start=' + startTime);
   expect(videoInfo).toMatch('end=' + endTime);

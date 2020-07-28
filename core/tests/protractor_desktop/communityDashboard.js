@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,18 +20,19 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CommunityDashboardPage = require(
   '../protractor_utils/CommunityDashboardPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-var SkillEditorPage =
-  require('../protractor_utils/SkillEditorPage.js');
-var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
+var SkillEditorPage = require(
+  '../protractor_utils/SkillEditorPage.js');
+var TopicsAndSkillsDashboardPage = require(
+  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
-describe('Community dashboard page', function() {
+fdescribe('Community dashboard page', function() {
   const TOPIC_NAMES = [
     'Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
@@ -50,7 +51,7 @@ describe('Community dashboard page', function() {
   let explorationEditorMainTab = null;
   let adminPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     communityDashboardPage = (
       new CommunityDashboardPage.CommunityDashboardPage());
     communityDashboardTranslateTextTab = (
@@ -62,180 +63,149 @@ describe('Community dashboard page', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     adminPage = new AdminPage.AdminPage();
-    users.createUser(USER_EMAILS[0], 'user0');
-    users.createUser(USER_EMAILS[1], 'user1');
-    users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
+    await users.createUser(USER_EMAILS[0], 'user0');
+    await users.createUser(USER_EMAILS[1], 'user1');
+    await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
     // Create 2 topics and 2 skills. Link 1 skill to 1 topic.
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAMES[0], 'abbrev');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAMES[1], 'abbrev');
-    workflow.createSkillAndAssignTopic(
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAMES[0], 'abbrev');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAMES[1], 'abbrev');
+    await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
     // Allow user1 to review suggestions.
-    adminPage.get();
-    adminPage.assignQuestionReviewer('user1');
-    users.logout();
+    await adminPage.get();
+    await adminPage.assignQuestionReviewer('user1');
+    await users.logout();
   });
 
-  it('should allow user to switch to translate text tab', function() {
-    communityDashboardPage.get();
-    communityDashboardPage.navigateToTranslateTextTab();
-    communityDashboardTranslateTextTab.changeLanguage(HINDI_LANGUAGE);
-    communityDashboardTranslateTextTab.expectSelectedLanguageToBe(
+  it('should allow user to switch to translate text tab', async function() {
+    await communityDashboardPage.get();
+    await communityDashboardPage.navigateToTranslateTextTab();
+    await communityDashboardTranslateTextTab.changeLanguage(HINDI_LANGUAGE);
+    await communityDashboardTranslateTextTab.expectSelectedLanguageToBe(
       HINDI_LANGUAGE);
   });
 
-  it('should allow users to accept question suggestions', function() {
+  it('should allow users to accept question suggestions', async function() {
     // Baseline verification.
-    users.login(USER_EMAILS[0]);
-    communityDashboardPage.get();
-    // Initially, there should be no opportunity contributions, only the 2
-    // placeholder opportunities used when loading.
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.expectNumberOfOpportunitiesToBe(2);
-    communityDashboardPage.navigateToSubmitQuestionTab();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    // Before submission, progress percentage should be 0/50 = 0%.
-    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
-      '(0.00%)', 0);
-    communityDashboardPage.expectOpportunityHeadingToBe(SKILL_DESCRIPTIONS[0]);
+    await users.login(USER_EMAILS[0]);
+    await communityDashboardPage.get();
+
+    await communityDashboardPage.navigateToSubmitQuestionTab();
+
+    await communityDashboardPage.expectOpportunityPropertiesToBe(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0.00%)');
 
     // Submit suggestion as user0.
-    communityDashboardPage.clickOpportunityListItemButton(0);
-    skillEditorPage.confirmSkillDifficulty();
-    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Correct Answer'), null, false,
+    await communityDashboardPage.clickOpportunityActionButton(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
+    await skillEditorPage.confirmSkillDifficulty();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction('TextInput');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', 'correct');
-    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-    explorationEditorMainTab.addHint('Hint 1');
-    explorationEditorMainTab.addSolution('TextInput', {
+    await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
       explanation: 'It is correct'
     });
-    skillEditorPage.saveQuestion();
-    users.logout();
+    await skillEditorPage.saveQuestion();
+    await users.logout();
 
     // Review and accept the suggestion as user1.
-    users.login(USER_EMAILS[1]);
-    communityDashboardPage.get();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.clickOpportunityListItemButton(0);
-    communityDashboardPage.clickAcceptQuestionSuggestionButton();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.expectEmptyOpportunityAvailabilityMessage();
+    await users.login(USER_EMAILS[1]);
+    await communityDashboardPage.get();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.clickOpportunityActionButton(
+      'Question 1', SKILL_DESCRIPTIONS[0]);
+    await communityDashboardPage.waitForQuestionSuggestionReviewModalToAppear();
+    await communityDashboardPage.clickAcceptQuestionSuggestionButton();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.expectEmptyOpportunityAvailabilityMessage();
 
     // Validate progress percentage was updated in the opportunity.
-    communityDashboardPage.get();
-    communityDashboardPage.navigateToSubmitQuestionTab();
-    communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.get();
+    await communityDashboardPage.navigateToSubmitQuestionTab();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
     // After acceptance, progress percentage should be 1/50 = 2%.
-    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
-      '(2.00%)', 0);
-    users.logout();
+    await communityDashboardPage.expectOpportunityPropertiesToBe(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
+    await users.logout();
 
     // Validate the contribution status changed.
-    users.login(USER_EMAILS[0]);
-    communityDashboardPage.get();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
-    communityDashboardPage.expectOpportunityHeadingToBe('Question 1');
-    communityDashboardPage.expectOpportunityListItemSubheadingToBe(
-      SKILL_DESCRIPTIONS[0], 0);
-    communityDashboardPage.expectOpportunityListItemLabelToBe(
-      'Accepted', 0);
+    await users.login(USER_EMAILS[0]);
+    await communityDashboardPage.get();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.expectNumberOfOpportunitiesToBe(1);
+    await communityDashboardPage.expectOpportunityPropertiesToBe(
+      'Question 1', SKILL_DESCRIPTIONS[0], 'Accepted', null);
   });
 
-  it('should allow users to reject question suggestions', function() {
+  it('should allow users to reject question suggestions', async function() {
     // Baseline verification.
-    users.login(USER_EMAILS[0]);
-    communityDashboardPage.get();
-    communityDashboardPage.navigateToSubmitQuestionTab();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
-      '(2.00%)', 0);
+    await users.login(USER_EMAILS[0]);
+    await communityDashboardPage.get();
+    await communityDashboardPage.navigateToSubmitQuestionTab();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.expectOpportunityPropertiesToBe(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
 
     // Submit suggestion as user0.
-    communityDashboardPage.clickOpportunityListItemButton(0);
-    skillEditorPage.confirmSkillDifficulty();
-    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Correct Answer'), null, false,
+    await communityDashboardPage.clickOpportunityActionButton(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
+    await skillEditorPage.confirmSkillDifficulty();
+    await explorationEditorMainTab.setContent(await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction('TextInput');
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
       'FuzzyEquals', 'correct');
-    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-    explorationEditorMainTab.addHint('Hint 1');
-    explorationEditorMainTab.addSolution('TextInput', {
+    await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
       explanation: 'It is correct'
     });
-    skillEditorPage.saveQuestion();
-    users.logout();
+    await skillEditorPage.saveQuestion();
+    await users.logout();
 
     // Review and reject the suggestion as user1.
-    users.login(USER_EMAILS[1]);
-    communityDashboardPage.get();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.clickOpportunityListItemButton(0);
-    communityDashboardPage.setQuestionSuggestionReviewMessage('review message');
-    communityDashboardPage.clickRejectQuestionSuggestionButton();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.expectEmptyOpportunityAvailabilityMessage();
+    await users.login(USER_EMAILS[1]);
+    await communityDashboardPage.get();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.clickOpportunityActionButton(
+      'Question 1', SKILL_DESCRIPTIONS[0]);
+    await communityDashboardPage.waitForQuestionSuggestionReviewModalToAppear();
+    await communityDashboardPage.setQuestionSuggestionReviewMessage('review message');
+    await communityDashboardPage.clickRejectQuestionSuggestionButton();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.expectEmptyOpportunityAvailabilityMessage();
 
     // Validate progress percentage remains the same in the opportunity.
-    communityDashboardPage.get();
-    communityDashboardPage.navigateToSubmitQuestionTab();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    // After rejection, progress percentage should still be 0%.
-    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
-      '(2.00%)', 0);
-    users.logout();
+    await communityDashboardPage.get();
+    await communityDashboardPage.navigateToSubmitQuestionTab();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.expectOpportunityPropertiesToBe(
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(2.00%)');
+    await users.logout();
 
     // Validate the contribution status changed.
-    users.login(USER_EMAILS[0]);
-    communityDashboardPage.get();
-    communityDashboardPage.waitForOpportunitiesToLoad();
-    communityDashboardPage.expectNumberOfOpportunitiesToBe(4);
-    communityDashboardPage.expectOpportunityHeadingToBe('Question 1');
-    communityDashboardPage.expectOpportunityListItemSubheadingToBe(
-      SKILL_DESCRIPTIONS[0], 0);
-    communityDashboardPage.expectOpportunityListItemLabelToBe(
-      'Rejected', 0);
+    await users.login(USER_EMAILS[0]);
+    await communityDashboardPage.get();
+    await communityDashboardPage.waitForOpportunitiesToLoad();
+    await communityDashboardPage.expectNumberOfOpportunitiesToBe(2);
+    await communityDashboardPage.expectOpportunityPropertiesToBe(
+      'Question 1', SKILL_DESCRIPTIONS[0], 'Rejected', null);
   });
 
-  describe('Submit question tab', function() {
-    it('should list skill opportunities for admin user', function() {
-      users.login(ADMIN_EMAIL, true);
-      communityDashboardPage.get();
-      communityDashboardPage.navigateToSubmitQuestionTab();
-      communityDashboardPage.waitForOpportunitiesToLoad();
-
-      // There are always at least 2 placeholder opportunity list items.
-      communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
-      communityDashboardPage.expectOpportunityHeadingToBe(
-        SKILL_DESCRIPTIONS[0]);
-    });
-
-    it('should list skill opportunities for non-admin user', function() {
-      users.login(USER_EMAILS[0]);
-      communityDashboardPage.get();
-      communityDashboardPage.navigateToSubmitQuestionTab();
-      communityDashboardPage.waitForOpportunitiesToLoad();
-
-      // There are always at least 2 placeholder opportunity list items.
-      communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
-      communityDashboardPage.expectOpportunityHeadingToBe(
-        SKILL_DESCRIPTIONS[0]);
-    });
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
 
@@ -251,61 +221,104 @@ describe('Admin page community reviewer form', function() {
   var questionReviewerEmail = 'questionreviewer@community.com';
   var ADMIN_EMAIL = 'adminToAssignReviewer@adminTab.com';
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     communityDashboardPage = (
       new CommunityDashboardPage.CommunityDashboardPage());
-    users.createUser(translationReviewerEmail, translationReviewerUsername);
-    users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
-    users.createUser(questionReviewerEmail, questionReviewerUsername);
-    users.createUser(ADMIN_EMAIL, 'assignReviewer');
+    await users.createUser(translationReviewerEmail, translationReviewerUsername);
+    await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
+    await users.createUser(questionReviewerEmail, questionReviewerUsername);
+    await users.createAdmin(ADMIN_EMAIL, 'assignReviewer');
   });
 
-  beforeEach(function() {
-    users.login(ADMIN_EMAIL, true);
+  beforeEach(async function() {
+    await users.login(ADMIN_EMAIL, true);
   });
 
-  it('should allow admin to add translation reviewer', function() {
-    adminPage.get();
-    adminPage.assignTranslationReviewer(
+  it('should allow admin to add translation reviewer', async function() {
+    await adminPage.get();
+    await adminPage.assignTranslationReviewer(
       translationReviewerUsername, HINDI_LANGUAGE);
-    adminPage.expectUserToBeTranslationReviewer(
+    await adminPage.expectUserToBeTranslationReviewer(
       translationReviewerUsername, HINDI_LANGUAGE);
-    users.logout();
+    await users.logout();
 
-    users.login(translationReviewerEmail);
-    communityDashboardPage.get();
-    communityDashboardPage.expectUserToBeTranslationReviewer(HINDI_LANGUAGE);
-    users.logout();
+    await users.login(translationReviewerEmail);
+    await communityDashboardPage.get();
+    await communityDashboardPage.expectUserToBeTranslationReviewer(HINDI_LANGUAGE);
+    await users.logout();
   });
 
-  it('should allow admin to add voiceover reviewer', function() {
-    adminPage.get();
-    adminPage.assignVoiceoverReviewer(
+  it('should allow admin to add voiceover reviewer', async function() {
+    await adminPage.get();
+    await adminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
-    adminPage.expectUserToBeVoiceoverReviewer(
+    await adminPage.expectUserToBeVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
-    users.logout();
+    await users.logout();
 
-    users.login(voiceoverReviewerEmail);
-    communityDashboardPage.get();
-    communityDashboardPage.expectUserToBeVoiceoverReviewer(HINDI_LANGUAGE);
-    users.logout();
+    await users.login(voiceoverReviewerEmail);
+    await communityDashboardPage.get();
+    await communityDashboardPage.expectUserToBeVoiceoverReviewer(HINDI_LANGUAGE);
+    await users.logout();
   });
 
-  it('should allow admin to add question reviewer', function() {
-    adminPage.get();
-    adminPage.assignQuestionReviewer(questionReviewerUsername);
-    adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
-    users.logout();
+  it('should allow admin to add question reviewer', async function() {
+    await adminPage.get();
+    await adminPage.assignQuestionReviewer(questionReviewerUsername);
+    await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
+    await users.logout();
 
-    users.login(questionReviewerEmail);
-    communityDashboardPage.get();
-    communityDashboardPage.expectUserToBeQuestionReviewer();
-    users.logout();
+    await users.login(questionReviewerEmail);
+    await communityDashboardPage.get();
+    await communityDashboardPage.expectUserToBeQuestionReviewer();
+    await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Translation contribution featured languages', () => {
+  var communityDashboardPage = null;
+  var communityDashboardTranslateTextTab = null;
+
+  beforeAll(async function() {
+    communityDashboardPage = (
+      new CommunityDashboardPage.CommunityDashboardPage());
+    communityDashboardTranslateTextTab = (
+      communityDashboardPage.getTranslateTextTab());
+    await users.createAndLoginAdminUser(
+      'config@communityDashboard.com', 'communityDashboard');
+    const adminPage = new AdminPage.AdminPage();
+    await adminPage.editConfigProperty(
+      'Featured Translation Languages',
+      'List',
+      async function(elem) {
+        const featured = await elem.addItem('Dictionary');
+        await (await featured.editEntry(0, 'Unicode')).setValue('fr');
+        await (await featured.editEntry(1, 'Unicode'))
+          .setValue('Partnership with ABC');
+      });
+    await users.logout();
+  });
+
+  beforeEach(async function(){
+    await communityDashboardPage.get();
+    await communityDashboardPage.navigateToTranslateTextTab();
+  });
+
+  it('should show correct featured languages', async function() {
+    await communityDashboardTranslateTextTab
+      .expectFeaturedLanguagesToBe(['French']);
+  });
+
+  it('should show correct explanation', async function() {
+    await communityDashboardTranslateTextTab
+      .mouseoverFeaturedLanguageTooltip(0);
+    await communityDashboardTranslateTextTab
+      .expectFeaturedLanguageExplanationToBe('Partnership with ABC');
   });
 });

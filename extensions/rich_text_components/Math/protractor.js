@@ -19,15 +19,30 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeComponent = function(modal, rawLatex) {
-  objects.MathLatexStringEditor(
-    modal.element(by.tagName('math-latex-string-editor'))
-  ).setValue(rawLatex);
+var customizeComponent = async function(modal, rawLatex) {
+  await (objects.MathExpressionContentEditor(
+    modal.element(by.tagName('math-expression-content-editor'))
+  ).setValue(rawLatex));
 };
 
-var expectComponentDetailsToMatch = function(elem, rawLatex) {
+// This function is used to convert the escaped Json to unescaped object.
+// This is required because the customizationArg value which we get initially
+// from the Math rich text component is in escaped format and we need to
+// convert it to unescaped format.
+var escapedJsonToObj = function(json) {
+  return (
+    JSON.parse((json.toString())
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, '\'')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')));
+};
+
+var expectComponentDetailsToMatch = async function(elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
-  expect(elem.getAttribute('raw_latex-with-value')).toMatch(rawLatex);
+  var mathComponent = await elem.getAttribute('math_content-with-value');
+  expect(escapedJsonToObj(mathComponent).raw_latex).toBe(rawLatex);
 };
 
 exports.customizeComponent = customizeComponent;

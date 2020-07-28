@@ -49,7 +49,7 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
 
     Raises:
         Exception: The schema version of the story_contents is outside of what
-        is supported at present.
+            is supported at present.
     """
     story_contents_schema_version = versioned_story_contents['schema_version']
     if not (1 <= story_contents_schema_version
@@ -133,7 +133,9 @@ def get_story_summary_from_model(story_summary_model):
         story_summary_model.description,
         story_summary_model.language_code,
         story_summary_model.version,
-        story_summary_model.node_count,
+        story_summary_model.node_titles,
+        story_summary_model.thumbnail_bg_color,
+        story_summary_model.thumbnail_filename,
         story_summary_model.story_model_created_on,
         story_summary_model.story_model_last_updated
     )
@@ -178,6 +180,7 @@ def get_story_summary_by_id(story_id, strict=True):
         story_id: str. ID of the story summary.
         strict: bool. Whether to fail noisily if no story summary with the given
             id exists in the datastore.
+
     Returns:
         StorySummary. The story summary domain object corresponding to
         a story with the given story_id.
@@ -217,8 +220,8 @@ def get_story_summaries_by_ids(story_ids):
             summaries are to be found.
 
     Returns:
-        list(StorySummary). The story summaries corresponding to given story
-            ids.
+        list(StorySummary). The story summaries corresponds to given story
+        ids.
     """
     story_summary_models = story_models.StorySummaryModel.get_multi(story_ids)
     story_summaries = [
@@ -238,8 +241,8 @@ def get_latest_completed_node_ids(user_id, story_id):
 
     Returns:
         list(str). List of the completed node ids that come latest in the story.
-            If length is larger than 3, return the last three of them.
-            If length is smaller or equal to 3, return all of them.
+        If length is larger than 3, return the last three of them. If length is
+        smaller or equal to 3, return all of them.
     """
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)
@@ -340,6 +343,6 @@ def get_node_index_by_story_id_and_node_id(story_id, node_id):
 
     node_index = story.story_contents.get_node_index(node_id)
     if node_index is None:
-        raise Exception('Story node with id %s does not exist '
-                        'in this story.' % node_id)
+        raise Exception(
+            'Story node with id %s does not exist in this story.' % node_id)
     return node_index

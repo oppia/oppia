@@ -19,34 +19,54 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { InteractionObjectFactory } from
+import { InteractionBackendDict, Interaction, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { ParamChangeBackendDict, ParamChange } from
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+import {
+  RecordedVoiceOverBackendDict,
+  RecordedVoiceovers,
+  RecordedVoiceoversObjectFactory
+} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import {
+  SubtitledHtmlBackendDict,
+  SubtitledHtml,
+  SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  WrittenTranslationsBackendDict,
+  WrittenTranslations,
+  WrittenTranslationsObjectFactory
+} from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 const constants = require('constants.ts');
 
+export interface StateBackendDict {
+  'classifier_model_id': string;
+  'content': SubtitledHtmlBackendDict;
+  'interaction': InteractionBackendDict;
+  'param_changes': ParamChangeBackendDict[];
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
+  'solicit_answer_details': boolean;
+  'written_translations': WrittenTranslationsBackendDict;
+}
+
 export class State {
-  name;
-  classifierModelId;
-  content;
-  interaction;
-  paramChanges;
-  recordedVoiceovers;
-  solicitAnswerDetails;
-  writtenTranslations;
-  // TODO(#7165): Replace any with exact type.
+  name: string;
+  classifierModelId: string;
+  content: SubtitledHtml;
+  interaction: Interaction;
+  paramChanges: ParamChange[];
+  recordedVoiceovers: RecordedVoiceovers;
+  solicitAnswerDetails: boolean;
+  writtenTranslations: WrittenTranslations;
   constructor(
-      name: string, classifierModelId: any, content: any, interaction: any,
-      paramChanges: any, recordedVoiceovers: any, solicitAnswerDetails: any,
-      writtenTranslations: any) {
+      name: string, classifierModelId: string, content: SubtitledHtml,
+      interaction: Interaction, paramChanges: ParamChange[],
+      recordedVoiceovers: RecordedVoiceovers, solicitAnswerDetails: boolean,
+      writtenTranslations: WrittenTranslations) {
     this.name = name;
     this.classifierModelId = classifierModelId;
     this.content = content;
@@ -60,8 +80,7 @@ export class State {
     this.name = newName;
   }
 
-  // TODO(#7165): Replace any with exact type.
-  toBackendDict(): any {
+  toBackendDict(): StateBackendDict {
     return {
       content: this.content.toBackendDict(),
       classifier_model_id: this.classifierModelId,
@@ -75,8 +94,7 @@ export class State {
     };
   }
 
-  // TODO(#7165): Replace any with exact type.
-  copy(otherState: any): void {
+  copy(otherState: State): void {
     this.name = otherState.name;
     this.classifierModelId = otherState.classifierModelId;
     this.content = otherState.content;
@@ -113,8 +131,9 @@ export class StateObjectFactory {
     newState.interaction.defaultOutcome.dest = newStateName;
     return newState;
   }
-  // TODO(#7165): Replace any with exact type.
-  createFromBackendDict(stateName: string, stateDict: any): State {
+
+  createFromBackendDict(
+      stateName: string, stateDict: StateBackendDict): State {
     return new State(
       stateName,
       stateDict.classifier_model_id,

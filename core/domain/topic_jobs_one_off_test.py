@@ -65,8 +65,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
-        topic.add_subtopic(1, title='A subtitle')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+        topic.add_subtopic(1, 'A subtitle')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
             topic.subtopic_schema_version,
@@ -84,8 +84,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
-        self.assertEqual(topic.subtopics[0].to_dict(),
-                         updated_topic.subtopics[0].to_dict())
+        self.assertEqual(
+            topic.subtopics[0].to_dict(), updated_topic.subtopics[0].to_dict())
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_migrated',
@@ -97,7 +97,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
         topic_services.save_new_topic(self.albert_id, topic)
 
         # Delete the topic before migration occurs.
@@ -186,7 +186,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2,
+            'a name', 'description', 'Image.svg',
+            '#C6DCDA', [], [], [], 2,
             language_code='invalid_language_code')
 
         job_id = (
@@ -234,19 +235,19 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         deleted uncategorized skills ids from the topic.
         """
         valid_skill_1 = skill_domain.Skill.create_default_skill(
-            'valid_skill_1', description='A description', rubrics=self.rubrics)
+            'valid_skill_1', 'A description', self.rubrics)
         valid_skill_2 = skill_domain.Skill.create_default_skill(
-            'valid_skill_2', description='A description', rubrics=self.rubrics)
+            'valid_skill_2', 'A description', self.rubrics)
         valid_skill_3 = skill_domain.Skill.create_default_skill(
-            'valid_skill_3', description='A description', rubrics=self.rubrics)
+            'valid_skill_3', 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, valid_skill_1)
         skill_services.save_new_skill(self.albert_id, valid_skill_2)
         skill_services.save_new_skill(self.albert_id, valid_skill_3)
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
-        topic.add_subtopic(1, title='A subtitle')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+        topic.add_subtopic(1, 'A subtitle')
         topic.add_uncategorized_skill_id('valid_skill_1')
         topic.add_uncategorized_skill_id('valid_skill_2')
         topic.add_uncategorized_skill_id('valid_skill_3')
@@ -305,7 +306,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         skills that are deleted.
         """
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
         topic.add_uncategorized_skill_id('skill_1')
         topic.add_uncategorized_skill_id('skill_2')
         topic_services.save_new_topic(self.albert_id, topic)

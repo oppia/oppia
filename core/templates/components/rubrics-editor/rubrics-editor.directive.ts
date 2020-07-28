@@ -50,15 +50,13 @@ angular.module('oppia').directive('rubricsEditor', [
         '/components/rubrics-editor/rubrics-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope', 'ContextService',
-        'RubricObjectFactory', 'SkillCreationService',
-        'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT', 'SKILL_DIFFICULTY_MEDIUM',
-        'SKILL_DESCRIPTION_STATUS_VALUES',
+        '$scope', '$filter', '$uibModal', 'ContextService',
+        'RubricObjectFactory', 'SkillCreationService', 'PAGE_CONTEXT',
+        'SKILL_DIFFICULTY_MEDIUM', 'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
-            $scope, $filter, $uibModal, $rootScope, ContextService,
-            RubricObjectFactory, SkillCreationService,
-            EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT, SKILL_DIFFICULTY_MEDIUM,
-            SKILL_DESCRIPTION_STATUS_VALUES) {
+            $scope, $filter, $uibModal, ContextService,
+            RubricObjectFactory, SkillCreationService, PAGE_CONTEXT,
+            SKILL_DIFFICULTY_MEDIUM, SKILL_DESCRIPTION_STATUS_VALUES) {
           var ctrl = this;
           var explanationsMemento = {};
 
@@ -147,6 +145,16 @@ angular.module('oppia').directive('rubricsEditor', [
               type: 'html',
               ui_config: {}
             };
+            ctrl.selectedRubricIndex = null;
+            ctrl.rubricsOptions = [
+              {id: 0, difficulty: 'Easy'},
+              {id: 1, difficulty: 'Medium'},
+              {id: 2, difficulty: 'Hard'}
+            ];
+          };
+
+          ctrl.onRubricSelectionChange = function() {
+            ctrl.rubric = ctrl.getRubrics()[ctrl.selectedRubricIndex];
           };
 
           // The section below is only called in the topics and skills

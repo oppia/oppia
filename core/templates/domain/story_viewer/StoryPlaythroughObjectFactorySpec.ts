@@ -31,6 +31,7 @@ describe('Story playthrough object factory', () => {
 
     var firstSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
+      description: 'description',
       title: 'Title 1',
       prerequisite_skill_ids: [],
       acquired_skill_ids: [],
@@ -40,12 +41,35 @@ describe('Story playthrough object factory', () => {
       outline_is_finalized: false,
       exp_summary_dict: {
         title: 'Title',
-        status: 'private'
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
       },
-      completed: true
+      completed: true,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename'
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_2',
+      description: 'description',
       title: 'Title 2',
       prerequisite_skill_ids: [],
       acquired_skill_ids: [],
@@ -55,14 +79,39 @@ describe('Story playthrough object factory', () => {
       outline_is_finalized: false,
       exp_summary_dict: {
         title: 'Title',
-        status: 'private'
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
       },
-      completed: false
+      completed: false,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename',
     };
     var storyPlaythroughBackendObject = {
       story_nodes: [
         firstSampleReadOnlyStoryNodeBackendDict,
-        secondSampleReadOnlyStoryNodeBackendDict]
+        secondSampleReadOnlyStoryNodeBackendDict],
+      story_title: 'Story',
+      story_description: 'Description',
+      topic_name: 'Topic 1'
     };
     _samplePlaythroughObject =
       storyPlaythroughObjectFactory.createFromBackendDict(

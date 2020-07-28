@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the donate page.
+ * @fileoverview Component for the donate page.
  */
 
 import { Component, OnInit } from '@angular/core';
@@ -24,12 +24,13 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 require('base-components/base-content.directive.ts');
 
 @Component({
   selector: 'donate-page',
-  template: require('./donate-page.component.html'),
+  templateUrl: './donate-page.component.html',
   styleUrls: []
 })
 export class DonatePageComponent implements OnInit {
@@ -38,7 +39,8 @@ export class DonatePageComponent implements OnInit {
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionService: WindowDimensionsService
+    private windowDimensionService: WindowDimensionsService,
+    private windowRef: WindowRef
   ) {}
   ngOnInit() {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
@@ -49,7 +51,8 @@ export class DonatePageComponent implements OnInit {
   onDonateThroughAmazon() {
     this.siteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
     setTimeout(() => {
-      window.location.href = 'https://smile.amazon.com/ch/81-1740068';
+      this.windowRef.nativeWindow.location.href = (
+        'https://smile.amazon.com/ch/81-1740068');
     }, 150);
     return false;
   }

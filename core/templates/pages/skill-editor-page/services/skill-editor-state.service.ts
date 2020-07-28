@@ -26,35 +26,31 @@ require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
+import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('SkillEditorStateService', [
-  '$rootScope', 'AlertsService', 'QuestionsListService',
+  'AlertsService', 'QuestionsListService',
   'SkillBackendApiService', 'SkillObjectFactory',
   'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
-      $rootScope, AlertsService, QuestionsListService,
+      AlertsService, QuestionsListService,
       SkillBackendApiService, SkillObjectFactory,
-      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService,
-      EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
+      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = (
       SkillRightsObjectFactory.createInterstitialSkillRights());
     var _skillIsInitialized = false;
+    var assignedSkillTopicData = null;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
     var _groupedSkillSummaries = {
       current: [],
       others: []
     };
-
+    var _skillChangedEventEmitter = new EventEmitter();
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
-      if (_skillIsInitialized) {
-        $rootScope.$broadcast(EVENT_SKILL_REINITIALIZED);
-      } else {
-        $rootScope.$broadcast(EVENT_SKILL_INITIALIZED);
-      }
+      _skillChangedEventEmitter.emit();
       _skillIsInitialized = true;
     };
 
@@ -100,9 +96,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
       _skillRights.copyFromSkillRights(skillRights);
     };
 
-    var _updateSkillRights = function(newBackendSkillRightsObject) {
-      _setSkillRights(SkillRightsObjectFactory.createFromBackendDict(
-        newBackendSkillRightsObject));
+    var _updateSkillRights = function(newSkillRightsObject) {
+      _setSkillRights(newSkillRightsObject);
     };
     return {
       /**
@@ -115,6 +110,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
         SkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
+            assignedSkillTopicData = (
+              newBackendSkillObject.assignedSkillTopicData);
             _updateSkill(newBackendSkillObject.skill);
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
@@ -127,8 +124,8 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _skillIsBeingLoaded = false;
           });
         SkillRightsBackendApiService.fetchSkillRights(
-          skillId).then(function(newBackendSkillRightsObject) {
-          _updateSkillRights(newBackendSkillRightsObject);
+          skillId).then(function(newSkillRightsObject) {
+          _updateSkillRights(newSkillRightsObject);
           _skillIsBeingLoaded = false;
         }, function(error) {
           AlertsService.addWarning(
@@ -143,6 +140,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
        */
       isLoadingSkill: function() {
         return _skillIsBeingLoaded;
+      },
+
+      getAssignedSkillTopicData: function() {
+        return assignedSkillTopicData;
       },
 
       getGroupedSkillSummaries: function() {
@@ -200,6 +201,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _skillIsBeingSaved = false;
           });
         return true;
+      },
+
+      get onSkillChange() {
+        return _skillChangedEventEmitter;
       },
 
       getSkillRights: function() {

@@ -16,6 +16,9 @@
  * @fileoverview Directive for the exploration editor feedback tab.
  */
 
+require('pages/exploration-editor-page/feedback-tab/templates/' +
+  'create-feedback-thread-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -24,6 +27,9 @@ require(
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/thread-table/' +
+  'thread-table.component.ts');
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
@@ -98,32 +104,7 @@ angular.module('oppia').directive('feedbackTab', [
                 '/pages/exploration-editor-page/feedback-tab/templates/' +
                 'create-feedback-thread-modal.template.html'),
               backdrop: true,
-              resolve: {},
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.newThreadSubject = '';
-                  $scope.newThreadText = '';
-
-                  $scope.create = (newThreadSubject, newThreadText) => {
-                    if (!newThreadSubject) {
-                      AlertsService.addWarning(
-                        'Please specify a thread subject.');
-                      return;
-                    }
-                    if (!newThreadText) {
-                      AlertsService.addWarning('Please specify a message.');
-                      return;
-                    }
-                    $uibModalInstance.close({
-                      newThreadSubject: newThreadSubject,
-                      newThreadText: newThreadText
-                    });
-                  };
-
-                  $scope.cancel = () => $uibModalInstance.dismiss('cancel');
-                }
-              ]
+              controller: 'CreateFeedbackThreadModalController'
             }).result.then(result => ThreadDataService.createNewThreadAsync(
               result.newThreadSubject, result.newThreadText)
             ).then(() => {

@@ -18,9 +18,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import logging
 
 from core import jobs
+from core.domain import draft_upgrade_services
+from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -42,6 +46,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -148,6 +153,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -266,6 +272,7 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -323,30 +330,11 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_id, first_contribution_msec)
 
 
-class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that updates profile pictures for users which do not
-    currently have them. Users who already have profile pictures are
-    unaffected.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-        if item.deleted or item.profile_picture_data_url is not None:
-            return
-
-        user_services.generate_initial_profile_picture(item.id)
-
-
 class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that adds fields to record last exploration created and last
     edited times.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -374,6 +362,90 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_model.last_edited_an_exploration = user_commits[0].created_on
 
         user_model.put()
+
+
+class DraftChangeMathRichTextAuditOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that finds all the valid exploration draft changes with math rich
+    text components having no SVG and outputs the corresponding exploration IDs.
+    """
+
+    _SUCCESS_KEY = 'found_draft_changes_with_math_tags'
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationUserDataModel]
+
+    @staticmethod
+    def map(item):
+        exp_id = item.exploration_id
+        exploration = exp_models.ExplorationModel.get_by_id(exp_id)
+        if exploration is None or exploration.deleted:
+            yield (
+                'Invalid Draft change list found.',
+                'Exploration corresponding to Draft change %s does not exist' %
+                (item.id))
+            return
+        if item.draft_change_list is None:
+            return
+        draft_change_list = [
+            exp_domain.ExplorationChange(change)
+            for change in item.draft_change_list]
+        draft_change_list_version = item.draft_change_list_exp_version
+        exploration_version = exploration.version
+        final_draft_change_list = None
+
+        if exploration_version == draft_change_list_version:
+            final_draft_change_list = draft_change_list
+        elif exploration_version > draft_change_list_version:
+            updated_draft_change_list = (
+                draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                    draft_change_list, draft_change_list_version,
+                    exploration_version, exp_id))
+            final_draft_change_list = updated_draft_change_list
+        else:
+            yield (
+                'Invalid Draft change list found.',
+                'Draft change %s version greater than exploration version' % (
+                    item.id))
+            return
+
+
+        if final_draft_change_list is not None:
+            try:
+                html_string = ''.join(
+                    draft_upgrade_services.
+                    extract_html_from_draft_change_list(
+                        final_draft_change_list))
+                latex_strings = (
+                    html_validation_service.
+                    get_latex_strings_without_svg_from_html(
+                        html_string))
+                if len(latex_strings) > 0:
+                    yield (
+                        DraftChangeMathRichTextAuditOneOffJob.
+                        _SUCCESS_KEY, item.exploration_id)
+
+            except Exception as e:
+                logging.error(
+                    'Draft change %s parsing failed: %s' %
+                    (item.id, e))
+                yield (
+                    'failed to parse draft change list.',
+                    'Draft change %s parsing failed: %s' % (item.id, e))
+                return
+
+    @staticmethod
+    def reduce(key, values):
+        if key == (
+                DraftChangeMathRichTextAuditOneOffJob.
+                _SUCCESS_KEY):
+            final_values = list(set(values))
+            yield ((
+                'found %d explorations having draft changes with math-tags '
+                'having no SVG'
+            ) % len(final_values), final_values)
+        else:
+            yield (key, values)
 
 
 class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(

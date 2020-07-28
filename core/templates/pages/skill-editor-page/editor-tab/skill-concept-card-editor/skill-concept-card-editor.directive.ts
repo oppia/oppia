@@ -30,6 +30,11 @@ require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
   'worked-example-editor.directive.ts');
+require(
+  'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
+require(
+  'pages/skill-editor-page/modal-templates/' +
+  'add-worked-example-modal.controller.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
@@ -38,18 +43,23 @@ require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/format-rte-preview.filter.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 require('services/generate-content-id.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  'WorkedExampleObjectFactory', 'COMPONENT_NAME_WORKED_EXAMPLE',
+  'WindowDimensionsService', 'WorkedExampleObjectFactory',
+  'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
       GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
       SubtitledHtmlObjectFactory, UrlInterpolationService,
-      WorkedExampleObjectFactory, COMPONENT_NAME_WORKED_EXAMPLE) {
+      WindowDimensionsService, WorkedExampleObjectFactory,
+      COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -57,9 +67,15 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
         'skill-concept-card-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
-        function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
+        '$scope', '$filter', '$uibModal',
+        function($scope, $filter, $uibModal) {
           var ctrl = this;
+
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
+          ctrl.directiveSubscriptions = new Subscription();
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
@@ -120,32 +136,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 '/pages/skill-editor-page/modal-templates/' +
                 'add-worked-example-modal.directive.html'),
               backdrop: 'static',
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {}
-                  };
-
-                  $scope.tmpWorkedExampleQuestionHtml = '';
-                  $scope.tmpWorkedExampleExplanationHtml = '';
-
-                  $scope.saveWorkedExample = function() {
-                    $uibModalInstance.close({
-                      workedExampleQuestionHtml:
-                        $scope.tmpWorkedExampleQuestionHtml,
-                      workedExampleExplanationHtml:
-                        $scope.tmpWorkedExampleExplanationHtml
-                    });
-                  };
-                }
-              ]
+              controller: 'AddWorkedExampleModalController'
             }).result.then(function(result) {
               var newExample = WorkedExampleObjectFactory.create(
                 SubtitledHtmlObjectFactory.createDefault(
@@ -172,14 +163,41 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             });
           };
 
+          $scope.showSkillPreview = function() {
+            var skillDescription = (
+              SkillEditorStateService.getSkill().getDescription());
+            var skillExplanation = (
+              $scope.bindableFieldsDict.displayedConceptCardExplanation);
+            var skillWorkedExamples = (
+              $scope.bindableFieldsDict.displayedWorkedExamples);
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill-editor-page/editor-tab/' +
+                'skill-preview-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                skillDescription: () => skillDescription,
+                skillExplanation: () => skillExplanation,
+                skillWorkedExamples: () => skillWorkedExamples
+              },
+              controller: 'SkillPreviewModalController'
+            });
+          };
+
+          $scope.toggleWorkedExampleList = function() {
+            $scope.workedExamplesListIsShown = (
+              !$scope.workedExamplesListIsShown);
+          };
+
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
             initBindableFieldsDict();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              initBindableFieldsDict();
-            });
+            $scope.workedExamplesListIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.onSkillChange.subscribe(
+                () => initBindableFieldsDict())
+            );
 
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
@@ -204,6 +222,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               }
             };
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          });
         }
       ]
     };

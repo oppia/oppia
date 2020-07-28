@@ -1,0 +1,44 @@
+{
+  "ListOfSetsOfHtmlStrings": {
+    "interactionId": "DragAndDropSortInput",
+    "format": "listOfSets",
+    "ruleTypes": {
+      "IsEqualToOrdering": {
+        "htmlInputVariables": ["x"]
+      },
+      "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
+        "htmlInputVariables": ["x"]
+      }
+    }
+  },
+  "DragAndDropHtmlString": {
+    "interactionId": "DragAndDropSortInput",
+    "format": "string",
+    "ruleTypes": {
+      "HasElementXAtPositionY": {
+        "htmlInputVariables": ["x"]
+      },
+      "HasElementXBeforeElementY": {
+        "htmlInputVariables": ["x", "y"]
+      }
+    }
+  },
+  "SetOfHtmlString": {
+    "interactionId": "ItemSelectionInput",
+    "format": "set",
+    "ruleTypes": {
+      "Equals": {
+        "htmlInputVariables": ["x"]
+      },
+      "ContainsAtLeastOneOf": {
+        "htmlInputVariables": ["x"]
+      },
+      "DoesNotContainAtLeastOneOf": {
+        "htmlInputVariables": ["x"]
+      },
+      "IsProperSubsetOf": {
+        "htmlInputVariables": ["x"]
+      }
+    }
+  }
+}

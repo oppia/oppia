@@ -16,45 +16,52 @@
  * @fileoverview Tests for ReadOnlyTopicObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
-describe('Topic Data Object Factory', () => {
+describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
 
   beforeEach(() => {
     readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
-      new SkillSummaryObjectFactory());
+      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
+      new ShortSkillSummaryObjectFactory());
 
     let sampleTopicDataDict = {
       topic_name: 'topic_name',
       topic_id: 'topic_id',
+      topic_description: 'Topic description',
       canonical_story_dicts: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1,
-        published: true
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1,
-        published: true
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
         skill_ids: ['skill_id_2'],
         id: 1,
-        title: 'subtopic_name'
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74'
       }],
       degrees_of_mastery: {
         skill_id_1: 0.5,
@@ -71,8 +78,10 @@ describe('Topic Data Object Factory', () => {
       sampleTopicDataDict);
   });
 
-  it('should return correct values of topic name and id', () => {
+  it('should return correct values of topic name, description and id', () => {
     expect(_sampleReadOnlyTopic.getTopicName()).toEqual('topic_name');
+    expect(
+      _sampleReadOnlyTopic.getTopicDescription()).toEqual('Topic description');
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
     expect(_sampleReadOnlyTopic.getTrainTabShouldBeDisplayed()).toEqual(false);
   });
@@ -109,8 +118,11 @@ describe('Topic Data Object Factory', () => {
       .toEqual('Story Title');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0]
       .getDescription()).toEqual('Story Description');
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeCount())
-      .toEqual(1);
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeTitles())
+      .toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0].isNodeCompleted(
+        'Chapter 1')).toEqual(true);
   });
 
   it('should return correct values of additional stories', () => {
@@ -121,7 +133,10 @@ describe('Topic Data Object Factory', () => {
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
       .getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-      .getNodeCount()).toEqual(1);
+      .getNodeTitles()).toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].isNodeCompleted(
+        'Chapter 1')).toEqual(true);
   });
 
   it('should return the correct value of degrees for skills', () => {

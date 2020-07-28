@@ -20,9 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import datetime
 
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -67,112 +65,9 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         return self.ONE_OFF_JOB_CLASS.get_output(job_id)
 
 
-class PlaythroughAuditTests(OneOffJobTestBase):
-    ONE_OFF_JOB_CLASS = stats_jobs_one_off.PlaythroughAudit
-
-    def setUp(self):
-        super(PlaythroughAuditTests, self).setUp()
-        self.exp = self.save_new_valid_exploration('EXP_ID', 'owner_id')
-
-    def create_playthrough(self):
-        """Helper method to create and return a simple playthrough model."""
-        playthrough_id = stats_models.PlaythroughModel.create(
-            self.exp.id, self.exp.version, issue_type='EarlyQuit',
-            issue_customization_args={
-                'state_name': {'value': 'state_name'},
-                'time_spent_in_exp_in_msecs': {'value': 200},
-            },
-            actions=[])
-        return stats_models.PlaythroughModel.get(playthrough_id)
-
-    def create_exp_issues_with_playthroughs(self, playthrough_ids_list):
-        """Helper method to create and return an ExplorationIssuesModel instance
-        with the given sets of playthrough ids as reference issues.
-        """
-        return stats_models.ExplorationIssuesModel.create(
-            self.exp.id, self.exp.version, unresolved_issues=[
-                {
-                    'issue_type': 'EarlyQuit',
-                    'issue_customization_args': {
-                        'state_name': {'value': 'state_name'},
-                        'time_spent_in_exp_in_msecs': {'value': 200},
-                    },
-                    'playthrough_ids': list(playthrough_ids),
-                    'schema_version': 1,
-                    'is_valid': True,
-                }
-                for playthrough_ids in playthrough_ids_list
-            ])
-
-    def test_empty_output_for_good_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(output, [])
-
-    def test_output_for_pre_release_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        # Set created_on to a date which is definitely before GSoC 2018.
-        playthrough.created_on = datetime.datetime(2017, 12, 31)
-        playthrough.put()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('before the GSoC 2018 submission deadline', output[0])
-
-    def test_output_for_non_whitelisted_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id + 'differentiated'])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('has not been curated for recording', output[0])
-
-    def test_output_for_bad_schema_playthrough(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        playthrough.actions.append({'bad schema key': 'bad schema value'})
-        playthrough.put()
-        self.create_exp_issues_with_playthroughs([[playthrough.id]])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('could not be validated', output[0])
-
-    def test_output_for_missing_reference(self):
-        self.set_config_property(
-            config_domain.WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS,
-            [self.exp.id])
-        playthrough = self.create_playthrough()
-        self.create_exp_issues_with_playthroughs([
-            [playthrough.id + '-different'],
-        ])
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('not found as a reference', output[0])
-
-
 class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Unit tests for RegenerateMissingV1StatsModelsOneOffJob."""
+
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob)
     EXP_ID = 'EXP_ID1'
@@ -1406,6 +1301,7 @@ class RecomputeStatisticsValidationCopyOneOffJobTests(OneOffJobTestBase):
 
 class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Tests the regeneration of missing stats models."""
+
     ONE_OFF_JOB_CLASS = (
         stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob)
 
@@ -1642,7 +1538,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.save_new_default_exploration('ID', 'owner_id')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '1 ExplorationStats model present'],
+            ['EXPECTED', '1 ExplorationStats model is valid'],
         ])
 
     def test_success_when_several_stats_model_exists(self):
@@ -1651,7 +1547,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.save_new_default_exploration('ID3', 'owner_id')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '3 ExplorationStats models present'],
+            ['EXPECTED', '3 ExplorationStats models are valid'],
         ])
 
     def test_error_when_stats_model_is_missing(self):
@@ -1685,7 +1581,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             exp_services.update_exploration('owner_id', 'ID', None, 'noop')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '1 ExplorationStats model present'],
+            ['EXPECTED', '1 ExplorationStats model is valid'],
             ['UNEXPECTED',
              'ExplorationStats for Exploration "ID" missing at versions: 1, 3'],
         ])
@@ -1701,7 +1597,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            ['EXPECTED', '1 ExplorationStats model present'],
+            ['EXPECTED', '1 ExplorationStats model is valid'],
             ['UNEXPECTED',
              'ExplorationStats for Exploration "ID" deleted at versions: 1, 3'],
         ])
@@ -1719,3 +1615,82 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             'owner_id', feconf.COMMIT_MESSAGE_EXPLORATION_DELETED)
 
         self.assertItemsEqual(self.run_one_off_job(), [])
+
+    def test_error_when_stats_for_state_is_missing(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v1 does not have stats for card "%s", but '
+             'card appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
+        ])
+
+    def test_error_when_stats_for_state_does_not_exist(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        stats.state_stats_mapping['Unknown State'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v1 has stats for card "Unknown State", but '
+             'card never existed.']
+        ])
+
+    def test_error_when_stats_for_state_no_longer_exists(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 2)
+        del stats.state_stats_mapping[feconf.DEFAULT_INIT_STATE_NAME]
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v2 does not have stats for card "%s", but '
+             'card appears in versions: 1, 2.' % feconf.DEFAULT_INIT_STATE_NAME]
+        ])
+
+    def test_error_when_stats_for_state_once_existed(self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'ID', 'owner_id',
+            ['State ①', 'State ②', 'State ③'],
+            ['TextInput', 'TextInput', 'EndExploration'])
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        exp_services.update_exploration( # v3
+            'owner_id', 'ID', [
+                exp_domain.ExplorationChange(
+                    {'cmd': 'delete_state', 'state_name': 'State ②'})
+            ], 'Delete State ②')
+
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 3)
+        stats.state_stats_mapping['State ②'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '2 ExplorationStats models are valid'],
+            ['UNEXPECTED',
+             'ExplorationStats "ID" v3 has stats for card "State ②", but card '
+             'only appears in versions: 1, 2.']
+        ])
+
+    def test_no_error_when_exploration_can_not_update_schema(self):
+        old_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 24)
+
+        with old_schema:
+            self.save_new_default_exploration('ID', 'owner_id')
+
+        new_schema = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 25)
+        schema_update_failure = self.swap(
+            exp_domain.Exploration, '_convert_states_v24_dict_to_v25_dict',
+            classmethod(lambda *_: python_utils.divide(1, 0)))
+
+        with new_schema, schema_update_failure:
+            self.assertItemsEqual(self.run_one_off_job(), [
+                ['EXPECTED', '1 ExplorationStats model is valid']
+            ])

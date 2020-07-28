@@ -4,16 +4,17 @@
     @load('base-components/header.template.html', {"title": "Getting Started with Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <content>
-          <stewards-landing-page></stewards-landing-page>
-        </content>
-        <page-footer></page-footer>
-      </base-content>
-    </div>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <content>
+            <stewards-landing-page></stewards-landing-page>
+          </content>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

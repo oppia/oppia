@@ -24,6 +24,9 @@ require(
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
+require(
+  'pages/story-editor-page/modal-templates/' +
+  'new-chapter-title-modal.controller.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
@@ -31,6 +34,8 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('pages/topic-editor-page/modal-templates/' +
+    'preview-thumbnail.component.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -78,8 +83,6 @@ angular.module('oppia').directive('storyEditor', [
               $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
               $scope.linearNodesList =
                 $scope.storyContents.getLinearNodesList();
-              $scope.disconnectedNodes =
-                $scope.storyContents.getDisconnectedNodes();
             }
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
@@ -108,20 +111,15 @@ angular.module('oppia').directive('storyEditor', [
               $scope.story.getStoryContents().getInitialNodeId() === nodeId);
           };
 
-          $scope.markAsInitialNode = function(nodeId) {
-            if ($scope.isInitialNode(nodeId)) {
-              return;
-            }
-            StoryUpdateService.setInitialNodeId($scope.story, nodeId);
-            var nodes = this.storyContents.getNodes();
-            for (var i = 0; i < nodes.length; i++) {
-              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
-                StoryUpdateService.removeDestinationNodeIdFromNode(
-                  $scope.story, nodes[i].getId(), nodeId);
-              }
-            }
+          $scope.onMoveChapterStart = function(index, node) {
+            $scope.dragStartIndex = index;
+            $scope.nodeBeingDragged = node;
+          };
+
+          $scope.rearrangeNodeInStory = function(toIndex) {
+            StoryUpdateService.rearrangeNodeInStory(
+              $scope.story, $scope.dragStartIndex, toIndex);
             _initEditor();
-            $scope.$broadcast('recalculateAvailableNodes');
           };
 
           $scope.deleteNode = function(nodeId) {
@@ -156,38 +154,12 @@ angular.module('oppia').directive('storyEditor', [
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.nodeTitle = '';
-                  $scope.nodeTitles = nodeTitles;
-                  $scope.errorMsg = null;
-                  $scope.MAX_CHARS_IN_CHAPTER_TITLE =
-                    MAX_CHARS_IN_CHAPTER_TITLE;
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-                  $scope.isNodeTitleEmpty = function(nodeTitle) {
-                    return (nodeTitle === '');
-                  };
-                  $scope.save = function(title) {
-                    if ($scope.nodeTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A chapter with this title already exists';
-                      return;
-                    }
-                    $uibModalInstance.close(title);
-                  };
-                }
-              ]
-            }).result.then(function(title) {
-              StoryUpdateService.addStoryNode($scope.story, title);
+              resolve: {
+                nodeTitles: () => nodeTitles
+              },
+              windowClass: 'create-new-chapter',
+              controller: 'CreateNewChapterModalController'
+            }).result.then(function() {
               _initEditor();
               // If the first node is added, open it just after creation.
               if ($scope.story.getStoryContents().getNodes().length === 1) {
@@ -247,7 +219,12 @@ angular.module('oppia').directive('storyEditor', [
             }
           };
 
+          $scope.togglePreview = function() {
+            $scope.storyPreviewCardIsShown = !($scope.storyPreviewCardIsShown);
+          };
+
           ctrl.$onInit = function() {
+            $scope.storyPreviewCardIsShown = false;
             $scope.NOTES_SCHEMA = {
               type: 'html',
               ui_config: {

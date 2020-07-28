@@ -21,8 +21,10 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { NumericInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -36,21 +38,15 @@ export class NumericInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): any[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: NumericInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -107,7 +103,7 @@ export class NumericInputValidationService {
         };
         switch (rule.type) {
           case 'Equals':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
             break;
           case 'IsInclusivelyBetween':
@@ -119,24 +115,24 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, a, b, true, true);
             break;
           case 'IsGreaterThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, false, false);
             break;
           case 'IsGreaterThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, true, false);
             break;
           case 'IsLessThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
             break;
           case 'IsLessThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
             break;
           case 'IsWithinTolerance':
-            var x = rule.inputs.x;
-            var tol = rule.inputs.tol;
+            var x = (<number>rule.inputs.x);
+            var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             break;
           default:
@@ -164,35 +160,40 @@ export class NumericInputValidationService {
     return warningsList;
   }
 
-  getErrorString(value: string): string {
-    if (!value) {
-      return '';
+  getErrorString(value: number): string {
+    if (value === undefined || value === null) {
+      return 'Please enter a valid number.';
+    }
+    let stringValue = null;
+    // Convert exponential notation to decimal number.
+    // Logic derived from https://stackoverflow.com/a/16139848.
+    var data = String(value).split(/[eE]/);
+    if (data.length === 1) {
+      stringValue = data[0];
+    } else {
+      var z = '';
+      var sign = value < 0 ? '-' : '';
+      var str = data[0].replace('.', '');
+      var mag = Number(data[1]) + 1;
+
+      if (mag < 0) {
+        z = sign + '0.';
+        while (mag++) {
+          z += '0';
+        }
+        stringValue = z + str.replace(/^\-/, '');
+      } else {
+        mag -= str.length;
+        while (mag--) {
+          z += '0';
+        }
+        stringValue = str + z;
+      }
     }
 
-    value = value.toString().trim();
-    const trailingDot = /\.\d/g;
-    const twoDecimals = /.*\..*\./g;
-    const extraChars = /[^0-9.+-]/g;
-    const trailingMinus = /^-/g;
-    const extraMinus = /-.*-/g;
-
-    if (value.includes('.') && !value.match(trailingDot)) {
-      return 'Trailing decimals are not allowed.';
-    } else if (value.match(twoDecimals)) {
-      return 'At most 1 decimal point should be present.';
-    } else if (value.match(extraChars)) {
-      return 'Only use numbers, minus sign (-), and decimal (.).';
-    } else if (value.includes('-') && !value.match(trailingMinus)) {
-      return 'Minus (-) sign is only allowed in beginning.';
-    } else if (value.includes('-') && value.match(extraMinus)) {
-      return 'At most 1 minus (-) sign should be present.';
-    }
-  }
-
-  parseValue(viewValue: string): number {
-    if (viewValue) {
-      viewValue = viewValue.trim();
-      return parseFloat(viewValue);
+    if (stringValue.match(/\d/g).length > 15) {
+      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
+        '(. or -).';
     }
   }
 }

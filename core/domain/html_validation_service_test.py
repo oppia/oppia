@@ -923,8 +923,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'abc&amp;quot;" filepath-with-value="&amp;quot;'
             'random.png&amp;quot;"></oppia-noninteractive-image>'
         ), (
-            '<p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
-            'abc&amp;quot;"></oppia-noninteractive-math></p>'
+            '<p><oppia-noninteractive-math math_content-with-value="'
+            '{&amp;quot;raw_latex&amp;quot;:&amp;quot;abc&amp;quot;'
+            ',&amp;quot;svg_filename&amp;quot;:&amp;quot;&amp;quot;}">'
+            '</oppia-noninteractive-math></p>'
         ), (
             '<p><oppia-noninteractive-math url-with-value="&amp;quot;'
             'http://link.com&amp;quot;></oppia-noninteractive-math></p>'
@@ -1373,7 +1375,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaises(Exception)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception, 'No JSON object could be decoded')
 
         html_content = (
             '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
@@ -1506,6 +1509,357 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.get_invalid_svg_tags_and_attrs(
                 invalid_svg_string), ([], ['path:keytimes']))
+
+    def test_add_math_content_to_math_rte_components(self):
+        test_cases = [{
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+                'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+            ),
+            'expected_output': (
+                '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+                'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+                '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+                ';quot;}"></oppia-noninteractive-math>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
+                '+,+,+&amp;quot;"></oppia-noninteractive-math>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-math math_content-with-value="{&amp;'
+                'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+                'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+                '-noninteractive-math>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
+                'noninteractive-math>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+                '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            )
+        }, {
+            'html_content': '<p> This is a normal tag </p>',
+            'expected_output': '<p> This is a normal tag </p>'
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math math_content-with-value="{&amp;qu'
+                'ot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a_3)'
+                '...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+                '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+                ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.add_math_content_to_math_rte_components(
+                    test_case['html_content']),
+                test_case['expected_output'])
+        invalid_cases = [{
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math></oppia-nonintera'
+                'ctive-math>')
+        }, {
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+                'e="++--"></oppia-noninteractive-math>'
+            )
+        }]
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid math tag with no proper attribute found'):
+            html_validation_service.add_math_content_to_math_rte_components(
+                invalid_cases[0]['html_content'])
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid raw_latex string found in the math tag'):
+            html_validation_service.add_math_content_to_math_rte_components(
+                invalid_cases[1]['html_content'])
+
+    def test_validate_math_tags_in_html(self):
+        """Test that the validate_math_tags_in_html method validates an
+        HTML string and returns all the invalid tags.
+        """
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+            'e="+,-,-,+"></oppia-noninteractive-math><p>Feedback</p><oppia-n'
+            'oninteractive-math></oppia-noninteractive-math><p>Feedback</p><'
+            'oppia-noninteractive-math invalid_tag-with-value="&amp;quot;+,-'
+            ',-,+&amp;quot;"></oppia-noninteractive-math><p>Feedback</p><opp'
+            'ia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&'
+            'amp;quot;"></oppia-noninteractive-math><p>Feedback</p><oppia-no'
+            'ninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;q'
+            'uot;"></oppia-noninteractive-math>'
+        )
+        expected_invalid_tags = [(
+            '<oppia-noninteractive-math raw_latex-with-value="+,-,-,+"></op'
+            'pia-noninteractive-math>'
+        ), (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>'
+        ), (
+            '<oppia-noninteractive-math invalid_tag-with-value="&amp;quot;+'
+            ',-,-,+&amp;quot;"></oppia-noninteractive-math>'
+        ), (
+            '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-'
+            ',-,+&amp;quot;"></oppia-noninteractive-math>'
+        )]
+        invalid_tags = (
+            html_validation_service.validate_math_tags_in_html(html_string))
+
+        for index, invalid_tag in enumerate(invalid_tags):
+            self.assertEqual(
+                python_utils.UNICODE(invalid_tag), expected_invalid_tags[index])
+
+    def test_validate_math_tags_in_html_with_attribute_math_content(self):
+        """Test that the validate_math_tags_in_html_with_attribute_math_content
+        method validates an HTML string and returns all the invalid tags.
+        """
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
+            '+,+,+&amp;quot;"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
+            'noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math></oppia-noninteractive-math>'
+            '<p>this is a normal tag</p>'
+            '<oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{'
+            'raw_latex: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+            )
+
+        expected_invalid_tags = [(
+            '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
+            'noninteractive-math>'
+        ), (
+            '<oppia-noninteractive-math></oppia-noninteractive-math>'
+        ), (
+            '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
+            '+,+,+&amp;quot;"></oppia-noninteractive-math>'
+        ), (
+            '<oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;}"></oppia-noninteractive-math>'
+        ), (
+            '<oppia-noninteractive-math math_content-with-value="{'
+            'raw_latex: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+        )]
+        invalid_tags = (
+            html_validation_service.
+            validate_math_tags_in_html_with_attribute_math_content(
+                html_string))
+
+        self.assertEqual(len(invalid_tags), 5)
+        for invalid_tag in invalid_tags:
+            self.assertTrue(
+                python_utils.UNICODE(invalid_tag) in expected_invalid_tags)
+
+    def test_extract_latex_strings_when_all_math_tags_have_empty_svg_filename(
+            self):
+        """Test that get_latex_strings_without_svg_from_html
+        extracts filenames when all math tags have empty filename field.
+        """
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
+
+        expected_list_of_latex_strings = [
+            '+,-,-,+', '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+
+        list_of_latex_string = (
+            html_validation_service.
+            get_latex_strings_without_svg_from_html(
+                html_string))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_encoded_latex_strings))
+
+    def test_extract_latex_strings_when_latex_strings_have_unicode_characters(
+            self):
+        """Test that get_latex_strings_without_svg_from_html
+        extracts filenames when LaTeX strings have unicode characters.
+        """
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\u03A7\u03A6'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈ&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n)&amp;quot;, &amp;quot;svg_filename&amp;quot;'
+            ': &amp;quot;&amp;quot;}"></oppia-noninteractive-math>')
+
+        expected_list_of_latex_strings = [
+            'ÀÁÂÃÄÅÆÇÈ', '\u03A7\u03A6',
+            '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+        list_of_latex_string = (
+            html_validation_service.
+            get_latex_strings_without_svg_from_html(
+                html_string))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_encoded_latex_strings))
+
+    def test_extract_latex_strings_when_math_tags_have_non_empty_svg_filename(
+            self):
+        """Test that get_latex_strings_without_svg_from_html
+        extracts filenames when some math tags have non empty filename field.
+        """
+
+        html_string = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp'
+            ';quot;}"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+(x^2)&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;\\\\sqrt{x}&amp;quot;, &am'
+            'p;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></opp'
+            'ia-noninteractive-math>')
+
+        # Here '+,+,+,+(x^2)' won't be extracted because the corresponding
+        # math tag has a non-empty svg_filename field.
+        expected_list_of_latex_strings = ['\\sqrt{x}', '\\frac{x}{y}']
+        expected_list_of_encoded_latex_strings = [
+            string.encode(encoding='utf-8') for string in (
+                expected_list_of_latex_strings)]
+        list_of_latex_string = (
+            html_validation_service.
+            get_latex_strings_without_svg_from_html(
+                html_string))
+        self.assertEqual(
+            sorted(list_of_latex_string),
+            sorted(expected_list_of_encoded_latex_strings))
+
+    def test_extract_latex_strings_when_no_math_tags_are_present(self):
+        """Test that get_latex_strings_without_svg_from_html
+        when there are no math tags present in the HTML.
+        """
+        html_string_with_no_math = (
+            '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
+            '</oppia-noninteractive-image>Hello this is test case to check that'
+            ' dimensions are added to the oppia noninteractive image tags.</p>'
+        )
+        self.assertEqual(
+            html_validation_service.
+            get_latex_strings_without_svg_from_html(
+                html_string_with_no_math), [])
+
+    def test_extract_svg_filenames_in_math_rte_components(self):
+        """Test that the extract_svg_filenames_in_math_rte_components
+        method extracts all the filenames from math rich-text components in
+        html.
+        """
+        html_string_with_filename_having_filename = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';img.svg&amp;quot;}"></oppia-noninteractive-math>'
+        )
+
+        self.assertEqual(
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(
+                html_string_with_filename_having_filename), ['img.svg'])
+
+        html_string_with_no_filename = (
+            '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        self.assertEqual(
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(
+                html_string_with_no_filename), [])
+
+    def test_check_for_math_component_in_html(self):
+        """Test that the check_for_math_component_in_html method checks for
+         math-tags in an HTML string and returns a boolean.
+        """
+        test_cases = [{
+            'html_content': (
+                '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
+                'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+            ),
+            'expected_output': True
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
+                '+,+,+&amp;quot;"></oppia-noninteractive-math>'
+            ),
+            'expected_output': True
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
+                'noninteractive-math>'
+            ),
+            'expected_output': True
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
+                '</oppia-noninteractive-image>Hello this is test case to check'
+                ' that dimensions are added to the oppia noninteractive image '
+                'tags.</p>'
+            ),
+            'expected_output': False
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_validation_service.check_for_math_component_in_html(
+                    test_case['html_content']),
+                test_case['expected_output'])
 
     def test_parsable_as_xml(self):
         invalid_xml = 'aDRjSzNS'

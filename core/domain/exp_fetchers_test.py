@@ -35,6 +35,7 @@ import python_utils
 
 class ExplorationRetrievalTests(test_utils.GenericTestBase):
     """Test the exploration retrieval methods."""
+
     EXP_1_ID = 'exploration_1_id'
     EXP_2_ID = 'exploration_2_id'
     EXP_3_ID = 'exploration_3_id'
@@ -75,7 +76,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(self.exploration_1.id, retrieved_exploration.id)
         self.assertEqual(self.exploration_1.title, retrieved_exploration.title)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id fake_exploration'
+            ' not found'):
             exp_fetchers.get_exploration_by_id('fake_exploration')
 
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
@@ -164,17 +168,22 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         self.assertNotIn('doesnt_exist', result)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Couldn\'t find explorations with the following ids:\n'
+            'doesnt_exist'):
             exp_fetchers.get_multiple_explorations_by_id(
                 exp_ids + ['doesnt_exist'])
 
 
 class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = ("""author_notes: ''
+    UPGRADED_EXP_YAML = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category

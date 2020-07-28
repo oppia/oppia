@@ -1,52 +1,53 @@
-/* eslint-disable camelcase */
-interface IKNN {
-  occurrence: number;
-  K: number;
-  T: number;
-  top: number;
-  fingerprint_data: {
+interface KNN {
+  'occurrence': number;
+  'K': number;
+  'T': number;
+  'top': number;
+  'fingerprint_data': {
     [key: number]: {
       class: number;
       fingerprint: number[][]
     }
   };
-  token_to_id: {
+  'token_to_id': {
     [key: string]: number;
   };
 }
 
-interface ISVM {
-  classes: number[];
-  kernel_params: {
-    kernel: string;
-    coef0: number;
-    degree: number;
-    gamma: number;
-  };
-  intercept: number[];
-  n_support: number[];
-  probA: number[];
-  support_vectors: number[][];
-  probB: number[];
-  dual_coef: number[][];
+interface KernelParams {
+  kernel: string;
+  coef0: number;
+  degree: number;
+  gamma: number;
 }
 
-interface IClassifierData {
-  KNN: IKNN;
-  SVM: ISVM;
-  cv_vocabulary: {
+interface SVM {
+  'classes': number[];
+  'kernel_params': KernelParams;
+  'intercept': number[];
+  'n_support': number[];
+  'probA': number[];
+  'support_vectors': number[][];
+  'probB': number[];
+  'dual_coef': number[][];
+}
+
+interface ClassifierData {
+  'KNN': KNN;
+  'SVM': SVM;
+  'cv_vocabulary': {
     [key: string]: number;
   };
 }
 
-type IClassifierAccuracyTest = {
-  answer_group_index: number;
-  answers: {
+type ClassifierAccuracyTest = {
+  'answer_group_index': number;
+  'answers': {
     code: string
   }[];
 }[];
 
-interface IHashes {
+interface Hashes {
   '/hash_test.html': string;
   '/path_test/hash_test.html': string;
   '/hash_test.min.js': string;
@@ -57,45 +58,49 @@ interface IHashes {
   '/interactions/interTest/static/interTest.png': string;
 }
 
-interface IInplaceReplaceTest {
+interface InplaceReplaceTest {
   RANDMON1: string;
   '312RANDOM': string;
   DEV_MODE: boolean;
   RAN213DOM: string;
 }
 
-interface ITestCasesRTE {
+interface TestCasesRTE {
   RTE_TYPE_TEXTANGULAR: {
     TEST_CASES: {
-      html_content: string;
-      expected_output: string;
-      case: string;
+      'html_content': string;
+      'expected_output': string;
+      'case': string;
     }[];
   };
 }
 
-type ITextClassifierResults = {
-  answer_group_index: number;
-  answers: string[];
+type TextClassifierResults = {
+  'answer_group_index': number;
+  'answers': string[];
 }[];
 
-interface ITextInputClassifierData {
-  best_params: {
+interface TextInputClassifierData {
+  'best_params': {
     kernel: string;
     C: number;
   };
-  best_score: number;
-  SVM: ISVM;
-  cv_vocabulary: {
+  'best_score': number;
+  'SVM': SVM;
+  'cv_vocabulary': {
     [key: string]: number;
   };
 }
 
-interface IRuleDescription {
+interface RuleDescription {
   description: string;
 }
 
-interface IRuleTemplates {
+interface RuleTemplates {
+  AlgebraicExpressionInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+  };
   CodeRepl: {
     CodeEquals: IRuleDescription;
     CodeContains: IRuleDescription;
@@ -146,6 +151,10 @@ interface IRuleTemplates {
     NotCorrect: IRuleDescription;
     NotCorrectByCategory: IRuleDescription;
   };
+  MathEquationInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+  };
   MathExpressionInput: {
     IsMathematicallyEquivalentTo: IRuleDescription;
   };
@@ -163,6 +172,12 @@ interface IRuleTemplates {
   NumberWithUnits: {
     IsEqualTo: IRuleDescription;
     IsEquivalentTo: IRuleDescription;
+  };
+  NumericExpressionInput: {
+    MatchesExactlyWith: IRuleDescription;
+    IsEquivalentTo: IRuleDescription;
+    ContainsSomeOf: IRuleDescription;
+    OmitsSomeOf: IRuleDescription;
   };
   NumericInput: {
     Equals: IRuleDescription;
@@ -201,8 +216,8 @@ interface IRuleTemplates {
 }
 
 interface KarmaFixtures {
-  'extensions/interactions/rule_templates': IRuleTemplates;
-  'core/tests/data/code_classifier_data': IClassifierData;
+  'extensions/interactions/rule_templates': RuleTemplates;
+  'core/tests/data/code_classifier_data': ClassifierData;
   'core/tests/data/code_classifier_accuracy_test': IClassifierAccuracyTest;
   'core/tests/data/code_classifier_test_knn': IClassifierAccuracyTest;
   'core/tests/data/code_classifier_test_svm': IClassifierAccuracyTest;
@@ -210,6 +225,6 @@ interface KarmaFixtures {
   'core/tests/data/inplace_replace_test': IInplaceReplaceTest;
   'core/tests/data/test_cases_for_rte': ITestCasesRTE;
   'core/tests/data/text_classifier_results': ITextClassifierResults;
-  'core/tests/data/text_input_classifier_data': ITextInputClassifierData;
+  'core/tests/data/text_input_classifier_data': TextInputClassifierData;
   'core/tests/data/text_input_training_data': ITextClassifierResults;
 }

@@ -28,11 +28,13 @@ from google.appengine.ext import ndb
 
 class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a story snapshot."""
+
     pass
 
 
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
+
     pass
 
 
@@ -42,6 +44,7 @@ class StoryModel(base_models.VersionedModel):
     This class should only be imported by the story services file
     and the story model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = StorySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = StorySnapshotContentModel
     ALLOW_REVERT = False
@@ -85,11 +88,6 @@ class StoryModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StoryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -111,16 +109,9 @@ class StoryModel(base_models.VersionedModel):
         super(StoryModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         story_commit_log_entry = StoryCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()
@@ -137,9 +128,9 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     StoryModel occurs.
 
-    The id for this model is of the form
-    'story-{{STORY_ID}}-{{STORY_VERSION}}'.
+    The id for this model is of the form 'story-[story_id]-[version]'.
     """
+
     # The id of the story being edited.
     story_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -199,8 +190,12 @@ class StorySummaryModel(base_models.BaseModel):
     # with created_on, which is the time when the story *summary*
     # model was created).
     story_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
-    # The number of nodes that are part of this story.
-    node_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The titles of the nodes in the story, in the same order as present there.
+    node_titles = ndb.StringProperty(repeated=True, indexed=False)
+    # The thumbnail filename of the story.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the story.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
 
     @staticmethod
@@ -216,7 +211,7 @@ class StorySummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -227,8 +222,3 @@ class StorySummaryModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StoryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

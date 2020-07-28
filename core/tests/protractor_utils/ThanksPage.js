@@ -21,9 +21,9 @@ var waitFor = require('./waitFor.js');
 var ThanksPage = function() {
   var THANKS_PAGE_URL = '/thanks';
 
-  this.get = function() {
-    browser.get(THANKS_PAGE_URL);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(THANKS_PAGE_URL);
+    await waitFor.pageToFullyLoad();
   };
 };
 

@@ -119,9 +119,9 @@ class ActivityRights(python_utils.OBJECT):
         """Validates an ActivityRights object.
 
         Raises:
-          utils.ValidationError: if any of the owners, editors, voice artists
-          and viewers lists overlap, or if a community-owned exploration has
-          owners, editors, voice artists or viewers specified.
+            utils.ValidationError: if any of the owners, editors, voice artists
+                and viewers lists overlap, or if a community-owned exploration
+                has owners, editors, voice artists or viewers specified.
         """
         if self.community_owned:
             if (self.owner_ids or self.editor_ids or self.voice_artist_ids or
@@ -138,15 +138,12 @@ class ActivityRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Public explorations should have no viewers specified.')
 
-        owner_editor = set(self.owner_ids).intersection(set(self.editor_ids))
-        owner_voice_artist = set(self.owner_ids).intersection(
-            set(self.voice_artist_ids))
-        owner_viewer = set(self.owner_ids).intersection(set(self.viewer_ids))
-        editor_voice_artist = set(self.editor_ids).intersection(
-            set(self.voice_artist_ids))
-        editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
-        voice_artist_viewer = set(self.voice_artist_ids).intersection(
-            set(self.viewer_ids))
+        owner_editor = set(self.owner_ids) & set(self.editor_ids)
+        owner_voice_artist = set(self.owner_ids) & set(self.voice_artist_ids)
+        owner_viewer = set(self.owner_ids) & set(self.viewer_ids)
+        editor_voice_artist = set(self.editor_ids) & set(self.voice_artist_ids)
+        editor_viewer = set(self.editor_ids) & set(self.viewer_ids)
+        voice_artist_viewer = set(self.voice_artist_ids) & set(self.viewer_ids)
         if owner_editor:
             raise utils.ValidationError(
                 'A user cannot be both an owner and an editor: %s' %
@@ -177,7 +174,7 @@ class ActivityRights(python_utils.OBJECT):
 
         Returns:
             dict. A dict version of ActivityRights suitable for use by the
-                frontend.
+            frontend.
         """
         if self.community_owned:
             return {
@@ -326,6 +323,7 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
     Returns:
         ActivityRights. The rights object created from the model.
     """
+
     return ActivityRights(
         activity_rights_model.id,
         activity_rights_model.owner_ids,
@@ -389,7 +387,7 @@ def _update_exploration_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-    # TODO(msl): get rid of inline imports by refactoring code.
+    # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
     exp_services.update_exploration_summary(
         activity_rights.id, None)
@@ -515,8 +513,8 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
         exp_ids: list(str). List of exploration ids.
 
     Returns:
-        list(ActivityRights or None). List of rights object containing
-            ActivityRights object for existing exploration or None.
+        list(ActivityRights or None). List of rights object --> ActivityRights
+        objects for existing exploration or None.
     """
     exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
         exp_ids)
@@ -629,7 +627,7 @@ def get_collection_owner_names(collection_id):
 
     Returns:
         list(str). Human-readable usernames (or truncated email addresses) of
-            owners for this collection.
+        owners for this collection.
     """
     collection_rights = get_collection_rights(collection_id)
     return user_services.get_human_readable_user_ids(
@@ -742,8 +740,7 @@ def check_can_edit_activity(user, activity_rights):
         return True
 
     if (activity_rights.is_published() and
-            (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
-             user.actions)):
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False
@@ -773,12 +770,11 @@ def check_can_voiceover_activity(user, activity_rights):
         return True
 
     if (activity_rights.community_owned or
-            (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
+            role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions):
         return True
 
     if (activity_rights.is_published() and
-            (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
-             user.actions)):
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False

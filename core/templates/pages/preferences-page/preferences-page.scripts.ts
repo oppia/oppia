@@ -20,7 +20,8 @@
 // main module the elements are attached to.
 require('pages/preferences-page/preferences-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');
 
-require('pages/preferences-page/preferences-page.controller.ts');
+require('pages/preferences-page/preferences-page.component.ts');

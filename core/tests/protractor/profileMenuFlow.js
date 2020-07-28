@@ -26,126 +26,129 @@ var waitFor = require('../protractor_utils/waitFor.js');
 describe('Profile menu flow', function() {
   var learnerDashboardPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     var VISITOR_USERNAME = 'desktopAndMobileVisitor';
-    users.createAdmin(
+    await users.createAdmin(
       'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
-    users.createAndLoginUser(
+    await users.createAndLoginUser(
       'desktopAndMobileVisitor@profileMenuFlow.com', VISITOR_USERNAME);
   });
 
   it('should land on the learner dashboard after successful login',
-    function() {
-      expect(browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner_dashboard');
+    async function() {
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/learner-dashboard');
     });
 
   describe('profile dropdown menu', function() {
-    beforeEach(function() {
-      users.login('desktopAndMobileVisitor@profileMenuFlow.com');
-      learnerDashboardPage.get();
+    beforeEach(async function() {
+      await users.login('desktopAndMobileVisitor@profileMenuFlow.com');
+      await learnerDashboardPage.get();
       var profileDropdown = element(by.css(
         '.protractor-test-profile-dropdown'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         profileDropdown, 'Could not click profile dropdown');
-      profileDropdown.click();
+      await profileDropdown.click();
     });
 
     it('should visit the profile page from the profile dropdown menu',
-      function() {
+      async function() {
         var profileLink = element(by.css(
           '.protractor-test-profile-link'));
-        waitFor.elementToBeClickable(
+        await waitFor.elementToBeClickable(
           profileLink, 'Could not click on the profile link');
-        profileLink.click();
-        waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/profile/desktopAndMobileVisitor');
+        await profileLink.click();
+        await waitFor.pageToFullyLoad();
+        expect(await browser.getCurrentUrl()).toEqual(
+          'http://localhost:9001/profile/desktopAndMobileVisitor');
       });
 
     it('should visit the creator dashboard from the profile dropdown menu',
-      function() {
+      async function() {
         var creatorDashboardLink = element(by.css(
           '.protractor-test-creator-dashboard-link'));
-        waitFor.elementToBeClickable(
+        await waitFor.elementToBeClickable(
           creatorDashboardLink,
           'Could not click on the creator dashboard link');
-        creatorDashboardLink.click();
-        waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/creator_dashboard');
+        await creatorDashboardLink.click();
+        await waitFor.pageToFullyLoad();
+        expect(await browser.getCurrentUrl()).toEqual(
+          'http://localhost:9001/creator-dashboard');
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',
-      function() {
+      async function() {
         var learnerDashboardLink = element(by.css(
           '.protractor-test-learner-dashboard-link'));
-        waitFor.elementToBeClickable(
+        await waitFor.elementToBeClickable(
           learnerDashboardLink,
           'Could not click on the learner dashboard link');
-        learnerDashboardLink.click();
-        waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/learner_dashboard');
+        await learnerDashboardLink.click();
+        await waitFor.pageToFullyLoad();
+        expect(await browser.getCurrentUrl()).toEqual(
+          'http://localhost:9001/learner-dashboard');
       });
 
     it('should not show the topics and skills dashboard link in the profile ' +
-      'dropdown menu when user is not admin', function() {
-      element.all(
-        by.css(
-          '.protractor-test-topics-and-skills-dashboard-link')
-      ).then(function(links) {
-        expect(links.length).toEqual(0);
-      });
+      'dropdown menu when user is not admin', async function() {
+      var links = element.all(by.css(
+        '.protractor-test-topics-and-skills-dashboard-link'));
+      expect(await links.count()).toEqual(0);
     });
 
     it('should visit the topics and skills dashboard from the profile ' +
-      'dropdown menu when user is admin', function() {
-      users.logout();
+      'dropdown menu when user is admin', async function() {
+      await users.logout();
 
-      users.login('desktopAndMobileAdm@profileMenuFlow.com');
-      learnerDashboardPage.get();
+      await users.login('desktopAndMobileAdm@profileMenuFlow.com');
+      await learnerDashboardPage.get();
       var profileDropdown = element(by.css(
         '.protractor-test-profile-dropdown'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         profileDropdown, 'Could not click profile dropdown');
-      profileDropdown.click();
+      await profileDropdown.click();
 
       var topicsAndSkillsDashboardLink = element(by.css(
         '.protractor-test-topics-and-skills-dashboard-link'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         topicsAndSkillsDashboardLink,
         'Could not click on the topics and skills dashboard link');
-      topicsAndSkillsDashboardLink.click();
-      waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/topics_and_skills_dashboard');
+      await topicsAndSkillsDashboardLink.click();
+      await waitFor.pageToFullyLoad();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/topics-and-skills-dashboard');
     });
 
     it('should visit the notifications page from the profile dropdown menu',
-      function() {
+      async function() {
         var notificationsDashboardLink = element(by.css(
           '.protractor-test-notifications-link'));
-        waitFor.elementToBeClickable(
+        await waitFor.elementToBeClickable(
           notificationsDashboardLink,
           'Could not click on the notifications dashboard link');
-        notificationsDashboardLink.click();
-        waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/notifications_dashboard');
+        await notificationsDashboardLink.click();
+        await waitFor.pageToFullyLoad();
+        expect(await browser.getCurrentUrl()).toEqual(
+          'http://localhost:9001/notifications');
       });
 
     it('should visit the preferences page from the profile dropdown menu',
-      function() {
+      async function() {
         var preferencesLink = element(by.css(
           '.protractor-test-preferences-link'));
-        waitFor.elementToBeClickable(
+        await waitFor.elementToBeClickable(
           preferencesLink,
           'Could not click on the preferences link');
-        preferencesLink.click();
-        waitFor.pageToFullyLoad();
-        expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/preferences');
+        await preferencesLink.click();
+        await waitFor.pageToFullyLoad();
+        expect(await browser.getCurrentUrl()).toEqual(
+          'http://localhost:9001/preferences');
       });
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-    users.logout();
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

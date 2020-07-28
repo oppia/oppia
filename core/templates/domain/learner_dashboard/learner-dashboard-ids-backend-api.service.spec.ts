@@ -18,15 +18,18 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import { LearnerDashboardActivityIdsObjectFactory } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 
 describe('Learner Dashboard Backend API Service', () => {
   var learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService = null;
+  var learnerDashboardActivityIdsObjectFactory:
+    LearnerDashboardActivityIdsObjectFactory = null;
   let httpTestingController: HttpTestingController;
 
   var sampleDataResults = {
@@ -56,6 +59,8 @@ describe('Learner Dashboard Backend API Service', () => {
     });
     learnerDashboardIdsBackendApiService = TestBed.get(
       LearnerDashboardIdsBackendApiService);
+    learnerDashboardActivityIdsObjectFactory = TestBed.get(
+      LearnerDashboardActivityIdsObjectFactory);
 
     httpTestingController = TestBed.get(HttpTestingController);
   });
@@ -78,7 +83,9 @@ describe('Learner Dashboard Backend API Service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(
+        learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+          sampleDataResults.learner_dashboard_activity_ids));
       expect(failHandler).not.toHaveBeenCalled();
     }
     ));
@@ -91,17 +98,13 @@ describe('Learner Dashboard Backend API Service', () => {
       var failHandler = jasmine.createSpy('fail');
 
       learnerDashboardIdsBackendApiService.fetchLearnerDashboardIds()
-        .then(successHandler, (error: HttpErrorResponse) => {
-          // This is done because the error callback gets called with an
-          // HttpErrorResponse object, not with the error message. The following
-          // line extracts the error message and calls the failHandler with the
-          // error message as the parameter.
-          failHandler(error.error);
-        });
+        .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading dashboard IDs data.', {
+      req.flush({
+        error: 'Error loading dashboard IDs data.'
+      }, {
         status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
       });
 

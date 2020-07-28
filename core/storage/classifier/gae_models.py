@@ -37,12 +37,12 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
 
     The id of instances of this class has the form
-    {{exp_id}}.{{random_hash_of_12_chars}}
+    '[exp_id].[random hash of 12 chars]'.
     """
 
     # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
-                                      indexed=True)
+    algorithm_id = ndb.StringProperty(
+        required=True, choices=ALGORITHM_CHOICES, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
     interaction_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
@@ -52,18 +52,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING.
-    status = ndb.StringProperty(required=True,
-                                choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                                default=feconf.TRAINING_JOB_STATUS_PENDING,
-                                indexed=True)
+    status = ndb.StringProperty(
+        required=True, choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
+        default=feconf.TRAINING_JOB_STATUS_PENDING, indexed=True)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
     # data group.
     training_data = ndb.JsonProperty(default=None)
     # The time when the job's status should next be checked.
     # It is incremented by TTL when a job with status NEW is picked up by VM.
-    next_scheduled_check_time = ndb.DateTimeProperty(required=True,
-                                                     indexed=True)
+    next_scheduled_check_time = ndb.DateTimeProperty(
+        required=True, indexed=True)
     # The schema version for the data that is being classified.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
@@ -77,15 +76,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ClassifierTrainingJobModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
-        {{exp_id}}.{{random_hash_of_16_chars}}
+        '[exp_id].[random hash of 16 chars]'.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -95,7 +89,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         Raises:
             Exception: The id generator for ClassifierTrainingJobModel is
-            producing too many collisions.
+                producing too many collisions.
         """
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
@@ -164,6 +158,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         Args:
             cursor: str or None. The list of returned entities starts from this
                 datastore cursor.
+
         Returns:
             List of the ClassifierTrainingJobModels with status new or pending.
         """
@@ -211,8 +206,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 class TrainingJobExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierTrainingJob.
 
-    The id of instances of this class has the form
-    {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
+    The ID of instances of this class has the form
+    [exp_id].[exp_version].[state_name].
     """
 
     # The exploration_id of the exploration to whose state the model belongs.
@@ -235,17 +230,10 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TrainingJobExplorationMappingModel doesn't have any field with
-        user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
         """Generates a unique ID for the Classifier Exploration Mapping of the
-        form {{exp_id}}.{{exp_version}}.{{utf8_encoded_state_name}}
+        form [exp_id].[exp_version].[state_name].
 
         Args:
             exp_id: str. ID of the exploration.
@@ -274,7 +262,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
         Returns:
             list(ClassifierExplorationMappingModel|None). The model instances
-                for the classifier exploration mapping.
+            for the classifier exploration mapping.
         """
         mapping_ids = []
         for state_name in state_names:

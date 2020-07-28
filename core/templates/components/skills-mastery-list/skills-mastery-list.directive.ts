@@ -17,8 +17,9 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'components/skills-mastery-list/' +
+  'skills-mastery-list-concept-card-modal.controller.ts');
+
 require('components/concept-card/concept-card.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -73,19 +74,11 @@ angular.module('oppia').directive('skillsMasteryList', [
                 '/components/concept-card/concept-card-modal.template.html'
               ),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function(
-                    $controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.skillIds = [skillId];
-                  $scope.index = 0;
-                  $scope.modalHeader = skillDescription;
-                }
-              ]
+              resolve: {
+                skillDescription: () => skillDescription,
+                skillId: () => skillId
+              },
+              controller: 'SkillsMasteryListConceptCardModal'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

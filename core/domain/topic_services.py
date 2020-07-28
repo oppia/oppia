@@ -45,7 +45,7 @@ def get_all_topic_summaries():
 
     Returns:
         list(TopicSummary). The list of summaries of all topics present in the
-            datastore.
+        datastore.
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_all()
     topic_summaries = [
@@ -63,7 +63,7 @@ def get_multi_topic_summaries(topic_ids):
 
     Returns:
         list(TopicSummary). The list of summaries of all given topics present in
-            the datastore.
+        the datastore.
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
     topic_summaries = [
@@ -220,13 +220,14 @@ def apply_change_list(topic_id, change_list):
     Raises:
         Exception. The incoming changelist had simultaneuous creation and
             deletion of subtopics.
+
     Returns:
         Topic, dict, list(int), list(int), list(SubtopicPageChange).
-            The modified topic object, the modified subtopic pages dict keyed
-            by subtopic page id containing the updated domain objects of
-            each subtopic page, a list of ids of the deleted subtopics,
-            a list of ids of the newly created subtopics and a list of changes
-            applied to modified subtopic pages.
+        The modified topic object, the modified subtopic pages dict keyed
+        by subtopic page id containing the updated domain objects of
+        each subtopic page, a list of ids of the deleted subtopics,
+        a list of ids of the newly created subtopics and a list of changes
+        applied to modified subtopic pages.
     """
     topic = topic_fetchers.get_topic_by_id(topic_id)
     newly_created_subtopic_ids = []
@@ -260,7 +261,7 @@ def apply_change_list(topic_id, change_list):
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))
                 modified_subtopic_pages[subtopic_page_id] = (
-                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( #pylint: disable=line-too-long
+                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
                         change.subtopic_id, topic_id)
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
@@ -281,6 +282,9 @@ def apply_change_list(topic_id, change_list):
                 topic.add_canonical_story(change.story_id)
             elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
                 topic.delete_canonical_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
+                topic.rearrange_canonical_story(
+                    change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
                 topic.add_additional_story(change.story_id)
             elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
@@ -295,6 +299,11 @@ def apply_change_list(topic_id, change_list):
                 topic.move_skill_id_to_subtopic(
                     change.old_subtopic_id, change.new_subtopic_id,
                     change.skill_id)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
+                topic.rearrange_skill_in_subtopic(
+                    change.subtopic_id, change.from_index, change.to_index)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
+                topic.rearrange_subtopic(change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
                 topic.remove_skill_id_from_subtopic(
                     change.subtopic_id, change.skill_id)
@@ -816,23 +825,29 @@ def save_topic_summary(topic_summary):
         topic_summary: The topic summary object to be saved in the
             datastore.
     """
-    topic_summary_model = topic_models.TopicSummaryModel(
-        id=topic_summary.id,
-        name=topic_summary.name,
-        description=topic_summary.description,
-        canonical_name=topic_summary.canonical_name,
-        language_code=topic_summary.language_code,
-        version=topic_summary.version,
-        additional_story_count=topic_summary.additional_story_count,
-        canonical_story_count=topic_summary.canonical_story_count,
-        uncategorized_skill_count=topic_summary.uncategorized_skill_count,
-        subtopic_count=topic_summary.subtopic_count,
-        total_skill_count=topic_summary.total_skill_count,
-        topic_model_last_updated=topic_summary.topic_model_last_updated,
-        topic_model_created_on=topic_summary.topic_model_created_on
-    )
+    topic_summary_dict = {
+        'name': topic_summary.name,
+        'description': topic_summary.description,
+        'canonical_name': topic_summary.canonical_name,
+        'language_code': topic_summary.language_code,
+        'version': topic_summary.version,
+        'additional_story_count': topic_summary.additional_story_count,
+        'canonical_story_count': topic_summary.canonical_story_count,
+        'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
+        'subtopic_count': topic_summary.subtopic_count,
+        'total_skill_count': topic_summary.total_skill_count,
+        'topic_model_last_updated': topic_summary.topic_model_last_updated,
+        'topic_model_created_on': topic_summary.topic_model_created_on
+    }
 
-    topic_summary_model.put()
+    topic_summary_model = (
+        topic_models.TopicSummaryModel.get_by_id(topic_summary.id))
+    if topic_summary_model is not None:
+        topic_summary_model.populate(**topic_summary_dict)
+        topic_summary_model.put()
+    else:
+        topic_summary_dict['id'] = topic_summary.id
+        topic_models.TopicSummaryModel(**topic_summary_dict).put()
 
 
 def get_topic_rights_from_model(topic_rights_model):
@@ -985,7 +1000,7 @@ def get_multi_topic_rights(topic_ids):
 
     Returns:
         list(TopicRights). The list of rights of all given topics present in
-            the datastore.
+        the datastore.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
     topic_rights = [
@@ -1002,7 +1017,7 @@ def get_topic_rights_with_user(user_id):
 
     Returns:
         list(TopicRights). The rights objects associated with the topics
-            assigned to given user.
+        assigned to given user.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
     return [
@@ -1014,8 +1029,8 @@ def get_all_topic_rights():
     """Returns the rights object of all topics present in the datastore.
 
     Returns:
-        dict. The dict of rights objects of all topics present in
-            the datastore keyed by topic id.
+        dict. The dict of rights objects of all topics present in the datastore
+        keyed by topic id.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_all()
     topic_rights = {}
@@ -1034,7 +1049,7 @@ def filter_published_topic_ids(topic_ids):
 
     Returns:
         list(str). The topic IDs in the passed in list corresponding to
-            published topics.
+        published topics.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
     published_topic_ids = []

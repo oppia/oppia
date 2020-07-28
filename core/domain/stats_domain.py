@@ -116,8 +116,7 @@ class ExplorationStats(python_utils.OBJECT):
         state of the exploration and traversed to the next state.
 
         Returns:
-            int. The number of learners who actually attempted
-                the exploration.
+            int. The number of learners who actually attempted the exploration.
         """
         return self.num_actual_starts_v1 + self.num_actual_starts_v2
 
@@ -334,7 +333,7 @@ class StateStats(python_utils.OBJECT):
 
         Returns:
             int. Number of times the solution button was triggered to answer a
-                state only for events for schema version 2.
+            state only for events for schema version 2.
         """
         return self.num_times_solution_viewed_v2
 
@@ -477,7 +476,7 @@ class ExplorationIssues(python_utils.OBJECT):
 
         Returns:
             ExplorationIssues. The corresponding ExplorationIssues domain
-                object.
+            object.
         """
         unresolved_issues = [
             ExplorationIssue.from_dict(unresolved_issue_dict)
@@ -718,7 +717,9 @@ class ExplorationIssue(python_utils.OBJECT):
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _convert_issue_v1_dict_to_v2_dict() method is missing from the'
+            ' derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
@@ -827,7 +828,9 @@ class LearnerAction(python_utils.OBJECT):
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _convert_action_v1_dict_to_v2_dict() method is missing from '
+            'the derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the LearnerAction domain object."""
@@ -1161,11 +1164,11 @@ class AnswerFrequencyList(AnswerCalculationOutput):
 
         Returns:
             list(dict). A list of answer occurrence dicts. Each dict has the
-                following format:
-                {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
-                }
+            following format:
+            {
+                'answer': *. The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
+            }
         """
         return [
             answer_occurrence.to_raw_type()
@@ -1212,12 +1215,12 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
         Returns:
             dict. A dict whose keys are category names and whose corresponding
-                values are lists of answer frequency dicts. Each answer
-                frequency dict has the following keys and values:
-                {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
-                }
+            values are lists of answer frequency dicts. Each answer
+            frequency dict has the following keys and values:
+            {
+                'answer': *. The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
+            }
         """
         return {
             category: answer_frequency_list.to_raw_type()
@@ -1242,7 +1245,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
         Returns:
             CategorizedAnswerFrequencyLists. The domain object for categorized
-                answer frequency dict.
+            answer frequency dict.
         """
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
@@ -1325,7 +1328,7 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
 
         output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
-            # TODO(msl): find a better way to deal with big
+            # TODO(msl): Find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.
             raise utils.ValidationError(
@@ -1405,7 +1408,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
 
         Returns:
             LearnerAnswerDetails. The corresponding LearnerAnswerDetails
-                domain object.
+            domain object.
         """
         return cls(
             learner_answer_details_dict['state_reference'],
@@ -1594,7 +1597,7 @@ class LearnerAnswerInfo(python_utils.OBJECT):
     def get_new_learner_answer_info_id(cls):
         """Generates the learner answer info domain object id.
 
-        Return:
+        Returns:
             learner_answer_info_id: str. The id generated by the function.
         """
         learner_answer_info_id = (
@@ -1627,8 +1630,8 @@ class LearnerAnswerInfo(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The answer details submitted cannot be an empty string.')
         if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
-            raise utils.ValidationError('The answer details size is to large '
-                                        'to be stored')
+            raise utils.ValidationError(
+                'The answer details size is to large to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s'

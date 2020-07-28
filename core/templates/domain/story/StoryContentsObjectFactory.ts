@@ -22,8 +22,14 @@ import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
-import { StoryNode, StoryNodeObjectFactory } from
+import { StoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
+
+export interface StoryContentsBackendDict {
+  'initial_node_id': string;
+  'next_node_id': string;
+  'nodes': StoryNodeBackendDict[];
+}
 
 export class StoryContents {
   _initialNodeId: string;
@@ -39,8 +45,6 @@ export class StoryContents {
     this._storyNodeObjectFactoryInstance = storyNodeObjectFactoryInstance;
   }
 
-  _disconnectedNodes: StoryNode[] = [];
-
   getIncrementedNodeId(nodeId: string): string {
     var index = parseInt(
       nodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
@@ -53,22 +57,7 @@ export class StoryContents {
   }
 
   getLinearNodesList(): StoryNode[] {
-    var linearList = [];
-    var currentIndex = this.getNodeIndex(this._initialNodeId);
-    while (true) {
-      var node = this._nodes[currentIndex];
-      linearList.push(node);
-      if (node.getDestinationNodeIds().length === 0) {
-        break;
-      } else {
-        currentIndex = this.getNodeIndex(node.getDestinationNodeIds()[0]);
-      }
-    }
-    return linearList;
-  }
-
-  getDisconnectedNodes(): StoryNode[] {
-    return this._disconnectedNodes;
+    return this._nodes.slice();
   }
 
   getNextNodeId(): string {
@@ -87,6 +76,12 @@ export class StoryContents {
       }
     }
     return null;
+  }
+
+  rearrangeNodeInStory(fromIndex, toIndex) {
+    const nodeToMove = this._nodes[fromIndex];
+    this._nodes.splice(fromIndex, 1);
+    this._nodes.splice(toIndex, 0, nodeToMove);
   }
 
   getNodeIdsToTitleMap(nodeIds: string[]): {} {
@@ -122,11 +117,8 @@ export class StoryContents {
     return -1;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  validate(): any {
-    this._disconnectedNodes = [];
-    var issues = [];
+  validate(): string[] {
+    var issues: string[] = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
       var nodeIssues = nodes[i].validate();
@@ -186,7 +178,7 @@ export class StoryContents {
         return issues;
       }
 
-      // nodesQueue stores the pending nodes to visit in a queue form.
+      // Variable nodesQueue stores the pending nodes to visit in a queue form.
       var nodesQueue = [];
       var nodeIsVisited = new Array(nodeIds.length).fill(false);
       var startingNode = nodes[this.getNodeIndex(this._initialNodeId)];
@@ -235,26 +227,15 @@ export class StoryContents {
           nodesQueue.push(nodeId);
         }
       }
-      for (var i = 0; i < nodeIsVisited.length; i++) {
-        if (!nodeIsVisited[i]) {
-          this._disconnectedNodes.push(nodes[i]);
-          issues.push(
-            'There is no way to get to the chapter with title ' +
-            nodeTitles[i] + ' from any other chapter');
-        }
-      }
     }
     return issues;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is an assignment statement and should be
-  // typed as void and the return statement should be removed.
-  setInitialNodeId(nodeId: string): any {
+  setInitialNodeId(nodeId: string): void {
     if (this.getNodeIndex(nodeId) === -1) {
       throw new Error('The node with given id doesn\'t exist');
     }
-    return this._initialNodeId = nodeId;
+    this._initialNodeId = nodeId;
   }
 
   addNode(title: string): void {
@@ -402,11 +383,8 @@ export class StoryContents {
 })
 export class StoryContentsObjectFactory {
   constructor(private storyNodeObjectFactory: StoryNodeObjectFactory) {}
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'storyContentsBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyContentsBackendObject: any): StoryContents {
+  createFromBackendDict(
+      storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
       nodes.push(

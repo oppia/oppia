@@ -19,20 +19,26 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+angular.module('oppia', [
+  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
+  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+]);
+
+import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { SubtopicViewerNavbarBreadcrumbComponent } from
+  // eslint-disable-next-line max-len
+  'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
 
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
 
 import { SubtopicViewerDomainConstants } from
   'domain/subtopic_viewer/subtopic-viewer-domain.constants';
@@ -40,13 +46,16 @@ import { SubtopicViewerDomainConstants } from
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent,
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent,
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
     SubtopicViewerDomainConstants,
@@ -73,17 +82,12 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-])
+angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({
-      component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory);
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
+  }) as angular.IDirectiveFactory);

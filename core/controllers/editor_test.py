@@ -249,13 +249,13 @@ class EditorTests(BaseEditorControllerTests):
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
 
         exploration_rights = self.put_json(
-            publish_url, payload={},
+            publish_url, {},
             csrf_token=csrf_token)['rights']
 
         self.assertEqual(exploration_rights['status'], 'private')
 
         exploration_rights = self.put_json(
-            publish_url, payload={'make_public': True},
+            publish_url, {'make_public': True},
             csrf_token=csrf_token)['rights']
 
         self.assertEqual(exploration_rights['status'], 'public')
@@ -314,7 +314,8 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""classifier_model_id: null
+        'State A': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -349,7 +350,8 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        'State B': ("""classifier_model_id: null
+        'State B': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -384,7 +386,8 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+        feconf.DEFAULT_INIT_STATE_NAME: (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -421,7 +424,8 @@ written_translations:
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+    SAMPLE_STATE_STRING = (
+        """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -527,8 +531,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
         self.assertEqual(
@@ -607,8 +612,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-Hola!-v1.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
@@ -635,8 +641,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-unpublished_exploration-v1.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
@@ -887,17 +894,18 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
+class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateRulesStatsHandlerTests, self).setUp()
+        super(StateInteractionStatsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/state_rules_stats/invalid_exp_id/state_name',
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                'invalid_exp_id', 'state_name'),
             expected_status_int=404)
 
         self.logout()
@@ -920,8 +928,9 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
 
         with logging_swap:
             self.get_json(
-                '/createhandler/state_rules_stats/%s/invalid_state_name'
-                % (exp_id), expected_status_int=404)
+                '/createhandler/state_interaction_stats/%s/%s' % (
+                    exp_id, 'invalid_state_name'),
+                expected_status_int=404)
 
         self.assertEqual(
             observed_log_messages,
@@ -941,8 +950,8 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(exp_id, owner_id)
 
         response = self.get_json(
-            '/createhandler/state_rules_stats/%s/%s'
-            % (exp_id, exploration.init_state_name))
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                exp_id, exploration.init_state_name))
 
         visualizations_info = stats_services.get_visualizations_info(
             exploration.id, 'Introduction',
@@ -958,8 +967,8 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         response = self.get_json(
-            '/createhandler/state_rules_stats/%s/%s'
-            % (exp_id, exploration.init_state_name))
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                exp_id, exploration.init_state_name))
 
         visualizations_info = stats_services.get_visualizations_info(
             exploration.id, 'new_state_name',
@@ -1201,8 +1210,8 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             if not isinstance(rev_version, int):
                 self.assertIn('Expected an integer', response_dict['error'])
             else:
-                self.assertIn('Cannot revert to version',
-                              response_dict['error'])
+                self.assertIn(
+                    'Cannot revert to version', response_dict['error'])
 
             # Check that exploration is really not reverted to old version.
             reader_dict = self.get_json(
@@ -1339,11 +1348,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         """Test exploration rights handler for assign role for exploration."""
         # Create several users.
         self.signup(
-            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(
-            self.COLLABORATOR2_EMAIL, username=self.COLLABORATOR2_USERNAME)
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
         self.signup(
-            self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
+            self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
 
         # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
@@ -1521,7 +1530,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Create a random user.
         self.signup(
-            self.RANDOM_USER_EMAIL, username=self.RANDOM_USER_USERNAME)
+            self.RANDOM_USER_EMAIL, self.RANDOM_USER_USERNAME)
 
         # Check community_owned_status value.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
@@ -1587,7 +1596,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={
+            {
                 'version': exploration.version,
                 'new_member_username': 'invalid_new_member_username'},
             csrf_token=csrf_token, expected_status_int=400)
@@ -1606,7 +1615,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assertFalse(exploration_rights.viewable_if_private)
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={
+            {
                 'version': exploration.version,
                 'viewable_if_private': True}, csrf_token=csrf_token)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -1622,7 +1631,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={'version': exploration.version}, csrf_token=csrf_token,
+            {'version': exploration.version}, csrf_token=csrf_token,
             expected_status_int=400)
 
         self.assertEqual(
@@ -1695,7 +1704,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id),
-            payload={'message_type': 'invalid_message_type'},
+            {'message_type': 'invalid_message_type'},
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid message type.')
@@ -1703,7 +1712,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         self.logout()
 
 
-class ModeratorEmailsTests(test_utils.GenericTestBase):
+class ModeratorEmailsTests(test_utils.EmailTestBase):
     """Integration test for post-moderator action emails."""
 
     EXP_ID = 'eid'
@@ -1806,14 +1815,14 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
                 valid_payload, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             self.assertEqual(
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertFalse(hasattr(messages[0], 'cc'))
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
