@@ -77,7 +77,6 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {
-    // If element does not have an id attribute, compare the class attribute
     if (await elementToFocus.getAttribute('id') === '') {
       // Should move the focus to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
