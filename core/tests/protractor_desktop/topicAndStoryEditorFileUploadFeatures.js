@@ -222,6 +222,7 @@ describe('Chapter editor functionality', function() {
       defaultThumbnailImageSrc);
     await storyEditorPage.createNewChapter(
       'Chapter 1', dummyExplorationIds[0], '../data/test_svg.svg');
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
     await storyEditorPage.submitChapterThumbnail(
       '../data/test2_svg.svg', true);
     expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(
