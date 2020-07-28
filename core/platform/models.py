@@ -240,14 +240,14 @@ class _Gae(Platform):
                  % feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
-    def import_memcache_services(cls):
+    def import_cache_services(cls):
         """Imports and returns gae_memcache_services.
 
         Returns:
             module. The gae_memcache_services module.
         """
-        from core.platform.memcache import gae_memcache_services
-        return gae_memcache_services
+        from core.platform.cache import redis_cache_services
+        return redis_cache_services
 
     @classmethod
     def import_taskqueue_services(cls):
@@ -374,13 +374,13 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_email_services()
 
     @classmethod
-    def import_memcache_services(cls):
+    def import_cache_services(cls):
         """Imports and returns memcache_services module.
 
         Returns:
             module. The memcache_services module.
         """
-        return cls._get().import_memcache_services()
+        return cls._get().import_cache_services()
 
     @classmethod
     def import_taskqueue_services(cls):
