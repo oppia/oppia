@@ -554,6 +554,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_functiondef_returns(node, node_doc)
         self.check_functiondef_yields(node, node_doc)
         self.check_docstring_section_style(node)
+        self.check_docstring_section_indentation(node)
 
     def check_functiondef_params(self, node, node_doc):
         """Checks whether all parameters in a function definition are
@@ -595,29 +596,28 @@ class DocstringParameterChecker(checkers.BaseChecker):
             accept_no_param_doc=node_allow_no_param)
 
     def check_docstring_section_style(self, node):
-        """Checks whether the function argument definitions ("Args": section)
-        are indented properly. Parameters should be indented by 4 relative to
-        the 'Arg: ' line and any wrap-around descriptions should be indented
-        by 8. The rest of the docstring section checks are in DocstringChecker.
+        """Checks whether the docstring has valid style.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
                 method definition in the AST.
         """
-        arguments_node = node.args
-        expected_argument_names = set(
-            None if (arg.name in self.not_needed_param_in_docstring)
-            else (arg.name + ':') for arg in arguments_node.args)
-        currently_in_args_section = False
-        # When we are in the args section and a line ends in a colon,
-        # we can ignore the indentation styling in the next section of
-        # description, hence a freeform section.
-        currently_in_freeform_section = False
-        args_indentation = 0
+        if node.name in self.constructor_names:
+            class_node = checker_utils.node_frame_class(node)
+            if class_node is not None:
+                self.check_docstring_structure(class_node)
+        self.check_docstring_structure(node)
+
+    def check_docstring_structure(self, node):
+        """Checks whether the docstring has the correct structure i.e.
+        do not have space the beginning and have a period at the end of
+        docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
         if node.doc:
-            current_docstring_section = None
-            in_description = False
-            args_indentation_in_spaces = 0
             docstring = node.doc.splitlines()
             # Check for space after """ in docstring.
             if docstring[0][0] == b' ':
@@ -638,11 +638,37 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     self.add_message(
                         'no-newline-used-at-end', node=node)
                 elif (docstring[-2][-1] not in
-                      ALLOWED_TERMINATING_PUNCTUATIONS and
-                      docstring[-2].split()[-1] not in EXCLUDED_PHRASES):
+                      ALLOWED_TERMINATING_PUNCTUATIONS and not
+                      any(word in docstring[-2] for word in EXCLUDED_PHRASES)):
                     self.add_message('no-period-used', node=node)
-            # Process the docstring line by line.
-            for line in docstring:
+
+    def check_docstring_section_indentation(self, node):
+        """Checks whether the function argument definitions ("Args": section,
+        "Returns": section, "Yield": section, "Raises: section) are indented
+        properly. Parameters should be indented by 4 relative to the 'Args:'
+        'Return:', 'Raises:', 'Yield:' line and any wrap-around descriptions
+        should be indented by 8. The rest of the docstring section checks are
+        in DocstringChecker.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
+        arguments_node = node.args
+        expected_argument_names = set(
+            None if (arg.name in self.not_needed_param_in_docstring)
+            else (arg.name + ':') for arg in arguments_node.args)
+        currently_in_args_section = False
+        # When we are in the args section and a line ends in a colon,
+        # we can ignore the indentation styling in the next section of
+        # description, hence a freeform section.
+        currently_in_freeform_section = False
+        args_indentation = 0
+        if node.doc:
+            current_docstring_section = None
+            in_description = False
+            args_indentation_in_spaces = 0
+            for line in node.doc.splitlines():
                 stripped_line = line.lstrip()
                 current_line_indentation = (
                     len(line) - len(stripped_line))
