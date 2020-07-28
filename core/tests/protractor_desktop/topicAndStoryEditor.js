@@ -126,7 +126,7 @@ describe('Topic editor functionality', function() {
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'Story description', '../data/test_svg.svg');
+      'Story Title', 'Story description', Constants.TEST_SVG_PATH);
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -151,18 +151,6 @@ describe('Topic editor functionality', function() {
       await storyEditorPage.expectNotesToBe(
         await forms.toRichText('Story notes'));
     });
-
-  it('should add and remove nodes (chapters) from a story', async function() {
-    await topicEditorPage.navigateToStoryWithIndex(0);
-    await storyEditorPage.expectNumberOfChaptersToBe(0);
-    await storyEditorPage.createNewChapter('Chapter 1');
-    await storyEditorPage.expectNumberOfChaptersToBe(1);
-
-    await storyEditorPage.createNewChapter('Chapter 2');
-    await storyEditorPage.expectNumberOfChaptersToBe(2);
-    await storyEditorPage.deleteChapterWithIndex(1);
-    await storyEditorPage.expectNumberOfChaptersToBe(1);
-  });
 
   it('should assign a skill to, and from subtopics',
     async function() {
@@ -285,7 +273,7 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(topicName,
       'Description', false);
     await topicEditorPage.createStory(
-      'Story 0', 'Story description', '../data/test_svg.svg');
+      'Story 0', 'Story description', Constants.TEST_SVG_PATH);
     var url = await browser.getCurrentUrl();
     storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -298,9 +286,9 @@ describe('Chapter editor functionality', function() {
   });
 
   it('should create a basic chapter.', async function() {
-    await storyEditorPage.createNewChapter('Chapter 1');
+    await storyEditorPage.createNewChapter(
+      'Chapter 1', dummyExplorationIds[0], Constants.TEST_SVG_PATH);
     await storyEditorPage.changeNodeDescription('Chapter description 1');
-    await storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     await storyEditorPage.changeNodeOutline(
       await forms.toRichText('First outline'));
     await storyEditorPage.saveStory('First save');
@@ -332,12 +320,12 @@ describe('Chapter editor functionality', function() {
     });
 
   it('should add one more chapter to the story', async function() {
-    await storyEditorPage.createNewChapter('Chapter 2');
+    await storyEditorPage.createNewChapter(
+      'Chapter 2', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
     await storyEditorPage.navigateToChapterByIndex(1);
     await storyEditorPage.changeNodeDescription('Chapter description 2');
     await storyEditorPage.changeNodeOutline(
       await forms.toRichText('Second outline'));
-    await storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
     await storyEditorPage.saveStory('Second save');
     await users.logout();
     await users.login(userEmail);
@@ -350,20 +338,17 @@ describe('Chapter editor functionality', function() {
 
   it('should fail to add one more chapter with existing exploration',
     async function() {
-      await storyEditorPage.navigateToChapterByIndex(1);
-      await storyEditorPage.createNewChapter('Chapter 3');
-      await storyEditorPage.navigateToChapterByIndex(2);
-      await storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
-      await storyEditorPage.expectExplorationIdAlreadyExistWarningAndCloseIt();
-      allowedErrors.push('The given exploration already exists in the story.');
+      await storyEditorPage.createNewChapter(
+        'Chapter 3', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
+      await storyEditorPage.expectExplorationIdAlreadyExistWarning();
     }
   );
 
   it('should add one more chapter and change the chapters sequences',
     async function() {
-      await storyEditorPage.createNewChapter('Chapter 3');
+      await storyEditorPage.createNewChapter(
+        'Chapter 3', dummyExplorationIds[2], Constants.TEST_SVG_PATH);
       await storyEditorPage.navigateToChapterByIndex(2);
-      await storyEditorPage.setChapterExplorationId(dummyExplorationIds[2]);
       await storyEditorPage.expectChaptersListToBe(
         ['Chapter 1', 'Chapter 2', 'Chapter 3']);
 

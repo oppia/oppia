@@ -149,8 +149,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
             for clazz in self._get_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
-        models_with_export = (takeout_service
-                              .get_models_which_should_be_exported())
+        models_with_export = (
+            takeout_service.get_models_which_should_be_exported())
         for model in all_models:
             export_policy = model.get_export_policy()
             if model in models_with_export:

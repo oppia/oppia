@@ -27,6 +27,7 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -156,7 +157,7 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
     the given exploration ids.
 
     Args:
-        exp_ids: list(str). list of exploration ids to query for.
+        exp_ids: list(str). List of exploration ids to query for.
 
     Returns:
         list(Suggestion). A list of translation suggestions that
@@ -166,9 +167,11 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
     if len(exp_ids) == 0:
         return []
 
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_with_exp_ids(exp_ids)]
+    return [
+        get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_translation_suggestions_with_exp_ids(exp_ids)
+    ]
 
 
 def get_all_stale_suggestions():
@@ -190,17 +193,37 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-    suggestion.validate()
 
-    suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
-        suggestion.suggestion_id)
+    _update_suggestions([suggestion])
 
-    suggestion_model.status = suggestion.status
-    suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    suggestion_model.change_cmd = suggestion.change.to_dict()
-    suggestion_model.score_category = suggestion.score_category
 
-    suggestion_model.put()
+def _update_suggestions(suggestions):
+    """Updates the given suggestions.
+
+    Args:
+        suggestions: list(Suggestion). The suggestions to be updated.
+    """
+    suggestion_ids = []
+
+    for suggestion in suggestions:
+        suggestion.validate()
+        suggestion_ids.append(suggestion.suggestion_id)
+
+    suggestion_models_to_update = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
+    )
+
+    for suggestion_model in suggestion_models_to_update:
+        suggestion = python_utils.NEXT(
+            suggestion for suggestion in suggestions
+            if suggestion.suggestion_id == suggestion_model.id)
+        suggestion_model.status = suggestion.status
+        suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
+        suggestion_model.change_cmd = suggestion.change.to_dict()
+        suggestion_model.score_category = suggestion.score_category
+
+    suggestion_models.GeneralSuggestionModel.put_multi(
+        suggestion_models_to_update)
 
 
 def mark_review_completed(suggestion, status, reviewer_id):
@@ -212,8 +235,9 @@ def mark_review_completed(suggestion, status, reviewer_id):
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
-    if(status not in [suggestion_models.STATUS_ACCEPTED,
-                      suggestion_models.STATUS_REJECTED]):
+    if status not in [
+            suggestion_models.STATUS_ACCEPTED,
+            suggestion_models.STATUS_REJECTED]:
         raise Exception('Invalid status after review.')
 
     suggestion.status = status
@@ -255,7 +279,11 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         Exception: The commit message is empty.
     """
     if suggestion.is_handled:
-        raise Exception('The suggestion has already been accepted/rejected.')
+        raise Exception(
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id
+            )
+        )
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
     suggestion.pre_accept_validate()
@@ -265,7 +293,11 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         validate_math_tags_in_html_with_attribute_math_content(
             html_string))
     if len(error_list) > 0:
-        raise Exception('Invalid math tags found in the suggestion.')
+        raise Exception(
+            'Invalid math tags found in the suggestion with id %s.' % (
+                suggestion.suggestion_id
+            )
+        )
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
@@ -322,27 +354,23 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
             rejecting the suggestions.
 
     Raises:
-        Exception: One of the suggestions has already been handled.
+        Exception: One or more of the suggestions has already been handled.
     """
 
     for suggestion in suggestions:
         if suggestion.is_handled:
             raise Exception(
-                'The suggestion has already been accepted/rejected.')
+                'The suggestion with id %s has already been accepted/'
+                'rejected.' % (suggestion.suggestion_id)
+            )
     if not review_message:
         raise Exception('Review message cannot be empty.')
 
-    suggestion_ids = [suggestion.suggestion_id for suggestion in suggestions]
-    suggestion_models_to_reject = (
-        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
-    )
+    for suggestion in suggestions:
+        suggestion.status = suggestion_models.STATUS_REJECTED
+        suggestion.final_reviewer_id = reviewer_id
 
-    for suggestion_model in suggestion_models_to_reject:
-        suggestion_model.status = suggestion_models.STATUS_REJECTED
-        suggestion_model.final_reviewer_id = reviewer_id
-
-    suggestion_models.GeneralSuggestionModel.put_multi(
-        suggestion_models_to_reject)
+    _update_suggestions(suggestions)
 
     for suggestion in suggestions:
         thread_id = suggestion.suggestion_id
@@ -353,7 +381,7 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
 
 def reject_question_suggestions_with_skill_target_id(skill_id):
     """Rejects all SuggestionAddQuestions with target ID matching the supplied
-    skill ID. Reviewer ID is set to Oppia Bot.
+    skill ID. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
     Args:
         skill_id: The skill ID corresponding to the target ID of the
@@ -376,11 +404,11 @@ def reject_translation_suggestions_with_exp_target_ids(exp_ids):
     """Rejects all translation suggestions with target IDs matching the
     supplied exploration IDs. These suggestions are being rejected because
     their corresponding exploration was removed from a story or the story was
-    deleted. Reviewer ID is set to Oppia Bot.
+    deleted. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
     Args:
-        exp_ids: The exploration ID corresponding to the target ID of the
-            translation suggestion.
+        exp_ids: list(str). The exploration IDs corresponding to the target IDs
+            of the translation suggestions.
     """
     suggestions = get_translation_suggestions_with_exp_ids(exp_ids)
 
@@ -406,11 +434,18 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
     if not suggestion.is_handled:
-        raise Exception('The suggestion is not yet handled.')
+        raise Exception(
+            'The suggestion with id %s is not yet handled.' % (
+                suggestion.suggestion_id
+            )
+        )
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception(
-            'The suggestion was accepted. '
-            'Only rejected suggestions can be resubmitted.')
+            'The suggestion with id %s was accepted. '
+            'Only rejected suggestions can be resubmitted.' % (
+                suggestion.suggestion_id
+            )
+        )
 
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
     _update_suggestion(suggestion)
@@ -439,11 +474,12 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     if len(score_categories) == 0:
         return []
 
-    return (
-        [get_suggestion_from_model(s)
-         for s in suggestion_models.GeneralSuggestionModel
-         .get_in_review_suggestions_in_score_categories(
-             score_categories, user_id)])
+    return ([
+        get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_in_review_suggestions_in_score_categories(
+            score_categories, user_id)
+    ])
 
 
 def get_reviewable_suggestions(user_id, suggestion_type):
