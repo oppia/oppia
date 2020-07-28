@@ -1418,7 +1418,7 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
                 'from_version': '33',
                 'to_version': '34'
             })]
-       
+
             exp_services.update_exploration(
                 self.owner_id, 'exp_id', exp_migration_change_list,
                 'Ran Exploration Migration job.')
