@@ -65,18 +65,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
         self.save_new_story(
-            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_3,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 3',
+            description='Description 3'
+        )
         self.save_new_story(
-            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
-            self.TOPIC_ID)
-        self.save_new_story(
-            self.story_id_2, self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_2,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -262,16 +268,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_index_values(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index, to_index')):
+            Exception, (
+                'The following required attributes are missing: '
+                'from_index, to_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
             })
 
     def test_cannot_rearrange_story_with_missing_from_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index')):
+            Exception, (
+                'The following required attributes are missing: '
+                'from_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'to_index': 1
@@ -279,8 +287,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_to_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'to_index')):
+            Exception, (
+                'The following required attributes are missing: to_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'from_index': 1
@@ -570,8 +578,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'invalid_story', self.user_id_admin)
 
         self.save_new_story(
-            'story_10', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_10',
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         with self.assertRaisesRegexp(
             Exception, 'Story with given id doesn\'t exist in the topic'):
             topic_services.publish_story(
@@ -584,8 +596,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         # Throw error if a story node doesn't have an exploration.
         self.save_new_story(
-            'story_id_new', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_id_new',
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 2',
+            description='Description 2'
+        )
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_new')
         changelist = [

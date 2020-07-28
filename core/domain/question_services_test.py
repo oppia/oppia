@@ -259,7 +259,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            r'Entity for class QuestionModel with id %s not found' % (
+                question_id_2)):
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id_2, 'skill_1', 0.5)
 
@@ -386,8 +389,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'skill_1', 'Skill Description 1'))
 
         self.assertEqual(len(question_skill_links), 2)
-        self.assertTrue(isinstance(question_skill_links[0],
-                                   question_domain.QuestionSkillLink))
+        self.assertTrue(isinstance(
+            question_skill_links[0], question_domain.QuestionSkillLink))
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
         self.assertItemsEqual(
@@ -498,7 +501,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaises(Exception)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception, '\'unicode\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             question_services.update_question(
@@ -817,15 +821,16 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question = question_fetchers.get_question_from_model(question_model)
 
         self.assertEqual(question.question_state_data_schema_version, 31)
-        self.assertEqual(question.question_state_data
-                         .recorded_voiceovers.to_dict(), {
-                             'voiceovers_mapping': {
-                                 'content': {
-                                     'en': {
-                                         'filename': 'test.mp3',
-                                         'file_size_bytes': 100,
-                                         'needs_update': False,
-                                         'duration_secs': 0.0}}}})
+        self.assertEqual(
+            question.question_state_data
+            .recorded_voiceovers.to_dict(), {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False,
+                            'duration_secs': 0.0}}}})
 
     def test_migrate_question_state_from_v31_to_v32(self):
         answer_group = {
