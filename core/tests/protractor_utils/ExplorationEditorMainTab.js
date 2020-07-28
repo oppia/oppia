@@ -91,6 +91,8 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-edit-content'));
   var stateContentDisplay = element(
     by.css('.protractor-test-state-content-display'));
+  var stateEditButton = element(
+    by.css('.protractor-test-edit-content-pencil-button'));
   var stateNameContainer = element(
     by.css('.protractor-test-state-name-container'));
   var stateNameInput = element(
@@ -496,12 +498,16 @@ var ExplorationEditorMainTab = function() {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
-
     await waitFor.elementToBeClickable(
       stateEditContent,
       'stateEditContent taking too long to appear to set content');
-    await stateEditContent.click();
+    await waitFor.elementToBeClickable(
+      stateEditButton,
+      'State edit button taking too long to show up');
+    await stateEditButton.click();
     var stateEditorTag = element(by.tagName('state-content-editor'));
+    await waitFor.visibilityOf(
+      stateEditorTag, 'State editor tag not showing up');
     var stateContentEditor = stateEditorTag.element(
       by.css('.protractor-test-state-content-editor'));
     await waitFor.visibilityOf(
