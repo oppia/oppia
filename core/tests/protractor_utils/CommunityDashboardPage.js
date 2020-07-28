@@ -17,7 +17,7 @@
  * tests.
  */
 var waitFor = require('./waitFor.js');
-var action = require('./action.js')
+var action = require('./action.js');
 
 var CommunityDashboardTranslateTextTab = require(
   '../protractor_utils/CommunityDashboardTranslateTextTab.js');
@@ -71,7 +71,7 @@ var CommunityDashboardPage = function() {
       'Opportunity placeholders take too long to become invisible.');
   };
 
-  this.waitForQuestionSuggestionReviewModalToAppear = async function(){
+  this.waitForQuestionSuggestionReviewModalToAppear = async function() {
     await waitFor.visibilityOf(
       questionReviewModalHeader,
       'Question suggestion review modal takes too long to appear');
@@ -132,7 +132,7 @@ var CommunityDashboardPage = function() {
   };
 
   var _getOpportunityWithHeadingAndSubheading = async function(
-      expectedHeading, expectedSubheading){
+      expectedHeading, expectedSubheading) {
     var opportunityCount = await opportunityListItems.count();
     for (var i = 0; i < opportunityCount; i++) {
       var opportunity = await opportunityListItems.get(i);
@@ -149,7 +149,7 @@ var CommunityDashboardPage = function() {
         'Opportunity subheading is taking too much time to appear');
       var subheading = await subheadingElement.getText();
 
-      if(expectedHeading === heading && expectedSubheading === subheading) {
+      if (expectedHeading === heading && expectedSubheading === subheading) {
         return opportunity;
       }
     }
@@ -183,7 +183,7 @@ var CommunityDashboardPage = function() {
   };
 
   this.clickOpportunityActionButton = async function(
-    opportunityHeading, opportunitySubheading) {
+      opportunityHeading, opportunitySubheading) {
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       opportunityHeading, opportunitySubheading);
     expect(opportunity).not.toBe(null);

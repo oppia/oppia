@@ -32,7 +32,7 @@ var SkillEditorPage = require(
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
-fdescribe('Community dashboard page', function() {
+describe('Community dashboard page', function() {
   const TOPIC_NAMES = [
     'Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
@@ -161,7 +161,8 @@ fdescribe('Community dashboard page', function() {
     await communityDashboardPage.clickOpportunityActionButton(
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
     await skillEditorPage.confirmSkillDifficulty();
-    await explorationEditorMainTab.setContent(await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
@@ -182,7 +183,8 @@ fdescribe('Community dashboard page', function() {
     await communityDashboardPage.clickOpportunityActionButton(
       'Question 1', SKILL_DESCRIPTIONS[0]);
     await communityDashboardPage.waitForQuestionSuggestionReviewModalToAppear();
-    await communityDashboardPage.setQuestionSuggestionReviewMessage('review message');
+    await communityDashboardPage.setQuestionSuggestionReviewMessage(
+      'review message');
     await communityDashboardPage.clickRejectQuestionSuggestionButton();
     await communityDashboardPage.waitForOpportunitiesToLoad();
     await communityDashboardPage.expectEmptyOpportunityAvailabilityMessage();
@@ -225,7 +227,8 @@ describe('Admin page community reviewer form', function() {
     adminPage = new AdminPage.AdminPage();
     communityDashboardPage = (
       new CommunityDashboardPage.CommunityDashboardPage());
-    await users.createUser(translationReviewerEmail, translationReviewerUsername);
+    await users.createUser(
+      translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
     await users.createAdmin(ADMIN_EMAIL, 'assignReviewer');
@@ -245,7 +248,8 @@ describe('Admin page community reviewer form', function() {
 
     await users.login(translationReviewerEmail);
     await communityDashboardPage.get();
-    await communityDashboardPage.expectUserToBeTranslationReviewer(HINDI_LANGUAGE);
+    await communityDashboardPage.expectUserToBeTranslationReviewer(
+      HINDI_LANGUAGE);
     await users.logout();
   });
 
@@ -259,7 +263,8 @@ describe('Admin page community reviewer form', function() {
 
     await users.login(voiceoverReviewerEmail);
     await communityDashboardPage.get();
-    await communityDashboardPage.expectUserToBeVoiceoverReviewer(HINDI_LANGUAGE);
+    await communityDashboardPage.expectUserToBeVoiceoverReviewer(
+      HINDI_LANGUAGE);
     await users.logout();
   });
 
@@ -305,7 +310,7 @@ describe('Translation contribution featured languages', () => {
     await users.logout();
   });
 
-  beforeEach(async function(){
+  beforeEach(async function() {
     await communityDashboardPage.get();
     await communityDashboardPage.navigateToTranslateTextTab();
   });

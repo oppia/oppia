@@ -32,10 +32,10 @@ var click = async function(elementName, clickableElement) {
   await clickableElement.click();
 };
 
-var select = async function(selectorName, selectorElement, optionToSelect){
+var select = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var optionElement = selectorElement.element(
-      by.cssContainingText('option', optionToSelect));
+    by.cssContainingText('option', optionToSelect));
   await optionElement.click();
 };
 

@@ -17,7 +17,7 @@
  * tests.
  */
 
-var action = require('./action.js')
+var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
@@ -62,7 +62,6 @@ var AdminPage = function() {
   var REVIEW_CATEGORY_VOICEOVER = 'VOICEOVER';
   var REVIEW_CATEGORY_QUESTION = 'QUESTION';
 
-  // Viewing roles can be done by two methods: 1. By roles 2. By username
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
   var roleUsernameOption = element(by.css(
@@ -391,7 +390,7 @@ var AdminPage = function() {
   this.expectUserToBeTranslationReviewer = async function(
       username, languageDescription) {
     var reviewRights = await _getUserReviewRightsElement(
-        username, REVIEW_CATEGORY_TRANSLATION);
+      username, REVIEW_CATEGORY_TRANSLATION);
     var languageList = await Promise.all(
       reviewRights.map(function(languageElem) {
         return languageElem.getText();
@@ -402,7 +401,7 @@ var AdminPage = function() {
   this.expectUserToBeVoiceoverReviewer = async function(
       username, languageDescription) {
     var reviewRights = await _getUserReviewRightsElement(
-        username, REVIEW_CATEGORY_VOICEOVER);
+      username, REVIEW_CATEGORY_VOICEOVER);
     var languageList = await Promise.all(reviewRights.map(
       function(languageElem) {
         return languageElem.getText();
