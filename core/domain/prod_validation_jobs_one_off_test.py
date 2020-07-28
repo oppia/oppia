@@ -172,14 +172,12 @@ def update_datastore_types_for_mock_datetime():
     of ndb datetime properties does not fail.
     """
 
-    # pylint: disable=protected-access
-    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime13Hours] = (
+    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime13Hours] = (  # pylint: disable=protected-access
         datastore_types.ValidatePropertyNothing)
-    datastore_types._PACK_PROPERTY_VALUES[MockDatetime13Hours] = (
+    datastore_types._PACK_PROPERTY_VALUES[MockDatetime13Hours] = (  # pylint: disable=protected-access
         datastore_types.PackDatetime)
-    datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (
+    datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (  # pylint: disable=protected-access
         datastore_types.entity_pb.Property.GD_WHEN)
-    # pylint: enable=protected-access
 
 
 class MockModel(base_models.BaseModel):
@@ -249,11 +247,17 @@ class BaseValidatorTests(test_utils.GenericTestBase):
         self.item.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_external_id_relationships\(\) method is missing from the'
+            ' derived class. It should be implemented in the derived class.'):
             MockBaseModelValidator().validate(self.item)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_external_model_properties\(\) method is missing from the'
+            ' derived class. It should be implemented in the derived class.'):
             MockSummaryModelValidator().validate(self.item)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
@@ -262,17 +266,23 @@ class BaseValidatorTests(test_utils.GenericTestBase):
             MockSnapshotContentModelValidator().validate(self.item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _get_change_domain_class\(\) method is missing from the '
+            'derived class. It should be implemented in the derived class.'):
             snapshot_model = MockSnapshotModel(id='mockmodel')
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
     def test_error_is_raised_if_entity_classes_to_map_over_is_undefined(self):
         job_class = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-        with self.assertRaises(NotImplementedError), self.swap(
-            jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
-            job_id = job_class.create_new()
-            job_class.enqueue(job_id)
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The entity_classes_to_map_over\(\) method is missing from the '
+            'derived class. It should be implemented in the derived class.'):
+            with self.swap(jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
+                job_id = job_class.create_new()
+                job_class.enqueue(job_id)
 
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')
@@ -2340,8 +2350,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A story',
-            corresponding_topic_id=self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -5645,8 +5654,8 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -5654,7 +5663,7 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+            ['%s' % (i * 2), '%s' % (i * 2 + 1)]
         ) for i in python_utils.RANGE(3)]
 
         for index, question in enumerate(questions):
@@ -5824,8 +5833,8 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(3)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -5833,7 +5842,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            skill_ids=['%s' % (2 - i)]
+            ['%s' % (2 - i)]
         ) for i in python_utils.RANGE(3)]
 
         for index, question in enumerate(questions):
@@ -5945,8 +5954,9 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(2)]
 
         for story in stories:
@@ -6279,8 +6289,8 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6288,7 +6298,7 @@ class QuestionSnapshotMetadataModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+            ['%s' % (i * 2), '%s' % (i * 2 + 1)]
         ) for i in python_utils.RANGE(3)]
 
         for index, question in enumerate(questions):
@@ -6459,8 +6469,8 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6468,7 +6478,7 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+            ['%s' % (i * 2), '%s' % (i * 2 + 1)]
         ) for i in python_utils.RANGE(3)]
 
         for index, question in enumerate(questions):
@@ -6589,8 +6599,8 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6598,7 +6608,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+            ['%s' % (i * 2), '%s' % (i * 2 + 1)]
         ) for i in python_utils.RANGE(3)]
 
         for index, question in enumerate(questions):
@@ -6810,8 +6820,8 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
@@ -6819,7 +6829,7 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+            ['%s' % (i * 2), '%s' % (i * 2 + 1)]
         ) for i in python_utils.RANGE(3)]
 
         for index, question in enumerate(questions):
@@ -7227,15 +7237,15 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(3)]
 
         for i in python_utils.RANGE(2):
             skill = skill_domain.Skill.create_default_skill(
                 '%s' % (i + 3),
-                description='description %d' % (i + 3),
-                rubrics=rubrics)
+                'description %d' % (i + 3),
+                rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
 
         example_1 = skill_domain.WorkedExample(
@@ -7459,8 +7469,8 @@ class SkillSnapshotMetadataModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(3)]
 
         example_1 = skill_domain.WorkedExample(
@@ -7661,8 +7671,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(3)]
 
         example_1 = skill_domain.WorkedExample(
@@ -7812,8 +7822,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(3)]
 
         example_1 = skill_domain.WorkedExample(
@@ -8052,8 +8062,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
+            'description %d' % i,
+            rubrics
         ) for i in python_utils.RANGE(3)]
 
         example_1 = skill_domain.WorkedExample(
@@ -8227,8 +8237,9 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(3)]
 
         for index, story in enumerate(stories):
@@ -8428,8 +8439,9 @@ class StorySnapshotMetadataModelValidatorTests(
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8594,8 +8606,9 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8712,8 +8725,9 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8937,8 +8951,9 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d' % i,
-            corresponding_topic_id='0'
+            'title %d' % i,
+            'description %d' % i,
+            '0'
         ) for i in python_utils.RANGE(3)]
 
         for index, story in enumerate(stories):
@@ -9467,8 +9482,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                '%s' % i,
+                'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9476,8 +9491,9 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -9763,8 +9779,8 @@ class TopicSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                '%s' % i,
+                'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9772,8 +9788,9 @@ class TopicSnapshotMetadataModelValidatorTests(
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -9957,7 +9974,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9965,8 +9982,9 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10118,7 +10136,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10126,8 +10144,9 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10294,7 +10313,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10302,8 +10321,9 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10499,7 +10519,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10507,8 +10527,9 @@ class TopicRightsSnapshotContentModelValidatorTests(
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10658,7 +10679,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10666,8 +10687,9 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10942,7 +10964,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10950,8 +10972,9 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11166,7 +11189,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -11174,8 +11197,9 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11378,7 +11402,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -11386,8 +11410,9 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11585,7 +11610,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -11593,8 +11618,9 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11753,7 +11779,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                '%s' % i, 'skill%s' % i, rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -11761,8 +11787,9 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d',
-            corresponding_topic_id='%s' % (python_utils.divide(i, 2))
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -13980,8 +14007,9 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
 
         story = story_domain.Story.create_default_story(
             'story',
-            title='title %d',
-            corresponding_topic_id='0'
+            'title %d',
+            'description %d',
+            '0'
         )
 
         story.add_node('node_1', 'Node1')
@@ -14384,7 +14412,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill = skill_domain.Skill.create_default_skill(
-            'skill', description='description', rubrics=rubrics)
+            'skill', 'description', rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
         skill_services.create_user_skill_mastery(
             self.user_id, 'skill', 0.8)

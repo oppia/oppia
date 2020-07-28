@@ -122,7 +122,9 @@ describe('Read only collection backend API service', () => {
         successHandler, failHandler);
       var req = httpTestingController.expectOne('/collection_handler/data/0');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading collection 0', {
+      req.flush({
+        error: 'Error loading collection 0'
+      }, {
         status: 500, statusText: 'Invalid Request'
       });
 

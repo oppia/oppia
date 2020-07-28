@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks.
+presubmit checks. Next message id would be C0029.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -25,6 +25,7 @@ import linecache
 import os
 import re
 import sys
+import tokenize
 
 import python_utils
 from .. import docstrings_checker
@@ -43,15 +44,11 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import astroid  # isort:skip
-from pylint import checkers  # isort:skip
-from pylint import interfaces  # isort:skip
-from pylint.checkers import typecheck  # isort:skip
-from pylint.checkers import utils as checker_utils  # isort:skip
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
+import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import typecheck  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def read_from_node(node):
@@ -81,7 +78,96 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             'non-explicit-keyword-args',
             'All keyword arguments should be explicitly named in function call.'
         ),
+        'C0027': (
+            'Keyword argument %s used for a non keyword argument in %s '
+            'call of %s.',
+            'arg-name-for-non-keyword-arg',
+            'Position arguments should not be used as keyword arguments '
+            'in function call.'
+        ),
     }
+
+    def _check_non_explicit_keyword_args(
+            self, node, name, callable_name, keyword_args,
+            num_positional_args_unused, num_mandatory_parameters):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            name: str. Name of the keyword argument.
+            callable_name: str. Name of method type.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            num_positional_args_unused: int. Number of unused positional
+                arguments.
+            num_mandatory_parameters: int. Number of mandatory parameters.
+
+        Returns:
+            int. Number of unused positional arguments.
+        """
+        display_name = repr(name)
+
+        if name not in keyword_args and (
+                num_positional_args_unused > (
+                    num_mandatory_parameters)) and (
+                        callable_name != 'constructor'):
+            # This try/except block tries to get the function
+            # name. Since each node may differ, multiple
+            # blocks have been used.
+            try:
+                func_name = node.func.attrname
+            except AttributeError:
+                func_name = node.func.name
+
+            self.add_message(
+                'non-explicit-keyword-args', node=node,
+                args=(
+                    display_name,
+                    callable_name,
+                    func_name))
+            num_positional_args_unused -= 1
+        return num_positional_args_unused
+
+    def _check_argname_for_nonkeyword_arg(
+            self, node, called, callable_name, keyword_args,
+            keyword_args_in_funcdef):
+        """Custom pylint check to ensure that position arguments should not
+        be used as keyword arguments.
+
+        Args:
+            node: astroid.node.Function. The current function call node.
+            called: astroid.Call. The function call object.
+            keyword_args: list(str). Name of all keyword arguments in function
+                call.
+            callable_name: str. Name of method type.
+            keyword_args_in_funcdef: list(str). Name of all keyword arguments in
+                function definition.
+        """
+        for arg in keyword_args:
+            # TODO(#10038): Fix the check to cover below case as well.
+            # If there is *args and **kwargs in the function definition skip the
+            # check because we can use keywords arguments in function call even
+            # if **kwargs is present in the function definition. See Example:
+            # Function def -> def func(entity_id, *args, **kwargs):
+            # Function call -> func(entity_id='1', a=1, b=2, c=3)
+            # By parsing calling method we get
+            # keyword_arguments = entity_id, a, b, c.
+            # From the function definition, we will get keyword_arguments = []
+            # Now we do not have a way to identify which one is a keyword
+            # argument and which one is not.
+            if not called.args.kwarg and callable_name != 'constructor':
+                if not arg in keyword_args_in_funcdef:
+                    # This try/except block tries to get the function
+                    # name.
+                    try:
+                        func_name = node.func.attrname
+                    except AttributeError:
+                        func_name = node.func.name
+
+                    self.add_message(
+                        'arg-name-for-non-keyword-arg', node=node,
+                        args=(repr(arg), callable_name, func_name))
 
     def visit_call(self, node):
         """Visits each function call in a lint check.
@@ -139,31 +225,21 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
             parameters.append([(name, defval), False])
 
         num_positional_args_unused = num_positional_args
+        # The list below will store all the keyword arguments present in the
+        # function definition.
+        keyword_args_in_funcdef = []
         # Check that all parameters with a default value have
         # been called explicitly.
         for [(name, defval), _] in parameters:
             if defval:
-                display_name = repr(name)
+                keyword_args_in_funcdef.append(name)
+                num_positional_args_unused = (
+                    self._check_non_explicit_keyword_args(
+                        node, name, callable_name, keyword_args,
+                        num_positional_args_unused, num_mandatory_parameters))
 
-                if name not in keyword_args and (
-                        num_positional_args_unused > (
-                            num_mandatory_parameters)) and (
-                                callable_name != 'constructor'):
-                    # This try/except block tries to get the function
-                    # name. Since each node may differ, multiple
-                    # blocks have been used.
-                    try:
-                        func_name = node.func.attrname
-                    except AttributeError:
-                        func_name = node.func.name
-
-                    self.add_message(
-                        'non-explicit-keyword-args', node=node,
-                        args=(
-                            display_name,
-                            callable_name,
-                            func_name))
-                    num_positional_args_unused -= 1
+        self._check_argname_for_nonkeyword_arg(
+            node, called, callable_name, keyword_args, keyword_args_in_funcdef)
 
 
 class HangingIndentChecker(checkers.BaseChecker):
@@ -171,7 +247,7 @@ class HangingIndentChecker(checkers.BaseChecker):
     of hanging indentation.
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.ITokenChecker
 
     name = 'hanging-indent'
     priority = -1
@@ -187,47 +263,83 @@ class HangingIndentChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node):
-        """Process a module.
+    def process_tokens(self, tokens):
+        """Process tokens to check if there is a line break after the bracket.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            tokens: astroid.Tokens. Object to process tokens.
         """
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        exclude = False
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].lstrip().rstrip()
-            # The source files are read as bytes, hence the b' prefix.
-            if line.startswith(b'"""') and not line.endswith(b'"""'):
-                exclude = True
-            if line.endswith(b'"""'):
-                exclude = False
-            if line.startswith(b'#') or exclude:
-                continue
-            line_length = len(line)
-            bracket_count = 0
-            for char_num in python_utils.RANGE(line_length):
-                char = line[char_num]
-                if char == b'(':
-                    if bracket_count == 0:
-                        position = char_num
-                    bracket_count += 1
-                elif char == b')' and bracket_count > 0:
-                    bracket_count -= 1
-            if bracket_count > 0 and position + 1 < line_length:
-                content = line[position + 1:]
-                if not len(content) or not b',' in content:
+        escape_character_indicator = b'\\'
+        string_indicator = b'\''
+        excluded = False
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            # Check if token type is an operator and is either a
+            # left parenthesis '(' or a right parenthesis ')'.
+            if token_type == tokenize.OP and (
+                    token == b'(' or token == b')'):
+                line = line.strip()
+
+                # Exclude 'if', 'elif', 'while' statements.
+                if line.startswith((b'if ', b'while ', b'elif ')):
+                    excluded = True
+                # Skip check if there is a comment at the end of line.
+                if excluded:
+                    split_line = line.split()
+                    if '#' in split_line:
+                        comment_index = split_line.index('#')
+                        if split_line[comment_index - 1].endswith(b'):'):
+                            excluded = False
+                    elif line.endswith(b'):'):
+                        excluded = False
+                if excluded:
                     continue
-                split_list = content.split(b', ')
-                if len(split_list) == 1 and not any(
-                        char.isalpha() for char in split_list[0]):
-                    continue
-                separators = set('@^! #%$&)(+*-=')
-                if not any(char in separators for item in split_list
-                           for char in item):
+
+                bracket_count = 0
+                line_length = len(line)
+                escape_character_found = False
+                in_string = False
+                for char_num in python_utils.RANGE(line_length):
+                    char = line[char_num]
+                    if in_string and (
+                            char == escape_character_indicator or
+                            escape_character_found):
+                        escape_character_found = not escape_character_found
+                        continue
+
+                    # Check if we found the string indicator and flip the
+                    # in_string boolean.
+                    if char == string_indicator:
+                        in_string = not in_string
+
+                    # Ignore anything inside a string.
+                    if in_string:
+                        continue
+
+                    if char == b'(':
+                        if bracket_count == 0:
+                            position = char_num
+                        bracket_count += 1
+                    elif char == b')' and bracket_count > 0:
+                        bracket_count -= 1
+
+                if bracket_count > 0 and position + 1 < line_length:
+                    # Allow the use of '[', ']', '{', '}' after the parenthesis.
+                    separators = set('[{( ')
+                    if line[line_length - 1] in separators:
+                        continue
+                    content = line[position + 1:]
+                    # Skip check if there is nothing after the bracket.
+                    split_content = content.split()
+                    # Skip check if there is a comment at the end of line.
+                    if '#' in split_content:
+                        comment_index = split_content.index('#')
+                        if comment_index == 0:
+                            continue
+                        else:
+                            if split_content[comment_index - 1].endswith(b'('):
+                                continue
                     self.add_message(
-                        'no-break-after-hanging-indent', line=line_num + 1)
+                        'no-break-after-hanging-indent', line=line_num)
 
 
 # The following class was derived from
@@ -254,104 +366,121 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
     name = 'parameter_documentation'
     msgs = {
-        'W9005': ('"%s" has constructor parameters '
-                  'documented in class and __init__',
-                  'multiple-constructor-doc',
-                  'Please remove parameter declarations '
-                  'in the class or constructor.'),
-        'W9006': ('"%s" not documented as being raised',
-                  'missing-raises-doc',
-                  'Please document exceptions for '
-                  'all raised exception types.'),
-        'W9008': ('Redundant returns documentation',
-                  'redundant-returns-doc',
-                  'Please remove the return/rtype '
-                  'documentation from this method.'),
-        'W9010': ('Redundant yields documentation',
-                  'redundant-yields-doc',
-                  'Please remove the yields documentation from this method.'),
-        'W9011': ('Missing return documentation',
-                  'missing-return-doc',
-                  'Please add documentation about what this method returns.',
-                  {'old_names': [('W9007', 'missing-returns-doc')]}),
-        'W9012': ('Missing return type documentation',
-                  'missing-return-type-doc',
-                  'Please document the type returned by this method.',
-                  # We can't use the same old_name for two different warnings
-                  # {'old_names': [('W9007', 'missing-returns-doc')]}.
-                 ),
-        'W9013': ('Missing yield documentation',
-                  'missing-yield-doc',
-                  'Please add documentation about what this generator yields.',
-                  {'old_names': [('W9009', 'missing-yields-doc')]}),
-        'W9014': ('Missing yield type documentation',
-                  'missing-yield-type-doc',
-                  'Please document the type yielded by this method.',
-                  # We can't use the same old_name for two different warnings
-                  # {'old_names': [('W9009', 'missing-yields-doc')]}.
-                 ),
-        'W9015': ('"%s" missing in parameter documentation',
-                  'missing-param-doc',
-                  'Please add parameter declarations for all parameters.',
-                  {'old_names': [('W9003', 'missing-param-doc')]}),
-        'W9016': ('"%s" missing in parameter type documentation',
-                  'missing-type-doc',
-                  'Please add parameter type declarations for all parameters.',
-                  {'old_names': [('W9004', 'missing-type-doc')]}),
-        'W9017': ('"%s" differing in parameter documentation',
-                  'differing-param-doc',
-                  'Please check parameter names in declarations.',
-                 ),
-        'W9018': ('"%s" differing in parameter type documentation',
-                  'differing-type-doc',
-                  'Please check parameter names in type declarations.',
-                 ),
+        'W9005': (
+            '"%s" has constructor parameters '
+            'documented in class and __init__',
+            'multiple-constructor-doc',
+            'Please remove parameter declarations '
+            'in the class or constructor.'),
+        'W9006': (
+            '"%s" not documented as being raised',
+            'missing-raises-doc',
+            'Please document exceptions for '
+            'all raised exception types.'),
+        'W9008': (
+            'Redundant returns documentation',
+            'redundant-returns-doc',
+            'Please remove the return/rtype '
+            'documentation from this method.'),
+        'W9010': (
+            'Redundant yields documentation',
+            'redundant-yields-doc',
+            'Please remove the yields documentation from this method.'),
+        'W9011': (
+            'Missing return documentation',
+            'missing-return-doc',
+            'Please add documentation about what this method returns.',
+            {'old_names': [('W9007', 'missing-returns-doc')]}),
+        'W9012': (
+            'Missing return type documentation',
+            'missing-return-type-doc',
+            'Please document the type returned by this method.',
+            # We can't use the same old_name for two different warnings
+            # {'old_names': [('W9007', 'missing-returns-doc')]}.
+        ),
+        'W9013': (
+            'Missing yield documentation',
+            'missing-yield-doc',
+            'Please add documentation about what this generator yields.',
+            {'old_names': [('W9009', 'missing-yields-doc')]}),
+        'W9014': (
+            'Missing yield type documentation',
+            'missing-yield-type-doc',
+            'Please document the type yielded by this method.',
+            # We can't use the same old_name for two different warnings
+            # {'old_names': [('W9009', 'missing-yields-doc')]}.
+        ),
+        'W9015': (
+            '"%s" missing in parameter documentation',
+            'missing-param-doc',
+            'Please add parameter declarations for all parameters.',
+            {'old_names': [('W9003', 'missing-param-doc')]}),
+        'W9016': (
+            '"%s" missing in parameter type documentation',
+            'missing-type-doc',
+            'Please add parameter type declarations for all parameters.',
+            {'old_names': [('W9004', 'missing-type-doc')]}),
+        'W9017': (
+            '"%s" differing in parameter documentation',
+            'differing-param-doc',
+            'Please check parameter names in declarations.',
+        ),
+        'W9018': (
+            '"%s" differing in parameter type documentation',
+            'differing-type-doc',
+            'Please check parameter names in type declarations.',
+        ),
         'W9019': (
-            ('Line starting with "%s" requires 4 space indentation relative to'
-             + ' args line indentation'),
+            'Line starting with "%s" requires 4 space indentation relative to'
+            ' args line indentation',
             '4-space-indentation-for-arg-parameters-doc',
-            ('Please use 4 space indentation in parameter definitions relative'
-             + ' to the args line indentation.')
+            'Please use 4 space indentation in parameter definitions relative'
+            ' to the args line indentation.'
         ),
         'W9020': (
-            ('Line starting with "%s" requires 8 space indentation relative to'
-             + ' args line indentation'),
+            'Line starting with "%s" requires 8 space indentation relative to'
+            ' args line indentation',
             '8-space-indentation-for-arg-in-descriptions-doc',
-            ('Please indent wrap-around descriptions by 8 relative to the args'
-             + ' line indentation.')
+            'Please indent wrap-around descriptions by 8 relative to the args'
+            ' line indentation.'
         ),
         'W9021': (
-            ('Args: indentation is incorrect, must be at the outermost'
-             + ' indentation level.'),
+            'Args: indentation is incorrect, must be at the outermost'
+            ' indentation level.',
             'incorrect-indentation-for-arg-header-doc',
             'Please indent args line to the outermost indentation level.'
         )
     }
 
-    options = (('accept-no-param-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing parameter '
-                         'documentation in the docstring of a '
-                         'function that has parameters.'
-                }),
-               ('accept-no-raise-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing raises '
-                         'documentation in the docstring of a function that '
-                         'raises an exception.'
-                }),
-               ('accept-no-return-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing return '
-                         'documentation in the docstring of a function that '
-                         'returns a statement.'
-                }),
-               ('accept-no-yields-doc',
-                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-                 'help': 'Whether to accept totally missing yields '
-                         'documentation in the docstring of a generator.'
-                }),
-              )
+    options = (
+        (
+            'accept-no-param-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing parameter '
+                     'documentation in the docstring of a '
+                     'function that has parameters.'
+            }),
+        (
+            'accept-no-raise-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing raises '
+                     'documentation in the docstring of a function that '
+                     'raises an exception.'
+            }),
+        (
+            'accept-no-return-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing return '
+                     'documentation in the docstring of a function that '
+                     'returns a statement.'
+            }),
+        (
+            'accept-no-yields-doc',
+            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
+             'help': 'Whether to accept totally missing yields '
+                     'documentation in the docstring of a generator.'
+            }),
+        )
 
     priority = -2
 
@@ -461,8 +590,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 # arguments that start with * which means it's autofill and will
                 # not appear in the node args list so we handle those too.
                 elif (currently_in_args_section and parameter
-                      and ((parameter.group(0).strip('*')
-                            in expected_argument_names) or
+                      and ((
+                          parameter.group(0).strip('*')
+                          in expected_argument_names) or
                            re.search(
                                br'\*[^ ]+: ',
                                line_with_no_leading_whitespaces))):
@@ -759,15 +889,18 @@ class DocstringParameterChecker(checkers.BaseChecker):
                         sorted(differing_argument_names)),),
                     node=warning_node)
 
-        _compare_missing_args(params_with_doc, 'missing-param-doc',
-                              self.not_needed_param_in_docstring)
-        _compare_missing_args(params_with_type, 'missing-type-doc',
-                              not_needed_type_in_docstring)
+        _compare_missing_args(
+            params_with_doc, 'missing-param-doc',
+            self.not_needed_param_in_docstring)
+        _compare_missing_args(
+            params_with_type, 'missing-type-doc', not_needed_type_in_docstring)
 
-        _compare_different_args(params_with_doc, 'differing-param-doc',
-                                self.not_needed_param_in_docstring)
-        _compare_different_args(params_with_type, 'differing-type-doc',
-                                not_needed_type_in_docstring)
+        _compare_different_args(
+            params_with_doc, 'differing-param-doc',
+            self.not_needed_param_in_docstring)
+        _compare_different_args(
+            params_with_type, 'differing-type-doc',
+            not_needed_type_in_docstring)
 
     def check_single_constructor_params(self, class_doc, init_doc, class_node):
         """Checks whether a class and corresponding  init() method are
@@ -1043,7 +1176,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
     when applicable ('yield' is acceptable).
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'single-space-after-yield'
     priority = -1
@@ -1055,46 +1188,21 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that yield keywords are followed by
-        exactly one space, so matching 'yield *' where * is not a
+    def visit_yield(self, node):
+        """Visit every yield statement to ensure that yield keywords are
+        followed by exactly one space, so matching 'yield *' where * is not a
         whitespace character. Note that 'yield' is also acceptable in
         cases where the user wants to yield nothing.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module
+            node: astroid.nodes.Yield. Nodes to access yield statements.
                 content.
         """
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        for (line_num, line) in enumerate(file_content):
-            bare_line = line.strip()
-
-            # Single multi-line comment, ignore it.
-            if bare_line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in bare_line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            # Whitespace to right of yield keyword is important for regex.
-            # Allows alphabet characters and underscore for cases where 'yield'
-            # is used at the start of a variable name.
-            source_line = line.lstrip()
-            if (source_line.startswith(b'yield') and
-                    not re.search(br'^(yield)( \S|$|\w)', source_line)):
-                self.add_message('single-space-after-yield', line=line_num + 1)
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number).lstrip()
+        if (line.startswith(b'yield') and
+                not re.search(br'^(yield)( \S|$|\w)', line)):
+            self.add_message('single-space-after-yield', node=node)
 
 
 class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
@@ -1237,7 +1345,7 @@ class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'division-operator-used'
     priority = -1
     msgs = {
@@ -1248,52 +1356,16 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that the division operator('/') is not
-        used and python_utils.divide() is used instead.
+    def visit_binop(self, node):
+        """Visit assign statements to ensure that the division operator('/')
+        is not used and python_utils.divide() is used instead.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.node.BinOp. Node to access module content.
         """
-
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        string_indicator = b'\''
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-
-            # Single line comment, ignore it.
-            if line.startswith(b'#'):
-                continue
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            # Ignore anything inside a string.
-            if line.count(string_indicator) >= 2:
-                continue
-
-            if (re.search(br'[^/]/[^/]', line) and
-                    not line.endswith(multi_line_indicator)):
-                self.add_message(
-                    'division-operator-used', line=line_num + 1)
+        if node.op == b'/':
+            self.add_message(
+                'division-operator-used', node=node)
 
 
 class SingleLineCommentChecker(checkers.BaseChecker):
@@ -1453,21 +1525,21 @@ class DocstringChecker(checkers.BaseChecker):
         'W0026': (
             '4 space indentation in docstring.',
             '4-space-indentation-in-docstring',
-            ('Please use 4 space indentation for parameters relative to section'
-             + ' headers.')
+            'Please use 4 space indentation for parameters relative to section'
+            ' headers.'
         ),
         'W0027': (
             '8 space indentation in docstring.',
             '8-space-indentation-in-docstring',
-            ('Please use 8 space indentation in wrap around messages' +
-             ' relative to section headers.')
+            'Please use 8 space indentation in wrap around messages' +
+            ' relative to section headers.'
         ),
         'W0028': (
             'malformed parameter',
             'malformed-parameter',
-            ('The parameter is incorrectly formatted: \nFor returns and yields,'
-             + ' headers should have this format: "type (elaboration). \n'
-             + 'For raises, headers should have the format: "exception: ')
+            'The parameter is incorrectly formatted: \nFor returns and yields,'
+            ' headers should have this format: "type (elaboration). \n'
+            'For raises, headers should have the format: "exception: '
         )
     }
 
@@ -1605,14 +1677,14 @@ class DocstringChecker(checkers.BaseChecker):
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
                 # Check if we are in a docstring raises section.
-                elif (current_docstring_section and
-                      (current_docstring_section ==
-                       self.DOCSTRING_SECTION_RAISES)):
+                elif (current_docstring_section and (
+                        current_docstring_section ==
+                        self.DOCSTRING_SECTION_RAISES)):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
-                    if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
-                                 line):
+                    if re.search(
+                            br'^[a-zA-Z0-9_\.\*]+: ', line):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
                             self.add_message(
@@ -1639,15 +1711,16 @@ class DocstringChecker(checkers.BaseChecker):
                 # NOTE: Each function should only have one yield or return
                 # object. If a tuple is returned, wrap both in a tuple parameter
                 # section.
-                elif (current_docstring_section and
-                      (current_docstring_section ==
-                       self.DOCSTRING_SECTION_RETURNS)
-                      or (current_docstring_section ==
-                          self.DOCSTRING_SECTION_YIELDS)):
+                elif (current_docstring_section and (
+                        current_docstring_section ==
+                        self.DOCSTRING_SECTION_RETURNS) or (
+                            current_docstring_section ==
+                            self.DOCSTRING_SECTION_YIELDS)):
                     # Check for the start of a new parameter definition in the
                     # format "type (elaboration)." and check the indentation.
-                    if (re.search(br'^[a-zA-Z_() -:,\*]+\.',
-                                  line) and not in_description):
+                    if (re.search(
+                            br'^[a-zA-Z_() -:,\*]+\.',
+                            line) and not in_description):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
                             self.add_message(
@@ -1782,6 +1855,50 @@ class NewlineBelowClassDocstring(checkers.BaseChecker):
             self.add_message('newline-below-class-docstring', node=node)
 
 
+class SingleLinePragmaChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks if pylint pragma is used to disable
+    a rule for a single line only.
+    """
+
+    __implements__ = interfaces.ITokenChecker
+
+    name = 'single-line-pragma'
+    priority = -1
+    msgs = {
+        'C0028': (
+            'Pylint pragmas should be used to disable a rule '
+            'for a single line only',
+            'single-line-pragma',
+            'Please use pylint pragmas to disable a rule for a single line only'
+        )
+    }
+
+    def process_tokens(self, tokens):
+        """Custom pylint checker which allows paramas to disable a rule for a
+        single line only.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT:
+                line = line.lstrip()
+                # Ignore line that is enabling this check.
+                # Example:
+                # # pylint: disable=import-only-modules, single-line-pragma
+                # def func(a, b):
+                # # pylint: enable=import-only-modules, single-line-pragma
+                # Now if do not ignore the line with 'enable' statement
+                # pylint will raise the error of single-line-pragma because
+                # from here on all this lint check is enabled. So we need to
+                # ignore this line.
+                if re.search(br'^(#\s*pylint:)', line):
+                    if 'enable' in line and 'single-line-pragma' in line:
+                        continue
+                    self.add_message(
+                        'single-line-pragma', line=line_num)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1804,3 +1921,4 @@ def register(linter):
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(NewlineBelowClassDocstring(linter))
+    linter.register_checker(SingleLinePragmaChecker(linter))

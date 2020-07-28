@@ -717,7 +717,9 @@ class ExplorationIssue(python_utils.OBJECT):
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _convert_issue_v1_dict_to_v2_dict() method is missing from the'
+            ' derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
@@ -826,7 +828,9 @@ class LearnerAction(python_utils.OBJECT):
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _convert_action_v1_dict_to_v2_dict() method is missing from '
+            'the derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the LearnerAction domain object."""
@@ -1626,8 +1630,8 @@ class LearnerAnswerInfo(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The answer details submitted cannot be an empty string.')
         if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
-            raise utils.ValidationError('The answer details size is to large '
-                                        'to be stored')
+            raise utils.ValidationError(
+                'The answer details size is to large to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s'

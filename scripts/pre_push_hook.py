@@ -102,8 +102,8 @@ class ChangedBranch(python_utils.OBJECT):
 
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
 
@@ -117,16 +117,17 @@ def get_remote_name():
     remote_name = ''
     remote_num = 0
     get_remotes_name_cmd = 'git remote'.split()
-    task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        get_remotes_name_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     remotes = python_utils.UNICODE(out)[:-1].split('\n')
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (
                 'git config --get remote.%s.url' % remote).split()
-            task = subprocess.Popen(get_remotes_url_cmd, stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+            task = subprocess.Popen(
+                get_remotes_url_cmd, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
                 if remote_url.endswith('oppia/oppia.git\n'):
@@ -408,8 +409,9 @@ def main(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('remote', nargs='?', help='provided by git before push')
     parser.add_argument('url', nargs='?', help='provided by git before push')
-    parser.add_argument('--install', action='store_true', default=False,
-                        help='Install pre_push_hook to the .git/hooks dir')
+    parser.add_argument(
+        '--install', action='store_true', default=False,
+        help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args(args=args)
     if args.install:
         install_hook()

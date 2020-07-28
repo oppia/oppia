@@ -36,9 +36,7 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github  # isort:skip pylint: disable=wrong-import-position
 
 ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
     'core', 'templates', 'pages', 'about-page',
@@ -162,7 +160,8 @@ def get_previous_release_version(branch_type, current_release_version_number):
         previous_release_version = all_tags[-2][1:]
     else:
         raise Exception('Invalid branch type: %s.' % branch_type)
-    assert previous_release_version != current_release_version_number
+    assert previous_release_version != current_release_version_number, (
+        'Previous release version is same as current release version.')
     return previous_release_version
 
 
