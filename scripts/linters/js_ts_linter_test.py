@@ -558,18 +558,16 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     INVALID_TS_IGNORE_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        def mock_open_file(unused_path, unused_permissions, newline=''):
-            return python_utils.string_io(buffer_value='{}')
-
-        open_file_swap = self.swap(
-            python_utils, 'open_file', mock_open_file)
+        ts_ignore_exceptions_swap = self.swap(
+            js_ts_linter, 'TS_IGNORE_EXCEPTIONS', {})
         compile_all_ts_files_swap = self.swap(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
-        with self.print_swap, compile_all_ts_files_swap, open_file_swap:
-            js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_TS_IGNORE_FILEPATH], FILE_CACHE,
-                True).perform_all_lint_checks()
+        with self.print_swap, compile_all_ts_files_swap:
+            with ts_ignore_exceptions_swap:
+                js_ts_linter.JsTsLintChecksManager(
+                    [], [INVALID_TS_IGNORE_FILEPATH], FILE_CACHE,
+                    True).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
