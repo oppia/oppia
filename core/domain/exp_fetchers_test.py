@@ -875,8 +875,8 @@ title: Old Title
         self.assertEqual(
             answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
         self.assertEqual(sorted(exploration.states[
-            'State4'].recorded_voiceovers.voiceovers_mapping.keys()),
-            ['content_1', 'feedback_1', 'feedback_3'])
+            'State4'].recorded_voiceovers.voiceovers_mapping.keys()), [
+                'content_1', 'feedback_1', 'feedback_3'])
         self.assertEqual(sorted(exploration.states[
-            'State4'].written_translations.translations_mapping.keys()),
-            ['content_1', 'feedback_1', 'feedback_3'])
+            'State4'].written_translations.translations_mapping.keys()), [
+                'content_1', 'feedback_1', 'feedback_3'])

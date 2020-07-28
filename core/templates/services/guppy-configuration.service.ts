@@ -43,19 +43,19 @@ export class GuppyConfigurationService {
     Guppy.add_global_symbol(
       '*',
       {
-        "output": {
-          "latex": "\\times",
-          "asciimath": "*"
+        output: {
+          latex: '\\times',
+          asciimath: '*'
         },
-        "keys": ["*"],
-        "attrs": {
-          "group": "operations",
-          "type": "*"
+        keys: ['*'],
+        attrs: {
+          group: 'operations',
+          type: '*'
         },
-        "ast": {
-          "type": "operator"
+        ast: {
+          type: 'operator'
         }
-      })
+      });
 
     // Remove symbols since they are not supported.
     for (let symbol of SYMBOLS_TO_REMOVE) {
