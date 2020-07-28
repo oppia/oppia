@@ -638,7 +638,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     self.add_message(
                         'no-newline-used-at-end', node=node)
                 elif (docstring[-2][-1] not in
-                      ALLOWED_TERMINATING_PUNCTUATIONS):
+                      ALLOWED_TERMINATING_PUNCTUATIONS and
+                      docstring[-2].split()[-1] not in EXCLUDED_PHRASES):
                     self.add_message('no-period-used', node=node)
             # Process the docstring line by line.
             for line in docstring:
