@@ -487,9 +487,9 @@ class StoryContents(python_utils.OBJECT):
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if python_utils.NEXT(
-                        (node for node in self.nodes
-                         if node.id == destination_node_id), None) is None:
+                if python_utils.NEXT((
+                        node for node in self.nodes
+                        if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
                         'Expected all destination nodes to exist')
             if node.id == self.initial_node_id:
@@ -1300,24 +1300,24 @@ class Story(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         story_content_nodes = self.story_contents.nodes
-        if (from_index >= len(story_content_nodes) or
-                from_index < 0):
+        if from_index >= len(story_content_nodes) or from_index < 0:
             raise Exception('Expected from_index value to be with-in bounds.')
 
-        if (to_index >= len(story_content_nodes) or
-                to_index < 0):
+        if to_index >= len(story_content_nodes) or to_index < 0:
             raise Exception('Expected to_index value to be with-in bounds.')
 
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
