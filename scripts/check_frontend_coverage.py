@@ -327,7 +327,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'select2-dropdown.directive.ts',
     'set-of-html-string-editor.directive.ts',
     'set-of-unicode-string-editor.directive.ts',
-    'settings-tab.directive.ts',
     'shared.ts',
     'sharing-links.component.ts',
     'side-navigation-bar.directive.ts',

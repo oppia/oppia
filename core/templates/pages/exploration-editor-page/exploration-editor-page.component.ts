@@ -63,7 +63,7 @@ require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
-require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
+require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.ts');
 require(
