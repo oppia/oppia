@@ -148,8 +148,9 @@ def possible_exc_types(node):
 
         if handler and handler.type:
             inferred_excs = astroid.unpack_infer(handler.type)
-            excs = (exc.name for exc in inferred_excs
-                    if exc is not astroid.Uninferable)
+            excs = (
+                exc.name for exc in inferred_excs
+                if exc is not astroid.Uninferable)
 
 
     try:
@@ -185,7 +186,8 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """
 
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
-    re_param_line = re.compile(r"""
+    re_param_line = re.compile(
+        r"""
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
         \s*  ( [:]
             \s*
@@ -197,7 +199,8 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
         type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
-    re_returns_line = re.compile(r"""
+    re_returns_line = re.compile(
+        r"""
         \s* (({type}|\S*).)?              # identifier
         \s* (.*)                          # beginning of description
     """.format(
