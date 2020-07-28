@@ -337,8 +337,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>HasElementXAtPositionY rule_spec html</p>',
                 '<p>y input for HasElementXAtPositionY rule_spec </p>',
                 '<p>x input for HasElementXAtPositionY rule_spec </p>',
-                ('<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_spec '
-                 'htmls</p>'),
+                (
+                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
+                    'pec htmls</p>'),
                 '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',

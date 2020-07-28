@@ -395,8 +395,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
-                for state_stats in (list(datastore_stats_for_version.
-                                         state_stats_mapping.values())):
+                for state_stats in list(
+                        datastore_stats_for_version.
+                        state_stats_mapping.values()):
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0

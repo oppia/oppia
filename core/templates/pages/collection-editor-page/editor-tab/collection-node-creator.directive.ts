@@ -154,7 +154,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
               title: title
             }).then(function(response) {
               ctrl.newExplorationTitle = '';
-              var newExplorationId = response.data.explorationId;
+              var newExplorationId = response.data.exploration_id;
 
               SiteAnalyticsService
                 .registerCreateNewExplorationInCollectionEvent(

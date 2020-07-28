@@ -389,8 +389,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'skill_1', 'Skill Description 1'))
 
         self.assertEqual(len(question_skill_links), 2)
-        self.assertTrue(isinstance(question_skill_links[0],
-                                   question_domain.QuestionSkillLink))
+        self.assertTrue(isinstance(
+            question_skill_links[0], question_domain.QuestionSkillLink))
         question_ids = [question_skill.question_id for question_skill
                         in question_skill_links]
         self.assertItemsEqual(
@@ -811,20 +811,23 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        question = question_fetchers.get_question_from_model(question_model)
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 31)
+
+        with current_schema_version_swap:
+            question = question_fetchers.get_question_from_model(question_model)
+
+        self.assertEqual(question.question_state_data_schema_version, 31)
         self.assertEqual(
-            question.question_state_data_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(question.question_state_data
-                         .recorded_voiceovers.to_dict(), {
-                             'voiceovers_mapping': {
-                                 'ca_placeholder_0': {},
-                                 'content': {
-                                     'en': {
-                                         'filename': 'test.mp3',
-                                         'file_size_bytes': 100,
-                                         'needs_update': False,
-                                         'duration_secs': 0.0}}}})
+            question.question_state_data
+            .recorded_voiceovers.to_dict(), {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False,
+                            'duration_secs': 0.0}}}})
 
     def test_migrate_question_state_from_v31_to_latest(self):
         answer_group = {

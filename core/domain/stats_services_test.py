@@ -2339,10 +2339,12 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.question_id = 'q_id_1'
         self.interaction_id = 'TextInput'
         self.state_reference_exploration = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_exploration(
                 self.exp_id, self.state_name))
         self.state_reference_question = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_question(
                 self.question_id))
         self.learner_answer_details_model_exploration = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(

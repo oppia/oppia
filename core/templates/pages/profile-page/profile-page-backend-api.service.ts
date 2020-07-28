@@ -44,14 +44,19 @@ export class ProfilePageBackendApiService {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_SUBSCRIBE_URL,
       { creator_username: creatorUsername }
-    ).toPromise();
+    ).toPromise().then(() => {}, errorResponse => {
+      console.error(errorResponse.error.error);
+      throw new Error(errorResponse.error.error);
+    });
   }
 
   _postUnsubscribe(creatorUsername: string): Promise<void> {
     return this.http.post<void>(
       ProfilePageDomainConstants.PROFILE_UNSUBSCRIBE_URL,
       { creator_username: creatorUsername }
-    ).toPromise();
+    ).toPromise().then(() => {}, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
   }
 
   _fetchProfileData(): Promise<UserProfile> {
@@ -61,7 +66,9 @@ export class ProfilePageBackendApiService {
         {username: this.urlService.getUsernameFromProfileUrl()}
       )
     ).toPromise().then(userProfileDict => this.userProfileObjectFactory
-      .createFromBackendDict(userProfileDict));
+      .createFromBackendDict(userProfileDict), errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
   }
 
   /**

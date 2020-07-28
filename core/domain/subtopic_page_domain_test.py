@@ -64,8 +64,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
-        self.assertEqual(self.subtopic_page.to_dict(),
-                         expected_subtopic_page_dict)
+        self.assertEqual(
+            self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_create_default_subtopic_page(self):
         """Tests the create_default_topic() function."""
@@ -161,8 +161,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.subtopic_page.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
                 recorded_voiceovers_dict))
-        self.assertEqual(self.subtopic_page.to_dict(),
-                         expected_subtopic_page_dict)
+        self.assertEqual(
+            self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_update_html(self):
         expected_subtopic_page_dict = {
@@ -194,8 +194,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello world</p>',
                 'content_id': 'content'
             }))
-        self.assertEqual(self.subtopic_page.to_dict(),
-                         expected_subtopic_page_dict)
+        self.assertEqual(
+            self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_update_written_translations(self):
         written_translations_dict = {
@@ -298,8 +298,9 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.assertEqual(subtopic_page_contents.to_dict(),
-                         expected_subtopic_page_contents_dict)
+        self.assertEqual(
+            subtopic_page_contents.to_dict(),
+            expected_subtopic_page_contents_dict)
 
     def test_to_and_from_dict(self):
         subtopic_page_contents_dict = {
@@ -334,8 +335,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents.from_dict(
                 subtopic_page_contents_dict))
-        self.assertEqual(subtopic_page_contents.to_dict(),
-                         subtopic_page_contents_dict)
+        self.assertEqual(
+            subtopic_page_contents.to_dict(), subtopic_page_contents_dict)
 
 
 class SubtopicPageChangeTests(test_utils.GenericTestBase):

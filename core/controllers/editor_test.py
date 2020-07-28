@@ -314,7 +314,8 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""classifier_model_id: null
+        'State A': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -354,7 +355,8 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        'State B': ("""classifier_model_id: null
+        'State B': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -394,7 +396,8 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+        feconf.DEFAULT_INIT_STATE_NAME: (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -436,7 +439,8 @@ written_translations:
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+    SAMPLE_STATE_STRING = (
+        """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -613,8 +617,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
         self.assertEqual(
@@ -693,8 +698,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-Hola!-v1.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
@@ -721,8 +727,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-unpublished_exploration-v1.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
@@ -1290,8 +1297,8 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             if not isinstance(rev_version, int):
                 self.assertIn('Expected an integer', response_dict['error'])
             else:
-                self.assertIn('Cannot revert to version',
-                              response_dict['error'])
+                self.assertIn(
+                    'Cannot revert to version', response_dict['error'])
 
             # Check that exploration is really not reverted to old version.
             reader_dict = self.get_json(
