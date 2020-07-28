@@ -140,8 +140,8 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'Email Hash', sent_datetime_lower_bound=time_now1)
             self.assertEqual(len(results), 0)
 
-            time_before = (datetime.datetime.utcnow() -
-                           datetime.timedelta(minutes=10))
+            time_before = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=10))
 
             results = email_models.SentEmailModel.get_by_hash(
                 'Email Hash', sent_datetime_lower_bound=time_before)

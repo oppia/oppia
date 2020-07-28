@@ -75,6 +75,30 @@ describe('PlaythroughIssuesBackendApiService', () => {
         expect(failureHandler).not.toHaveBeenCalled();
       }));
 
+    it('should use the rejection handler if the backend request failed.',
+      fakeAsync(() => {
+        var successHandler = jasmine.createSpy('success');
+        var failHandler = jasmine.createSpy('fail');
+
+        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
+          successHandler, failHandler);
+
+        var req = httpTestingController.expectOne(
+          '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          error: 'Some error in the backend.'
+        }, {
+          status: 500, statusText: 'Internal Server Error'
+        });
+
+        flushMicrotasks();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+      })
+    );
+
     it('should not fetch an issue when another issue was already fetched',
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
@@ -136,6 +160,30 @@ describe('PlaythroughIssuesBackendApiService', () => {
       }));
   });
 
+  it('should use the rejection handler if the backend request failed.',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      playthroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
+        successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/playthroughdatahandler/7/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    })
+  );
+
   describe('.resolve', () => {
     it('should resolve an issue', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
@@ -164,6 +212,41 @@ describe('PlaythroughIssuesBackendApiService', () => {
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
+    it('should use the rejection handler if the backend request failed.',
+      fakeAsync(() => {
+        var successHandler = jasmine.createSpy('success');
+        var failHandler = jasmine.createSpy('fail');
+        let explorationId = '7';
+        let playthroughIssue = playthroughIssueObjectFactory
+          .createFromBackendDict(backendIssues[0]);
+
+        playthroughIssuesBackendApiService.fetchIssues('7', 1)
+          .then(() => playthroughIssuesBackendApiService.resolveIssue(
+            playthroughIssue, explorationId, 1))
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
+        req.flush(backendIssues);
+        flushMicrotasks();
+
+        req = httpTestingController.expectOne(
+          '/resolveissuehandler/7');
+        expect(req.request.method).toEqual('POST');
+        req.flush({
+          error: 'Some error in the backend.'
+        }, {
+          status: 500, statusText: 'Internal Server Error'
+        });
+
+        flushMicrotasks();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+      })
+    );
+
     it('should use the rejection handler when try to get non fetched issue',
       fakeAsync(() => {
         let successHandler = jasmine.createSpy('success');
@@ -181,8 +264,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
         flushMicrotasks();
 
         expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalledWith(Error(
-          'An issue which was not fetched from the backend has been resolved'));
+        expect(failHandler).toHaveBeenCalledWith(
+          'An issue which was not fetched from the backend has been resolved');
       }));
   });
 });

@@ -79,13 +79,13 @@ class AudioUploadHandler(base.BaseHandler):
             # seems to return None. It's not clear if this is always
             # the case. Occasionally, mutagen.File() also seems to
             # raise a MutagenError.
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
         tempbuffer.close()
 
         if audio is None:
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
                 'Audio files must be under %s seconds in length. The uploaded '

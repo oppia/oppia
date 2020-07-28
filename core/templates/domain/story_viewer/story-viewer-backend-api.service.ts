@@ -62,8 +62,8 @@ export class StoryViewerBackendApiService {
   _fetchStoryData(
       abbreviatedTopicName: string,
       storyId: string,
-      successCallback: (value?: StoryPlaythrough) => void,
-      errorCallback: (reason?: Object) => void): void {
+      successCallback: (value: StoryPlaythrough) => void,
+      errorCallback: (reason: string) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
         abbreviated_topic_name: abbreviatedTopicName,
@@ -77,17 +77,23 @@ export class StoryViewerBackendApiService {
           .createFromBackendDict(data);
         successCallback(storyPlaythrough);
       }
-    }, (error) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
+<<<<<<< HEAD
   _recordChapterCompletion(
       abbreviatedTopicName: string, storyId: string, nodeId: string,
       successCallback: (value?: StoryChapterCompletionResponse) => void,
       errorCallback: (reason?: Object) => void): void {
+=======
+  _recordChapterCompletion(storyId: string, nodeId: string,
+      successCallback: (value: StoryChapterCompletionResponse) => void,
+      errorCallback: (reason: string) => void): void {
+>>>>>>> upstream/develop
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
         abbreviated_topic_name: abbreviatedTopicName,
@@ -103,6 +109,8 @@ export class StoryViewerBackendApiService {
             .createFromBackendDict(expSummary)),
         nextNodeId: data.next_node_id,
         readyForReviewTest: data.ready_for_review_test});
+    }, errorResponse => {
+      errorCallback(errorResponse.error.error);
     });
   }
 

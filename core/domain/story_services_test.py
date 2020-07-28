@@ -299,8 +299,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, ('Expected story to only belong to a valid topic, but '
-                        'found no topic with ID: %s' % topic_id)):
+            Exception, (
+                'Expected story to only belong to a valid topic, but '
+                'found no topic with ID: %s' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
@@ -324,9 +325,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, ('Expected story to belong to the topic %s, but it is '
-                        'neither a part of the canonical stories or the '
-                        'additional stories of the topic.' % topic_id)):
+            Exception, (
+                'Expected story to belong to the topic %s, but it is '
+                'neither a part of the canonical stories or the '
+                'additional stories of the topic.' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 

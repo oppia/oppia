@@ -66,8 +66,8 @@ export class QuestionBackendApiService {
   private _fetchQuestions(
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean,
-      successCallback: (value?: QuestionBackendDict[]) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: QuestionBackendDict[]) => void,
+      errorCallback: (reason: string) => void): void {
     if (!this.validateRequestParameters(
       skillIds, questionCount, errorCallback)) {
       return;
@@ -85,16 +85,16 @@ export class QuestionBackendApiService {
       if (successCallback) {
         successCallback(questionDicts);
       }
-    }, (errorResponse) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
   private _fetchTotalQuestionCountForSkillIds(skillIds: string[],
-      successCallback: (value?: number) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: number) => void,
+      errorCallback: (reason: string) => void): void {
     var questionsCountUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTION_COUNT_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
@@ -107,14 +107,14 @@ export class QuestionBackendApiService {
         successCallback(response.total_question_count);
       }
     }, (errorResponse) => {
-      errorCallback(errorResponse.error);
+      errorCallback(errorResponse.error.error);
     });
   }
 
   private _fetchQuestionSummaries(
       skillIds: string[], cursor: string,
-      successCallback: (value?: QuestionSummariesResponse) => void,
-      errorCallback: (reason?: string) => void): void|boolean {
+      successCallback: (value: QuestionSummariesResponse) => void,
+      errorCallback: (reason: string) => void): void|boolean {
     if (!this.isListOfStrings(skillIds)) {
       errorCallback('Skill ids should be a list of strings');
       return false;
@@ -138,7 +138,7 @@ export class QuestionBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
@@ -148,7 +148,7 @@ export class QuestionBackendApiService {
    */
   private validateRequestParameters(
       skillIds: string[], questionCount: number,
-      errorCallback: (reason?: string) => void): boolean {
+      errorCallback: (reason: string) => void): boolean {
     if (!this.isListOfStrings(skillIds)) {
       errorCallback('Skill ids should be a list of strings');
       return false;

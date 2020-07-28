@@ -54,6 +54,8 @@ export class ReviewTestBackendApiService {
     ).toPromise().then(backendResponse => {
       return this.reviewTestObjectFactory.createFromBackendDict(
         backendResponse);
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 

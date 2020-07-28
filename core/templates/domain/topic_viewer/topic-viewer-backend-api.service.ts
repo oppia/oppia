@@ -43,8 +43,8 @@ export class TopicViewerBackendApiService {
 
   private _fetchTopicData(
       abbrevTopicName: string,
-      successCallback: (value?: ReadOnlyTopic) => void,
-      errorCallback: (reason?: Object) => void
+      successCallback: (value: ReadOnlyTopic) => void,
+      errorCallback: (reason: string) => void
   ): void {
     const topicDataUrl = this.urlInterpolation.interpolateUrl(
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
@@ -62,7 +62,7 @@ export class TopicViewerBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.error);
+          errorCallback(errorResponse.error.error);
         }
       });
   }
