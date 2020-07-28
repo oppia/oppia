@@ -86,8 +86,8 @@ export class EditableCollectionBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
   private _fetchCollection(
       collectionId: string,
-      successCallback: (value?: Collection) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: Collection) => void,
+      errorCallback: (reason: string) => void): void {
     var collectionDataUrl = this.urlInterpolationService.interpolateUrl(
       CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
         collection_id: collectionId
@@ -102,7 +102,7 @@ export class EditableCollectionBackendApiService {
       }
     }, errorResponse => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
@@ -110,8 +110,8 @@ export class EditableCollectionBackendApiService {
   private _updateCollection(
       collectionId: string, collectionVersion: number,
       commitMessage: string, changeList: CollectionChange[],
-      successCallback: (value?: Collection) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: Collection) => void,
+      errorCallback: (reason: string) => void): void {
     var editableCollectionDataUrl = this.urlInterpolationService.interpolateUrl(
       CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
         collection_id: collectionId
@@ -138,7 +138,7 @@ export class EditableCollectionBackendApiService {
       }
     }, errorResponse => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }

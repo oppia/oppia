@@ -190,14 +190,16 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
-                logging.info('[ADMIN] %s saved config property values: %s' %
-                             (self.user_id, new_config_property_values))
+                logging.info(
+                    '[ADMIN] %s saved config property values: %s' %
+                    (self.user_id, new_config_property_values))
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
-                logging.info('[ADMIN] %s reverted config property: %s' %
-                             (self.user_id, config_property_id))
+                logging.info(
+                    '[ADMIN] %s reverted config property: %s' %
+                    (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
             elif self.payload.get('action') == 'start_new_job':
@@ -415,7 +417,8 @@ class AdminHandler(base.BaseHandler):
             self._reload_exploration('13')
 
             story = story_domain.Story.create_default_story(
-                story_id, 'Help Jaime win the Arcade', topic_id_1)
+                story_id, 'Help Jaime win the Arcade', 'Description',
+                topic_id_1)
 
             story_node_dicts = [{
                 'exp_id': '15',

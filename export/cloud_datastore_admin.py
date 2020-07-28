@@ -57,9 +57,10 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         app_id = app_identity.get_application_id()
 
         if app_id != APP_NAME_OPPIASERVER:
-            logging.error('Export service has been pinged. '
-                          'Since this is not production, a real export request '
-                          'has not been initiated.')
+            logging.error(
+                'Export service has been pinged. '
+                'Since this is not production, a real export request '
+                'has not been initiated.')
             return
 
         timestamp = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')

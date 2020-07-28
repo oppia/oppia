@@ -487,9 +487,9 @@ class StoryContents(python_utils.OBJECT):
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if python_utils.NEXT(
-                        (node for node in self.nodes
-                         if node.id == destination_node_id), None) is None:
+                if python_utils.NEXT((
+                        node for node in self.nodes
+                        if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
                         'Expected all destination nodes to exist')
             if node.id == self.initial_node_id:
@@ -901,7 +901,8 @@ class Story(python_utils.OBJECT):
         }
 
     @classmethod
-    def create_default_story(cls, story_id, title, corresponding_topic_id):
+    def create_default_story(
+            cls, story_id, title, description, corresponding_topic_id):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
@@ -909,6 +910,7 @@ class Story(python_utils.OBJECT):
         Args:
             story_id: str. The unique id of the story.
             title: str. The title for the newly created story.
+            description: str. The high level description of the story.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
 
@@ -919,9 +921,9 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title, None, None,
-            feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
-            story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            story_id, title, None, None, description,
+            feconf.DEFAULT_STORY_NOTES, story_contents,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
 
     @classmethod
@@ -1298,24 +1300,24 @@ class Story(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         story_content_nodes = self.story_contents.nodes
-        if (from_index >= len(story_content_nodes) or
-                from_index < 0):
+        if from_index >= len(story_content_nodes) or from_index < 0:
             raise Exception('Expected from_index value to be with-in bounds.')
 
-        if (to_index >= len(story_content_nodes) or
-                to_index < 0):
+        if to_index >= len(story_content_nodes) or to_index < 0:
             raise Exception('Expected to_index value to be with-in bounds.')
 
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
