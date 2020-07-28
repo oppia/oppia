@@ -60,12 +60,12 @@ describe('Translation tab active content id service', function() {
 
 
   it('should correctly set and get active content id', function() {
-    const x = jasmine.createSpy('x');
+    const sampleSubscription = jasmine.createSpy('sampleSubscription');
     testSubscriptions.add(ttacis.onActiveContentIdChange
-      .subscribe(x));
+      .subscribe(sampleSubscription));
     expect(ttacis.getActiveContentId()).toBeNull();
     ttacis.setActiveContentId('content');
-    expect(x).toHaveBeenCalled();
+    expect(sampleSubscription).toHaveBeenCalled();
     expect(ttacis.getActiveContentId()).toBe('content');
   });
 

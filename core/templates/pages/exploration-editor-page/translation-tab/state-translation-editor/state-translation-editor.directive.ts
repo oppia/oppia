@@ -158,8 +158,8 @@ angular.module('oppia').directive('stateTranslationEditor', [
             $scope.HTML_SCHEMA = {
               type: 'html'
             };
-            TranslationTabActiveContentIdService.onActiveContentIdChange.
-              subscribe(() => initEditor());
+            TranslationTabActiveContentIdService.onActiveContentIdChange
+              .subscribe(() => initEditor());
             $scope.$on('activeLanguageChanged', function() {
               initEditor();
             });
