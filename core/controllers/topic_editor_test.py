@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -25,6 +27,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
@@ -151,15 +154,52 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#F8BF74'
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+
         json_response = self.post_json(
-            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
-            {'title': 'Story title'},
-            csrf_token=csrf_token)
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),))
+
         story_id = json_response['storyId']
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
+
+    def test_story_creation_fails_with_invalid_image(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'cafe.flac',
+            'thumbnailBgColor': '#F8BF74'
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'], 'Image exceeds file size limit of 100 KB.')
 
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
@@ -324,7 +364,7 @@ class TopicEditorTests(
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.get_json(
                 '%s/%s' % (
@@ -343,7 +383,7 @@ class TopicEditorTests(
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -454,7 +494,7 @@ class TopicEditorTests(
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.put_json(
                 '%s/%s' % (
@@ -468,7 +508,7 @@ class TopicEditorTests(
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
             messages = self._get_sent_email_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -717,7 +757,7 @@ class TopicPublishSendMailHandlerTests(
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
                 {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
         messages = self._get_sent_email_messages(
-            to=feconf.ADMIN_EMAIL_ADDRESS)
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s, please review'
             ' and publish if it looks good.'

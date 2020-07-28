@@ -372,8 +372,9 @@ class SkillSelector(BaseObject):
 class MusicPhrase(BaseObject):
     """List of Objects that represent a musical phrase."""
 
-    description = ('A musical phrase that contains zero or more notes, rests, '
-                   'and time signature.')
+    description = (
+        'A musical phrase that contains zero or more notes, rests, '
+        'and time signature.')
     default_value = []
 
     # The maximum number of notes allowed in a music phrase.

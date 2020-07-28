@@ -83,8 +83,6 @@ angular.module('oppia').directive('storyEditor', [
               $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
               $scope.linearNodesList =
                 $scope.storyContents.getLinearNodesList();
-              $scope.disconnectedNodes =
-                $scope.storyContents.getDisconnectedNodes();
             }
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
@@ -113,20 +111,15 @@ angular.module('oppia').directive('storyEditor', [
               $scope.story.getStoryContents().getInitialNodeId() === nodeId);
           };
 
-          $scope.markAsInitialNode = function(nodeId) {
-            if ($scope.isInitialNode(nodeId)) {
-              return;
-            }
-            StoryUpdateService.setInitialNodeId($scope.story, nodeId);
-            var nodes = this.storyContents.getNodes();
-            for (var i = 0; i < nodes.length; i++) {
-              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
-                StoryUpdateService.removeDestinationNodeIdFromNode(
-                  $scope.story, nodes[i].getId(), nodeId);
-              }
-            }
+          $scope.onMoveChapterStart = function(index, node) {
+            $scope.dragStartIndex = index;
+            $scope.nodeBeingDragged = node;
+          };
+
+          $scope.rearrangeNodeInStory = function(toIndex) {
+            StoryUpdateService.rearrangeNodeInStory(
+              $scope.story, $scope.dragStartIndex, toIndex);
             _initEditor();
-            $scope.$broadcast('recalculateAvailableNodes');
           };
 
           $scope.deleteNode = function(nodeId) {
@@ -164,9 +157,9 @@ angular.module('oppia').directive('storyEditor', [
               resolve: {
                 nodeTitles: () => nodeTitles
               },
-              controller: 'NewChapterTitleModalController'
-            }).result.then(function(title) {
-              StoryUpdateService.addStoryNode($scope.story, title);
+              windowClass: 'create-new-chapter',
+              controller: 'CreateNewChapterModalController'
+            }).result.then(function() {
               _initEditor();
               // If the first node is added, open it just after creation.
               if ($scope.story.getStoryContents().getNodes().length === 1) {

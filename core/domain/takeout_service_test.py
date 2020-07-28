@@ -481,8 +481,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_user(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaises(
-            user_models.UserSettingsModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            user_models.UserSettingsModel.EntityNotFoundError,
+            'Entity for class UserSettingsModel with id fake_user_id '
+            'not found'):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_trivial(self):
@@ -770,8 +772,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
-                'suggestion_type': (suggestion_models.
-                                    SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                 'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
