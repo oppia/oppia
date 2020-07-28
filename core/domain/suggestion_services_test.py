@@ -388,9 +388,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state_1',
             'new_value': {
                 'content_id': 'content',
-                'html': ('<oppia-noninteractive-math raw_latex-with-value="&am'
-                         'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
-                         'uot;"></oppia-noninteractive-math>')
+                'html': (
+                    '<oppia-noninteractive-math raw_latex-with-value="&am'
+                    'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                    'uot;"></oppia-noninteractive-math>')
             }
         }
         with self.swap(
@@ -408,6 +409,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
+        expected_exception_regexp = (
+            'Invalid math tags found in the suggestion with id %s.' % (
+                suggestion.suggestion_id
+            )
+        )
         with self.swap(
             exp_services, 'update_exploration', self.mock_update_exploration):
             with self.swap(
@@ -422,8 +428,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         'get_change_list_for_accepting_suggestion',
                         self.mock_get_change_list_does_nothing):
                         with self.assertRaisesRegexp(
-                            Exception,
-                            'Invalid math tags found in the suggestion'):
+                            Exception, expected_exception_regexp):
                             suggestion_services.accept_suggestion(
                                 suggestion, self.reviewer_id,
                                 self.COMMIT_MESSAGE, 'review message')

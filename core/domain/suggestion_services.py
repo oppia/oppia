@@ -230,8 +230,9 @@ def mark_review_completed(suggestion, status, reviewer_id):
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
-    if(status not in [suggestion_models.STATUS_ACCEPTED,
-                      suggestion_models.STATUS_REJECTED]):
+    if status not in [
+            suggestion_models.STATUS_ACCEPTED,
+            suggestion_models.STATUS_REJECTED]:
         raise Exception('Invalid status after review.')
 
     suggestion.status = status
@@ -274,8 +275,9 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     """
     if suggestion.is_handled:
         raise Exception(
-            'The suggestion with id %s has already been accepted/'
-            'rejected.' % (suggestion.suggestion_id)
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id
+            )
         )
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
@@ -286,7 +288,11 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         validate_math_tags_in_html_with_attribute_math_content(
             html_string))
     if len(error_list) > 0:
-        raise Exception('Invalid math tags found in the suggestion.')
+        raise Exception(
+            'Invalid math tags found in the suggestion with id %s.' % (
+                suggestion.suggestion_id
+            )
+        )
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
