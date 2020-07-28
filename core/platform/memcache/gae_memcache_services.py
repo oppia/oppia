@@ -35,15 +35,11 @@ def get_multi(keys):
         keys: list(str). A list of keys (strings) to look up.
 
     Returns:
-        tuplelist(str), list(str|None)). Returns a tuple of the list of key
-        strings and the corresponding list of value strings. The keys and values
-        are both strings unless a key is not found in the cache in which case
-        the value corresponding to that key is None. More details can be found
-        here: https://redis.io/commands/mget
+        list(str). A list of values in the cache corresponding to the keys that
+        are passed in.
     """
     assert isinstance(keys, list)
-    result = redis_client.mget(keys)
-    return (keys, result)
+    return redis_client.mget(keys)
 
 
 def set_multi(key_value_mapping):
@@ -59,8 +55,7 @@ def set_multi(key_value_mapping):
         int. Number of successful inserts to the Redis cache.
     """
     assert isinstance(key_value_mapping, dict)
-    added = redis_client.mset(key_value_mapping)
-    return added
+    return redis_client.mset(key_value_mapping)
 
 
 def delete(key):

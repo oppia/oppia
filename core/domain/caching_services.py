@@ -25,8 +25,11 @@ from core.domain import exp_domain
 from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
+from core.platform import models
 
-def get_correct_dict_type_of_key(key):
+memory_cache_services = models.Registry.import_memcache_services()
+
+def _get_correct_dict_type_of_key(key):
     """In the memory cache, values are stored as (key, value) pairs where values
     can be dictionary representations of Oppia objects, e.g Collection,
     Exploration, etc. These dictionary types can be identified by the key that
@@ -50,11 +53,11 @@ def get_correct_dict_type_of_key(key):
     elif key.startswith('story'):
         return story_domain.Story
     elif key.startswith('topic'):
-        return topic_domain.topic
+        return topic_domain.Topic
     else:
         return None
 
-def convert_object_to_json_str(object):
+def _convert_object_to_json_str(object):
     """Converts an oppia object to a json string representation of that object.
 
     Args:
@@ -85,7 +88,7 @@ def convert_object_to_json_str(object):
 
     return result
 
-def get_object_from_json_string(object_class, json_string):
+def _get_object_from_json_string(object_class, json_string):
     """Converts a json string back into the object it was serialized from.
 
     Args:
@@ -94,7 +97,7 @@ def get_object_from_json_string(object_class, json_string):
             dictionary.
 
     Raises:
-        Exception: When json.loads fails to decode the json string.
+        Exception: When json.loads fails to decode the JSON string.
         Exception: The object type corresponding to the key does not have a
             from_dict() method implemented.
 
@@ -114,30 +117,55 @@ def get_object_from_json_string(object_class, json_string):
             'Json decoding failed for object associated with key %s' % key)
     return object_class.from_dict(decoded_object_dict)
 
-def get_object_dict_from_cache_tuple(cache_tuple):
-    """Returns the object dictionary corresponding to the serialized cache tuple
-
+def get_multi(keys):
+    """Get a dictionary of the key, value pairs from the memory cache.
 
     Args:
-        cache_tuple:tuple(list(str), list(str|None)). A tuple consisting of
-            a list of keys and a list of corresponding values returned from the
-            cache.
+        keys: list(str). keys: list(str). List of keys to query the caching
+            service for.
 
     Returns:
-        dict(*). Object dictionary where (key, value) pairs from the cache_tuple
-        are either inserted into the dictionary as (key,value) or (key, object)
-        if the value is a json encoded string and the object is the decoded
-        object of that string.
+        dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
+        decoded (key, value) pairs retrieved from the platform caching service.
+    """
+    values = memcache_services.get_multi(
+        [exploration_memcache_key])
+    result_dict = {}
+    for key, value in zip(keys, values):
+        if value:
+            correct_type_of_dict = _get_correct_dict_type_of_key(key)
+            if correct_type_of_dict:
+                decoded_object = _get_object_from_json_string(
+                    correct_type_of_dict, value)
+                result_dict[key] = decoded_object
+            else:
+                result_dict[key] = value
+
+    return result_dict
+
+def set_multi(key_value_mapping):
+    """Set multiple keys' values at once to the cache.
+
+    Args:
+        key_value_mapping: list(str, Exploration|Skill|Story|Topic|Collection|
+            str). A dict of {key, value} pairs to set to the cache.
+
+    Returns:
+        bool. True if all of the keys are set. False otherwise.
     """
 
-    for key, value in zip(cache_tuple[0], cache_tuple[1]):
-        if value:
-            correct_type_of_dict = get_correct_dict_type_of_key(key)
-            if correct_type_of_dict:
-                decoded_object = get_object_from_json_string(value)
-                cache_dict[key] = decoded_object
+    for key, value in key_value_mapping.items():
+        if _get_correct_dict_type_of_key(key):
+            key_value_mapping[key] = _convert_object_to_json_str(value)
+    return memory_cache_services.set_multi(key_value_mapping)
 
-    return cache_dict
+def delete_multi(key):
+    """Deletes a multiple keys in the cache.
 
+    Args:
+        keys: list(str). A list of key strings to delete from the cache.
 
-
+    Returns:
+        bool. True if all operations complete successfully; False otherwise.
+    """
+    return memory_cache_services.delete_multi(keys) == len(keys)
