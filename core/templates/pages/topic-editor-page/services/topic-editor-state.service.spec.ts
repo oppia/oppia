@@ -506,8 +506,6 @@ describe('Topic editor state service', function() {
 
   it('should fire an init event after loading the first topic',
     function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       TopicEditorStateService.loadTopic(5);
       $rootScope.$apply();
       var skillIdToRubricsObject =
