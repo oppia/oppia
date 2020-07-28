@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 import os
 import sys
+from constants import constants
 
 ROOT_PATH = os.path.dirname(__file__)
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -64,8 +65,17 @@ for lib_path in THIRD_PARTY_LIBS:
     if not os.path.isdir(lib_path):
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
+# The system path insertions above MUST be run before the imports below because
+# each of the imports below uses various third_party libraries in their
+# execution. During the import of a pythob module, the python interpreter also
+# loads imports specific to that module. For example, the acl_decorators module
+# imports backports.functools_lru_cache so importing acl_decorators will
+# automatically force the python interpreter to import backports as part of the
+# acl_decorators import execution. The system path setup above lets the python
+# compiler know where to look when these third_party imports occur.
+# As such, any imports of non system-standard modules should occur after the
+# third_party libraries are added to the system path.
 
-from constants import constants # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import acl_decorators # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import admin # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import base # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
