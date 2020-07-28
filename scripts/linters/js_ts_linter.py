@@ -325,7 +325,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         failed = True
                         previous_line_has_ts_ignore = False
                         summary_message = (
-                            '%s --> ts ignore found at line %s. Please add '
+                            '%s --> TS ignore found at line %s. Please add '
                             'this exception in %s.' % (
                                 file_path, line_number,
                                 TS_IGNORE_EXCEPTIONS_FILEPATH))
@@ -338,11 +338,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s ts ignore check failed' % (
+                    '%s TS ignore check failed' % (
                         linter_utils.FAILED_MESSAGE_PREFIX))
             else:
                 summary_message = (
-                    '%s ts ignore check passed' % (
+                    '%s TS ignore check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
 
             python_utils.PRINT(summary_message)

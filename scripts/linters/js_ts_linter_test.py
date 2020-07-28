@@ -26,7 +26,6 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-import python_utils
 
 from . import js_ts_linter
 from . import pre_commit_linter
@@ -546,7 +545,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'backend api services.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
-    def test_ts_ignore_found(self):
+    def test_ts_ignore_found_error(self):
         def mock_compile_all_ts_files():
             cmd = (
                 './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
@@ -571,8 +570,38 @@ class JsTsLintTests(test_utils.LinterTestBase):
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
-            'ts ignore found at line 22.'], self.linter_stdout)
+            'TS ignore found at line 22.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
+
+    def test_ts_ignore_found_success(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    INVALID_TS_IGNORE_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        ts_ignore_exceptions_swap = self.swap(
+            js_ts_linter, 'TS_IGNORE_EXCEPTIONS', {
+                INVALID_TS_IGNORE_FILEPATH: ['let b: number = a;']
+            })
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with self.print_swap, compile_all_ts_files_swap:
+            with ts_ignore_exceptions_swap:
+                js_ts_linter.JsTsLintChecksManager(
+                    [], [INVALID_TS_IGNORE_FILEPATH], FILE_CACHE,
+                    True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        self.assert_same_list_elements([
+            'SUCCESS  TS ignore check passed'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_missing_punctuation_at_end_of_comment(self):
         def mock_compile_all_ts_files():
