@@ -14,17 +14,16 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-#pylint: disable=bad-option-value,wrong-import-position,invalid-name
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
 import os
 import sys
 
-# Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-oppia_tools_path = os.path.join(_PARENT_DIR, 'oppia_tools')
+OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
 
 # oppia_tools/ is available locally (in both dev and prod mode). However,
 # on the GAE production server, oppia_tools/ is not available, and the default
@@ -33,12 +32,12 @@ oppia_tools_path = os.path.join(_PARENT_DIR, 'oppia_tools')
 # We cannot special-case this using DEV_MODE because it is possible to run
 # Oppia in production mode locally, where a built-in PIL won't be available.
 # Hence the check for oppia_tools instead.
-if os.path.isdir(oppia_tools_path):
-    pil_path = os.path.join(
-        oppia_tools_path, 'Pillow-6.2.2')
-    if not os.path.isdir(pil_path):
-        raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
-    sys.path.insert(0, pil_path)
+if os.path.isdir(OPPIA_TOOLS_PATH):
+    PIL_PATH = os.path.join(
+        OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
+    if not os.path.isdir(PIL_PATH):
+        raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
+    sys.path.insert(0, PIL_PATH)
 
 THIRD_PARTY_LIBS = [
     os.path.join(
@@ -66,58 +65,59 @@ for lib_path in THIRD_PARTY_LIBS:
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
 
-import logging
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+from constants import constants # isort:skip
+from core.controllers import acl_decorators # isort:skip
+from core.controllers import admin # isort:skip
+from core.controllers import base # isort:skip
+from core.controllers import classifier # isort:skip
+from core.controllers import classroom # isort:skip
+from core.controllers import collection_editor # isort:skip
+from core.controllers import collection_viewer # isort:skip
+from core.controllers import community_dashboard # isort:skip
+from core.controllers import concept_card_viewer # isort:skip
+from core.controllers import creator_dashboard # isort:skip
+from core.controllers import custom_landing_pages # isort:skip
+from core.controllers import editor # isort:skip
+from core.controllers import email_dashboard # isort:skip
+from core.controllers import features # isort:skip
+from core.controllers import feedback # isort:skip
+from core.controllers import improvements # isort:skip
+from core.controllers import learner_dashboard # isort:skip
+from core.controllers import learner_playlist # isort:skip
+from core.controllers import library # isort:skip
+from core.controllers import moderator # isort:skip
+from core.controllers import pages # isort:skip
+from core.controllers import practice_sessions # isort:skip
+from core.controllers import profile # isort:skip
+from core.controllers import question_editor # isort:skip
+from core.controllers import questions_list # isort:skip
+from core.controllers import reader # isort:skip
+from core.controllers import recent_commits # isort:skip
+from core.controllers import resources # isort:skip
+from core.controllers import review_tests # isort:skip
+from core.controllers import skill_editor # isort:skip
+from core.controllers import skill_mastery # isort:skip
+from core.controllers import story_editor # isort:skip
+from core.controllers import story_viewer # isort:skip
+from core.controllers import subscriptions # isort:skip
+from core.controllers import subtopic_viewer # isort:skip
+from core.controllers import suggestion # isort:skip
+from core.controllers import topic_editor # isort:skip
+from core.controllers import topic_viewer # isort:skip
+from core.controllers import topics_and_skills_dashboard # isort:skip
+from core.controllers import voice_artist # isort:skip
+from core.domain import user_services # isort:skip
+from core.platform import models # isort:skip
+import feconf # isort:skip
 
-from constants import constants
-from core.controllers import acl_decorators
-from core.controllers import admin
-from core.controllers import base
-from core.controllers import classifier
-from core.controllers import classroom
-from core.controllers import collection_editor
-from core.controllers import collection_viewer
-from core.controllers import community_dashboard
-from core.controllers import concept_card_viewer
-from core.controllers import creator_dashboard
-from core.controllers import custom_landing_pages
-from core.controllers import editor
-from core.controllers import email_dashboard
-from core.controllers import features
-from core.controllers import feedback
-from core.controllers import improvements
-from core.controllers import learner_dashboard
-from core.controllers import learner_playlist
-from core.controllers import library
-from core.controllers import moderator
-from core.controllers import pages
-from core.controllers import practice_sessions
-from core.controllers import profile
-from core.controllers import question_editor
-from core.controllers import questions_list
-from core.controllers import reader
-from core.controllers import recent_commits
-from core.controllers import resources
-from core.controllers import review_tests
-from core.controllers import skill_editor
-from core.controllers import skill_mastery
-from core.controllers import story_editor
-from core.controllers import story_viewer
-from core.controllers import subscriptions
-from core.controllers import subtopic_viewer
-from core.controllers import suggestion
-from core.controllers import topic_editor
-from core.controllers import topic_viewer
-from core.controllers import topics_and_skills_dashboard
-from core.controllers import voice_artist
-from core.domain import user_services
-from core.platform import models
-import feconf
-
-from mapreduce import main as mapreduce_main
-from mapreduce import parameters as mapreduce_parameters
-import webapp2
-from webapp2_extras import routes
-#pylint: enable=bad-option-value,wrong-import-position,invalid-name
+from mapreduce import main as mapreduce_main # isort:skip
+from mapreduce import parameters as mapreduce_parameters # isort:skip
+import webapp2 # isort:skip
+from webapp2_extras import routes # isort:skip
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()

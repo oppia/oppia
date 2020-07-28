@@ -199,7 +199,6 @@
 
 
 # Google-app-engine configurations
-/appengine_config.py @nithusha21
 /cron.yaml @nithusha21
 /dispatch.yaml @seanlip
 /index.yaml @seanlip
