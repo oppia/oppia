@@ -56,7 +56,7 @@ describe('Keyboard Shortcuts', () => {
       hrefValue = href;
     });
     keyboardShortcutService.bindNavigationShortcuts();
-    
+
     Mousetrap.trigger('ctrl+0');
     expect(hrefValue).toEqual('/get-started');
 
@@ -79,7 +79,7 @@ describe('Keyboard Shortcuts', () => {
     expect(hrefValue).toEqual('/preferences');
   });
 
-  it('should move the focus to the corresponding element' + 
+  it('should move the focus to the corresponding element' +
     ' when the action key is pressed', () => {
     keyboardShortcutService.bindLibraryPageShortcuts();
 
