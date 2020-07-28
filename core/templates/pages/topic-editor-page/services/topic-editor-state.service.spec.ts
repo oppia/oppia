@@ -44,6 +44,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
@@ -64,6 +65,11 @@ describe('Topic editor state service', function() {
   var $rootScope = null;
   var $scope = null;
   var $q = null;
+
+  var testSubscriptions: Subscription;
+
+  const topicInitializedSpy = jasmine.createSpy('topicInitialized');
+  const topicReinitializedSpy = jasmine.createSpy('topicReinitialized');
 
   var FakeEditableTopicBackendApiService = function() {
     var self = {
@@ -347,6 +353,19 @@ describe('Topic editor state service', function() {
     };
   }));
 
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(TopicEditorStateService.onTopicInitialized.subscribe(
+      topicInitializedSpy));
+    testSubscriptions.add(
+      TopicEditorStateService.onTopicReinitialized.subscribe(
+        topicReinitializedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should request to load the topic from the backend', function() {
     spyOn(
       fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
@@ -494,7 +513,7 @@ describe('Topic editor state service', function() {
       var skillIdToRubricsObject =
         TopicEditorStateService.getSkillIdToRubricsObject();
       expect(skillIdToRubricsObject.skill_1.length).toEqual(3);
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('topicInitialized');
+      expect(topicInitializedSpy).toHaveBeenCalled();
     }
   );
 
@@ -520,7 +539,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.loadTopic(1);
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('topicReinitialized');
+    expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the topic', function() {
@@ -681,12 +700,10 @@ describe('Topic editor state service', function() {
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
     TopicEditorStateService.saveTopic('Commit message');
     $rootScope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'topicReinitialized');
+    expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently saving the topic', function() {
