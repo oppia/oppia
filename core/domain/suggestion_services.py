@@ -192,8 +192,9 @@ def mark_review_completed(suggestion, status, reviewer_id):
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
-    if(status not in [suggestion_models.STATUS_ACCEPTED,
-                      suggestion_models.STATUS_REJECTED]):
+    if status not in [
+            suggestion_models.STATUS_ACCEPTED,
+            suggestion_models.STATUS_REJECTED]:
         raise Exception('Invalid status after review.')
 
     suggestion.status = status

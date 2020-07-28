@@ -150,8 +150,9 @@ class DummyMailTest(test_utils.EmailTestBase):
             self.assertEqual(messages[0].to, [dummy_receiver_address])
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
-            self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
-                          messages[0].html.decode())
+            self.assertIn(
+                'This is a test mail from DUMMY_SYSTEM_NAME',
+                messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
@@ -1241,8 +1242,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 0)
 
-            email_sent_time = (datetime.datetime.utcnow() -
-                               datetime.timedelta(minutes=4))
+            email_sent_time = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=4))
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
@@ -1255,8 +1256,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             all_models = email_models.SentEmailModel.get_all().fetch()
             self.assertEqual(len(all_models), 1)
 
-            email_sent_time = (datetime.datetime.utcnow() -
-                               datetime.timedelta(minutes=2))
+            email_sent_time = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=2))
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
@@ -2697,8 +2698,9 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
     def test_correct_email_draft_received_on_exploration_unpublish(self):
-        expected_draft_text_body = ('I\'m writing to inform you that '
-                                    'I have unpublished the above exploration.')
+        expected_draft_text_body = (
+            'I\'m writing to inform you that '
+            'I have unpublished the above exploration.')
         with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
             d_text = email_manager.get_moderator_unpublish_exploration_email()
             self.assertEqual(d_text, expected_draft_text_body)
