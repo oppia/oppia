@@ -28,6 +28,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
@@ -35,7 +36,6 @@ import feconf
 import python_utils
 import utils
 
-memcache_services = models.Registry.import_cache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -314,7 +314,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
 
     exploration_memcache_key = get_exploration_memcache_key(
         exploration_id, version=version)
-    memcached_exploration = memcache_services.get_multi(
+    memcached_exploration = caching_services.get_multi(
         [exploration_memcache_key]).get(exploration_memcache_key)
 
     if memcached_exploration is not None:
@@ -324,7 +324,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             exploration_id, strict=strict, version=version)
         if exploration_model:
             exploration = get_exploration_from_model(exploration_model)
-            memcache_services.set_multi({
+            caching_services.set_multi({
                 exploration_memcache_key: exploration})
             return exploration
         else:
@@ -353,7 +353,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     result = {}
     uncached = []
     memcache_keys = [get_exploration_memcache_key(i) for i in exp_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
+    cache_result = caching_services.get_multi(memcache_keys)
 
     for exp_obj in cache_result.values():
         result[exp_obj.id] = exp_obj
@@ -386,7 +386,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     }
 
     if cache_update:
-        memcache_services.set_multi(cache_update)
+        caching_services.set_multi(cache_update)
 
     result.update(db_results_dict)
     return result

@@ -32,6 +32,7 @@ import os
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -47,7 +48,6 @@ import utils
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_cache_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -199,7 +199,7 @@ def get_collection_by_id(collection_id, strict=True, version=None):
     """
     collection_memcache_key = _get_collection_memcache_key(
         collection_id, version=version)
-    memcached_collection = memcache_services.get_multi(
+    memcached_collection = caching_services.get_multi(
         [collection_memcache_key]).get(collection_memcache_key)
 
     if memcached_collection is not None:
@@ -209,7 +209,7 @@ def get_collection_by_id(collection_id, strict=True, version=None):
             collection_id, strict=strict, version=version)
         if collection_model:
             collection = get_collection_from_model(collection_model)
-            memcache_services.set_multi({collection_memcache_key: collection})
+            caching_services.set_multi({collection_memcache_key: collection})
             return collection
         else:
             return None
@@ -258,7 +258,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     result = {}
     uncached = []
     memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
+    cache_result = caching_services.get_multi(memcache_keys)
 
     for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
@@ -292,7 +292,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     }
 
     if cache_update:
-        memcache_services.set_multi(cache_update)
+        caching_services.set_multi(cache_update)
 
     result.update(db_results_dict)
     return result
@@ -754,7 +754,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
-    memcache_services.delete(_get_collection_memcache_key(collection.id))
+    caching_services.delete_multi([_get_collection_memcache_key(collection.id)])
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -858,7 +858,7 @@ def delete_collections(committer_id, collection_ids, force_deletion=False):
     collection_memcache_keys = [
         _get_collection_memcache_key(collection_id)
         for collection_id in collection_ids]
-    memcache_services.delete_multi(collection_memcache_keys)
+    caching_services.delete_multi(collection_memcache_keys)
 
     # Delete the collection from search.
     search_services.delete_collections_from_search_index(collection_ids)

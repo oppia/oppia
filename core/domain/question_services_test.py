@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from core.domain import caching_services
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
@@ -29,7 +30,6 @@ from core.tests import test_utils
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
-memcache_services = models.Registry.import_cache_services()
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):

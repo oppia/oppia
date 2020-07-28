@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
+from core.domain import caching_services
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_services
@@ -41,7 +42,6 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_cache_services()
 
 
 # Repository GET methods.
@@ -714,7 +714,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(skill_fetchers.get_skill_memcache_key(skill.id))
+    caching_services.delete_multi(
+        [skill_fetchers.get_skill_memcache_key(skill.id)])
     skill.version += 1
 
 
@@ -763,7 +764,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.
     skill_memcache_key = skill_fetchers.get_skill_memcache_key(skill_id)
-    memcache_services.delete(skill_memcache_key)
+    caching_services.delete_multi([skill_memcache_key])
 
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).

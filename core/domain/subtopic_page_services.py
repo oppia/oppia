@@ -21,13 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import subtopic_page_domain
 from core.platform import models
 import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_cache_services()
 
 
 def _migrate_page_contents_to_latest_schema(versioned_page_contents):

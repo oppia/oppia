@@ -25,13 +25,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
-memcache_services = models.Registry.import_cache_services()
 
 
 def _migrate_story_contents_to_latest_schema(versioned_story_contents):
@@ -157,7 +157,7 @@ def get_story_by_id(story_id, strict=True, version=None):
     """
     story_memcache_key = get_story_memcache_key(
         story_id, version=version)
-    memcached_story = memcache_services.get_multi(
+    memcached_story = caching_services.get_multi(
         [story_memcache_key]).get(story_memcache_key)
 
     if memcached_story is not None:
@@ -167,7 +167,7 @@ def get_story_by_id(story_id, strict=True, version=None):
             story_id, strict=strict, version=version)
         if story_model:
             story = get_story_from_model(story_model)
-            memcache_services.set_multi({story_memcache_key: story})
+            caching_services.set_multi({story_memcache_key: story})
             return story
         else:
             return None

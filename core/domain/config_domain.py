@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
 import feconf
@@ -26,7 +27,6 @@ import python_utils
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
-memcache_services = models.Registry.import_cache_services()
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
@@ -214,14 +214,14 @@ class ConfigProperty(python_utils.OBJECT):
     def value(self):
         """Get the latest value from memcache, datastore, or use default."""
 
-        memcached_items = memcache_services.get_multi([self.name])
+        memcached_items = caching_services.get_multi([self.name])
         if self.name in memcached_items:
             return memcached_items[self.name]
 
         datastore_item = config_models.ConfigPropertyModel.get(
             self.name, strict=False)
         if datastore_item is not None:
-            memcache_services.set_multi({
+            caching_services.set_multi({
                 datastore_item.id: datastore_item.value})
             return datastore_item.value
 
@@ -247,7 +247,7 @@ class ConfigProperty(python_utils.OBJECT):
             }])
 
         # Set value in memcache.
-        memcache_services.set_multi({
+        caching_services.set_multi({
             model_instance.id: model_instance.value})
 
     def normalize(self, value):

@@ -36,6 +36,7 @@ import zipfile
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
@@ -57,7 +58,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_cache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -582,7 +582,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
     exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
+    caching_services.delete_multi([exp_memcache_key])
 
     exploration.version += 1
 
@@ -762,7 +762,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     exploration_memcache_keys = [
         exp_fetchers.get_exploration_memcache_key(exploration_id)
         for exploration_id in exploration_ids]
-    memcache_services.delete_multi(exploration_memcache_keys)
+    caching_services.delete_multi(exploration_memcache_keys)
 
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
@@ -1189,7 +1189,7 @@ def revert_exploration(
         'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
     exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
+    caching_services.delete_multi([exp_memcache_key])
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
@@ -1264,7 +1264,6 @@ def save_new_exploration_from_yaml_and_assets(
     """
     if assets_list is None:
         assets_list = []
-
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')
@@ -1542,7 +1541,6 @@ def is_version_of_draft_valid(exp_id, version):
         bool. Whether the given version number is the same as the current
         version number of the exploration in the datastore.
     """
-
     return exp_fetchers.get_exploration_by_id(exp_id).version == version
 
 
@@ -1703,7 +1701,6 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
     updated_exploration = None
-
     if (exp_user_data and exp_user_data.draft_change_list and
             is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
         updated_exploration = apply_change_list(exp_id, draft_change_list)

@@ -25,6 +25,7 @@ import os
 import re
 import zipfile
 
+from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
@@ -77,7 +78,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
         super(ExplorationServicesUnitTests, self).setUp()
-
+        caching_services.flush_memory_cache()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
@@ -915,6 +916,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             ['exp_id_1', 'exp_id_2'])
 
         self.assertEqual(len(explorations), 2)
+        print(explorations)
         self.assertEqual(explorations['exp_id_1'].title, 'title 1')
         self.assertEqual(explorations['exp_id_1'].category, 'category 1')
         self.assertEqual(
@@ -1207,6 +1209,7 @@ title: Title
 
     def setUp(self):
         super(ExplorationYamlImportingTests, self).setUp()
+        caching_services.flush_memory_cache()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -4240,6 +4243,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(EditorAutoSavingUnitTests, self).setUp()
+        caching_services.flush_memory_cache()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -4489,6 +4493,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ApplyDraftUnitTests, self).setUp()
         # Create explorations.
+        caching_services.flush_memory_cache()
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
         exploration.param_specs = {

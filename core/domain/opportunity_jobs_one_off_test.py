@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -36,7 +37,6 @@ from core.tests import test_utils
 import python_utils
 
 
-memcache_services = models.Registry.import_cache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
@@ -309,7 +309,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             self.owner_id, 'Delete exploration', force_deletion=True)
         exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
             '0')
-        memcache_services.delete(exploration_memcache_key)
+        caching_services.delete_multi([exploration_memcache_key])
 
         exp_opp_summary_model_regen_job_class = (
             opportunity_jobs_one_off

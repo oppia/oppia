@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import logging
 
+from core.domain import caching_services
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import state_domain
@@ -37,7 +38,6 @@ import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_cache_services()
 
 
 def get_all_topic_summaries():
@@ -447,7 +447,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(topic_fetchers.get_topic_memcache_key(topic.id))
+    caching_services.delete_multi([topic_fetchers.get_topic_memcache_key(topic.id)])
     topic.version += 1
 
 
@@ -751,7 +751,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.
     topic_memcache_key = topic_fetchers.get_topic_memcache_key(topic_id)
-    memcache_services.delete(topic_memcache_key)
+    caching_services.delete_multi([topic_memcache_key])
     (
         opportunity_services
         .delete_exploration_opportunities_corresponding_to_topic(topic_id))

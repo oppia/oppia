@@ -30,6 +30,9 @@ from core.platform import models
 
 memory_cache_services = models.Registry.import_cache_services()
 
+def flush_memory_cache():
+    memory_cache_services.flush_cache()
+
 def _get_correct_dict_type_of_key(key):
     """In the memory cache, values are stored as (key, value) pairs where values
     can be dictionary representations of Oppia objects, e.g Collection,
@@ -47,7 +50,7 @@ def _get_correct_dict_type_of_key(key):
     """
     if key.startswith('collection'):
         return collection_domain.Collection
-    elif key.startswith('exploration'):
+    elif key.startswith('exp'):
         return exp_domain.Exploration
     elif key.startswith('skill'):
         return skill_domain.Skill
@@ -129,8 +132,10 @@ def get_multi(keys):
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
         decoded (key, value) pairs retrieved from the platform caching service.
     """
-    values = memory_cache_services.get_multi(keys)
     result_dict = {}
+    if len(keys) == 0:
+        return result_dict
+    values = memory_cache_services.get_multi(keys)
     for key, value in zip(keys, values):
         if value:
             correct_type_of_dict = _get_correct_dict_type_of_key(key)
@@ -153,6 +158,8 @@ def set_multi(key_value_mapping):
     Returns:
         bool. True if all of the keys are set. False otherwise.
     """
+    if len(key_value_mapping) == 0:
+        return True
 
     for key, value in key_value_mapping.items():
         if _get_correct_dict_type_of_key(key):
@@ -168,4 +175,7 @@ def delete_multi(keys):
     Returns:
         bool. True if all operations complete successfully; False otherwise.
     """
+    if len(keys) == 0:
+        return True
+
     return memory_cache_services.delete_multi(keys) == len(keys)

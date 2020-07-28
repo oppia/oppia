@@ -684,7 +684,13 @@ class Exploration(python_utils.OBJECT):
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
 
-        exploration.version = exploration_version
+        print('version' in exploration_dict)
+
+        exploration.version = (
+            exploration_dict['version'] if 'version' in exploration_dict
+            else exploration_version)
+        print("@@@@@")
+        print(exploration.version)
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
@@ -3785,6 +3791,7 @@ class Exploration(python_utils.OBJECT):
         # The ID is the only property which should not be stored within the
         # YAML representation.
         del exp_dict['id']
+        del exp_dict['version']
 
         return python_utils.yaml_from_dict(exp_dict)
 
@@ -3811,7 +3818,8 @@ class Exploration(python_utils.OBJECT):
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'states': {state_name: state.to_dict()
-                       for (state_name, state) in self.states.items()}
+                       for (state_name, state) in self.states.items()},
+            'version': self.version
         })
 
     def to_player_dict(self):
