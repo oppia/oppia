@@ -37,7 +37,7 @@ describe('Feedback Tab Component', function() {
   var suggestionModalForExplorationEditorService = null;
   var suggestionThreadObjectFactory = null;
   var threadDataService = null;
-  var userService = null;
+  var userBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -63,11 +63,12 @@ describe('Feedback Tab Component', function() {
     suggestionModalForExplorationEditorService = $injector.get(
       'SuggestionModalForExplorationEditorService');
     threadDataService = $injector.get('ThreadDataService');
-    userService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
 
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
     spyOn(threadDataService, 'getThreadsAsync').and.returnValue(
       $q.resolve({}));
 

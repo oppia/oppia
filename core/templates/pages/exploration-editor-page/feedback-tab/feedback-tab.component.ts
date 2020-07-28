@@ -36,7 +36,7 @@ require(
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
-require('services/user.service.ts');
+require('services/user-backend-api.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -44,17 +44,19 @@ require(
 angular.module('oppia').component('feedbackTab', {
   template: require('./feedback-tab.component.html'),
   controller: [
-    '$q', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'LoaderService',
     'ExplorationStatesService',
     'SuggestionModalForExplorationEditorService', 'ThreadDataService',
-    'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+    'ThreadStatusDisplayService', 'UrlInterpolationService',
+    'UserBackendApiService',
     function(
-        $q, $uibModal, AlertsService, ChangeListService,
+        $q, $rootScope, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, LoaderService,
         ExplorationStatesService,
         SuggestionModalForExplorationEditorService, ThreadDataService,
-        ThreadStatusDisplayService, UrlInterpolationService, UserService) {
+        ThreadStatusDisplayService, UrlInterpolationService,
+        UserBackendApiService) {
       var ctrl = this;
 
       var _resetTmpMessageFields = function() {
@@ -223,8 +225,13 @@ angular.module('oppia').component('feedbackTab', {
         ctrl.clearActiveThread();
 
         return $q.all([
-          UserService.getUserInfoAsync().then(
-            userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
+          UserBackendApiService.getUserInfoAsync().then(
+            userInfo => {
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
+            }),
           ctrl.fetchUpdatedThreads()
         ]).then(() => LoaderService.hideLoadingScreen());
       };
