@@ -1991,21 +1991,25 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
             html_in_exploration_after_conversion))
 
     for filename, raw_latex in filenames_mapping:
-        image_file = raw_latex_to_image_data_dict[raw_latex].raw_image
-        image_validation_error_message_suffix = (
-            'SVG image provided for latex %s failed validation' % raw_latex)
-        try:
-            file_format = (
-                image_validation_services.validate_image_and_filename(
-                    image_file, filename))
-        except utils.ValidationError as e:
-            e = '%s %s' % (e, image_validation_error_message_suffix)
-            raise Exception(e)
-        image_is_compressible = (
-            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-        fs_services.save_original_and_compressed_versions_of_image(
-            filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id, image_file,
-            'image', image_is_compressible)
+        # Some new filenames may already have the images saved from the math
+        # rich-text editor, for these files we don't need to save the image
+        # again.
+        if raw_latex in raw_latex_to_image_data_dict.keys():
+            image_file = raw_latex_to_image_data_dict[raw_latex].raw_image
+            image_validation_error_message_suffix = (
+                'SVG image provided for latex %s failed validation' % raw_latex)
+            try:
+                file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        image_file, filename))
+            except utils.ValidationError as e:
+                e = '%s %s' % (e, image_validation_error_message_suffix)
+                raise Exception(e)
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id, image_file,
+                'image', image_is_compressible)
 
     update_exploration(
         feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
