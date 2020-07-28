@@ -81,6 +81,7 @@ describe('Feedback Tab Component', function() {
       }));
     spyOn(threadDataService, 'getThreadsAsync').and.returnValue(
       $q.resolve({}));
+    spyOn($rootScope, '$apply').and.callThrough();
 
     $scope = $rootScope.$new();
     ctrl = $componentController('feedbackTab', {
