@@ -568,7 +568,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
     DOCSTRING_SECTION_RAISES = 'raises'
 
     def visit_classdef(self, node):
-        """Visit each class definition in a module.
+        """Visit each class definition in a module and check if there is a
+        single new line below each class docstring.
 
         Args:
             node: astroid.nodes.ClassDef. Node for a class definition
