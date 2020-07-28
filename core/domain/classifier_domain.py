@@ -314,6 +314,10 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             get_proto_attribute_name_for_algorithm(
                 self.algorithm_id, self.algorithm_version))
 
+        if not self.classifier_data:
+            raise Exception(
+                'No classifier data found. Unable to generate proto object')
+
         if self.classifier_data and classifier_data_proto_name is None:
             raise Exception(
                 'No protobuf class found for classifier with %s '

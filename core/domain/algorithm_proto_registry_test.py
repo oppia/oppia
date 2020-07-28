@@ -40,3 +40,20 @@ class AlgorithmProtoRegistryTests(test_utils.GenericTestBase):
             self.assertTrue(algorithm_id in mapping)
             self.assertTrue(isinstance(mapping[algorithm_id], dict))
             self.assertTrue(algorithm_version in mapping[algorithm_id])
+
+    def test_that_none_is_returned_when_algorithm_id_is_not_found(self):
+        self.assertIsNone(
+            algorithm_proto_registry.Registry.
+            get_proto_attribute_name_for_algorithm('FakeClassifier', 1))
+
+        self.assertIsNone(
+            algorithm_proto_registry.Registry.
+            get_proto_attribute_type_for_algorithm('FakeClassifier', 1))
+
+    def test_that_none_is_returned_when_algorithm_version_is_not_found(self):
+        self.assertIsNone(
+            algorithm_proto_registry.Registry.
+            get_proto_attribute_name_for_algorithm('TextClassifier', 1000))
+        self.assertIsNone(
+            algorithm_proto_registry.Registry.
+            get_proto_attribute_type_for_algorithm('TextClassifier', 1000))

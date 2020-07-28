@@ -70,6 +70,10 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
 PROTOTOOL_PATH = os.path.join(
     common.THIRD_PARTY_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION,
     'bin', 'prototool')
+# Path of files which needs to be compiled by protobuf.
+PROTO_FILES_PATHS = [
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
+    os.path.join('core', 'domain', 'proto')]
 
 
 def tweak_yarn_executable():
@@ -148,39 +152,23 @@ def pip_install(package, version, install_path):
         raise Exception('Error installing package')
 
 
-def compile_protobuf_files():
+def compile_protobuf_files(proto_files_paths):
     """Compiles protobuf files using prototool.
 
     Raises:
         Exception. If there is any error in compiling the proto files.
     """
-    # The call to python -m is used to ensure that Python and Pip versions are
-    # compatible.
-    oppia_ml_proto_path = os.path.join(
-        common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')
-    oppia_proto_path = os.path.join('core', 'domain', 'proto')
-
-    command = [
-        PROTOTOOL_PATH, 'generate', oppia_ml_proto_path]
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    else:
-        python_utils.PRINT(stderr)
-        raise Exception('Error compiling oppia-ml proto files.')
-
-    command = [
-        PROTOTOOL_PATH, 'generate', oppia_proto_path]
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    else:
-        python_utils.PRINT(stderr)
-        raise Exception('Error compiling oppia proto files.')
+    for path in proto_files_paths:
+        command = [
+            PROTOTOOL_PATH, 'generate', path]
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            python_utils.PRINT(stdout)
+        else:
+            python_utils.PRINT(stderr)
+            raise Exception('Error compiling proto files at %s' % path)
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -256,7 +244,7 @@ def main():
 
     # Compile protobuf files.
     python_utils.PRINT('Compiling protobuf files.')
-    compile_protobuf_files()
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     if common.is_windows_os():
         tweak_yarn_executable()

@@ -130,6 +130,17 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             install_third_party_libs.pip_install('package', 'version', 'path')
         self.assertTrue('Error installing package' in context.exception)
 
+    def test_proto_file_compilation(self):
+        with self.Popen_swap:
+            install_third_party_libs.compile_protobuf_files(['mock_path'])
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
+
+    def test_proto_file_compilation_raises_exception_on_compile_errors(self):
+        with self.Popen_error_swap:
+            with self.assertRaisesRegexp(
+                Exception, 'Error compiling proto files at mock_path'):
+                install_third_party_libs.compile_protobuf_files(['mock_path'])
+
     def test_pip_install_with_import_error_and_darwin_os(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
 

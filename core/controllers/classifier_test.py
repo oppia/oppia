@@ -388,7 +388,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=404)
 
-    def test_error_on_no_training_job_for_retrieving_model(self):
+    def test_error_on_no_training_job_mapping_for_retrieving_model(self):
         new_exp_id = 'new_exp'
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')
@@ -406,15 +406,15 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
         params = {
             'exploration_id': new_exp_id,
-            'exploration_version': new_exp.version,
+            'exploration_version': 2,
             'state_name': new_exp.init_state_name,
         }
 
         self.get_json(
             '/ml/trainedclassifierhandler', params=params,
-            expected_status_int=404)
+            expected_status_int=400)
 
-    def test_error_on_no_classifier_for_retrieving_model(self):
+    def test_error_on_no_training_job_for_retrieving_model(self):
         new_exp_id = 'new_exp'
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')

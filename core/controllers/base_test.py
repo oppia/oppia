@@ -444,6 +444,39 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             # 'unused-import' would appear if this line was not disabled.
             import appengine_config  # pylint: disable-all
 
+    def test_valid_protobuf_path(self):
+        # We need to re-import appengine_config here to make it look like a
+        # local variable so that we can again re-import appengine_config later.
+        import appengine_config
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Invalid path for oppia_tools library: invalid_path')
+
+        def mock_os_path_join_for_protobuf(*args):
+            """Mocks path for 'Protobuf' with an invalid path. This is done by
+            substituting os.path.join to return an invalid path. This is
+            needed to test the scenario where the 'Pillow' path points
+            to a non-existent directory.
+            """
+            path = ''
+            if args[1] == 'protobuf-3.12.0':
+                return 'invalid_path'
+            else:
+                path = '/'.join(args)
+                return path
+
+        protobuf_path_swap = self.swap(
+            os.path, 'join', mock_os_path_join_for_protobuf)
+        # We need to delete the existing module else the re-importing
+        # would just call the existing module.
+        del sys.modules['appengine_config']
+
+        with assert_raises_regexp_context_manager, protobuf_path_swap:
+            # This pragma is needed since we are re-importing under
+            # invalid conditions. The pylint error messages
+            # 'reimported', 'unused-variable', 'redefined-outer-name' and
+            # 'unused-import' would appear if this line was not disabled.
+            import appengine_config  # pylint: disable-all
+
     def test_valid_third_party_library_path(self):
         # We need to re-import appengine_config here to make it look like a
         # local variable so that we can again re-import appengine_config later.

@@ -341,7 +341,15 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'downloadFormat': 'zip',
                             'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                             'rootDir': 'bootstrap-4.3.1-dist',
-                            'targetDir': 'bootstrap'}}}}
+                            'targetDir': 'bootstrap'},
+                        'prototool': {
+                            'version': '1.10.0',
+                            'downloadFormat': 'tar',
+                            'url': 'https://github/prototool/prototool.tar.gz',
+                            'tarRootDir': 'prototool',
+                            'rootDirPrefix': 'prototool-',
+                            'targetDirPrefix': 'prototool-'}}}}
+
         def mock_validate_manifest(unused_filepath):
             check_function_calls['validate_manifest_is_called'] = True
         def mock_download_files(

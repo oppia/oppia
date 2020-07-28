@@ -165,6 +165,112 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             player_proto.text_classifier.model_json,
             expected_training_job_player_proto.text_classifier.model_json)
 
+    def test_exception_is_for_to_player_proto_with_invalid_algorith_id(self):
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.model_json = json.dumps({})
+
+        expected_training_job_dict = {
+            'job_id': 'exp_id1.SOME_RANDOM_STRING',
+            'algorithm_id': 'FakeClassifier',
+            'interaction_id': 'TextInput',
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'next_scheduled_check_time':
+                datetime.datetime.strptime(
+                    '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'),
+            'state_name': 'a state name',
+            'status': 'NEW',
+            'training_data': [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ],
+            'classifier_data': classifier_data_proto,
+            'algorithm_version': 1
+        }
+
+        observed_training_job = self._get_training_job_from_dict(
+            expected_training_job_dict)
+        with self.assertRaisesRegexp(
+            Exception, 'No protobuf class found for classifier with '
+            'FakeClassifier algorithm id and 1 algorithm version'):
+            observed_training_job.to_player_proto()
+
+    def test_exception_is_for_to_player_proto_with_invalid_algorith_version(
+            self):
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.model_json = json.dumps({})
+
+        expected_training_job_dict = {
+            'job_id': 'exp_id1.SOME_RANDOM_STRING',
+            'algorithm_id': 'TextClassifier',
+            'interaction_id': 'TextInput',
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'next_scheduled_check_time':
+                datetime.datetime.strptime(
+                    '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'),
+            'state_name': 'a state name',
+            'status': 'NEW',
+            'training_data': [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ],
+            'classifier_data': classifier_data_proto,
+            'algorithm_version': 1000
+        }
+
+        observed_training_job = self._get_training_job_from_dict(
+            expected_training_job_dict)
+        with self.assertRaisesRegexp(
+            Exception, 'No protobuf class found for classifier with '
+            'TextClassifier algorithm id and 1000 algorithm version'):
+            observed_training_job.to_player_proto()
+
+    def test_exception_is_raised_for_to_player_proto_with_no_classifier_data(
+            self):
+        expected_training_job_dict = {
+            'job_id': 'exp_id1.SOME_RANDOM_STRING',
+            'algorithm_id': 'TextClassifier',
+            'interaction_id': 'TextInput',
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'next_scheduled_check_time':
+                datetime.datetime.strptime(
+                    '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'),
+            'state_name': 'a state name',
+            'status': 'NEW',
+            'training_data': [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ],
+            'classifier_data': None,
+            'algorithm_version': 1
+        }
+
+        observed_training_job = self._get_training_job_from_dict(
+            expected_training_job_dict)
+        with self.assertRaisesRegexp(
+            Exception, 'No classifier data found'):
+            observed_training_job.to_player_proto()
+
     def test_validation_exp_id(self):
         self.training_job_dict['exp_id'] = 1
         training_job = self._get_training_job_from_dict(self.training_job_dict)
@@ -392,6 +498,20 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected algorithm_id_to_job_id_map to be a dict'):
+            mapping.validate()
+
+    def test_validation_with_invalid_algorithm_id_in_algorithm_to_job_map(self):
+        self.mapping_dict['algorithm_id_to_job_id_map'] = {123: 'job_id'}
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected algorithm_id to be str'):
+            mapping.validate()
+
+    def test_validation_with_invalid_job_id_in_algorithm_to_job_map(self):
+        self.mapping_dict['algorithm_id_to_job_id_map'] = {'algorithm_id': 12}
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected job_id to be str'):
             mapping.validate()
 
     def test_validation_with_invalid_state_name(self):
