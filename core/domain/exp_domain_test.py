@@ -5806,7 +5806,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V40 = ("""author_notes: ''
+    YAML_CONTENT_V40 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7657,7 +7658,8 @@ title: title
 """)
 
 
-    YAML_CONTENT_V40_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V40_IMAGE_DIMENSIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7925,7 +7927,8 @@ tags: []
 title: title
 """)
 
-    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8037,7 +8040,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V40_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V40_WITH_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category

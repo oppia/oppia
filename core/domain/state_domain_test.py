@@ -152,15 +152,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'hi': {
                         'data_format': 'html',
                         'translation':
-                            ('<p>state written_translation ca_choices_0-hi'
-                             '</p>'),
+                            (
+                                '<p>state written_translation ca_choices_0-hi'
+                                '</p>'
+                            ),
                         'needs_update': False
                     },
                     'en': {
                         'data_format': 'html',
                         'translation':
-                            ('<p>state written_translation ca_choices_0'
-                             '-en</p>'),
+                            (
+                                '<p>state written_translation ca_choices_0'
+                                '-en</p>'
+                            ),
                         'needs_update': False
                     }
                 },
@@ -168,15 +172,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'hi': {
                         'data_format': 'html',
                         'translation':
-                            ('<p>state written_translation ca_choices_1-hi'
-                             '</p>'),
+                            (
+                                '<p>state written_translation ca_choices_1-hi'
+                                '</p>'
+                            ),
                         'needs_update': False
                     },
                     'en': {
                         'data_format': 'html',
                         'translation':
-                            ('<p>state written_translation ca_choices_1-en'
-                             '</p>'),
+                            (
+                                '<p>state written_translation ca_choices_1-en'
+                                '</p>'
+                            ),
                         'needs_update': False
                     }
                 },
@@ -184,15 +192,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'hi': {
                         'data_format': 'html',
                         'translation':
-                            ('<p>state written_translation ca_choices_2-hi'
-                             '</p>'),
+                            (
+                                '<p>state written_translation ca_choices_2-hi'
+                                '</p>'
+                            ),
                         'needs_update': False
                     },
                     'en': {
                         'data_format': 'html',
                         'translation':
-                            ('<p>state written_translation ca_choices_2-en'
-                             '</p>'),
+                            (
+                                '<p>state written_translation ca_choices_2-en'
+                                '</p>'
+                            ),
                         'needs_update': False
                     }
                 },
@@ -207,8 +219,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'data_format': 'html',
                         'translation':
-                            ('<p>state written_translation ca_choices_3-en'
-                             '</p>'),
+                            (
+                                '<p>state written_translation ca_choices_3-en'
+                                '</p>'
+                            ),
                         'needs_update': False
                     }
                 },

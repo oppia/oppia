@@ -2675,8 +2675,11 @@ class Exploration(python_utils.OBJECT):
                     schema_utils.SCHEMA_TYPE_SUBTITLED_UNICODE)
                 is_subtitled_html_list_spec = (
                     schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                    (schema['items']['type'] ==
-                     schema_utils.SCHEMA_TYPE_SUBTITLED_HTML))
+                    (
+                        schema['items']['type'] ==
+                        schema_utils.SCHEMA_TYPE_SUBTITLED_HTML
+                    )
+                )
 
                 if is_subtitled_html_spec or is_subtitled_unicode_spec:
                     # Default is a SubtitledHtml dict or SubtitleUnicode dict.
@@ -2721,12 +2724,13 @@ class Exploration(python_utils.OBJECT):
                     ca_dict[ca_name] = {'value': ca_spec.default_value}
 
 
-            (customization_args_util
-             .validate_customization_args_and_values(
-                 'interaction',
-                 interaction_id,
-                 ca_dict,
-                 ca_specs)
+            (
+                customization_args_util
+                .validate_customization_args_and_values(
+                    'interaction',
+                    interaction_id,
+                    ca_dict,
+                    ca_specs)
             )
 
             state_dict['next_content_id_index'] = (
