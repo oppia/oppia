@@ -27,6 +27,7 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -192,8 +193,9 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-    
+
     _update_suggestions([suggestion])
+
 
 def _update_suggestions(suggestions):
     """Updates the given suggestions.
@@ -202,16 +204,19 @@ def _update_suggestions(suggestions):
         suggestions: list(Suggestion). The suggestions to be updated.
     """
     suggestion_ids = []
-    
+
     for suggestion in suggestions:
         suggestion.validate()
         suggestion_ids.append(suggestion.suggestion_id)
-    
+
     suggestion_models_to_update = (
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
     )
 
     for suggestion_model in suggestion_models_to_update:
+        suggestion = python_utils.NEXT(
+            suggestion for suggestion in suggestions
+            if suggestion.suggestion_id == suggestion_model.id)
         suggestion_model.status = suggestion.status
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
         suggestion_model.change_cmd = suggestion.change.to_dict()
@@ -429,7 +434,8 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
     if not suggestion.is_handled:
-        raise Exception('The suggestion with id %s is not yet handled.' % (
+        raise Exception(
+            'The suggestion with id %s is not yet handled.' % (
                 suggestion.suggestion_id
             )
         )
@@ -468,12 +474,12 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     if len(score_categories) == 0:
         return []
 
-    return (
-        [get_suggestion_from_model(s)
-         for s in suggestion_models.GeneralSuggestionModel
-         .get_in_review_suggestions_in_score_categories(
-             score_categories, user_id)]
-    )
+    return ([
+        get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_in_review_suggestions_in_score_categories(
+            score_categories, user_id)
+    ])
 
 
 def get_reviewable_suggestions(user_id, suggestion_type):
