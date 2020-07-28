@@ -52,7 +52,7 @@ def set_multi(key_value_mapping):
             core.domain.caching_services.
 
     Returns:
-        int. Number of successful inserts to the Redis cache.
+        bool. Whether or not the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
     return redis_client.mset(key_value_mapping)
@@ -65,11 +65,11 @@ def delete(key):
         key: str. A key (string) to delete.
 
     Returns:
-        bool. True if the key is deleted. False if it failed.
+        int. Number of successfully deleted keys.
     """
     assert isinstance(key, python_utils.BASESTRING)
     return_code = redis_client.delete(key)
-    return return_code == 1
+    return return_code
 
 
 def delete_multi(keys):
@@ -79,9 +79,9 @@ def delete_multi(keys):
         keys: list(str). The keys (strings) to delete.
 
     Returns:
-        bool. True if all operations complete successfully; False otherwise.
+        int. Number of successfully deleted keys.
     """
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)
     return_value = redis_client.delete(*keys)
-    return return_value == len(keys)
+    return return_value

@@ -14,46 +14,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for methods in the gae_memcache_services."""
+"""Tests for methods in the redis_cache_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.platform.memcache import gae_memcache_services
+from core.platform.cache import redis_cache_services
 from core.tests import test_utils
 
 
-class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
-    """Tests for gae_memcache_services."""
+class RedisCacheServicesUnitTests(test_utils.GenericTestBase):
+    """Tests for redis_cache_services."""
 
     def setUp(self):
-        super(GaeMemcacheServicesUnitTests, self).setUp()
+        super(RedisCacheServicesUnitTests, self).setUp()
         self.keys = ['a', 'b', 'c']
         self.non_existent_keys = ['d', 'e']
         # Redis can only store strings so integers must be casted to correct
         # values.
         self.key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
-        self.exp_list = gae_memcache_services.set_multi(self.key_value_mapping)
+        self.response = redis_cache_services.set_multi(self.key_value_mapping)
 
     def test_get_multi(self):
-        exp_dict = gae_memcache_services.get_multi(self.keys)
-        self.assertEqual(exp_dict, self.key_value_mapping)
-        exp_dict = gae_memcache_services.get_multi(self.non_existent_keys)
-        self.assertEqual(exp_dict, {})
+        result = redis_cache_services.get_multi(self.keys)
+        self.assertEqual(result, ['1', '2', '3'])
+        result = redis_cache_services.get_multi(self.non_existent_keys)
+        self.assertEqual(result, [None, None])
 
     def test_set_multi(self):
-        self.assertEqual(self.exp_list, [])
+        self.assertTrue(self.response)
 
     def test_delete(self):
-        return_code_key_present = gae_memcache_services.delete('a')
-        return_code_key_not_present = gae_memcache_services.delete('d')
-        self.assertEqual(return_code_key_present, 2)
-        self.assertEqual(return_code_key_not_present, 1)
+        is_successful = redis_cache_services.delete('a')
+        self.assertTrue(is_successful)
+        is_successful = redis_cache_services.delete('d')
+        self.assertFalse(is_successful)
 
     def test_delete_multi(self):
-        return_value_keys_present = gae_memcache_services.delete_multi(
+        return_number_of_keys_set = redis_cache_services.delete_multi(
             self.keys)
-        return_value_keys_not_present = gae_memcache_services.delete_multi(
+        self.assertEqual(return_number_of_keys_set, 3)
+        return_number_of_keys_set = redis_cache_services.delete_multi(
             ['d', 'e', 'f'])
-        self.assertEqual(return_value_keys_present, True)
-        self.assertEqual(return_value_keys_not_present, True)
+        self.assertEqual(return_number_of_keys_set, 0)
