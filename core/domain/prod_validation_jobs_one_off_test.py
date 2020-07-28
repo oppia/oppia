@@ -13045,6 +13045,68 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class UserAuthModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserAuthModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
+        user_models.UserAuthModel(id=self.user_id, gae_id=[self.gae_id]).put()
+        self.model_instance = user_models.UserAuthModel.get_by_id(
+            self.user_id)
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .UserAuthModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated UserAuthModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UserAuthModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.user_id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UserAuthModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.user_id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids '
+                'field check of UserAuthModel\', '
+                '[u"Entity id %s: based on '
+                'field user_settings_ids having value '
+                '%s, expect model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.user_id, self.user_id, self.user_id)]
+        run_job_and_check_output(self, expected_output)
+
+
 class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
