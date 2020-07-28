@@ -28,6 +28,7 @@ import sys
 import time
 import traceback
 
+import backports.functools_lru_cache
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
@@ -36,7 +37,6 @@ import feconf
 import python_utils
 import utils
 
-import backports.functools_lru_cache
 import webapp2
 
 current_user_services = models.Registry.import_current_user_services()
