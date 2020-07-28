@@ -477,7 +477,8 @@ class TestBase(unittest.TestCase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -561,7 +562,8 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_UNTITLED_YAML_CONTENT = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: %s
@@ -712,8 +714,8 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(response.status_int, expected_status_int)
         if not expect_errors:
-            self.assertTrue(response.status_int >= 200 and
-                            response.status_int < 400)
+            self.assertTrue(
+                response.status_int >= 200 and response.status_int < 400)
         else:
             self.assertTrue(response.status_int >= 400)
         self.assertEqual(
@@ -868,8 +870,9 @@ tags: []
         self.assertEqual(blob_response.status_int, expected_status_int)
         return self._parse_blob_response(blob_response, expect_errors)
 
-    def post_json(self, url, payload, csrf_token=None,
-                  expected_status_int=200, upload_files=None):
+    def post_json(
+            self, url, payload, csrf_token=None,
+            expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -2374,7 +2377,8 @@ class LinterTestBase(GenericTestBase):
                 method's execution.
         """
         self.assertTrue(
-            any(all(phrase in output for phrase in phrases) for
+            any(
+                all(phrase in output for phrase in phrases) for
                 output in stdout))
 
     def assert_failed_messages_count(self, stdout, expected_failed_count):

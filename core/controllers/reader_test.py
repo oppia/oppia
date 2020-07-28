@@ -257,8 +257,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             json_response_1 = self.get_json(
                 '%s/%s?story_id=%s' % (
                     feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
-        self.assertTrue(json_response_1['pretest_question_dicts'][0]['id'] in
-                        [question_id, question_id_2])
+        self.assertTrue(
+            json_response_1['pretest_question_dicts'][0]['id'] in
+            [question_id, question_id_2])
 
         self.get_json(
             '%s/%s?story_id=%s' % (
@@ -370,8 +371,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
                 feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME),
             skill_ids_for_url, 'true')
         json_response = self.get_json(url)
-        self.assertEqual(len(json_response['question_dicts']),
-                         feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+        self.assertEqual(
+            len(json_response['question_dicts']),
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.

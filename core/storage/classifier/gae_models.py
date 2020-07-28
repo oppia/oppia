@@ -47,18 +47,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING.
-    status = ndb.StringProperty(required=True,
-                                choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                                default=feconf.TRAINING_JOB_STATUS_PENDING,
-                                indexed=True)
+    status = ndb.StringProperty(
+        required=True, choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
+        default=feconf.TRAINING_JOB_STATUS_PENDING, indexed=True)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
     # data group.
     training_data = ndb.JsonProperty(default=None)
     # The time when the job's status should next be checked.
     # It is incremented by TTL when a job with status NEW is picked up by VM.
-    next_scheduled_check_time = ndb.DateTimeProperty(required=True,
-                                                     indexed=True)
+    next_scheduled_check_time = ndb.DateTimeProperty(
+        required=True, indexed=True)
     # The algorithm version for the classifier. Algorithm version identifies
     # the format of the classifier_data as well as the prediction API to be
     # used.

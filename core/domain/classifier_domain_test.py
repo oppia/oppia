@@ -184,8 +184,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job = self._get_training_job_from_dict(self.training_job_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            re.escape('Expected status to be in %s'
-                      % (feconf.ALLOWED_TRAINING_JOB_STATUSES))):
+            re.escape(
+                'Expected status to be in %s'
+                % (feconf.ALLOWED_TRAINING_JOB_STATUSES))):
             training_job.validate()
 
     def test_validation_interaction_id_type(self):
