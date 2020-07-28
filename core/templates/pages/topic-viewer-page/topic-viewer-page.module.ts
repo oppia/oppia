@@ -60,14 +60,18 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent, PracticeTabComponent,
-    TopicViewerNavbarBreadcrumbComponent, StoriesListComponent,
-    SubtopicsListComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent,
+    TopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent, PracticeTabComponent,
-    TopicViewerNavbarBreadcrumbComponent, StoriesListComponent,
-    SubtopicsListComponent
+    OppiaAngularRootComponent,
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent,
+    TopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
     AppConstants,

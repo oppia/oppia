@@ -25,16 +25,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
-    CommonModule,
     BrowserAnimationsModule,
+    CommonModule,
     MatButtonModule,
-    MatCheckboxModule,
-    MatCardModule
+    MatCardModule,
+    MatCheckboxModule
   ],
   exports: [
     BrowserAnimationsModule,
     MatButtonModule,
-    MatCheckboxModule,
-    MatCardModule]
+    MatCardModule,
+    MatCheckboxModule
+  ]
 })
 export class MaterialModule {}

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the topic viewer practice tab
+ * @fileoverview Component for the topic viewer practice tab.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { PracticeSessionPageConstants} from
+import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants.ts';
 
 @Component({
@@ -36,9 +36,11 @@ export class PracticeTabComponent implements OnInit {
   selectedSubtopics: Array<Subtopic> = [];
   availableSubtopics: Array<Subtopic> = [];
   selectedSubtopicIndices: Array<Boolean> = [];
+
   constructor(
-    private urlInterpolationService: UrlInterpolationService) {
-  }
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
   ngOnInit(): void {
     this.selectedSubtopics = [];
     this.availableSubtopics = this.subtopicsList.filter(
@@ -49,6 +51,7 @@ export class PracticeTabComponent implements OnInit {
     this.selectedSubtopicIndices = Array(
       this.availableSubtopics.length).fill(false);
   }
+
   isStartButtonDisabled(): boolean {
     for (var idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
@@ -57,6 +60,7 @@ export class PracticeTabComponent implements OnInit {
     }
     return true;
   }
+
   openNewPracticeSession(): void {
     const selectedSubtopicIds = [];
     for (let idx in this.selectedSubtopicIndices) {
@@ -65,7 +69,7 @@ export class PracticeTabComponent implements OnInit {
           this.availableSubtopics[idx].getId());
       }
     }
-    var practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+    const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
       PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
         topic_name: this.topicName,
         comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
