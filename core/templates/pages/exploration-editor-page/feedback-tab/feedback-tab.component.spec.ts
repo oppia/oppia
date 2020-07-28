@@ -43,16 +43,16 @@ describe('Feedback Tab Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(function() {
-    alertsService = TestBed.get(AlertsService);
-    dateTimeFormatService = TestBed.get(DateTimeFormatService);
-    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
-  });
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
+  });
+
+  beforeEach(function() {
+    alertsService = TestBed.get(AlertsService);
+    dateTimeFormatService = TestBed.get(DateTimeFormatService);
+    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
