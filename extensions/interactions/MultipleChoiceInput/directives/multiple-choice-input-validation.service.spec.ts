@@ -83,6 +83,9 @@ describe('MultipleChoiceInputValidationService', () => {
     customizationArguments = {
       choices: {
         value: ['Option 1', 'Option 2']
+      },
+      showChoicesInShuffledOrder: {
+        value: false
       }
     };
 
@@ -113,6 +116,8 @@ describe('MultipleChoiceInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        // TS ignore is used here for testing.
+        // @ts-ignore
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have property: choices');

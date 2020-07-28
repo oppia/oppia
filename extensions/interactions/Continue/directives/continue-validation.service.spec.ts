@@ -85,6 +85,8 @@ describe('ContinueValidationService', () => {
 
       expect(() => {
         validatorService.getAllWarnings(
+          // TS ignore is needed here for testing purposes.
+          // @ts-ignore
           currentState, {}, [], goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: buttonText');

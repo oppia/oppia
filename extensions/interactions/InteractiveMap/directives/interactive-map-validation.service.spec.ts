@@ -70,6 +70,9 @@ describe('InteractiveMapValidationService', () => {
       },
       longitude: {
         value: 0
+      },
+      zoom: {
+        value: 0
       }
     };
     goodAnswerGroups = [agof.createNew(
@@ -101,6 +104,8 @@ describe('InteractiveMapValidationService', () => {
     () => {
       expect(() => {
         validatorService.getAllWarnings(
+          // TS ignore is needed here for testing purposes.
+          // @ts-ignore
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have properties: ' +

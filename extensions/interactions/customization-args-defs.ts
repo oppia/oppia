@@ -37,28 +37,28 @@ interface ReadableMusicNote {
 export interface AlgebraicExpressionInputCustomizationArgs { }
 
 export interface CodeReplCustomizationArgs {
-  language?: {
+  language: {
     value: string;
   };
-  placeholder?: {
+  placeholder: {
     value: string;
   };
-  preCode?: {
+  preCode: {
     value: string;
   };
-  postCode?: {
+  postCode: {
     value: string;
   };
 }
 
 export interface ContinueCustomizationArgs {
-  buttonText?: {
+  buttonText: {
     value: string;
   };
 }
 
 export interface DragAndDropSortInputCustomizationArgs {
-  choices?: {
+  choices: {
     value: string[];
   };
   allowMultipleItemsInSamePosition: {
@@ -67,28 +67,28 @@ export interface DragAndDropSortInputCustomizationArgs {
 }
 
 export interface EndExplorationCustomizationArgs {
-  recommendedExplorationIds?: {
+  recommendedExplorationIds: {
     value: string[];
   };
 }
 
 export interface FractionInputCustomizationArgs {
-  requireSimplestForm?: {
+  requireSimplestForm: {
     value: string;
   };
-  allowImproperFraction?: {
+  allowImproperFraction: {
     value: string;
   };
-  allowNonzeroIntegerPart?: {
+  allowNonzeroIntegerPart: {
     value: string;
   };
-  customPlaceholder?: {
+  customPlaceholder: {
     value: string;
   };
 }
 
 export interface GraphInputCustomizationArgs {
-  graph?: {
+  graph: {
     value: GraphAnswer;
   };
   canAddVertex: {
@@ -115,40 +115,40 @@ export interface GraphInputCustomizationArgs {
 }
 
 export interface ImageClickInputCustomizationArgs {
-  imageAndRegions?: {
+  imageAndRegions: {
     value: ImageWithRegions;
   };
-  highlightRegionsOnHover?: {
-    value: string;
+  highlightRegionsOnHover: {
+    value: boolean;
   };
 }
 
 export interface InteractiveMapCustomizationArgs {
-  latitude?: {
+  latitude: {
     value: number;
   };
-  longitude?: {
+  longitude: {
     value: number;
   };
-  zoom?: {
-    value: string;
+  zoom: {
+    value: number;
   };
 }
 
 export interface ItemSelectionInputCustomizationArgs {
-  choices?: {
+  choices: {
     value: string[];
   };
-  maxAllowableSelectionCount?: {
+  maxAllowableSelectionCount: {
     value: number;
   };
-  minAllowableSelectionCount?: {
+  minAllowableSelectionCount: {
     value: number;
   };
 }
 
 export interface LogicCustomizationArgs {
-  question?: {
+  question: {
     value: Object;
   };
 }
@@ -156,40 +156,40 @@ export interface LogicCustomizationArgs {
 export interface MathEquationInputCustomizationArgs { }
 
 export interface MultipleChoiceInputCustomizationArgs {
-  showChoicesInShuffledOrder?: {
-    value: string;
+  showChoicesInShuffledOrder: {
+    value: boolean;
   };
-  choices?: {
+  choices: {
     value: string[];
   };
 }
 
 export interface MusicNotesInputCustomizationArgs {
-  sequenceToGuess?: {
+  sequenceToGuess: {
     value: ReadableMusicNote[];
   };
-  initialSequence?: {
+  initialSequence: {
     value: ReadableMusicNote[];
   };
 }
 
 export interface PencilCodeCustomizationArgs {
-  initialCode?: {
+  initialCode: {
     value: string;
   };
 }
 
 export interface SetInputCustomizationArgs {
-  buttonText?: {
+  buttonText: {
     value: string;
   };
 }
 
 export interface TextInputCustomizationArgs {
-  placeholder?: {
+  placeholder: {
     value: string;
   };
-  rows?: {
+  rows: {
     value: number;
   };
 }
@@ -202,9 +202,7 @@ export interface NumericInputCustomizationArgs { }
 
 export interface NumberWithUnitsCustomizationArgs { }
 
-export interface NumberWithUnitsCustomizationArgs {
-
-}
+export interface NumberWithUnitsCustomizationArgs { }
 
 export type InteractionCustomizationArgs = (
   AlgebraicExpressionInputCustomizationArgs |

@@ -98,6 +98,8 @@ describe('SetInputValidationService', () => {
 
       let warnings = validatorService.getAllWarnings(
         currentState,
+        // TS ignore is used here for testing purposes.
+        // @ts-ignore
         badCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome

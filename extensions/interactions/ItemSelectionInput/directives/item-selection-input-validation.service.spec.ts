@@ -153,6 +153,8 @@ describe('ItemSelectionInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        // TS ignore is used here for testing purposes.
+        // @ts-ignore
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have property: choices');

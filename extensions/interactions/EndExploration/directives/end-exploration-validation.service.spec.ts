@@ -113,6 +113,8 @@ describe('EndExplorationValidationService', () => {
 
   it('should throw for missing recommendations argument', () => {
     expect(() => {
+      // TS ignore is needed here for testing purposes.
+      // @ts-ignore
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrowError(
       'Expected customization arguments to have property: ' +

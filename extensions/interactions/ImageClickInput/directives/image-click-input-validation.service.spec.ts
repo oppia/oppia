@@ -96,6 +96,9 @@ describe('ImageClickInputValidationService', () => {
             }
           }]
         }
+      },
+      highlightRegionsOnHover: {
+        value: true
       }
     };
     goodAnswerGroups = [agof.createNew(
@@ -115,6 +118,8 @@ describe('ImageClickInputValidationService', () => {
       goodAnswerGroups[0].rules = [];
       expect(() => {
         validatorService.getAllWarnings(
+          // TS ignore is needed here for testing.
+          // @ts-ignore
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: imageAndRegions');
