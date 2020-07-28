@@ -241,6 +241,7 @@ angular.module('oppia').directive('adminMiscTab', [
             MathJax.Hub.Register.MessageHook(
               'Math Processing Error', function(message) {
                 LoggerService.error(message[2]);
+                LoggerService.error('Cannot convert Latex:' + inputLatexString);
                 reject();
               });
           });
