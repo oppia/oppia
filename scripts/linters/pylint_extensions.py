@@ -453,21 +453,21 @@ class DocstringParameterChecker(checkers.BaseChecker):
         'W9022': (
             '4 space indentation in docstring.',
             '4-space-indentation-in-docstring',
-            ('Please use 4 space indentation for parameters relative to section'
-             + ' headers.')
+            'Please use 4 space indentation for parameters relative to section'
+            ' headers.'
         ),
         'W9023': (
             '8 space indentation in docstring.',
             '8-space-indentation-in-docstring',
-            ('Please use 8 space indentation in wrap around messages' +
-             ' relative to section headers.')
+            'Please use 8 space indentation in wrap around messages'
+            ' relative to section headers.'
         ),
         'W9024': (
             'malformed parameter',
             'malformed-parameter',
-            ('The parameter is incorrectly formatted: \nFor returns and yields,'
-             + ' headers should have this format: "type (elaboration). \n'
-             + 'For raises, headers should have the format: "exception: ')
+            'The parameter is incorrectly formatted: \nFor returns and yields,'
+            ' headers should have this format: "type (elaboration). \n'
+            'For raises, headers should have the format: "exception: '
         ),
         'W9025': (
             'Period is not used at the end of the docstring.',

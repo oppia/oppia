@@ -384,6 +384,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_no_period_at_end = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Args:
                             arg: variable
                     \"\"\"
@@ -401,6 +402,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_no_newline_at_end = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Args:
                             arg: variable.\"\"\"
                     Something
@@ -417,6 +419,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         raises_invalid_indentation_node = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Raises:
                         NoVariableException: variable.
                     \"\"\"
@@ -434,6 +437,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         return_invalid_indentation_node = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Returns:
                         str. If :true,
                             individual key=value pairs.
@@ -451,6 +455,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         invalid_raises_description_indentation_node = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Raises:
                             AssertionError: if the
                             schema is not valid.
@@ -469,6 +474,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         invalid_return_description_indentation_node = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Returns:
                             str. If :true,
                                 individual key=value pairs.
@@ -485,6 +491,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         invalid_yield_description_indentation_node = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Yields:
                             str. If :true,
                                 incorrent indentation line.
@@ -502,6 +509,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         invalid_parameter_name = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Raises:
                             Incorrect-Exception: if the
                             schema is not valid.
@@ -532,6 +540,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Args:
                             arg: variable.
                     \"\"\"
@@ -546,6 +555,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Args:
                             arg: bool. If true, individual key=value
                                 pairs separated by '&' are
@@ -562,6 +572,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Raises:
                             doseq: bool. If true, individual
                                 key=value pairs separated by '&' are
@@ -579,10 +590,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.extract_node(
             u"""def func(arg):
                     \"\"\"This is a docstring.
+
                         Returns:
                             str. The string parsed using
                             Jinja templating. Returns an error
                             string in case of error in parsing.
+
                         Yields:
                             tuple. For ExplorationStatsModel,
                             a 2-tuple of the form (exp_id, value)
@@ -600,11 +613,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.extract_node(
             u"""def func(arg): #@
                     \"\"\"This is a docstring.
+
                         Returns:
                             str. From this item there
                             is things:
                                 Jinja templating. Returns an error
                             string in case of error in parsing.
+
                         Yields:
                             tuple. For ExplorationStatsModel:
                                 {key
