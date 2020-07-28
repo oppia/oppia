@@ -211,9 +211,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'ca_choices_3': {
                     'hi': {
                         'data_format': 'html',
-                        'translation':
-                            ('<p>state written_translation ca_choices_3-hi'
-                             '</p>'),
+                        'translation': (
+                            '<p>state written_translation ca_choices_3-hi'
+                            '</p>'
+                        ),
                         'needs_update': False
                     },
                     'en': {
