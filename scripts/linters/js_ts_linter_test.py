@@ -558,7 +558,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     INVALID_TS_IGNORE_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        def mock_open_file(unused_path, unused_permissions):
+        def mock_open_file(unused_path, unused_permissions, unused_newline):
             return python_utils.string_io(buffer_value='{}')
 
         open_file_swap = self.swap(
