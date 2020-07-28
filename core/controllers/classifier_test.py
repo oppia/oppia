@@ -324,7 +324,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             'exploration_version': self.exploration.version,
             'state_name': 'Home',
         }
-        self.get_html_response(
+        self.get_json(
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=400)
 
@@ -349,7 +349,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             'exploration_version': self.exploration.version,
             'state_name': 'fake_state',
         }
-        self.get_html_response(
+        self.get_json(
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=400)
 
@@ -374,7 +374,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             'exploration_version': 3,
             'state_name': 'fake_state',
         }
-        self.get_html_response(
+        self.get_json(
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=400)
 
@@ -384,7 +384,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             'exploration_version': self.exploration.version,
             'state_name': 'Home',
         }
-        self.get_html_response(
+        self.get_json(
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=404)
 
@@ -410,7 +410,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             'state_name': new_exp.init_state_name,
         }
 
-        self.get_html_response(
+        self.get_json(
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=404)
 
@@ -436,7 +436,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             'state_name': new_exp.init_state_name,
         }
 
-        self.get_html_response(
+        self.get_json(
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=404)
 
@@ -466,7 +466,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
-            self.get_html_response(
+            self.get_json(
                 '/ml/trainedclassifierhandler', params=params,
                 expected_status_int=404)
 
@@ -520,7 +520,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
-            self.get_html_response(
+            self.get_json(
                 '/ml/trainedclassifierhandler', params=params,
                 expected_status_int=404)
 

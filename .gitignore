@@ -40,6 +40,7 @@ yarn-error.log
 .env
 .pytest_cache/v/cache/*
 .lighthouseci
+core/domain/proto/*.py
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated
