@@ -77,20 +77,46 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {
-    // Should move the focus to the elementToFocus.
-    await browser.actions().sendKeys(key).perform();
-    expect(await elementToFocus.getAttribute('id')).toEqual(
-      await (await browser.driver.switchTo().activeElement())
-        .getAttribute('id'));
+    // If element does not have an id attribute, compare the class attribute instead
+    if(await elementToFocus.getAttribute('id') == '') {
+      // Should move the focus to the elementToFocus.
+      await browser.actions().sendKeys(key).perform();
+      expect(await browser.driver.switchTo().activeElement()
+          .getAttribute('class')).toEqual(
+            await (await elementToFocus.getAttribute('class')));
 
-    // Should move the focus away from the elementToFocus.
-    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+      // Should move the focus away from the elementToFocus.
+      await browser.actions().sendKeys(protractor.Key.TAB).perform();
+      await browser.actions().sendKeys(protractor.Key.TAB).perform();
+      expect(await browser.driver.switchTo().activeElement()
+          .getAttribute('class')).not.toEqual(
+            await (await elementToFocus.getAttribute('class')));
 
-    // Should move the focus back to the elementToFocus.
-    await browser.actions().sendKeys(key).perform();
-    expect(await elementToFocus.getAttribute('id')).toEqual(
-      await (await browser.driver.switchTo().activeElement())
-        .getAttribute('id'));
+      // Should move the focus back to the elementToFocus.
+      await browser.actions().sendKeys(key).perform();
+      expect(await browser.driver.switchTo().activeElement()
+          .getAttribute('class')).toEqual(
+            await (await elementToFocus.getAttribute('class')));
+    }
+    else {
+      // Should move the focus to the elementToFocus.
+      await browser.actions().sendKeys(key).perform();
+      expect(await elementToFocus.getAttribute('id')).toEqual(
+        await (await browser.driver.switchTo().activeElement())
+          .getAttribute('id'));
+
+      // Should move the focus away from the elementToFocus.
+      await browser.actions().sendKeys(protractor.Key.TAB).perform();
+      expect(await elementToFocus.getAttribute('id')).not.toEqual(
+        await (await browser.driver.switchTo().activeElement())
+          .getAttribute('id'));
+
+      // Should move the focus back to the elementToFocus.
+      await browser.actions().sendKeys(key).perform();
+      expect(await elementToFocus.getAttribute('id')).toEqual(
+        await (await browser.driver.switchTo().activeElement())
+          .getAttribute('id'));
+    }
   };
 
   it('should skip to the main content element', async function() {
@@ -103,30 +129,25 @@ describe('screenreader and keyboard user accessibility features', function() {
         .getAttribute('id'));
   });
 
-  it('should move focus to the skip button in the library page',
+  it('should move the focus to the skip button search bar and category bar ',
     async function() {
       // Should test the skip to main content shortcut.
       await libraryPage.get();
-      await checkActionShortcuts('s', skipLink);
-    });
-
-  it('should move focus to the search bar in the library page',
-    async function() {
-      // Should move the focus to the search bar.
-      await libraryPage.get();
+      await waitFor.pageToFullyLoad();
       await checkActionShortcuts('/', searchBar);
-    });
 
-  it('should move focus to the category bar in library page',
-    async function() {
-      // Should move the focus to the category bar.
       await libraryPage.get();
+      await waitFor.pageToFullyLoad();
+      await checkActionShortcuts('s', skipLink);
+      
+      await libraryPage.get();
+      await waitFor.pageToFullyLoad();
       await checkActionShortcuts('c', categoryBar);
     });
 
   it('should move focus to skip to main content button in exploration player',
     async function() {
-      // Should Create a user and login.
+      // Should create a user and login.
       await users.createUser('user11@accessibility.com', 'user11accessibility');
       await users.login('user11@accessibility.com', true);
 
@@ -142,6 +163,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await libraryPage.playExploration('A new exploration');
 
       // Should test the skip to main content shortcut.
+      await waitFor.elementAttributeToBe(skipLink, 'id', 'skipToMainContentId');
       await checkActionShortcuts('s', skipLink);
     });
 
