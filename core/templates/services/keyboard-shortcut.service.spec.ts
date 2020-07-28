@@ -48,9 +48,33 @@ describe('KeyboardShortcutService', () => {
   });
 
   it('should test navigation shortcuts.', () => {
+    var getStartedShortcutTriggered = false;
+    var libraryShortcutTriggered = false;
+    var learnerShortcutTriggered = false;
+    var creatorShortcutTriggered = false;
+    var preferencesShortcutTriggered = false;
+    var aboutShortcutTriggered = false;
+    var notificationShortcutTriggered = false;
+
     keyboardShortcutService.setHref('#foo');
     const reloadSpy = jasmine.createSpy('reload');
-    spyOn(keyboardShortcutService, 'setHref').and.returnValue(null);
+    spyOn(keyboardShortcutService, 'setHref').and.callFake(function(href) {
+      if(href == '/get-started') {
+        getStartedShortcutTriggered = true;
+      } else if (href == '/community-library') {
+        learnerShortcutTriggered = true;
+      } else if (href =='/learner-dashboard') {
+        libraryShortcutTriggered = true;
+      } else if (href == '/creator-dashboard') {
+        creatorShortcutTriggered = true;
+      } else if (href == '/preferences') {
+        preferencesShortcutTriggered = true;
+      } else if (href == '/about') {
+        aboutShortcutTriggered = true;
+      } else if (href =='/notifications') {
+        notificationShortcutTriggered = true;
+      }
+    })
     keyboardShortcutService.bindNavigationShortcuts();
     Mousetrap.trigger('ctrl+0');
     Mousetrap.trigger('ctrl+1');
@@ -59,6 +83,13 @@ describe('KeyboardShortcutService', () => {
     Mousetrap.trigger('ctrl+4');
     Mousetrap.trigger('ctrl+5');
     Mousetrap.trigger('ctrl+6');
+    expect(getStartedShortcutTriggered).toBe(true);
+    expect(libraryShortcutTriggered).toBe(true);
+    expect(learnerShortcutTriggered).toBe(true);
+    expect(creatorShortcutTriggered).toBe(true);
+    expect(preferencesShortcutTriggered).toBe(true);
+    expect(aboutShortcutTriggered).toBe(true);
+    expect(notificationShortcutTriggered).toBe(true);
   });
 
   it('should test library page action shortcuts', () => {
