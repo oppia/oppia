@@ -39,6 +39,24 @@ export class GuppyConfigurationService {
       return;
     }
 
+    Guppy.remove_global_symbol('*');
+    Guppy.add_global_symbol(
+      '*',
+      {
+        "output": {
+          "latex": "\\times",
+          "asciimath": "*"
+        },
+        "keys": ["*"],
+        "attrs": {
+          "group": "operations",
+          "type": "*"
+        },
+        "ast": {
+          "type": "operator"
+        }
+      })
+
     // Remove symbols since they are not supported.
     for (let symbol of SYMBOLS_TO_REMOVE) {
       Guppy.remove_global_symbol(symbol);
