@@ -35,7 +35,8 @@ from . import install_third_party_libs
 # Install third party libraries before importing other files.
 install_third_party_libs.main()
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run the script from the oppia root folder:
     python -m scripts.start
 Note that the root folder MUST be named 'oppia'.

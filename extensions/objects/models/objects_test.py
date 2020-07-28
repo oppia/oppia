@@ -315,12 +315,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests objects of type HTML."""
         # TODO(sll): Add more tests.
         mappings = [
-            ('<p onclick="evil_function()">a paragraph</p>',
-             '<p>a paragraph</p>'),
+            (
+                '<p onclick="evil_function()">a paragraph</p>',
+                '<p>a paragraph</p>'),
             ('<iframe src="evil-site"></iframe>', ''),
             (u'¡Hola!', u'¡Hola!'),
-            ('<a href="evil-site">spam spam SPAM!</a>',
-             '<a>spam spam SPAM!</a>'),
+            (
+                '<a href="evil-site">spam spam SPAM!</a>',
+                '<a>spam spam SPAM!</a>'),
         ]
         invalid_values_with_error_messages = [
             ({'a': 1}, r'Expected unicode HTML string, received \{u\'a\': 1\}'),

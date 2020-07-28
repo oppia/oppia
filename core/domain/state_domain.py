@@ -969,9 +969,9 @@ class Voiceover(python_utils.OBJECT):
         if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
-                'the following extensions: %s. Received: %s'
-                % (list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
-                   self.filename))
+                'the following extensions: %s. Received: %s' % (
+                    list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
+                    self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
@@ -1653,8 +1653,7 @@ class RuleSpec(python_utils.OBJECT):
                                             input_variable][value_index] = (
                                                 conversion_fn(value))
                         elif (html_type_format ==
-                              feconf.
-                              HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                              feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                             for list_index, html_list in enumerate(
                                     rule_spec_dict['inputs'][input_variable]):
                                 for rule_html_index, rule_html in enumerate(
@@ -1947,8 +1946,8 @@ class State(python_utils.OBJECT):
         for answer_group in self.interaction.answer_groups:
             training_examples_count += len(answer_group.training_data)
             labels_count += 1
-        if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
-                (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
+        if (training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES
+                and (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
             return True
         return False
 
