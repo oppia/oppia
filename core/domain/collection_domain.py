@@ -642,10 +642,11 @@ class Collection(python_utils.OBJECT):
         """
         if (versioned_collection_contents['schema_version'] + 1 >
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
-            raise Exception('Collection is version %d but current collection'
-                            ' schema version is %d' % (
-                                versioned_collection_contents['schema_version'],
-                                feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
+            raise Exception(
+                'Collection is version %d but current collection'
+                ' schema version is %d' % (
+                    versioned_collection_contents['schema_version'],
+                    feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
 
         versioned_collection_contents['schema_version'] = (
             current_version + 1)
