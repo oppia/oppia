@@ -740,8 +740,7 @@ def check_can_edit_activity(user, activity_rights):
         return True
 
     if (activity_rights.is_published() and
-            (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
-             user.actions)):
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False
@@ -771,12 +770,11 @@ def check_can_voiceover_activity(user, activity_rights):
         return True
 
     if (activity_rights.community_owned or
-            (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
+            role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions):
         return True
 
     if (activity_rights.is_published() and
-            (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
-             user.actions)):
+            role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in user.actions):
         return True
 
     return False

@@ -25,7 +25,8 @@ import subprocess
 
 import python_utils
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 This script should only be run by Travis to install and provide a constant
 version of Chrome.
 """)

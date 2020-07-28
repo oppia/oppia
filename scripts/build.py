@@ -132,7 +132,8 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Creates a third-party directory where all the JS and CSS dependencies are
 built and stored. Depending on the options passed to the script, might also
 minify third-party libraries and/or generate a build directory.
@@ -647,8 +648,9 @@ def hash_should_be_inserted(filepath):
     Returns:
         bool. True if filepath should contain hash else False.
     """
-    return not any(fnmatch.fnmatch(filepath, pattern) for pattern
-                   in FILEPATHS_NOT_TO_RENAME)
+    return not any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_NOT_TO_RENAME)
 
 
 def should_file_be_built(filepath):
@@ -737,8 +739,9 @@ def is_file_hash_provided_to_frontend(filepath):
     Returns:
         bool. True if file hash should be provided to the frontend else False.
     """
-    return any(fnmatch.fnmatch(filepath, pattern) for pattern
-               in FILEPATHS_PROVIDED_TO_FRONTEND)
+    return any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_PROVIDED_TO_FRONTEND)
 
 
 def generate_md5_hash(filepath):
