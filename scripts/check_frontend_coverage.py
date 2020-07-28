@@ -149,7 +149,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'hint-and-solution-buttons.directive.ts',
     'hint-and-solution-modal.service.ts',
     'hint-editor.directive.ts',
-    'history-tab.directive.ts',
     'html-editor.directive.ts',
     'html-escaper.service.ts',
     'html-select.directive.ts',
