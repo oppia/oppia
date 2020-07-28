@@ -57,7 +57,7 @@ describe('Command executor service', () => {
     addButton.classList.add('btn btn-secondary btn-sm');
     addButton.onclick = function() {
       addBoolean = true;
-    }
+    };
     var deleteButton = windowRef.nativeWindow.document.createElement(
       'BUTTON');
     deleteButton.classList.add('oppia-delete-list-entry-button');
@@ -87,11 +87,11 @@ describe('Command executor service', () => {
     testPage.appendChild(mc2);
     testPage.appendChild(mc3);
     testPage.appendChild(mc4);
-  }
+  };
   it('should properly click the continue button', () => {
     setupWindowRef(wrf);
-    ces.continueClick(wrf)
-    expect(continueBoolean).toEqual(false)
+    ces.continueClick(wrf);
+    expect(continueBoolean).toEqual(false);
   });
 
   it('should properly enter text', () => {
@@ -99,26 +99,26 @@ describe('Command executor service', () => {
     ces.fillTextBox(wrf, 'testText');
     var textbox = wrf.nativeWindow.document.getElementsByClassName(
       'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
-    expect(textbox.value).toEqual('testText'); 
+    expect(textbox.value).toEqual('testText');
   });
 
-  it('should click the add button and enter text for adding to set', 
-      () => {
-    setupWindowRef(wrf);
-    ces.addSet(wrf, 1);
-    expect(addBoolean).toEqual(true);
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
-    expect(textbox.value).toEqual(1);
-  });
+  it('should click the add button and enter text for adding to set',
+    () => {
+      setupWindowRef(wrf);
+      ces.addSet(wrf, 1);
+      expect(addBoolean).toEqual(true);
+      var textbox = wrf.nativeWindow.document.getElementsByClassName(
+        'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
+      expect(textbox.value).toEqual(1);
+    });
 
   it('should delete the set element correctly by clicking the button',
-  () => {
-    setupWindowRef(wrf);
-    ces.addSet(wrf, 1);
-    ces.removeSet(wrf, 1);
-    expect(deleteBoolean).toEqual(true);
-  });
+    () => {
+      setupWindowRef(wrf);
+      ces.addSet(wrf, 1);
+      ces.removeSet(wrf, 1);
+      expect(deleteBoolean).toEqual(true);
+    });
 
   it('should add the fraction into the correct box', () => {
     setupWindowRef(wrf);
@@ -126,7 +126,7 @@ describe('Command executor service', () => {
     var fractionbox = wrf.nativeWindow.document.getElementsByClassName(
       'form-control ng-pristine ng-untouched \n' +
       'ng-valid ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty'
-      )[0];
+    )[0];
     expect(fractionbox.value).toEqual('2/3');
-  })
+  });
 });
