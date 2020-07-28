@@ -113,7 +113,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'editor-navigation.directive.ts',
     'email-dashboard-data.service.ts',
     'entity-creation.service.ts',
-    'exploration-automatic-text-to-speech.service.ts',
     'exploration-creation.service.ts',
     'exploration-diff.service.ts',
     'exploration-editor-tab.directive.ts',

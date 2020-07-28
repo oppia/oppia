@@ -205,8 +205,9 @@ def create_message(
         if suggestion:
             suggestion.put()
 
-    if (feconf.CAN_SEND_EMAILS and feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id)):
+    if (feconf.CAN_SEND_EMAILS and (
+            feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
+            user_services.is_user_registered(author_id))):
         _add_message_to_email_buffer(
             author_id, thread_id, message_id, len(text), old_status, new_status)
 
@@ -542,7 +543,8 @@ def get_closed_threads(entity_type, entity_id, has_suggestion):
     """
     return [
         thread for thread in get_threads(entity_type, entity_id)
-        if (thread.has_suggestion == has_suggestion and
+        if (
+            thread.has_suggestion == has_suggestion and
             thread.status != feedback_models.STATUS_CHOICES_OPEN)
     ]
 
