@@ -65,59 +65,56 @@ for lib_path in THIRD_PARTY_LIBS:
         raise Exception('Invalid path for third_party library: %s' % lib_path)
     sys.path.insert(0, lib_path)
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-from constants import constants # isort:skip
-from core.controllers import acl_decorators # isort:skip
-from core.controllers import admin # isort:skip
-from core.controllers import base # isort:skip
-from core.controllers import classifier # isort:skip
-from core.controllers import classroom # isort:skip
-from core.controllers import collection_editor # isort:skip
-from core.controllers import collection_viewer # isort:skip
-from core.controllers import community_dashboard # isort:skip
-from core.controllers import concept_card_viewer # isort:skip
-from core.controllers import creator_dashboard # isort:skip
-from core.controllers import custom_landing_pages # isort:skip
-from core.controllers import editor # isort:skip
-from core.controllers import email_dashboard # isort:skip
-from core.controllers import features # isort:skip
-from core.controllers import feedback # isort:skip
-from core.controllers import improvements # isort:skip
-from core.controllers import learner_dashboard # isort:skip
-from core.controllers import learner_playlist # isort:skip
-from core.controllers import library # isort:skip
-from core.controllers import moderator # isort:skip
-from core.controllers import pages # isort:skip
-from core.controllers import practice_sessions # isort:skip
-from core.controllers import profile # isort:skip
-from core.controllers import question_editor # isort:skip
-from core.controllers import questions_list # isort:skip
-from core.controllers import reader # isort:skip
-from core.controllers import recent_commits # isort:skip
-from core.controllers import resources # isort:skip
-from core.controllers import review_tests # isort:skip
-from core.controllers import skill_editor # isort:skip
-from core.controllers import skill_mastery # isort:skip
-from core.controllers import story_editor # isort:skip
-from core.controllers import story_viewer # isort:skip
-from core.controllers import subscriptions # isort:skip
-from core.controllers import subtopic_viewer # isort:skip
-from core.controllers import suggestion # isort:skip
-from core.controllers import topic_editor # isort:skip
-from core.controllers import topic_viewer # isort:skip
-from core.controllers import topics_and_skills_dashboard # isort:skip
-from core.controllers import voice_artist # isort:skip
-from core.domain import user_services # isort:skip
-from core.platform import models # isort:skip
-import feconf # isort:skip
+from constants import constants # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import acl_decorators # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import admin # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import base # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import classifier # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import classroom # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import collection_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import collection_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import community_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import concept_card_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import creator_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import custom_landing_pages # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import email_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import features # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import feedback # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import improvements # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import learner_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import learner_playlist # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import library # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import moderator # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import pages # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import practice_sessions # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import profile # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import question_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import questions_list # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import reader # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import recent_commits # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import resources # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import review_tests # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import skill_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import skill_mastery # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import story_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import story_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import subscriptions # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import subtopic_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import suggestion # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import topic_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import topic_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import topics_and_skills_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import voice_artist # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.domain import user_services # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.platform import models # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+import feconf # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
-from mapreduce import main as mapreduce_main # isort:skip
-from mapreduce import parameters as mapreduce_parameters # isort:skip
-import webapp2 # isort:skip
-from webapp2_extras import routes # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+from mapreduce import main as mapreduce_main # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from mapreduce import parameters as mapreduce_parameters # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+import webapp2 # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from webapp2_extras import routes # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
