@@ -32,6 +32,8 @@ describe('screenreader and keyboard user accessibility features', function() {
   var ABOUT_URL = 'http://localhost:9001/about';
   var NOTIFICATIONS_URL = 'http://localhost:9001/notifications';
   var PREFERENCES_URL = 'http://localhost:9001/preferences';
+  var PRIVACY_POLICY_URL = 'http://localhost:9001/privacy-policy';
+  var DONATE_URL = 'http://localhost:9001/donate';
 
   var holdCtrlAndPressKey = async function(key) {
     await browser.actions().sendKeys(
@@ -63,49 +65,49 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should navigate to the get-started page when ctrl+0 is pressed',
     async function() {
       await browser.get('get-started');
-      await waitFor.urlRedirection('http://localhost:9001/get-started');
+      await waitFor.urlRedirection(GET_STARTED_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('about');
-      await waitFor.urlRedirection('http://localhost:9001/about');
+      await waitFor.urlRedirection(ABOUT_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('privacy-policy');
-      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+      await waitFor.urlRedirection(PRIVACY_POLICY_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('learner-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('donate');
-      await waitFor.urlRedirection('http://localhost:9001/donate');
+      await waitFor.urlRedirection(DONATE_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('notifications');
-      await waitFor.urlRedirection('http://localhost:9001/notifications');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('community-library');
-      await waitFor.urlRedirection('http://localhost:9001/community-library');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
@@ -120,43 +122,43 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('about');
-      await waitFor.urlRedirection('http://localhost:9001/about');
+      await waitFor.urlRedirection(ABOUT_URL);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('privacy-policy');
-      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+      await waitFor.urlRedirection(PRIVACY_POLICY_URL);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('learner-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('donate');
-      await waitFor.urlRedirection('http://localhost:9001/donate');
+      await waitFor.urlRedirection(DONATE_URL);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('notifications');
-      await waitFor.urlRedirection('http://localhost:9001/notifications');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('community-library');
-      await waitFor.urlRedirection('http://localhost:9001/community-library');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
@@ -171,43 +173,43 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('about');
-      await waitFor.urlRedirection('http://localhost:9001/about');
+      await waitFor.urlRedirection(ABOUT_URL);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('privacy-policy');
-      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+      await waitFor.urlRedirection(PRIVACY_POLICY_URL);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('learner-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('donate');
-      await waitFor.urlRedirection('http://localhost:9001/donate');
+      await waitFor.urlRedirection(DONATE_URL);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('notifications');
-      await waitFor.urlRedirection('http://localhost:9001/notifications');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('community-library');
-      await waitFor.urlRedirection('http://localhost:9001/community-library');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
@@ -222,43 +224,43 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await browser.get('about');
-      await waitFor.urlRedirection('http://localhost:9001/about');
+      await waitFor.urlRedirection(ABOUT_URL);
 
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await browser.get('privacy-policy');
-      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+      await waitFor.urlRedirection(PRIVACY_POLICY_URL);
 
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await browser.get('learner-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await browser.get('donate');
-      await waitFor.urlRedirection('http://localhost:9001/donate');
+      await waitFor.urlRedirection(DONATE_URL);
 
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await browser.get('notifications');
-      await waitFor.urlRedirection('http://localhost:9001/notifications');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await browser.get('community-library');
-      await waitFor.urlRedirection('http://localhost:9001/community-library');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
@@ -273,43 +275,43 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('about');
-      await waitFor.urlRedirection('http://localhost:9001/about');
+      await waitFor.urlRedirection(ABOUT_URL);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('privacy-policy');
-      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+      await waitFor.urlRedirection(PRIVACY_POLICY_URL);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('learner-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('donate');
-      await waitFor.urlRedirection('http://localhost:9001/donate');
+      await waitFor.urlRedirection(DONATE_URL);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('notifications');
-      await waitFor.urlRedirection('http://localhost:9001/notifications');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('community-library');
-      await waitFor.urlRedirection('http://localhost:9001/community-library');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
@@ -324,43 +326,43 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('about');
-      await waitFor.urlRedirection('http://localhost:9001/about');
+      await waitFor.urlRedirection(ABOUT_URL);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('privacy-policy');
-      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+      await waitFor.urlRedirection(PRIVACY_POLICY_URL);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('learner-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('donate');
-      await waitFor.urlRedirection('http://localhost:9001/donate');
+      await waitFor.urlRedirection(DONATE_URL);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('notifications');
-      await waitFor.urlRedirection('http://localhost:9001/notifications');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('community-library');
-      await waitFor.urlRedirection('http://localhost:9001/community-library');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
@@ -375,43 +377,43 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('about');
-      await waitFor.urlRedirection('http://localhost:9001/about');
+      await waitFor.urlRedirection(ABOUT_URL);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('privacy-policy');
-      await waitFor.urlRedirection('http://localhost:9001/privacy-policy');
+      await waitFor.urlRedirection(PRIVACY_POLICY_URL);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('learner-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/learner-dashboard');
+      await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('donate');
-      await waitFor.urlRedirection('http://localhost:9001/donate');
+      await waitFor.urlRedirection(DONATE_URL);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('notifications');
-      await waitFor.urlRedirection('http://localhost:9001/notifications');
+      await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection('http://localhost:9001/creator-dashboard');
+      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('community-library');
-      await waitFor.urlRedirection('http://localhost:9001/community-library');
+      await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
