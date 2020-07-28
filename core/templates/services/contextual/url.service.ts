@@ -234,4 +234,3 @@ export class UrlService {
 
 angular.module('oppia').factory(
   'UrlService', downgradeInjectable(UrlService));
-  

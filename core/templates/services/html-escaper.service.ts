@@ -59,4 +59,3 @@ export class HtmlEscaperService {
 
 angular.module('oppia').factory(
   'HtmlEscaperService', downgradeInjectable(HtmlEscaperService));
-  

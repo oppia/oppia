@@ -87,4 +87,3 @@ export class PlayerPositionService {
 angular.module('oppia').factory(
   'PlayerPositionService',
   downgradeInjectable(PlayerPositionService));
-  
