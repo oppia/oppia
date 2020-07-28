@@ -27,29 +27,29 @@ import { Outcome } from
 import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
-interface ILostChangeValues {
+interface LostChangeValues {
   'outcome'?: Outcome;
   'dest'?: string;
   'feedback'?: SubtitledHtml;
   'rules'?: Object;
 }
 
-type ILostChangeValue = string | ILostChangeValues;
+type LostChangeValue = string | LostChangeValues;
 
 export class LostChange {
   cmd: string;
   stateName: string;
   newStateName: string;
   oldStateName: string;
-  newValue: ILostChangeValue;
-  oldValue: ILostChangeValue;
+  newValue: LostChangeValue;
+  oldValue: LostChangeValue;
   propertyName: string;
   utilsService: UtilsService;
 
   constructor(
       utilsService: UtilsService, cmd: string, newStateName: string,
-      oldStateName: string, stateName: string, newValue: ILostChangeValue,
-      oldValue: ILostChangeValue, propertyName: string) {
+      oldStateName: string, stateName: string, newValue: LostChangeValue,
+      oldValue: LostChangeValue, propertyName: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;
@@ -86,46 +86,46 @@ export class LostChange {
   }
 
   isOutcomeFeedbackEqual() {
-    if ((<ILostChangeValues> this.newValue).outcome &&
-      (<ILostChangeValues> this.newValue).outcome.feedback &&
-      (<ILostChangeValues> this.oldValue).outcome &&
-      (<ILostChangeValues> this.oldValue).outcome.feedback) {
+    if ((<LostChangeValues> this.newValue).outcome &&
+      (<LostChangeValues> this.newValue).outcome.feedback &&
+      (<LostChangeValues> this.oldValue).outcome &&
+      (<LostChangeValues> this.oldValue).outcome.feedback) {
       return (
-        (<ILostChangeValues> this.newValue).outcome.feedback.getHtml() ===
-        (<ILostChangeValues> this.oldValue).outcome.feedback.getHtml());
+        (<LostChangeValues> this.newValue).outcome.feedback.getHtml() ===
+        (<LostChangeValues> this.oldValue).outcome.feedback.getHtml());
     }
     return false;
   }
 
   isOutcomeDestEqual() {
-    if ((<ILostChangeValues> this.newValue).outcome &&
-      (<ILostChangeValues> this.oldValue).outcome) {
+    if ((<LostChangeValues> this.newValue).outcome &&
+      (<LostChangeValues> this.oldValue).outcome) {
       return (
-        (<ILostChangeValues> this.oldValue).outcome.dest ===
-        (<ILostChangeValues> this.newValue).outcome.dest);
+        (<LostChangeValues> this.oldValue).outcome.dest ===
+        (<LostChangeValues> this.newValue).outcome.dest);
     }
     return false;
   }
 
   isDestEqual() {
-    return (<ILostChangeValues> this.oldValue).dest ===
-      (<ILostChangeValues> this.newValue).dest;
+    return (<LostChangeValues> this.oldValue).dest ===
+      (<LostChangeValues> this.newValue).dest;
   }
 
   isFeedbackEqual() {
-    if ((<ILostChangeValues> this.newValue).feedback &&
-    (<ILostChangeValues> this.oldValue).feedback) {
+    if ((<LostChangeValues> this.newValue).feedback &&
+    (<LostChangeValues> this.oldValue).feedback) {
       return (
-        (<ILostChangeValues> this.newValue).feedback.getHtml() ===
-        (<ILostChangeValues> this.oldValue).feedback.getHtml());
+        (<LostChangeValues> this.newValue).feedback.getHtml() ===
+        (<LostChangeValues> this.oldValue).feedback.getHtml());
     }
     return false;
   }
 
   isRulesEqual() {
     return isEqual(
-      (<ILostChangeValues> this.newValue).rules,
-      (<ILostChangeValues> this.oldValue).rules);
+      (<LostChangeValues> this.newValue).rules,
+      (<LostChangeValues> this.oldValue).rules);
   }
 
   // Detects whether an object of the type 'answer_group' or

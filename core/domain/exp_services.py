@@ -364,66 +364,57 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     state.update_interaction_answer_groups(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
                         )
                     state.update_interaction_default_outcome(new_outcome)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if not isinstance(change.new_value, list):
-                        raise Exception('Expected hints_list to be a list,'
-                                        ' received %s' % change.new_value)
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
                     new_hints_list = [state_domain.Hint.from_dict(hint_dict)
                                       for hint_dict in change.new_value]
                     state.update_interaction_hints(new_hints_list)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     new_solution = None
                     if change.new_value is not None:
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value)
                     state.update_interaction_solution(new_solution)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
@@ -448,9 +439,8 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected written_translations to be a dict, '
@@ -591,7 +581,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        exp_versions_diff, None)
 
     stats_services.create_stats_model(new_exp_stats)
 
@@ -616,8 +606,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff=exp_versions_diff,
-        revert_to_version=None)
+        exploration, exp_versions_diff, None)
 
 
 def _create_exploration(
@@ -1197,14 +1186,13 @@ def revert_exploration(
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
+        None, revert_to_version)
     stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
     stats_services.update_exp_issues_for_new_exp_version(
-        current_exploration, exp_versions_diff=None,
-        revert_to_version=revert_to_version)
+        current_exploration, None, revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
@@ -1324,8 +1312,9 @@ def delete_demo(exploration_id):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if not exploration:
-        logging.info('Exploration with id %s was not deleted, because it '
-                     'does not exist.' % exploration_id)
+        logging.info(
+            'Exploration with id %s was not deleted, because it '
+            'does not exist.' % exploration_id)
     else:
         delete_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
@@ -1573,10 +1562,11 @@ def get_user_exploration_data(
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                     and exp_user_data.draft_change_list else None)
-    draft_change_list_id = (exp_user_data.draft_change_list_id
-                            if exp_user_data else 0)
+    draft_changes = (
+        exp_user_data.draft_change_list if exp_user_data
+        and exp_user_data.draft_change_list else None)
+    draft_change_list_id = (
+        exp_user_data.draft_change_list_id if exp_user_data else 0)
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
@@ -1688,8 +1678,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]
-            if (
-                    exploration.version >
+            if (exploration.version >
                     exp_user_data.draft_change_list_exp_version):
                 logging.info(
                     'Exploration and draft versions out of sync, trying '
@@ -1761,3 +1750,37 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def save_multi_exploration_math_rich_text_info_model(
+        exploration_math_rich_text_info_list):
+    """Saves multiple instances of ExplorationMathRichTextInfoModel to the
+    datastore.
+
+    Args:
+        exploration_math_rich_text_info_list:
+        list(ExplorationMathRichTextInfoModel). A list of
+            ExplorationMathRichTextInfoModel domain objects.
+    """
+
+    exploration_math_rich_text_info_models = []
+    for exploration_math_rich_text_info in (
+            exploration_math_rich_text_info_list):
+        latex_strings_without_svg = (
+            exploration_math_rich_text_info.latex_strings_without_svg)
+        math_images_generation_required = (
+            exploration_math_rich_text_info.math_images_generation_required)
+        exp_id = (
+            exploration_math_rich_text_info.exp_id)
+        estimated_max_size_of_images_in_bytes = (
+            exploration_math_rich_text_info.get_svg_size_in_bytes())
+        exploration_math_rich_text_info_models.append(
+            exp_models.ExplorationMathRichTextInfoModel(
+                id=exp_id,
+                math_images_generation_required=math_images_generation_required,
+                latex_strings_without_svg=latex_strings_without_svg,
+                estimated_max_size_of_images_in_bytes=(
+                    estimated_max_size_of_images_in_bytes)))
+
+    exp_models.ExplorationMathRichTextInfoModel.put_multi(
+        exploration_math_rich_text_info_models)

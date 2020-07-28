@@ -1177,7 +1177,7 @@ def save_learner_answer_details(
                  in learner_answer_details.learner_answer_info_list])
             learner_answer_details_model.learner_answer_info_schema_version = (
                 learner_answer_details.learner_answer_info_schema_version)
-            learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( #pylint: disable=line-too-long
+            learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( # pylint: disable=line-too-long
                 learner_answer_details.accumulated_answer_info_json_size_bytes)
             learner_answer_details_model.put()
         else:
@@ -1284,7 +1284,8 @@ def delete_learner_answer_details_for_exploration_state(
         state_name: str. The name of the state.
     """
     state_reference = (
-        stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+        stats_models.LearnerAnswerDetailsModel.
+        get_state_reference_for_exploration(
             exp_id, state_name))
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(

@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-export interface ITranslationsDict {
+export interface TranslationsDict {
   [translation: string]: string;
 }
 
@@ -33,8 +33,8 @@ export class TranslationsBackendApiService {
 
   constructor(private http: HttpClient) {}
 
-  fetchTranslations(languageCode: string): Promise<ITranslationsDict> {
-    return this.http.get<ITranslationsDict>(
+  fetchTranslations(languageCode: string): Promise<TranslationsDict> {
+    return this.http.get<TranslationsDict>(
       `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
 }

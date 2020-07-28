@@ -165,7 +165,7 @@ export class SpeechSynthesisChunkerService {
         this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
-    interface IMathExpressionContent {
+    interface MathExpressionContent {
       'raw_latex': string,
       'svg_filename': string
     }
@@ -190,7 +190,7 @@ export class SpeechSynthesisChunkerService {
       .replaceWith(function() {
         var element = <HTMLElement> this;
         if (element.attributes['math_content-with-value'] !== undefined) {
-          var mathContent = <IMathExpressionContent>(
+          var mathContent = <MathExpressionContent>(
             _this.htmlEscaper.escapedJsonToObj(
               element.attributes['math_content-with-value'].textContent));
           const latexSpeakableText = _this._formatLatexToSpeakableText(

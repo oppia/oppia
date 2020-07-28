@@ -16,61 +16,61 @@
  * @fileoverview Type definiitions for Answers.
  */
 
-interface IGraphVertex {
+interface GraphVertex {
   x: number;
   y: number;
   label: string;
 }
 
-interface IGraphEdge {
+interface GraphEdge {
   src: number;
   dst: number;
   weight: number;
 }
 
-export interface IUnit {
+export interface Unit {
   unit: string;
   exponent: number;
 }
 
-export type IAlgebraicExpressionAnswer = string;
+export type AlgebraicExpressionAnswer = string;
 
-export interface ICodeReplAnswer {
+export interface CodeReplAnswer {
   code: string;
   output: string;
   evaluation: string;
   error: string;
 }
 
-export type IContinueAnswer = string;
+export type ContinueAnswer = string;
 
-export type IDragAndDropAnswer = string[][];
+export type DragAndDropAnswer = string[][];
 
-export interface IFractionAnswer {
+export interface FractionAnswer {
   isNegative: boolean;
   wholeNumber: number;
   numerator: number;
   denominator: number;
 }
 
-export interface IGraphAnswer {
+export interface GraphAnswer {
   isDirected: boolean;
   isWeighted: boolean;
   isLabeled: boolean;
-  vertices: IGraphVertex[];
-  edges: IGraphEdge[];
+  vertices: GraphVertex[];
+  edges: GraphEdge[];
 }
 
-export interface IImageClickAnswer {
+export interface ImageClickAnswer {
   clickPosition: [number, number];
   clickedRegions: string[];
 }
 
-export type IInteractiveMapAnswer = number[];
+export type InteractiveMapAnswer = number[];
 
-export type IItemSelectionAnswer = string[];
+export type ItemSelectionAnswer = string[];
 
-export interface ILogicProofAnswer {
+export interface LogicProofAnswer {
   'assumptions_string': string,
   'target_string': string,
   'proof_string': string,
@@ -81,16 +81,16 @@ export interface ILogicProofAnswer {
   'error_line_number'?: number
 }
 
-export type IMathEquationAnswer = string;
+export type MathEquationAnswer = string;
 
-export interface IMathExpressionAnswer {
+export interface MathExpressionAnswer {
   ascii: string;
   latex: string;
 }
 
-export type IMultipleChoiceAnswer = number;
+export type MultipleChoiceAnswer = number;
 
-export interface IMusicNotesAnswer {
+export interface MusicNotesAnswer {
   readableNoteName: string,
   noteDuration: {
     num: number,
@@ -98,46 +98,46 @@ export interface IMusicNotesAnswer {
   }
 }
 
-export interface INumberWithUnitsAnswer {
+export interface NumberWithUnitsAnswer {
   type: string;
   real: number;
-  fraction: IFractionAnswer;
-  units: IUnit[];
+  fraction: FractionAnswer;
+  units: Unit[];
 }
 
-export type INumericExpressionAnswer = string;
+export type NumericExpressionAnswer = string;
 
-export type INumericInputAnswer = number;
+export type NumericInputAnswer = number;
 
-export interface IPencilCodeEditorAnswer {
+export interface PencilCodeEditorAnswer {
   code: string;
   output: string;
   evaluation: string;
   error: string;
 }
 
-export type ISetInputAnswer = string[];
+export type SetInputAnswer = string[];
 
-export type ITextInputAnswer = string;
+export type TextInputAnswer = string;
 
-export type IInteractionAnswer = (
-  IAlgebraicExpressionAnswer |
-  ICodeReplAnswer |
-  IContinueAnswer |
-  IDragAndDropAnswer |
-  IFractionAnswer |
-  IGraphAnswer |
-  IImageClickAnswer |
-  IInteractiveMapAnswer |
-  IItemSelectionAnswer |
-  ILogicProofAnswer |
-  IMathExpressionAnswer |
-  IMultipleChoiceAnswer |
-  IMusicNotesAnswer |
-  INumericExpressionAnswer |
-  INumberWithUnitsAnswer |
-  INumericInputAnswer |
-  IPencilCodeEditorAnswer |
-  ISetInputAnswer |
-  ITextInputAnswer |
-  IMathEquationAnswer);
+export type InteractionAnswer = (
+  AlgebraicExpressionAnswer |
+  CodeReplAnswer |
+  ContinueAnswer |
+  DragAndDropAnswer |
+  FractionAnswer |
+  GraphAnswer |
+  ImageClickAnswer |
+  InteractiveMapAnswer |
+  ItemSelectionAnswer |
+  LogicProofAnswer |
+  MathExpressionAnswer |
+  MultipleChoiceAnswer |
+  MusicNotesAnswer |
+  NumericExpressionAnswer |
+  NumberWithUnitsAnswer |
+  NumericInputAnswer |
+  PencilCodeEditorAnswer |
+  SetInputAnswer |
+  TextInputAnswer |
+  MathEquationAnswer);
