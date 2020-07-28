@@ -133,15 +133,15 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.objectIsSelected = false;
       ctrl.pieChartDataLimit = 10;
       var defaultDataInput = [{
-        name: 'Data name',
+        name: 'Data name 1',
         data: 10,
-        color: '#000000',
+        color: '#ff0000',
         angle: 0
       },
       {
-        name: 'Data name',
+        name: 'Data name 2',
         data: 10,
-        color: '#000000',
+        color: '#00ff00',
         angle: 0
       }]
       ctrl.groupCount = 0;
@@ -387,6 +387,17 @@ angular.module('oppia').component('svgFilenameEditor', {
         return ctrl.diagramStatus === STATUS_SAVED;
       };
 
+      ctrl.customToSVG = function(toSVG, type, id) {
+        return function() {
+          var svgString = toSVG.call(this);
+          var domParser = new DOMParser();
+          var doc = domParser.parseFromString(svgString, 'image/svg+xml');
+          var parentG = doc.querySelector(type);
+          parentG.setAttribute('id', id);
+          return doc.documentElement.outerHTML;
+        }
+      }
+
       ctrl.continueDiagramEditing = function() {
         if (
           ctrl.data.savedSVGFileName &&
@@ -409,16 +420,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                     if (groupedObjects.length <= objId.slice(5)) {
                       groupedObjects.push([])
                     }
-                    obj.toSVG = (function(toSVG) {
-                      return function(){
-                        var svgString = toSVG.call(this);
-                        var domParser = new DOMParser();
-                        var doc = domParser.parseFromString(svgString, 'image/svg+xml');
-                        var parentG = doc.querySelector(this.type)
-                        parentG.setAttribute('id', this.id);
-                        return doc.documentElement.outerHTML;
-                      }
-                      })(obj.toSVG)
+                    obj.toSVG = ctrl.customToSVG(obj.toSVG, obj.type, obj.id);
                     groupedObjects[objId.slice(5)].push(obj);
                   }
                 } else {
@@ -444,7 +446,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                             fill: el.style.fill,
                             stroke: el.style.stroke,
                             strokeWidth: el.style.strokeWidth
-                          })
+                          });
                         }
                         value += el.childNodes[0].nodeValue;
                       }
@@ -455,10 +457,12 @@ angular.module('oppia').component('svgFilenameEditor', {
                     value = (
                       obj['text-transform'] === 'uppercase' ?
                       value.toUpperCase() : value);
-
+                    
+                    obj.set({
+                      text: value,
+                    });
                     var text = new fabric.Textbox(obj.text, obj.toObject());
                     text.set({
-                      text: value,
                       type: 'textbox',
                       strokeUniform: true,
                     });
@@ -468,7 +472,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                     if (text.left > CANVAS_WIDTH) {
                       text.set({
                         left: CANVAS_WIDTH
-                      })
+                      });
                     }
                     coloredTextIndex.forEach(function(obj) {
                       text.setSelectionStart(obj.startIndex);
@@ -477,8 +481,8 @@ angular.module('oppia').component('svgFilenameEditor', {
                         stroke: obj.stroke,
                         strokeWidth: obj.strokeWidth,
                         fill: obj.fill
-                      })
-                    })
+                      });
+                    });
                     ctrl.canvas.add(text);
                   } else {
                     ctrl.canvas.add(obj);
@@ -488,7 +492,7 @@ angular.module('oppia').component('svgFilenameEditor', {
               groupedObjects.forEach(function(objs) {
                 ctrl.canvas.add(new fabric.Group(objs))
                 ctrl.groupCount += 1;
-              })
+              });
             }
           );
         });
@@ -781,15 +785,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
       };
 
-      var getPieSlice = function(center, radius, startAngle, endAngle, color)
-      {
+      var getPieSlice = function(center, radius, startAngle, endAngle, color) {
         var angle = endAngle - startAngle;
         var halfAngle = angle / 2;
-        var halfChord = radius * Math.sin (angle / 2);
-        var height = Math.sqrt (Math.pow (radius, 2) - Math.pow (halfChord, 2));
+        var halfChord = radius * Math.sin(angle / 2);
+        var height = Math.sqrt(Math.pow(radius, 2) - Math.pow(halfChord, 2));
         var radiansToDegrees = 180 / Math.PI;
 
-        var arc = new fabric.Circle ({
+        var arc = new fabric.Circle({
             radius: radius,
             startAngle: -halfAngle,
             endAngle: halfAngle,
@@ -803,37 +806,19 @@ angular.module('oppia').component('svgFilenameEditor', {
             strokeUniform: true,
             id: 'group' + ctrl.groupCount
         });
-        arc.toSVG = (function(toSVG) {
-          return function(){
-            var svgString = toSVG.call(this);
-            var domParser = new DOMParser();
-            var doc = domParser.parseFromString(svgString, 'image/svg+xml');
-            var parentG = doc.querySelector('path')
-            parentG.setAttribute('id', this.id);
-            return doc.documentElement.outerHTML;
-          }
-          })(arc.toSVG)
+        arc.toSVG = ctrl.customToSVG(arc.toSVG, 'path', arc.id);
         var p1 = new polyPoint (height + center.x, center.y + halfChord);
         var p2 = new polyPoint (height + center.x, center.y - halfChord);
-        var tri = new fabric.Polygon ([center, p1, p2, center], {
+        var tri = new fabric.Polygon([center, p1, p2, center], {
             fill: color,
             stroke: color,
             strokeWidth: 1,
             strokeUniform: true,
             id: 'group' + ctrl.groupCount
         });
-        tri.toSVG = (function(toSVG) {
-          return function(){
-            var svgString = toSVG.call(this);
-            var domParser = new DOMParser();
-            var doc = domParser.parseFromString(svgString, 'image/svg+xml');
-            var parentG = doc.querySelector('polygon')
-            parentG.setAttribute('id', this.id);
-            return doc.documentElement.outerHTML;
-          }
-          })(tri.toSVG)
+        tri.toSVG = ctrl.customToSVG(tri.toSVG, tri.type, tri.id);
         var rotationAngle = (startAngle + halfAngle) * radiansToDegrees;
-        var slice = new fabric.Group ([arc, tri], {
+        var slice = new fabric.Group([arc, tri], {
             originX: 'center',
             originY: 'center',
             top: center.y,
@@ -844,9 +829,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       }
 
       var getTextIndex = function(text, lineNum, charIndex) {
-        return text.split('\n').slice(0, lineNum).reduce(function(sum, textLine) {
+        return (
+          text.split('\n').slice(0, lineNum).reduce(function(sum, textLine) {
           return sum + textLine.length + 1;
-        }, 0) + charIndex;
+        }, 0) + charIndex);
       }
 
       var createChart = function() {
@@ -857,26 +843,31 @@ angular.module('oppia').component('svgFilenameEditor', {
         for (var i = 0; i < ctrl.pieChartDataInput.length; i++) {
           total += ctrl.pieChartDataInput[i].data;
           legendText += '\u2587 - ';
-          legendText += ctrl.pieChartDataInput[i].name + '\n';
+          legendText += (
+            ctrl.pieChartDataInput[i].name + ' - ' +
+            ctrl.pieChartDataInput[i].data + '\n');
         }
         legendText = legendText.slice(0, -1);
         for (var i = 0; i < ctrl.pieChartDataInput.length; i++) {
           ctrl.pieChartDataInput[i].angle = (
             ctrl.pieChartDataInput[i].data / total * Math.PI * 2);
-          pieSlices.push(getPieSlice(new polyPoint(50, 50), 30, currentAngle, currentAngle + ctrl.pieChartDataInput[i].angle, ctrl.pieChartDataInput[i].color));
+          pieSlices.push(getPieSlice(
+            new polyPoint(50, 50), 30, currentAngle,
+            currentAngle + ctrl.pieChartDataInput[i].angle,
+            ctrl.pieChartDataInput[i].color));
           currentAngle += ctrl.pieChartDataInput[i].angle;
         }
         ctrl.fabricjsOptions.size = '18px';
         var size = ctrl.fabricjsOptions.size;
         var text = new fabric.Textbox(legendText, {
           top: 100,
-          left: 100,
+          left: 120,
           fontFamily: ctrl.fabricjsOptions.fontFamily,
           fontSize: parseInt(size.substring(0, size.length - 2)),
           fill: '#000000',
           fontWeight: ctrl.fabricjsOptions.bold ? 'bold' : 'normal',
           fontStyle: ctrl.fabricjsOptions.italic ? 'italic' : 'normal',
-          width: 150
+          width: 200
         });
         for (var i = 0; i < ctrl.pieChartDataInput.length; i++) {
           text.setSelectionStart(getTextIndex(legendText, i, 0));
@@ -887,6 +878,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             fill: ctrl.pieChartDataInput[i].color,
           });
         }
+        ctrl.drawMode = DRAW_MODE_NONE;
         ctrl.canvas.add(text);
         ctrl.canvas.add(new fabric.Group(pieSlices));
         ctrl.groupCount += 1;
@@ -898,7 +890,6 @@ angular.module('oppia').component('svgFilenameEditor', {
         } else {
           createChart();
           ctrl.pieChartDataInput = defaultDataInput;
-          ctrl.drawMode = DRAW_MODE_NONE;
         }
       };
 
@@ -1012,7 +1003,9 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.objectUndoStack = [];
         ctrl.objectRedoStack = [];
         ctrl.canvasObjects = [];
-        ctrl.canvas.clear();
+        if (ctrl.canvas) {
+          ctrl.canvas.clear();
+        }
       };
 
       ctrl.isClearEnabled = function() {
