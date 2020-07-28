@@ -1,8 +1,3 @@
-import { ExplorationFeaturesService } from './../../../services/exploration-features.service';
-import { AlertsService } from './../../../services/alerts.service';
-import { WindowRef } from './../../../services/contextual/window-ref.service';
-import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,21 +12,35 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed } from "@angular/core/testing";
-import { AnswerGroupsCacheService } from "../editor-tab/services/answer-groups-cache.service";
-import { TextInputRulesService } from "interactions/TextInput/directives/text-input-rules.service";
-import { OutcomeObjectFactory } from "domain/exploration/OutcomeObjectFactory";
-import { StateSolutionService } from "components/state-editor/state-editor-properties-services/state-solution.service";
-import { AngularNameService } from "../services/angular-name.service";
-import { StateCustomizationArgsService } from "components/state-editor/state-editor-properties-services/state-customization-args.service";
-import { StateInteractionIdService } from "components/state-editor/state-editor-properties-services/state-interaction-id.service";
-import { UserExplorationPermissionsService } from "../services/user-exploration-permissions.service";
-
 /**
  * @fileoverview Unit tests for settingsTab.
  */
 
-fdescribe('Settings Tab Component', function() {
+import { TestBed } from '@angular/core/testing';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { StateCustomizationArgsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { AlertsService } from 'services/alerts.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+describe('Settings Tab Component', function() {
   var ctrl = null;
   var $httpBackend = null;
   var $q = null;
@@ -42,10 +51,7 @@ fdescribe('Settings Tab Component', function() {
   var changeListService = null;
   var contextService = null;
   var editableExplorationBackendApiService = null;
-  var explorationAutomaticTextToSpeechService = null;
   var explorationCategoryService = null;
-  var explorationCorrectnessFeedbackService = null;
-  var explorationFeaturesService = null;
   var explorationInitStateNameService = null;
   var explorationLanguageCodeService = null;
   var explorationObjectiveService = null;
@@ -71,7 +77,6 @@ fdescribe('Settings Tab Component', function() {
       imports: [HttpClientTestingModule]
     });
     alertsService = TestBed.get(AlertsService);
-    explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     userExplorationPermissionsService = (
       TestBed.get(UserExplorationPermissionsService));
     windowRef = TestBed.get(WindowRef);
@@ -109,11 +114,7 @@ fdescribe('Settings Tab Component', function() {
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     editableExplorationBackendApiService = $injector.get(
       'EditableExplorationBackendApiService');
-    explorationAutomaticTextToSpeechService = $injector.get(
-      'ExplorationAutomaticTextToSpeechService');
     explorationCategoryService = $injector.get('ExplorationCategoryService');
-    explorationCorrectnessFeedbackService = $injector.get(
-      'ExplorationCorrectnessFeedbackService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
     explorationLanguageCodeService = $injector.get(
@@ -138,7 +139,6 @@ fdescribe('Settings Tab Component', function() {
     ctrl = $componentController('settingsTab', {
       $scope: $scope,
       AlertsService: alertsService,
-      ExplorationFeaturesService: explorationFeaturesService,
       UserExplorationPermissionsService: userExplorationPermissionsService,
       WindowRef: windowRef
     });

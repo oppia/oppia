@@ -86,7 +86,7 @@ angular.module('oppia').component('settingsTab', {
     currentUserIsAdmin: '=',
     currentUserIsModerator: '='
   },
-  templateUrl: require('./settings-tab.component.html'),
+  template: require('./settings-tab.component.html'),
   controller: [
     '$http', '$rootScope', '$scope', '$uibModal',
     'AlertsService', 'ChangeListService',
