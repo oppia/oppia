@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
+from constants import constants
 from core.domain import change_domain
 from core.platform import models
 import feconf
@@ -31,6 +32,20 @@ import utils
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
+
+SERVER_MODES = utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
+FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
+
+ALLOWED_USER_LOCALES = [
+    lang_dict['id'] for lang_dict in constants.SUPPORTED_SITE_LANGUAGES]
+
+ALLOWED_SERVER_MODES = [
+    SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
+
+ALLOWED_FEATURE_STAGES = [
+    FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
+
+ALLOWED_CLIENT_TYPE = ['Web', 'Native']
 
 
 class PlatformParameterChange(change_domain.BaseChange):
@@ -51,22 +66,24 @@ class PlatformParameterChange(change_domain.BaseChange):
 class EvaluationContext(python_utils.OBJECT):
     """Domain object representing the context for parameter evaluation."""
 
+    APP_VERSION_REGEXP = re.compile(r'^\d+(?:\.\d+)*$')
+
     def __init__(
             self, client_platform, client_type, browser_type,
-            app_version, user_locale, mode):
+            app_version, user_locale, server_mode):
         self._client_platform = client_platform
         self._client_type = client_type
         self._browser_type = browser_type
         self._app_version = app_version
         self._user_locale = user_locale
-        self._mode = mode
+        self._server_mode = server_mode
 
     @property
     def client_platform(self):
         """Returns client platform.
 
         Returns:
-            str. The client platform.
+            str. The client platform, e.g. 'Windows', 'Linux', 'Android'.
         """
         return self._client_platform
 
@@ -75,7 +92,7 @@ class EvaluationContext(python_utils.OBJECT):
         """Returns client type.
 
         Returns:
-            str. The client type.
+            str. The client type, e.g. 'Web', 'Native'.
         """
         return self._client_type
 
@@ -84,7 +101,8 @@ class EvaluationContext(python_utils.OBJECT):
         """Returns client browser type.
 
         Returns:
-            str. The client browser type.
+            str|None. The client browser type, e.g. 'Chrome', 'FireFox',
+            'Edge'. None if the client is a native app.
         """
         return self._browser_type
 
@@ -93,7 +111,8 @@ class EvaluationContext(python_utils.OBJECT):
         """Returns client application version.
 
         Returns:
-            str. The client application version.
+            str|None. The version of native application, e.g. '1.0.0',
+            None if the client type is web.
         """
         return self._app_version
 
@@ -102,21 +121,45 @@ class EvaluationContext(python_utils.OBJECT):
         """Returns client locale.
 
         Returns:
-            str. The client locale.
+            str. The client locale, e.g. 'en', 'es', 'ar'. This must be the id
+            of a supported language specified in SUPPORTED_SITE_LANGUAGES in
+            constants.ts.
         """
         return self._user_locale
 
     @property
-    def mode(self):
-        """Returns the mode Oppia is running on.
+    def server_mode(self):
+        """Returns the server mode of Oppia.
 
         Returns:
-            str. The the mode Oppia is running on.
+            str. The the server mode of Oppia, must be one of the following:
+            'dev', 'test', 'prod'.
         """
-        return self._mode
+        return self._server_mode
+
+    def validate(self):
+        """Validates the EvaluationContext domain object."""
+        if self._client_type not in ALLOWED_CLIENT_TYPE:
+            raise utils.ValidationError(
+                'Invalid client type %s, must be one of %s.' % (
+                    self._client_type, ALLOWED_CLIENT_TYPE))
+        if (
+                self._app_version is not None and
+                self.APP_VERSION_REGEXP.match(self._app_version) is None):
+            raise utils.ValidationError(
+                'Invalid version %s, expected to match regexp %s' % (
+                    self._app_version, self.APP_VERSION_REGEXP))
+        if self._user_locale not in ALLOWED_USER_LOCALES:
+            raise utils.ValidationError(
+                'Invalid user locale %s, must be one of %s.' % (
+                    self._user_locale, ALLOWED_USER_LOCALES))
+        if self._server_mode not in ALLOWED_SERVER_MODES:
+            raise utils.ValidationError(
+                'Invalid server mode %s, must be one of %s.' % (
+                    self._server_mode, ALLOWED_SERVER_MODES))
 
     @classmethod
-    def create_from_dict(cls, client_context_dict, server_context_dict):
+    def from_dict(cls, client_context_dict, server_context_dict):
         """Creates a new EvaluationContext object by combining both client side
         and server side context.
 
@@ -134,7 +177,7 @@ class EvaluationContext(python_utils.OBJECT):
             client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
             client_context_dict.get('user_locale'),
-            server_context_dict.get('mode'),
+            server_context_dict.get('server_mode'),
         )
 
 
@@ -142,10 +185,10 @@ class PlatformParameterFilter(python_utils.OBJECT):
     """Domain object for filters in platform parameters."""
 
     SUPPORTED_FILTER_TYPE = [
-        'mode', 'user_locale', 'client_platform', 'client_type',
+        'server_mode', 'user_locale', 'client_platform', 'client_type',
         'browser_type', 'app_version',
     ]
-    VERSION_EXPR_REGEXP = re.compile(r'^(>|<|=|>=|<=)?(\d+(?:\.\d+)*)$')
+    VERSION_EXPR_REGEXP = re.compile(r'^(>|<|=|>=|<=)(\d+(?:\.\d+)*)$')
 
     def __init__(self, filter_type, filter_value):
         self._type = filter_type
@@ -200,8 +243,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
             bool. True if the filter is matched.
         """
         matched = False
-        if self._type == 'mode':
-            matched = context.mode == value
+        if self._type == 'server_mode':
+            matched = context.server_mode == value
         elif self._type == 'user_locale':
             matched = context.user_locale == value
         elif self._type == 'client_platform':
@@ -234,18 +277,42 @@ class PlatformParameterFilter(python_utils.OBJECT):
         if self._type not in self.SUPPORTED_FILTER_TYPE:
             raise utils.ValidationError(
                 'Unsupported filter type %s' % self._type)
-        if self._type == 'app_version':
-            if isinstance(self._value, list):
-                values = self._value
-            else:
-                values = [self._value]
-            for version_expr in values:
-                if not self.VERSION_EXPR_REGEXP.match(version_expr):
+
+        if isinstance(self._value, list):
+            values = self._value
+        else:
+            values = [self._value]
+
+        if self._type == 'server_mode':
+            for mode in values:
+                if mode not in ALLOWED_SERVER_MODES:
                     raise utils.ValidationError(
-                        'Invalid version expression %s.' % version_expr)
+                        'Invalid server mode %s, must be one of %s.' % (
+                            mode, ALLOWED_SERVER_MODES))
+        elif self._type == 'user_locale':
+            for locale in values:
+                if locale not in ALLOWED_USER_LOCALES:
+                    raise utils.ValidationError(
+                        'Invalid user locale %s, must be one of %s.' % (
+                            locale, ALLOWED_USER_LOCALES))
+        elif self._type == 'client_type':
+            for client_type in values:
+                if client_type not in ALLOWED_CLIENT_TYPE:
+                    raise utils.ValidationError(
+                        'Invalid client type %s, must be one of %s.' % (
+                            client_type, ALLOWED_CLIENT_TYPE))
+        elif self._type == 'app_version':
+            for version_expr in values:
+                if (
+                        version_expr is not None and
+                        not self.VERSION_EXPR_REGEXP.match(version_expr)):
+                    raise utils.ValidationError(
+                        'Invalid version expression %s, expected to match'
+                        'regexp %s.' % (
+                            version_expr, self.VERSION_EXPR_REGEXP))
 
     @classmethod
-    def create_from_dict(cls, filter_dict):
+    def from_dict(cls, filter_dict):
         """Returns an PlatformParameterFilter object from a dict.
 
         Args:
@@ -272,8 +339,6 @@ class PlatformParameterFilter(python_utils.OBJECT):
         match = cls.VERSION_EXPR_REGEXP.match(expr)
         if match:
             op, version = match.groups()
-            if op is None:
-                op = '='
 
             is_equal = version == client_version
             is_client_version_smaller = cls._is_first_version_smaller(
@@ -354,29 +419,24 @@ class PlatformParameterRule(python_utils.OBJECT):
             context: EvaluationContext. The context for evaluation.
 
         Returns:
-            tuple. A 2-tuple whose elements are as follows:
             - bool. True if the rule is matched.
-            - *. The outcome if this rule when it's matched, None if not
-            matched.
         """
-        are_all_filters_matched = (
-            all(
-                filter_domain.evaluate(context)
-                for filter_domain in self._filters))
+        are_all_filters_matched = all(
+            filter_domain.evaluate(context)
+            for filter_domain in self._filters)
         if are_all_filters_matched:
-            return (True, self._value_when_matched)
-        return (False, None)
+            return True
+        return False
 
-    def has_mode_filter(self):
-        """Checks if the rule has a filter with type 'mode'.
+    def has_server_mode_filter(self):
+        """Checks if the rule has a filter with type 'server_mode'.
 
         Returns:
-            bool. True if the rule has a filter with type 'mode'.
+            bool. True if the rule has a filter with type 'server_mode'.
         """
-        return (
-            any(
-                filter_domain.type == 'mode'
-                for filter_domain in self._filters))
+        return any(
+            filter_domain.type == 'server_mode'
+            for filter_domain in self._filters)
 
     def to_dict(self):
         """Returns a dict representation of the PlatformParameterRule domain
@@ -398,7 +458,7 @@ class PlatformParameterRule(python_utils.OBJECT):
             filter_domain_object.validate()
 
     @classmethod
-    def create_from_dict(cls, rule_dict, schema_version):
+    def from_dict(cls, rule_dict, schema_version):
         """Returns an PlatformParameterRule object from a dict.
 
         Args:
@@ -420,7 +480,7 @@ class PlatformParameterRule(python_utils.OBJECT):
 
         return cls(
             [
-                PlatformParameterFilter.create_from_dict(filter_dict)
+                PlatformParameterFilter.from_dict(filter_dict)
                 for filter_dict in rule_dict['filters']],
             rule_dict['value_when_matched'],
         )
@@ -467,7 +527,7 @@ class PlatformParameterMetadata(python_utils.OBJECT):
         }
 
     @classmethod
-    def create_from_dict(cls, metadata_dict):
+    def from_dict(cls, metadata_dict):
         """Returns an PlatformParameterMetadata object from a dict.
 
         Args:
@@ -479,8 +539,8 @@ class PlatformParameterMetadata(python_utils.OBJECT):
             PlatformParameterMetadata domain object.
         """
         return cls(
-            metadata_dict.get('is_feature', False),
-            metadata_dict.get('stage', None),
+            metadata_dict['is_feature'],
+            metadata_dict['stage'],
         )
 
 
@@ -495,7 +555,6 @@ class PlatformParameter(python_utils.OBJECT):
         'number': lambda x: isinstance(x, (float, int)),
     }
 
-    ALLOWED_FEATURE_STAGE = ['dev', 'test', 'prod']
 
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
 
@@ -551,6 +610,15 @@ class PlatformParameter(python_utils.OBJECT):
         """
         return self._rules
 
+    def set_rules(self, new_rules):
+        """Sets the rules of the PlatformParameter.
+
+        Args:
+            new_rules: list(PlatformParameterRules). The new rules of the
+                parameter.
+        """
+        self._rules = new_rules
+
     @property
     def rule_schema_version(self):
         """Returns the schema version of the rules.
@@ -568,52 +636,6 @@ class PlatformParameter(python_utils.OBJECT):
             PlatformParameterMetadata. The metadata of the platform parameter.
         """
         return self._metadata
-
-    def update(self, committer_id, commit_message, new_rule_dicts):
-        """Updates the rules of the platform parameter instance.
-
-        Args:
-            committer_id: str. ID of the committer.
-            commit_message: str. The commit message.
-            new_rule_dicts: list(dist). A list of dict mappings of all fields
-                of PlatformParameterRule object, used for creating
-                PlatformParameterRule instances.
-
-        Returns:
-            PlatformParameter. The instance with updated rules.
-        """
-        # Create a temporary param instance with new rules for validation,
-        # if the new rules are invalid, an exception will be raised in
-        # validate() method.
-        param_dict = self.to_dict()
-        param_dict['rules'] = new_rule_dicts
-        updated_param = self.create_from_dict(param_dict)
-        updated_param.validate()
-
-        # Set value in datastore.
-        model_instance = config_models.PlatformParameterModel.get(
-            self._name, strict=False)
-        if model_instance is None:
-            model_instance = config_models.PlatformParameterModel.create(
-                self._name,
-                [rule.to_dict() for rule in self._rules],
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            )
-
-        self._rules = [
-            PlatformParameterRule.create_from_dict(
-                rule_dict, self._rule_schema_version)
-            for rule_dict in new_rule_dicts]
-        model_instance.rules = [rule.to_dict() for rule in self._rules]
-
-        model_instance.commit(
-            committer_id,
-            commit_message,
-            [{
-                'cmd': PlatformParameterChange.CMD_EDIT_RULES,
-                'new_rules': new_rule_dicts
-            }]
-        )
 
     def validate(self):
         """Validates the PlatformParameter domain object."""
@@ -648,9 +670,9 @@ class PlatformParameter(python_utils.OBJECT):
             *. The evaluate result of the platform parameter.
         """
         for rule in self._rules:
-            matched, value = rule.evaluate(context)
+            matched = rule.evaluate(context)
             if matched:
-                return value
+                return rule.value_when_matched
 
     def to_dict(self):
         """Returns a dict representation of the PlatformParameter domain
@@ -676,37 +698,39 @@ class PlatformParameter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got %s '
                 'instead.' % self._data_type)
-        if self._metadata.stage not in self.ALLOWED_FEATURE_STAGE:
+        if self._metadata.stage not in ALLOWED_FEATURE_STAGES:
             raise utils.ValidationError(
                 'Invalid feature stage, expected on of %s, got %s.' % (
-                    self.ALLOWED_FEATURE_STAGE, self._data_type))
+                    ALLOWED_FEATURE_STAGES, self._data_type))
         enabling_rules = [
             rule for rule in self._rules if rule.value_when_matched]
         for rule in enabling_rules:
-            if not rule.has_mode_filter():
+            if not rule.has_server_mode_filter():
                 raise utils.ValidationError(
-                    'Rules that enable a feature must have a mode '
+                    'Rules that enable a feature must have a server_mode '
                     'filter.')
             mode_filters = [
                 mode_filter for mode_filter in rule.filters
-                if mode_filter.type == 'mode']
+                if mode_filter.type == 'server_mode']
             for mode_filter in mode_filters:
                 value_list = (
                     mode_filter.value if isinstance(mode_filter.value, list)
                     else [mode_filter.value])
-                if self._metadata.stage == 'dev':
-                    if 'test' in value_list or 'prod' in value_list:
+                if self._metadata.stage == FEATURE_STAGES.dev:
+                    if (
+                            SERVER_MODES.test in value_list or
+                            SERVER_MODES.prod in value_list):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environment.')
-                elif self._metadata.stage == 'test':
-                    if 'prod' in value_list:
+                elif self._metadata.stage == FEATURE_STAGES.test:
+                    if SERVER_MODES.prod in value_list:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')
 
     @classmethod
-    def create_from_dict(cls, param_dict):
+    def from_dict(cls, param_dict):
         """Returns an PlatformParameter object from a dict.
 
         Args:
@@ -722,12 +746,11 @@ class PlatformParameter(python_utils.OBJECT):
             param_dict['description'],
             param_dict['data_type'],
             [
-                PlatformParameterRule.create_from_dict(
+                PlatformParameterRule.from_dict(
                     rule_dict, param_dict['rule_schema_version'])
                 for rule_dict in param_dict['rules']],
             param_dict['rule_schema_version'],
-            PlatformParameterMetadata.create_from_dict(
-                param_dict.get('metadata', {})),
+            PlatformParameterMetadata.from_dict(param_dict.get('metadata', {}))
         )
 
     @staticmethod
@@ -867,7 +890,7 @@ class Registry(python_utils.OBJECT):
     @classmethod
     def update_platform_parameter(
             cls, name, committer_id, commit_message, new_rule_dicts):
-        """Updates the platform parameter.
+        """Updates the platform parameter with new rules.
 
         Args:
             name: str. The name of the platform parameter to update.
@@ -876,8 +899,41 @@ class Registry(python_utils.OBJECT):
             new_rule_dicts: list(dist). A list of dict mappings of all fields
                 of PlatformParameterRule object.
         """
-        parameter = cls.get_platform_parameter(name)
-        parameter.update(committer_id, commit_message, new_rule_dicts)
+        param = cls.get_platform_parameter(name)
+
+        # Create a temporary param instance with new rules for validation,
+        # if the new rules are invalid, an exception will be raised in
+        # validate() method.
+        param_dict = param.to_dict()
+        param_dict['rules'] = new_rule_dicts
+        updated_param = param.from_dict(param_dict)
+        updated_param.validate()
+
+        # Set value in datastore.
+        model_instance = config_models.PlatformParameterModel.get(
+            param.name, strict=False)
+        if model_instance is None:
+            model_instance = config_models.PlatformParameterModel.create(
+                param.name,
+                [rule.to_dict() for rule in param.rules],
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            )
+
+        new_rules = [
+            PlatformParameterRule.from_dict(
+                rule_dict, param.rule_schema_version)
+            for rule_dict in new_rule_dicts]
+        param.set_rules(new_rules)
+
+        model_instance.rules = [rule.to_dict() for rule in param.rules]
+        model_instance.commit(
+            committer_id,
+            commit_message,
+            [{
+                'cmd': PlatformParameterChange.CMD_EDIT_RULES,
+                'new_rules': new_rule_dicts
+            }]
+        )
 
         memcache_services.delete(PlatformParameter.get_memcache_key(name))
 
@@ -919,7 +975,7 @@ class Registry(python_utils.OBJECT):
         Returns:
             PlatformParameter. The created platform parameter.
         """
-        parameter = PlatformParameter.create_from_dict(parameter_dict)
+        parameter = PlatformParameter.from_dict(parameter_dict)
 
         cls.init_platform_parameter(parameter.name, parameter)
 
@@ -941,7 +997,7 @@ class Registry(python_utils.OBJECT):
 
         if parameter_model:
             parameter_with_init_settings = cls.parameter_registry.get(name)
-            return PlatformParameter.create_from_dict({
+            return PlatformParameter.from_dict({
                 'name': parameter_with_init_settings.name,
                 'description': parameter_with_init_settings.description,
                 'data_type': parameter_with_init_settings.data_type,
@@ -976,5 +1032,5 @@ class Registry(python_utils.OBJECT):
 Registry.create_feature_flag(
     'Dummy_Feature',
     'This is a dummy feature flag',
-    'dev',
+    FEATURE_STAGES.dev,
 )

@@ -94,24 +94,106 @@ class EvaluationContextTest(test_utils.GenericTestBase):
     """Test for the EvaluationContext."""
 
     def test_create_feature_context_from_dict(self):
-        context = parameter_domain.EvaluationContext.create_from_dict(
+        context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_platform': 'Android',
-                'client_type': 'native',
-                'browser_type': 'n/a',
+                'client_type': 'Native',
+                'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en-US',
+                'user_locale': 'en',
             },
             {
-                'mode': 'dev',
+                'server_mode': 'dev',
             },
         )
         self.assertEqual(context.client_platform, 'Android')
-        self.assertEqual(context.client_type, 'native')
-        self.assertEqual(context.browser_type, 'n/a')
+        self.assertEqual(context.client_type, 'Native')
+        self.assertEqual(context.browser_type, None)
         self.assertEqual(context.app_version, '1.0.0')
-        self.assertEqual(context.user_locale, 'en-US')
-        self.assertEqual(context.mode, 'dev')
+        self.assertEqual(context.user_locale, 'en')
+        self.assertEqual(context.server_mode, 'dev')
+
+    def test_validate(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_platform': 'Android',
+                'client_type': 'Native',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        context.validate()
+
+    def test_validate_with_invalid_client_type_raises_exception(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_platform': 'Android',
+                'client_type': 'invalid',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid client type'):
+            context.validate()
+
+    def test_validate_with_invalid_app_version_raises_exception(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_platform': 'Android',
+                'client_type': 'Native',
+                'browser_type': None,
+                'app_version': 'a.a.a',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        with self.assertRaisesRegexp(utils.ValidationError, 'Invalid version'):
+            context.validate()
+
+    def test_validate_with_invalid_user_locale_raises_exception(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_platform': 'Android',
+                'client_type': 'Native',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'invalid',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid user locale'):
+            context.validate()
+
+    def test_validate_with_invalid_server_mode_raises_exception(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_platform': 'Android',
+                'client_type': 'Native',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'invalid',
+            },
+        )
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid server mode'):
+            context.validate()
 
 
 class PlatformParameterFilterTest(test_utils.GenericTestBase):
@@ -119,12 +201,12 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
 
     def create_example_context(
             self, client_platform='Android',
-            client_type='native', browser_type='n/a', app_version='1.2.3',
-            user_locale='en-US', mode='dev'):
+            client_type='Native', browser_type=None, app_version='1.2.3',
+            user_locale='en', mode='dev'):
         """Creates and returns an EvaluationContext using the given
         arguments.
         """
-        return parameter_domain.EvaluationContext.create_from_dict(
+        return parameter_domain.EvaluationContext.from_dict(
             {
                 'client_platform': client_platform,
                 'client_type': client_type,
@@ -133,34 +215,34 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 'user_locale': user_locale,
             },
             {
-                'mode': mode,
+                'server_mode': mode,
             },
         )
 
     def test_create_filter_from_dict(self):
-        filter_dict = {'type': 'app_version', 'value': '1.2.3'}
+        filter_dict = {'type': 'app_version', 'value': '=1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
         filter_domain.validate()
 
         self.assertEqual(filter_domain.type, 'app_version')
-        self.assertEqual(filter_domain.value, '1.2.3')
+        self.assertEqual(filter_domain.value, '=1.2.3')
 
     def test_filter_to_dict(self):
-        filter_dict = {'type': 'app_version', 'value': '1.2.3'}
+        filter_dict = {'type': 'app_version', 'value': '=1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
     def test_evaluate_mode_filter(self):
-        filter_dict = {'type': 'mode', 'value': 'dev'}
+        filter_dict = {'type': 'server_mode', 'value': 'dev'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
         dev_context = self.create_example_context(mode='dev')
         prod_context = self.create_example_context(mode='prod')
@@ -169,13 +251,13 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(prod_context))
 
     def test_evaluate_user_locale_filter(self):
-        filter_dict = {'type': 'user_locale', 'value': 'en-US'}
+        filter_dict = {'type': 'user_locale', 'value': 'en'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
-        en_context = self.create_example_context(user_locale='en-US')
-        zh_context = self.create_example_context(user_locale='zh-CN')
+        en_context = self.create_example_context(user_locale='en')
+        zh_context = self.create_example_context(user_locale='zh-hans')
 
         self.assertTrue(filter_domain.evaluate(en_context))
         self.assertFalse(filter_domain.evaluate(zh_context))
@@ -184,7 +266,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         filter_dict = {'type': 'client_platform', 'value': 'Linux'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
         linux_context = self.create_example_context(client_platform='Linux')
         windows_context = self.create_example_context(client_platform='Windows')
@@ -193,13 +275,13 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(windows_context))
 
     def test_evaluate_client_type_filter(self):
-        filter_dict = {'type': 'client_type', 'value': 'web'}
+        filter_dict = {'type': 'client_type', 'value': 'Web'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
-        web_context = self.create_example_context(client_type='web')
-        native_context = self.create_example_context(client_type='native')
+        web_context = self.create_example_context(client_type='Web')
+        native_context = self.create_example_context(client_type='Native')
 
         self.assertTrue(filter_domain.evaluate(web_context))
         self.assertFalse(filter_domain.evaluate(native_context))
@@ -208,7 +290,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         filter_dict = {'type': 'browser_type', 'value': 'Chrome'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
         chrome_context = self.create_example_context(browser_type='Chrome')
         firefox_context = self.create_example_context(browser_type='Firefox')
@@ -217,10 +299,10 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(firefox_context))
 
     def test_evaluate_app_version_filter(self):
-        filter_dict = {'type': 'app_version', 'value': '1.2.3'}
+        filter_dict = {'type': 'app_version', 'value': '=1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
 
         true_context = self.create_example_context(app_version='1.2.3')
         false_context = self.create_example_context(app_version='1.2.4')
@@ -229,19 +311,10 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(false_context))
 
     def test_evaluate_app_version_filter_with_eq_comparison(self):
-        filter_dict = {'type': 'app_version', 'value': '1.2.3'}
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.3')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.4')))
-
         filter_dict = {'type': 'app_version', 'value': '=1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.3')))
         self.assertFalse(filter_domain.evaluate(
@@ -251,7 +324,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         filter_dict = {'type': 'app_version', 'value': '>1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.1.2')))
         self.assertFalse(filter_domain.evaluate(
@@ -263,7 +336,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         filter_dict = {'type': 'app_version', 'value': '>=1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.1.2')))
         self.assertTrue(filter_domain.evaluate(
@@ -275,7 +348,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         filter_dict = {'type': 'app_version', 'value': '<1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.1.2')))
         self.assertFalse(filter_domain.evaluate(
@@ -287,7 +360,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         filter_dict = {'type': 'app_version', 'value': '<=1.2.3'}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.1')))
         self.assertTrue(filter_domain.evaluate(
@@ -295,44 +368,11 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
 
-    def test_evaluate_app_version_filter_with_invalid_expr_failure(self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.create_from_dict(
-                {'type': 'app_version', 'value': '1.a.2'}
-            ))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.3.2')
-        ))
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid version expression'):
-            filter_domain.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid version expression'):
-            filter_domain = (
-                parameter_domain
-                .PlatformParameterFilter.create_from_dict(
-                    {'type': 'app_version', 'value': 'x1.2.3'}
-                ))
-            filter_domain.validate()
-
-    def test_validate_filter_with_invalid_type_raises_exception(self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.create_from_dict(
-                {'type': 'invalid', 'value': 'value1'}
-            ))
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Unsupported filter type'):
-            filter_domain.validate()
-
     def test_evaluate_filter_with_multiple_values(self):
-        filter_dict = {'type': 'mode', 'value': ['dev', 'prod']}
+        filter_dict = {'type': 'server_mode', 'value': ['dev', 'prod']}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
         filter_domain.validate()
 
         dev_context = self.create_example_context(mode='dev')
@@ -344,10 +384,10 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(test_context))
 
     def test_evaluate_app_version_filter_with_multiple_values(self):
-        filter_dict = {'type': 'app_version', 'value': ['1.2.3', '1.2.4']}
+        filter_dict = {'type': 'app_version', 'value': ['=1.2.3', '=1.2.4']}
         filter_domain = (
             parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+            .PlatformParameterFilter.from_dict(filter_dict))
         filter_domain.validate()
 
         self.assertTrue(filter_domain.evaluate(
@@ -358,21 +398,74 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             self.create_example_context(app_version='1.5.3')))
 
     def test_evaluate_app_version_filter_with_no_version_in_context(self):
-        filter_dict = {'type': 'app_version', 'value': ['1.2.3', '1.2.4']}
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.create_from_dict(filter_dict))
+        filter_dict = {'type': 'app_version', 'value': ['=1.2.3', '=1.2.4']}
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
+            filter_dict)
 
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version=None)))
+
+    def test_validate_filter_with_invalid_type_raises_exception(self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'invalid', 'value': 'value1'}
+            ))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Unsupported filter type'):
+            filter_domain.validate()
+
+    def test_validate_filter_with_invalid_server_mode_raises_exception(self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'server_mode', 'value': 'invalid'}
+            ))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid server mode'):
+            filter_domain.validate()
+
+    def test_validate_filter_with_invalid_user_locale_raises_exception(self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'user_locale', 'value': 'invalid'}
+            ))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid user locale'):
+            filter_domain.validate()
+
+    def test_validate_filter_with_invalid_client_type_raises_exception(self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'client_type', 'value': 'invalid'}
+            ))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid client type'):
+            filter_domain.validate()
+
+    def test_validate_filter_with_invalid_version_expr_raises_exception(self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version', 'value': '=1.a.2'}
+            ))
+        self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='1.3.2')
+        ))
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid version expression'):
+            filter_domain.validate()
 
 
 class PlatformParameterRuleTest(test_utils.GenericTestBase):
     """Test for the PlatformParameterRule."""
 
-    def test_create_from_dict(self):
+    def test_from_dict(self):
         filters = [{'type': 'app_version', 'value': '=1.2.3'}]
-        rule = parameter_domain.PlatformParameterRule.create_from_dict(
+        rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': filters,
                 'value_when_matched': False,
@@ -389,13 +482,13 @@ class PlatformParameterRuleTest(test_utils.GenericTestBase):
         self.assertEqual(filter_domain.value, '=1.2.3')
         self.assertEqual(rule.value_when_matched, False)
 
-    def test_create_from_dict_with_old_schema_version_failure(self):
+    def test_from_dict_with_old_schema_version_failure(self):
         filters = [{'type': 'app_version', 'value': '=1.2.3'}]
         with self.swap(
             feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2):
             with self.assertRaisesRegexp(
                 Exception, 'rule schema version to be 2'):
-                parameter_domain.PlatformParameterRule.create_from_dict(
+                parameter_domain.PlatformParameterRule.from_dict(
                     {
                         'filters': filters,
                         'value_when_matched': False,
@@ -405,94 +498,90 @@ class PlatformParameterRuleTest(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         rule_dict = {
-            'filters': [{'type': 'app_version', 'value': '1.2.3'}],
+            'filters': [{'type': 'app_version', 'value': '=1.2.3'}],
             'value_when_matched': False,
         }
-        rule = parameter_domain.PlatformParameterRule.create_from_dict(
+        rule = parameter_domain.PlatformParameterRule.from_dict(
             rule_dict,
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
         self.assertEqual(rule.to_dict(), rule_dict)
 
-    def test_has_mode_filter(self):
-        rule = parameter_domain.PlatformParameterRule.create_from_dict(
+    def test_has_server_mode_filter(self):
+        rule = parameter_domain.PlatformParameterRule.from_dict(
             {
-                'filters': [{'type': 'app_version', 'value': '1.2.3'}],
+                'filters': [{'type': 'app_version', 'value': '=1.2.3'}],
                 'value_when_matched': False,
             },
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
-        self.assertFalse(rule.has_mode_filter())
+        self.assertFalse(rule.has_server_mode_filter())
 
-        rule = parameter_domain.PlatformParameterRule.create_from_dict(
+        rule = parameter_domain.PlatformParameterRule.from_dict(
             {
-                'filters': [{'type': 'mode', 'value': 'dev'}],
+                'filters': [{'type': 'server_mode', 'value': 'dev'}],
                 'value_when_matched': False,
             },
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
-        self.assertTrue(rule.has_mode_filter())
+        self.assertTrue(rule.has_server_mode_filter())
 
     def test_evaluation_matched(self):
-        rule = parameter_domain.PlatformParameterRule.create_from_dict(
+        rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
-                    {'type': 'app_version', 'value': '1.2.3'},
-                    {'type': 'user_locale', 'value': 'en-US'},
+                    {'type': 'app_version', 'value': '=1.2.3'},
+                    {'type': 'user_locale', 'value': 'en'},
                 ],
                 'value_when_matched': 'matched_val',
             },
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
-        context = parameter_domain.EvaluationContext.create_from_dict(
+        context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_platform': 'Android',
-                'client_type': 'native',
-                'browser_type': 'n/a',
+                'client_type': 'Native',
+                'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en-US',
+                'user_locale': 'en',
             },
             {
-                'mode': 'dev',
+                'server_mode': 'dev',
             },
         )
-        matched, val = rule.evaluate(context)
-        self.assertTrue(matched)
-        self.assertEqual(val, 'matched_val')
+        self.assertTrue(rule.evaluate(context))
 
     def test_evaluation_not_matched(self):
-        rule = parameter_domain.PlatformParameterRule.create_from_dict(
+        rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
-                    {'type': 'app_version', 'value': '1.2.3'},
+                    {'type': 'app_version', 'value': '=1.2.3'},
                     {'type': 'user_locale', 'value': 'en-UK'},
                 ],
                 'value_when_matched': 'matched_val',
             },
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
-        context = parameter_domain.EvaluationContext.create_from_dict(
+        context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_platform': 'Android',
-                'client_type': 'native',
-                'browser_type': 'n/a',
+                'client_type': 'Native',
+                'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en-US',
+                'user_locale': 'en',
             },
             {
-                'mode': 'dev',
+                'server_mode': 'dev',
             },
         )
-        matched, val = rule.evaluate(context)
-        self.assertFalse(matched)
-        self.assertIsNone(val)
+        self.assertFalse(rule.evaluate(context))
 
     def test_validate_each_filter(self):
         filters = [
             {'type': 'app_version', 'value': '=1.2.3'},
             {'type': 'invalid', 'value': '=1.2.3'},
         ]
-        rule = parameter_domain.PlatformParameterRule.create_from_dict(
+        rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': filters,
                 'value_when_matched': False,
@@ -507,26 +596,19 @@ class PlatformParameterRuleTest(test_utils.GenericTestBase):
 class PlatformParameterMetadataTest(test_utils.GenericTestBase):
     """Test for the PlatformParameterMetadata."""
 
-    def test_create_from_dict(self):
-        metadata = parameter_domain.PlatformParameterMetadata.create_from_dict(
+    def test_from_dict(self):
+        metadata = parameter_domain.PlatformParameterMetadata.from_dict(
             {'is_feature': True, 'stage': 'dev'})
 
         self.assertTrue(metadata.is_feature)
         self.assertEqual(metadata.stage, 'dev')
-
-    def test_create_with_default_value(self):
-        metadata = parameter_domain.PlatformParameterMetadata.create_from_dict(
-            {})
-
-        self.assertFalse(metadata.is_feature)
-        self.assertIsNone(metadata.stage)
 
     def test_to_dict(self):
         metadata_dict = {
             'is_feature': True,
             'stage': 'dev',
         }
-        metadata = parameter_domain.PlatformParameterMetadata.create_from_dict(
+        metadata = parameter_domain.PlatformParameterMetadata.from_dict(
             metadata_dict)
 
         self.assertDictEqual(metadata.to_dict(), metadata_dict)
@@ -535,8 +617,8 @@ class PlatformParameterMetadataTest(test_utils.GenericTestBase):
 class PlatformParameterTest(test_utils.GenericTestBase):
     """Test for the PlatformParameter."""
 
-    def test_create_from_dict(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+    def test_from_dict(self):
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'string',
@@ -544,7 +626,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'mode',
+                            'type': 'server_mode',
                             'value': 'dev'
                         }
                     ],
@@ -557,6 +639,10 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'metadata': {
+                'is_feature': False,
+                'stage': None,
+            },
         })
 
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
@@ -572,7 +658,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
 
     def test_create_with_invalid_name_failure(self):
         with self.assertRaisesRegexp(Exception, 'Invalid parameter name'):
-            parameter_domain.PlatformParameter.create_from_dict({
+            parameter_domain.PlatformParameter.from_dict({
                 'name': 'Invalid~Name',
                 'description': 'for test',
                 'data_type': 'string',
@@ -580,7 +666,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                     {
                         'filters': [
                             {
-                                'type': 'mode',
+                                'type': 'server_mode',
                                 'value': 'dev'
                             }
                         ],
@@ -593,12 +679,16 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 ],
                 'rule_schema_version': (
                     feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+                'metadata': {
+                    'is_feature': False,
+                    'stage': None,
+                },
             })
 
     def test_validate_without_last_default_rule_raises_exception(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'must not have any filter'):
-            parameter = parameter_domain.PlatformParameter.create_from_dict({
+            parameter = parameter_domain.PlatformParameter.from_dict({
                 'name': 'parameter_a',
                 'description': 'for test',
                 'data_type': 'string',
@@ -606,7 +696,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                     {
                         'filters': [
                             {
-                                'type': 'mode',
+                                'type': 'server_mode',
                                 'value': 'dev'
                             }
                         ],
@@ -615,13 +705,17 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 ],
                 'rule_schema_version': (
                     feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+                'metadata': {
+                    'is_feature': False,
+                    'stage': None,
+                },
             })
             parameter.validate()
 
     def test_validate_with_unsupported_data_type_raises_exception(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Unsupported data type'):
-            parameter = parameter_domain.PlatformParameter.create_from_dict({
+            parameter = parameter_domain.PlatformParameter.from_dict({
                 'name': 'parameter_a',
                 'description': 'for test',
                 'data_type': 'InvalidType',
@@ -629,7 +723,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                     {
                         'filters': [
                             {
-                                'type': 'mode',
+                                'type': 'server_mode',
                                 'value': 'dev'
                             }
                         ],
@@ -642,6 +736,10 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 ],
                 'rule_schema_version': (
                     feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+                'metadata': {
+                    'is_feature': False,
+                    'stage': None,
+                },
             })
             parameter.validate()
 
@@ -649,7 +747,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected bool'):
-            parameter = parameter_domain.PlatformParameter.create_from_dict({
+            parameter = parameter_domain.PlatformParameter.from_dict({
                 'name': 'parameter_a',
                 'description': 'for test',
                 'data_type': 'bool',
@@ -657,7 +755,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                     {
                         'filters': [
                             {
-                                'type': 'mode',
+                                'type': 'server_mode',
                                 'value': 'dev'
                             }
                         ],
@@ -670,6 +768,10 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 ],
                 'rule_schema_version': (
                     feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+                'metadata': {
+                    'is_feature': False,
+                    'stage': None,
+                },
             })
             parameter.validate()
 
@@ -682,7 +784,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'mode',
+                            'type': 'server_mode',
                             'value': 'dev'
                         }
                     ],
@@ -700,12 +802,11 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 'stage': None
             }
         }
-        parameter = parameter_domain.PlatformParameter.create_from_dict(
-            param_dict)
+        parameter = parameter_domain.PlatformParameter.from_dict(param_dict)
         self.assertDictEqual(parameter.to_dict(), param_dict)
 
     def test_evaluate_in_dev(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'string',
@@ -713,7 +814,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'mode',
+                            'type': 'server_mode',
                             'value': 'dev'
                         }
                     ],
@@ -726,24 +827,28 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'metadata': {
+                'is_feature': False,
+                'stage': None,
+            },
         })
 
-        dev_context = parameter_domain.EvaluationContext.create_from_dict(
+        dev_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_platform': 'Android',
-                'client_type': 'native',
-                'browser_type': 'n/a',
+                'client_type': 'Native',
+                'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en-US',
+                'user_locale': 'en',
             },
             {
-                'mode': 'dev',
+                'server_mode': 'dev',
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
 
     def test_evaluate_in_prod(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'string',
@@ -751,7 +856,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'mode',
+                            'type': 'server_mode',
                             'value': 'dev'
                         }
                     ],
@@ -764,30 +869,34 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'metadata': {
+                'is_feature': False,
+                'stage': None,
+            },
         })
 
-        prod_context = parameter_domain.EvaluationContext.create_from_dict(
+        prod_context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_platform': 'Android',
-                'client_type': 'native',
-                'browser_type': 'n/a',
+                'client_type': 'Native',
+                'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en-US',
+                'user_locale': 'en',
             },
             {
-                'mode': 'prod',
+                'server_mode': 'prod',
             },
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
 
     def test_validate_feature(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'bool',
             'rules': [
                 {
-                    'filters': [{'type': 'mode', 'value': 'dev'}],
+                    'filters': [{'type': 'server_mode', 'value': 'dev'}],
                     'value_when_matched': False
                 },
                 {
@@ -805,7 +914,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         parameter.validate()
 
     def test_validate_feature_with_invalid_type_raises_exception(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'string',
@@ -827,7 +936,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             parameter.validate()
 
     def test_validate_feature_with_invalid_stage_raises_exception(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'bool',
@@ -849,7 +958,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             parameter.validate()
 
     def test_validate_feature_with_no_mode_filter_raises_exception(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'bool',
@@ -867,18 +976,18 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             }
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'must have a mode filter'):
+            utils.ValidationError, 'must have a server_mode filter'):
             parameter.validate()
 
     def test_validate_dev_feature_for_inappropriate_env_raises_exception(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'bool',
             'rules': [
                 {
                     'filters': [
-                        {'type': 'mode', 'value': 'test'}],
+                        {'type': 'server_mode', 'value': 'test'}],
                     'value_when_matched': True
                 },
                 {
@@ -899,14 +1008,14 @@ class PlatformParameterTest(test_utils.GenericTestBase):
 
     def test_validate_test_feature_for_inappropriate_env_raises_exception(
             self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
+        parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'bool',
             'rules': [
                 {
                     'filters': [
-                        {'type': 'mode', 'value': 'prod'}],
+                        {'type': 'server_mode', 'value': 'prod'}],
                     'value_when_matched': True
                 },
                 {
@@ -924,76 +1033,6 @@ class PlatformParameterTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'cannot be enabled in production'):
             parameter.validate()
-
-    def test_update(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'string',
-            'rules': [
-                {
-                    'filters': [
-                        {
-                            'type': 'mode',
-                            'value': 'dev'
-                        }
-                    ],
-                    'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-        })
-        parameter.validate()
-
-        self.assertEqual(len(parameter.rules), 2)
-        self.assertIsNone(config_models.PlatformParameterModel.get(
-            parameter.name, strict=False))
-        parameter.update(
-            feconf.SYSTEM_COMMITTER_ID,
-            'commit message',
-            [{'filters': [], 'value_when_matched': '333'}]
-        )
-        self.assertEqual(len(parameter.rules), 1)
-        self.assertIsNotNone(config_models.PlatformParameterModel.get(
-            parameter.name, strict=False))
-
-    def test_update_incorrect_rules_failure(self):
-        parameter = parameter_domain.PlatformParameter.create_from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'string',
-            'rules': [
-                {
-                    'filters': [
-                        {
-                            'type': 'mode',
-                            'value': 'dev'
-                        }
-                    ],
-                    'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-        })
-        parameter.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected string'):
-            parameter.update(
-                feconf.SYSTEM_COMMITTER_ID,
-                'commit message',
-                [{'filters': [], 'value_when_matched': False}]
-            )
 
 
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
@@ -1029,7 +1068,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'mode',
+                            'type': 'server_mode',
                             'value': 'dev'
                         }
                     ],
@@ -1042,6 +1081,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'metadata': {
+                'is_feature': False,
+                'stage': None,
+            },
         })
 
     def test_create_platform_parameter(self):
@@ -1135,7 +1178,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'commit message',
             [{'filters': [], 'value_when_matched': 'updated'}],
         )
-        # Cache is invalidated after update.
+        # Cached value is invalidated after update.
         self.assertIsNone(
             parameter_domain.Registry.load_platform_parameter_from_memcache(
                 parameter_name))
@@ -1150,6 +1193,23 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             parameter_domain.Registry.load_platform_parameter_from_memcache(
                 parameter_name))
+
+    def test_update_parameter_with_invalid_rules_failure(self):
+        parameter_name = 'parameter_a'
+        self.create_example_parameter_with_name(parameter_name)
+
+        param = parameter_domain.Registry.get_platform_parameter(
+            parameter_name)
+        param.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected string'):
+            parameter_domain.Registry.update_platform_parameter(
+                parameter_name,
+                feconf.SYSTEM_COMMITTER_ID,
+                'commit message',
+                [{'filters': [], 'value_when_matched': False}],
+            )
 
     def test_updated_parameter_is_saved_in_storage(self):
         parameter_name = 'parameter_a'
@@ -1173,16 +1233,16 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertIsNotNone(parameter_updated)
 
     def test_evaluate_all_parameters(self):
-        context = parameter_domain.EvaluationContext.create_from_dict(
+        context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_platform': 'Android',
-                'client_type': 'native',
-                'browser_type': 'n/a',
+                'client_type': 'Native',
+                'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en-US',
+                'user_locale': 'en',
             },
             {
-                'mode': 'dev',
+                'server_mode': 'dev',
             },
         )
         parameter_domain.Registry.create_platform_parameter_from_dict({
@@ -1193,7 +1253,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 {
                     'filters': [
                         {
-                            'type': 'mode',
+                            'type': 'server_mode',
                             'value': 'dev'
                         }
                     ],
@@ -1224,7 +1284,9 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'metadata': {
-            }
+                'is_feature': False,
+                'stage': None,
+            },
         })
 
         self.assertDictEqual(
