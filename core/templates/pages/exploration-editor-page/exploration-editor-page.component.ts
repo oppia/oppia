@@ -65,8 +65,6 @@ require(
 require('pages/exploration-editor-page/preview-tab/preview-tab.component.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.ts');
-require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
