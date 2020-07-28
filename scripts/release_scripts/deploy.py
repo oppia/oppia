@@ -41,8 +41,6 @@ IMPORTANT NOTES:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
@@ -50,21 +48,17 @@ import shutil
 import subprocess
 import sys
 
+import github
 import python_utils
 import release_constants
 from scripts import common
 from scripts import install_third_party_libs
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
-# pylint: enable=wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
 sys.path.insert(0, _PY_GITHUB_PATH)
-
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -151,8 +145,10 @@ def preprocess_release(app_name, deploy_data_path):
         os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
         content = assets_file.read()
 
-    assert '"DEV_MODE": true' in content
-    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
+    assert '"DEV_MODE": true' in content, 'Invalid DEV_MODE'
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content, (
+        'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+            common.CONSTANTS_FILE_PATH))
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,

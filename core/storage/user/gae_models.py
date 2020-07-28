@@ -46,8 +46,12 @@ class UserSettingsModel(base_models.BaseModel):
 
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
+    # Will be deprecated. This is moved to UserAuthModel now.
     gae_id = ndb.StringProperty(required=True, indexed=True)
-    # Email address of the user.
+    # Email address of the user. Won't be a required field in future. Because
+    # we will have other auth methods also in future. Vaidation for not being
+    # None will be shifted to domain layer in case of google id sign in.
+    # Once that is implemented, required=True will be removed from here.
     email = ndb.StringProperty(required=True, indexed=True)
     # User role. Required for authorization. User gets a default role of
     # exploration editor.
@@ -59,6 +63,14 @@ class UserSettingsModel(base_models.BaseModel):
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
     normalized_username = ndb.StringProperty(indexed=True)
+    # Display name for users.
+    name = ndb.StringProperty(default=None, indexed=True)
+    # List of profile user ids associated with this user. None for profiles.
+    profiles_list = ndb.StringProperty(default=None, repeated=True)
+    # Pin assocaited with the user profile.
+    pin = ndb.StringProperty(default=None)
+    # Date timestamp when the account/profile was created. May be None.
+    date_created_timestamp = ndb.DateTimeProperty(default=None)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
@@ -94,6 +106,12 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
+    # Preference for automatically updating topics on android.
+    automatically_update_topics = ndb.BooleanProperty(default=False)
+    # Preferences for downloading and updating data via wifi on android.
+    download_and_update_only_on_wifi = ndb.BooleanProperty(default=False)
+    # Download and delete access for profiles on android.
+    profile_download_access = ndb.BooleanProperty(default=False)
     # Exploration language preferences specified by the user.
     # TODO(sll): Add another field for the language that the user wants the
     # site to display in. These language preferences are mainly for the purpose
@@ -106,8 +124,14 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_site_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES])
-    # Audio language preference used for audio translations.
+    # Language preference for android app.
+    preferred_android_language_code = ndb.StringProperty(default=None)
+    # Audio language preference used for audio translations on web.
     preferred_audio_language_code = ndb.StringProperty(
+        default=None, choices=[
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+    # Audio language preference used for audio translations on android.
+    preferred_android_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
@@ -163,6 +187,14 @@ class UserSettingsModel(base_models.BaseModel):
             'role': user.role,
             'username': user.username,
             'normalized_username': user.normalized_username,
+            'name': user.name,
+            'profiles_list': user.profiles_list,
+            'pin': user.pin,
+            'date_created_timestamp': (
+                utils.get_time_in_millisecs(user.date_created_timestamp)
+                if user.date_created_timestamp
+                else None
+            ),
             'last_agreed_to_terms': (
                 utils.get_time_in_millisecs(user.last_agreed_to_terms)
                 if user.last_agreed_to_terms
@@ -197,9 +229,17 @@ class UserSettingsModel(base_models.BaseModel):
             'user_bio': user.user_bio,
             'subject_interests': user.subject_interests,
             'first_contribution_msec': user.first_contribution_msec,
+            'automatically_update_topics': user.automatically_update_topics,
+            'download_and_update_only_on_wifi': (
+                user.download_and_update_only_on_wifi),
+            'profile_download_access': user.profile_download_access,
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
-            'preferred_audio_language_code': user.preferred_audio_language_code
+            'preferred_android_language_code': (
+                user.preferred_android_language_code),
+            'preferred_audio_language_code': user.preferred_audio_language_code,
+            'preferred_android_audio_language_code': (
+                user.preferred_android_audio_language_code)
         }
 
     @classmethod
@@ -244,7 +284,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_gae_id(cls, gae_id):
-        """Returns a user model with given GAE user ID.
+        """Returns a user model with given GAE user ID. Will be deprecated
+        after UserAuthModel is implemented.
 
         Args:
             gae_id: str. The GAE user ID that is being queried for.
