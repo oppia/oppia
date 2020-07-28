@@ -77,6 +77,8 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {
+    await waitFor.presenceOf(elementToFocus, 'Element took too long to load');
+    
     if (await elementToFocus.getAttribute('id') === '') {
       // Should move the focus to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
@@ -85,7 +87,6 @@ describe('screenreader and keyboard user accessibility features', function() {
         await (await elementToFocus.getAttribute('class')));
 
       // Should move the focus away from the elementToFocus.
-      await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       expect(await browser.driver.switchTo().activeElement()
         .getAttribute('class')).not.toEqual(
@@ -161,7 +162,6 @@ describe('screenreader and keyboard user accessibility features', function() {
       await libraryPage.playExploration('A new exploration');
 
       // Should test the skip to main content shortcut.
-      await waitFor.elementAttributeToBe(skipLink, 'id', 'skipToMainContentId');
       await checkActionShortcuts('s', skipLink);
     });
 
@@ -171,18 +171,20 @@ describe('screenreader and keyboard user accessibility features', function() {
       await libraryPage.get();
       await libraryPage.findExploration('A new exploration');
       await libraryPage.playExploration('A new exploration');
+      // Do not change order of actions below. The exploration
+      // needs to be navigated in a specific order
 
-      // Should test the continue button shortcut.
+      // Should press 'j' key to navigate to the next card
       await waitFor.elementToBeClickable(continueButton);
       await checkActionShortcuts('j', continueButton);
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
 
-      // Should test the previous button shortcut.
+      // Should press 'k' key to navigate to the previous card.
       await waitFor.elementToBeClickable(backButton);
       await checkActionShortcuts('k', backButton);
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();
 
-      // Should test the next button shortcut.
+      // Should press 'j' key to navigate to the next card.
       await waitFor.elementToBeClickable(nextButton);
       await checkActionShortcuts('j', nextButton);
       await browser.actions().sendKeys(protractor.Key.ENTER).perform();

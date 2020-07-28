@@ -79,6 +79,17 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
 };
 
 /**
+ * @param {Object} element - Element is expected to be present on the DOM of a page. 
+ *                           This does not necessarily mean that the element is visible.
+ * @param {string} errorMessage - Error message when element is invisible.
+ */
+var presenceOf = async function(element, errorMessage) {
+  await browser.wait(
+    await until.presenceOf(element),
+    DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
+
+/**
  * @param {Object} element - Element expected to be present in the DOM and has
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
@@ -138,6 +149,7 @@ exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
+exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
