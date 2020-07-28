@@ -286,7 +286,8 @@ class Collection(python_utils.OBJECT):
             'schema_version': self.schema_version,
             'nodes': [
                 node.to_dict() for node in self.nodes
-            ]
+            ],
+            'version': self.version
         }
 
     @classmethod
@@ -339,7 +340,9 @@ class Collection(python_utils.OBJECT):
             [
                 CollectionNode.from_dict(node_dict)
                 for node_dict in collection_dict['nodes']
-            ], collection_version,
+            ], (
+                collection_dict['version'] if 'version' in collection_dict else
+                collection_version),
             collection_created_on, collection_last_updated)
 
         return collection
