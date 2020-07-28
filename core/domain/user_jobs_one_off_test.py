@@ -1409,17 +1409,19 @@ class DraftChangeMathRichTextAuditOneOffJobTests(
 
 
     def test_draft_changes_having_math_with_version_less_than_exploration(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        exp_migration_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': '34',
-            'to_version': '35'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, 'exp_id', exp_migration_change_list,
-            'Ran Exploration Migration job.')
+        with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 34):
+            exploration = exp_domain.Exploration.create_default_exploration(
+                'exp_id')
+            exp_services.save_new_exploration(self.owner_id, exploration)
+            exp_migration_change_list = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '33',
+                'to_version': '34'
+            })]
+       
+            exp_services.update_exploration(
+                self.owner_id, 'exp_id', exp_migration_change_list,
+                'Ran Exploration Migration job.')
 
 
         change_list = [exp_domain.ExplorationChange({

@@ -2678,7 +2678,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 state_domain.WrittenTranslations.from_dict(
                     written_translations_dict))
 
-        exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(self.albert_id, exploration)
         with self.swap(
             html_validation_service,
             'add_math_content_to_math_rte_components', lambda html: html):

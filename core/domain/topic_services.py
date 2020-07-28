@@ -340,10 +340,12 @@ def apply_change_list(topic_id, change_list):
                 if (change.property_name ==
                         subtopic_page_domain.
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
+                    page_contents = state_domain.SubtitledHtml.from_dict(
+                        change.new_value)
+                    page_contents.validate()
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
-                            state_domain.SubtitledHtml.from_dict(
-                                change.new_value))
+                            page_contents)
 
                 elif (change.property_name ==
                       subtopic_page_domain.

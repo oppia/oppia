@@ -642,6 +642,7 @@ class Exploration(python_utils.OBJECT):
 
             state.content = state_domain.SubtitledHtml(
                 sdict['content']['content_id'], sdict['content']['html'])
+            state.content.validate()
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']

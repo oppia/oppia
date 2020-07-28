@@ -362,8 +362,10 @@ def apply_change_list(exploration_id, change_list):
                         list(python_utils.MAP(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    state.update_content(
+                    content = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
+                    content.validate()
+                    state.update_content(content)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ID):

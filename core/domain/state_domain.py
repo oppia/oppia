@@ -279,7 +279,9 @@ class Hint(python_utils.OBJECT):
         Returns:
             Hint. The corresponding Hint domain object.
         """
-        return cls(SubtitledHtml.from_dict(hint_dict['hint_content']))
+        hint_content = SubtitledHtml.from_dict(hint_dict['hint_content'])
+        hint_content.validate()
+        return cls(hint_content)
 
     def validate(self):
         """Validates all properties of Hint."""
@@ -360,13 +362,15 @@ class Solution(python_utils.OBJECT):
         Returns:
             Solution. The corresponding Solution domain object.
         """
+        explanation = SubtitledHtml.from_dict(solution_dict['explanation'])
+        explanation.validate()
         return cls(
             interaction_id,
             solution_dict['answer_is_exclusive'],
             interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(
                     solution_dict['correct_answer']),
-            SubtitledHtml.from_dict(solution_dict['explanation']))
+            explanation)
 
     def validate(self, interaction_id):
         """Validates all properties of Solution.
@@ -807,16 +811,11 @@ class InteractionInstance(python_utils.OBJECT):
         # name to InteractionCustomizationArg, so that we can utilize
         # InteractionCustomizationArg helper functions.
         # Then, covert back to original dict format afterwards, at the end.
-
-        # We use skip_html_cleaning=True because we may be converting an old
-        # schema of html that is now invalid- the html cleaning process would
-        # remove invalid html before we get a chance to migrate it.
         customization_args = (
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
                 interaction_id,
-                interaction_dict['customization_args'],
-                skip_html_cleaning=True)
+                interaction_dict['customization_args'])
         )
         ca_specs = interaction_registry.Registry.get_interaction_by_id(
             interaction_id).customization_arg_specs
@@ -844,7 +843,7 @@ class InteractionInstance(python_utils.OBJECT):
 
     @staticmethod
     def convert_customization_args_dict_to_customization_args(
-            interaction_id, customization_args_dict, skip_html_cleaning=False):
+            interaction_id, customization_args_dict):
         """Converts customization arguments dictionary to customization
         arguments. This is done by converting each customization argument to a
         InteractionCustomizationArg domain object.
@@ -855,10 +854,6 @@ class InteractionInstance(python_utils.OBJECT):
                 argument name to a customization argument dict, which is a dict
                 of the single key 'value' to the value of the customization
                 argument.
-            skip_html_cleaning: bool. Whether or not to skip html cleaning
-                when constructing the SubtitledHtml domain objects. This
-                should only be used if the end goal is to apply conversion
-                functions on the html, and the old html is no longer valid.
 
         Returns:
             dict. A dictionary of customization argument names to the
@@ -872,8 +867,7 @@ class InteractionInstance(python_utils.OBJECT):
         customization_args = {
             spec.name: InteractionCustomizationArg.from_customization_arg_dict(
                 customization_args_dict[spec.name],
-                spec.schema,
-                skip_html_cleaning=skip_html_cleaning
+                spec.schema
             ) for spec in ca_specs
         }
 
@@ -928,8 +922,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_customization_arg_dict(
-            cls, ca_dict, ca_schema, skip_html_cleaning=False):
+    def from_customization_arg_dict(cls, ca_dict, ca_schema):
         """Converts a customization argument dictionary to an
         InteractionCustomizationArgument domain object. This is done by
         traversing the customization argument schema, and converting
@@ -940,10 +933,6 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 single key 'value' to the value of the customization argument.
             ca_schema: dict. The schema that defines the customization argument
                 value.
-            skip_html_cleaning: bool. Whether or not to skip html cleaning
-                when constructing the SubtitledHtml domain objects. This
-                should only be used if the end goal is to apply conversion
-                functions on the html, and the old html is no longer valid.
 
         Returns:
             InteractionCustomizationArg. The customization argument domain
@@ -967,9 +956,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
 
             if schema_type == schema_utils.SCHEMA_TYPE_SUBTITLED_HTML:
                 return SubtitledHtml(
-                    ca_value['content_id'],
-                    ca_value['html'],
-                    skip_html_cleaning=skip_html_cleaning)
+                    ca_value['content_id'], ca_value['html'])
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
@@ -1006,6 +993,23 @@ class InteractionCustomizationArg(python_utils.OBJECT):
             self.value,
             [schema_utils.SCHEMA_TYPE_SUBTITLED_HTML],
             lambda x: x.html
+        )
+
+    def validate_subtitled_html(self):
+        """Calls the validate method on all SubtitledHtml domain objects in
+        the customization arguments.
+        """
+        def validate_html(subtitled_html):
+            """A dummy value extractor that calls the validate method on
+            the passed SubtitledHtml domain object.
+            """
+            subtitled_html.validate()
+
+        InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_TYPE_SUBTITLED_HTML],
+            validate_html
         )
 
     @staticmethod
@@ -1140,9 +1144,11 @@ class Outcome(python_utils.OBJECT):
         Returns:
             Outcome. The corresponding Outcome domain object.
         """
+        feedback = SubtitledHtml.from_dict(outcome_dict['feedback'])
+        feedback.validate()
         return cls(
             outcome_dict['dest'],
-            SubtitledHtml.from_dict(outcome_dict['feedback']),
+            feedback,
             outcome_dict['labelled_as_correct'],
             [param_domain.ParamChange(
                 param_change['name'], param_change['generator_id'],
@@ -2060,21 +2066,20 @@ class RuleSpec(python_utils.OBJECT):
 class SubtitledHtml(python_utils.OBJECT):
     """Value object representing subtitled HTML."""
 
-    def __init__(self, content_id, html, skip_html_cleaning=False):
-        """Initializes a SubtitledHtml domain object.
+    def __init__(self, content_id, html):
+        """Initializes a SubtitledHtml domain object. Note that initializing
+        the SubtitledHtml object does not clean the html. Before saving the
+        SubtitledHtml object, validate should be called for validation and
+        cleaning of the html.
 
         Args:
             content_id: str. A unique id referring to the other assets for this
                 content.
             html: str. A piece of user-submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
-            skip_html_cleaning: bool. Whether or not to skip html cleaning.
-                This should only be used if the end goal is to apply conversion
-                functions on the html, and the old html is no longer valid.
         """
         self.content_id = content_id
-        self.html = html if skip_html_cleaning else html_cleaner.clean(html)
-        self.validate()
+        self.html = html
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
@@ -2102,7 +2107,7 @@ class SubtitledHtml(python_utils.OBJECT):
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
     def validate(self):
-        """Validates properties of the SubtitledHtml.
+        """Validates properties of the SubtitledHtml, and cleans the html.
 
         Raises:
             ValidationError: One or more attributes of the SubtitledHtml are
@@ -2116,6 +2121,8 @@ class SubtitledHtml(python_utils.OBJECT):
         if not isinstance(self.html, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
+
+        self.html = html_cleaner.clean(self.html)
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
@@ -2574,6 +2581,8 @@ class State(python_utils.OBJECT):
                 self.interaction.id,
                 customization_args_dict)
         )
+        for ca_name in customization_args:
+            customization_args[ca_name].validate_subtitled_html()
 
         old_content_id_list = list(itertools.chain.from_iterable([
             self.interaction.customization_args[ca_name].get_content_ids()
@@ -2866,8 +2875,10 @@ class State(python_utils.OBJECT):
         Returns:
             State. The corresponding State domain object.
         """
+        content = SubtitledHtml.from_dict(state_dict['content'])
+        content.validate()
         return cls(
-            SubtitledHtml.from_dict(state_dict['content']),
+            content,
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
