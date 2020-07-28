@@ -28,6 +28,9 @@ import logging
 
 redis_client = redis.Redis(host='localhost', port=6379)
 
+def flush_cache():
+    redis_client.flushdb()
+
 def get_multi(keys):
     """Looks up a list of keys in memcache.
 

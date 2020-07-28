@@ -267,12 +267,12 @@ class RegistryUnitTest(test_utils.GenericTestBase):
                 'Invalid email service provider: invalid service provider'):
                 self.registry_instance.import_email_services()
 
-    def test_import_memcache_services(self):
+    def test_import_caching_services(self):
         """Tests import memcache services function."""
-        from core.platform.memcache import gae_memcache_services
+        from core.platform.memcache import gae_caching_services
         self.assertEqual(
-            self.registry_instance.import_memcache_services(),
-            gae_memcache_services)
+            self.registry_instance.import_caching_services(),
+            gae_caching_services)
 
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
