@@ -74,7 +74,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             StoryUpdateService, UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR,
             MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
-          ctrl.attachedSubscriptions = new Subscription();
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
           $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
             MAX_CHARS_IN_CHAPTER_DESCRIPTION);
@@ -362,23 +362,21 @@ angular.module('oppia').directive('storyNodeEditor', [
             // with empty exploration id.
             $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.expIdCanBeSaved = true;
-            const storyInitializedSubscription =
+            ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryInitialized.subscribe(
                 () => _init()
-              );
-            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
-            const storyReinitializedSubscription =
+              ));
+            ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _init()
-              );
-            ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
+              ));
             $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
 
             _init();
           };
 
           ctrl.$onDestroy = function() {
-            ctrl.attachedSubscriptions.unsubscribe();
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

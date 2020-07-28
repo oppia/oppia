@@ -48,7 +48,7 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
             UrlInterpolationService, UndoRedoService, StoryEditorStateService
         ) {
           var ctrl = this;
-          ctrl.attachedSubscriptions = new Subscription();
+          ctrl.directiveSubscriptions = new Subscription();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
           $scope.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -73,15 +73,14 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.story = StoryEditorStateService.getStory();
-            const storyInitializedSubscription =
+            ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryInitialized.subscribe(
                 () => $scope.topicName = StoryEditorStateService.getTopicName()
-              );
-            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
+              ));
+            $scope.story = StoryEditorStateService.getStory();
           };
           ctrl.$onDestroy = function() {
-            ctrl.attachedSubscriptions.unsubscribe();
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

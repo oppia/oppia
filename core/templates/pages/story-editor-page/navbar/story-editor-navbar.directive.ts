@@ -51,7 +51,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             StoryEditorStateService, UrlService,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
-          ctrl.attachedSubscriptions = new Subscription();
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.explorationValidationIssues = [];
 
           $scope.getChangeListLength = function() {
@@ -165,28 +165,26 @@ angular.module('oppia').directive('storyEditorNavbar', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryInitialized.subscribe(
+                () => _validateStory()
+              ));
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
+                () => _validateStory()
+              ));
             $scope.forceValidateExplorations = true;
             $scope.story = StoryEditorStateService.getStory();
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
-            const storyInitializedSubscription =
-              StoryEditorStateService.onStoryInitialized.subscribe(
-                () => _validateStory()
-              );
-            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
-            const storyReinitializedSubscription =
-              StoryEditorStateService.onStoryReinitialized.subscribe(
-                () => _validateStory()
-              );
-            ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
           };
 
           ctrl.$onDestroy = function() {
-            ctrl.attachedSubscriptions.unsubscribe();
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

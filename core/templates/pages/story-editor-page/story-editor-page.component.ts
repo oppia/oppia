@@ -49,7 +49,7 @@ angular.module('oppia').component('storyEditorPage', {
         StoryEditorStateService, UndoRedoService,
         UrlInterpolationService, UrlService) {
       var ctrl = this;
-      ctrl.attachedSubscriptions = new Subscription();
+      ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
         if (UndoRedoService.getChangeCount() > 0) {
@@ -81,21 +81,19 @@ angular.module('oppia').component('storyEditorPage', {
       };
 
       ctrl.$onInit = function() {
-        const storyInitializedSubscription =
-        StoryEditorStateService.onStoryInitialized.subscribe(
-          () => setPageTitle()
-        );
-        ctrl.attachedSubscriptions.add(storyInitializedSubscription);
-        const storyReinitializedSubscription =
+        ctrl.directiveSubscriptions.add(
+          StoryEditorStateService.onStoryInitialized.subscribe(
+            () => setPageTitle()
+          ));
+        ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryReinitialized.subscribe(
             () => setPageTitle()
-          );
-        ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
+          ));
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
       };
 
       ctrl.$onDestroy = function() {
-        ctrl.attachedSubscriptions.unsubscribe();
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

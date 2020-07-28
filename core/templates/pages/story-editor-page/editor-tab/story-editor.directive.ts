@@ -61,7 +61,7 @@ angular.module('oppia').directive('storyEditor', [
             AlertsService, MAX_CHARS_IN_STORY_TITLE,
             MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
-          ctrl.attachedSubscriptions = new Subscription();
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
@@ -242,19 +242,21 @@ angular.module('oppia').directive('storyEditor', [
               _initEditor();
             });
 
-            const storyInitializedSubscription =
+            ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryInitialized.subscribe(
                 () => _init()
-              );
-            ctrl.attachedSubscriptions.add(storyInitializedSubscription);
-            const storyReinitializedSubscription =
+              ));
+            ctrl.directiveSubscriptions.add(
               StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _initEditor()
-              );
-            ctrl.attachedSubscriptions.add(storyReinitializedSubscription);
+              ));
 
             _init();
             _initEditor();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
