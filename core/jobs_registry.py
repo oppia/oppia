@@ -103,6 +103,9 @@ AUDIT_JOB_MANAGERS = [
     interaction_validation_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_validation_jobs_one_off.MathExpressionValidationOneOffJob,
     interaction_validation_jobs_one_off.MultipleChoiceInteractionOneOffJob,
+    (
+        interaction_validation_jobs_one_off
+        .InteractionCustomizationArgsValidationJob),
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,

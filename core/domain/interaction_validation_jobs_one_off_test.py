@@ -1175,7 +1175,9 @@ class InteractionRTECustomizationArgsValidationJobTests(
         self.process_and_flush_pending_tasks()
 
     def test_for_customization_arg_validation_job(self):
-        """Validates customization args for rich text components."""
+        """Check expected errors are produced for invalid html strings in RTE
+        components.
+        """
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -1291,6 +1293,7 @@ class InteractionRTECustomizationArgsValidationJobTests(
             .InteractionRTECustomizationArgsValidationJob)
 
     def test_validation_job_fails_for_invalid_schema_version(self):
+        """Test that invalid schema version results in job failure."""
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1318,3 +1321,127 @@ class InteractionRTECustomizationArgsValidationJobTests(
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class InteractionCustomizationArgsValidationJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            InteractionCustomizationArgsValidationJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_customization_arg_validation_job(self):
+        """Check that expected errors are produced for invalid
+        customization args.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+
+        state1.update_interaction_id('ItemSelectionInput')
+        state2.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict1 = {
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 1},
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+            ]}
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        job_id = (
+            interaction_validation_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.create_new())
+        (
+            interaction_validation_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            interaction_validation_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.get_output(job_id))
+        self.assertEqual(actual_output, [])
+
+        customization_args_dict2 = {
+            'minAllowableSelectionCount': {'value': '1b'},
+            'maxAllowableSelectionCount': {'value': 1},
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+            ]}
+        }
+
+        state2.update_interaction_customization_args(customization_args_dict2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        job_id = (
+            interaction_validation_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.create_new())
+        (
+            interaction_validation_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            interaction_validation_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.get_output(job_id))
+        expected_output = [(
+            u'[u\'Failed customization args validation for exp id exp_id0\', '
+            '[u\'ItemSelectionInput: Could not convert unicode to int: 1b\']]')]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict = {
+            'minAllowableSelectionCount': {'value': '1b'},
+            'maxAllowableSelectionCount': {'value': 1},
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+            ]}
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self,
+            interaction_validation_jobs_one_off
+            .InteractionCustomizationArgsValidationJob)

@@ -24,8 +24,10 @@ import itertools
 import re
 
 from core import jobs
+from core.domain import customization_args_util
 from core.domain import exp_fetchers
 from core.domain import html_validation_service
+from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -355,3 +357,48 @@ class InteractionRTECustomizationArgsValidationJob(
         else:
             output_values.append(key[exp_id_index:])
             yield (key[:exp_id_index - 1], output_values)
+
+
+class InteractionCustomizationArgsValidationJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of (exploration, state) pairs and validates
+    customization args for all interactions.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        error_messages = []
+        for _, state in exploration.states.items():
+            if state.interaction.id is None:
+                continue
+            try:
+                ca_specs = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        state.interaction.id).customization_arg_specs
+                )
+                customization_args_util.validate_customization_args_and_values(
+                    'interaction',
+                    state.interaction.id,
+                    state.interaction.customization_args,
+                    ca_specs,
+                    fail_on_validation_errors=True
+                )
+            except Exception as e:
+                error_messages.append('%s: %s' % (state.interaction.id, e))
+
+        if error_messages:
+            yield (
+                'Failed customization args validation for exp '
+                'id %s' % item.id, ', '.join(error_messages))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
