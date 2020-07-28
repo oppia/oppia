@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
 import feconf
@@ -214,9 +213,8 @@ class ConfigProperty(python_utils.OBJECT):
     @property
     def value(self):
         """Get the latest value from memcache, datastore, or use default."""
-        cache_tuple = memcache_services.get_multi([self.name])
-        memcached_items = caching_services.get_object_dict_from_cache_tuple(
-            cache_tuple)
+
+        memcached_items = memcache_services.get_multi([self.name])
         if self.name in memcached_items:
             return memcached_items[self.name]
 
