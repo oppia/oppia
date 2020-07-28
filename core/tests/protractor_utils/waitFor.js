@@ -132,6 +132,11 @@ var visibilityOfSuccessToast = async function(errorMessage) {
   await invisibilityOf(toastSuccessElement, errorMessage);
 };
 
+var modalPopupToAppear = async function() {
+  await visibilityOf(
+    element(by.css('.modal-body')), 'Modal taking too long to appear.');
+};
+
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
@@ -143,3 +148,4 @@ exports.newTabToBeCreated = newTabToBeCreated;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
+exports.modalPopupToAppear = modalPopupToAppear;

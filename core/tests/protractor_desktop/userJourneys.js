@@ -69,11 +69,7 @@ describe('Basic user journeys', function() {
 
       await users.login('mod@userManagement.com');
       await browser.get(general.MODERATOR_URL_SUFFIX);
-      var profileDropdown = element(
-        by.css('.protractor-test-profile-dropdown'));
-      await waitFor.elementToBeClickable(
-        profileDropdown, 'Could not click profile dropdown');
-      await profileDropdown.click();
+      await general.openProfileDropdown();
       await users.logout();
       await general.checkForConsoleErrors([]);
     });
