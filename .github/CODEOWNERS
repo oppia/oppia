@@ -150,6 +150,7 @@
 /scripts/install_prerequisites.sh @seanlip
 /scripts/typescript_checks*.py @ankita240796 @seanlip
 /scripts/linters/ @seanlip @Hudda
+/scripts/linters/ts_ignore_exceptions.json @nishantwrp
 /ubuntu_dockerfile @seanlip
 
 
