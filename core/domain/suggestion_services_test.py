@@ -447,9 +447,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id
+            )
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -460,9 +463,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion.status = suggestion_models.STATUS_REJECTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id
+            )
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -561,9 +567,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id
+            )
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'reject review message')
 
@@ -575,9 +584,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion.status = suggestion_models.STATUS_REJECTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id
+            )
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'reject review message')
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -628,8 +640,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
                 suggestion, '', self.author_id)
-        with self.assertRaisesRegexp(
-            Exception, 'The suggestion is not yet handled.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s is not yet handled.' % (
+                suggestion.suggestion_id
+            )
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 suggestion, 'resubmit summary message', self.author_id)
 
@@ -655,10 +671,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         self.COMMIT_MESSAGE, 'review message')
                 suggestion = suggestion_services.get_suggestion_by_id(
                     self.suggestion_id)
+                expected_exception_regexp = (
+                    'The suggestion with id %s was accepted. Only rejected '
+                    'suggestions can be resubmitted.' % (
+                        suggestion.suggestion_id
+                    )
+                )
                 with self.assertRaisesRegexp(
-                    Exception,
-                    'The suggestion was accepted. Only rejected suggestions '
-                    'can be resubmitted.'):
+                    Exception, expected_exception_regexp):
                     suggestion_services.resubmit_rejected_suggestion(
                         suggestion, 'resubmit summary message', self.author_id)
 
