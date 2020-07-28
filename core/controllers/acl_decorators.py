@@ -488,7 +488,9 @@ def can_manage_own_account(handler):
 
 
 def can_manage_own_profile(handler):
-    """Decorator to check whether user can manage their profile.
+    """Decorator to check whether a user can manage their profile. Only
+    the particular profile user and full user of the account have access
+    to this. Error will be thrown for others.
 
     Args:
         handler: function. The function to be decorated.

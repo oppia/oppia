@@ -102,7 +102,7 @@ UPDATABLE_ROLES = [
 # Users can be viewed by following list of role IDs via admin interface.
 #
 # NOTE: Do not include LEARNER role in this list as it does not represent
-#   role for a separate user account, rather a profile within the account.
+#   role for a separate user account, but rather a profile within the account.
 VIEWABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
