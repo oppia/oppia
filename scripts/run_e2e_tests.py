@@ -437,10 +437,15 @@ def get_chrome_driver_version():
     popen_args = ['google-chrome', '--version']
     command_that_errors = 'google-chrome --version'
     if common.is_mac_os():
+        # There are spaces between Google and Chrome in the path. Spaces don't
+        # need to be escaped when we're not using the terminal, ie. shell=False
+        # for Popen by default.
         popen_args = [
-            r'/Applications/Google Chrome.app/Contents/MacOS/Google '
-            'Chrome', '--version'
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            '--version'
         ]
+        # It is likely that the user will want to try this command on their
+        # terminal, therefore we need the backslashes to escape the spaces.
         command_that_errors = (
             r'/Applications/Google\ Chrome.app/Contents/MacOS/Google\ '
             'Chrome --version'

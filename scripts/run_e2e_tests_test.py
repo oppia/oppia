@@ -1052,8 +1052,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
-                r'/Applications/Google Chrome.app/Contents/MacOS/Google '
-                'Chrome', '--version'],)],)
+                '/Applications/Google Chrome.app/Contents/MacOS/Google '
+                'Chrome', '--version'],)])
         expected_message = (
             r'Failed to execute "/Applications/Google\\ '
             r'Chrome.app/Contents/MacOS/Google\\ Chrome --version" command. '
