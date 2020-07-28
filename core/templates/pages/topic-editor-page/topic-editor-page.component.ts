@@ -42,6 +42,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('topicEditorPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
@@ -56,16 +58,15 @@ angular.module('oppia').directive('topicEditorPage', [
         '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
         'ContextService', 'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-        'TOPIC_VIEWER_URL_TEMPLATE',
+        'UndoRedoService', 'UrlService',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
         function($scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED,
-            TOPIC_VIEWER_URL_TEMPLATE) {
+            UndoRedoService, UrlService,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
             return TopicEditorRoutingService.getActiveTabName();
           };
@@ -166,15 +167,25 @@ angular.module('oppia').directive('topicEditorPage', [
 
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => setPageTitle()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => setPageTitle()
+              ));
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
-            $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, setPageTitle);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

@@ -36,6 +36,8 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
@@ -43,16 +45,15 @@ angular.module('oppia').component('subtopicEditorTab', {
     'SubtopicValidationService', 'TopicEditorStateService',
     'TopicEditorRoutingService', 'TopicUpdateService',
     'UrlInterpolationService', 'WindowDimensionsService',
-    'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
-    'EVENT_TOPIC_REINITIALIZED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
+    'EVENT_SUBTOPIC_PAGE_LOADED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
     function(
         $scope, EntityCreationService, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
         UrlInterpolationService, WindowDimensionsService,
-        EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
-        EVENT_TOPIC_REINITIALIZED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
+        EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
       var _initEditor = function() {
@@ -224,8 +225,16 @@ angular.module('oppia').component('subtopicEditorTab', {
           !WindowDimensionsService.isWindowNarrow());
         ctrl.subtopicPreviewCardIsShown = false;
         ctrl.schemaEditorIsShown = false;
-        $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-        $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicInitialized.subscribe(
+            () => _initEditor()
+          ));
+        ctrl.directiveSubscriptions.add(
+          TopicEditorStateService.onTopicReinitialized.subscribe(
+            () => _initEditor()
+          ));
+
         $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
           ctrl.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
@@ -234,6 +243,11 @@ angular.module('oppia').component('subtopicEditorTab', {
         });
 
         _initEditor();
+      };
+
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

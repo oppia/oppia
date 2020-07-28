@@ -49,6 +49,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('domain/question/question-backend-api.service.ts');
 
+import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -70,7 +71,6 @@ angular.module('oppia').directive('topicEditorTab', [
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, AlertsService,
@@ -81,9 +81,9 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
             MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
@@ -378,14 +378,24 @@ angular.module('oppia').directive('topicEditorTab', [
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
-            $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicInitialized.subscribe(
+                () => _initEditor()
+              ));
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onTopicReinitialized.subscribe(
+                () => _initEditor()
+              ));
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
             $scope.$on(
               EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
               $scope.refreshTopic);
             _initEditor();
             _initStorySummaries();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

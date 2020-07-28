@@ -29,15 +29,15 @@ require('domain/topic/SubtopicPageObjectFactory.ts');
 const createSubtopicConstants = require('constants.ts');
 
 angular.module('oppia').controller('CreateNewSubtopicModalController', [
-  '$controller', '$rootScope', '$scope', '$uibModalInstance',
+  '$controller', '$scope', '$uibModalInstance',
   'SubtopicPageObjectFactory', 'SubtopicValidationService',
   'TopicEditorStateService', 'TopicUpdateService',
-  'topic', 'EVENT_TOPIC_REINITIALIZED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
+  'topic', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
   function(
-      $controller, $rootScope, $scope, $uibModalInstance,
+      $controller, $scope, $uibModalInstance,
       SubtopicPageObjectFactory, SubtopicValidationService,
       TopicEditorStateService, TopicUpdateService,
-      topic, EVENT_TOPIC_REINITIALIZED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
+      topic, MAX_CHARS_IN_SUBTOPIC_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -96,7 +96,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       TopicEditorStateService.deleteSubtopicPage(
         ctrl.topic.getId(), ctrl.subtopicId);
       TopicUpdateService.deleteSubtopic(ctrl.topic, ctrl.subtopicId);
-      $rootScope.$broadcast(EVENT_TOPIC_REINITIALIZED);
+      TopicEditorStateService.onTopicReinitialized.emit();
       $uibModalInstance.dismiss('cancel');
     };
 

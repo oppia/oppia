@@ -32,6 +32,8 @@ require('services/questions-list.service.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
@@ -39,16 +41,14 @@ angular.module('oppia').factory('TopicEditorStateService', [
   'SubtopicPageObjectFactory', 'TopicObjectFactory',
   'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
   'EVENT_STORY_SUMMARIES_INITIALIZED',
-  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
-  'EVENT_TOPIC_REINITIALIZED', function(
+  'EVENT_SUBTOPIC_PAGE_LOADED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
       RubricObjectFactory, StorySummaryObjectFactory,
       SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
       EVENT_STORY_SUMMARIES_INITIALIZED,
-      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
-      EVENT_TOPIC_REINITIALIZED) {
+      EVENT_SUBTOPIC_PAGE_LOADED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
@@ -69,6 +69,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
       current: [],
       others: []
     };
+
+    var _topicInitializedEventEmitter = new EventEmitter();
+    var _topicReinitializedEventEmitter = new EventEmitter();
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -103,9 +106,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
       // Reset the subtopic pages list after setting new topic.
       _cachedSubtopicPages.length = 0;
       if (_topicIsInitialized) {
-        $rootScope.$broadcast(EVENT_TOPIC_REINITIALIZED);
+        _topicInitializedEventEmitter.emit();
       } else {
-        $rootScope.$broadcast(EVENT_TOPIC_INITIALIZED);
+        _topicReinitializedEventEmitter.emit();
         _topicIsInitialized = true;
       }
     };
@@ -297,9 +300,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
       /**
        * Sets the topic stored within this service, propogating changes to
        * all bindings to the topic returned by getTopic(). The first
-       * time this is called it will fire a global event based on the
-       * EVENT_TOPIC_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_TOPIC_REINITIALIZED event.
+       * time this is called it will fire a global event based on
+       * onTopicInitialized. All subsequent
+       * calls will similarly fire a onTopicReinitialized event.
        */
       setTopic: function(topic) {
         _setTopic(topic);
@@ -429,6 +432,14 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       isSavingTopic: function() {
         return _topicIsBeingSaved;
+      },
+
+      get onTopicInitialized() {
+        return _topicInitializedEventEmitter;
+      },
+
+      get onTopicReinitialized() {
+        return _topicReinitializedEventEmitter;
       }
     };
   }
