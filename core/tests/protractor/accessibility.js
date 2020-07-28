@@ -25,7 +25,6 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
-  var timeout = 15000;
   var GET_STARTED_URL = 'http://localhost:9001/get-started';
   var COMMUNITY_LIBRARY_URL = 'http://localhost:9001/community-library';
   var LEARNER_DASHBOARD_URL = 'http://localhost:9001/learner-dashboard';
@@ -61,7 +60,7 @@ describe('screenreader and keyboard user accessibility features', function() {
         .getAttribute('id'));
   });
 
-  it('should test the navigation shortcut ctrl+0',
+  it('should navigate to the get-started page when ctrl+0 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection('http://localhost:9001/get-started');
@@ -112,7 +111,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(GET_STARTED_URL);
     });
 
-  it('should test the navigation shortcut ctrl+1',
+  it('should navigate to the community-library page when ctrl+1 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection('http://localhost:9001/get-started');
@@ -163,7 +162,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
     });
 
-  it('should test the navigation shortcut ctrl+2',
+  it('should navigate to the learner-dashboard page when ctrl+2 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection('http://localhost:9001/get-started');
@@ -214,7 +213,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
     });
 
-  it('should test the navigation shortcut ctrl+3',
+  it('should navigate to the creator-dashboard page when ctrl+3 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection('http://localhost:9001/get-started');
@@ -265,7 +264,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
     });
 
-  it('should test the navigation shortcut ctrl+4',
+  it('should navigate to about page when ctrl+4 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection('http://localhost:9001/get-started');
@@ -316,7 +315,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(ABOUT_URL);
     });
 
-  it('should test the navigation shortcut ctrl+5',
+  it('should navigate to the notifications page when ctrl+5 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection('http://localhost:9001/get-started');
@@ -367,7 +366,7 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
     });
 
-  it('should test the navigation shortcut ctrl+6',
+  it('should navigate to the preferences page when ctrl+6 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection('http://localhost:9001/get-started');

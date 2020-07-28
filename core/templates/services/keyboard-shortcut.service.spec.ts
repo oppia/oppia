@@ -19,7 +19,7 @@ import 'mousetrap';
 
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 
-describe('KeyboardShortcutService', () => {
+describe('Keyboard Shortcuts', () => {
   var skipButton = document.createElement('button');
   var nextButton = document.createElement('button');
   var continueToNextCardButton = document.createElement('button');
@@ -47,52 +47,40 @@ describe('KeyboardShortcutService', () => {
     document.body.append(categoryBar);
   });
 
-  it('should test navigation shortcuts.', () => {
-    var getStartedShortcutTriggered = false;
-    var libraryShortcutTriggered = false;
-    var learnerShortcutTriggered = false;
-    var creatorShortcutTriggered = false;
-    var preferenceShortcutTriggered = false;
-    var aboutShortcutTriggered = false;
-    var notificationShortcutTriggered = false;
+  it('should navigate to the corresponding page' +
+    ' when the navigation key is pressed', () => {
+    var hrefValue = '';
 
     keyboardShortcutService.setHref('#foo');
-    const reloadSpy = jasmine.createSpy('reload');
     spyOn(keyboardShortcutService, 'setHref').and.callFake(function(href) {
-      if (href === '/get-started') {
-        getStartedShortcutTriggered = true;
-      } else if (href === '/community-library') {
-        learnerShortcutTriggered = true;
-      } else if (href === '/learner-dashboard') {
-        libraryShortcutTriggered = true;
-      } else if (href === '/creator-dashboard') {
-        creatorShortcutTriggered = true;
-      } else if (href === '/preferences') {
-        preferenceShortcutTriggered = true;
-      } else if (href === '/about') {
-        aboutShortcutTriggered = true;
-      } else if (href === '/notifications') {
-        notificationShortcutTriggered = true;
-      }
+      hrefValue = href;
     });
     keyboardShortcutService.bindNavigationShortcuts();
+    
     Mousetrap.trigger('ctrl+0');
+    expect(hrefValue).toEqual('/get-started');
+
     Mousetrap.trigger('ctrl+1');
+    expect(hrefValue).toEqual('/community-library');
+
     Mousetrap.trigger('ctrl+2');
+    expect(hrefValue).toEqual('/learner-dashboard');
+
     Mousetrap.trigger('ctrl+3');
+    expect(hrefValue).toEqual('/creator-dashboard');
+
     Mousetrap.trigger('ctrl+4');
+    expect(hrefValue).toEqual('/about');
+
     Mousetrap.trigger('ctrl+5');
+    expect(hrefValue).toEqual('/notifications');
+
     Mousetrap.trigger('ctrl+6');
-    expect(getStartedShortcutTriggered).toBe(true);
-    expect(libraryShortcutTriggered).toBe(true);
-    expect(learnerShortcutTriggered).toBe(true);
-    expect(creatorShortcutTriggered).toBe(true);
-    expect(preferenceShortcutTriggered).toBe(true);
-    expect(aboutShortcutTriggered).toBe(true);
-    expect(notificationShortcutTriggered).toBe(true);
+    expect(hrefValue).toEqual('/preferences');
   });
 
-  it('should test library page action shortcuts', () => {
+  it('should move the focus to the corresponding element' + 
+    ' when the action key is pressed', () => {
     keyboardShortcutService.bindLibraryPageShortcuts();
 
     Mousetrap.trigger('s');
@@ -103,9 +91,7 @@ describe('KeyboardShortcutService', () => {
 
     Mousetrap.trigger('c');
     expect(categoryBar.isEqualNode(document.activeElement));
-  });
 
-  it('should test exploration player action shortcuts', () => {
     keyboardShortcutService.bindExplorationPlayerShortcuts();
 
     Mousetrap.trigger('s');
