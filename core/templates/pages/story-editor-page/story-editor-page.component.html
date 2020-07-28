@@ -14,8 +14,8 @@
           </a>
           <div>
             <div ng-if="$ctrl.getTotalWarningsCount()"
-                 class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color protractor-test-warning-indicator">
-              <span class="oppia-editor-warnings-count story-warning-count" ng-mouseover="$ctrl.toggleWarnings()" ng-mouseleave="$ctrl.toggleWarnings()">
+                 class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
+              <span class="oppia-editor-warnings-count story-warning-count protractor-test-warning-indicator" ng-mouseover="$ctrl.toggleWarnings()" ng-mouseleave="$ctrl.toggleWarnings()">
                 <[$ctrl.getTotalWarningsCount()]>
               </span>
               <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box story-editor-warning-box" ng-if="$ctrl.warningsAreShown">
