@@ -104,21 +104,21 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
-            raise self.InvalidInputException('This handler allows actions only'
-                                             ' on suggestions to explorations.')
+            raise self.InvalidInputException(
+                'This handler allows actions only'
+                ' on suggestions to explorations.')
 
         if suggestion_id.split('.')[1] != target_id:
-            raise self.InvalidInputException('The exploration id provided does '
-                                             'not match the exploration id '
-                                             'present as part of the '
-                                             'suggestion_id')
+            raise self.InvalidInputException(
+                'The exploration id provided does not match the exploration id '
+                'present as part of the suggestion_id')
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
-            raise self.UnauthorizedUserException('You cannot accept/reject your'
-                                                 ' own suggestion.')
+            raise self.UnauthorizedUserException(
+                'You cannot accept/reject your own suggestion.')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             suggestion_services.accept_suggestion(

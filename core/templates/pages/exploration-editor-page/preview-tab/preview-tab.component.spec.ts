@@ -158,9 +158,8 @@ describe('Preview Tab Component', function() {
       });
       spyOn(explorationEngineService, 'initSettingsFromEditor');
 
-      // Get data from exploration data service.
-      $scope.$apply();
-      // Resolve promise in open modal.
+      // Get data from exploration data service and resolve promise in open
+      // modal.
       $scope.$apply();
 
       var expectedParamChanges = parameters.map(parameter => (
@@ -177,9 +176,8 @@ describe('Preview Tab Component', function() {
       });
       spyOn(routerService, 'navigateToMainTab');
 
-      // Get data from exploration data service.
-      $scope.$apply();
-      // Resolve promise in open modal.
+      // Get data from exploration data service and resolve promise in open
+      // modal.
       $scope.$apply();
 
       expect(routerService.navigateToMainTab).toHaveBeenCalled();
@@ -240,9 +238,8 @@ describe('Preview Tab Component', function() {
       spyOn($uibModal, 'open');
       spyOn(explorationEngineService, 'initSettingsFromEditor');
 
-      // Get data from exploration data service.
-      $scope.$apply();
-      // Resolve promise in open modal.
+      // Get data from exploration data service and resolve promise in open
+      // modal.
       $scope.$apply();
 
       expect($uibModal.open).not.toHaveBeenCalled();
@@ -259,9 +256,8 @@ describe('Preview Tab Component', function() {
       spyOn(numberAttemptsService, 'reset').and.callThrough();
       spyOn(explorationEngineService, 'initSettingsFromEditor');
 
-      // Get data from exploration data service.
-      $scope.$apply();
-      // Resolve promise in open modal.
+      // Get data from exploration data service and resolve promise in open
+      // modal.
       $scope.$apply();
 
       ctrl.resetPreview();

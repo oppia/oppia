@@ -36,7 +36,7 @@ require(
   'editor-navbar-breadcrumb.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.component.ts');
+  'editor-navigation.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.component.ts');
@@ -54,7 +54,7 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.component.ts');
-require('pages/exploration-editor-page/feedback-tab/feedback-tab.directive.ts');
+require('pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.component.ts');
@@ -72,7 +72,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'playthrough-issues.directive.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
+  'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
 require(
