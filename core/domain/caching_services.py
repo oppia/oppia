@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
@@ -27,7 +28,7 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-memory_cache_services = models.Registry.import_memcache_services()
+memory_cache_services = models.Registry.import_cache_services()
 
 def _get_correct_dict_type_of_key(key):
     """In the memory cache, values are stored as (key, value) pairs where values
@@ -57,11 +58,11 @@ def _get_correct_dict_type_of_key(key):
     else:
         return None
 
-def _convert_object_to_json_str(object):
+def _convert_object_to_json_str(obj):
     """Converts an oppia object to a json string representation of that object.
 
     Args:
-        object: *. An object that has a to_dict method which means that it can
+        obj: *. An object that has a to_dict method which means that it can
             be represented by a dictionary with json-serializable (key, value)
             pairs.
 
@@ -72,19 +73,19 @@ def _convert_object_to_json_str(object):
     Returns:
         str. Returns the json encoded string version of the object.
     """
-    if not hasattr(value, 'to_dict'):
+    if not hasattr(obj, 'to_dict'):
         raise Exception(
             ('Object of type %s does not have a to_dict() method ' +
              'implemented. This method is required to allow' +
-             ' caching.') % python_utils.convert_to_bytes(type(object)))
+             ' caching.') % python_utils.convert_to_bytes(type(obj)))
     try:
-        result = json.dumps(value.to_dict())
+        result = json.dumps(obj.to_dict())
     except TypeError:
         raise Exception(
             ('Object of type %s cannot be serialized. Please ' +
             'consult this table for more information on what types are ' +
             'serializable: https://docs.python.org/3/library/json.html#py-to' +
-            '-json-table.') % python_utils.convert_to_bytes(type(object)))
+            '-json-table.') % python_utils.convert_to_bytes(type(obj)))
 
     return result
 
@@ -111,7 +112,7 @@ def _get_object_from_json_string(object_class, json_string):
              'object.') % (str_type, key))
 
     try:
-        decoded_object_dict = json.loads(value)
+        decoded_object_dict = json.loads(json_string)
     except ValueError:
         raise Exception(
             'Json decoding failed for object associated with key %s' % key)
@@ -128,8 +129,7 @@ def get_multi(keys):
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
         decoded (key, value) pairs retrieved from the platform caching service.
     """
-    values = memcache_services.get_multi(
-        [exploration_memcache_key])
+    values = memory_cache_services.get_multi(keys)
     result_dict = {}
     for key, value in zip(keys, values):
         if value:
@@ -159,7 +159,7 @@ def set_multi(key_value_mapping):
             key_value_mapping[key] = _convert_object_to_json_str(value)
     return memory_cache_services.set_multi(key_value_mapping)
 
-def delete_multi(key):
+def delete_multi(keys):
     """Deletes a multiple keys in the cache.
 
     Args:

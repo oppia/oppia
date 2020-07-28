@@ -29,7 +29,7 @@ from core.tests import test_utils
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
-memcache_services = models.Registry.import_memcache_services()
+memcache_services = models.Registry.import_cache_services()
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):

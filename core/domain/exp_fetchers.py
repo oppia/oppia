@@ -35,7 +35,7 @@ import feconf
 import python_utils
 import utils
 
-memcache_services = models.Registry.import_memcache_services()
+memcache_services = models.Registry.import_cache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 

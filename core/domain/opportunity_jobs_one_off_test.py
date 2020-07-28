@@ -36,7 +36,7 @@ from core.tests import test_utils
 import python_utils
 
 
-memcache_services = models.Registry.import_memcache_services()
+memcache_services = models.Registry.import_cache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])

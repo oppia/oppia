@@ -39,7 +39,7 @@ import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
-memcache_services = models.Registry.import_memcache_services()
+memcache_services = models.Registry.import_cache_services()
 
 
 def get_new_story_id():

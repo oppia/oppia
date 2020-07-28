@@ -31,7 +31,7 @@ import feconf
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
-memcache_services = models.Registry.import_memcache_services()
+memcache_services = models.Registry.import_cache_services()
 
 
 def _migrate_story_contents_to_latest_schema(versioned_story_contents):

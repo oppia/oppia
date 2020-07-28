@@ -27,7 +27,7 @@ import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_memcache_services()
+memcache_services = models.Registry.import_cache_services()
 
 
 def _migrate_page_contents_to_latest_schema(versioned_page_contents):

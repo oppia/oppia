@@ -57,7 +57,7 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_memcache_services()
+memcache_services = models.Registry.import_cache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user

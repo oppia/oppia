@@ -21,13 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import topic_domain
 from core.platform import models
 import feconf
 
 (skill_models, topic_models,) = models.Registry.import_models([
     models.NAMES.skill, models.NAMES.topic])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def _migrate_subtopics_to_latest_schema(versioned_subtopics):
@@ -183,7 +183,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
         given id, or None if it does not exist.
     """
     topic_memcache_key = get_topic_memcache_key(topic_id, version=version)
-    memcached_topic = memcache_services.get_multi(
+    memcached_topic = caching_services.get_multi(
         [topic_memcache_key]).get(topic_memcache_key)
 
     if memcached_topic is not None:
@@ -193,7 +193,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             topic_id, strict=strict, version=version)
         if topic_model:
             topic = get_topic_from_model(topic_model)
-            memcache_services.set_multi({topic_memcache_key: topic})
+            caching_services.set_multi({topic_memcache_key: topic})
             return topic
         else:
             return None
