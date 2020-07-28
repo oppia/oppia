@@ -52,11 +52,12 @@ export class LearnerAnswerDetailsDataService {
           entity_type: 'exploration',
           entity_id: this._expId
         });
-        return this.http.get(learnerAnswerInfoDataUrl).toPromise();
+    return this.http.get(learnerAnswerInfoDataUrl).toPromise();
   }
   private _deleteLearnerAnswerInfo(
-    entityId, stateName, learnerAnswerInfoId) {
-    const learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
+      entityId, stateName, learnerAnswerInfoId) {
+    const learnerAnswerInfoDataUrl =
+      this.urlInterpolationService.interpolateUrl(
       this.LEARNER_ANSWER_INFO_DATA_URL, {
         entity_type: 'exploration',
         entity_id: entityId
