@@ -20,6 +20,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { EventEmitter } from '@angular/core';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {
@@ -114,6 +115,10 @@ describe('Topic editor tab directive', function() {
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize the variables', function() {
     expect($scope.topic).toEqual(topic);
@@ -416,5 +421,21 @@ describe('Topic editor tab directive', function() {
       spyOn(TopicUpdateService, 'rearrangeSubtopic'));
     $scope.onRearrangeSubtopicEnd(0);
     expect(moveSubtopicSpy).not.toHaveBeenCalled();
+  });
+
+  it('should call functions after subscribing', function() {
+    let sampleEventEmitter1 = new EventEmitter();
+    let sampleEventEmitter2 = new EventEmitter();
+    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+      function() {
+        sampleEventEmitter1.emit();
+        return sampleEventEmitter1;
+      });
+    spyOnProperty(TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+      function() {
+        sampleEventEmitter2.emit();
+        return sampleEventEmitter2;
+      });
+    expect(ctrl.directiveSubscriptions._subscriptions.length).toEqual(2);
   });
 });
