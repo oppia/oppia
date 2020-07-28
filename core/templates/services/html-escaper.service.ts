@@ -27,22 +27,10 @@ import { LoggerService } from 'services/contextual/logger.service';
 export class HtmlEscaperService {
   constructor(private loggerService: LoggerService) {}
 
-  /**
-   * Converts an object to its JSON counterpart.
-   * @param {object} graph - An object.
-   * @return {string} An escaped JSON version of the original string object.
-   */
   objToEscapedJson(obj: Object): string {
     return this.unescapedStrToEscapedStr(JSON.stringify(obj));
   }
 
-
-  /**
-   * Converts a escaped JSON string to its object counterpart.
-   * @param {string} json - A JSON string.
-   * @return {object} an unescaped non-JSON version of the original string.
-   * @throws Will throw error if empty string is passed to JSON decoder.
-   */
   escapedJsonToObj(json: string): Object {
     if (!json) {
       this.loggerService.error('Empty string was passed to JSON decoder.');
@@ -51,11 +39,6 @@ export class HtmlEscaperService {
     return JSON.parse(this.escapedStrToUnescapedStr(json));
   }
 
-  /**
-   * Converts an unescaped string to its HTML escaped counterpart.
-   * @param {string} str - An unescaped string.
-   * @return {string} an escaped string derived from the previous string.
-   */
   unescapedStrToEscapedStr(str: string): string {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -64,12 +47,6 @@ export class HtmlEscaperService {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
-
-  /**
-   * Converts an HTML escaped string to its unescaped counterpart.
-   * @param {string} value - An escaped string.
-   * @return {string} an unescaped string derived from the previous string.
-   */
   escapedStrToUnescapedStr(value: string): string {
     return String(value)
       .replace(/&quot;/g, '"')
