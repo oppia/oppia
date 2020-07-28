@@ -1019,8 +1019,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                 run_e2e_tests.main(
                                     args=['--skip-install', '--skip-build'])
 
-    def test_chrome_not_found_failure(self):
-
+    def test_linux_chrome_version_command_not_found_failure(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
 
         def mock_popen(unused_commands, stdout):
@@ -1042,23 +1041,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             Exception, expected_message):
             run_e2e_tests.get_chrome_driver_version()
 
-    def test_get_chrome_driver_for_mac_users(self):
-        """Makes sure get_chrome_driver_version() can get the chrome driver
-        version for mac users.
-        """
-
+    def test_mac_chrome_version_command_not_found_failure(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
 
-        with os_name_swap:
-            version = run_e2e_tests.get_chrome_driver_version()
-            self.assertRegexpMatches(version, '^[0-9]+')
-
-    def test_mac_chrome_driver_not_found_failure(self):
-
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-
-        def mock_popen(unused_commands, shell, stdout):
-            self.assertEqual(shell, True)
+        def mock_popen(unused_commands, stdout):
             self.assertEqual(stdout, -1)
             raise OSError(
                 r'/Applications/Google\ Chrome.app/Contents/MacOS/Google\ '
@@ -1066,13 +1052,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
-                r'/Applications/Google\ Chrome.app/Contents/MacOS/Google\ '
-                'Chrome --version'],)],
-            expected_kwargs=[{'shell': True, 'stdout': -1}])
+                r'/Applications/Google Chrome.app/Contents/MacOS/Google '
+                'Chrome', '--version'],)],)
         expected_message = (
             r'Failed to execute "/Applications/Google\\ '
             r'Chrome.app/Contents/MacOS/Google\\ Chrome --version" command. '
-            'This is used to determine which chromedriver version to use. '
+            'This is used to determine the chromedriver version to use. '
             'Please set the chromedriver version manually using '
             '--chrome_driver_version flag. To determine the chromedriver '
             'version to be used, please follow the instructions mentioned '
