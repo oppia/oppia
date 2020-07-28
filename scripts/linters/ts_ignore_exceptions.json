@@ -1,5 +1,145 @@
 {
-    "core/templates/services/search.service.spec.ts": [
-        "jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue("
-    ]
+  "core/templates/domain/improvements/NeedsGuidingResponsesTaskObjectFactorySpec.ts": [
+    "task_type: '???',"
+  ],
+  "extensions/interactions/LogicProof/static/js/tools/logic-demo-test.controller.spec.ts": [
+    "properties than entries according with lint settings.",
+    "properties than {} according with lint settings."
+  ],
+  "extensions/interactions/CodeRepl/directives/code-repl-validation.service.spec.ts": [
+    "customizationArguments.language.value = 1;",
+    "customizationArguments.placeholder.value = 1;",
+    "customizationArguments.preCode.value = 1;",
+    "customizationArguments.postCode.value = 1;"
+  ],
+  "core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts": [
+    "spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and",
+    ".returnValue(element);",
+    "properties than toDataURL according with lint settings."
+  ],
+  "core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts": [
+    "expect(summary.isSelected).toBe(true);",
+    "expect(summary.isSelected).toBe(false);"
+  ],
+  "core/templates/mathjaxConfig.ts": ["skipStartupTypeset: true,"],
+  "core/templates/domain/collection/collection-validation.service.ts": [
+    "rid of the TS2339 error on AppConstants."
+  ],
+  "core/templates/services/request-interceptor.service.ts": [
+    "request.body = body;",
+    "request.body = {"
+  ],
+  "extensions/objects/templates/svg-filename-editor.component.spec.ts": [
+    "be declared."
+  ],
+  "core/templates/Polyfills.ts": [
+    "navigator.mediaDevices = {};",
+    "property does not exist error."
+  ],
+  "core/templates/pages/exploration-editor-page/exploration-editor-page.component.spec.ts": [
+    "should be declared.",
+    "1 argument in the lints.",
+    "just offset in the lint settings."
+  ],
+  "core/templates/domain/story/StoryObjectFactorySpec.ts": [
+    "sampleStoryBackendDict);"
+  ],
+  "core/templates/domain/improvements/HighBounceRateTaskObjectFactorySpec.ts": [
+    "task_type: '???',"
+  ],
+  "core/templates/services/navigation.service.spec.ts": [
+    "angularElementSpy = spyOn(angular, 'element').and.returnValue(element);"
+  ],
+  "core/templates/services/assets-backend-api.service.spec.ts": [
+    "be declarated."
+  ],
+  "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts": [
+    "since sort is an ENUM, we can't assign any random value."
+  ],
+  "core/templates/domain/statistics/PlaythroughIssueObjectFactorySpec.ts": [
+    "piof.createFromBackendDict(playthroughDict);"
+  ],
+  "core/templates/services/schema-default-value.service.ts": [
+    "this.logger.error('Invalid schema type: ' + schema.type);"
+  ],
+  "core/templates/pages/exploration-player-page/templates/information-card-modal.controller.spec.ts": [
+    "property according with lint settings."
+  ],
+  "core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts": [
+    "spyOn(window, 'getSelection').and.returnValue({"
+  ],
+  "core/templates/services/csrf-token.service.spec.ts": [
+    "spyOn($, 'ajax').and.returnValue(Promise.resolve("
+  ],
+  "core/templates/services/math-interactions.service.ts": [
+    "rid of the TS2339 error on AppConstants."
+  ],
+  "core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts": [
+    "var jQuerySpy = spyOn(window, '$');",
+    "jQuerySpy.withArgs('.oppia-save-exploration-modal').and.returnValue(",
+    "divMock);"
+  ],
+  "core/templates/services/date-time-format.service.spec.ts": [
+    "spyOn(window, 'Date').and.callFake(MockDateContructor);"
+  ],
+  "core/templates/domain/statistics/PlaythroughObjectFactorySpec.ts": [
+    "expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError("
+  ],
+  "extensions/interactions/EndExploration/directives/end-exploration-validation.service.spec.ts": [
+    "customizationArguments.recommendedExplorationIds.value = [1];",
+    "customizationArguments.recommendedExplorationIds.value = 'ExpID0';"
+  ],
+  "extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts": [
+    "currentState, {}, answerGroups, goodDefaultOutcome);"
+  ],
+  "core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.controller.spec.ts": [
+    "spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(",
+    "element);"
+  ],
+  "core/templates/domain/statistics/LearnerActionObjectFactorySpec.ts": [
+    "learnerActionObjectFactory.createFromBackendDict(playthroughDict);"
+  ],
+  "core/templates/pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.spec.ts": [
+    "third-party library according to the lint."
+  ],
+  "core/templates/pages/exploration-editor-page/services/router.service.spec.ts": [
+    "var jQuerySpy = spyOn(window, '$');",
+    "jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(",
+    "$(document.createElement('div')));",
+    "var jQuerySpy = spyOn(window, '$');",
+    "jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(",
+    "$(document.createElement('div')));"
+  ],
+  "core/templates/services/speech-synthesis-chunker.service.spec.ts": [
+    "// SpeechSynthesisUtterance."
+  ],
+  "core/templates/pages/creator-dashboard-page/modal-templates/upload-activity-modal.controller.spec.ts": [
+    "spyOn(document, 'getElementById').and.callFake(function() {",
+    "spyOn(document, 'getElementById').and.callFake(function() {"
+  ],
+  "core/templates/domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactorySpec.ts": [
+    "task_type: '???',"
+  ],
+  "core/templates/services/search.service.spec.ts": [
+    "var jquerySpy = spyOn(window, '$');",
+    "jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue(",
+    "$(mockInput).val(searchQuery));",
+    "jquerySpy.withArgs(mockInput).and.callThrough();",
+    "var jquerySpy = spyOn(window, '$');",
+    "jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue(",
+    "$(mockInput).val('mismatch'));",
+    "jquerySpy.withArgs(mockInput).and.callThrough();"
+  ],
+  "core/templates/pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.spec.ts": [
+    "// third-party library according to the lint."
+  ],
+  "core/templates/pages/exploration-editor-page/modal-templates/post-publish-modal.controller.spec.ts": [
+    "spyOn(window, 'getSelection').and.returnValue({"
+  ],
+  "core/templates/domain/improvements/IneffectiveFeedbackLoopTaskObjectFactorySpec.ts": [
+    "task_type: '???',"
+  ],
+  "core/templates/pages/exploration-player-page/exploration-player-page.component.spec.ts": [
+    "// in the lints."
+  ]
 }

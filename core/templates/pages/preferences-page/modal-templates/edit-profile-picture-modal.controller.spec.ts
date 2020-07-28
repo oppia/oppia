@@ -58,8 +58,7 @@ describe('EditProfilePictureModalController', function() {
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
     var file = new File([arrayBuffer], 'filename.mp3');
 
-    // The window has strict type rules which will fail typescript lint tests
-    // without the @ts-ignore.
+    // The window has strict type rules which will fail typescript lint test.
     // @ts-ignore
     spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
       // @ts-ignore
