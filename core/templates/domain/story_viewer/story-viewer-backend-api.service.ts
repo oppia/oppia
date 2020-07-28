@@ -84,16 +84,10 @@ export class StoryViewerBackendApiService {
     });
   }
 
-<<<<<<< HEAD
   _recordChapterCompletion(
       abbreviatedTopicName: string, storyId: string, nodeId: string,
-      successCallback: (value?: StoryChapterCompletionResponse) => void,
-      errorCallback: (reason?: Object) => void): void {
-=======
-  _recordChapterCompletion(storyId: string, nodeId: string,
       successCallback: (value: StoryChapterCompletionResponse) => void,
       errorCallback: (reason: string) => void): void {
->>>>>>> upstream/develop
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
         abbreviated_topic_name: abbreviatedTopicName,
