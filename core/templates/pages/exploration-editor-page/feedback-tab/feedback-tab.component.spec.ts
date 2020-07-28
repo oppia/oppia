@@ -89,6 +89,7 @@ describe('Feedback Tab Component', function() {
     });
     ctrl.$onInit();
     $scope.$apply();
+    $rootScope.$apply();
   }));
 
   it('should throw an error when trying to active a non-existent thread',
