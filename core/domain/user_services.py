@@ -435,11 +435,11 @@ def generate_initial_profile_picture(user_id):
         user_id: str. The unique ID of the user.
     """
     user_email = get_email_from_user_id(user_id)
-    user_gravatar = fetch_gravatar_by_email(user_email)
+    user_gravatar = fetch_gravatar(user_email)
     update_profile_picture_data_url(user_id, user_gravatar)
 
 
-def get_gravatar_url_by_email(email):
+def get_gravatar_url(email):
     """Returns the gravatar url for the specified email.
 
     Args:
@@ -453,7 +453,7 @@ def get_gravatar_url_by_email(email):
         (hashlib.md5(email).hexdigest(), GRAVATAR_SIZE_PX))
 
 
-def fetch_gravatar_by_email(email):
+def fetch_gravatar(email):
     """Returns the gravatar corresponding to the user's email, or an
     identicon generated from the email if the gravatar doesn't exist.
 
@@ -465,7 +465,7 @@ def fetch_gravatar_by_email(email):
         to the gravatar service fails, this returns DEFAULT_IDENTICON_DATA_URL
         and logs an error.
     """
-    gravatar_url = get_gravatar_url_by_email(email)
+    gravatar_url = get_gravatar_url(email)
     try:
         result = urlfetch.fetch(
             gravatar_url,

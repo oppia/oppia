@@ -291,7 +291,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
 
-    def test_fetch_gravatar_by_email_with_headers(self):
+    def test_fetch_gravatar_with_headers(self):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
@@ -304,7 +304,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
             'content_type': 'application/json; charset=utf-8'
         }
         with self.urlfetch_mock(content=gravatar, headers=headers_dict):
-            profile_picture = user_services.fetch_gravatar_by_email(user_email)
+            profile_picture = user_services.fetch_gravatar(user_email)
             gravatar_data_url = utils.convert_png_to_data_url(
                 expected_gravatar_filepath)
             self.assertEqual(profile_picture, gravatar_data_url)
