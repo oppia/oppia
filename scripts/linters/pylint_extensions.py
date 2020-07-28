@@ -496,6 +496,31 @@ class DocstringParameterChecker(checkers.BaseChecker):
             'Space after """ in docstring.',
             'space-after-triple-quote',
             'Please do not use space after """ in docstring.'
+        ),
+        'W9030': (
+            'Missing single newline below class docstring.',
+            'newline-below-class-docstring',
+            'Please add a single newline below class docstring.'
+        ),
+        'W9031': (
+            'Files must have a single newline above args in doc string.',
+            'single-space-above-args',
+            'Please enter a single newline above args in doc string.'
+        ),
+        'W9032': (
+            'Files must have a single newline above returns in doc string.',
+            'single-space-above-returns',
+            'Please enter a single newline above returns in doc string.'
+        ),
+        'W9033': (
+            'Files must have a single newline above raises in doc string.',
+            'single-space-above-raises',
+            'Please enter a single newline above raises in doc string.'
+        ),
+        'W9034': (
+            'Files must have a single newline above yield in doc string.',
+            'single-space-above-yield',
+            'Please enter a single newline above yield in doc string.'
         )
     }
 
@@ -542,6 +567,36 @@ class DocstringParameterChecker(checkers.BaseChecker):
     DOCSTRING_SECTION_YIELDS = 'yields'
     DOCSTRING_SECTION_RAISES = 'raises'
 
+    def visit_classdef(self, node):
+        """Visit each class definition in a module.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+        """
+        # Check if the given node has docstring.
+        if node.doc is None:
+            return
+        line_number = node.fromlineno
+        # Iterate till the start of docstring.
+        while True:
+            line = linecache.getline(node.root().file, line_number).strip()
+            if line.startswith((b'"""', b'\'\'\'', b'\'', b'"')):
+                break
+            else:
+                line_number += 1
+
+        doc_length = len(node.doc.split(b'\n'))
+        line_number += doc_length
+        first_line_after_doc = linecache.getline(
+            node.root().file, line_number).strip()
+        second_line_after_doc = linecache.getline(
+            node.root().file, line_number + 1).strip()
+        if first_line_after_doc != b'':
+            self.add_message('newline-below-class-docstring', node=node)
+        elif second_line_after_doc == b'':
+            self.add_message('newline-below-class-docstring', node=node)
+
     def visit_functiondef(self, node):
         """Called for function and method definitions (def).
 
@@ -553,7 +608,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_functiondef_params(node, node_doc)
         self.check_functiondef_returns(node, node_doc)
         self.check_functiondef_yields(node, node_doc)
-        self.check_docstring_section_style(node)
+        self.check_docstring_style(node)
         self.check_docstring_section_indentation(node)
 
     def check_functiondef_params(self, node, node_doc):
@@ -595,8 +650,11 @@ class DocstringParameterChecker(checkers.BaseChecker):
             node_doc, node.args, node,
             accept_no_param_doc=node_allow_no_param)
 
-    def check_docstring_section_style(self, node):
-        """Checks whether the docstring has valid style.
+    def check_docstring_style(self, node):
+        """It fetches a function node and extract the class node from function
+        node if it is inside a class body and passes it to
+        check_docstring_structure which checks whether the docstring has a
+        space at the beginning and a period at the end.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -608,9 +666,40 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 self.check_docstring_structure(class_node)
         self.check_docstring_structure(node)
 
+    def check_space_above_args(self, node, docstring):
+        """Checks to ensure that there is a single space above the
+        argument parameters in the docstring.
+
+        Args:
+            node: astroid.node.Function. Node for a function or method
+                definition in the AST.
+            docstring: list(str). Function docstring in splitted by newlines.
+        """
+        blank_line_counter = 0
+        for line in docstring:
+            line = line.strip()
+            if line == b'':
+                blank_line_counter += 1
+            if blank_line_counter == 0 or blank_line_counter > 1:
+                if line == b'Args:':
+                    self.add_message(
+                        'single-space-above-args', node=node)
+                elif line == b'Returns:':
+                    self.add_message(
+                        'single-space-above-returns', node=node)
+                elif line == b'Raises:':
+                    self.add_message(
+                        'single-space-above-raises', node=node)
+                elif line == b'Yield:':
+                    self.add_message(
+                        'single-space-above-yield', node=node)
+            if line != b'':
+                blank_line_counter = 0
+
+
     def check_docstring_structure(self, node):
         """Checks whether the docstring has the correct structure i.e.
-        do not have space the beginning and have a period at the end of
+        do not have space at the beginning and have a period at the end of
         docstring.
 
         Args:
@@ -647,8 +736,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         "Returns": section, "Yield": section, "Raises: section) are indented
         properly. Parameters should be indented by 4 relative to the 'Args:'
         'Return:', 'Raises:', 'Yield:' line and any wrap-around descriptions
-        should be indented by 8. The rest of the docstring section checks are
-        in DocstringChecker.
+        should be indented by 8.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -668,7 +756,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
             current_docstring_section = None
             in_description = False
             args_indentation_in_spaces = 0
-            for line in node.doc.splitlines():
+            docstring = node.doc.splitlines()
+            self.check_space_above_args(node, docstring)
+            for line in docstring:
                 stripped_line = line.lstrip()
                 current_line_indentation = (
                     len(line) - len(stripped_line))
@@ -688,7 +778,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     args_indentation_in_spaces = current_line_indentation
                 # If line starts with Raises: , it is the header of a Raises
                 # subsection.
-                if stripped_line.startswith('Raises:'):
+                elif stripped_line.startswith('Raises:'):
                     current_docstring_section = (
                         self.DOCSTRING_SECTION_RAISES)
                     in_freeform_section = False
@@ -696,7 +786,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     args_indentation_in_spaces = current_line_indentation
                 # If line starts with Yields: , it is the header of a Yields
                 # subsection.
-                if stripped_line.startswith('Yields:'):
+                elif stripped_line.startswith('Yields:'):
                     current_docstring_section = (
                         self.DOCSTRING_SECTION_YIELDS)
                     in_freeform_section = False
@@ -1460,84 +1550,6 @@ class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
                     self.add_message('excessive-new-lines', line=line_num + 1)
 
 
-class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
-    """Checker for single space above args in python doc string."""
-
-    __implements__ = interfaces.IRawChecker
-    name = 'single-space-above-args-raises-returns'
-    priority = -1
-    msgs = {
-        'C0012': (
-            'Files must have a single newline above args in doc string.',
-            'single-space-above-args',
-            'Please enter a single newline above args in doc string.'
-        ),
-        'C0013': (
-            'Files must have a single newline above returns in doc string.',
-            'single-space-above-returns',
-            'Please enter a single newline above returns in doc string.'
-        ),
-        'C0014': (
-            'Files must have a single newline above raises in doc string.',
-            'single-space-above-raises',
-            'Please enter a single newline above raises in doc string.'
-        )
-    }
-
-    def process_module(self, node):
-        """Process a module to ensure that there is a single newline above args,
-        raises, returns in python doc string.
-
-        Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
-        """
-
-        in_class_or_function = False
-        in_docstring = False
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        blank_line_counter = 0
-        prev_line = ''
-
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-
-            if line_num > 0:
-                prev_line = file_content[line_num - 1].strip()
-
-            # Check if it is a docstring and not some multi-line string.
-            if (prev_line.startswith(b'class ') or
-                    prev_line.startswith(b'def ') or in_class_or_function):
-                in_class_or_function = True
-                if prev_line.endswith(b'):') and line.startswith(b'"""'):
-                    in_docstring = True
-                    in_class_or_function = False
-
-            if line.endswith(b'"""'):
-                in_docstring = False
-
-            if not in_docstring:
-                continue
-
-            if file_content[line_num] == b'\n':
-                blank_line_counter += 1
-            else:
-                blank_line_counter = 0
-
-            if (line_num + 1 < file_length and (
-                    blank_line_counter == 0 or blank_line_counter > 1)):
-                line = file_content[line_num + 1].strip()
-                if line == b'Args:':
-                    self.add_message(
-                        'single-space-above-args', line=line_num + 1)
-                elif line == b'Returns:':
-                    self.add_message(
-                        'single-space-above-returns', line=line_num + 1)
-                elif line == b'Raises:':
-                    self.add_message(
-                        'single-space-above-raises', line=line_num + 1)
-
-
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
@@ -1747,51 +1759,6 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                     line=closing_line_index_of_fileoverview + 1)
 
 
-class NewlineBelowClassDocstring(checkers.BaseChecker):
-    """Checks if there is a single newline below the class docstring."""
-
-    __implements__ = interfaces.IAstroidChecker
-    name = 'newline-below-class-docstring'
-    priority = -1
-    msgs = {
-        'C0026': (
-            'Missing single newline below class docstring.',
-            'newline-below-class-docstring',
-            'Please add a single newline below class docstring.'
-        )
-    }
-
-    def visit_classdef(self, node):
-        """Visit each class definition in a module.
-
-        Args:
-            node: astroid.nodes.ClassDef. Node for a class definition
-                in the AST.
-        """
-        # Check if the given node has docstring.
-        if node.doc is None:
-            return
-        line_number = node.fromlineno
-        # Iterate till the start of docstring.
-        while True:
-            line = linecache.getline(node.root().file, line_number).strip()
-            if line.startswith((b'"""', b'\'\'\'', b'\'', b'"')):
-                break
-            else:
-                line_number += 1
-
-        doc_length = len(node.doc.split(b'\n'))
-        line_number += doc_length
-        first_line_after_doc = linecache.getline(
-            node.root().file, line_number).strip()
-        second_line_after_doc = linecache.getline(
-            node.root().file, line_number + 1).strip()
-        if first_line_after_doc != b'':
-            self.add_message('newline-below-class-docstring', node=node)
-        elif second_line_after_doc == b'':
-            self.add_message('newline-below-class-docstring', node=node)
-
-
 class SingleLinePragmaChecker(checkers.BaseChecker):
     """Custom pylint checker which checks if pylint pragma is used to disable
     a rule for a single line only.
@@ -1852,9 +1819,7 @@ def register(linter):
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
     linter.register_checker(ExcessiveEmptyLinesChecker(linter))
-    linter.register_checker(SingleNewlineAboveArgsChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
-    linter.register_checker(NewlineBelowClassDocstring(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
