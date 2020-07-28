@@ -27,15 +27,17 @@ import os
 import subprocess
 import sys
 
-import github
 import python_utils
 import release_constants
 from scripts import common
 from scripts.release_scripts import generate_release_info
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
     'core', 'templates', 'pages', 'about-page',
