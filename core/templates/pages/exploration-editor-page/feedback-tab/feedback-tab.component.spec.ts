@@ -23,6 +23,7 @@ import { AlertsService } from 'services/alerts.service';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -51,6 +52,8 @@ describe('Feedback Tab Component', function() {
     $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));
+    $provide.value(
+      'UserBackendApiService', TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
