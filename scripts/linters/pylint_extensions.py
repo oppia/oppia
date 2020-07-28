@@ -666,7 +666,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 self.check_docstring_structure(class_node)
         self.check_docstring_structure(node)
 
-    def check_space_above_args(self, node, docstring):
+    def check_newline_above_args(self, node, docstring):
         """Checks to ensure that there is a single space above the
         argument parameters in the docstring.
 
@@ -757,7 +757,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
             in_description = False
             args_indentation_in_spaces = 0
             docstring = node.doc.splitlines()
-            self.check_space_above_args(node, docstring)
+            self.check_newline_above_args(node, docstring)
             for line in docstring:
                 stripped_line = line.lstrip()
                 current_line_indentation = (
