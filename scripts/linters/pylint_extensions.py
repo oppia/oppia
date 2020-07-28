@@ -712,7 +712,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
             if docstring[0][0] == b' ':
                 self.add_message('space-after-triple-quote', node=node)
             # Check if single line docstring span two lines.
-            elif len(docstring) == 2 and docstring[-1].strip() == b'':
+            if len(docstring) == 2 and docstring[-1].strip() == b'':
                 self.add_message(
                     'single-line-docstring-span-two-lines', node=node)
             # Check for punctuation at end of a single line docstring.
