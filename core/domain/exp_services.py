@@ -1933,16 +1933,20 @@ def get_all_latex_strings_from_explorations():
             exp_models.  # pylint: disable=singleton-comparison
             ExplorationMathRichTextInfoModel.
             math_images_generation_required == True))
+    exploration_ids_to_fetch = []
     for model in exploration_math_rich_text_info_models:
-        exploration = exp_fetchers.get_exploration_by_id(model.id)
-        latex_strings_mapping[model.id] = {}
+        exploration_ids_to_fetch.append(model.id)
+    explorations_dict = exp_fetchers.get_multiple_explorations_by_id(
+        exploration_ids_to_fetch)
+    for exp_id, exploration in explorations_dict.items():
+        latex_strings_mapping[exp_id] = {}
         for state_name, state in exploration.states.items():
             html_string = ''.join(state.get_all_html_content_strings())
             latex_strings_without_svg = (
                 html_validation_service.
                 get_latex_strings_without_svg_from_html(html_string))
             if len(latex_strings_without_svg) > 0:
-                latex_strings_mapping[model.id][state_name] = (
+                latex_strings_mapping[exp_id][state_name] = (
                     latex_strings_without_svg)
     return latex_strings_mapping
 
