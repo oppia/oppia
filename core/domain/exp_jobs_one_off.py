@@ -367,13 +367,23 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Do not upgrade explorations that fail non-strict validation.
-        old_exploration = exp_fetchers.get_exploration_by_id(item.id)
+        try:
+            old_exploration = exp_fetchers.get_exploration_by_id(item.id)
+        except Exception as e:
+            error_message = (
+                'Exploration %s failed migration during GET: %s' %
+                (item.id, e))
+            logging.error(error_message)
+            yield ('MIGRATION_ERROR', error_message)
+            return
         try:
             old_exploration.validate()
         except Exception as e:
-            logging.error(
+            error_message = (
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
+            logging.error(error_message)
+            yield ('VALIDATION_ERROR', error_message)
             return
 
         # If the exploration model being stored in the datastore is not the
@@ -393,16 +403,29 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'to_version': python_utils.UNICODE(
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             })]
-            exp_services.update_exploration(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update exploration states from schema version %d to %d.' % (
-                    item.states_schema_version,
-                    feconf.CURRENT_STATE_SCHEMA_VERSION))
+            try:
+                exp_services.update_exploration(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                    'Update exploration states from schema version %d to %d.' %
+                    (
+                        item.states_schema_version,
+                        feconf.CURRENT_STATE_SCHEMA_VERSION))
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed final update, could be due to not '
+                    'passing strict validations for a public exploration: %s' %
+                    (item.id, e))
+                logging.error(error_message)
+                yield ('UPDATE_ERROR', error_message)
+                return
             yield ('SUCCESS', item.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
 
 
 class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):

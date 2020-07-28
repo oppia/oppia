@@ -1334,12 +1334,88 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
         with self.swap(logging, 'error', _mock_logging_function):
             self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id))
 
+        expected_message = (
+            'Exploration %s failed non-strict validation: '
+            'Invalid language_code: invalid_language_code'
+            % (self.VALID_EXP_ID))
+        expected_output = [
+            '[u\'VALIDATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
         self.assertEqual(
-            observed_log_messages,
-            ['Exploration %s failed non-strict validation: '
-             'Invalid language_code: invalid_language_code'
-             % (self.VALID_EXP_ID)])
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_get_exploration_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_get_exploration_by_id(_):
+            """Raises an error when fetching exploration."""
+            raise Exception('Invalid Exploration')
+
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                _mock_get_exploration_by_id):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id))
+
+        expected_message = (
+            'Exploration %s failed migration during GET: Invalid Exploration'
+            % (self.VALID_EXP_ID))
+        expected_output = [
+            '[u\'MIGRATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_update_exploration_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_update_exploration(*_):
+            """Raises an error when updating exploration."""
+            raise Exception('Error when updating exploration')
+
+        self.save_new_exp_with_states_schema_v0(
+            self.NEW_EXP_ID, self.albert_id, self.EXP_TITLE)
+
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            with self.swap(
+                exp_services, 'update_exploration',
+                _mock_update_exploration):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id))
+
+        expected_message = (
+            'Exploration %s failed final update, could be due to not '
+            'passing strict validations for a public exploration: '
+            'Error when updating exploration'
+            % (self.NEW_EXP_ID))
+        expected_output = [
+            '[u\'UPDATE_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
