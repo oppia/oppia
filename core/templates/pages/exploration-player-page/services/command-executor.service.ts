@@ -95,7 +95,7 @@ export class CommandExecutorService {
     try {
       var button = windowRef.nativeWindow.document.getElementsByClassName(
         'oppia-learner-confirm-button md-button md-ink-ripple'
-        )[0] as HTMLElement;
+      )[0] as HTMLElement;
       button.click();
     } catch {
       var button = windowRef.nativeWindow.document.getElementsByClassName(
@@ -128,7 +128,7 @@ export class CommandExecutorService {
       } else {
         var addButton = windowRef.nativeWindow.document.getElementsByClassName(
           'btn btn-secondary btn-sm'
-          )[this.setElementsOnPage - 1] as HTMLElement;
+        )[this.setElementsOnPage - 1] as HTMLElement;
         addButton.click();
         this.setElementsOnPage += 1;
         var box = windowRef.nativeWindow.document.getElementsByClassName(
@@ -143,12 +143,12 @@ export class CommandExecutorService {
 
   removeSet(windowRef, element) {
     var boxes = windowRef.nativeWindow.document.getElementsByClassName(
-      'form-control ng-pristine ng-untouched ng-valid ng-empty');
+      'form-control ng-pristine ng-untouched ng-valid ng-not-empty');
     for (var i = 0; i < boxes.length; i++) {
       if (boxes[i].value === element) {
         var deleteButton =
         windowRef.nativeWindow.document.getElementsByClassName(
-          'material-icons md-18');
+          'oppia-delete-list-entry-button');
         deleteButton[i].click();
       }
     }
