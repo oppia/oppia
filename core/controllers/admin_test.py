@@ -1076,7 +1076,10 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             expected_status_int=200)
         self.assertEqual(
             response_dict,
-            {'number_of_explorations_updated': '1'})
+            {
+                'number_of_explorations_updated': '1',
+                'number_of_explorations_left_to_update': '0'
+            })
         self.logout()
 
     def test_post_svgs_when_some_images_are_not_supplied(self):

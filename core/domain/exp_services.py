@@ -1890,14 +1890,37 @@ def get_batch_of_exps_for_latex_svg_generation():
             ExplorationMathRichTextInfoModel.
             math_images_generation_required == True))
     size_of_svgs_in_batch_bytes = 0
-    for model in exploration_math_rich_text_info_models:
+    for model_index, model in enumerate(exploration_math_rich_text_info_models):
         if size_of_svgs_in_batch_bytes > (
                 feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
+            break
+        if model_index + 1 > feconf.MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH:
             break
         latex_strings_mapping[model.id] = model.latex_strings_without_svg
         size_of_svgs_in_batch_bytes += (
             model.estimated_max_size_of_images_in_bytes)
     return latex_strings_mapping
+
+
+def get_number_explorations_having_latex_strings_without_svgs():
+    """Returns the number of explorations in the datastore which have LaTeX
+    strings without SVGs. These explorations need to be updated with math
+    SVGs.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    explorations have a valid math SVG stored in the datastore.
+
+    Returns:
+        int. The number of explorations which need to be updated with math SVGs.
+    """
+
+    number_of_explorations_having_latex_strings_without_svgs = (
+        exp_models.ExplorationMathRichTextInfoModel.get_all().filter(
+            exp_models.  # pylint: disable=singleton-comparison
+            ExplorationMathRichTextInfoModel.
+            math_images_generation_required == True).count())
+
+    return number_of_explorations_having_latex_strings_without_svgs
 
 
 def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
@@ -1920,14 +1943,6 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     html_in_exploration_after_conversion = ''
     change_lists = []
-    # # Create a dict with dimensions for each LaTeX string. This dict will be
-    # # used for generating a filename for each raw_latex string in the HTML.
-    # raw_latex_to_dimensions_dict = {}
-    # for raw_latex, raw_latex_dict in image_data.items():
-    #     raw_latex_to_dimensions_dict[raw_latex] = {}
-    #     raw_latex_to_dimensions_dict[raw_latex]['dimensions'] = (
-    #         raw_latex_dict['dimensions'])
-
     for state_name, state in exploration.states.items():
         add_svg_filenames_for_latex_strings_in_html_string = (
             functools.partial(

@@ -636,9 +636,14 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
         for exp_id in latex_to_svg_mappings.keys():
             exp_services.update_exploration_with_math_svgs(
                 exp_id, latex_to_svg_mappings[exp_id])
+        number_of_explorations_left_to_update = (
+            exp_services.
+            get_number_explorations_having_latex_strings_without_svgs())
         self.render_json({
             'number_of_explorations_updated': '%d' % (
-                len(latex_to_svg_mappings.keys()))
+                len(latex_to_svg_mappings.keys())),
+            'number_of_explorations_left_to_update': '%d' % (
+                number_of_explorations_left_to_update)
         })
 
 

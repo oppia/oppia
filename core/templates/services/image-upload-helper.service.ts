@@ -112,6 +112,8 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           if (node.tagName.toLowerCase() === 'svg') {
             node.removeAttribute('xmlns:xlink');
             node.removeAttribute('role');
+            // We are removing this attribute, because currently it is not in
+            // the white list of valid attributes.
             node.removeAttribute('aria-hidden');
             node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
           }
@@ -151,6 +153,8 @@ angular.module('oppia').factory('ImageUploadHelperService', [
                 '.', 'd'));
             // This attribute is useful for the vertical allignment of the
             // Math SVG while displaying inline with other text.
+            // Math SVGs don't necessarily have a vertical allignment, in that
+            // case we assign it zero.
             var styleValue = node.getAttribute('style').match(/\d+\.\d+/g);
             if (styleValue) {
               dimensions.verticalPadding = styleValue[0].replace('.', 'd');

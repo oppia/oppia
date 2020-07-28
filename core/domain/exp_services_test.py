@@ -4615,6 +4615,46 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
                 exp_services.get_batch_of_exps_for_latex_svg_generation(),
                 expected_output)
 
+        expected_output_when_max_entities_is_limited = {
+            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
+            'exp_id2': ['+,-,-,+', '\\sqrt{x}']
+        }
+        with self.swap(
+            feconf, 'MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES',
+            mock_max_size_of_math_svgs_batch):
+            with self.swap(
+                feconf, 'MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH',
+                2):
+                self.assertEqual(
+                    exp_services.get_batch_of_exps_for_latex_svg_generation(),
+                    expected_output_when_max_entities_is_limited)
+
+    def test_get_number_explorations_having_latex_strings_without_svgs(self):
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id2',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,-,-,+', '\\sqrt{x}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id3',
+            math_images_generation_required=False,
+            latex_strings_without_svg=['(x-a)(x-b)', '\\frac{x^2}{y^3}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id4',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['(x-a1)(x-b1)', '\\frac{x^3}{y^2}'],
+            estimated_max_size_of_images_in_bytes=30000).put()
+        self.assertEqual(
+            exp_services.
+            get_number_explorations_having_latex_strings_without_svgs(), 3)
+
     def test_generate_html_change_list_for_state(self):
         old_html = (
             '<oppia-noninteractive-math math_content-with-value="{&amp;'

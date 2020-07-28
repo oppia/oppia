@@ -1485,6 +1485,17 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.get_invalid_svg_tags_and_attrs(
                 valid_svg_string), ([], []))
+
+        # A Valid SVG string with unicode characters.
+        valid_svg_string_with_unicode = (
+            '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="'
+            '100pt" height="100pt" viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                valid_svg_string_with_unicode), ([], []))
+
         # SVG containing an invalid tag.
         invalid_svg_string = '<svg><testtag /></svg>'
         self.assertEqual(

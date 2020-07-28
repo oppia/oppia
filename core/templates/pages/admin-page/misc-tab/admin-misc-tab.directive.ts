@@ -198,8 +198,12 @@ angular.module('oppia').directive('adminMiscTab', [
                 ImageUploadHelperService.
                   extractDimensionsFromMathExpressionSvgString(
                     cleanedSvgString));
+              // We need use unescape and encodeURIComponent in order to
+              // handle the case when SVGs have non-ascii unicode characters.
               var dataURI = (
-                'data:image/svg+xml;base64,' + btoa(cleanedSvgString));
+                'data:image/svg+xml;base64,' +
+                btoa(unescape(encodeURIComponent(cleanedSvgString))));
+
               var invalidTagsAndAttributes = (
                 ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
               var tags = invalidTagsAndAttributes.tags;
@@ -254,7 +258,8 @@ angular.module('oppia').directive('adminMiscTab', [
               var svgFile = await convertLatexToSvgFile(latexStrings[i]);
               countOfSvgsGenerated++;
               LoggerService.info(
-                'generated ' + countOfSvgsGenerated.toString() + ' SVGs');
+                'generated ' + countOfSvgsGenerated.toString() + ' SVGs' +
+                ' out of ' + numberOfLatexStrings.toString());
               latexMapping[expId][latexStrings[i]] = svgFile;
             }
             if (numberOfLatexStrings === countOfSvgsGenerated) {
@@ -297,9 +302,11 @@ angular.module('oppia').directive('adminMiscTab', [
             function(response) {
               var numberOfExplorationsUpdated = (
                 response.number_of_explorations_updated);
+              var numberOfExplorationsLeftToUpdate = (
+                response.number_of_explorations_left_to_update);
               ctrl.setStatusMessage(
                 'Successfully updated ' + numberOfExplorationsUpdated +
-                ' explorations.');
+                ' explorations, ' + numberOfExplorationsLeftToUpdate + ' left');
               $rootScope.$apply();
             }, function(errorResponse) {
               ctrl.setStatusMessage(
