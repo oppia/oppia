@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Provides constant global variables, for use in Protractor
- * tests.
+ * @fileoverview Invalid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py. eslint @typescript-eslint no explicit any
+ * is not allowed to use.
  */
 
-module.exports = {
-  SKILL_STATUS_UNASSIGNED: 'Unassigned',
-  SKILL_STATUS_ASSIGNED: 'Assigned',
-  TEST_SVG_PATH: '../data/test_svg.svg'
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let a: any;

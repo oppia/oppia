@@ -36,7 +36,8 @@ import utils
 # If evaluating differences in YAML, conversion to dict form via
 # utils.dict_from_yaml can isolate differences quickly.
 
-SAMPLE_YAML_CONTENT = ("""category: A category
+SAMPLE_YAML_CONTENT = (
+    """category: A category
 language_code: en
 nodes:
 - exploration_id: an_exploration_id
@@ -713,7 +714,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = ("""category: A category
+    YAML_CONTENT_V1 = (
+        """category: A category
 nodes:
 - acquired_skills:
   - Skill1
@@ -728,7 +730,8 @@ objective: ''
 schema_version: 1
 title: A title
 """)
-    YAML_CONTENT_V2 = ("""category: A category
+    YAML_CONTENT_V2 = (
+        """category: A category
 language_code: en
 nodes:
 - acquired_skills:
@@ -745,7 +748,8 @@ schema_version: 2
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V3 = ("""category: A category
+    YAML_CONTENT_V3 = (
+        """category: A category
 language_code: en
 nodes:
 - acquired_skills:
@@ -762,7 +766,8 @@ schema_version: 2
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V4 = ("""category: A category
+    YAML_CONTENT_V4 = (
+        """category: A category
 language_code: en
 next_skill_id: 2
 nodes:
@@ -787,7 +792,8 @@ skills:
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V5 = ("""category: A category
+    YAML_CONTENT_V5 = (
+        """category: A category
 language_code: en
 next_skill_index: 2
 nodes:
@@ -812,7 +818,8 @@ skills:
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V6 = ("""category: A category
+    YAML_CONTENT_V6 = (
+        """category: A category
 language_code: en
 nodes:
 - exploration_id: Exp1

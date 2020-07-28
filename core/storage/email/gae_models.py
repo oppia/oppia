@@ -440,8 +440,8 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
         instance_id = cls._generate_id(user_id, thread_id)
         if cls.get_by_id(instance_id):
-            raise Exception('Unique reply-to ID for given user and thread'
-                            ' already exists.')
+            raise Exception(
+                'Unique reply-to ID for given user and thread already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
         feedback_email_reply_model_instance = cls(
