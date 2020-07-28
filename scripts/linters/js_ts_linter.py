@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import json
 import os
 import re
 import shutil
@@ -44,6 +45,12 @@ sys.path.insert(1, ESPRIMA_PATH)
 import esprima  # isort:skip pylint: disable=wrong-import-order, wrong-import-position
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
+
+TS_IGNORE_EXCEPTIONS_FILEPATH = os.path.join(
+    CURR_DIR, 'scripts', 'linters', 'ts_ignore_exceptions.json')
+
+TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
+    TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
 
 def _get_expression_from_node_if_one_exists(
@@ -280,6 +287,66 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
+
+    def _check_ts_ignore(self):
+        """Checks if ts ignore is used."""
+        summary_messages = []
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting ts ignore check')
+            python_utils.PRINT('----------------------------------------')
+
+        ts_ignore_pattern = r'@ts-ignore'
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            failed = False
+
+            for file_path in self.all_filepaths:
+                file_content = self.file_cache.read(file_path)
+                previous_line_has_ts_ignore = False
+
+                for line_number, line in enumerate(file_content.split('\n')):
+                    if previous_line_has_ts_ignore:
+                        if file_path in TS_IGNORE_EXCEPTIONS:
+                            line_contents = TS_IGNORE_EXCEPTIONS[file_path]
+                            this_line_is_exception = False
+
+                            for line_content in line_contents:
+                                if line.find(line_content) != -1:
+                                    this_line_is_exception = True
+                                    break
+
+                            if this_line_is_exception:
+                                previous_line_has_ts_ignore = False
+                                continue
+
+                        failed = True
+                        previous_line_has_ts_ignore = False
+                        summary_message = (
+                            '%s --> ts ignore found at line %s. Please add '
+                            'this exception in %s.' % (
+                                file_path, line_number,
+                                TS_IGNORE_EXCEPTIONS_FILEPATH))
+                        python_utils.PRINT(summary_message)
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT('')
+
+                    previous_line_has_ts_ignore = bool(
+                        re.findall(ts_ignore_pattern, line))
+
+            if failed:
+                summary_message = (
+                    '%s ts ignore check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s ts ignore check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
             python_utils.PRINT('')
 
         return summary_messages
@@ -994,6 +1061,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
+        ts_ignore_messages = self._check_ts_ignore()
         extra_js_files_messages = self._check_extra_js_files()
         http_requests_messages = self._check_http_requests()
         js_and_ts_component_messages = (
@@ -1009,7 +1077,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         all_messages = (
-            extra_js_files_messages +
+            ts_ignore_messages + extra_js_files_messages +
             http_requests_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
             controller_dependency_messages + constant_declaration_messages +

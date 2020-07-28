@@ -26,6 +26,7 @@ import subprocess
 import sys
 
 from core.tests import test_utils
+import python_utils
 
 from . import js_ts_linter
 from . import pre_commit_linter
@@ -77,6 +78,8 @@ INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_comments.ts')
 INVALID_DIRECTIVE_WITH_NO_RETURN_BLOCK = os.path.join(
     LINTER_TESTS_DIR, 'invalid_directive_without_return.ts')
+INVALID_TS_IGNORE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_ts_ignore.ts')
 
 
 class JsTsLintTests(test_utils.LinterTestBase):
@@ -541,6 +544,36 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'An instance of HttpClient is found in this file. You are not '
             'allowed to create http requests from files that are not '
             'backend api services.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
+
+    def test_ts_ignore_found(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    INVALID_TS_IGNORE_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        def mock_open_file(unused_path, unused_permissions):
+            return python_utils.string_io(buffer_value='{}')
+
+        open_file_swap = self.swap(
+            python_utils, 'open_file', mock_open_file)
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with self.print_swap, compile_all_ts_files_swap, open_file_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_TS_IGNORE_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        self.assert_same_list_elements([
+            'ts ignore found at line 22.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_missing_punctuation_at_end_of_comment(self):

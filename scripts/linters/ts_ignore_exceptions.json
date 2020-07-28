@@ -1,0 +1,5 @@
+{
+    "core/templates/services/search.service.spec.ts": [
+        "jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue("
+    ]
+}
