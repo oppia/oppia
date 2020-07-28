@@ -2350,8 +2350,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story',
-            self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -5956,6 +5955,7 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(2)]
 
@@ -8238,6 +8238,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8439,6 +8440,7 @@ class StorySnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8605,6 +8607,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8723,6 +8726,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8948,6 +8952,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -9487,6 +9492,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -9783,6 +9789,7 @@ class TopicSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -9976,6 +9983,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10137,6 +10145,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10313,6 +10322,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10518,6 +10528,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10677,6 +10688,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10961,6 +10973,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11185,6 +11198,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11397,6 +11411,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11604,6 +11619,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11772,6 +11788,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -14053,6 +14070,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             'story',
             'title %d',
+            'description %d',
             '0'
         )
 

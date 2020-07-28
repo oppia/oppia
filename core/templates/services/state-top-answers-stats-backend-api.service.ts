@@ -42,7 +42,10 @@ export class StateTopAnswersStatsBackendApiService {
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.STATE_ANSWER_STATS_URL, {exploration_id: expId}))
       .toPromise().then(
-        d => this.stateTopAnswersStatsObjectFactory.createFromBackendDict(d));
+        d => this.stateTopAnswersStatsObjectFactory.createFromBackendDict(d),
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        });
   }
 }
 

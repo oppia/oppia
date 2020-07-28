@@ -59,7 +59,7 @@ class UserGlobalPrefs(python_utils.OBJECT):
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
-        self.can_receive_feedback_message_email = ( #pylint: disable=invalid-name
+        self.can_receive_feedback_message_email = ( # pylint: disable=invalid-name
             can_receive_feedback_message_email)
         self.can_receive_subscription_email = can_receive_subscription_email
 
