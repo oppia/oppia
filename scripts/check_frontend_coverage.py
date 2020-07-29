@@ -248,7 +248,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-pencil-code-editor.directive.ts',
     'oppia-short-response-set-input.directive.ts',
     'oppia-short-response-text-input.directive.ts',
-    'oppia-visualization-bar-chart.directive.ts',
     'oppia-visualization-enumerated-frequency-table.directive.ts',
     'OppiaFooterDirective.ts',
     'opportunities-list-item.directive.ts',

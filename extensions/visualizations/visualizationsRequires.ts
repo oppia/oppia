@@ -16,7 +16,6 @@
  * @fileoverview Requires for all the visualization directives.
  */
 
-require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
