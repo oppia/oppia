@@ -96,7 +96,6 @@ angular.module('oppia').factory('RouterService', [
               StateEditorService.setActiveStateName(
                 ExplorationInitStateNameService.savedMemento);
             }
-            console.log('Emit: refreshTranslationTab, RouterService');
             _refreshTranslationTabEventEmitter.emit();
           }
         }, 300);
@@ -105,11 +104,9 @@ angular.module('oppia').factory('RouterService', [
         _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === TABS.SETTINGS.path) {
         activeTabName = TABS.SETTINGS.name;
-        console.log('Emit: refreshSettingsTab, RouterService');
         _refreshSettingsTabEventEmitter.emit();
       } else if (newPath === TABS.STATS.path) {
         activeTabName = TABS.STATS.name;
-        console.log('Emit: refreshStatisticsTab, RouterService');
         _refreshStatisticsTabEventEmitter.emit();
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;

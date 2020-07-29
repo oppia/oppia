@@ -134,7 +134,6 @@ angular.module('oppia').component('statisticsTab', {
           RouterService.onRefreshStatisticsTab.subscribe(
             () => {
               refreshExplorationStatistics();
-              console.log('Caught: refreshStatisticsTab, StatisticsTab');
             }
           )
         );

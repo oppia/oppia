@@ -350,7 +350,6 @@ angular.module('oppia').component('explorationEditorPage', {
               ChangeListService.getChangeList());
             return;
           }
-          console.log('Emit: refreshStatisticsTab, ExplorationEditorPage');
           RouterService.onRefreshStatisticsTab.emit();
           $scope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
@@ -458,7 +457,6 @@ angular.module('oppia').component('explorationEditorPage', {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
         ctrl.directiveSubscriptions.add(
           ExplorationStatesService.onRefreshGraph.subscribe(() => {
-            console.log('Caught: onRefreshGraph');
             GraphDataService.recompute();
             ExplorationWarningsService.updateWarnings();
           }));

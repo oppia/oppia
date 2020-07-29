@@ -203,7 +203,6 @@ angular.module('oppia').directive('settingsTab', [
             }
 
             ExplorationInitStateNameService.saveDisplayedValue();
-            console.log('Emit: Settings tab');
             ExplorationStatesService.onRefreshGraph.emit();
           };
 
@@ -375,7 +374,6 @@ angular.module('oppia').directive('settingsTab', [
             ctrl.directiveSubscriptions.add(
               RouterService.onRefreshSettingsTab.subscribe(
                 () => {
-                  console.log('Caught: refreshSettingsTab, SettingsTab');
                   ctrl.refreshSettingsTab();
                 }
               )

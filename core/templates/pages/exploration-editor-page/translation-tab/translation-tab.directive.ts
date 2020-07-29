@@ -161,7 +161,6 @@ angular.module('oppia').directive('translationTab', [
             ctrl.directiveSubscriptions.add(
               RouterService.onRefreshTranslationTab.subscribe(
                 () => {
-                  console.log('Caught: refreshTranslationTab, TranslationTab');
                   initTranslationTab();
                 }
               )
