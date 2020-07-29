@@ -1232,8 +1232,8 @@ def can_publish_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
-            *args: arguments.
-            **kwargs: *. Keyword arguments.
+            *args: arguments. The arguments in *args.
+            **kwargs: *. Keyword arguments. Keyword arguments present in kwargs.
 
         Returns:
             *. The return value of the decorated function.
@@ -2345,7 +2345,7 @@ def can_access_story_viewer_page(handler):
     """Decorator to check whether user can access story viewer page.
 
     Args:
-        handler: function.  The function to be decorated.
+        handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now checks

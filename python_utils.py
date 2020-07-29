@@ -373,7 +373,7 @@ def convert_to_bytes(string_to_convert):
     """Converts the string to bytes.
 
     Args:
-        string_to_convert: unicode|str.
+        string_to_convert: unicode|str. String needed to convert to bytes.
 
     Returns:
         bytes. The encoded string.

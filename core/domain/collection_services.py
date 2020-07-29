@@ -70,7 +70,7 @@ def _migrate_collection_contents_to_latest_schema(
     this function to account for that new version.
 
     Args:
-        versioned_collection_contents: A dict with two keys:
+        versioned_collection_contents: dict. A dict with two keys:
           - schema_version: int. The schema version for the collection.
           - collection_contents: dict. The dict comprising the collection
               contents.
@@ -160,10 +160,11 @@ def get_collection_summary_from_model(collection_summary_model):
     collection summary model.
 
     Args:
-        collection_summary_model: CollectionSummaryModel.
+        collection_summary_model: CollectionSummaryModel. collection summary
+            model object.
 
     Returns:
-        CollectionSummary.
+        CollectionSummary. CollectionSummary domain object.
     """
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
@@ -247,8 +248,8 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             exists in the datastore.
 
     Returns:
-        A dict of domain objects representing collections with the given ids as
-        keys.
+        dict. A dict of domain objects representing collections with
+        the given ids as keys.
 
     Raises:
         ValueError: 'strict' is True, and one or more of the given collection
@@ -433,12 +434,12 @@ def get_valid_completed_exploration_ids(user_id, collection):
 
     Args:
         user_id: str. ID of the given user.
-        collection: Collection.
+        collection: Collection. The Collection object.
 
     Returns:
-        A filtered version of the return value of get_completed_exploration_ids
-        which only includes explorations found within the current version of
-        the collection.
+        list(str). A filtered version of the return value of
+        get_completed_exploration_ids which only includes explorations found
+        within the current version of the collection.
     """
     completed_exploration_ids = get_completed_exploration_ids(
         user_id, collection.id)
@@ -500,7 +501,7 @@ def get_collection_summary_dicts_from_models(collection_summary_models):
             iterable of CollectionSummaryModel instances.
 
     Returns:
-        A dict containing corresponding collection summary domain objects,
+        dict. A dict containing corresponding collection summary domain objects,
         keyed by id.
     """
     collection_summaries = [
@@ -518,7 +519,7 @@ def get_collection_summaries_matching_ids(collection_ids):
     exist).
 
     Args:
-        collection_ids: A list of collection ids.
+        collection_ids: list. A list of collection ids.
 
     Returns:
         list(CollectionSummary). A list with the corresponding summary domain
@@ -1029,7 +1030,7 @@ def compute_collection_contributors_summary(collection_id):
         collection_id: str. ID of the collection.
 
     Returns:
-        A dict whose keys are user_ids and whose values are the number of
+        dict. A dict whose keys are user_ids and whose values are the number of
         (non-revert) commits made to the given collection by that user_id.
         This does not count commits which have since been reverted.
     """
@@ -1054,8 +1055,8 @@ def save_collection_summary(collection_summary):
     entity in the datastore.
 
     Args:
-        collection_summary: The collection summary object to be saved in the
-            datastore.
+        collection_summary: object. The collection summary object to be saved
+            in the datastore.
     """
     collection_summary_dict = {
         'title': collection_summary.title,

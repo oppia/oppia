@@ -278,7 +278,7 @@ class StoryNode(python_utils.OBJECT):
         """Returns a dict representing this StoryNode domain object.
 
         Returns:
-            A dict, mapping all fields of StoryNode instance.
+            dict. A dict, mapping all fields of StoryNode instance.
         """
         return {
             'id': self.id,
@@ -632,7 +632,7 @@ class StoryContents(python_utils.OBJECT):
         """Returns a dict representing this StoryContents domain object.
 
         Returns:
-            A dict, mapping all fields of StoryContents instance.
+            dict. A dict, mapping all fields of StoryContents instance.
         """
         return {
             'nodes': [
@@ -884,7 +884,7 @@ class Story(python_utils.OBJECT):
         """Returns a dict representing this Story domain object.
 
         Returns:
-            A dict, mapping all fields of Story instance.
+            dict. A dict, mapping all fields of Story instance.
         """
         return {
             'id': self.id,

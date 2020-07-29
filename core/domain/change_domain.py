@@ -177,7 +177,7 @@ class BaseChange(python_utils.OBJECT):
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
-            A dict, mapping all fields of BaseChange instance.
+            dict. A dict, mapping all fields of BaseChange instance.
         """
         base_change_dict = {}
         base_change_dict['cmd'] = self.cmd

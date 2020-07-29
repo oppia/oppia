@@ -45,7 +45,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
             linter_stdout list.
 
             Args:
-                *args(str): Variable length argument list of values to print in
+                *args: str. Variable length argument list of values to print in
                     the same line of output.
             """
             self.linter_stdout.append(

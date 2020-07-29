@@ -141,7 +141,7 @@ def get_overall_ratings_for_exploration(exploration_id):
         exploration_id: str. The id of the exploration.
 
     Returns:
-        a dict whose keys are '1', '2', '3', '4', '5' and whose
+        dict. a dict whose keys are '1', '2', '3', '4', '5' and whose
         values are nonnegative integers representing the frequency counts
         of each rating.
     """

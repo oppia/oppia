@@ -38,7 +38,7 @@ def _migrate_page_contents_to_latest_schema(versioned_page_contents):
     function to account for that new version.
 
     Args:
-        versioned_page_contents: A dict with two keys:
+        versioned_page_contents: dict. A dict with two keys:
           - schema_version: int. The schema version for the page_contents dict.
           - page_contents: dict. The dict comprising the page contents.
 
@@ -64,10 +64,10 @@ def get_subtopic_page_from_model(subtopic_page_model):
     """Returns a domain object for an SubtopicPage given a subtopic page model.
 
     Args:
-        subtopic_page_model: SubtopicPageModel.
+        subtopic_page_model: SubtopicPageModel. Subtopic page model object.
 
     Returns:
-        SubtopicPage.
+        SubtopicPage. domain object of SubtopicPage.
     """
     versioned_page_contents = {
         'schema_version': subtopic_page_model.page_contents_schema_version,
@@ -149,7 +149,7 @@ def get_subtopic_page_contents_by_id(topic_id, subtopic_id, strict=True):
             id exists in the datastore.
 
     Returns:
-        SubtopicPageContents or None: The page contents for a subtopic page,
+        SubtopicPageContents or None. The page contents for a subtopic page,
         or None if subtopic page does not exist.
     """
     subtopic_page = get_subtopic_page_by_id(

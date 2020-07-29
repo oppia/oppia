@@ -168,7 +168,7 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
     function to account for that new version.
 
     Args:
-        versioned_skill_contents: A dict with two keys:
+        versioned_skill_contents: dict. A dict with two keys:
             - schema_version: int. The schema version for the skill_contents
                 dict.
             - skill_contents: dict. The dict comprising the skill contents.

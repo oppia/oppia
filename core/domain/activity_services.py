@@ -33,7 +33,7 @@ def get_featured_activity_references():
     """Gets a list of ActivityReference domain models.
 
     Returns:
-        A list of all ActivityReference domain objects that are
+        list.A list of all ActivityReference domain objects that are
         currently featured.
     """
     featured_model_instance = (
@@ -49,7 +49,7 @@ def update_featured_activity_references(featured_activity_references):
     """Updates the current list of featured activity references.
 
     Args:
-        featured_activity_references: A list of ActivityReference domain
+        featured_activity_references: list. A list of ActivityReference domain
             objects representing the full list of 'featured' activities.
 
     Raises:
@@ -119,10 +119,10 @@ def split_by_type(activity_references):
     in the input list.
 
     Args:
-        activity_references: A list of ActivityReference domain objects.
+        activity_references: list. A list of ActivityReference domain objects.
 
     Returns:
-        A 2-tuple whose first element is a list of all exploration
+        (list, list). A 2-tuple whose first element is a list of all exploration
         ids represented in the input list, and whose second element
         is a list of all collection ids represented in the input list.
 

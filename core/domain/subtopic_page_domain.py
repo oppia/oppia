@@ -118,7 +118,7 @@ class SubtopicPageContents(python_utils.OBJECT):
         """Returns a dict representing this SubtopicPageContents domain object.
 
         Returns:
-            A dict, mapping all fields of SubtopicPageContents instance.
+            dict. A dict, mapping all fields of SubtopicPageContents instance.
         """
         return {
             'subtitled_html': self.subtitled_html.to_dict(),
@@ -176,7 +176,7 @@ class SubtopicPage(python_utils.OBJECT):
         """Returns a dict representing this SubtopicPage domain object.
 
         Returns:
-            A dict, mapping all fields of SubtopicPage instance.
+            dict. A dict, mapping all fields of SubtopicPage instance.
         """
         return {
             'id': self.id,

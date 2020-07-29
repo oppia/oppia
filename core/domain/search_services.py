@@ -154,7 +154,7 @@ def _should_index_collection(collection):
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: CollectionSummaryModel.
+        collection: CollectionSummaryModel. Collection summary model object.
 
     Returns:
         bool. Whether a particular collection should be indexed.

@@ -67,7 +67,7 @@ class ActivityReference(python_utils.OBJECT):
         """Returns a dict representing this ActivityReference domain object.
 
         Returns:
-            A dict, mapping type and id of a ActivityReference
+            dict. A dict, mapping type and id of a ActivityReference
             instance to corresponding keys 'type' and 'id'.
         """
         return {

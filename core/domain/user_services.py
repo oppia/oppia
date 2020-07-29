@@ -689,7 +689,7 @@ def get_system_user():
     """Returns user object with system committer user id.
 
     Returns:
-        system_user: user object with system committer user id.
+        system_user. user object with system committer user id.
     """
     system_user = UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
     return system_user
@@ -699,7 +699,7 @@ def _save_user_settings(user_settings):
     """Commits a user settings object to the datastore.
 
     Args:
-        user_settings: UserSettings domain object.
+        user_settings: UserSettings. UserSettings domain object.
     """
     user_settings.validate()
 
@@ -748,7 +748,7 @@ def _transform_user_settings(user_settings_model):
     """Transform user settings storage model to domain object.
 
     Args:
-        user_settings_model: UserSettingsModel.
+        user_settings_model: UserSettingsModel. UserSettings model object.
 
     Returns:
         UserSettings. Domain object for user settings.
@@ -1996,7 +1996,7 @@ def get_community_reviewer_usernames(review_category, language_code=None):
             review category.
 
     Returns:
-        list(str.) A list of usernames.
+        list(str). A list of usernames.
     """
     reviewer_ids = []
     if review_category == constants.REVIEW_CATEGORY_TRANSLATION:

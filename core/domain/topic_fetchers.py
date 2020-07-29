@@ -38,7 +38,7 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
     function to account for that new version.
 
     Args:
-        versioned_subtopics: A dict with two keys:
+        versioned_subtopics: dict. A dict with two keys:
           - schema_version: int. The schema version for the subtopics dict.
           - subtopics: list(dict). The list of dicts comprising the topic's
               subtopics.
@@ -69,7 +69,7 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
     function to account for that new version.
 
     Args:
-        versioned_story_references: A dict with two keys:
+        versioned_story_references: dict. A dict with two keys:
           - schema_version: int. The schema version for the story reference
                 dict.
           - story_references: list(dict). The list of dicts comprising the

@@ -908,7 +908,7 @@ tags: []
             headers: dict(str, *). Extra headers to send.
 
         Returns:
-            webtest.TestResponse: The response of the POST request.
+            webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
         if upload_files is not None:
@@ -1861,12 +1861,11 @@ tags: []
             print datetime.datetime.utcnow()  # prints current time.
 
         Args:
-            mocked_datetime: datetime.datetime.
-                The datetime which will be used instead of
-                the current UTC datetime.
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
 
         Yields:
-            nothing.
+            None. Empty yield statement.
         """
         if not isinstance(mocked_datetime, datetime.datetime):
             raise utils.ValidationError(
@@ -1975,7 +1974,7 @@ tags: []
                 will always be checked.
 
         Yields:
-            context: The context with function replaced.
+            context. The context with function replaced.
         """
         original = getattr(obj, attr)
         # The actual error message will also include detail assert error message
@@ -2142,7 +2141,7 @@ class AppEngineTestBase(TestBase):
                 that header.
 
         Yields:
-            None.
+            None. Yields nothing.
         """
         if headers is None:
             response_headers = {}
@@ -2179,8 +2178,8 @@ class AppEngineTestBase(TestBase):
         """Execute queued tasks.
 
         Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
-                The queued tasks.
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
+                queued tasks.
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':

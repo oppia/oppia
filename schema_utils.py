@@ -229,7 +229,7 @@ class Normalizers(python_utils.OBJECT):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-            obj: a string representing a URL.
+            obj: str. a string representing a URL.
 
         Returns:
             An empty string if the URL does not start with http:// or https://
@@ -258,7 +258,7 @@ class Normalizers(python_utils.OBJECT):
         """Collapses multiple spaces into single spaces.
 
         Args:
-            obj: a string.
+            obj: str. String to be processed for multiple spaces.
 
         Returns:
             A string that is the same as `obj`, except that each block of

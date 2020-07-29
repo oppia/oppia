@@ -365,7 +365,8 @@ def get_total_open_threads(feedback_analytics_list):
     FeedbackAnalytics domain objects.
 
     Args:
-        feedback_analytics_list: list(FeedbackAnalytics).
+        feedback_analytics_list: list(FeedbackAnalytics). list of
+            FeedbackAnalytics object.
 
     Returns:
         int. The count of all open threads for the given the given list of
@@ -378,7 +379,7 @@ def get_multiple_threads(thread_ids):
     """Gets multiple feedback threads.
 
     Args:
-        thread_ids: list(str). The list of thread ids.
+        thread_ids: list(str). list. The list of thread ids.
 
     Returns:
         list(FeedbackThread). The list of feedback threads.
@@ -602,7 +603,8 @@ def _enqueue_feedback_thread_status_change_email_task(
 
     Args:
         user_id: str. The user to be notified.
-        reference: FeedbackMessageReference.
+        reference: object(FeedbackMessageReference). Object of
+            FeedbackMessageReference.
         old_status: str. One of STATUS_CHOICES.
         new_status: str. One of STATUS_CHOICES.
     """
@@ -665,7 +667,7 @@ def update_feedback_email_retries(user_id):
     corresponding user's UnsentEmailFeedbackModel.
 
     Args:
-        user_id: str.
+        user_id: str. The id of the user.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
     time_since_buffered = (
@@ -682,7 +684,7 @@ def pop_feedback_message_references(user_id, num_references_to_pop):
     processed already.
 
     Args:
-        user_id: str.
+        user_id: str. The id of the current user.
         num_references_to_pop: int. Number of feedback message references that
             have been processed already.
     """

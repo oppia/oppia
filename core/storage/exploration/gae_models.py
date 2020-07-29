@@ -778,7 +778,7 @@ class ExpSummaryModel(base_models.BaseModel):
         """Fetches exp summaries that are at least editable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with exp summaries that are at least

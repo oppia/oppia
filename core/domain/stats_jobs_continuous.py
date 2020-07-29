@@ -71,7 +71,7 @@ class InteractionAnswerSummariesMRJobManager(
             }
 
         Args:
-            item: The submitted answer.
+            item: str. The submitted answer.
 
         Yields:
             dict(str, str). The submitted answer in dict format.

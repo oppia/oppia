@@ -103,7 +103,8 @@ def get_suggestion_from_model(suggestion_model):
     """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
-        suggestion_model: SuggestionModel.
+        suggestion_model: SuggestionModel. SuggestionModel object to be
+            converted to Suggestion domain object.
 
     Returns:
         Suggestion. The corresponding Suggestion domain object.
@@ -307,7 +308,7 @@ def reject_question_suggestions_with_skill_target_id(skill_id):
     skill ID. Reviewer ID is set to Oppia Bot.
 
     Args:
-        skill_id: The skill ID corresponding to the target ID of the
+        skill_id: str. The skill ID corresponding to the target ID of the
             SuggestionAddQuestion.
     """
     suggestions = query_suggestions(
@@ -557,7 +558,7 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
         user_id: str. The ID of the user.
 
     Returns:
-        bool: Whether the user can resubmit the suggestion.
+        bool. Whether the user can resubmit the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)

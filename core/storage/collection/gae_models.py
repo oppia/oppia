@@ -587,7 +587,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         at least viewable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with private collection summary models that
@@ -610,7 +610,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         editable by the given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with collection summary models that are at

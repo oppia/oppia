@@ -700,7 +700,7 @@ class InteractionInstance(python_utils.OBJECT):
         """Get all html content strings in the interaction.
 
         Returns:
-            list(str): The list of all html content strings in the interaction.
+            list(str). The list of all html content strings in the interaction.
         """
         html_list = []
 
@@ -1148,8 +1148,8 @@ class WrittenTranslations(python_utils.OBJECT):
         """Validates properties of the WrittenTranslations.
 
         Args:
-            expected_content_id_list: A list of content id which are expected to
-                be inside they WrittenTranslations.
+            expected_content_id_list: list. A list of content id which are
+                expected to be inside they WrittenTranslations.
 
         Raises:
             ValidationError: One or more attributes of the WrittenTranslations
@@ -1379,8 +1379,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Validates properties of the RecordedVoiceovers.
 
         Args:
-            expected_content_id_list: A list of content id which are expected to
-                be inside they RecordedVoiceovers.
+            expected_content_id_list: list. A list of content id which are
+                expected to be inside they RecordedVoiceovers.
 
         Raises:
             ValidationError: One or more attributes of the RecordedVoiceovers
@@ -1526,18 +1526,18 @@ class RuleSpec(python_utils.OBJECT):
         for all the parameters the rule expects.
 
         Args:
-            rule_params_list: A list of parameters used by the rule represented
-                by this RuleSpec instance, to be used to validate the inputs of
-                this RuleSpec. Each element of the list represents a single
-                parameter and is a tuple with two elements:
+            rule_params_list: list. A list of parameters used by the rule
+                represented by this RuleSpec instance, to be used to validate
+                the inputs of this RuleSpec. Each element of the list represents
+                a single parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
                     1: The typed object instance for that
                         parameter (e.g. Real).
-            exp_param_specs_dict: A dict of specified parameters used in this
-                exploration. Keys are parameter names and values are ParamSpec
-                value objects with an object type property (obj_type). RuleSpec
-                inputs may have a parameter value which refers to one of these
-                exploration parameters.
+            exp_param_specs_dict: dic. A dict of specified parameters used in
+                this exploration. Keys are parameter names and values are
+                ParamSpec value objects with an object type property (obj_type).
+                RuleSpec inputs may have a parameter value which refers to one
+                of these exploration parameters.
 
         Raises:
             ValidationError: One or more attributes of the RuleSpec are
@@ -1937,7 +1937,7 @@ class State(python_utils.OBJECT):
         for a ML model to be trained.
 
         Returns:
-            bool: True, if the conditions are satisfied.
+            bool. True, if the conditions are satisfied.
         """
         training_examples_count = 0
         labels_count = 0

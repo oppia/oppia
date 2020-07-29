@@ -65,7 +65,7 @@ class _Gae(Platform):
             model_names: list(str). List of storage module names.
 
         Returns:
-            tuple(module): Tuple of storage modules.
+            tuple(module). Tuple of storage modules.
 
         Raises:
             Exception: Invalid model name.
@@ -290,7 +290,7 @@ class Registry(python_utils.OBJECT):
         imports.
 
         Returns:
-            class: The corresponding platform-specific interface class.
+            class. The corresponding platform-specific interface class.
         """
         return cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
 

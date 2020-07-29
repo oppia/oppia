@@ -195,7 +195,7 @@ class Misconception(python_utils.OBJECT):
         """Returns a dict representing this Misconception domain object.
 
         Returns:
-            A dict, mapping all fields of Misconception instance.
+            dict. A dict, mapping all fields of Misconception instance.
         """
         return {
             'id': self.id,
@@ -293,7 +293,7 @@ class Rubric(python_utils.OBJECT):
         """Returns a dict representing this Rubric domain object.
 
         Returns:
-            A dict, mapping all fields of Rubric instance.
+            dict. A dict, mapping all fields of Rubric instance.
         """
         return {
             'difficulty': self.difficulty,
@@ -378,7 +378,7 @@ class WorkedExample(python_utils.OBJECT):
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
-            A dict, mapping all fields of WorkedExample instance.
+            dict. A dict, mapping all fields of WorkedExample instance.
         """
         return {
             'question': self.question.to_dict(),
@@ -474,7 +474,7 @@ class SkillContents(python_utils.OBJECT):
         """Returns a dict representing this SkillContents domain object.
 
         Returns:
-            A dict, mapping all fields of SkillContents instance.
+            dict. A dict, mapping all fields of SkillContents instance.
         """
         return {
             'explanation': self.explanation.to_dict(),
@@ -745,7 +745,7 @@ class Skill(python_utils.OBJECT):
         """Returns a dict representing this Skill domain object.
 
         Returns:
-            A dict, mapping all fields of Skill instance.
+            dict. A dict, mapping all fields of Skill instance.
         """
         return {
             'id': self.id,

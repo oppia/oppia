@@ -255,7 +255,7 @@ class StoryReference(python_utils.OBJECT):
         """Returns a dict representing this StoryReference domain object.
 
         Returns:
-            A dict, mapping all fields of StoryReference instance.
+            dict. A dict, mapping all fields of StoryReference instance.
         """
         return {
             'story_id': self.story_id,
@@ -336,7 +336,7 @@ class Subtopic(python_utils.OBJECT):
         """Returns a dict representing this Subtopic domain object.
 
         Returns:
-            A dict, mapping all fields of Subtopic instance.
+            dict. A dict, mapping all fields of Subtopic instance.
         """
         return {
             'id': self.id,
@@ -518,7 +518,7 @@ class Topic(python_utils.OBJECT):
         """Returns a dict representing this Topic domain object.
 
         Returns:
-            A dict, mapping all fields of Topic instance.
+            dict. A dict, mapping all fields of Topic instance.
         """
         return {
             'id': self.id,

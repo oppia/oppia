@@ -912,7 +912,7 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
     excluding files that should not be built.
 
     Args:
-        source: str.  Path relative to /oppia of directory containing source
+        source: str. Path relative to /oppia of directory containing source
             files and directories to be built.
         target: str. Path relative to /oppia of directory where the built files
             and directories will be saved to.

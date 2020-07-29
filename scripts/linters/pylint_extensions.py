@@ -49,13 +49,14 @@ from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, w
 from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint.checkers import typecheck  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def read_from_node(node):
     """Returns the data read from the ast node in unicode form.
 
     Args:
-        node: astroid.scoped_nodes.Function. Node to access module content.
+        node: astroid.scoped_nodes.Function Node to access module content.
 
     Returns:
         list(str). The data read from the ast node.
@@ -500,6 +501,28 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_functiondef_returns(node, node_doc)
         self.check_functiondef_yields(node, node_doc)
         self.check_arg_section_indentation(node)
+        self.check_typeinfo(node, node_doc)
+
+    def check_typeinfo(self, node, node_doc):
+        re_param_line = re.compile(
+            r"""
+            \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
+            \s*  ( [:]
+                \s*
+                ({type}|\S*)
+                (?:,\s+optional)?
+                [.]+\s )+ \s*                  # optional type declaration
+            \s*  (.*)                       # beginning of optional description
+        """.format(
+            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+        ), flags=re.X | re.S | re.M)
+
+        if node_doc.has_params():
+            entries = node_doc._parse_section(_check_docs_utils.GoogleDocstring.re_param_section)
+            for entry in entries:
+                match = re_param_line.match(entry)
+                if not match:
+                    self.add_message('malform-param')
 
     def check_functiondef_params(self, node, node_doc):
         """Checks whether all parameters in a function definition are

@@ -85,7 +85,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new ClassifierTrainingJobModel instance.
+            str. ID of the new ClassifierTrainingJobModel instance.
 
         Raises:
             Exception: The id generator for ClassifierTrainingJobModel is
@@ -129,7 +129,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             data_schema_version: int. The schema version for the data.
 
         Returns:
-            ID of the new ClassifierModel entry.
+            str. ID of the new ClassifierModel entry.
 
         Raises:
             Exception: A model with the same ID already exists.
@@ -160,7 +160,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            List of the ClassifierTrainingJobModels with status new or pending.
+            list. List of the ClassifierTrainingJobModels with status new or
+            pending.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
@@ -286,7 +287,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 combination of <exp_id, exp_version, state_name>.
 
         Returns:
-            ID of the new ClassifierExplorationMappingModel entry.
+            str. ID of the new ClassifierExplorationMappingModel entry.
 
         Raises:
             Exception: A model with the same ID already exists.

@@ -206,8 +206,8 @@ def _get_linters_for_file_extension(
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        custom_linter: list. Custom lint checks.
-        third_party_linter: list. Third party lint checks.
+        (CustomLintChecks, ThirdPartyLintChecks). A 2-tuple containing objects
+        of lint check classes to run in parallel processing.
     """
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     custom_linters = []
@@ -271,7 +271,7 @@ def _get_changed_filepaths():
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
-        a list of filepaths of modified files.
+        list. a list of filepaths of modified files.
     """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only',
@@ -293,7 +293,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
             to be excluded.
 
     Returns:
-        a list of files in directory and subdirectories without excluded files.
+        list. a list of files in directory and subdirectories without excluded
+        files.
     """
     files_in_directory = []
     for _dir, _, files in os.walk(dir_path):
@@ -316,7 +317,7 @@ def _get_file_extensions(file_extensions_to_lint):
             linted and checked.
 
     Returns:
-        all_file_extensions_type: list(str). The list of all file extensions
+        list(str). The list of all file extensions
         to be linted and checked.
     """
     all_file_extensions_type = ['js', 'py', 'html', 'css', 'other']
@@ -349,8 +350,7 @@ def _get_all_filepaths(input_path, input_filenames):
             checked, ignored if input_path is specified.
 
     Returns:
-        all_filepaths: list(str). The list of filepaths to be linted and
-        checked.
+        list(str). The list of filepaths to be linted and checked.
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     if input_path:

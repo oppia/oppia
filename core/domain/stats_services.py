@@ -431,7 +431,7 @@ def get_exp_issues(exp_id, exp_version):
         exp_version: int. Version of the exploration.
 
     Returns:
-        ExplorationIssues|None: The domain object for exploration issues or
+        ExplorationIssues|None. The domain object for exploration issues or
         None if the exp_id is invalid.
     """
     exp_issues = None
@@ -449,7 +449,7 @@ def get_playthrough_by_id(playthrough_id):
         playthrough_id: str. ID of the playthrough.
 
     Returns:
-        Playthrough|None: The domain object for the playthrough or None if the
+        Playthrough|None. The domain object for the playthrough or None if the
         playthrough_id is invalid.
     """
     playthrough = None

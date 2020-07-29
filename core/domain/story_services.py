@@ -438,7 +438,7 @@ def update_story(
         committer_id: str. The id of the user who is performing the update
             action.
         story_id: str. The story id.
-        change_list: list(StoryChange).These changes are applied in sequence to
+        change_list: list(StoryChange). These changes are applied in sequence to
             produce the resulting story.
         commit_message: str or None. A description of changes made to the
             story.
@@ -574,7 +574,7 @@ def save_story_summary(story_summary):
     entity in the datastore.
 
     Args:
-        story_summary: The story summary object to be saved in the
+        story_summary: StorySummary. The story summary object to be saved in the
             datastore.
     """
     story_summary_dict = {

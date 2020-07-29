@@ -174,8 +174,9 @@ class CollectionNode(python_utils.OBJECT):
         """Returns a dict representing this CollectionNode domain object.
 
         Returns:
-            A dict, mapping all fields (exploration_id, prerequisite_skill_ids,
-            acquired_skill_ids) of CollectionNode instance.
+            dict. A dict, mapping all fields (exploration_id,
+            prerequisite_skill_ids, acquired_skill_ids) of CollectionNode
+            instance.
         """
         return {
             'exploration_id': self.exploration_id
@@ -274,7 +275,7 @@ class Collection(python_utils.OBJECT):
         """Returns a dict representing this Collection domain object.
 
         Returns:
-            A dict, mapping all fields of Collection instance.
+            dict. A dict, mapping all fields of Collection instance.
         """
         return {
             'id': self.id,
@@ -1043,7 +1044,7 @@ class CollectionSummary(python_utils.OBJECT):
         """Returns a dict representing this CollectionSummary domain object.
 
         Returns:
-            A dict, mapping all fields of CollectionSummary instance.
+            dict. A dict, mapping all fields of CollectionSummary instance.
         """
         return {
             'id': self.id,

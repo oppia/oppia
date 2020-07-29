@@ -233,7 +233,7 @@ def get_parent_branch_name_for_diff():
     """Returns remote branch name against which the diff has to be checked.
 
     Returns:
-        str: The name of the remote branch.
+        str. The name of the remote branch.
     """
     if common.is_current_branch_a_hotfix_branch():
         return 'release-%s' % common.get_current_release_version_number(
@@ -249,7 +249,7 @@ def collect_files_being_pushed(ref_list, remote):
         remote: the remote being pushed to
 
     Returns:
-        dict: Dict mapping branch names to 2-tuples of the form (list of
+        dict. Dict mapping branch names to 2-tuples of the form (list of
         changed files, list of files to lint).
     """
     if not ref_list:

@@ -93,10 +93,10 @@ def get_topic_summary_from_model(topic_summary_model):
     topic summary model.
 
     Args:
-        topic_summary_model: TopicSummaryModel.
+        topic_summary_model: TopicSummaryModel. Topic summary model object.
 
     Returns:
-        TopicSummary.
+        TopicSummary. Domain object for an Oppia topic summary.
     """
     return topic_domain.TopicSummary(
         topic_summary_model.id, topic_summary_model.name,
@@ -222,8 +222,8 @@ def apply_change_list(topic_id, change_list):
             deletion of subtopics.
 
     Returns:
-        Topic, dict, list(int), list(int), list(SubtopicPageChange).
-        The modified topic object, the modified subtopic pages dict keyed
+        Topic, dict, list(int), list(int), list(SubtopicPageChange). The
+        modified topic object, the modified subtopic pages dict keyed
         by subtopic page id containing the updated domain objects of
         each subtopic page, a list of ids of the deleted subtopics,
         a list of ids of the newly created subtopics and a list of changes
@@ -822,8 +822,8 @@ def save_topic_summary(topic_summary):
     entity in the datastore.
 
     Args:
-        topic_summary: The topic summary object to be saved in the
-            datastore.
+        topic_summary: TopicSummaryModel. The topic summary object to be saved
+            in the datastore.
     """
     topic_summary_dict = {
         'name': topic_summary.name,

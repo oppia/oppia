@@ -53,9 +53,8 @@ def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers.
 
     Args:
-        response_headers: webapp2.ResponseHeaders.
-            Response headers are used to give a more detailed
-            context of the response.
+        response_headers: webapp2.ResponseHeaders. Response headers are used
+            to give a more detailed context of the response.
     """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below. We also unset dev_appserver_login
@@ -554,7 +553,7 @@ class CsrfTokenManager(python_utils.OBJECT):
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
-            str: The generated CSRF token.
+            str. The generated CSRF token.
         """
         cls.init_csrf_secret()
 

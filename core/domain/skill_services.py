@@ -224,7 +224,7 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
     Args:
         augmented_skill_summaries: list(AugmentedSkillSummary). The list
             of augmented skill summaries.
-        status: str. The status of the skill.
+        status: str. str. The status of the skill.
 
     Returns:
         list(AugmentedSkillSummary). The list of AugmentedSkillSummaries
@@ -380,10 +380,10 @@ def get_skill_summary_from_model(skill_summary_model):
     skill summary model.
 
     Args:
-        skill_summary_model: SkillSummaryModel.
+        skill_summary_model: SkillSummaryModel. The skill summary model object.
 
     Returns:
-        SkillSummary.
+        SkillSummary. Domain object for an oppia skill summary.
     """
     return skill_domain.SkillSummary(
         skill_summary_model.id, skill_summary_model.description,
@@ -825,8 +825,8 @@ def save_skill_summary(skill_summary):
     entity in the datastore.
 
     Args:
-        skill_summary: The skill summary object to be saved in the
-            datastore.
+        skill_summary: SkillSummaryModel. The skill summary object to be saved
+            in the datastore.
     """
     skill_summary_dict = {
         'description': skill_summary.description,

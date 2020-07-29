@@ -642,8 +642,8 @@ def save_question_summary(question_summary):
     entity in the datastore.
 
     Args:
-        question_summary: The question summary object to be saved in the
-            datastore.
+        question_summary: QuestionSummaryModel. The question summary object to
+            be saved in the datastore.
     """
     question_summary_model = question_models.QuestionSummaryModel(
         id=question_summary.id,
@@ -660,10 +660,11 @@ def get_question_summary_from_model(question_summary_model):
     question summary model.
 
     Args:
-        question_summary_model: QuestionSummaryModel.
+        question_summary_model: QuestionSummaryModel. The QuestionSummary model
+            object.
 
     Returns:
-        QuestionSummary.
+        QuestionSummary. The domain object of QuestionSummary.
     """
     return question_domain.QuestionSummary(
         question_summary_model.id,

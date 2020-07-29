@@ -30,12 +30,12 @@ def run_in_transaction(fn, *args, **kwargs):
     commit, since TransactionOptions.ALLOWED is used.
 
     Args:
-        fn: A function (or callable) to be called.
-        *args: Variable length argument list passed to the callable.
-        **kwargs: Arbitrary keyword arguments passed to the callable.
+        fn: callable. A function (or callable) to be called.
+        *args: list. Variable length argument list passed to the callable.
+        **kwargs: args. Arbitrary keyword arguments passed to the callable.
 
     Returns:
-        Whatever fn() returns.
+        function_return. Whatever fn() returns.
 
     Raises:
         *: Whatever fn() raises.
