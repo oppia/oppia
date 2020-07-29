@@ -395,7 +395,7 @@ def _get_thread_from_model(thread_model):
     """Converts the given FeedbackThreadModel to a FeedbackThread object.
 
     Args:
-        thread_model: FeedbackThreadModel.
+        thread_model: FeedbackThreadModel. The FeedbackThread model object.
 
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.

@@ -1403,7 +1403,7 @@ def get_image_filenames_from_exploration(exploration):
     """Get the image filenames from the exploration.
 
     Args:
-        exploration: Exploration object. The exploration itself.
+        exploration: object(Exploration). The exploration itself.
 
     Returns:
         list(str). List containing the name of the image files in exploration.
@@ -1759,7 +1759,7 @@ def save_multi_exploration_math_rich_text_info_model(
 
     Args:
         exploration_math_rich_text_info_list:
-        list(ExplorationMathRichTextInfoModel). A list of
+            list(ExplorationMathRichTextInfoModel). A list of
             ExplorationMathRichTextInfoModel domain objects.
     """
 

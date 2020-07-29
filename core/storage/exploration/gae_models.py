@@ -755,7 +755,7 @@ class ExpSummaryModel(base_models.BaseModel):
         given user.
 
         Args:
-            user_id: The id of the given user.
+            user_id: str. The id of the given user.
 
         Returns:
             iterable. An iterable with private exp summaries that are at least

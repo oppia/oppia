@@ -56,7 +56,7 @@ def read_from_node(node):
     """Returns the data read from the ast node in unicode form.
 
     Args:
-        node: astroid.scoped_nodes.Function Node to access module content.
+        node: astroid.scoped_nodes.Function. Node to access module content.
 
     Returns:
         list(str). The data read from the ast node.
@@ -464,11 +464,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
             ' relative to section headers.'
         ),
         'W9024': (
-            'malformed parameter',
-            'malformed-parameter',
-            'The parameter is incorrectly formatted: \nFor returns and yields,'
-            ' headers should have this format: "type (elaboration). \n'
-            'For raises, headers should have the format: "exception: '
+            'Raises section should be the following form: exception_name: '
+            'description',
+            'malformed-raises-section',
+            'The parameter is incorrectly formatted.'
         ),
         'W9025': (
             'Period is not used at the end of the docstring.',
@@ -527,17 +526,17 @@ class DocstringParameterChecker(checkers.BaseChecker):
             'Arguments should be in following form: variable_name: typeinfo. '
             'description.',
             'malformed-arg-section',
-            'The parameter is incorrectly formatted: \nFor returns and yields,'
-            ' headers should have this format: "type (elaboration). \n'
-            'For raises, headers should have the format: "exception: '
+            'The parameter is incorrectly formatted.'
         ),
         'W9036': (
-            'Returns and Yields should be in the following form: typeinfo. '
-            'description.',
-            'malformed-return-yield',
-            'The parameter is incorrectly formatted: \nFor returns and yields,'
-            ' headers should have this format: "type (elaboration). \n'
-            'For raises, headers should have the format: "exception: '
+            'Returns should be in the following form: typeinfo. description.',
+            'malformed-return-section',
+            'The parameter is incorrectly formatted.'
+        ),
+        'W9037': (
+            'Yields should be in the following form: typeinfo. description.',
+            'malformed-yield-section',
+            'The parameter is incorrectly formatted.'
         )
     }
 
@@ -631,25 +630,63 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_typeinfo(node, node_doc)
 
     def check_typeinfo(self, node, node_doc):
+        """Checks whether all parameters in a function definition are
+        properly formatted.
+
+        Args:
+            node: astroid.node.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Docstring. Pylint Docstring class instance representing
+                a node's docstring.
+        """
         re_param_line = re.compile(
             r"""
-            \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
+            \s*  \*{{0,2}}(\w+)          # identifier potentially with asterisks
             \s*  ( [:]
                 \s*
-                ({type}|\S*)
+                ({type}|\S*|[\s\S]*)
                 (?:,\s+optional)?
-                [.]+\s )+ \s*                  # optional type declaration
+                [.]+\s )+ \s*
             \s*  (.*)                       # beginning of optional description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
 
+        re_returns_line = re.compile(
+            r"""
+            \s* (({type}|\S*|[\s\S]*).[.]+\s)+              # identifier
+            \s* (.+)                          # beginning of description
+        """.format(
+            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+        ), flags=re.X | re.S | re.M)
+
+        re_yields_line = re_returns_line
+
         if node_doc.has_params():
-            entries = node_doc._parse_section(_check_docs_utils.GoogleDocstring.re_param_section)
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_param_section)
             for entry in entries:
                 match = re_param_line.match(entry)
                 if not match:
-                    self.add_message('malform-param')
+                    self.add_message('malformed-args-section', node=node)
+
+        if node_doc.has_returns():
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_returns_section)
+            entries = [''.join(entries)]
+            for entry in entries:
+                match = re_returns_line.match(entry)
+                if not match:
+                    self.add_message('malformed-returns-section', node=node)
+
+        if node_doc.has_yields():
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_yields_section)
+            entries = [''.join(entries)]
+            for entry in entries:
+                match = re_yields_line.match(entry)
+                if not match:
+                    self.add_message('malformed-yields-section', node=node)
 
     def check_functiondef_params(self, node, node_doc):
         """Checks whether all parameters in a function definition are
@@ -730,7 +767,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 elif line == b'Raises:':
                     self.add_message(
                         'single-space-above-raises', node=node)
-                elif line == b'Yield:':
+                elif line == b'Yields:':
                     self.add_message(
                         'single-space-above-yield', node=node)
             if line != b'':
@@ -853,7 +890,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     elif (re.search(br'^[^ ]+: ', stripped_line) and
                           not in_description):
                         self.add_message(
-                            'malformed-parameter',
+                            'malformed-raises-section',
                             node=node)
                     # In a description line that is wrapped around (doesn't
                     # start off with the parameter name), we need to make sure

@@ -193,7 +193,8 @@ def apply_changes_to_model(task_entry, task_entry_model):
     Args:
         task_entry: improvements_domain.TaskEntry. The improvements domain's
             TaskEntry object.
-        task_entry_model: improvements_models.TaskEntryModel.
+        task_entry_model: improvements_models.TaskEntryModel. The TaskEntry
+            model object.
 
     Returns:
         bool. Whether any change was made to the model.

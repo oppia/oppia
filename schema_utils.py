@@ -232,9 +232,9 @@ class Normalizers(python_utils.OBJECT):
             obj: str. a string representing a URL.
 
         Returns:
-            An empty string if the URL does not start with http:// or https://
-            except when the string is empty. Otherwise, returns the original
-            URL.
+            url(str). An empty string if the URL does not start with http:// or
+            https:// except when the string is empty. Otherwise, returns the
+            original URL.
 
         Raises:
             AssertionError: The string is non-empty and does not start with
@@ -261,7 +261,7 @@ class Normalizers(python_utils.OBJECT):
             obj: str. String to be processed for multiple spaces.
 
         Returns:
-            A string that is the same as `obj`, except that each block of
+            str. A string that is the same as `obj`, except that each block of
             whitespace is collapsed into a single space character. If the
             block of whitespace is at the front or end of obj, then it
             is simply removed.

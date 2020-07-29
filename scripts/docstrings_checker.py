@@ -303,7 +303,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
             function_node: ast node object. Represents a function.
 
         Returns:
-            func_result: list(str). List of docstring errors associated with
+            list(str). List of docstring errors associated with
             the function. If the function has no errors, the list is empty.
         """
         func_def_args = cls.get_args_list_from_function_definition(

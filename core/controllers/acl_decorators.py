@@ -1540,7 +1540,7 @@ def can_edit_topic(handler):
 
         Args:
             topic_id: str. The topic id.
-            *args: arguments.
+            *args: arguments. The arguments from the calling function.
             **kwargs: *. Keyword arguments.
 
         Returns:

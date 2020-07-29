@@ -33,7 +33,7 @@ def get_featured_activity_references():
     """Gets a list of ActivityReference domain models.
 
     Returns:
-        list.A list of all ActivityReference domain objects that are
+        list. A list of all ActivityReference domain objects that are
         currently featured.
     """
     featured_model_instance = (

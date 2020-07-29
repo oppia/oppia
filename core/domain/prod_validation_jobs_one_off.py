@@ -6058,7 +6058,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         """Validates the composite_entity_id field of the given item.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The TaskEntry model
+                object.
         """
         expected_composite_entity_id = (
             improvements_models.TaskEntryModel.generate_composite_entity_id(
@@ -6076,7 +6077,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         """Validates the fields of the item relating to the status field.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The TaskEntry model
+                object.
         """
         if item.status == improvements_models.TASK_STATUS_OPEN:
             if item.resolver_id:
@@ -6107,7 +6109,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         name.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The TaskEntry model
+                object.
         """
         try:
             exp_model = exp_models.ExplorationModel.get(

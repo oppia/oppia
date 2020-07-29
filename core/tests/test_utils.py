@@ -2053,7 +2053,7 @@ tags: []
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                Result of `new_value`.
+                *. Result of `new_value`.
             """
             wrapper.called = True
             if expected_args is not None:

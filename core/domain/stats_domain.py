@@ -879,7 +879,7 @@ class StateAnswers(python_utils.OBJECT):
             submitted_answer_list: list. The list of SubmittedAnswer domain
                 objects that were submitted to the exploration and version
                 specified in this object.
-            schema_version: The schema version of this answers object.
+            schema_version: str. The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version

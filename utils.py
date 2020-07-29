@@ -734,7 +734,7 @@ def get_hashable_value(value):
             each other.
 
     Returns:
-        hashed_value: *. A new object that will always have the same hash for
+        hashed_value(*). A new object that will always have the same hash for
         "equivalent" values.
     """
     if isinstance(value, list):

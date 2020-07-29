@@ -14777,7 +14777,7 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         """Helper method to run job and fetch the output.
 
         Returns:
-            list([str, *]).
+            list([str, *]). Returns a list of output.
         """
         job_id = self.job_class.create_new()
         self.assertEqual(

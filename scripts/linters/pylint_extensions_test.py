@@ -562,6 +562,111 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
+    def test_malformed_args_section(self):
+        node_malformed_args_section = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Does nothing.
+
+                Args:
+                    arg: argument description.
+                \"\"\"
+                a = True
+        """)
+
+        message = testutils.Message(
+            msg_id='malformed-args-section',
+            node=node_malformed_args_section
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_malformed_args_section)
+    
+    def test_malformed_returns_section(self):
+        node_malformed_returns_section = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Return True.
+
+                Returns:
+                    arg: argument description.
+                \"\"\"
+                return True
+        """)
+
+        message = testutils.Message(
+            msg_id='malformed-returns-section',
+            node=node_malformed_returns_section
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_malformed_returns_section)
+
+    def test_malformed_yields_section(self):
+        node_malformed_yields_section = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Yield true.
+
+                Yields:
+                    yields: argument description.
+                \"\"\"
+                yield True
+        """)
+
+        message = testutils.Message(
+            msg_id='malformed-yields-section',
+            node=node_malformed_yields_section
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_malformed_yields_section)
+
+    def test_well_formated_args_section(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Does nothing.
+
+                Args:
+                    arg: argument. description.
+                \"\"\"
+                a = True
+        """)
+
+        with self.checker_test_object.assertAddsMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+    def test_well_formated_returns_section(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Does nothing.
+
+                Returns:
+                    int. argument description.
+                \"\"\"
+                return args
+        """)
+
+        with self.checker_test_object.assertAddsMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+    def test_well_formated_yields_section(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Does nothing.
+
+                Yields:
+                    arg. argument description.
+                \"\"\"
+                yield args
+        """)
+
+        with self.checker_test_object.assertAddsMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
     def test_space_after_docstring(self):
         node_space_after_docstring = astroid.extract_node(
             u"""def func():
@@ -630,7 +735,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable
+                            arg: variable. desciption
                     \"\"\"
                     Something
         """)
@@ -648,7 +753,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable.\"\"\"
+                            arg: variable. description.\"\"\"
                     Something
         """)
 
@@ -664,7 +769,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             u"""def func(arg): #@
                 \"\"\"Do something.
                 Args:
-                    arg: argument.
+                    arg: argument. description.
                 \"\"\"
         """)
 
@@ -682,7 +787,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             u"""def func(): #@
                     \"\"\"Raises exception.
                     Raises:
-                        raises_exception.
+                        raises_exception. description.
                     \"\"\"
                     raise exception
         """)
@@ -701,7 +806,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             u"""def func(): #@
                 \"\"\"Returns something.
                 Returns:
-                    returns_something.
+                    returns_something. description.
                 \"\"\"
                 return something
         """)
@@ -721,9 +826,9 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Raises exception.
 
                 Args:
-                    arg: argument
+                    arg: argument. description.
                 Raises:
-                    raises_something.
+                    raises_something. description.
                 \"\"\"
                 raise exception
         """)
@@ -743,9 +848,9 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Returns Something.
 
                 Args:
-                    arg: argument
+                    arg: argument. description.
                 Returns:
-                    returns_something.
+                    returns_something. description.
                 \"\"\"
                 return something
         """)
@@ -766,10 +871,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
 
                 Raises:
-                    raises_exception
+                    raises_exception: description.
 
                 Returns:
-                    returns_something.
+                    returns_something. description.
                 \"\"\"
                 raise something
                 return something
@@ -791,15 +896,15 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
 
                     Args:
-                        arg: argument
+                        arg: argument. This is  description.
 
 
                     Returns:
-                        returns_something
+                        int. returns something.
 
 
-                    Yield:
-                        yield_something.
+                    Yields:
+                        yield_something. description.
                     \"\"\"
                     return True
                     yield something
@@ -831,10 +936,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"Returns something.
 
                     Args:
-                        arg: argument
+                        arg: argument. description.
 
                     Returns:
-                        returns_something.
+                        returns_something. description.
                     \"\"\"
                     "Returns: something"
                     return something
@@ -862,16 +967,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"Returns something.
 
                     Args:
-                        arg: argument
+                        arg: argument. This is description.
 
                     Returns:
-                        returns_something
+                        returns_something. This is description.
 
                     Raises:
-                        raises something
+                        raises. something
 
                     Yield:
-                        yield_something.
+                        yield_something. This is description.
                     \"\"\"
                     raise something
                     yield something
@@ -985,7 +1090,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         """)
 
         message = testutils.Message(
-            msg_id='malformed-parameter',
+            msg_id='malformed-raises-section',
             node=invalid_parameter_name)
 
         with self.checker_test_object.assertAddsMessages(message):
@@ -1009,7 +1114,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable.
+                            arg: variable. description.
                     \"\"\"
                     Something
         """)
@@ -1129,6 +1234,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node=invalid_args_description_node,
                 args='Incorrect'
             ),
+            testutils.Message(
+                msg_id='malformed-args-section',
+                node=invalid_args_description_node,
+            )
         ):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_args_description_node)
