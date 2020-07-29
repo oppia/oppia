@@ -110,7 +110,7 @@ class LatexStringSvgImageData(python_utils.OBJECT):
         """Initializes an LatexStringSvgImageData domain object.
 
         Args:
-            raw_image: bool. SVG image content for the LaTeX string.
+            raw_image: str. SVG image content for the LaTeX string.
             latex_string_svg_image_dimensions: LatexStringSvgImageDimensions.
                 The dimensions for the SVG image.
         """

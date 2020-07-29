@@ -146,16 +146,16 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           // to process and validate the filnames.
           if (node.tagName.toLowerCase() === 'svg') {
             dimensions.height = (
-              (node.getAttribute('height').match(/\d+\.\d+/g)[0]).replace(
+              (node.getAttribute('height').match(/\d+\.*\d*/g)[0]).replace(
                 '.', 'd'));
             dimensions.width = (
-              (node.getAttribute('width').match(/\d+\.\d+/g)[0]).replace(
+              (node.getAttribute('width').match(/\d+\.*\d*/g)[0]).replace(
                 '.', 'd'));
             // This attribute is useful for the vertical allignment of the
             // Math SVG while displaying inline with other text.
             // Math SVGs don't necessarily have a vertical allignment, in that
             // case we assign it zero.
-            var styleValue = node.getAttribute('style').match(/\d+\.\d+/g);
+            var styleValue = node.getAttribute('style').match(/\d+\.*\d*/g);
             if (styleValue) {
               dimensions.verticalPadding = styleValue[0].replace('.', 'd');
             } else {

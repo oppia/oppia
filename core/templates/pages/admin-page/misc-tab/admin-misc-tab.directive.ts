@@ -247,15 +247,19 @@ angular.module('oppia').directive('adminMiscTab', [
           });
         };
 
-        var latexMapping = {};
+        var latexMapping;
         var expIdToLatexMapping = null;
         var numberOfLatexStrings = 0;
         ctrl.generateSvgs = async function() {
           var countOfSvgsGenerated = 0;
+          latexMapping = {};
           for (var expId in expIdToLatexMapping) {
             var latexStrings = expIdToLatexMapping[expId];
             latexMapping[expId] = {};
             for (var i = 0; i < latexStrings.length; i++) {
+              LoggerService.info(
+                'Trying to generate SVG for Latex: ' +
+                latexStrings[i] + '  Exploration: ' + expId );
               var svgFile = await convertLatexToSvgFile(latexStrings[i]);
               countOfSvgsGenerated++;
               LoggerService.info(
@@ -275,78 +279,11 @@ angular.module('oppia').directive('adminMiscTab', [
         // TODO(#10045): Remove this function once all the math-rich text
         // components in explorations have a valid math SVG stored in the
         // datastore.
-        var allExplorationsLatexMapping = {};
-        var numberOfLatexStringsInAllExploration = 0;
-        ctrl.fetchAndGenerateSvgsForAllExplorations = function() {
-          $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER, {
-            params: {
-              type_of_latex_svg_generation: 'test_run'
-            }
-          }).then(
-            function(response) {
-              var numberOfExplorationsFetched = 0;
-              allExplorationsLatexMapping = (
-                response.data.all_explorations_latex_mapping);
-              for (var expId in allExplorationsLatexMapping) {
-                numberOfExplorationsFetched++;
-                for (var stateName in allExplorationsLatexMapping[expId]) {
-                  numberOfLatexStringsInAllExploration += (
-                    allExplorationsLatexMapping[expId][stateName]).length;
-                }
-              }
-              ctrl.setStatusMessage(
-                numberOfLatexStringsInAllExploration.toString() +
-                ' LaTeX strings fetched from backend for ' +
-                numberOfExplorationsFetched.toString() + ' explorations.' +
-                ' Generating SVGs.....');
-              ctrl.generateSvgsForAllExploration();
-            });
-        };
-
-        // TODO(#10045): Remove this function once all the math-rich text
-        // components in explorations have a valid math SVG stored in the
-        // datastore.
-        ctrl.generateSvgsForAllExploration = async function() {
-          var countOfSvgsGenerated = 0;
-          for (var expId in allExplorationsLatexMapping) {
-            for (var stateName in allExplorationsLatexMapping[expId]) {
-              var latexStringsInState = (
-                allExplorationsLatexMapping[expId][stateName]);
-              for (var i = 0; i < latexStringsInState.length; i++) {
-                if (latexStringsInState[i] === '') {
-                  LoggerService.error(
-                    'Found Empty Latex String in Exploration' + expId +
-                    ', State: ' + stateName);
-                  return;
-                }
-                LoggerService.info(
-                  'Trying to generate SVG for Latex: ' +
-                  latexStringsInState[i] + '  Exploration: ' + expId +
-                  ', State: ' + stateName);
-                var svgFile = await convertLatexToSvgFile(
-                  latexStringsInState[i]);
-                countOfSvgsGenerated++;
-                LoggerService.info(
-                  'generated ' + countOfSvgsGenerated.toString() + ' SVGs' +
-                  ' out of ' + numberOfLatexStringsInAllExploration.toString());
-              }
-            }
-          }
-          if (numberOfLatexStringsInAllExploration === countOfSvgsGenerated) {
-            ctrl.setStatusMessage(
-              'SVGs generated for ' + countOfSvgsGenerated.toString() +
-              ' LaTeX strings .');
-            $rootScope.$apply();
-          }
-        };
-
-        // TODO(#10045): Remove this function once all the math-rich text
-        // components in explorations have a valid math SVG stored in the
-        // datastore.
         ctrl.fetchAndGenerateSvgsForExplorations = function() {
           $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
             function(response) {
               var numberOfExplorationsFetched = 0;
+              numberOfLatexStrings = 0;
               expIdToLatexMapping = (
                 response.data.latex_strings_to_exp_id_mapping);
               for (var expId in expIdToLatexMapping) {
