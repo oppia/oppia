@@ -808,9 +808,8 @@ class Registry(python_utils.OBJECT):
             data_type: str. The data type of the platform parameter, must be
                 one of the following: 'bool', 'number', 'string'.
             is_feature: bool. True if the platform parameter is a feature flag.
-            feature_stage: str|None. The stage of the feature, required if
-                'is_feature' is True, must be one of the following:
-                'dev', 'test', 'prod'.
+            feature_stage: FEATURE_STAGES|None. The stage of the feature,
+                required if 'is_feature' is True.
 
         Returns:
             PlatformParameter. The created platform parameter.
