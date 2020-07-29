@@ -110,6 +110,22 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+    # Displayed name for users on android. They are editable unlike usernames.
+    name = ndb.StringProperty(default=None)
+    # A code associated with profiles to provide a PIN based authentication
+    # within the account on android.
+    pin = ndb.StringProperty(default=None)
+    # List of profile user ids associated with a full user. None for profiles.
+    associated_profile_user_ids = ndb.StringProperty(repeated=True)
+    # Exploration language preferences specified by the user for android.
+    preferred_android_language_codes = ndb.StringProperty(
+        repeated=True,
+        indexed=True,
+        choices=[lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES])
+    # Audio language preference used for audio translations on android.
+    preferred_android_audio_language_code = ndb.StringProperty(
+        default=None, choices=[
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
     # DEPRECATED in 2.8.7. Do not use.
     gae_user_id = ndb.StringProperty(required=False, indexed=False)
@@ -199,7 +215,14 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec': user.first_contribution_msec,
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
-            'preferred_audio_language_code': user.preferred_audio_language_code
+            'preferred_audio_language_code': user.preferred_audio_language_code,
+            'name': user.name,
+            'pin': user.pin,
+            'associated_profile_user_ids': user.associated_profile_user_ids,
+            'preferred_android_language_codes': (
+                user.preferred_android_language_codes),
+            'preferred_android_audio_language_code': (
+                user.preferred_android_audio_language_code)
         }
 
     @classmethod
