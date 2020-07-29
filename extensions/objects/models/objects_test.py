@@ -72,11 +72,11 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
                     ('-1', -1), (3.00, 3), (3.05, 3.05), ('3.05', 3.05), ]
         invalid_values_with_error_messages = [
-            ('a', r'could not convert string to float: a'),
-            ('', r'could not convert string to float: '),
-            ({'a': 3}, r'float\(\) argument must be a string or a number'),
-            ([3], r'float\(\) argument must be a string or a number'),
-            (None, r'float\(\) argument must be a string or a number')]
+            ('a', 'Could not convert unicode to float: a'),
+            ('', 'Could not convert unicode to float: '),
+            ({'a': 3}, r'Could not convert dict to float: \{u\'a\': 3\}'),
+            ([3], r'Could not convert list to float: \[3\]'),
+            (None, 'Could not convert NoneType to float: None')]
 
         self.check_normalization(
             objects.Real, mappings, invalid_values_with_error_messages)
@@ -86,18 +86,17 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0),
                     ('-1', -1), (-1, -1), (3.00, 3), (3.05, 3), ]
         invalid_values_with_error_messages = [
-            ('a', r'invalid literal for int\(\) with base 10: \'a\''),
-            ('', r'invalid literal for int\(\) with base 10: \'\''),
+            ('a', 'Could not convert unicode to int: a'),
+            ('', 'Could not convert unicode to int: '),
             (
                 {'a': 3},
-                r'int\(\) argument must be a string or a number, not \'dict\''),
+                r'Could not convert dict to int: \{u\'a\': 3\}'),
             (
                 [3],
-                r'int\(\) argument must be a string or a number, not \'list\''),
+                r'Could not convert list to int: \[3\]'),
             (
                 None,
-                r'int\(\) argument must be a string or a number, not '
-                r'\'NoneType\'')]
+                'Could not convert NoneType to int: None')]
 
         self.check_normalization(
             objects.Int, mappings, invalid_values_with_error_messages)
@@ -107,18 +106,17 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (3.00, 3),
                     (3.05, 3), ]
         invalid_values_with_error_messages = [
-            ('a', r'invalid literal for int\(\) with base 10: \'a\''),
-            ('', r'invalid literal for int\(\) with base 10: \'\''),
+            ('a', 'Could not convert unicode to int: a'),
+            ('', 'Could not convert unicode to int: '),
             (
                 {'a': 3},
-                r'int\(\) argument must be a string or a number, not \'dict\''),
+                r'Could not convert dict to int: \{u\'a\': 3\}'),
             (
                 [3],
-                r'int\(\) argument must be a string or a number, not \'list\''),
+                r'Could not convert list to int: \[3\]'),
             (
                 None,
-                r'int\(\) argument must be a string or a number, not '
-                r'\'NoneType\''),
+                'Could not convert NoneType to int: None'),
             (
                 -1,
                 r'Validation failed: is_at_least \(\{u\'min_value\': 0\}\) '
@@ -137,18 +135,17 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [(20, 20), ('20', 20), ('02', 2), (3.00, 3),
                     (3.05, 3), ]
         invalid_values_with_error_messages = [
-            ('a', r'invalid literal for int\(\) with base 10: \'a\''),
-            ('', r'invalid literal for int\(\) with base 10: \'\''),
+            ('a', 'Could not convert unicode to int: a'),
+            ('', 'Could not convert unicode to int: '),
             (
                 {'a': 3},
-                r'int\(\) argument must be a string or a number, not \'dict\''),
+                r'Could not convert dict to int: \{u\'a\': 3\}'),
             (
                 [3],
-                r'int\(\) argument must be a string or a number, not \'list\''),
+                r'Could not convert list to int: \[3\]'),
             (
                 None,
-                r'int\(\) argument must be a string or a number, not '
-                r'\'NoneType\''),
+                'Could not convert NoneType to int: None'),
             (
                 -1,
                 r'Validation failed: is_at_least \(\{u\'min_value\': 1\}\) '
@@ -671,7 +668,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 'Expected bool, received non-boolean'),
             (
                 self._create_fraction_dict(True, 'non-int', 2, 3),
-                r'invalid literal for int\(\) with base 10: \'non-int\''),
+                'Could not convert unicode to int: non-int'),
             (
                 self._create_fraction_dict(None, None, None, None),
                 'Expected bool, received None'),
