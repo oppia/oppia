@@ -44,6 +44,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
+import atexit
 import importlib
 import inspect
 import multiprocessing
@@ -237,6 +238,17 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
+def cleanup():
+    """Cleanup the redis client server when backend tests finish.
+    """
+    common.print_each_string_after_two_new_lines([
+        'INFORMATION',
+        'Cleaning up the redis_servers.'])
+    # No need to check return values since if the error fails, redis server is
+    # shutdown anyways.
+    shutdown_redis_server = subprocess.call(command_text)
+
+
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -256,6 +268,11 @@ def main(args=None):
 
     import dev_appserver
     dev_appserver.fix_sys_path()
+
+    # Start the redis local developmental server
+    subprocess.Popen(
+            'redis-server %s' % (common.REDIS_CONF_PATH), shell=True)
+    atexit.register(cleanup)
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

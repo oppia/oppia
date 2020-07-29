@@ -90,6 +90,10 @@ def cleanup():
     while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
     build.set_constants_to_default()
+    command_text = ['redis-cli', 'shutdown']
+    # No need to check return values since if the error fails, redis server is
+    # shutdown anyways.
+    shutdown_redis_server = subprocess.call(command_text)
 
 
 def main(args=None):
@@ -141,9 +145,11 @@ def main(args=None):
         time.sleep(10)
         # Redis-cli is only required in a development environment.
         python_utils.PRINT('Starting Redis development server')
-        background_processes.append(subprocess.Popen(
-        'redis-server %s' (common.REDIS_CONF_PATH), shell=True))
-
+        # Not appended to background_processes since this server is not a python
+        # backend process. It does not hang the terminal but returns
+        # automatically and runs the service in the system background.
+        subprocess.Popen(
+            'redis-server %s' % (common.REDIS_CONF_PATH), shell=True)
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
@@ -203,7 +209,6 @@ def main(args=None):
 
     for process in background_processes:
         process.wait()
-
 
 if __name__ == '__main__':
     main()
