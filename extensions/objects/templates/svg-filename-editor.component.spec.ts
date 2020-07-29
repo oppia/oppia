@@ -417,7 +417,7 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.onAddItem();
     svgFilenameCtrl.createPieChart();
     expect(svgFilenameCtrl.isDrawModePieChart()).toBe(false);
-  })
+  });
 
   it('should trigger object selection and scaling events', function() {
     svgFilenameCtrl.createRect();
@@ -497,10 +497,10 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.savedSVGDiagram = samplesvg;
     svgFilenameCtrl.continueDiagramEditing();
     var mocktoSVG = function(arg) {
-      return  '<path></path>';
-    }
+      return '<path></path>';
+    };
     var customToSVG = svgFilenameCtrl.customToSVG(mocktoSVG, 'path', 'group1');
-    expect(customToSVG()).toBe('<path id="group1"/>')
+    expect(customToSVG()).toBe('<path id="group1"/>');
     expect(svgFilenameCtrl.diagramStatus).toBe('editing');
   });
 });

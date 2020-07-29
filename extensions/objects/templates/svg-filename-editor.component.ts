@@ -143,7 +143,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         data: 10,
         color: '#00ff00',
         angle: 0
-      }]
+      }];
       ctrl.groupCount = 0;
       ctrl.pieChartDataInput = defaultDataInput;
 
@@ -318,7 +318,9 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.isSvgTagValid = function(svgString) {
-        var dataURI = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+        var dataURI = (
+          'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(svgString))));
         var invalidTagsAndAttr = (
           ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
         if (invalidTagsAndAttr.tags.length !== 0) {
@@ -342,7 +344,9 @@ angular.module('oppia').component('svgFilenameEditor', {
         }
 
         var svgString = getSVGString();
-        var svgDataURI = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+        var svgDataURI = (
+          'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(svgString))));
         var dimensions = {
           width: ctrl.diagramWidth,
           height: ctrl.diagramHeight,
@@ -395,8 +399,8 @@ angular.module('oppia').component('svgFilenameEditor', {
           var parentG = doc.querySelector(type);
           parentG.setAttribute('id', id);
           return doc.documentElement.outerHTML;
-        }
-      }
+        };
+      };
 
       ctrl.continueDiagramEditing = function() {
         if (
@@ -418,7 +422,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                 if (objId !== '') {
                   if (objId.slice(0, 5) === 'group') {
                     if (groupedObjects.length <= objId.slice(5)) {
-                      groupedObjects.push([])
+                      groupedObjects.push([]);
                     }
                     obj.toSVG = ctrl.customToSVG(obj.toSVG, obj.type, obj.id);
                     groupedObjects[objId.slice(5)].push(obj);
@@ -442,7 +446,9 @@ angular.module('oppia').component('svgFilenameEditor', {
                         if (el.style.fill !== '') {
                           coloredTextIndex.push({
                             startIndex: value.length,
-                            endIndex: value.length + el.childNodes[0].nodeValue.length,
+                            endIndex: (
+                              value.length +
+                              el.childNodes[0].nodeValue.length),
                             fill: el.style.fill,
                             stroke: el.style.stroke,
                             strokeWidth: el.style.strokeWidth
@@ -450,14 +456,16 @@ angular.module('oppia').component('svgFilenameEditor', {
                         }
                         value += el.childNodes[0].nodeValue;
                       }
-                      if (index < childrens.length - 1 && el.style.fill === '') {
+                      if (
+                        index < childrens.length - 1 &&
+                        el.style.fill === '') {
                         value += '\n';
                       }
                     });
                     value = (
                       obj['text-transform'] === 'uppercase' ?
                       value.toUpperCase() : value);
-                    
+
                     obj.set({
                       text: value,
                     });
@@ -490,7 +498,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                 }
               });
               groupedObjects.forEach(function(objs) {
-                ctrl.canvas.add(new fabric.Group(objs))
+                ctrl.canvas.add(new fabric.Group(objs));
                 ctrl.groupCount += 1;
               });
             }
@@ -779,7 +787,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             data: 10,
             color: '#000000',
             angle: 0
-          }
+          };
           ctrl.pieChartDataInput.push(dataInput);
           $scope.$applyAsync();
         }
@@ -793,47 +801,47 @@ angular.module('oppia').component('svgFilenameEditor', {
         var radiansToDegrees = 180 / Math.PI;
 
         var arc = new fabric.Circle({
-            radius: radius,
-            startAngle: -halfAngle,
-            endAngle: halfAngle,
-            left: center.x,
-            top: center.y,
-            originX: 'center',
-            originY: 'center',
-            fill: color,
-            stroke: color,
-            strokeWidth: 1,
-            strokeUniform: true,
-            id: 'group' + ctrl.groupCount
+          radius: radius,
+          startAngle: -halfAngle,
+          endAngle: halfAngle,
+          left: center.x,
+          top: center.y,
+          originX: 'center',
+          originY: 'center',
+          fill: color,
+          stroke: color,
+          strokeWidth: 1,
+          strokeUniform: true,
+          id: 'group' + ctrl.groupCount
         });
         arc.toSVG = ctrl.customToSVG(arc.toSVG, 'path', arc.id);
         var p1 = new polyPoint (height + center.x, center.y + halfChord);
         var p2 = new polyPoint (height + center.x, center.y - halfChord);
         var tri = new fabric.Polygon([center, p1, p2, center], {
-            fill: color,
-            stroke: color,
-            strokeWidth: 1,
-            strokeUniform: true,
-            id: 'group' + ctrl.groupCount
+          fill: color,
+          stroke: color,
+          strokeWidth: 1,
+          strokeUniform: true,
+          id: 'group' + ctrl.groupCount
         });
         tri.toSVG = ctrl.customToSVG(tri.toSVG, tri.type, tri.id);
         var rotationAngle = (startAngle + halfAngle) * radiansToDegrees;
         var slice = new fabric.Group([arc, tri], {
-            originX: 'center',
-            originY: 'center',
-            top: center.y,
-            left: center.x,
-            angle: rotationAngle,
+          originX: 'center',
+          originY: 'center',
+          top: center.y,
+          left: center.x,
+          angle: rotationAngle,
         });
         return slice;
-      }
+      };
 
       var getTextIndex = function(text, lineNum, charIndex) {
         return (
           text.split('\n').slice(0, lineNum).reduce(function(sum, textLine) {
-          return sum + textLine.length + 1;
-        }, 0) + charIndex);
-      }
+            return sum + textLine.length + 1;
+          }, 0) + charIndex);
+      };
 
       var createChart = function() {
         var total = 0;
