@@ -99,12 +99,12 @@ AUDIT_JOB_MANAGERS = [
         .DragAndDropSortInputInteractionOneOffJob),
     (
         interaction_validation_jobs_one_off
-        .InteractionRTECustomizationArgsValidationJob),
+        .InteractionRTECustomizationArgsValidationOneOffJob),
     interaction_validation_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_validation_jobs_one_off.MultipleChoiceInteractionOneOffJob,
     (
         interaction_validation_jobs_one_off
-        .InteractionCustomizationArgsValidationJob),
+        .InteractionCustomizationArgsValidationOneOffJob),
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,

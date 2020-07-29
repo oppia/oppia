@@ -187,7 +187,7 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class InteractionRTECustomizationArgsValidationJob(
+class InteractionRTECustomizationArgsValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for validating all the customizations arguments of
     Rich Text Components.
@@ -233,7 +233,7 @@ class InteractionRTECustomizationArgsValidationJob(
             yield (key[:exp_id_index - 1], output_values)
 
 
-class InteractionCustomizationArgsValidationJob(
+class InteractionCustomizationArgsValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs and validates
     customization args for all interactions.

@@ -792,15 +792,18 @@ class InteractionRTECustomizationArgsValidationJobTests(
             # Start CustomizationArgsValidation job on sample exploration.
             job_id = (
                 interaction_validation_jobs_one_off
-                .InteractionRTECustomizationArgsValidationJob.create_new())
+                .InteractionRTECustomizationArgsValidationOneOffJob.create_new(
+                    ))
             (
                 interaction_validation_jobs_one_off
-                .InteractionRTECustomizationArgsValidationJob.enqueue(job_id))
+                .InteractionRTECustomizationArgsValidationOneOffJob.enqueue(
+                    job_id))
             self.process_and_flush_pending_tasks()
 
         actual_output = (
             interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationJob.get_output(job_id))
+            .InteractionRTECustomizationArgsValidationOneOffJob.get_output(
+                job_id))
 
         expected_output = [(
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
@@ -850,7 +853,7 @@ class InteractionRTECustomizationArgsValidationJobTests(
         run_job_for_deleted_exp(
             self,
             interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationJob)
+            .InteractionRTECustomizationArgsValidationOneOffJob)
 
     def test_validation_job_fails_for_invalid_schema_version(self):
         """Test that invalid schema version results in job failure."""
@@ -866,15 +869,16 @@ class InteractionRTECustomizationArgsValidationJobTests(
 
         job_id = (
             interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationJob.create_new())
+            .InteractionRTECustomizationArgsValidationOneOffJob.create_new())
         (
             interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationJob.enqueue(job_id))
+            .InteractionRTECustomizationArgsValidationOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationJob.get_output(job_id))
+            .InteractionRTECustomizationArgsValidationOneOffJob.get_output(
+                job_id))
         expected_output = [
             u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
             'exploration state schemas at present. when loading exploration\', '
@@ -883,7 +887,7 @@ class InteractionRTECustomizationArgsValidationJobTests(
         self.assertEqual(actual_output, expected_output)
 
 
-class InteractionCustomizationArgsValidationJobTests(
+class InteractionCustomizationArgsValidationOneOffJobTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -895,7 +899,7 @@ class InteractionCustomizationArgsValidationJobTests(
 
     def setUp(self):
         super(
-            InteractionCustomizationArgsValidationJobTests, self).setUp()
+            InteractionCustomizationArgsValidationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -933,15 +937,15 @@ class InteractionCustomizationArgsValidationJobTests(
         # Start ItemSelectionInteractionOneOff job on sample exploration.
         job_id = (
             interaction_validation_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.create_new())
+            .InteractionCustomizationArgsValidationOneOffJob.create_new())
         (
             interaction_validation_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.enqueue(job_id))
+            .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             interaction_validation_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.get_output(job_id))
+            .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
@@ -960,15 +964,15 @@ class InteractionCustomizationArgsValidationJobTests(
         # Start ItemSelectionInteractionOneOff job on sample exploration.
         job_id = (
             interaction_validation_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.create_new())
+            .InteractionCustomizationArgsValidationOneOffJob.create_new())
         (
             interaction_validation_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.enqueue(job_id))
+            .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             interaction_validation_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.get_output(job_id))
+            .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'Failed customization args validation for exp id exp_id0\', '
             '[u\'ItemSelectionInput: Could not convert unicode to int: 1b\']]')]
@@ -1004,4 +1008,4 @@ class InteractionCustomizationArgsValidationJobTests(
         run_job_for_deleted_exp(
             self,
             interaction_validation_jobs_one_off
-            .InteractionCustomizationArgsValidationJob)
+            .InteractionCustomizationArgsValidationOneOffJob)
