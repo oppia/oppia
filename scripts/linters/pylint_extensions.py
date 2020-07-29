@@ -525,17 +525,17 @@ class DocstringParameterChecker(checkers.BaseChecker):
         'W9035': (
             'Arguments should be in following form: variable_name: typeinfo. '
             'description.',
-            'malformed-arg-section',
+            'malformed-args-section',
             'The parameter is incorrectly formatted.'
         ),
         'W9036': (
             'Returns should be in the following form: typeinfo. description.',
-            'malformed-return-section',
+            'malformed-returns-section',
             'The parameter is incorrectly formatted.'
         ),
         'W9037': (
             'Yields should be in the following form: typeinfo. description.',
-            'malformed-yield-section',
+            'malformed-yields-section',
             'The parameter is incorrectly formatted.'
         )
     }
@@ -639,6 +639,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
             node_doc: Docstring. Pylint Docstring class instance representing
                 a node's docstring.
         """
+        # The regexes are taken from the pylint codebase and then later modified
+        # in accorance to our needs. Link: https://github.com/PyCQA/pylint/blob/
+        # e89c361668aeead9fd192d5289c186611ef779ca/pylint/extensions/
+        # _check_docs_utils.py#L428.
         re_param_line = re.compile(
             r"""
             \s*  \*{{0,2}}(\w+)          # identifier potentially with asterisks
@@ -647,7 +651,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 ({type}|\S*|[\s\S]*)
                 (?:,\s+optional)?
                 [.]+\s )+ \s*
-            \s*  (.*)                       # beginning of optional description
+            \s*  (.*)[.]+                   # beginning of optional description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -655,7 +659,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         re_returns_line = re.compile(
             r"""
             \s* (({type}|\S*|[\s\S]*).[.]+\s)+              # identifier
-            \s* (.+)                          # beginning of description
+            \s* (.*)[.]+                          # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
