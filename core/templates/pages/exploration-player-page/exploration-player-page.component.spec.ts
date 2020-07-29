@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
+import 'mousetrap';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -30,12 +32,29 @@ describe('Exploration player page', function() {
   var ContextService = null;
   var PageTitleService = null;
   var ReadOnlyExplorationBackendApiService = null;
+  var skipButton = document.createElement('button');
+  var nextButton = document.createElement('button');
+  var continueToNextCardButton = document.createElement('button');
+  var continueButton = document.createElement('button');
+  var backButton = document.createElement('button');
 
   var explorationId = 'exp1';
   var exploration = {
     title: 'Exploration Title',
     objective: 'Exploration Objective',
   };
+
+  beforeEach(() => {
+    skipButton.setAttribute('id', 'skipToMainContentId');
+    backButton.setAttribute('id', 'backButtonId');
+    nextButton.setAttribute('class', 'protractor-test-next-button');
+    continueButton.setAttribute('class', 'protractor-test-continue-button');
+    continueToNextCardButton.setAttribute(
+      'class', 'protractor-test-continue-to-next-card-button');
+    document.body.append(skipButton);
+    document.body.append(continueButton);
+    document.body.append(backButton);
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -90,6 +109,23 @@ describe('Exploration player page', function() {
 
     ctrl.$onInit();
     $scope.$apply();
+
+    Mousetrap.trigger('s');
+    expect(skipButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('k');
+    expect(backButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('j');
+    expect(continueButton.isEqualNode(document.activeElement));
+
+    document.body.append(continueToNextCardButton);
+    Mousetrap.trigger('j');
+    expect(continueToNextCardButton.isEqualNode(document.activeElement));
+
+    document.body.append(nextButton);
+    Mousetrap.trigger('j');
+    expect(nextButton.isEqualNode(document.activeElement));
 
     expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
       'Exploration Title - Oppia');

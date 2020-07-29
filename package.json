@@ -134,6 +134,7 @@
     "lodash": "^4.17.14",
     "mathjs": "^7.0.0",
     "moment": "^2.24.0",
+    "mousetrap": "^1.6.5",
     "nerdamer": "^1.1.4",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^4.0.1"
