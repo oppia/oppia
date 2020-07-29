@@ -42,6 +42,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
+import { EventEmitter } from '@angular/core';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
@@ -72,6 +73,7 @@ describe('Exploration editor page component', function() {
   var stass = null;
   var tds = null;
   var ueps = null;
+  var sampleEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -296,6 +298,7 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(sampleEmitter);
 
       explorationData.is_version_of_draft_valid = true;
 
@@ -353,7 +356,8 @@ describe('Exploration editor page component', function() {
     });
 
     it('should react when refreshing graph', () => {
-      $rootScope.$broadcast('refreshGraph');
+      // $rootScope.$broadcast('refreshGraph');
+      sampleEmitter.emit();
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
