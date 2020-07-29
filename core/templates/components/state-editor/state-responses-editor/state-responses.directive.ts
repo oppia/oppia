@@ -634,7 +634,7 @@ angular.module('oppia').directive('stateResponses', [
           };
 
           ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe;
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
