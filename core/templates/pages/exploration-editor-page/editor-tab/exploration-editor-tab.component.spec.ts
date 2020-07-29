@@ -64,6 +64,7 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -167,7 +168,13 @@ describe('Exploration editor tab component', function() {
         },
         interaction: {
           id: 'TextInput',
-          customization_args: {},
+          customization_args: {
+            placeholder: {value: {
+              content_id: 'ca_placeholder',
+              unicode_str: ''
+            }},
+            rows: {value: 1}
+          },
           answer_groups: [{
             rule_specs: [],
             outcome: {
@@ -244,6 +251,13 @@ describe('Exploration editor tab component', function() {
         },
         interaction: {
           id: 'TextInput',
+          customization_args: {
+            placeholder: {value: {
+              content_id: 'ca_placeholder',
+              unicode_str: ''
+            }},
+            rows: {value: 1}
+          },
           answer_groups: [{
             rule_specs: [],
             outcome: {
@@ -444,7 +458,10 @@ describe('Exploration editor tab component', function() {
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
 
-    expect(stateEditorService.interaction.customizationArgs).toEqual({});
+    expect(stateEditorService.interaction.customizationArgs).toEqual({
+      rows: { value: 1 },
+      placeholder: { value: new SubtitledUnicode('', 'ca_placeholder') }
+    });
 
     var displayedValue = {
       placeholder: {
