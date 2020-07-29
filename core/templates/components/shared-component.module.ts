@@ -64,7 +64,7 @@ import { ExplorationSummaryTileDirective } from
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe,
+    TranslatePipe
   ],
 
   entryComponents: [
@@ -88,7 +88,7 @@ import { ExplorationSummaryTileDirective } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    TranslatePipe,
+    TranslatePipe
   ],
 })
 

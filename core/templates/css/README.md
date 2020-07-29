@@ -18,7 +18,7 @@ This folder contains all the global style sheets for the oppia frontend.
 - Updated in: N/A (Comma seperated pr numbers).
 
 ### Info
-More info regardign the oppia-material.css can be found in this doc:
+More info regarding the oppia-material.css can be found in this doc:
 Material CSS doc: https://docs.google.com/document/d/1UoCOC7XNhCZrWIMPAoR5Xex28OYWzteqXrqCU9gRUHQ/edit?usp=sharing
 
 ### Steps to generate oppia-material.css file:
