@@ -598,15 +598,15 @@ class PlatformParameterMetadataTest(test_utils.GenericTestBase):
 
     def test_from_dict(self):
         metadata = parameter_domain.PlatformParameterMetadata.from_dict(
-            {'is_feature': True, 'stage': 'dev'})
+            {'is_feature': True, 'feature_stage': 'dev'})
 
         self.assertTrue(metadata.is_feature)
-        self.assertEqual(metadata.stage, 'dev')
+        self.assertEqual(metadata.feature_stage, 'dev')
 
     def test_to_dict(self):
         metadata_dict = {
             'is_feature': True,
-            'stage': 'dev',
+            'feature_stage': 'dev',
         }
         metadata = parameter_domain.PlatformParameterMetadata.from_dict(
             metadata_dict)
@@ -618,7 +618,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
     """Test for the PlatformParameter."""
 
     def test_from_dict(self):
-        parameter = parameter_domain.PlatformParameter.from_dict({
+        param = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'string',
@@ -631,149 +631,132 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
             'metadata': {
                 'is_feature': False,
-                'stage': None,
+                'feature_stage': None,
             },
         })
 
-        self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
-        self.assertEqual(parameter.name, 'parameter_a')
-        self.assertEqual(parameter.description, 'for test')
-        self.assertEqual(parameter.data_type, 'string')
-        self.assertEqual(len(parameter.rules), 2)
+        self.assertIsInstance(param, parameter_domain.PlatformParameter)
+        self.assertEqual(param.name, 'parameter_a')
+        self.assertEqual(param.description, 'for test')
+        self.assertEqual(param.data_type, 'string')
+        self.assertEqual(len(param.rules), 1)
         self.assertIsInstance(
-            parameter.metadata, parameter_domain.PlatformParameterMetadata)
+            param.metadata, parameter_domain.PlatformParameterMetadata)
+        self.assertEqual(param.default_value, '333')
         self.assertEqual(
-            parameter.rule_schema_version,
+            param.rule_schema_version,
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION)
 
-    def test_create_with_invalid_name_failure(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid parameter name'):
-            parameter_domain.PlatformParameter.from_dict({
-                'name': 'Invalid~Name',
-                'description': 'for test',
-                'data_type': 'string',
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'value': 'dev'
-                            }
-                        ],
-                        'value_when_matched': '222'
-                    },
-                    {
-                        'filters': [],
-                        'value_when_matched': '111'
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-                'metadata': {
-                    'is_feature': False,
-                    'stage': None,
-                },
-            })
-
-    def test_validate_without_last_default_rule_raises_exception(self):
+    def test_validate_with_invalid_name_raises_exception(self):
+        param = parameter_domain.PlatformParameter.from_dict({
+            'name': 'Invalid~Name',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'value': 'dev'
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
+            'metadata': {
+                'is_feature': False,
+                'feature_stage': None,
+            },
+        })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'must not have any filter'):
-            parameter = parameter_domain.PlatformParameter.from_dict({
-                'name': 'parameter_a',
-                'description': 'for test',
-                'data_type': 'string',
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'value': 'dev'
-                            }
-                        ],
-                        'value_when_matched': '222'
-                    },
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-                'metadata': {
-                    'is_feature': False,
-                    'stage': None,
-                },
-            })
-            parameter.validate()
+            utils.ValidationError, 'Invalid parameter name'):
+            param.validate()
 
     def test_validate_with_unsupported_data_type_raises_exception(self):
+        param = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'InvalidType',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'value': 'dev'
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
+            'metadata': {
+                'is_feature': False,
+                'feature_stage': None,
+            },
+        })
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Unsupported data type'):
-            parameter = parameter_domain.PlatformParameter.from_dict({
-                'name': 'parameter_a',
-                'description': 'for test',
-                'data_type': 'InvalidType',
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'value': 'dev'
-                            }
-                        ],
-                        'value_when_matched': '222'
-                    },
-                    {
-                        'filters': [],
-                        'value_when_matched': '111'
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-                'metadata': {
-                    'is_feature': False,
-                    'stage': None,
-                },
-            })
-            parameter.validate()
+            param.validate()
 
     def test_validate_with_inconsistent_data_type_in_rules_raises_exception(
             self):
+        param = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'bool',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'value': 'dev'
+                        }
+                    ],
+                    'value_when_matched': '222'
+                },
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
+            'metadata': {
+                'is_feature': False,
+                'feature_stage': None,
+            },
+        })
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected bool'):
-            parameter = parameter_domain.PlatformParameter.from_dict({
-                'name': 'parameter_a',
-                'description': 'for test',
-                'data_type': 'bool',
-                'rules': [
-                    {
-                        'filters': [
-                            {
-                                'type': 'server_mode',
-                                'value': 'dev'
-                            }
-                        ],
-                        'value_when_matched': '222'
-                    },
-                    {
-                        'filters': [],
-                        'value_when_matched': '111'
-                    }
-                ],
-                'rule_schema_version': (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-                'metadata': {
-                    'is_feature': False,
-                    'stage': None,
-                },
-            })
-            parameter.validate()
+            param.validate()
+
+    def test_validate_with_inconsistent_default_value_type_raises_exception(
+            self):
+        param = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': 'for test',
+            'data_type': 'bool',
+            'rules': [],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
+            'metadata': {
+                'is_feature': False,
+                'feature_stage': None,
+            },
+        })
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected bool'):
+            param.validate()
 
     def test_to_dict(self):
         param_dict = {
@@ -789,17 +772,14 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
             'metadata': {
                 'is_feature': False,
-                'stage': None
+                'feature_stage': None
             }
         }
         parameter = parameter_domain.PlatformParameter.from_dict(param_dict)
@@ -819,17 +799,14 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
             'metadata': {
                 'is_feature': False,
-                'stage': None,
+                'feature_stage': None,
             },
         })
 
@@ -861,17 +838,14 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
             'metadata': {
                 'is_feature': False,
-                'stage': None,
+                'feature_stage': None,
             },
         })
 
@@ -898,17 +872,14 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                 {
                     'filters': [{'type': 'server_mode', 'value': 'dev'}],
                     'value_when_matched': False
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': False
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
             'metadata': {
                 'is_feature': True,
-                'stage': 'dev',
+                'feature_stage': 'dev',
             }
         })
         parameter.validate()
@@ -918,17 +889,13 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'string',
-            'rules': [
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
-                }
-            ],
+            'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
             'metadata': {
                 'is_feature': True,
-                'stage': 'dev',
+                'feature_stage': 'dev',
             }
         })
         with self.assertRaisesRegexp(
@@ -940,17 +907,13 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [],
-                    'value_when_matched': False
-                }
-            ],
+            'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
             'metadata': {
                 'is_feature': True,
-                'stage': 'Invalid',
+                'feature_stage': 'Invalid',
             }
         })
         with self.assertRaisesRegexp(
@@ -970,9 +933,10 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
             'metadata': {
                 'is_feature': True,
-                'stage': 'dev',
+                'feature_stage': 'dev',
             }
         })
         with self.assertRaisesRegexp(
@@ -989,17 +953,14 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                     'filters': [
                         {'type': 'server_mode', 'value': 'test'}],
                     'value_when_matched': True
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': False
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
             'metadata': {
                 'is_feature': True,
-                'stage': 'dev',
+                'feature_stage': 'dev',
             }
         })
         with self.assertRaisesRegexp(
@@ -1017,17 +978,14 @@ class PlatformParameterTest(test_utils.GenericTestBase):
                     'filters': [
                         {'type': 'server_mode', 'value': 'prod'}],
                     'value_when_matched': True
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': False
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
             'metadata': {
                 'is_feature': True,
-                'stage': 'test',
+                'feature_stage': 'test',
             }
         })
         with self.assertRaisesRegexp(
@@ -1073,17 +1031,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '111',
             'metadata': {
                 'is_feature': False,
-                'stage': None,
+                'feature_stage': None,
             },
         })
 
@@ -1104,26 +1059,26 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'parameter_a', 'test', 'dev')
         self.assertEqual(feature.data_type, 'bool')
         self.assertTrue(feature.metadata.is_feature)
-        self.assertEqual(feature.metadata.stage, 'dev')
+        self.assertEqual(feature.metadata.feature_stage, 'dev')
         feature.validate()
 
     def test_default_value_of_bool_platform_parameter(self):
         parameter = parameter_domain.Registry.create_platform_parameter(
             'parameter_a', 'test', 'bool')
         parameter.validate()
-        self.assertEqual(parameter.rules[0].value_when_matched, False)
+        self.assertEqual(parameter.default_value, False)
 
     def test_default_value_of_string_platform_parameter(self):
         parameter = parameter_domain.Registry.create_platform_parameter(
             'parameter_a', 'test', 'string')
         parameter.validate()
-        self.assertEqual(parameter.rules[0].value_when_matched, '')
+        self.assertEqual(parameter.default_value, '')
 
     def test_default_value_of_int_platform_parameter(self):
         parameter = parameter_domain.Registry.create_platform_parameter(
             'parameter_a', 'test', 'number')
         parameter.validate()
-        self.assertEqual(parameter.rules[0].value_when_matched, 0)
+        self.assertEqual(parameter.default_value, 0)
 
     def test_create_and_get_platform_parameter(self):
         parameter_name = 'parameter_a'
@@ -1176,7 +1131,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
-            [{'filters': [], 'value_when_matched': 'updated'}],
+            [
+                {
+                    'filters': [{'type': 'server_mode', 'value': 'dev'}],
+                    'value_when_matched': 'updated'
+                }
+            ],
         )
         # Cached value is invalidated after update.
         self.assertIsNone(
@@ -1208,7 +1168,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_name,
                 feconf.SYSTEM_COMMITTER_ID,
                 'commit message',
-                [{'filters': [], 'value_when_matched': False}],
+                [
+                    {
+                        'filters': [{'type': 'server_mode', 'value': 'dev'}],
+                        'value_when_matched': True
+                    }
+                ],
             )
 
     def test_updated_parameter_is_saved_in_storage(self):
@@ -1222,7 +1187,12 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             parameter_name,
             feconf.SYSTEM_COMMITTER_ID,
             'commit message',
-            [{'filters': [], 'value_when_matched': 'updated'}],
+            [
+                {
+                    'filters': [{'type': 'server_mode', 'value': 'dev'}],
+                    'value_when_matched': 'updated'
+                }
+            ],
         )
 
         parameter_updated = (
@@ -1258,34 +1228,27 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': '222'
-                },
-                {
-                    'filters': [],
-                    'value_when_matched': '111'
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
             'metadata': {
                 'is_feature': True,
-                'stage': 'in-dev',
+                'feature_stage': 'in-dev',
             }
         })
         parameter_domain.Registry.create_platform_parameter_from_dict({
             'name': 'parameter_b',
             'description': 'for test',
             'data_type': 'bool',
-            'rules': [
-                {
-                    'filters': [],
-                    'value_when_matched': False
-                }
-            ],
+            'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
             'metadata': {
                 'is_feature': False,
-                'stage': None,
+                'feature_stage': None,
             },
         })
 

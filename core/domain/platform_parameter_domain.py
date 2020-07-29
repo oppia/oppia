@@ -45,7 +45,7 @@ ALLOWED_SERVER_MODES = [
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
 
-ALLOWED_CLIENT_TYPE = ['Web', 'Native']
+ALLOWED_CLIENT_TYPES = ['Web', 'Native']
 
 
 class PlatformParameterChange(change_domain.BaseChange):
@@ -139,10 +139,10 @@ class EvaluationContext(python_utils.OBJECT):
 
     def validate(self):
         """Validates the EvaluationContext domain object."""
-        if self._client_type not in ALLOWED_CLIENT_TYPE:
+        if self._client_type not in ALLOWED_CLIENT_TYPES:
             raise utils.ValidationError(
                 'Invalid client type %s, must be one of %s.' % (
-                    self._client_type, ALLOWED_CLIENT_TYPE))
+                    self._client_type, ALLOWED_CLIENT_TYPES))
         if (
                 self._app_version is not None and
                 self.APP_VERSION_REGEXP.match(self._app_version) is None):
@@ -297,10 +297,10 @@ class PlatformParameterFilter(python_utils.OBJECT):
                             locale, ALLOWED_USER_LOCALES))
         elif self._type == 'client_type':
             for client_type in values:
-                if client_type not in ALLOWED_CLIENT_TYPE:
+                if client_type not in ALLOWED_CLIENT_TYPES:
                     raise utils.ValidationError(
                         'Invalid client type %s, must be one of %s.' % (
-                            client_type, ALLOWED_CLIENT_TYPE))
+                            client_type, ALLOWED_CLIENT_TYPES))
         elif self._type == 'app_version':
             for version_expr in values:
                 if (
@@ -372,10 +372,6 @@ class PlatformParameterFilter(python_utils.OBJECT):
         """
         version_a = version_a.split('.')
         version_b = version_b.split('.')
-        if len(version_a) < len(version_b):
-            version_a += ['0'] * (len(version_b) - len(version_a))
-        elif len(version_a) > len(version_b):
-            version_b += ['0'] * (len(version_a) - len(version_b))
 
         for sub_version_a, sub_version_b in python_utils.ZIP(
                 version_a, version_b):
@@ -419,14 +415,12 @@ class PlatformParameterRule(python_utils.OBJECT):
             context: EvaluationContext. The context for evaluation.
 
         Returns:
-            - bool. True if the rule is matched.
+            bool. True if the rule is matched.
         """
         are_all_filters_matched = all(
             filter_domain.evaluate(context)
             for filter_domain in self._filters)
-        if are_all_filters_matched:
-            return True
-        return False
+        return are_all_filters_matched
 
     def has_server_mode_filter(self):
         """Checks if the rule has a filter with type 'server_mode'.
@@ -489,9 +483,9 @@ class PlatformParameterRule(python_utils.OBJECT):
 class PlatformParameterMetadata(python_utils.OBJECT):
     """Domain object for metadatas of platform parameters."""
 
-    def __init__(self, is_feature, stage):
+    def __init__(self, is_feature, feature_stage):
         self._is_feature = is_feature
-        self._stage = stage
+        self._feature_stage = feature_stage
 
     @property
     def is_feature(self):
@@ -505,13 +499,13 @@ class PlatformParameterMetadata(python_utils.OBJECT):
         return self._is_feature
 
     @property
-    def stage(self):
+    def feature_stage(self):
         """Returns the stage of the feature flag.
 
         Returns:
             str. The stage of the feature flag.
         """
-        return self._stage
+        return self._feature_stage
 
     def to_dict(self):
         """Returns a dict representation of the PlatformParameterMetadata
@@ -523,7 +517,7 @@ class PlatformParameterMetadata(python_utils.OBJECT):
         """
         return {
             'is_feature': self._is_feature,
-            'stage': self.stage,
+            'feature_stage': self._feature_stage,
         }
 
     @classmethod
@@ -540,14 +534,12 @@ class PlatformParameterMetadata(python_utils.OBJECT):
         """
         return cls(
             metadata_dict['is_feature'],
-            metadata_dict['stage'],
+            metadata_dict['feature_stage'],
         )
 
 
 class PlatformParameter(python_utils.OBJECT):
     """Domain object for platform parameters."""
-
-    CMD_CHANGE_VARIABLE_SETTING = 'change_variable_setting'
 
     DATA_TYPE_PREDICATES_DICT = {
         'bool': lambda x: isinstance(x, bool),
@@ -555,23 +547,17 @@ class PlatformParameter(python_utils.OBJECT):
         'number': lambda x: isinstance(x, (float, int)),
     }
 
-
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
 
     def __init__(
             self, name, description, data_type, rules,
-            rule_schema_version, metadata):
-        if re.match(self.PARAMETER_NAME_REGEXP, name) is None:
-            raise Exception(
-                'Invalid parameter name, expected to match regexp %s, '
-                'got %s.' % (
-                    self.PARAMETER_NAME_REGEXP, name))
-
+            rule_schema_version, default_value, metadata):
         self._name = name
         self._description = description
         self._data_type = data_type
         self._rules = rules
         self._rule_schema_version = rule_schema_version
+        self._default_value = default_value
         self._metadata = metadata
 
     @property
@@ -629,6 +615,15 @@ class PlatformParameter(python_utils.OBJECT):
         return self._rule_schema_version
 
     @property
+    def default_value(self):
+        """Returns the default value of the platform parameter.
+
+        Returns:
+            *. The default value of the platform parameter.
+        """
+        return self._default_value
+
+    @property
     def metadata(self):
         """Returns the metadata of the platform parameter.
 
@@ -639,21 +634,29 @@ class PlatformParameter(python_utils.OBJECT):
 
     def validate(self):
         """Validates the PlatformParameter domain object."""
-        default_rule = self._rules[-1]
-        if len(default_rule.filters) != 0:
+        if re.match(self.PARAMETER_NAME_REGEXP, self._name) is None:
             raise utils.ValidationError(
-                'The last rule of a variable must not have any filter.')
+                'Invalid parameter name, expected to match regexp %s, '
+                'got %s.' % (
+                    self.PARAMETER_NAME_REGEXP, self._name))
 
         if self._data_type not in self.DATA_TYPE_PREDICATES_DICT:
             raise utils.ValidationError(
                 'Unsupported data type: %s.' % self._data_type)
 
+        predicate = self.DATA_TYPE_PREDICATES_DICT[self.data_type]
+        if not predicate(self._default_value):
+            raise utils.ValidationError(
+                'Expected %s, received %s in default value.' % (
+                    self._data_type, self._default_value))
         for rule in self._rules:
-            predicate = self.DATA_TYPE_PREDICATES_DICT[self.data_type]
             if not predicate(rule.value_when_matched):
                 raise utils.ValidationError(
                     'Expected %s, received %s in value_when_matched' % (
                         self._data_type, rule.value_when_matched))
+            if not rule.has_server_mode_filter():
+                raise utils.ValidationError(
+                    'All rules must have a server_mode filter.')
             rule.validate()
 
         if self._metadata.is_feature:
@@ -673,6 +676,7 @@ class PlatformParameter(python_utils.OBJECT):
             matched = rule.evaluate(context)
             if matched:
                 return rule.value_when_matched
+        return self._default_value
 
     def to_dict(self):
         """Returns a dict representation of the PlatformParameter domain
@@ -687,6 +691,7 @@ class PlatformParameter(python_utils.OBJECT):
             'data_type': self._data_type,
             'rules': [rule.to_dict() for rule in self._rules],
             'rule_schema_version': self._rule_schema_version,
+            'default_value': self._default_value,
             'metadata': self._metadata.to_dict()
         }
 
@@ -698,32 +703,30 @@ class PlatformParameter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got %s '
                 'instead.' % self._data_type)
-        if self._metadata.stage not in ALLOWED_FEATURE_STAGES:
+        if self._metadata.feature_stage not in ALLOWED_FEATURE_STAGES:
             raise utils.ValidationError(
-                'Invalid feature stage, expected on of %s, got %s.' % (
+                'Invalid feature stage, expected one of %s, got %s.' % (
                     ALLOWED_FEATURE_STAGES, self._data_type))
+
         enabling_rules = [
             rule for rule in self._rules if rule.value_when_matched]
         for rule in enabling_rules:
-            if not rule.has_server_mode_filter():
-                raise utils.ValidationError(
-                    'Rules that enable a feature must have a server_mode '
-                    'filter.')
-            mode_filters = [
-                mode_filter for mode_filter in rule.filters
-                if mode_filter.type == 'server_mode']
-            for mode_filter in mode_filters:
+            server_mode_filters = [
+                server_mode_filter for server_mode_filter in rule.filters
+                if server_mode_filter.type == 'server_mode']
+            for server_mode_filter in server_mode_filters:
                 value_list = (
-                    mode_filter.value if isinstance(mode_filter.value, list)
-                    else [mode_filter.value])
-                if self._metadata.stage == FEATURE_STAGES.dev:
+                    server_mode_filter.value if isinstance(
+                        server_mode_filter.value, list)
+                    else [server_mode_filter.value])
+                if self._metadata.feature_stage == FEATURE_STAGES.dev:
                     if (
                             SERVER_MODES.test in value_list or
                             SERVER_MODES.prod in value_list):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environment.')
-                elif self._metadata.stage == FEATURE_STAGES.test:
+                elif self._metadata.feature_stage == FEATURE_STAGES.test:
                     if SERVER_MODES.prod in value_list:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
@@ -750,6 +753,7 @@ class PlatformParameter(python_utils.OBJECT):
                     rule_dict, param_dict['rule_schema_version'])
                 for rule_dict in param_dict['rules']],
             param_dict['rule_schema_version'],
+            param_dict['default_value'],
             PlatformParameterMetadata.from_dict(param_dict.get('metadata', {}))
         )
 
@@ -802,25 +806,20 @@ class Registry(python_utils.OBJECT):
         else:
             raise Exception('Unsupported data type %s.' % data_type)
 
-        parameter_dict = {
+        param_dict = {
             'name': name,
             'description': description,
             'data_type': data_type,
-            'rules': [
-                {
-                    'filters': [],
-                    'value_when_matched': default,
-                }
-            ],
+            'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': default,
             'metadata': {
                 'is_feature': is_feature,
-                'stage': feature_stage,
+                'feature_stage': feature_stage,
             },
         }
-        parameter = cls.create_platform_parameter_from_dict(parameter_dict)
-        return parameter
+        return cls.create_platform_parameter_from_dict(param_dict)
 
     @classmethod
     def create_feature_flag(
@@ -836,9 +835,8 @@ class Registry(python_utils.OBJECT):
         Returns:
             PlatformParameter. The created feature flag.
         """
-        feature = cls.create_platform_parameter(
+        return cls.create_platform_parameter(
             name, description, 'bool', is_feature=True, feature_stage=stage)
-        return feature
 
     @classmethod
     def init_platform_parameter(cls, name, instance):
@@ -944,7 +942,7 @@ class Registry(python_utils.OBJECT):
         Returns:
             list(str). The list of all platform parameter names.
         """
-        return list(cls.parameter_registry)
+        return list(cls.parameter_registry.keys())
 
     @classmethod
     def evaluate_all_platform_parameters(cls, context):
@@ -996,14 +994,15 @@ class Registry(python_utils.OBJECT):
             name, strict=False)
 
         if parameter_model:
-            parameter_with_init_settings = cls.parameter_registry.get(name)
+            param_with_init_settings = cls.parameter_registry.get(name)
             return PlatformParameter.from_dict({
-                'name': parameter_with_init_settings.name,
-                'description': parameter_with_init_settings.description,
-                'data_type': parameter_with_init_settings.data_type,
+                'name': param_with_init_settings.name,
+                'description': param_with_init_settings.description,
+                'data_type': param_with_init_settings.data_type,
                 'rules': parameter_model.rules,
                 'rule_schema_version': parameter_model.rule_schema_version,
-                'metadata': parameter_with_init_settings.metadata.to_dict(),
+                'default_value': param_with_init_settings.default_value,
+                'metadata': param_with_init_settings.metadata.to_dict(),
             })
         else:
             return None
@@ -1027,8 +1026,6 @@ class Registry(python_utils.OBJECT):
 
 # Platform parameters should all be defined below.
 
-# This is a dummy feature flag demostrating the definition of features,
-# it can be safely removed once more realistic features are added here.
 Registry.create_feature_flag(
     'Dummy_Feature',
     'This is a dummy feature flag',
