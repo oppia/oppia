@@ -684,9 +684,9 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Yields:
             MapreducePipeline. Ready to start processing. Expects the output of
-                that pipeline to be sent back.
+            that pipeline to be sent back.
             StoreMapReduceResults. Will be constructed with whatever output the
-                caller sends back to the coroutine.
+            caller sends back to the coroutine.
         """
 
         job_class = mapreduce_util.for_name(job_class_str)

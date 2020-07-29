@@ -104,7 +104,8 @@ class SkillModel(base_models.VersionedModel):
     def get_merged_skills(cls):
         """Returns the skill models which have been merged.
 
-        Returns: list(SkillModel). List of skill models which have been merged.
+        Returns:
+            list(SkillModel). List of skill models which have been merged.
         """
 
         return [skill for skill in cls.query() if (
