@@ -169,7 +169,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
     var _setState = function(stateName, stateData, refreshGraph) {
       _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
-        console.log('Emit: ES: Set State');
         _refreshGraphEventEmitter.emit();
       }
     };
@@ -410,7 +409,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateAddedCallbacks.forEach(function(callback) {
           callback(newStateName);
         });
-        console.log('Emit: ES: Add State');
         _refreshGraphEventEmitter.emit();
         if (successCallback) {
           successCallback(newStateName);
@@ -452,7 +450,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
             callback(deleteStateName);
           });
           $location.path('/gui/' + StateEditorService.getActiveStateName());
-          console.log('Emit: ES: Delete State');
           _refreshGraphEventEmitter.emit();
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -492,7 +489,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateRenamedCallbacks.forEach(function(callback) {
           callback(oldStateName, newStateName);
         });
-        console.log('Emit: ES: Rename State');
         _refreshGraphEventEmitter.emit();
       },
       registerOnStateAddedCallback: function(callback) {
