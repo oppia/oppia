@@ -305,6 +305,10 @@ describe('Exploration editor page component', function() {
       ctrl.$onInit();
     });
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should link exploration to story when initing exploration page', () => {
       spyOn(cs, 'setExplorationIsLinkedToStory').and.callThrough();
       $scope.$apply();
@@ -697,6 +701,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
 
       expect(ctrl.isImprovementsTabEnabled()).toBeTrue();
+      ctrl.$onDestroy();
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
@@ -712,6 +717,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
 
       expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
+      ctrl.$onDestroy();
     }));
   });
 
@@ -734,6 +740,9 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should callback state-added method for stats', fakeAsync(() => {
