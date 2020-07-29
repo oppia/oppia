@@ -79,6 +79,9 @@ def generate_subtitled_html_schema(ui_config):
     Args:
         ui_config: dict. A dictionary that specifies properties related to
             the ui configuration.
+
+    Returns:
+        dict. The SubtitledHtml schema with the given ui config.
     """
     return {
         'type': 'dict',
@@ -95,6 +98,7 @@ def generate_subtitled_html_schema(ui_config):
             }
         }]
     }
+
 
 def is_subtitled_html_schema(schema):
     """Returns if the schema is a SubtitledHtml schema, regardless of the
@@ -113,6 +117,7 @@ def is_subtitled_html_schema(schema):
             schema_copy == generate_subtitled_html_schema({}))
     except KeyError:
         return False
+
 
 def is_subtitled_unicode_schema(schema):
     """Returns if the schema is a SubtitledUnicode schema.

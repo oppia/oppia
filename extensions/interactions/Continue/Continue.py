@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from extensions.interactions import base
 import schema_utils
 
+
 class Continue(base.BaseInteraction):
     """Interaction that takes the form of a simple 'Continue' button."""
 

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from extensions.interactions import base
 import schema_utils
 
+
 class FractionInput(base.BaseInteraction):
     """Interaction for fraction input."""
 

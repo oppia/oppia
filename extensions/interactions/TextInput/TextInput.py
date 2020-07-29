@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from extensions.interactions import base
 import schema_utils
 
+
 class TextInput(base.BaseInteraction):
     """Interaction for entering text strings."""
 

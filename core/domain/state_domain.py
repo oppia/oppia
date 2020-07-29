@@ -1031,7 +1031,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
             dict. The converted customization dict.
         """
         schema_type = schema['type']
-        
+
         if (
                 schema_utils.is_subtitled_html_schema(schema) or
                 schema_utils.is_subtitled_unicode_schema(schema)):

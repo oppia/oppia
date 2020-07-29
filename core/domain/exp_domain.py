@@ -2739,7 +2739,7 @@ class Exploration(python_utils.OBJECT):
                 schema = ca_spec.schema
                 ca_name = ca_spec.name
                 content_id_prefix = 'ca_%s_' % ca_name
-                
+
                 is_subtitled_html_spec = (
                     schema_utils.is_subtitled_html_schema(schema))
                 is_subtitled_unicode_spec = (
