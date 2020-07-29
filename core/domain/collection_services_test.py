@@ -410,7 +410,8 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.save_new_valid_collection(
             'collection_id', self.owner_id)
 
-        with self.assertRaises(Exception), logging_swap:
+        with self.assertRaisesRegexp(
+            Exception, 'Command invalid command is not allowed'), logging_swap:
             collection_services.update_collection(
                 self.owner_id, 'collection_id', [{
                     'cmd': 'invalid command'
@@ -507,7 +508,9 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
                 'Fake', self.COL_ID_0), self.EXP_ID_0)
 
         # There should be an exception if the collection does not exist.
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id Fake not found'):
             collection_services.get_next_exploration_id_to_complete_by_user(
                 self.owner_id, 'Fake')
 
@@ -811,7 +814,10 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.id, retrieved_collection.id)
         self.assertEqual(collection.title, retrieved_collection.title)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id fake_collection'
+            ' not found'):
             collection_services.get_collection_by_id('fake_collection')
 
     def test_retrieval_of_multiple_collections(self):
@@ -836,8 +842,10 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         self.assertNotIn('doesnt_exist', result)
 
-        with self.assertRaises(Exception):
-            collection_services.get_multiple_collection_by_id(
+        with self.assertRaisesRegexp(
+            Exception,
+            'Couldn\'t find collections with the following ids:\ndoesnt_exist'):
+            collection_services.get_multiple_collections_by_id(
                 collection_ids + ['doesnt_exist'])
 
     def test_soft_deletion_of_collection(self):
@@ -850,7 +858,10 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id A_collection_0_id '
+            'not found'):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
 
         # The deleted collection does not show up in any queries.
@@ -907,9 +918,15 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collections(
             self.owner_id, [self.COLLECTION_0_ID, self.COLLECTION_1_ID])
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id A_collection_0_id '
+            'not found'):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id A_collection_1_id '
+            'not found'):
             collection_services.get_collection_by_id(self.COLLECTION_1_ID)
 
         # The deleted collections does not show up in any queries.
@@ -985,7 +1002,10 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id A_collection_0_id'
+            ' not found'):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
 
         # The deleted collection does not show up in any queries.
@@ -1008,9 +1028,15 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             self.owner_id,
             [self.COLLECTION_0_ID, self.COLLECTION_1_ID],
             force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id A_collection_0_id'
+            ' not found'):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id A_collection_1_id '
+            'not found'):
             collection_services.get_collection_by_id(self.COLLECTION_1_ID)
 
         # The deleted collections does not show up in any queries.
@@ -1039,7 +1065,10 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class CollectionModel with id A_collection_0_id '
+            'not found'):
             collection_services.get_collection_by_id(self.COLLECTION_0_ID)
 
         # The deleted collection summary does not show up in any queries.

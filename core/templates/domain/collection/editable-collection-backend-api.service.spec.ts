@@ -97,7 +97,9 @@ describe('Editable collection backend API service', () => {
       var req = httpTestingController.expectOne(
         '/collection_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading collection 1', {
+      req.flush({
+        error: 'Error loading collection 1'
+      }, {
         status: 500, statusText: 'Invalid Request'
       });
 

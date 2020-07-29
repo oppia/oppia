@@ -22,11 +22,11 @@ import { Injectable } from '@angular/core';
 
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
-import { IStorySummaryBackendDict, StorySummary } from
+import { StorySummaryBackendDict, StorySummary } from
   'domain/story/StorySummaryObjectFactory';
 import {
-  ISkillIdToDescriptionMap,
-  ISubtopicBackendDict,
+  SkillIdToDescriptionMap,
+  SubtopicBackendDict,
   Subtopic,
   SubtopicObjectFactory
 } from 'domain/topic/SubtopicObjectFactory';
@@ -36,12 +36,12 @@ export interface DegreesOfMastery {
 }
 
 export interface ReadOnlyTopicBackendDict {
-  'subtopics': ISubtopicBackendDict[];
-  'skill_descriptions': ISkillIdToDescriptionMap;
+  'subtopics': SubtopicBackendDict[];
+  'skill_descriptions': SkillIdToDescriptionMap;
   'uncategorized_skill_ids': string[];
   'degrees_of_mastery': DegreesOfMastery;
-  'canonical_story_dicts': IStorySummaryBackendDict[];
-  'additional_story_dicts': IStorySummaryBackendDict[];
+  'canonical_story_dicts': StorySummaryBackendDict[];
+  'additional_story_dicts': StorySummaryBackendDict[];
   'topic_name': string;
   'topic_id': string;
   'topic_description': string;
@@ -57,7 +57,7 @@ export class ReadOnlyTopic {
   _uncategorizedSkillSummaries: ShortSkillSummary[];
   _subtopics: Subtopic[];
   _degreesOfMastery: DegreesOfMastery;
-  _skillDescriptions: ISkillIdToDescriptionMap;
+  _skillDescriptions: SkillIdToDescriptionMap;
   _trainTabShouldBeDisplayed: boolean;
 
   constructor(
@@ -67,7 +67,7 @@ export class ReadOnlyTopic {
       uncategorizedSkillSummaries: ShortSkillSummary[],
       subtopics: Subtopic[],
       degreesOfMastery: DegreesOfMastery,
-      skillDescriptions: ISkillIdToDescriptionMap,
+      skillDescriptions: SkillIdToDescriptionMap,
       trainTabShouldBeDisplayed: boolean) {
     this._topicName = topicName;
     this._topicId = topicId;
@@ -113,7 +113,7 @@ export class ReadOnlyTopic {
     return this._degreesOfMastery;
   }
 
-  getSkillDescriptions(): ISkillIdToDescriptionMap {
+  getSkillDescriptions(): SkillIdToDescriptionMap {
     return this._skillDescriptions;
   }
 
@@ -142,7 +142,7 @@ export class ReadOnlyTopicObjectFactory {
             skillId, topicDataDict.skill_descriptions[skillId]);
         });
     let degreesOfMastery: DegreesOfMastery = topicDataDict.degrees_of_mastery;
-    let skillDescriptions: ISkillIdToDescriptionMap =
+    let skillDescriptions: SkillIdToDescriptionMap =
         topicDataDict.skill_descriptions;
     let canonicalStories =
         topicDataDict.canonical_story_dicts.map(storyDict => {

@@ -40,7 +40,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(enum.first, 'first')
         self.assertEqual(enum.second, 'second')
         self.assertEqual(enum.third, 'third')
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesRegexp(
+            AttributeError,
+            'type object \'Enum\' has no attribute \'fourth\''):
             enum.fourth  # pylint: disable=pointless-statement
 
     def test_get_comma_sep_string_from_list(self):
@@ -77,7 +79,10 @@ class UtilsTests(test_utils.GenericTestBase):
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaises(utils.InvalidInputException):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'while parsing a flow node\n'
+            'expected the node content, but found \'<stream end>\'\n'):
             yaml_str = utils.dict_from_yaml('{')
 
     def test_recursively_remove_key(self):

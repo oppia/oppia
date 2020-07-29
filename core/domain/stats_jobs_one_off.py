@@ -223,7 +223,17 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         Raises:
             Exception: The item type is wrong.
         """
-        # pylint: disable=too-many-return-statements
+        class_name_to_event_type = {
+            'CompleteExplorationEventLogEntryModel':
+                feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            'StateHitEventLogEntryModel': feconf.EVENT_TYPE_STATE_HIT,
+            'StartExplorationEventLogEntryModel':
+                feconf.EVENT_TYPE_START_EXPLORATION,
+            'SolutionHitEventLogEntryModel': feconf.EVENT_TYPE_SOLUTION_HIT,
+            'ExplorationActualStartEventLogEntryModel':
+                feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
+        }
+
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             return (
                 item.exp_id,
@@ -246,65 +256,37 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'created_on': python_utils.UNICODE(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
-        elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_STATE_HIT,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-            return (
-                item.exp_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(
-                item, stats_models.StartExplorationEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(
-                item, stats_models.ExplorationActualStartEventLogEntryModel):
-            return (
-                item.exp_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-                    'version': item.exp_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        elif isinstance(
-                item, stats_models.CompleteExplorationEventLogEntryModel):
-            return (
-                item.exploration_id,
-                {
-                    'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                    'version': item.exploration_version,
-                    'state_name': item.state_name,
-                    'id': item.id,
-                    'created_on': python_utils.UNICODE(item.created_on),
-                    'session_id': item.session_id
-                })
-        # pylint: enable=too-many-return-statements
+        elif (
+                isinstance(
+                    item, (
+                        stats_models.CompleteExplorationEventLogEntryModel,
+                        stats_models.StartExplorationEventLogEntryModel,
+                        stats_models.StateHitEventLogEntryModel))):
+            event_dict = {
+                'event_type': class_name_to_event_type[
+                    item.__class__.__name__],
+                'version': item.exploration_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
+            return (item.exploration_id, event_dict)
+
+        elif (
+                isinstance(item, (
+                    stats_models.SolutionHitEventLogEntryModel,
+                    stats_models.ExplorationActualStartEventLogEntryModel))):
+            event_dict = {
+                'event_type': class_name_to_event_type[
+                    item.__class__.__name__],
+                'version': item.exp_version,
+                'state_name': item.state_name,
+                'id': item.id,
+                'created_on': python_utils.UNICODE(item.created_on),
+                'session_id': item.session_id
+            }
+            return (item.exp_id, event_dict)
 
     @staticmethod
     def map(item):
@@ -411,8 +393,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
-                for state_stats in (list(datastore_stats_for_version.
-                                         state_stats_mapping.values())):
+                for state_stats in list(
+                        datastore_stats_for_version.
+                        state_stats_mapping.values()):
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0

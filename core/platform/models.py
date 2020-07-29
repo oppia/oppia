@@ -48,7 +48,8 @@ class Platform(python_utils.OBJECT):
             NotImplementedError: The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'import_models() method is not overwritten in derived classes')
 
 
 class _Gae(Platform):
@@ -230,14 +231,15 @@ class _Gae(Platform):
         if constants.DEV_MODE:
             from core.platform.email import dev_mode_email_services
             return dev_mode_email_services
-        elif (feconf.EMAIL_SERVICE_PROVIDER ==
-              feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+        elif (
+                feconf.EMAIL_SERVICE_PROVIDER ==
+                feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:
             raise Exception(
-                ('Invalid email service provider: %s'
-                 % feconf.EMAIL_SERVICE_PROVIDER))
+                'Invalid email service provider: %s' % (
+                    feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
     def import_cache_services(cls):
