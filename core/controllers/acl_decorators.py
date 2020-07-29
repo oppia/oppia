@@ -487,46 +487,6 @@ def can_manage_own_account(handler):
     return test_can_manage_account
 
 
-def can_manage_own_profile(handler):
-    """Decorator to check whether a user can manage their profile. Only
-    the particular profile user and full user of the account have access
-    to this. Error will be thrown for others.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now also checks if the user
-        has permission to manage their profile preferences.
-    """
-
-    def test_can_manage_own_profile(self, **kwargs):
-        """Checks if the user is logged in and can manage their profile.
-
-        Args:
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have credentials to
-                manage profile preferences.
-        """
-        if not self.user_id:
-            raise self.NotLoggedInException
-
-        if role_services.ACTION_MANAGE_PROFILE in self.user.actions:
-            return handler(self, **kwargs)
-
-        raise self.UnauthorizedUserException(
-            'You do not have credentials to manage this profile.')
-    test_can_manage_own_profile.__wrapped__ = True
-
-    return test_can_manage_own_profile
-
-
 def can_access_admin_page(handler):
     """Decorator that checks if the current user is a super admin.
 
