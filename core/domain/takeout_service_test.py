@@ -68,6 +68,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
+    GENERIC_NAME = 'name'
+    GENERIC_PIN = '123'
+    ASSOCIATED_PROFILE_IDS = ['profile_1_user_id', 'profile_2_user_id']
     USER_1_IMPACT_SCORE = 0.87
     USER_1_TOTAL_PLAYS = 33
     USER_1_AVERAGE_RATINGS = 4.37
@@ -325,7 +328,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_contribution_msec=1,
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
+            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
+            name=(self.GENERIC_NAME),
+            pin=(self.GENERIC_PIN),
+            associated_profile_user_ids=(self.ASSOCIATED_PROFILE_IDS),
+            preferred_android_language_codes=(self.GENERIC_LANGUAGE_CODES),
+            preferred_android_audio_language_code=(
+                self.GENERIC_LANGUAGE_CODES[0])
         ).put()
 
         # Setup for GeneralFeedbackReplyToId.
@@ -479,7 +488,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
-    def test_export_nonexistent_user(self):
+    def test_export_nonexistent_user_raises_error(self):
         """Setup for nonexistent user test of export_data functionality."""
         with self.assertRaisesRegexp(
             user_models.UserSettingsModel.EntityNotFoundError,
@@ -534,7 +543,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'first_contribution_msec': None,
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
-            'preferred_audio_language_code': None
+            'preferred_audio_language_code': None,
+            'name': None,
+            'pin': None,
+            'associated_profile_user_ids': [],
+            'preferred_android_language_codes': [],
+            'preferred_android_audio_language_code': None
         }
         skill_data = {}
         stats_data = {}
@@ -808,7 +822,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'first_contribution_msec': 1,
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'name': self.GENERIC_NAME,
+            'pin': self.GENERIC_PIN,
+            'associated_profile_user_ids': self.ASSOCIATED_PROFILE_IDS,
+            'preferred_android_language_codes': self.GENERIC_LANGUAGE_CODES,
+            'preferred_android_audio_language_code': (
+                self.GENERIC_LANGUAGE_CODES[0])
         }
 
         expected_reply_to_data = {
