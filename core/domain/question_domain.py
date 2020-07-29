@@ -25,6 +25,7 @@ import datetime
 from constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
+from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
@@ -36,8 +37,9 @@ import python_utils
 import schema_utils
 import utils
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+from pylatexenc import latex2text
 
+(question_models,) = models.Registry.import_models([models.NAMES.question])
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -511,6 +513,312 @@ class Question(python_utils.OBJECT):
                     'voiceovers_mapping'][new_content_id] = {}
 
         return question_state_dict
+
+    @classmethod
+    def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
+        """Converts from version 34 to 35. Version 35 upgrades all explorations
+        that use the MathExpressionInput interaction to use one of
+        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
+        interactions.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        if question_state_dict['interaction']['id'] == 'MathExpressionInput':
+            new_answer_groups = []
+            types_of_inputs = set()
+            for group in question_state_dict['interaction']['answer_groups']:
+                new_answer_group = copy.deepcopy(group)
+                for rule_spec in new_answer_group['rule_specs']:
+                    rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+
+                    rule_input = exp_domain.clean_math_expression(
+                        rule_input)
+
+                    type_of_input = exp_domain.TYPE_INVALID_EXPRESSION
+                    if is_valid_algebraic_expression(rule_input):
+                        type_of_input = (
+                            exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+                    elif is_valid_numeric_expression(rule_input):
+                        type_of_input = exp_domain.TYPE_VALID_NUMERIC_EXPRESSION
+                    elif is_valid_math_equation(rule_input):
+                        type_of_input = exp_domain.TYPE_VALID_MATH_EQUATION
+
+                    types_of_inputs.add(type_of_input)
+
+                    if type_of_input != exp_domain.TYPE_INVALID_EXPRESSION:
+                        rule_spec['inputs']['x'] = rule_input
+                        if type_of_input == exp_domain.TYPE_VALID_MATH_EQUATION:
+                            rule_spec['inputs']['y'] = 'both'
+                        rule_spec['rule_type'] = 'MatchesExactlyWith'
+
+                new_answer_groups.append(new_answer_group)
+
+            if exp_domain.TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                # If at least one rule input is an equation, we remove
+                # all other rule inputs that are expressions.
+                if exp_domain.TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                    new_interaction_id = exp_domain.TYPE_VALID_MATH_EQUATION
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_math_equation(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+                # Otherwise, if at least one rule_input is an algebraic
+                # expression, we remove all other rule inputs that are
+                # numeric expressions.
+                elif exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                        types_of_inputs):
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_algebraic_expression(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+                else:
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
+
+                # Removing answer groups that have no rule specs left after
+                # the filtration done above.
+                new_answer_groups = [
+                    answer_group for answer_group in new_answer_groups if (
+                        len(answer_group['rule_specs']) != 0)]
+
+                # Removing feedback keys, from voiceovers_mapping and
+                # translations_mapping, that correspond to the rules that
+                # got deleted.
+                old_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            question_state_dict[
+                                'interaction']['answer_groups'])]
+                new_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            new_answer_groups)]
+                content_ids_to_delete = set(
+                    old_answer_groups_feedback_keys) - set(
+                        new_answer_groups_feedback_keys)
+                for content_id in content_ids_to_delete:
+                    if content_id in question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping']:
+                        del question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping'][content_id]
+                    if content_id in question_state_dict[
+                            'written_translations']['translations_mapping']:
+                        del question_state_dict['written_translations'][
+                            'translations_mapping'][content_id]
+
+                question_state_dict['interaction']['id'] = new_interaction_id
+                question_state_dict['interaction']['answer_groups'] = (
+                    new_answer_groups)
+                if question_state_dict['interaction']['solution']:
+                    correct_answer = question_state_dict['interaction'][
+                        'solution']['correct_answer']['ascii']
+                    correct_answer = exp_domain.clean_math_expression(
+                        correct_answer)
+                    question_state_dict['interaction'][
+                        'solution']['correct_answer'] = correct_answer
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_states_v35_dict_to_v36_dict(cls, question_state_dict):
+        """Converts from version 35 to 36. Version 35 adds translation support
+        for interaction customization arguments. This migration converts
+        customization arguments whose schemas have been changed from unicode to
+        SubtitledUnicode or html to SubtitledHtml. It also populates missing
+        customization argument keys on all interactions, removes extra
+        customization arguments, normalizes customization arguments against
+        its schema, and changes PencilCodeEditor's customization argument
+        name from initial_code to initialCode.
+        """
+        max_existing_content_id_index = -1
+        translations_mapping = question_state_dict[
+            'written_translations']['translations_mapping']
+        for content_id in translations_mapping:
+            # Find maximum existing content_id index.
+            content_id_suffix = content_id.split('_')[-1]
+
+            # Possible values of content_id_suffix are a digit, or from
+            # a 'outcome' (from 'default_outcome'). If the content_id_suffix
+            # is not a digit, we disregard it here.
+            if content_id_suffix.isdigit():
+                max_existing_content_id_index = max(
+                    max_existing_content_id_index,
+                    int(content_id_suffix)
+                )
+
+            # Move 'html' field to 'translation' field and set 'data_format'
+            # to 'html' for all WrittenTranslations.
+            for lang_code in translations_mapping[content_id]:
+                translations_mapping[
+                    content_id][lang_code]['data_format'] = 'html'
+                translations_mapping[
+                    content_id][lang_code]['translation'] = (
+                        translations_mapping[content_id][lang_code]['html'])
+                del translations_mapping[content_id][lang_code]['html']
+
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id is None:
+            question_state_dict['next_content_id_index'] = (
+                max_existing_content_id_index + 1)
+            continue
+
+        class ContentIdCounter(python_utils.OBJECT):
+            """This helper class is used to keep track of
+            next_content_id_index and new_content_ids, and provides a
+            function to generate new content_ids.
+            """
+
+            new_content_ids = []
+
+            def __init__(self, next_content_id_index):
+                """Initializes a ContentIdCounter object.
+
+                Args:
+                    next_content_id_index: int. The next content id index.
+                """
+                self.next_content_id_index = next_content_id_index
+
+            def generate_content_id(self, content_id_prefix):
+                """Generate a new content_id from the prefix provided and
+                the next content id index.
+
+                Args:
+                    content_id_prefix: str. The prefix of the content_id.
+
+                Returns:
+                    str. The generated content_id.
+                """
+                content_id = '%s%i' % (
+                    content_id_prefix,
+                    self.next_content_id_index)
+                self.next_content_id_index += 1
+                self.new_content_ids.append(content_id)
+                return content_id
+
+        content_id_counter = (
+            ContentIdCounter(max_existing_content_id_index + 1))
+
+        ca_dict = question_state_dict['interaction']['customization_args']
+        if (interaction_id == 'PencilCodeEditor' and
+                'initial_code' in ca_dict):
+            ca_dict['initialCode'] = ca_dict['initial_code']
+            del ca_dict['initial_code']
+
+        # Retrieve a cached version (state schema v35) of
+        # interaction_specs.json to ensure that this migration remains
+        # stable even when interaction_specs.json is changed.
+        ca_specs = [
+            domain.CustomizationArgSpec(
+                ca_spec_dict['name'],
+                ca_spec_dict['description'],
+                ca_spec_dict['schema'],
+                ca_spec_dict['default_value']
+            ) for ca_spec_dict in (
+                interaction_registry.Registry
+                .get_all_specs_for_state_schema_version(35)[
+                    interaction_id]['customization_arg_specs']
+            )
+        ]
+
+        for ca_spec in ca_specs:
+            schema = ca_spec.schema
+            ca_name = ca_spec.name
+            content_id_prefix = 'ca_%s_' % ca_name
+            
+            is_subtitled_html_spec = (
+                schema_utils.is_subtitled_html_schema(schema))
+            is_subtitled_unicode_spec = (
+                schema_utils.is_subtitled_unicode_schema(schema))
+            is_subtitled_html_list_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                schema_utils.is_subtitled_html_schema(schema['items'])
+            )
+
+            if is_subtitled_html_spec or is_subtitled_unicode_spec:
+                # Default is a SubtitledHtml dict or SubtitleUnicode dict.
+                new_value = copy.deepcopy(ca_spec.default_value)
+
+                # If available, assign value to html or unicode_str.
+                if ca_name in ca_dict:
+                    if is_subtitled_html_spec:
+                        new_value['html'] = ca_dict[ca_name]['value']
+                    elif is_subtitled_unicode_spec:
+                        new_value['unicode_str'] = ca_dict[ca_name]['value']
+
+                # Assign content_id.
+                new_value['content_id'] = (
+                    content_id_counter
+                    .generate_content_id(content_id_prefix)
+                )
+
+                ca_dict[ca_name] = {'value': new_value}
+            elif is_subtitled_html_list_spec:
+                new_value = []
+
+                if ca_name in ca_dict:
+                    # Assign values to html fields.
+                    for html in ca_dict[ca_name]['value']:
+                        new_value.append({
+                            'html': html, 'content_id': None
+                        })
+                else:
+                    # Default is a list of SubtitledHtml dict.
+                    new_value.extend(copy.deepcopy(ca_spec.default_values))
+
+                # Assign content_ids.
+                for subtitled_html_dict in new_value:
+                    subtitled_html_dict['content_id'] = (
+                        content_id_counter
+                        .generate_content_id(content_id_prefix)
+                    )
+
+                ca_dict[ca_name] = {'value': new_value}
+            elif ca_name not in ca_dict:
+                ca_dict[ca_name] = {'value': ca_spec.default_value}
+
+
+        (
+            customization_args_util
+            .validate_customization_args_and_values(
+                'interaction',
+                interaction_id,
+                ca_dict,
+                ca_specs)
+        )
+
+        question_state_dict['next_content_id_index'] = (
+            content_id_counter.next_content_id_index)
+        for new_content_id in content_id_counter.new_content_ids:
+            question_state_dict[
+                'written_translations'][
+                    'translations_mapping'][new_content_id] = {}
+            question_state_dict[
+                'recorded_voiceovers'][
+                    'voiceovers_mapping'][new_content_id] = {}
+
+    return question_state_dict
 
     @classmethod
     def update_state_from_model(

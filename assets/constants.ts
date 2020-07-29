@@ -5311,6 +5311,28 @@ export = {
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
 
+  // Name to human readable form mapping of the position of terms object.
+  "POSITION_OF_TERMS_MAPPING": [{
+    "name": "lhs",
+    "humanReadableName": "on Left Hand Side"
+  }, {
+    "name": "rhs",
+    "humanReadableName": "on Right Hand Side"
+  }, {
+    "name": "both",
+    "humanReadableName": "on both sides"
+  }, {
+    "name": "irrelevant",
+    "humanReadableName": "with reordering allowed around ="
+  }],
+
+  // Placeholder texts for the math interactions.
+  "MATH_INTERACTION_PLACEHOLDERS": {
+    "AlgebraicExpressionInput": "Type an expression here.",
+    "NumericExpressionInput": "Type an expression here, using only numbers.",
+    "MathEquationInput": "Type an equation here."
+  },
+
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
