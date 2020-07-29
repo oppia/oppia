@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ResponsesService.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Responses Service', function() {
@@ -687,5 +689,12 @@ describe('Responses Service', function() {
     expect(ResponsesService.getAnswerGroup(0)).toEqual(updatedAnswerGroups[0]);
     expect(callbackSpy).toHaveBeenCalledWith(
       updatedAnswerGroups, updatedDefaultOutcome);
+  });
+
+  it('should fetch EventEmitters', function() {
+    let sampleEventEmitter = new EventEmitter();
+    expect(ResponsesService.onAnswerGroupsChanged).toEqual(sampleEventEmitter);
+    expect(ResponsesService.onInitializeAnswerGroups).toEqual(
+      sampleEventEmitter);
   });
 });
