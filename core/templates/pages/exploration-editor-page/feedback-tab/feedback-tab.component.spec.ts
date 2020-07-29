@@ -84,13 +84,11 @@ describe('Feedback Tab Component', function() {
 
     $scope = $rootScope.$new();
     ctrl = $componentController('feedbackTab', {
-      $rootScope: $rootScope,
       $scope: $scope,
       AlertsService: alertsService
     });
     ctrl.$onInit();
     $scope.$apply();
-    $rootScope.$apply();
   }));
 
   it('should throw an error when trying to active a non-existent thread',
