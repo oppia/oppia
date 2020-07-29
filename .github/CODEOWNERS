@@ -128,7 +128,7 @@
 
 
 # Dev workflow team.
-/.circleci/ @BenHenning @vinitamurthi @U8NWXD
+/.circleci/ @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -138,7 +138,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD
+/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @seanlip
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -586,15 +586,15 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
-/core/tests/protractor_utils/ @U8NWXD
-/core/tests/protractor_desktop/ @U8NWXD
-/core/tests/protractor/ @U8NWXD
-/core/tests/protractor.conf.js @U8NWXD
-/extensions/interactions/*/protractor.js @U8NWXD
-/extensions/interactions/protractor.js @U8NWXD
-/extensions/rich_text_components/*/protractor.js @U8NWXD
-/extensions/rich_text_components/protractor.js @U8NWXD
-/extensions/objects/protractor.js @U8NWXD
+/core/tests/protractor_utils/ @U8NWXD @kevintab95
+/core/tests/protractor_desktop/ @U8NWXD @kevintab95
+/core/tests/protractor/ @U8NWXD @kevintab95
+/core/tests/protractor.conf.js @U8NWXD @kevintab95
+/extensions/interactions/*/protractor.js @U8NWXD @kevintab95
+/extensions/interactions/protractor.js @U8NWXD @kevintab95
+/extensions/rich_text_components/*/protractor.js @U8NWXD @kevintab95
+/extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
+/extensions/objects/protractor.js @U8NWXD @kevintab95
 
 
 # Critical files.
