@@ -581,7 +581,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_args_section)
-    
+
     def test_malformed_returns_section(self):
         node_malformed_returns_section = astroid.extract_node(
             u"""def func(): #@
