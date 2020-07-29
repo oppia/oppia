@@ -24,11 +24,13 @@ var users = require('../protractor_utils/users.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
+  var oppiaContentContainer = element(by.css('.oppia-content-container'));
+  var ERROR_MESSAGE = 'Element takes too long to load in'
   var libraryPage = null;
   var GET_STARTED_URL = 'http://localhost:9001/get-started';
   var COMMUNITY_LIBRARY_URL = 'http://localhost:9001/community-library';
   var LEARNER_DASHBOARD_URL = 'http://localhost:9001/learner-dashboard';
-  var CREATOR_DASHHBOARD_URL = 'http://localhost:9001/creator-dashboard';
+  var CREATOR_DASHBOARD_URL = 'http://localhost:9001/creator-dashboard';
   var ABOUT_URL = 'http://localhost:9001/about';
   var NOTIFICATIONS_URL = 'http://localhost:9001/notifications';
   var PREFERENCES_URL = 'http://localhost:9001/preferences';
@@ -66,48 +68,56 @@ describe('screenreader and keyboard user accessibility features', function() {
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
@@ -116,49 +126,57 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should navigate to the community-library page when ctrl+1 is pressed',
     async function() {
       await browser.get('get-started');
-      await waitFor.urlRedirection('http://localhost:9001/get-started');
+      await waitFor.urlRedirection(GET_STARTED_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
@@ -167,49 +185,57 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should navigate to the learner-dashboard page when ctrl+2 is pressed',
     async function() {
       await browser.get('get-started');
-      await waitFor.urlRedirection('http://localhost:9001/get-started');
+      await waitFor.urlRedirection(GET_STARTED_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
@@ -218,100 +244,116 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should navigate to the creator-dashboard page when ctrl+3 is pressed',
     async function() {
       await browser.get('get-started');
-      await waitFor.urlRedirection('http://localhost:9001/get-started');
+      await waitFor.urlRedirection(GET_STARTED_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('3');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
     });
 
   it('should navigate to about page when ctrl+4 is pressed',
     async function() {
       await browser.get('get-started');
-      await waitFor.urlRedirection('http://localhost:9001/get-started');
+      await waitFor.urlRedirection(GET_STARTED_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
@@ -320,49 +362,57 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should navigate to the notifications page when ctrl+5 is pressed',
     async function() {
       await browser.get('get-started');
-      await waitFor.urlRedirection('http://localhost:9001/get-started');
+      await waitFor.urlRedirection(GET_STARTED_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
@@ -371,49 +421,57 @@ describe('screenreader and keyboard user accessibility features', function() {
   it('should navigate to the preferences page when ctrl+6 is pressed',
     async function() {
       await browser.get('get-started');
-      await waitFor.urlRedirection('http://localhost:9001/get-started');
+      await waitFor.urlRedirection(GET_STARTED_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('creator-dashboard');
-      await waitFor.urlRedirection(CREATOR_DASHHBOARD_URL);
+      await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
+      await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
