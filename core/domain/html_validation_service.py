@@ -893,8 +893,9 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         and <attribute> represents the invalid attribute.
         eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
     """
-    # This is necessary to avoid UnicodeDecodeError when encoding the string.
-    svg_string = unicode(svg_string, errors='replace') # pylint: disable=unicode-builtin
+    # This is necessary to avoid UnicodeDecodeError when encoding the string
+    # with special character.
+    svg_string = svg_string.decode(encoding='utf-8')
     soup = bs4.BeautifulSoup(
         svg_string.encode(encoding='utf-8'), 'html.parser')
     invalid_elements = []
