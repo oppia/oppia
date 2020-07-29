@@ -811,17 +811,16 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 31)
+        question = question_fetchers.get_question_from_model(question_model)
 
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 31)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.assertEqual(
             question.question_state_data
             .recorded_voiceovers.to_dict(), {
                 'voiceovers_mapping': {
+                    'ca_placeholder_0': {},
                     'content': {
                         'en': {
                             'filename': 'test.mp3',

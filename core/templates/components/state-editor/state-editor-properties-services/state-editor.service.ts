@@ -33,8 +33,6 @@ import {
   MultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -147,7 +145,7 @@ export class StateEditorService {
   }
 
   setInteractionCustomizationArgs(
-      newArgs: {[name: string]: InteractionCustomizationArg}): void {
+      newArgs: InteractionCustomizationArgs): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 

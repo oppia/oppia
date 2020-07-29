@@ -42,13 +42,7 @@ interface ReadableMusicNote {
 
 export interface AlgebraicExpressionInputCustomizationArgs { }
 interface AlgebraicExpressionInputCustomizationArgsBackendDict { }
-export interface AlgebraicExpressionInputCustomizationArgs { }
-type AlgebraicExpressionInputCustomizationArgsBackendDictValue = (
-  AlgebraicExpressionInputCustomizationArgsBackendDict[
-    keyof AlgebraicExpressionInputCustomizationArgsBackendDict]['value']);
-type AlgebraicExpressionInputCustomizationArgsValue = (
-  AlgebraicExpressionInputCustomizationArgs[
-    keyof AlgebraicExpressionInputCustomizationArgs]['value']);
+
 
 interface CodeReplCustomizationArgsBackendDict {
   language?: {
@@ -78,15 +72,9 @@ export interface CodeReplCustomizationArgs {
     value: string;
   };
 }
-type CodeReplCustomizationArgsBackendDictValue = (
-  CodeReplCustomizationArgsBackendDict[
-    keyof CodeReplCustomizationArgsBackendDict]['value']);
-type CodeReplCustomizationArgsValue = (
-  CodeReplCustomizationArgs[
-    keyof CodeReplCustomizationArgs]['value']);
 
 
-interface ContinueCustomizationArgsBackendDict {
+export interface ContinueCustomizationArgsBackendDict {
   buttonText?: {
     value: SubtitledUnicodeBackendDict;
   };
@@ -96,15 +84,9 @@ export interface ContinueCustomizationArgs {
     value: SubtitledUnicode;
   };
 }
-type ContinueCustomizationArgsBackendDictValue = (
-  ContinueCustomizationArgsBackendDict[
-    keyof ContinueCustomizationArgsBackendDict]['value']);
-type ContinueCustomizationArgsValue = (
-  ContinueCustomizationArgs[
-    keyof ContinueCustomizationArgs]['value']);
 
 
-interface DragAndDropSortInputCustomizationArgsBackendDict {
+export interface DragAndDropSortInputCustomizationArgsBackendDict {
   choices?: {
     value: SubtitledHtmlBackendDict[];
   };
@@ -120,12 +102,6 @@ export interface DragAndDropSortInputCustomizationArgs {
     value: boolean;
   }
 }
-type DragAndDropSortInputCustomizationArgsBackendDictValue = (
-  DragAndDropSortInputCustomizationArgsBackendDict[
-    keyof DragAndDropSortInputCustomizationArgsBackendDict]['value']);
-type DragAndDropSortInputCustomizationArgsValue = (
-  DragAndDropSortInputCustomizationArgs[
-    keyof DragAndDropSortInputCustomizationArgs]['value']);
 
 
 interface EndExplorationCustomizationArgsBackendDict {
@@ -138,15 +114,9 @@ export interface EndExplorationCustomizationArgs {
     value: string[];
   };
 }
-type EndExplorationCustomizationArgsBackendDictValue = (
-  EndExplorationCustomizationArgsBackendDict[
-    keyof EndExplorationCustomizationArgsBackendDict]['value']);
-type EndExplorationCustomizationArgsValue = (
-  EndExplorationCustomizationArgs[
-    keyof EndExplorationCustomizationArgs]['value']);
 
 
-interface FractionInputCustomizationArgsBackendDict {
+export interface FractionInputCustomizationArgsBackendDict {
   requireSimplestForm?: {
     value: string;
   };
@@ -174,12 +144,6 @@ export interface FractionInputCustomizationArgs {
     value: SubtitledUnicode;
   };
 }
-type FractionInputCustomizationArgsBackendDictValue = (
-  FractionInputCustomizationArgsBackendDict[
-    keyof FractionInputCustomizationArgsBackendDict]['value']);
-type FractionInputCustomizationArgsValue = (
-  FractionInputCustomizationArgs[
-    keyof FractionInputCustomizationArgs]['value']);
 
 
 interface GraphInputCustomizationArgsBackendDict {
@@ -234,12 +198,6 @@ export interface GraphInputCustomizationArgs {
     value: boolean;
   };
 }
-type GraphInputCustomizationArgsBackendDictValue = (
-  GraphInputCustomizationArgsBackendDict[
-    keyof GraphInputCustomizationArgsBackendDict]['value']);
-type GraphInputCustomizationArgsValue = (
-  GraphInputCustomizationArgs[
-    keyof GraphInputCustomizationArgs]['value']);
 
 
 interface ImageClickInputCustomizationArgsBackendDict {
@@ -258,12 +216,6 @@ export interface ImageClickInputCustomizationArgs {
     value: string;
   };
 }
-type ImageClickInputCustomizationArgsBackendDictValue = (
-  ImageClickInputCustomizationArgsBackendDict[
-    keyof ImageClickInputCustomizationArgsBackendDict]['value']);
-type ImageClickInputCustomizationArgsValue = (
-  ImageClickInputCustomizationArgs[
-    keyof ImageClickInputCustomizationArgs]['value']);
 
 
 interface InteractiveMapCustomizationArgsBackendDict {
@@ -288,15 +240,9 @@ export interface InteractiveMapCustomizationArgs {
     value: string;
   };
 }
-type InteractiveMapCustomizationArgsBackendDictValue = (
-  InteractiveMapCustomizationArgsBackendDict[
-    keyof InteractiveMapCustomizationArgsBackendDict]['value']);
-type InteractiveMapCustomizationArgsValue = (
-  InteractiveMapCustomizationArgs[
-    keyof InteractiveMapCustomizationArgs]['value']);
 
 
-interface ItemSelectionInputCustomizationArgsBackendDict {
+export interface ItemSelectionInputCustomizationArgsBackendDict {
   choices?: {
     value: SubtitledHtmlBackendDict[];
   };
@@ -318,12 +264,6 @@ export interface ItemSelectionInputCustomizationArgs {
     value: number;
   };
 }
-type ItemSelectionInputCustomizationArgsBackendDictValue = (
-  ItemSelectionInputCustomizationArgsBackendDict[
-    keyof ItemSelectionInputCustomizationArgsBackendDict]['value']);
-type ItemSelectionInputCustomizationArgsValue = (
-  ItemSelectionInputCustomizationArgs[
-    keyof ItemSelectionInputCustomizationArgs]['value']);
 
 
 interface LogicCustomizationArgsBackendDict {
@@ -336,24 +276,13 @@ export interface LogicCustomizationArgs {
     value: Object;
   };
 }
-type LogicCustomizationArgsBackendDictValue = (
-  LogicCustomizationArgsBackendDict[
-    keyof LogicCustomizationArgsBackendDict]['value']);
-type LogicCustomizationArgsValue = (
-  LogicCustomizationArgs[
-    keyof LogicCustomizationArgs]['value']);
 
 
 interface MathEquationInputCustomizationArgsBackendDict { }
 export interface MathEquationInputCustomizationArgs { }
-type MathEquationInputCustomizationArgsBackendDictValue = (
-  MathEquationInputCustomizationArgsBackendDict[
-    keyof MathEquationInputCustomizationArgsBackendDict]['value']);
-type MathEquationInputCustomizationArgsValue = (
-  MathEquationInputCustomizationArgs[
-    keyof MathEquationInputCustomizationArgs]['value']);
 
-interface MultipleChoiceInputCustomizationArgsBackendDict {
+
+export interface MultipleChoiceInputCustomizationArgsBackendDict {
   showChoicesInShuffledOrder?: {
     value: string;
   };
@@ -369,12 +298,6 @@ export interface MultipleChoiceInputCustomizationArgs {
     value: SubtitledHtml[];
   };
 }
-type MultipleChoiceInputCustomizationArgsBackendDictValue = (
-  MultipleChoiceInputCustomizationArgsBackendDict[
-    keyof MultipleChoiceInputCustomizationArgsBackendDict]['value']);
-type MultipleChoiceInputCustomizationArgsValue = (
-  MultipleChoiceInputCustomizationArgs[
-    keyof MultipleChoiceInputCustomizationArgs]['value']);
 
 
 interface MusicNotesInputCustomizationArgsBackendDict {
@@ -393,12 +316,6 @@ export interface MusicNotesInputCustomizationArgs {
     value: ReadableMusicNote[];
   };
 }
-type MusicNotesInputCustomizationArgsBackendDictValue = (
-  MusicNotesInputCustomizationArgsBackendDict[
-    keyof MusicNotesInputCustomizationArgsBackendDict]['value']);
-type MusicNotesInputCustomizationArgsValue = (
-  MusicNotesInputCustomizationArgs[
-    keyof MusicNotesInputCustomizationArgs]['value']);
 
 
 interface PencilCodeCustomizationArgsBackendDict {
@@ -411,15 +328,9 @@ export interface PencilCodeCustomizationArgs {
     value: string;
   };
 }
-type PencilCodeCustomizationArgsBackendDictValue = (
-  PencilCodeCustomizationArgsBackendDict[
-    keyof PencilCodeCustomizationArgsBackendDict]['value']);
-type PencilCodeCustomizationArgsValue = (
-  PencilCodeCustomizationArgs[
-    keyof PencilCodeCustomizationArgs]['value']);
 
 
-interface SetInputCustomizationArgsBackendDict {
+export interface SetInputCustomizationArgsBackendDict {
   buttonText?: {
     value: SubtitledUnicodeBackendDict;
   };
@@ -429,15 +340,9 @@ export interface SetInputCustomizationArgs {
     value: SubtitledUnicode;
   };
 }
-type SetInputCustomizationArgsBackendDictValue = (
-  SetInputCustomizationArgsBackendDict[
-    keyof SetInputCustomizationArgsBackendDict]['value']);
-type SetInputCustomizationArgsValue = (
-  SetInputCustomizationArgs[
-    keyof SetInputCustomizationArgs]['value']);
 
 
-interface TextInputCustomizationArgsBackendDict {
+export interface TextInputCustomizationArgsBackendDict {
   placeholder?: {
     value: SubtitledUnicodeBackendDict;
   };
@@ -453,49 +358,23 @@ export interface TextInputCustomizationArgs {
     value: number;
   };
 }
-type TextInputCustomizationArgsBackendDictValue = (
-  TextInputCustomizationArgsBackendDict[
-    keyof TextInputCustomizationArgsBackendDict]['value']);
-type TextInputCustomizationArgsValue = (
-  TextInputCustomizationArgs[
-    keyof TextInputCustomizationArgs]['value']);
 
 
 interface MathExpressionCustomizationArgsBackendDict { }
 export interface MathExpressionCustomizationArgs { }
-type MathExpressionCustomizationArgsBackendDictValue = (
-  MathExpressionCustomizationArgsBackendDict[
-    keyof MathExpressionCustomizationArgsBackendDict]['value']);
-type MathExpressionCustomizationArgsValue = (
-  MathExpressionCustomizationArgs[
-    keyof MathExpressionCustomizationArgs]['value']);
+
 
 interface NumericExpressionInputCustomizationArgsBackendDict { }
 export interface NumericExpressionInputCustomizationArgs { }
-type NumericExpressionInputCustomizationArgsBackendDictValue = (
-  NumericExpressionInputCustomizationArgsBackendDict[
-    keyof NumericExpressionInputCustomizationArgsBackendDict]['value']);
-type NumericExpressionInputCustomizationArgsValue = (
-  MathExpressionCustomizationArgs[
-    keyof NumericExpressionInputCustomizationArgs]['value']);
+
 
 interface NumericInputCustomizationArgsBackendDict { }
 export interface NumericInputCustomizationArgs { }
-type NumericInputCustomizationArgsBackendDictValue = (
-  NumericInputCustomizationArgsBackendDict[
-    keyof NumericInputCustomizationArgsBackendDict]['value']);
-type NumericInputCustomizationArgsValue = (
-  NumericInputCustomizationArgs[
-    keyof NumericInputCustomizationArgs]['value']);
+
 
 interface NumberWithUnitsCustomizationArgsBackendDict { }
 export interface NumberWithUnitsCustomizationArgs { }
-type NumberWithUnitsCustomizationArgsBackendDictValue = (
-  NumberWithUnitsCustomizationArgsBackendDict[
-    keyof NumberWithUnitsCustomizationArgsBackendDict]['value']);
-type NumberWithUnitsCustomizationArgsValue = (
-  NumberWithUnitsCustomizationArgs[
-    keyof NumberWithUnitsCustomizationArgs]['value']);
+
 
 export type InteractionCustomizationArgsBackendDict = (
   AlgebraicExpressionInputCustomizationArgsBackendDict |
@@ -529,11 +408,11 @@ export type InteractionCustomizationArgs = (
   FractionInputCustomizationArgs |
   GraphInputCustomizationArgs |
   ImageClickInputCustomizationArgs |
-  MathExpressionCustomizationArgs |
   InteractiveMapCustomizationArgs |
   ItemSelectionInputCustomizationArgs |
   LogicCustomizationArgs |
   MathEquationInputCustomizationArgs |
+  MathExpressionCustomizationArgs |
   MultipleChoiceInputCustomizationArgs |
   MusicNotesInputCustomizationArgs |
   NumberWithUnitsCustomizationArgs |
@@ -542,49 +421,3 @@ export type InteractionCustomizationArgs = (
   PencilCodeCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);
-
-export type InteractionCustomizationArgsBackendDictValue = (
-  AlgebraicExpressionInputCustomizationArgsBackendDictValue |
-  CodeReplCustomizationArgsBackendDictValue |
-  ContinueCustomizationArgsBackendDictValue |
-  DragAndDropSortInputCustomizationArgsBackendDictValue |
-  EndExplorationCustomizationArgsBackendDictValue |
-  FractionInputCustomizationArgsBackendDictValue |
-  GraphInputCustomizationArgsBackendDictValue |
-  ImageClickInputCustomizationArgsBackendDictValue |
-  InteractiveMapCustomizationArgsBackendDictValue |
-  ItemSelectionInputCustomizationArgsBackendDictValue |
-  LogicCustomizationArgsBackendDictValue |
-  MathEquationInputCustomizationArgsBackendDictValue |
-  MathExpressionCustomizationArgsBackendDictValue |
-  MultipleChoiceInputCustomizationArgsBackendDictValue |
-  MusicNotesInputCustomizationArgsBackendDictValue |
-  NumberWithUnitsCustomizationArgsBackendDictValue |
-  NumericExpressionInputCustomizationArgsBackendDictValue |
-  NumericInputCustomizationArgsBackendDictValue |
-  PencilCodeCustomizationArgsBackendDictValue |
-  SetInputCustomizationArgsBackendDictValue |
-  TextInputCustomizationArgsBackendDictValue);
-
-export type InteractionCustomizationArgsValue = (
-  AlgebraicExpressionInputCustomizationArgsValue |
-  CodeReplCustomizationArgsValue |
-  ContinueCustomizationArgsValue |
-  DragAndDropSortInputCustomizationArgsValue |
-  EndExplorationCustomizationArgsValue |
-  FractionInputCustomizationArgsValue |
-  GraphInputCustomizationArgsValue |
-  ImageClickInputCustomizationArgsValue |
-  MathExpressionCustomizationArgsValue |
-  InteractiveMapCustomizationArgsValue |
-  ItemSelectionInputCustomizationArgsValue |
-  LogicCustomizationArgsValue |
-  MathEquationInputCustomizationArgsValue |
-  MultipleChoiceInputCustomizationArgsValue |
-  MusicNotesInputCustomizationArgsValue |
-  NumberWithUnitsCustomizationArgsValue |
-  NumericExpressionInputCustomizationArgsValue |
-  NumericInputCustomizationArgsValue |
-  PencilCodeCustomizationArgsValue |
-  SetInputCustomizationArgsValue |
-  TextInputCustomizationArgsValue);

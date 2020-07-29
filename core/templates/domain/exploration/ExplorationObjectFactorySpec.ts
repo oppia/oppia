@@ -29,8 +29,6 @@ import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
@@ -313,13 +311,18 @@ describe('Exploration object factory', () => {
 
     expect(exploration.getInteractionCustomizationArgs('first state'))
       .toEqual({
-        placeholder: new InteractionCustomizationArg(
-          new SubtitledUnicode('', 'ca_placeholder_0')),
-        rows: new InteractionCustomizationArg(1)
+        placeholder: {
+          value: new SubtitledUnicode('', 'ca_placeholder_0')
+        },
+        rows: {
+          value: 1
+        }
       });
     expect(exploration.getInteractionCustomizationArgs('second state'))
       .toEqual({
-        recommendedExplorationIds: new InteractionCustomizationArg([])
+        recommendedExplorationIds: {
+          value: []
+        }
       });
   });
 

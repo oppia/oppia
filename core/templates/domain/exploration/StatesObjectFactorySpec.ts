@@ -229,7 +229,7 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'second state',
@@ -283,7 +283,7 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'first state',
@@ -571,7 +571,7 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'third state',

@@ -1163,11 +1163,9 @@ tags: []
             schema_type = schema['type']
 
             is_subtitled_html_spec = (
-                schema_type ==
-                schema_utils.SCHEMA_TYPE_SUBTITLED_HTML)
+                schema_utils.is_subtitled_html_schema(schema))
             is_subtitled_unicode_spec = (
-                schema_type ==
-                schema_utils.SCHEMA_TYPE_SUBTITLED_UNICODE)
+                schema_utils.is_subtitled_unicode_schema(schema))
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
                 value['content_id'] = '%s_%i' % (

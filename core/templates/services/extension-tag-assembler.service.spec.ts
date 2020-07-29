@@ -21,8 +21,6 @@ import { ExtensionTagAssemblerService } from
   './extension-tag-assembler.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 
 describe('Extension Tag Assembler Service', () => {
   let etas;
@@ -49,7 +47,7 @@ describe('Extension Tag Assembler Service', () => {
   it('should format element with customization', () => {
     const element = $('<p>');
     const interactionCustomizationArgs = {
-      choices: new InteractionCustomizationArg('sampleChoice')
+      choices: {value: 'sampleChoice'}
     };
     const expectedElement = '<p ' +
       'choices-with-value="&amp;quot;sampleChoice&amp;quot;"' +

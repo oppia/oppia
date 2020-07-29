@@ -57,7 +57,7 @@ interface ListSchema {
   items: Schema | Schema[];
 }
 
-interface DictSchema {
+export interface DictSchema {
   type: 'dict';
   properties: {
     name: string;
@@ -70,14 +70,6 @@ interface CustomSchema {
   'obj_type': string;
 }
 
-interface SubtitledHtmlSchema {
-  'type': 'SubtitledHtml';
-}
-
-interface SubtitledUnicodeSchema {
-  'type': 'SubtitledUnicode';
-}
-
 export type Schema = (
   BoolSchema |
   UnicodeSchema |
@@ -86,9 +78,7 @@ export type Schema = (
   FloatSchema |
   ListSchema |
   DictSchema |
-  CustomSchema |
-  SubtitledHtmlSchema |
-  SubtitledUnicodeSchema
+  CustomSchema
 );
 
 interface DictSchemaDefaultValue {
@@ -119,6 +109,14 @@ export class SchemaDefaultValueService {
   getDefaultValue(schema: Schema): SchemaDefaultValue {
     if ('choices' in schema) {
       return schema.choices[0];
+    } else if (SchemaConstants.isSubtitledHtmlSchema(schema)) {
+      return this.subtitledHtmlObjectFactory.createFromBackendDict({
+        html: '', content_id: null
+      });
+    } else if (SchemaConstants.isSubtitledUnicodeSchema(schema)) {
+      return this.subtitledUnicodeObjectFactory.createFromBackendDict({
+        unicode_str: '', content_id: null
+      });
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_BOOL) {
       return false;
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_UNICODE ||
@@ -142,14 +140,6 @@ export class SchemaDefaultValueService {
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_INT ||
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
-    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_HTML) {
-      return this.subtitledHtmlObjectFactory.createFromBackendDict({
-        html: '', content_id: null
-      });
-    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_UNICODE) {
-      return this.subtitledUnicodeObjectFactory.createFromBackendDict({
-        unicode_str: '', content_id: null
-      });
     } else {
       // TS Ignore is used here to log an error in case of a
       // invalid schema.

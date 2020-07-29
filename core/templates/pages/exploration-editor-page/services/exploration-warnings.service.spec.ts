@@ -72,6 +72,7 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { null } from 'mathjs';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/graph-data.service');
@@ -377,6 +378,7 @@ describe('Exploration Warnings Service', function() {
           },
           param_changes: [],
           interaction: {
+            id: null,
             answer_groups: [{
               outcome: {
                 dest: '',

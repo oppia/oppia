@@ -45,7 +45,7 @@
                           label-for-focus-target="$ctrl.labelForFocusTarget()">
 </schema-based-list-editor>
 
-<schema-based-dict-editor ng-if="$ctrl.schema().type === 'dict' && !$ctrl.schema().choices"
+<schema-based-dict-editor ng-if="!isSubtitledHtmlSchema && !isSubtitledUnicodeSchema && $ctrl.schema().type === 'dict' && !$ctrl.schema().choices"
                           local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
                           property-schemas="$ctrl.schema().properties"
                           label-for-focus-target="$ctrl.labelForFocusTarget()">
@@ -56,13 +56,13 @@
                             is-disabled="$ctrl.isDisabled()" schema="$ctrl.schema()">
 </schema-based-custom-editor>
 
-<schema-based-subtitled-html-editor ng-if="$ctrl.schema().type === 'SubtitledHtml' && !$ctrl.schema().choices"
+<schema-based-subtitled-html-editor ng-if="isSubtitledHtmlSchema && !$ctrl.schema().choices"
                                     local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
                                     label-for-focus-target="$ctrl.labelForFocusTarget()"
                                     ui-config="$ctrl.schema().ui_config">
 </schema-based-subtitled-html-editor>
 
-<schema-based-subtitled-unicode-editor ng-if="$ctrl.schema().type === 'SubtitledUnicode' && !$ctrl.schema().choices"
+<schema-based-subtitled-unicode-editor ng-if="isSubtitledUnicodeSchema && !$ctrl.schema().choices"
                                        local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
                                        validators="$ctrl.schema().validators" ui-config="$ctrl.schema().ui_config"
                                        label-for-focus-target="$ctrl.labelForFocusTarget()"

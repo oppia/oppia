@@ -146,7 +146,11 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             schema_type = schema['type']
             if schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 traverse_schema_to_find_names(schema['items'])
-            elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
+            elif (
+                    schema_type == schema_utils.SCHEMA_TYPE_DICT and
+                    not schema_utils.is_subtitled_unicode_schema(schema) and
+                    not schema_utils.is_subtitled_html_schema(schema)
+            ):
                 for schema_property in schema['properties']:
                     ca_names_in_schema.append(schema_property['name'])
                     traverse_schema_to_find_names(schema_property['schema'])
@@ -155,7 +159,6 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
                 ca_names_in_schema.append(ca_spec['name'])
                 traverse_schema_to_find_names(ca_spec['schema'])
-
         for name in ca_names_in_schema:
             self.assertTrue(name.isalpha())
             self.assertTrue(name[0].islower())
@@ -177,9 +180,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             """
             schema_type = schema['type']
 
-            if schema_type == schema_utils.SCHEMA_TYPE_SUBTITLED_HTML:
+            if schema_utils.is_subtitled_html_schema(schema):
                 self.assertIsNone(value['content_id'])
-            elif schema_type == schema_utils.SCHEMA_TYPE_SUBTITLED_UNICODE:
+            elif schema_utils.is_subtitled_unicode_schema(schema):
                 self.assertIsNone(value['content_id'])
             elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:

@@ -129,11 +129,20 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "SubtitledHtml",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to drag and drop."
-            }
+            "type": "dict",
+            "properties": [{
+                "name": "html",
+                "schema": {
+                    "type": "html",
+                    "ui_config": {
+                      "hide_complex_extensions": true,
+                      "placeholder": "Enter an option for the learner to drag and drop."
+                    }
+                }
+            }, {
+                "name": "content_id",
+                "schema": {"type": "unicode_or_none"}
+            }]
           },
           "type": "list",
           "validators": [
@@ -218,11 +227,20 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "SubtitledHtml",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Sample item answer"
-            }
+            "type": "dict",
+            "properties": [{
+                "name": "html",
+                "schema": {
+                    "type": "html",
+                    "ui_config": {
+                      "hide_complex_extensions": true,
+                      "placeholder": "Sample item answer"
+                    }
+                }
+            }, {
+                "name": "content_id",
+                "schema": {"type": "unicode_or_none"}
+            }]
           },
           "type": "list",
           "ui_config": {
@@ -259,7 +277,14 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "SubtitledUnicode"
+          "type": "dict",
+          "properties": [{
+            "name": "unicode_str",
+            "schema": {"type": "unicode"}
+          }, {
+            "name": "content_id",
+            "schema": {"type": "unicode_or_none"}
+          }]
         },
         "default_value": {
           "content_id": null,
@@ -441,7 +466,14 @@
         "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
-          "type": "SubtitledUnicode"
+          "type": "dict",
+          "properties": [{
+            "name": "unicode_str",
+            "schema": {"type": "unicode"}
+          }, {
+            "name": "content_id",
+            "schema": {"type": "unicode_or_none"}
+          }]
         },
         "default_value": {
           "content_id": null,
@@ -622,11 +654,20 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "SubtitledHtml",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to select"
-            }
+            "type": "dict",
+            "properties": [{
+                "name": "html",
+                "schema": {
+                    "type": "html",
+                    "ui_config": {
+                      "hide_complex_extensions": true,
+                      "placeholder": "Enter an option for the learner to select"
+                    }
+                }
+            }, {
+                "name": "content_id",
+                "schema": {"type": "unicode_or_none"}
+            }]
           },
           "type": "list",
           "validators": [
@@ -714,7 +755,14 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "SubtitledUnicode"
+          "type": "dict",
+          "properties": [{
+            "name": "unicode_str",
+            "schema": {"type": "unicode"}
+          }, {
+            "name": "content_id",
+            "schema": {"type": "unicode_or_none"}
+          }]
         },
         "default_value": {
           "content_id": null,
@@ -943,7 +991,14 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "SubtitledUnicode"
+          "type": "dict",
+          "properties": [{
+            "name": "unicode_str",
+            "schema": {"type": "unicode"}
+          }, {
+            "name": "content_id",
+            "schema": {"type": "unicode_or_none"}
+          }]
         },
         "default_value": {
           "content_id": null,

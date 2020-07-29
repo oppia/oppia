@@ -16,6 +16,9 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
+
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
@@ -71,6 +74,16 @@ angular.module('oppia').directive('schemaBasedEditor', [
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: ['$scope',
+        function($scope) {
+          const ctrl = this;
+
+          ctrl.$onInit = () => {
+            $scope.isSubtitledHtmlSchema = (
+              SchemaConstants.isSubtitledHtmlSchema(ctrl.schema()));
+            $scope.isSubtitledUnicodeSchema = (
+              SchemaConstants.isSubtitledUnicodeSchema(ctrl.schema()));
+          };
+        }]
     };
   }]);

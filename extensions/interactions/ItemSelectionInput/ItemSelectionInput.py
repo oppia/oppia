@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
+import schema_utils
 
 
 class ItemSelectionInput(base.BaseInteraction):
@@ -65,13 +66,10 @@ class ItemSelectionInput(base.BaseInteraction):
         'description': 'Items for selection',
         'schema': {
             'type': 'list',
-            'items': {
-                'type': 'SubtitledHtml',
-                'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Sample item answer',
-                },
-            },
+            'items': schema_utils.generate_subtitled_html_schema({
+                'hide_complex_extensions': True,
+                'placeholder': 'Sample item answer',
+            }),
             'ui_config': {
                 'add_element_text': 'Add item for selection',
             }

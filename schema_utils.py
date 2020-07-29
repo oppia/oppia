@@ -27,6 +27,7 @@ following Python types: bool, dict, float, int, list, unicode.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import numbers
 import re
 
@@ -55,8 +56,74 @@ SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
-SCHEMA_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
-SCHEMA_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
+
+SUBTITLED_UNICODE_SCHEMA = {
+    'type': 'dict',
+    'properties': [{
+        'name': 'unicode_str',
+        'schema': {
+            'type': 'unicode',
+        }
+    }, {
+        'name': 'content_id',
+        'schema': {
+            'type': 'unicode_or_none'
+        }
+    }]
+}
+
+
+def generate_subtitled_html_schema(ui_config):
+    """Generate a SubtitledHtml schema given a ui config.
+
+    Args:
+        ui_config: dict. A dictionary that specifies properties related to
+            the ui configuration.
+    """
+    return {
+        'type': 'dict',
+        'properties': [{
+            'name': 'html',
+            'schema': {
+                'type': 'html',
+                'ui_config': ui_config
+            }
+        }, {
+            'name': 'content_id',
+            'schema': {
+                'type': 'unicode_or_none'
+            }
+        }]
+    }
+
+def is_subtitled_html_schema(schema):
+    """Returns if the schema is a SubtitledHtml schema, regardless of the
+    nested ui_config in the html field.
+
+    Args:
+        schema: dict. The schema to check.
+
+    Returns:
+        bool. Returns if the schema to check is a SubtitledHtml schema.
+    """
+    schema_copy = copy.deepcopy(schema)
+    try:
+        schema_copy['properties'][0]['schema']['ui_config'] = {}
+        return (
+            schema_copy == generate_subtitled_html_schema({}))
+    except KeyError:
+        return False
+
+def is_subtitled_unicode_schema(schema):
+    """Returns if the schema is a SubtitledUnicode schema.
+
+    Args:
+        schema: dict. The schema to check.
+
+    Returns:
+        bool. Returns if the schema to check is a SubtitledHtml schema.
+    """
+    return schema == SUBTITLED_UNICODE_SCHEMA
 
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
@@ -106,37 +173,6 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             key = prop[SCHEMA_KEY_NAME]
             normalized_obj[key] = normalize_against_schema(
                 obj[key], prop[SCHEMA_KEY_SCHEMA])
-    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_HTML:
-        assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
-        assert 'html' in obj, ('Expected dict with key html, received %s' % obj)
-        assert 'content_id' in obj, (
-            'Expected dict with key content_id, received %s' % obj)
-        assert len(obj.keys()) == 2, (
-            'Expected dict with 2 keys, received %s' % obj)
-
-        normalized_obj = {}
-        normalized_obj['html'] = normalize_against_schema(
-            obj['html'],
-            {'type': SCHEMA_TYPE_HTML})
-        normalized_obj['content_id'] = normalize_against_schema(
-            obj['content_id'],
-            {'type': SCHEMA_TYPE_UNICODE_OR_NONE})
-    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_SUBTITLED_UNICODE:
-        assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
-        assert 'unicode_str' in obj, (
-            'Expected dict with key unicode_str, received %s' % obj)
-        assert 'content_id' in obj, (
-            'Expected dict with key content_id, received %s' % obj)
-        assert len(obj.keys()) == 2, (
-            'Expected dict with 2 keys, received %s' % obj)
-
-        normalized_obj = {}
-        normalized_obj['unicode_str'] = normalize_against_schema(
-            obj['unicode_str'],
-            {'type': SCHEMA_TYPE_UNICODE})
-        normalized_obj['content_id'] = normalize_against_schema(
-            obj['content_id'],
-            {'type': SCHEMA_TYPE_UNICODE_OR_NONE})
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         obj = float(obj)
         assert isinstance(obj, numbers.Real), (

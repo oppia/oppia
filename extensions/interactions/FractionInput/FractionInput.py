@@ -18,7 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
-
+import schema_utils
 
 class FractionInput(base.BaseInteraction):
     """Interaction for fraction input."""
@@ -59,9 +59,7 @@ class FractionInput(base.BaseInteraction):
     }, {
         'name': 'customPlaceholder',
         'description': 'Custom placeholder text (optional)',
-        'schema': {
-            'type': 'SubtitledUnicode'
-        },
+        'schema': schema_utils.SUBTITLED_UNICODE_SCHEMA,
         'default_value': {
             'content_id': None,
             'unicode_str': ''

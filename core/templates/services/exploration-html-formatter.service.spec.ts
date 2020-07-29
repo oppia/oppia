@@ -27,8 +27,6 @@ import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 
 describe('Exploration Html Formatter Service', () => {
   let ehfs: ExplorationHtmlFormatterService = null;
@@ -44,9 +42,8 @@ describe('Exploration Html Formatter Service', () => {
      ' editor mode', () => {
     var interactionId = 'TextInput';
     let custArgs = {
-      placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('enter here', '')),
-      rows: new InteractionCustomizationArg(1)
+      placeholder: {value: new SubtitledUnicode('enter here', '')},
+      rows: {value: 1}
     };
     var expectedHtmlTag = '<oppia-interactive-text-input ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +

@@ -22,8 +22,6 @@ import { SubtitledHtml } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { Schema } from 'services/schema-default-value.service';
-import { InteractionCustomizationArgsValue } from
-  'interactions/customization-args-defs';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
 
@@ -49,14 +47,11 @@ require(
   'interaction-details-cache.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
-require(
-  'domain/exploration/interaction-customization-arg-object.factory.ts');
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',
   'EditorFirstTimeEventsService',
-  'InteractionCustomizationArgObjectFactory',
-  'InteractionDetailsCacheService',
+  'InteractionDetailsCacheService', 'InteractionObjectFactory',
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'StateNextContentIdIndexService',
   'UrlInterpolationService',
@@ -66,8 +61,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   function(
       $controller, $injector, $scope, $uibModalInstance,
       EditorFirstTimeEventsService,
-      InteractionCustomizationArgObjectFactory,
-      InteractionDetailsCacheService,
+      InteractionDetailsCacheService, InteractionObjectFactory,
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
@@ -177,17 +171,19 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           InteractionDetailsCacheService.get(
             newInteractionId).customization);
       } else {
-        const customizationArgs = {};
+        const customizationArgsBackendDict = {};
         $scope.customizationArgSpecs.forEach(function(caSpec) {
-          customizationArgs[caSpec.name] = (
-            InteractionCustomizationArgObjectFactory.createFromBackendDict(
-              {value: caSpec.default_value},
-              caSpec.schema
-            )
-          );
+          customizationArgsBackendDict[caSpec.name] = {
+            value: caSpec.default_value
+          };
         });
 
-        StateCustomizationArgsService.displayed = customizationArgs;
+        StateCustomizationArgsService.displayed = (
+          InteractionObjectFactory.convertFromCustomizationArgsBackendDict(
+            newInteractionId,
+            customizationArgsBackendDict
+          )
+        );
       }
 
       if (Object.keys(
@@ -253,14 +249,24 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       const interactionId = $scope.StateInteractionIdService.displayed;
 
       let traverseSchemaAndAssignContentIds = (
-          value: InteractionCustomizationArgsValue,
+          value: Object | Object[],
           schema: Schema,
           contentIdPrefix: string,
       ): void => {
-        if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
+        if (
+          SchemaConstants.isSubtitledHtmlSchema(schema) ||
+          SchemaConstants.isSubtitledUnicodeSchema(schema)
+        ) {
+          if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
+            (<SubtitledHtml|SubtitledUnicode>value).setContentId(
+              `${contentIdPrefix}_${StateNextContentIdIndexService.displayed}`
+            );
+            StateNextContentIdIndexService.displayed += 1;
+          }
+        } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (
             let i = 0;
-            i < (<InteractionCustomizationArgsValue[]> value).length;
+            i < (<Object[]> value).length;
             i++
           ) {
             traverseSchemaAndAssignContentIds(
@@ -276,16 +282,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
               property.schema,
               `${contentIdPrefix}_${name}`);
           });
-        } else if (
-          schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_UNICODE ||
-          schema.type === SchemaConstants.SCHEMA_TYPE_SUBTITLED_HTML
-        ) {
-          if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
-            (<SubtitledHtml|SubtitledUnicode>value).setContentId(
-              `${contentIdPrefix}_${StateNextContentIdIndexService.displayed}`
-            );
-            StateNextContentIdIndexService.displayed += 1;
-          }
         }
       };
 

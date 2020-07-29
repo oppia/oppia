@@ -20,7 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
-
+import schema_utils
 
 class SetInput(base.BaseInteraction):
     """Interaction for input of an unordered set of strings."""
@@ -41,9 +41,7 @@ class SetInput(base.BaseInteraction):
     _customization_arg_specs = [{
         'name': 'buttonText',
         'description': 'Label for the \'Add Item\' button',
-        'schema': {
-            'type': 'SubtitledUnicode'
-        },
+        'schema': schema_utils.SUBTITLED_UNICODE_SCHEMA,
         'default_value': {
             'content_id': None,
             'unicode_str': 'Add Item'

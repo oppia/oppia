@@ -26,8 +26,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from
@@ -61,8 +59,7 @@ describe('Learner Action Render Service', function() {
         interaction: {
           id: 'Continue',
           customizationArgs: {
-            buttonText: new InteractionCustomizationArg(
-              new SubtitledUnicode('', ''))
+            buttonText: {value: new SubtitledUnicode('', '')}
           }
         }
       })
@@ -70,9 +67,8 @@ describe('Learner Action Render Service', function() {
         interaction: {
           id: 'TextInput',
           customizationArgs: {
-            placeholder: new InteractionCustomizationArg(
-              new SubtitledUnicode('', '')),
-            rows: new InteractionCustomizationArg(1)
+            placeholder: {value: new SubtitledUnicode('', '')},
+            rows: {value: 1}
           }
         }
       })
@@ -80,12 +76,12 @@ describe('Learner Action Render Service', function() {
         interaction: {
           id: 'MultipleChoiceInput',
           customizationArgs: {
-            choices: new InteractionCustomizationArg([
+            choices: {value: [
               new SubtitledHtml('Choice1', ''),
               new SubtitledHtml('Choice2', ''),
               new SubtitledHtml('Choice3', '')
-            ]),
-            showChoicesInShuffledOrder: new InteractionCustomizationArg(true)
+            ]},
+            showChoicesInShuffledOrder: {value: true}
           }
         }
       });

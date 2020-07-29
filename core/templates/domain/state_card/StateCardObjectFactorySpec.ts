@@ -20,8 +20,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -146,9 +144,8 @@ describe('State card object factory', () => {
     expect(_sampleCard.isInteractionInline()).toEqual(true);
     expect(_sampleCard.getInteractionInstructions()).toEqual(null);
     expect(_sampleCard.getInteractionCustomizationArgs()).toEqual({
-      rows: new InteractionCustomizationArg(1),
-      placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('Type your answer here.', ''))
+      rows: {value: 1},
+      placeholder: {value: new SubtitledUnicode('Type your answer here.', '')}
     });
     expect(_sampleCard.getInteractionHtml()).toEqual(
       '<interaction></interaction>'

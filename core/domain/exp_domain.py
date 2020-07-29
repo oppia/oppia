@@ -2666,19 +2666,14 @@ class Exploration(python_utils.OBJECT):
                 schema = ca_spec.schema
                 ca_name = ca_spec.name
                 content_id_prefix = 'ca_%s_' % ca_name
-
+                
                 is_subtitled_html_spec = (
-                    schema['type'] ==
-                    schema_utils.SCHEMA_TYPE_SUBTITLED_HTML)
+                    schema_utils.is_subtitled_html_schema(schema))
                 is_subtitled_unicode_spec = (
-                    schema['type'] ==
-                    schema_utils.SCHEMA_TYPE_SUBTITLED_UNICODE)
+                    schema_utils.is_subtitled_unicode_schema(schema))
                 is_subtitled_html_list_spec = (
                     schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                    (
-                        schema['items']['type'] ==
-                        schema_utils.SCHEMA_TYPE_SUBTITLED_HTML
-                    )
+                    schema_utils.is_subtitled_html_schema(schema['items'])
                 )
 
                 if is_subtitled_html_spec or is_subtitled_unicode_spec:

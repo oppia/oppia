@@ -23,9 +23,7 @@ import { AnswerGroupObjectFactory } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
-import { InteractionObjectFactory } from
+import { InteractionObjectFactory, Interaction } from
   'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -33,6 +31,7 @@ import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('Interaction object factory', () => {
   let iof = null;
@@ -130,11 +129,310 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(copyInteractionDict);
 
     expect(testInteraction.customizationArgs).toEqual({
-      placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('Enter text', 'ca_placeholder_0')
-      ),
-      rows: new InteractionCustomizationArg(1)
+      placeholder: {
+        value: new SubtitledUnicode('Enter text', 'ca_placeholder_0')
+      },
+      rows: {
+        value: 1
+      }
     });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'AlgebraicExpressionInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'AlgebraicExpressionInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it('should correctly set customization arguments for ' +
+     'CodeRepl', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        language: {value: ''},
+        placeholder: {value: ''},
+        preCode: {value: ''},
+        postCode: {value: ''}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'CodeRepl',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      language: {value: ''},
+      placeholder: {value: ''},
+      preCode: {value: ''},
+      postCode: {value: ''}
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'CodeRepl', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        language: {value: ''},
+        placeholder: {value: ''},
+        preCode: {value: ''},
+        postCode: {value: ''}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'CodeRepl',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      language: {value: ''},
+      placeholder: {value: ''},
+      preCode: {value: ''},
+      postCode: {value: ''}
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'DragAndDropSortInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        choices: {value: [{
+          content_id: 'ca_choices',
+          html: '<p>first</p>'
+        }]},
+        allowMultipleItemsInSamePosition: {value: true}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'DragAndDropSortInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      choices: {value: [new SubtitledHtml('<p>first</p>', 'ca_choices')]},
+      allowMultipleItemsInSamePosition: {value: true}
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'GraphInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        graph: {value: {}},
+        canAddVertex: {value: true},
+        canDeleteVertex: {value: true},
+        canMoveVertex: {value: true},
+        canEditVertexLabel: {value: true},
+        canAddEdge: {value: true},
+        canDeleteEdge: {value: true},
+        canEditEdgeWeight: {value: true}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'GraphInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      graph: {value: {}},
+      canAddVertex: {value: true},
+      canDeleteVertex: {value: true},
+      canMoveVertex: {value: true},
+      canEditVertexLabel: {value: true},
+      canAddEdge: {value: true},
+      canDeleteEdge: {value: true},
+      canEditEdgeWeight: {value: true}
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'InteractiveMap', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        latitude: {value: 0.0},
+        longitude: {value: 0.0},
+        zoom: {value: 0.0},
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'InteractiveMap',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      latitude: {value: 0.0},
+      longitude: {value: 0.0},
+      zoom: {value: 0.0},
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'MathEquationInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'MathEquationInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it('should correctly set customization arguments for ' +
+     'MathExpression', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'MathExpression',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it('should correctly set customization arguments for ' +
+     'MusicNotesInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        sequenceToGuess: {value: []},
+        initialSequence: {value: []}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'MusicNotesInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      sequenceToGuess: {value: []},
+      initialSequence: {value: []}
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'NumericExpressionInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'NumericExpressionInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it('should correctly set customization arguments for ' +
+     'NumericInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'NumericInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it('should correctly set customization arguments for ' +
+     'NumericInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'NumericInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it('should correctly set customization arguments for ' +
+     'PencilCodeEditor', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        initialCode: {value: ''}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'PencilCodeEditor',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      initialCode: {value: ''}
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'SetInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        buttonText: {value: {
+          content_id: 'ca_buttonText',
+          unicode_str: ''
+        }}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'SetInput',
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      buttonText: {value: new SubtitledUnicode('', 'ca_buttonText')}
+    });
+  });
+
+  it('should throw error when trying to set customization arguments for ' +
+     'interaction id that does not exist', () => {
+    expect(() => {
+      iof.createFromBackendDict({
+        answer_groups: answerGroupsDict,
+        confirmed_unclassified_answers: [],
+        customization_args: {},
+        default_outcome: defaultOutcomeDict,
+        hints: hintsDict,
+        id: 'InteractionIDThatDNE',
+        solution: solutionDict
+      });
+    }).toThrowError('Unrecognized interaction id InteractionIDThatDNE');
   });
 
   it('should create an object when default outcome is null', () => {
@@ -229,16 +527,16 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
     const newCustomizationArgs = {
-      placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('New', 'ca_placeholder_1')
-      ),
+      placeholder: {
+        value: new SubtitledUnicode('New', 'ca_placeholder_1')
+      },
       rows: { value: 2 }
     };
     expect(testInteraction.customizationArgs).toEqual({
-      placeholder: new InteractionCustomizationArg(
-        new SubtitledUnicode('Enter text', 'ca_placeholder_0')
-      ),
-      rows: new InteractionCustomizationArg(1)
+      placeholder: {
+        value: new SubtitledUnicode('Enter text', 'ca_placeholder_0')
+      },
+      rows: { value: 1 }
     });
     testInteraction.setCustomizationArgs(newCustomizationArgs);
     expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
@@ -414,5 +712,62 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(mcInteractionDict);
 
     expect(testInteraction.toBackendDict()).toEqual(mcInteractionDict);
+  });
+
+  it('should create a convert customization arguments ' +
+     'to backend dict for complex nested customization arguments', () => {
+    const ca = {
+      testCA: {
+        value: [{
+          content: new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
+          show: true
+        },
+        {
+          content: new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
+          show: true
+        }]
+      }
+    };
+
+    const expectedCaBackendDict = {
+      testCA: {
+        value: [{
+          content: {
+            unicode_str: 'first',
+            content_id: 'ca_dummyCustArg_content_0'
+          },
+          show: true
+        },
+        {
+          content: {
+            unicode_str: 'second',
+            content_id: 'ca_dummyCustArg_content_1'
+          },
+          show: true
+        }]
+      }
+    };
+
+    const caBackendDict = Interaction.convertCustomizationArgsToBackendDict(ca);
+    expect(caBackendDict).toEqual(expectedCaBackendDict);
+  });
+
+  it('should get all content ids for complex nested customization ' +
+     'arguments', () => {
+    const ca = {
+      testCA: {
+        value: [{
+          content: new SubtitledUnicode('first', 'ca_dummyCustArg_content_0'),
+          show: true
+        },
+        {
+          content: new SubtitledUnicode('second', 'ca_dummyCustArg_content_1'),
+          show: true
+        }]
+      }
+    };
+
+    expect(Interaction.getCutomizationArgContentIds(ca)).toEqual(
+      ['ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1']);
   });
 });

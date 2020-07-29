@@ -31,13 +31,44 @@ import { SolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import {
-  InteractionCustomizationArgObjectFactory, InteractionCustomizationArg
-} from 'domain/exploration/interaction-customization-arg-object.factory';
-import {
+  AlgebraicExpressionInputCustomizationArgs,
+  CodeReplCustomizationArgs,
+  ContinueCustomizationArgs,
+  ContinueCustomizationArgsBackendDict,
+  DragAndDropSortInputCustomizationArgs,
+  DragAndDropSortInputCustomizationArgsBackendDict,
+  EndExplorationCustomizationArgs,
+  FractionInputCustomizationArgs,
+  FractionInputCustomizationArgsBackendDict,
+  GraphInputCustomizationArgs,
+  ImageClickInputCustomizationArgs,
+  InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict,
+  InteractiveMapCustomizationArgs,
+  ItemSelectionInputCustomizationArgs,
+  ItemSelectionInputCustomizationArgsBackendDict,
+  LogicCustomizationArgs,
+  MathEquationInputCustomizationArgs,
+  MathExpressionCustomizationArgs,
+  MultipleChoiceInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgsBackendDict,
+  MusicNotesInputCustomizationArgs,
+  NumberWithUnitsCustomizationArgs,
+  NumericExpressionInputCustomizationArgs,
+  NumericInputCustomizationArgs,
+  PencilCodeCustomizationArgs,
+  SetInputCustomizationArgs,
+  SetInputCustomizationArgsBackendDict,
+  TextInputCustomizationArgs,
+  TextInputCustomizationArgsBackendDict
 } from 'interactions/customization-args-defs';
+import {
+  SubtitledUnicodeObjectFactory, SubtitledUnicode
+} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {
+  SubtitledHtmlObjectFactory, SubtitledHtml
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export interface InteractionBackendDict {
   'default_outcome': OutcomeBackendDict;
@@ -52,7 +83,7 @@ export interface InteractionBackendDict {
 export class Interaction {
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: InteractionAnswer[];
-  customizationArgs: {[name: string]: InteractionCustomizationArg};
+  customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
   id: string;
@@ -60,7 +91,7 @@ export class Interaction {
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: InteractionAnswer[],
-      customizationArgs: {[name: string]: InteractionCustomizationArg},
+      customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
@@ -83,9 +114,7 @@ export class Interaction {
     this.defaultOutcome = newValue;
   }
 
-  setCustomizationArgs(
-      newValue: {[name: string]: InteractionCustomizationArg}
-  ): void {
+  setCustomizationArgs(newValue: InteractionCustomizationArgs): void {
     this.customizationArgs = newValue;
   }
 
@@ -109,15 +138,66 @@ export class Interaction {
   }
 
   static convertCustomizationArgsToBackendDict(
-      customizationArgs: {[name: string]: InteractionCustomizationArg}
+      customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
-    const custArgsBackendDict: InteractionCustomizationArgsBackendDict = {};
+    const traverseSchemaAndConvertSubtitledToDicts = (
+        value: Object[] | Object
+    ): Object[] | Object => {
+      let result: Object[] | Object;
+
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
+        result = value.toBackendDict();
+      } else if (value instanceof Array) {
+        result = value.map(element =>
+          traverseSchemaAndConvertSubtitledToDicts(element));
+      } else if (value instanceof Object) {
+        result = {};
+        Object.keys(value).forEach(key => {
+          result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
+        });
+      }
+
+      return result || value;
+    };
+
+    const customizationArgsBackendDict:
+      InteractionCustomizationArgsBackendDict = {};
     Object.keys(customizationArgs).forEach(caName => {
-      custArgsBackendDict[caName] = (
-        customizationArgs[caName].toBackendDict());
+      customizationArgsBackendDict[caName] = {
+        value: traverseSchemaAndConvertSubtitledToDicts(
+          customizationArgs[caName].value)
+      };
     });
 
-    return custArgsBackendDict;
+    return customizationArgsBackendDict;
+  }
+
+  static getCutomizationArgContentIds(
+      customizationArgs: InteractionCustomizationArgs
+  ): string[] {
+    const contentIds = [];
+
+    const traverseValueAndRetrieveContentIdsFromSubtitled = (
+        value: Object[] | Object
+    ): void => {
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
+        contentIds.push(value.getContentId());
+      } else if (value instanceof Array) {
+        value.forEach(element =>
+          traverseValueAndRetrieveContentIdsFromSubtitled(element));
+      } else if (value instanceof Object) {
+        Object.keys(value).forEach(key => {
+          traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
+        });
+      }
+    };
+
+    Object.keys(customizationArgs).forEach(caName =>
+      traverseValueAndRetrieveContentIdsFromSubtitled(
+        customizationArgs[caName])
+    );
+
+    return contentIds;
   }
 
   toBackendDict(): InteractionBackendDict {
@@ -148,31 +228,170 @@ export class InteractionObjectFactory {
       private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
       private outcomeFactory: OutcomeObjectFactory,
-      private interactionCustomizationArgObjectFactory:
-        InteractionCustomizationArgObjectFactory
+      private subtitledHtmlFactory: SubtitledHtmlObjectFactory,
+      private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory,
   ) {}
+
+  _createFromContinueCustomizationArgsBackendDict(
+      caBackendDict: ContinueCustomizationArgsBackendDict
+  ): ContinueCustomizationArgs {
+    const { buttonText } = caBackendDict;
+    return {
+      buttonText: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          buttonText.value)
+      }
+    };
+  }
+
+  _createFromDragAndDropSortInputCustomizationArgsBackendDict(
+      caBackendDict: DragAndDropSortInputCustomizationArgsBackendDict
+  ): DragAndDropSortInputCustomizationArgs {
+    const { choices, allowMultipleItemsInSamePosition } = caBackendDict;
+    return {
+      allowMultipleItemsInSamePosition,
+      choices: {
+        value: choices.value.map(subtitledHtmlDict =>
+          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+      }
+    };
+  }
+
+  _createFromFractionInputCustomizationArgsBackendDict(
+      caBackendDict: FractionInputCustomizationArgsBackendDict
+  ): FractionInputCustomizationArgs {
+    const {
+      requireSimplestForm, allowImproperFraction, allowNonzeroIntegerPart,
+      customPlaceholder
+    } = caBackendDict;
+    return {
+      requireSimplestForm, allowImproperFraction, allowNonzeroIntegerPart,
+      customPlaceholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          customPlaceholder.value)
+      }
+    };
+  }
+
+  _createFromItemSelectionInputCustomizationArgsBackendDict(
+      caBackendDict: ItemSelectionInputCustomizationArgsBackendDict
+  ): ItemSelectionInputCustomizationArgs {
+    const {
+      choices, maxAllowableSelectionCount, minAllowableSelectionCount
+    } = caBackendDict;
+    return {
+      minAllowableSelectionCount,
+      maxAllowableSelectionCount,
+      choices: {
+        value: choices.value.map(subtitledHtmlDict =>
+          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+      }
+    };
+  }
+
+  _createFromIMultipleChoiceInputCustomizationArgsBackendDict(
+      caBackendDict: MultipleChoiceInputCustomizationArgsBackendDict
+  ): MultipleChoiceInputCustomizationArgs {
+    const {
+      choices, showChoicesInShuffledOrder
+    } = caBackendDict;
+    return {
+      showChoicesInShuffledOrder,
+      choices: {
+        value: choices.value.map(subtitledHtmlDict =>
+          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+      }
+    };
+  }
+
+  _createFromSetInputCustomizationArgsBackendDict(
+      caBackendDict: SetInputCustomizationArgsBackendDict
+  ): SetInputCustomizationArgs {
+    const { buttonText } = caBackendDict;
+    return {
+      buttonText: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          buttonText.value)
+      }
+    };
+  }
+
+  _createFromTextInputCustomizationArgsBackendDict(
+      caBackendDict: TextInputCustomizationArgsBackendDict
+  ): TextInputCustomizationArgs {
+    const { rows, placeholder } = caBackendDict;
+    return {
+      rows,
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
 
   convertFromCustomizationArgsBackendDict(
       interactionId: string,
-      custArgsBackendDict: InteractionCustomizationArgsBackendDict
-  ) : {[name: string]: InteractionCustomizationArg} {
-    let custArgs: {[name: string]: InteractionCustomizationArg} = {};
-
-    if (interactionId !== null &&
-      INTERACTION_SPECS.hasOwnProperty(interactionId)
-    ) {
-      const custArgsSpecs = (
-        INTERACTION_SPECS[interactionId].customization_arg_specs);
-      custArgsSpecs.forEach(custArgsSpec => {
-        custArgs[custArgsSpec.name] = (
-          this.interactionCustomizationArgObjectFactory.createFromBackendDict(
-            custArgsBackendDict[custArgsSpec.name],
-            custArgsSpec.schema)
-        );
-      });
+      caBackendDict: InteractionCustomizationArgsBackendDict
+  ) : InteractionCustomizationArgs {
+    if (interactionId === null) {
+      return {};
     }
-
-    return custArgs;
+    switch (interactionId) {
+      case 'AlgebraicExpressionInput':
+        return (
+          <AlgebraicExpressionInputCustomizationArgs> cloneDeep(caBackendDict));
+      case 'CodeRepl':
+        return <CodeReplCustomizationArgs> cloneDeep(caBackendDict);
+      case 'Continue':
+        return this._createFromContinueCustomizationArgsBackendDict(
+          <ContinueCustomizationArgsBackendDict> caBackendDict);
+      case 'DragAndDropSortInput':
+        return this._createFromDragAndDropSortInputCustomizationArgsBackendDict(
+          <DragAndDropSortInputCustomizationArgsBackendDict> caBackendDict);
+      case 'EndExploration':
+        return <EndExplorationCustomizationArgs> cloneDeep(caBackendDict);
+      case 'FractionInput':
+        return this._createFromFractionInputCustomizationArgsBackendDict(
+          <FractionInputCustomizationArgsBackendDict> caBackendDict);
+      case 'GraphInput':
+        return (
+          <GraphInputCustomizationArgs> cloneDeep(caBackendDict));
+      case 'ImageClickInput':
+        return <ImageClickInputCustomizationArgs> cloneDeep(caBackendDict);
+      case 'InteractiveMap':
+        return <InteractiveMapCustomizationArgs> cloneDeep(caBackendDict);
+      case 'ItemSelectionInput':
+        return this._createFromItemSelectionInputCustomizationArgsBackendDict(
+          <ItemSelectionInputCustomizationArgsBackendDict> caBackendDict);
+      case 'LogicProof':
+        return <LogicCustomizationArgs> cloneDeep(caBackendDict);
+      case 'MathEquationInput':
+        return <MathEquationInputCustomizationArgs> cloneDeep(caBackendDict);
+      case 'MathExpression':
+        return <MathExpressionCustomizationArgs> cloneDeep(caBackendDict);
+      case 'MultipleChoiceInput':
+        return this._createFromIMultipleChoiceInputCustomizationArgsBackendDict(
+          <MultipleChoiceInputCustomizationArgsBackendDict> caBackendDict);
+      case 'MusicNotesInput':
+        return <MusicNotesInputCustomizationArgs> cloneDeep(caBackendDict);
+      case 'NumberWithUnits':
+        return <NumberWithUnitsCustomizationArgs> cloneDeep(caBackendDict);
+      case 'NumericExpressionInput':
+        return (
+          <NumericExpressionInputCustomizationArgs> cloneDeep(caBackendDict));
+      case 'NumericInput':
+        return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
+      case 'PencilCodeEditor':
+        return <PencilCodeCustomizationArgs> cloneDeep(caBackendDict);
+      case 'SetInput':
+        return this._createFromSetInputCustomizationArgsBackendDict(
+          <SetInputCustomizationArgsBackendDict> caBackendDict);
+      case 'TextInput':
+        return this._createFromTextInputCustomizationArgsBackendDict(
+          <TextInputCustomizationArgsBackendDict> caBackendDict);
+      default:
+        throw new Error(`Unrecognized interaction id ${interactionId}`);
+    }
   }
 
   createFromBackendDict(

@@ -25,8 +25,6 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -88,7 +86,7 @@ describe('Training Panel Component', function() {
       confirmed_unclassified_answers: null,
       customization_args: {},
       hints: [],
-      id: 'interaction_1',
+      id: null,
       solution: {
         answer_is_exclusive: false,
         correct_answer: 'This is the correct answer',
@@ -148,7 +146,7 @@ describe('Training Panel Component', function() {
 
     stateInteractionIdService.init(stateName, 'interaction_1');
     stateCustomizationArgsService.init(stateName, {
-      choices: new InteractionCustomizationArg([])
+      choices: {value: []}
     });
 
     $scope = $rootScope.$new();

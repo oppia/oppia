@@ -18,6 +18,8 @@
  * keeps no mementos.
  */
 
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
 require(
   'pages/exploration-editor-page/editor-tab/templates/' +
   'modal-templates/confirm-delete-state-modal.controller.ts');
@@ -105,12 +107,8 @@ angular.module('oppia').factory('ExplorationStatesService', [
         return writtenTranslations.toBackendDict();
       },
       widget_customization_args: function(customizationArgs) {
-        const customizationArgsBackendDict = {};
-        Object.keys(customizationArgs).forEach(caName => {
-          customizationArgsBackendDict[caName] = (
-            customizationArgs[caName].toBackendDict());
-        });
-        return customizationArgsBackendDict;
+        return Interaction.convertCustomizationArgsToBackendDict(
+          customizationArgs);
       }
     };
 

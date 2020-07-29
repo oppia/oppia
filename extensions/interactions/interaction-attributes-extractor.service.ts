@@ -19,12 +19,12 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import {
-  InteractionCustomizationArgObjectFactory,
-  InteractionCustomizationArgBackendDict
-} from 'domain/exploration/interaction-customization-arg-object.factory';
-import { InteractionCustomizationArgsValue } from './customization-args-defs';
+import { InteractionCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -34,30 +34,31 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 export class InteractionAttributesExtractorService {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
-    private interactionCustomizationArgObjectFactory:
-      InteractionCustomizationArgObjectFactory,
+    private interactionFactory: InteractionObjectFactory,
   ) {}
 
   getValuesFromAttributes(
       interactionId: string, attributes: Object
-  ) : {[caName: string]: InteractionCustomizationArgsValue} {
-    const caValues = {};
+  ) : InteractionCustomizationArgs {
+    const caBackendDict = {};
     const caSpecs = (
       INTERACTION_SPECS[interactionId].customization_arg_specs);
 
     caSpecs.forEach(caSpec => {
       const caName = caSpec.name;
       const attributesKey = `${caName}WithValue`;
-      const caBackendDict = (
-        <InteractionCustomizationArgBackendDict> (this.htmlEscaperService
-          .escapedJsonToObj(attributes[attributesKey]))
-      );
-      caValues[caName] = (
-        this.interactionCustomizationArgObjectFactory.createFromBackendDict(
-          {value: caBackendDict},
-          caSpec.schema
-        ).value
-      );
+      caBackendDict[caName] = {
+        value:
+          this.htmlEscaperService.escapedJsonToObj(attributes[attributesKey])
+      };
+    });
+
+    const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
+      interactionId, caBackendDict);
+
+    const caValues = {};
+    Object.keys(ca).forEach(caName => {
+      caValues[caName] = ca[caName].value;
     });
 
     return caValues;

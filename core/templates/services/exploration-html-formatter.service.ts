@@ -25,8 +25,6 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { InteractionCustomizationArg } from
-  'domain/exploration/interaction-customization-arg-object.factory';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 
@@ -58,8 +56,7 @@ export class ExplorationHtmlFormatterService {
    */
   getInteractionHtml(
       interactionId: string,
-      interactionCustomizationArgs:
-        {[name: string]: InteractionCustomizationArg},
+      interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
       labelForFocusTarget: string): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
