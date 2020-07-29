@@ -378,7 +378,7 @@ describe('Customize Interaction Modal Controller', function() {
 
       $scope.save();
       expect(stateCustomizationArgsService.displayed).toEqual({
-        choices:{value: [
+        choices: {value: [
           new SubtitledHtml('<p>1</p>', 'ca_choices_0'),
           new SubtitledHtml('<p>2</p>', 'ca_choices_1')
         ]},
