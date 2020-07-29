@@ -438,9 +438,7 @@ def get_chrome_driver_version():
     if common.is_mac_os():
         # There are spaces between Google and Chrome in the path. Spaces don't
         # need to be escaped when we're not using the terminal, ie. shell=False
-        # for Popen by default. However, for the error message we will add
-        # backslashes because it is likely that the user will want to try the
-        # command on their terminal if there's an error.
+        # for Popen by default.
         popen_args = [
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
             '--version'
@@ -449,8 +447,13 @@ def get_chrome_driver_version():
         proc = subprocess.Popen(popen_args, stdout=subprocess.PIPE)
         output = proc.stdout.readline()
     except OSError:
+        # For the error message for the mac command, we need to add the
+        # backslashes in. This is because it is likely that a user will try to
+        # run the command on their terminal and, as mentioned above, the mac
+        # get chrome version command has spaces in the path which need to be
+        # escaped for successful terminal use.
         raise Exception(
-            r'Failed to execute "%s" command. '
+            'Failed to execute "%s" command. '
             'This is used to determine the chromedriver version to use. '
             'Please set the chromedriver version manually using '
             '--chrome_driver_version flag. To determine the chromedriver '
