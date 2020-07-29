@@ -65,21 +65,6 @@ const SVGTAGS = {
     'ill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51" y="' +
     '-6.14">Enter</tspan><tspan x="-21.51" y="17.45">Text</tspan></text></g>' +
     '</svg>'),
-  rectangle_bezier: (
-    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
-    '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
-    '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
-    'x(1 0 0 1 50 50)"><rect style="stroke: rgb(0,0,0); stroke-width: 3; str' +
-    'oke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke' +
-    '-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-opacity:' +
-    ' 0; fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-stroke" ' +
-    'x="-30" y="-35" rx="0" ry="0" width="60" height="70"/></g><g transform=' +
-    '"matrix(1 0 0 1 95 62.5)"><path style="stroke: rgb(0,0,0); stroke-width' +
-    ': 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0' +
-    '; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-' +
-    'opacity: 0; fill-rule: nonzero; opacity: 1;" transform=" translate(-95,' +
-    ' -62.5)" d="M 40 40 Q 95 100 150 40" stroke-linecap="round"/></g></svg>'),
   rectangle_bezier_piechart: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
