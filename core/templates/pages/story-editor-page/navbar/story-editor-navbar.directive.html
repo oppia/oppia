@@ -50,31 +50,6 @@
       Unpublish Story
     </button>
   </li>
-  <li ng-class="{'active': true, 'uib-dropdown': getTotalWarningsCount()}" ng-attr-uib-dropdown="<[getTotalWarningsCount()]>"
-      class="nav-item">
-    <a uib-tooltip="Editor" class="nav-link protractor-test-main-tab">
-      <i class="material-icons">&#xE254;</i>
-    </a>
-    <div ng-show="getTotalWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color protractor-test-warning-indicator">
-      <span class="oppia-editor-warnings-count">
-        <[getTotalWarningsCount()]>
-      </span>
-    </div>
-    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
-      <span class="oppia-editor-warnings-header">Warnings</span>
-      <li class="oppia-editor-warnings-text protractor-test-warnings-text"
-          ng-repeat="issue in validationIssues.concat(explorationValidationIssues) track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-      <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in prepublishValidationIssues track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-    </ul>
-  </li>
 </ul>
 <style>
   .oppia-editor-warnings-text {
