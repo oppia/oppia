@@ -141,6 +141,22 @@ class EvaluationContextTest(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid client type'):
             context.validate()
 
+    def test_validate_with_invalid_browser_type_raises_exception(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Web',
+                'browser_type': 'Invalid',
+                'app_version': '1.0.0',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid browser type'):
+            context.validate()
+
     def test_validate_with_invalid_app_version_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {

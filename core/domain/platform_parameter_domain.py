@@ -47,6 +47,8 @@ ALLOWED_FEATURE_STAGES = [
 
 ALLOWED_CLIENT_TYPES = ['Web', 'Android']
 
+ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Others']
+
 APP_VERSION_WITH_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+)?$')
 
 APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)$')
@@ -135,16 +137,26 @@ class EvaluationContext(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid client type %s, must be one of %s.' % (
                     self._client_type, ALLOWED_CLIENT_TYPES))
+
+        if (
+                self._browser_type is not None and
+                self._browser_type not in ALLOWED_BROWSER_TYPES):
+            raise utils.ValidationError(
+                'Invalid browser type %s, must be one of %s.' % (
+                    self._browser_type, ALLOWED_BROWSER_TYPES))
+
         if (
                 self._app_version is not None and
                 APP_VERSION_WITH_HASH_REGEXP.match(self._app_version) is None):
             raise utils.ValidationError(
                 'Invalid version %s, expected to match regexp %s' % (
                     self._app_version, APP_VERSION_WITH_HASH_REGEXP))
+
         if self._user_locale not in ALLOWED_USER_LOCALES:
             raise utils.ValidationError(
                 'Invalid user locale %s, must be one of %s.' % (
                     self._user_locale, ALLOWED_USER_LOCALES))
+
         if self._server_mode not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
                 'Invalid server mode %s, must be one of %s.' % (
