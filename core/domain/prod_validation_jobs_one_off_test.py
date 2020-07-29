@@ -13077,12 +13077,12 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
             prod_validation_jobs_one_off
             .UserAuthModelAuditOneOffJob)
 
-    def test_standard_operation(self):
+    def test_audit_standard_operation_passes(self):
         expected_output = [
             u'[u\'fully-validated UserAuthModel\', 1]']
         run_job_and_check_output(self, expected_output)
 
-    def test_model_with_created_on_greater_than_last_updated(self):
+    def test_audit_with_created_on_greater_than_last_updated_fails(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
         self.model_instance.put()
@@ -13097,7 +13097,7 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
             )]
         run_job_and_check_output(self, expected_output)
 
-    def test_model_with_last_updated_greater_than_current_time(self):
+    def test_audit_with_last_updated_greater_than_current_time_fails(self):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'UserAuthModel\', '
@@ -13110,7 +13110,7 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output)
 
-    def test_missing_user_settings_model_failure(self):
+    def test_audit_missing_user_settings_model_fails(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (

@@ -2277,6 +2277,6 @@ class UserAuthModel(base_models.BaseModel):
             if there exists one, else None.
         """
 
-        if auth_service == 'gae':
+        if auth_service == feconf.GAE_AUTH_METHOD:
             return cls.query(cls.gae_id == auth_id).get()
         return None
