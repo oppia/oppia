@@ -26,6 +26,7 @@ import re
 import zipfile
 
 from core.domain import classifier_services
+from core.domain import config_domain
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -4611,34 +4612,37 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             latex_strings_without_svg=['(x-a1)(x-b1)', '\\frac{x^3}{y^2}'],
             estimated_max_size_of_images_in_bytes=30000).put()
 
-        expected_output = {}
-        mock_max_size_of_math_svgs_batch = 0.05 * 1024 * 1024
         expected_output = {
             'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
             'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
             'exp_id3': ['(x-a)(x-b)', '\\frac{x^2}{y^3}']
         }
+        self.set_config_property((
+            config_domain
+            .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 6)
+        self.assertEqual(
+            exp_services.get_batch_of_exps_for_latex_svg_generation(),
+            expected_output)
 
-        with self.swap(
-            feconf, 'MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES',
-            mock_max_size_of_math_svgs_batch):
+        expected_output_when_batch_is_limited = {
+            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
+            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
+        }
+        with self.swap(feconf, 'MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH', 2):
             self.assertEqual(
                 exp_services.get_batch_of_exps_for_latex_svg_generation(),
-                expected_output)
-
-        expected_output_when_max_entities_is_limited = {
+                expected_output_when_batch_is_limited)
+        expected_output_when_number_of_svgs_is_limited = {
             'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
-            'exp_id2': ['+,-,-,+', '\\sqrt{x}']
+            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
+            'exp_id3': ['(x-a)(x-b)']
         }
-        with self.swap(
-            feconf, 'MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES',
-            mock_max_size_of_math_svgs_batch):
-            with self.swap(
-                feconf, 'MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH',
-                2):
-                self.assertEqual(
-                    exp_services.get_batch_of_exps_for_latex_svg_generation(),
-                    expected_output_when_max_entities_is_limited)
+        self.set_config_property((
+            config_domain
+            .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 5)
+        self.assertEqual(
+            exp_services.get_batch_of_exps_for_latex_svg_generation(),
+            expected_output_when_number_of_svgs_is_limited)
 
     def test_get_number_explorations_having_latex_strings_without_svgs(self):
         exp_models.ExplorationMathRichTextInfoModel(
@@ -5046,6 +5050,118 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         exploration_math_rich_text_info_model = (
             exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
         self.assertFalse(
+            exploration_math_rich_text_info_model.
+            math_images_generation_required)
+
+    def test_exploration_is_updated_with_math_svgs_when_num_of_svgs_is_limited(
+            self):
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        valid_html_content3 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;-,+,+,-&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [
+                    valid_html_content2,
+                    valid_html_content2,
+                    '<p>3</p>',
+                    valid_html_content3
+                ]
+            }
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}', '-,+,+,-'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_1, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_2, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
+        image_data = {
+            '+,+,+,+': latex_string_svg_image_data1,
+            '\\frac{x}{y}': latex_string_svg_image_data2
+        }
+        exp_services.update_exploration_with_math_svgs(
+            'exp_id1', image_data)
+        update_exploration = exp_fetchers.get_exploration_by_id('exp_id1')
+        updated_html_string = ''
+        for state in update_exploration.states.values():
+            updated_html_string += (
+                ''.join(state.get_all_html_content_strings()))
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(updated_html_string))
+
+        self.assertEqual(len(filenames), 3)
+        for filename in filenames:
+            file_system_class = (
+                fs_services.get_entity_file_system_class())
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+            filepath = 'image/%s' % filename
+            self.assertTrue(fs.isfile(filepath))
+        exploration_math_rich_text_info_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
+        self.assertTrue(
             exploration_math_rich_text_info_model.
             math_images_generation_required)
 

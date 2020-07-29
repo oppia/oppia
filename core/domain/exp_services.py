@@ -39,6 +39,7 @@ import zipfile
 from constants import constants
 from core.domain import activity_services
 from core.domain import classifier_services
+from core.domain import config_domain
 from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
@@ -1880,16 +1881,33 @@ def get_batch_of_exps_for_latex_svg_generation():
             exp_models.  # pylint: disable=singleton-comparison
             ExplorationMathRichTextInfoModel.
             math_images_generation_required == True))
-    size_of_svgs_in_batch_bytes = 0
+    number_of_svgs_in_current_batch = 0
+    max_number_of_svgs_in_math_svgs_batch = (
+        config_domain.MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH.value)
     for model_index, model in enumerate(exploration_math_rich_text_info_models):
-        if size_of_svgs_in_batch_bytes > (
-                feconf.MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES):
-            break
         if model_index + 1 > feconf.MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH:
             break
-        latex_strings_mapping[model.id] = model.latex_strings_without_svg
-        size_of_svgs_in_batch_bytes += (
-            model.estimated_max_size_of_images_in_bytes)
+        list_of_latex_strings_in_model = model.latex_strings_without_svg
+        if number_of_svgs_in_current_batch >= (
+                max_number_of_svgs_in_math_svgs_batch):
+            break
+        number_of_svgs_in_batch_along_with_latex_strings_in_model = (
+            number_of_svgs_in_current_batch + len(
+                list_of_latex_strings_in_model))
+        if number_of_svgs_in_batch_along_with_latex_strings_in_model > (
+                max_number_of_svgs_in_math_svgs_batch):
+            number_of_latex_strings_to_be_added = (
+                max_number_of_svgs_in_math_svgs_batch -
+                number_of_svgs_in_current_batch)
+            latex_strings_mapping[model.id] = (
+                list_of_latex_strings_in_model[
+                    :number_of_latex_strings_to_be_added])
+            break
+        else:
+            latex_strings_mapping[model.id] = list_of_latex_strings_in_model
+            number_of_svgs_in_current_batch += len(
+                list_of_latex_strings_in_model)
+
     return latex_strings_mapping
 
 
@@ -2014,12 +2032,27 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id, image_file,
                 'image', image_is_compressible)
-
-    update_exploration(
-        feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
-        'added SVG images for math tags.')
+    list_of_latex_string_converted = raw_latex_to_image_data_dict.keys()
     exploration_math_rich_text_info_model = (
         exp_models.ExplorationMathRichTextInfoModel.get_by_id(exp_id))
-    exploration_math_rich_text_info_model.math_images_generation_required = (
-        False)
+    list_of_latex_strings_in_model = (
+        exploration_math_rich_text_info_model.latex_strings_without_svg)
+    list_of_latex_string_left_to_be_converted = list(
+        set(list_of_latex_strings_in_model) - set(
+            list_of_latex_string_converted))
+
+    if list_of_latex_string_left_to_be_converted == []:
+        update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
+            'added all SVG images for math tags.')
+        (
+            exploration_math_rich_text_info_model.
+            math_images_generation_required) = False
+    else:
+        update_exploration(
+            feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
+            'added some SVG images for math tags.')
+        exploration_math_rich_text_info_model.latex_strings_without_svg = (
+            list_of_latex_string_left_to_be_converted)
+
     exploration_math_rich_text_info_model.put()
