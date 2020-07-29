@@ -91,48 +91,52 @@ export class LearnerDashboardBackendApiService {
     private profileSummaryObjectFactory: ProfileSummaryObjectFactory) {}
 
   _fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
-    return this.http.get<LearnerDashboardDataBackendDict>(
-      '/learnerdashboardhandler/data').toPromise().then(dashboardData => {
-      return {
-        completedExplorationsList: (
-          dashboardData.completed_explorations_list.map(
-            expSummary => this.learnerExplorationSummaryObjectFactory
-              .createFromBackendDict(expSummary))),
-        incompleteExplorationsList: (
-          dashboardData.incomplete_explorations_list.map(
-            expSummary => this.learnerExplorationSummaryObjectFactory
-              .createFromBackendDict(expSummary))),
-        explorationPlaylist: (
-          dashboardData.exploration_playlist.map(
-            expSummary => this.learnerExplorationSummaryObjectFactory
-              .createFromBackendDict(expSummary))),
-        completedCollectionsList: (
-          dashboardData.completed_collections_list.map(
-            collectionSummary => this.collectionSummaryObjectFactory
-              .createFromBackendDict(collectionSummary))),
-        incompleteCollectionsList: (
-          dashboardData.incomplete_collections_list.map(
-            collectionSummary => this.collectionSummaryObjectFactory
-              .createFromBackendDict(collectionSummary))),
-        collectionPlaylist: (
-          dashboardData.collection_playlist.map(
-            collectionSummary => this.collectionSummaryObjectFactory
-              .createFromBackendDict(collectionSummary))),
-        numberOfUnreadThreads: dashboardData.number_of_unread_threads,
-        threadSummaries: (
-          dashboardData.thread_summaries.map(
-            threadSummary => this.feedbackThreadSummaryObjectFactory
-              .createFromBackendDict(threadSummary))),
-        completedToIncompleteCollections: (
-          dashboardData.completed_to_incomplete_collections),
-        numberOfNonexistentActivities: (
-          this.nonExistentActivitiesObjectFactory.createFromBackendDict(
-            dashboardData.number_of_nonexistent_activities)),
-        subscriptionList: (
-          dashboardData.subscription_list.map(
-            profileSummary => this.profileSummaryObjectFactory
-              .createFromCreatorBackendDict(profileSummary)))
-      };
+    return new Promise((resolve, reject) => {
+      this.http.get<LearnerDashboardDataBackendDict>(
+        '/learnerdashboardhandler/data').toPromise().then(dashboardData => {
+        resolve({
+          completedExplorationsList: (
+            dashboardData.completed_explorations_list.map(
+              expSummary => this.learnerExplorationSummaryObjectFactory
+                .createFromBackendDict(expSummary))),
+          incompleteExplorationsList: (
+            dashboardData.incomplete_explorations_list.map(
+              expSummary => this.learnerExplorationSummaryObjectFactory
+                .createFromBackendDict(expSummary))),
+          explorationPlaylist: (
+            dashboardData.exploration_playlist.map(
+              expSummary => this.learnerExplorationSummaryObjectFactory
+                .createFromBackendDict(expSummary))),
+          completedCollectionsList: (
+            dashboardData.completed_collections_list.map(
+              collectionSummary => this.collectionSummaryObjectFactory
+                .createFromBackendDict(collectionSummary))),
+          incompleteCollectionsList: (
+            dashboardData.incomplete_collections_list.map(
+              collectionSummary => this.collectionSummaryObjectFactory
+                .createFromBackendDict(collectionSummary))),
+          collectionPlaylist: (
+            dashboardData.collection_playlist.map(
+              collectionSummary => this.collectionSummaryObjectFactory
+                .createFromBackendDict(collectionSummary))),
+          numberOfUnreadThreads: dashboardData.number_of_unread_threads,
+          threadSummaries: (
+            dashboardData.thread_summaries.map(
+              threadSummary => this.feedbackThreadSummaryObjectFactory
+                .createFromBackendDict(threadSummary))),
+          completedToIncompleteCollections: (
+            dashboardData.completed_to_incomplete_collections),
+          numberOfNonexistentActivities: (
+            this.nonExistentActivitiesObjectFactory.createFromBackendDict(
+              dashboardData.number_of_nonexistent_activities)),
+          subscriptionList: (
+            dashboardData.subscription_list.map(
+              profileSummary => this.profileSummaryObjectFactory
+                .createFromCreatorBackendDict(profileSummary)))
+        });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 

@@ -71,7 +71,7 @@ describe('Collection Creation service', () => {
       let req = httpTestingController.expectOne(
         '/collection_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
-      req.flush({collectionId: SAMPLE_COLLECTION_ID});
+      req.flush({collection_id: SAMPLE_COLLECTION_ID});
 
       flushMicrotasks();
       tick(150);
@@ -95,7 +95,9 @@ describe('Collection Creation service', () => {
       let req = httpTestingController.expectOne(
         '/collection_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
-      req.flush('Error creating a new collection.', {
+      req.flush({
+        error: 'Error creating a new collection.'
+      }, {
         status: ERROR_STATUS_CODE,
         statusText: 'Error creating a new collection.'
       });
@@ -124,7 +126,7 @@ describe('Collection Creation service', () => {
       let req = httpTestingController.expectOne(
         '/collection_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
-      req.flush({collectionId: SAMPLE_COLLECTION_ID});
+      req.flush({collection_id: SAMPLE_COLLECTION_ID});
 
       flushMicrotasks();
       tick(150);
