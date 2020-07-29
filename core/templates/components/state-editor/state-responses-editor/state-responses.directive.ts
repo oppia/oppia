@@ -82,6 +82,8 @@ require('services/exploration-html-formatter.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/html-escaper.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -120,6 +122,7 @@ angular.module('oppia').directive('stateResponses', [
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
             SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _initializeTrainingData = function() {
             if (StateEditorService.isInQuestionMode()) {
               return;
@@ -574,12 +577,16 @@ angular.module('oppia').directive('stateResponses', [
               }
             });
 
-            $scope.$on('answerGroupChanged', function() {
-              $scope.answerGroups = ResponsesService.getAnswerGroups();
-              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-              $scope.activeAnswerGroupIndex = (
-                ResponsesService.getActiveAnswerGroupIndex());
-            });
+            ctrl.directiveSubscriptions.add(
+              ResponsesService.onAnswerGroupsChanged.subscribe(
+                () => {
+                  console.log('Caught');
+                  $scope.answerGroups = ResponsesService.getAnswerGroups();
+                  $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+                  $scope.activeAnswerGroupIndex =
+                  ResponsesService.getActiveAnswerGroupIndex();
+                }
+              ));
 
             $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
               ResponsesService.updateAnswerChoices(newAnswerChoices);
@@ -623,6 +630,10 @@ angular.module('oppia').directive('stateResponses', [
               $scope.onResponsesInitialized();
             }
             StateEditorService.updateStateResponsesInitialised();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe;
           };
         }
       ]
