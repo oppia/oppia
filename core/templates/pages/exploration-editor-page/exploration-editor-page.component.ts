@@ -58,12 +58,12 @@ require('pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.component.ts');
-require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
+require('pages/exploration-editor-page/history-tab/history-tab.component.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.component.ts');
-require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
+require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.ts');
 require(
