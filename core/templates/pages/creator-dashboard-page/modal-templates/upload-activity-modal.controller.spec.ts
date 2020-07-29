@@ -53,6 +53,7 @@ describe('Upload Activity Modal Controller', function() {
       size: 100,
       name: 'file.mp3'
     };
+    // TODO(#10113): Refactor the test to not use the DOM methods.
     // There is a typescript error here because the actual getElementById
     // returns more properties than just files. We need to suppress this error
     // because we need only "files" property for testing.
@@ -73,9 +74,10 @@ describe('Upload Activity Modal Controller', function() {
   it('should not save activity if file is empty', function() {
     var documentCopy = angular.copy(document);
     spyOn(AlertsService, 'addWarning').and.callThrough();
+    // TODO(#10113): Refactor the test to not use the DOM methods.
     // There is a typescript error here because the actual getElementById
     // returns more properties than just files. We need to suppress this error
-    // because we need only files for testing.
+    // because we need only "files" for testing.
     // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(function() {
       return {
