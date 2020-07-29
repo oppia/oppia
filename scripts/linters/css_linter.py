@@ -99,27 +99,26 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         stylelint_path = os.path.join(
             'node_modules', 'stylelint', 'bin', 'stylelint.js')
         if not os.path.exists(stylelint_path):
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log(
+            python_utils.PRINT('')
+            python_utils.PRINT(
                 'ERROR    Please run start.sh first to install node-eslint ')
-            concurrent_task_utils.log(
+            python_utils.PRINT(
                 '         or node-stylelint and its dependencies.')
             sys.exit(1)
         files_to_lint = self.all_filepaths
         start_time = time.time()
         num_files_with_errors = 0
+        failed = False
         summary_messages = []
+        verbose_messages = []
 
         num_css_files = len(files_to_lint)
-        concurrent_task_utils.log('Total css files: %s' % num_css_files)
+        python_utils.PRINT('Total css files: %s' % num_css_files)
         stylelint_cmd_args = [
             node_path, stylelint_path, '--config=' + self.config_path]
         result_list = []
-        if not self.verbose_mode_enabled:
-            concurrent_task_utils.log('Linting CSS files.')
         for _, filepath in enumerate(files_to_lint):
-            if self.verbose_mode_enabled:
-                concurrent_task_utils.log('Linting: %s' % filepath)
+            verbose_messages.append('Linting: %s' % filepath)
             proc_args = stylelint_cmd_args + [filepath]
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -128,8 +127,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
             linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
             if linter_stderr:
-                concurrent_task_utils.log('LINTER FAILED')
-                concurrent_task_utils.log(linter_stderr)
+                python_utils.PRINT('LINTER FAILED')
+                python_utils.PRINT(linter_stderr)
                 sys.exit(1)
 
             if linter_stdout:
@@ -138,20 +137,25 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for result in result_list:
-                concurrent_task_utils.log(result)
+                verbose_messages.append(result)
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
             summary_message = ('%s %s CSS file' % (
                 linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
+            failed = True
         else:
             summary_message = ('%s %s CSS file linted (%.1f secs)' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX, num_css_files,
                 time.time() - start_time))
-        concurrent_task_utils.log(summary_message)
-        summary_messages.append(summary_message)
+        verbose_messages.append(summary_message)
 
-        concurrent_task_utils.log('CSS linting finished.')
-        return summary_messages
+        verbose_messages.append('CSS linting finished.')
+        status = {
+            'failed': failed,
+            'verbose_messages': verbose_messages,
+            'summary_messages': summary_messages
+        }
+        return status
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -161,12 +165,12 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             all_messages: str. All the messages returned by the lint checks.
         """
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log(
+            python_utils.PRINT('')
+            python_utils.PRINT(
                 'There are no HTML or CSS files to lint.')
             return []
 
-        return self._lint_css_files()
+        return [self._lint_css_files()]
 
 
 def get_linters(config_path, files_to_lint, verbose_mode_enabled=False):
