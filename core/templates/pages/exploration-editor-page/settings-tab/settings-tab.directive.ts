@@ -200,8 +200,8 @@ angular.module('oppia').directive('settingsTab', [
             }
 
             ExplorationInitStateNameService.saveDisplayedValue();
-
-            $rootScope.$broadcast('refreshGraph');
+            console.log('Emit: Settings tab');
+            ExplorationStatesService.onRefreshGraph.emit();
           };
 
           ctrl.postSaveParamChangesHook = function() {

@@ -458,6 +458,7 @@ angular.module('oppia').component('explorationEditorPage', {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
         ctrl.directiveSubscriptions.add(
           ExplorationStatesService.onRefreshGraph.subscribe(() => {
+            console.log('Caught: onRefreshGraph');
             GraphDataService.recompute();
             ExplorationWarningsService.updateWarnings();
           }));
