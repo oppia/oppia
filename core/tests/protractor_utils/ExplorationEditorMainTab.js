@@ -497,12 +497,6 @@ var ExplorationEditorMainTab = function() {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
-    /*
-    await waitFor.elementToBeClickable(
-      stateEditButton,
-      'State edit button taking too long to show up');
-    await stateEditButton.click();
-    */
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
