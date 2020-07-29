@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. Ts ignore is used and no comment explains
+ * @fileoverview Valid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py. Ts ignore is used and a comment explains
  * the ts-ignore.
  */
 
-let a: string;
+let c: string;
 
+// Need ts-ignore here to test the lint check.
 // @ts-ignore
-let b: number = a;
+let b: number = c;

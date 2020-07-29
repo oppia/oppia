@@ -79,6 +79,8 @@ INVALID_DIRECTIVE_WITH_NO_RETURN_BLOCK = os.path.join(
     LINTER_TESTS_DIR, 'invalid_directive_without_return.ts')
 INVALID_TS_IGNORE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_ts_ignore.ts')
+VALID_TS_IGNORE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_ts_ignore.ts')
 
 
 class JsTsLintTests(test_utils.LinterTestBase):
@@ -569,9 +571,13 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     True).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        self.assert_same_list_elements(
+            ['@ts-ignore or @ts-expect-error found at line 23.'],
+            self.linter_stdout)
         self.assert_same_list_elements([
-            'TS ignore found at line 22.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            'Please add a comment at line 22 to '
+            'explain the @ts-ignore or @ts-expect-error.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 2)
 
     def test_ts_ignore_found_success(self):
         def mock_compile_all_ts_files():
@@ -582,12 +588,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
                     js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
                     'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
                     'true', 'es5', './node_modules/@types',
-                    INVALID_TS_IGNORE_FILEPATH)
+                    VALID_TS_IGNORE_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
         ts_ignore_exceptions_swap = self.swap(
             js_ts_linter, 'TS_IGNORE_EXCEPTIONS', {
-                INVALID_TS_IGNORE_FILEPATH: ['let b: number = a;']
+                VALID_TS_IGNORE_FILEPATH: ['let b: number = c;']
             })
         compile_all_ts_files_swap = self.swap(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
@@ -595,7 +601,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         with self.print_swap, compile_all_ts_files_swap:
             with ts_ignore_exceptions_swap:
                 js_ts_linter.JsTsLintChecksManager(
-                    [], [INVALID_TS_IGNORE_FILEPATH], FILE_CACHE,
+                    [], [VALID_TS_IGNORE_FILEPATH], FILE_CACHE,
                     True).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
