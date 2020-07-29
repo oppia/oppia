@@ -194,8 +194,10 @@ describe('Assets Backend API Service', function() {
 
     it('should successfully save an audio', function(done) {
       var successMessage = 'Audio was successfully saved.';
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declarated.
+      // There is an error here because the type of function we are using here
+      // doesn't match the type of actually $.ajax. We need to do this for
+      // testing purposes.
+      // @ts-ignore
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.resolve(successMessage);
@@ -214,8 +216,10 @@ describe('Assets Backend API Service', function() {
 
     it('should successfully save a math SVG', function(done) {
       var successMessage = 'Math SVG was successfully saved.';
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declarated.
+      // There is an error here because the type of function we are using here
+      // doesn't match the type of actually $.ajax. We need to do this for
+      // testing purposes.
+      // @ts-ignore
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.resolve(successMessage);
@@ -227,8 +231,10 @@ describe('Assets Backend API Service', function() {
         .then(function(response) {
           // Below checks assert that the correct data is sent to the backend.
           var dataArguementForAjaxCall = (
-            // @ts-ignore in order to ignore JQuery properties that should
-            // be declarated.
+            // There is an error here because the type of function we are using
+            // doesn't match the type of actually $.ajax. We need to do this for
+            // testing purposes.
+            // @ts-ignore
             $.ajax.calls.mostRecent().args[0].data);
           expect(dataArguementForAjaxCall instanceof FormData).toBeTruthy();
           var rawImageSentToBackend = null;
@@ -255,8 +261,10 @@ describe('Assets Backend API Service', function() {
 
     it('should handle rejection when saving a math SVG fails ', function(done) {
       var errorMessage = 'Math SVG was not successfully saved.';
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declarated.
+      // There is an error here because the type of function we are using here
+      // doesn't match the type of actually $.ajax. We need to do this for
+      // testing purposes.
+      // @ts-ignore
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.reject({
@@ -286,8 +294,10 @@ describe('Assets Backend API Service', function() {
 
     it('should handle rejection when saving a file fails', function(done) {
       var errorMessage = 'Error on saving audio';
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declarated.
+      // There is an error here because the type of function we are using here
+      // doesn't match the type of actually $.ajax. We need to do this for
+      // testing purposes.
+      // @ts-ignore
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.reject({

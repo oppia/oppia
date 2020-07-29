@@ -298,7 +298,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('Starting ts ignore check')
             python_utils.PRINT('----------------------------------------')
 
-        ts_ignore_pattern = r'@ts-ignore'
+        ts_ignore_pattern = r'@ts-(ignore|expect-error)'
+        comment_pattern = r'^ *// '
 
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
@@ -306,6 +307,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             for file_path in self.all_filepaths:
                 file_content = self.file_cache.read(file_path)
                 previous_line_has_ts_ignore = False
+                previous_line_has_comment = False
 
                 for line_number, line in enumerate(file_content.split('\n')):
                     if previous_line_has_ts_ignore:
@@ -325,8 +327,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         failed = True
                         previous_line_has_ts_ignore = False
                         summary_message = (
-                            '%s --> TS ignore found at line %s. Please add '
-                            'this exception in %s.' % (
+                            '%s --> @ts-ignore or @ts-expect-error found '
+                            'at line %s. Please add this exception in %s.' % (
                                 file_path, line_number,
                                 TS_IGNORE_EXCEPTIONS_FILEPATH))
                         python_utils.PRINT(summary_message)
@@ -335,6 +337,21 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
                     previous_line_has_ts_ignore = bool(
                         re.findall(ts_ignore_pattern, line))
+
+                    if (
+                            previous_line_has_ts_ignore and
+                            not previous_line_has_comment):
+                        failed = True
+                        summary_message = (
+                            '%s --> Please add a comment at line %s to '
+                            'explain the @ts-ignore or @ts-expect-error.' % (
+                                file_path, line_number))
+                        python_utils.PRINT(summary_message)
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT('')
+
+                    previous_line_has_comment = bool(
+                        re.findall(comment_pattern, line))
 
             if failed:
                 summary_message = (
@@ -960,7 +977,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         # Example: // eslint-disable max-len
         # This comment will be excluded from this check.
         allowed_start_phrases = [
-            '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable']
+            '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
+            'eslint-enable']
 
         # We allow comments to not have a terminating punctuation if any of the
         # below phrases appears in the last word of a comment.

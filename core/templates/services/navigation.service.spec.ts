@@ -38,6 +38,9 @@ describe('Navigation Service', () => {
   beforeEach(angular.mock.inject(function($injector) {
     NavigationService = $injector.get('NavigationService');
 
+    // There is a typescript error here because the type of element doesn't
+    // match the type of JQLite. We need this type of element for testing
+    // purposes.
     // @ts-ignore
     angularElementSpy = spyOn(angular, 'element').and.returnValue(element);
     focusAngularElementSpy = spyOn(element, 'focus').and.callThrough();

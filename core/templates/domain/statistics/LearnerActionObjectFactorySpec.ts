@@ -208,9 +208,8 @@ describe('Learner Action Object Factory', () => {
     };
 
     expect(() => {
-      // TS ignore is used because playthrough dict is assigned a invalid type
-      // to test errors.
-      // @ts-ignore
+      // Here playthrough dict is assigned a invalid action_type to test errors.
+      // @ts-expect-error
       learnerActionObjectFactory.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known action type: ' +

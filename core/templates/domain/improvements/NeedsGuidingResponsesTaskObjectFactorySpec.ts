@@ -130,7 +130,8 @@ describe('Needs guiding responses task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
-        // @ts-ignore Suppress compile-time error for testing.
+        // The task type should be of type needs_guiding_responses.
+        // @ts-expect-error
         task_type: '???',
         target_type: 'state',
         target_id: 'Introduction',

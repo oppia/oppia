@@ -58,9 +58,9 @@ describe('Story object factory', () => {
       language_code: 'en'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
-      // TS ignore is used because sample story doesn't have thumbail to test
+      // SampleStoryBackendDict should have a thumbail but doesn't to test
       // validations.
-      // @ts-ignore
+      // @ts-expect-error
       sampleStoryBackendDict);
   });
 

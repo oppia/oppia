@@ -139,8 +139,8 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3]);
 
-    // @ts-ignore
-    // since sort is an ENUM, we can't assign any random value.
+    // Here an invalid sort value is used to test validations.
+    // @ts-expect-error
     filterOptions.sort = 'Invalid sort value';
     expect(() => {
       tsds.getFilteredTopics(topicsArray, filterOptions);

@@ -53,7 +53,9 @@ describe('Upload Activity Modal Controller', function() {
       size: 100,
       name: 'file.mp3'
     };
-    // The document has strict type rules which will fail typescript lint tests.
+    // There is a typescript error here because the actual getElementById
+    // returns more properties than just files. We need to suppress this error
+    // because we need only files for testing.
     // @ts-ignore
     spyOn(document, 'getElementById').and.callFake(function() {
       return {
@@ -71,7 +73,9 @@ describe('Upload Activity Modal Controller', function() {
   it('should not save activity if file is empty', function() {
     var documentCopy = angular.copy(document);
     spyOn(AlertsService, 'addWarning').and.callThrough();
-    // The document has strict type rules which will fail typescript lint tests.
+    // There is a typescript error here because the actual getElementById
+    // returns more properties than just files. We need to suppress this error
+    // because we need only files for testing.
     // @ts-ignore
     spyOn(document, 'getElementById').and.callFake(function() {
       return {

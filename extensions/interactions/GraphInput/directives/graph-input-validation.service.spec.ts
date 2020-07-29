@@ -132,9 +132,8 @@ describe('GraphInputValidationService', () => {
   it('should expect graph and edit customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
-        // TS ignore is used because we are assigning no customization
-        // args here to test errors.
-        // @ts-ignore
+        // Here we are assigning no customization args here to test errors.
+        // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have properties: ' +

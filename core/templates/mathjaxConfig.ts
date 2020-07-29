@@ -1,6 +1,10 @@
 window.MathJax = {
-  // Need this because technically the type error thrown here is correct.
-  // This is not the type of MathJax but MathJaxConfig.
+  // There is a typescript here because window.MathJax should be a MathJax
+  // object instead of a MathJax config. We need to suppress this error
+  // because this is used to set the config we want. As mentioned here
+  // https://docs.mathjax.org/en/v2.7-latest/configuration.html#using-plain-javascript
+  // Also after the MathJax config is loaded, window.MathJax becomes
+  // a MathJax object as the typescript compiler expects.
   // @ts-ignore
   skipStartupTypeset: true,
   messageStyle: 'none',

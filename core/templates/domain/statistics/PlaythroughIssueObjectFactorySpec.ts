@@ -121,9 +121,8 @@ describe('Playthrough Issue Object Factory', () => {
     };
 
     expect(() => {
-      // TS ignore is used because playthrough dict is assigned a invalid type
-      // to test errors.
-      // @ts-ignore
+      // Here is playthrough dict has invalid issue_type to test validations.
+      // @ts-expect-error
       piof.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known issue type: ' +

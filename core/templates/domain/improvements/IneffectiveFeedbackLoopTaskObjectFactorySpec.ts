@@ -128,7 +128,9 @@ describe('Ineffective feedback loop task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
-        // @ts-ignore Suppress compile-time error for testing.
+        // Here the task_type should be 'ineffective_feedback_loop' but is not
+        // to test validations.
+        // @ts-expect-error
         task_type: '???',
         target_type: 'state',
         target_id: 'Introduction',

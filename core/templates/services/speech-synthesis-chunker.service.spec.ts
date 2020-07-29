@@ -157,8 +157,11 @@ describe('Speech Synthesis Chunker Service', () => {
 
     beforeEach(() => {
       spyOn(window, 'SpeechSynthesisUtterance').and.returnValue(
-        // @ts-ignore mock doesn't have all property and methods of a native
-        // SpeechSynthesisUtterance.
+        // There is a typescript error here because the type of
+        // mockSpeechSynthesisUtteran doesn't match the actual
+        // SpeechSynthesisUtterance. We need to suppress this error
+        // for testing purposes.
+        // @ts-ignore
         mockSpeechSynthesisUtteran);
     });
 

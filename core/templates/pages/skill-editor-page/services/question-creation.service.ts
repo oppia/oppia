@@ -130,7 +130,6 @@ angular.module('oppia').factory('QuestionCreationService', [
           groupedSkillSummaries.current.length;
       var allSkillSummaries = sortedSkillSummaries.map(
         function(summary) {
-          summary.isSelected = false;
           return summary;
         });
       $uibModal.open({

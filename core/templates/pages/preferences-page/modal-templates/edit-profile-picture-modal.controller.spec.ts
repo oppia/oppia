@@ -58,10 +58,7 @@ describe('EditProfilePictureModalController', function() {
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
     var file = new File([arrayBuffer], 'filename.mp3');
 
-    // The window has strict type rules which will fail typescript lint test.
-    // @ts-ignore
     spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
-      // @ts-ignore
       .returnValue(element);
 
     $scope.onInvalidImageLoaded();
@@ -87,8 +84,11 @@ describe('EditProfilePictureModalController', function() {
         'data:application/octet-stream;base64,' + dataBase64Mock);
 
       var mockUrl = 'mock-url';
-      // @ts-ignore Cropper getCroppedCanvas method should return more
-      // properties than toDataURL according with lint settings.
+      // This throws "Argument of type '{ toDataURL: () => string; }' is
+      // not assignable to parameter of type 'HTMLCanvasElement'"". This
+      // is because 'HTMLCanvasElement' has around 250 more properties. We
+      // only need to define one for testing purposes.
+      // @ts-ignore
       spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({
         toDataURL: () => mockUrl
       });

@@ -140,8 +140,10 @@ describe('SvgFilenameEditor', function() {
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
     });
-    // @ts-ignore inorder to ignore other Image object properties that
-    // should be declared.
+    // There is a typescript error here because the type of mockImageObject
+    // doesn't match the type of actual window.Image. We are suppressing this
+    // error because we need mockImageObject for testing purposes.
+    // @ts-ignore
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
@@ -392,8 +394,10 @@ describe('SvgFilenameEditor', function() {
     var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
     /* eslint-enable quotes */
 
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
+    // There is an error here because the type of function we are using here
+    // doesn't match the type of actual $.ajax. We need to do this for
+    // testing purposes.
+    // @ts-ignore
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.resolve(responseText);
@@ -417,8 +421,10 @@ describe('SvgFilenameEditor', function() {
   it('should handle rejection when saving an svg file fails', function() {
     svgFilenameCtrl.createRect();
     var errorMessage = 'Error on saving svg file';
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
+    // There is an error here because the type of function we are using here
+    // doesn't match the type of actual $.ajax. We need to do this for
+    // testing purposes.
+    // @ts-ignore
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.reject({
@@ -585,11 +591,15 @@ describe('SvgFilenameEditor with image save destination as ' +
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
 
-    // @ts-ignore inorder to ignore other Image object properties that
-    // should be declared.
+    // There is a typescript error here because the type of mockImageObject
+    // doesn't match the type of actual window.Image. We are suppressing this
+    // error because we need mockImageObject for testing purposes.
+    // @ts-ignore
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
-    // @ts-ignore inorder to ignore other FileReader object properties that
-    // should be declared.
+    // There is a typescript error here because the type of mockReaderObject
+    // doesn't match the type of actual window.FileReader. We are suppressing
+    // this error because we need mockReaderObject for testing purposes.
+    // @ts-ignore
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');

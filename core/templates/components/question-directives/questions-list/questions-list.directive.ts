@@ -247,7 +247,6 @@ angular.module('oppia').directive('questionsList', [
               ctrl.getGroupedSkillSummaries().current.length;
             var allSkillSummaries = sortedSkillSummaries.map(
               function(summary) {
-                summary.isSelected = false;
                 return summary;
               });
             $uibModal.open({
@@ -391,7 +390,6 @@ angular.module('oppia').directive('questionsList', [
             } else {
               var allSkillSummaries = ctrl.getAllSkillSummaries().filter(
                 function(summary) {
-                  summary.isSelected = false;
                   return skillDescription === summary.getDescription();
                 });
               for (var idx in allSkillSummaries) {
