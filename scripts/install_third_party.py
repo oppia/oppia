@@ -21,6 +21,7 @@ import argparse
 import contextlib
 import json
 import os
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -342,7 +343,33 @@ def main(args=None):
     """Installs all the third party libraries."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
+    import subprocess
 
+    # We need to install redis-cli separately from using manifest.json since it
+    # is a system program and we need to install it after the library is
+    # untarred.
+    try:
+        # Pipe output to /dev/null for silence in console.
+        null = open("/dev/null", "w")
+        command_text = ['redis-cli', '--version']
+        current_process = subprocess.Popen(
+            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output_stderr = current_process.communicate()[1]
+        null.close()
+    except OSError:
+        # Redis-cli is not installed, run the script to install it.
+        # NOTE: These should be constants but not sure where to put them since
+        # if they go in manifest.json they'll be automatically installed in the
+        # incorrect way.
+        download_and_untar_files(
+            'http://download.redis.io/releases/redis-6.0.6.tar.gz',
+            TARGET_DOWNLOAD_DIRS['backend'],
+            'redis-6.0.6', 'redis-cli-6.0.6')
+        command_text = ['chmod', '+x', 'scripts/install_redis_cli.sh']
+
+        make_script_executable = subprocess.call(command_text)
+        command_text = ['sh', './scripts/install_redis_cli.sh']
+        install_redis_cli = subprocess.call(command_text)
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party.py is used as a script.
