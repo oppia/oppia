@@ -1085,10 +1085,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
             return
 
         found_excs = doc.exceptions()
-        python_utils.PRINT(found_excs)
-        python_utils.PRINT(expected_excs)
         missing_excs = expected_excs - found_excs
-        python_utils.PRINT(missing_excs)
         self._add_raise_message(missing_excs, func_node)
 
     def visit_return(self, node):
