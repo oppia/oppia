@@ -25,7 +25,7 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
   var oppiaContentContainer = element(by.css('.oppia-content-container'));
-  var ERROR_MESSAGE = 'Element takes too long to load in'
+  var ERROR_MESSAGE = 'Element takes too long to load in';
   var libraryPage = null;
   var GET_STARTED_URL = 'http://localhost:9001/get-started';
   var COMMUNITY_LIBRARY_URL = 'http://localhost:9001/community-library';
