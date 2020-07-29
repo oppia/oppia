@@ -2236,8 +2236,8 @@ class UserAuthModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Currently, the model hold authentication details relavant only for
-        backend, and no exportable user data, but it may contain future user
-        data.
+        backend, and no exportable user data. It may contain user data in
+        the future.
         """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
