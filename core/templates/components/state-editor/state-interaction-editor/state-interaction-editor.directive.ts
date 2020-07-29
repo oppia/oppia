@@ -93,8 +93,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             ExplorationHtmlFormatterService, ResponsesService,
-            SubtitledHtmlObjectFactory, StateSolutionService, StateHintsService,
-            StateContentService) {
+            SubtitledHtmlObjectFactory, StateSolutionService,
+            StateHintsService, StateContentService) {
           var ctrl = this;
           var DEFAULT_TERMINAL_STATE_CONTENT =
             'Congratulations, you have finished!';
