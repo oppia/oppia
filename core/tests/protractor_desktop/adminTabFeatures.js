@@ -28,6 +28,7 @@ describe('Admin Page', function() {
   });
 
   it('should allow assigning roles and show them', async function() {
+    // Adding this comment so I can make a PR (REMOVE LATER)
     await users.createUser('moderator1@adminTab.com', 'moderator1');
     await users.createUser('moderator2@adminTab.com', 'moderator2');
     await users.createUser(
