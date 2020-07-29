@@ -968,7 +968,6 @@ class Story(python_utils.OBJECT):
         return result
 
     @classmethod
-<<<<<<< HEAD
     def from_dict(
         cls, story_dict, story_version=0,
          story_created_on=None, story_last_updated=None):
@@ -998,11 +997,8 @@ class Story(python_utils.OBJECT):
         return story
 
     @classmethod
-    def create_default_story(cls, story_id, title, corresponding_topic_id):
-=======
     def create_default_story(
             cls, story_id, title, description, corresponding_topic_id):
->>>>>>> upstream/develop
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
