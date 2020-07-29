@@ -139,6 +139,11 @@ def main(args=None):
             '--config', 'webpack.dev.config.ts', '--watch']))
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
+        # Redis-cli is only required in a development environment.
+        python_utils.PRINT('Starting Redis development server')
+        background_processes.append(subprocess.Popen(
+        'redis-server %s' (common.REDIS_CONF_PATH), shell=True))
+
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(

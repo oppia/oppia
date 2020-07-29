@@ -85,6 +85,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 FECONF_PATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+REDIS_CONF_PATH = os.path.join('/etc', 'redis', 'redis.conf')
 
 
 def is_windows_os():
