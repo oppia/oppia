@@ -968,8 +968,8 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationAnnotationsModel or StateCounterModel. The model
-                object.
+            item: ExplorationAnnotationsModel or StateCounterModel. The
+                ExplorationAnnotations or StateCounter model object.
 
         Yields:
             tuple. Different for different models:

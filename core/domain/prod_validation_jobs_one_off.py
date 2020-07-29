@@ -908,10 +908,9 @@ class BaseUserModelValidator(BaseModelValidator):
 
         Returns:
             list(tuple(str, str, list, str, list). A list of tuple which
-            consists of External model name,
-            property name in model, list of property value in model,
-            property name in external model, list of property value
-            in external model.
+            consists of External model name, property name in model, list of
+            property value in model, property name in external model, list of
+            property value in external model.
         """
         return []
 

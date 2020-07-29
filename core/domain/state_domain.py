@@ -1533,7 +1533,7 @@ class RuleSpec(python_utils.OBJECT):
                     0: The name (string) of the parameter.
                     1: The typed object instance for that
                         parameter (e.g. Real).
-            exp_param_specs_dict: dic. A dict of specified parameters used in
+            exp_param_specs_dict: dict. A dict of specified parameters used in
                 this exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property (obj_type).
                 RuleSpec inputs may have a parameter value which refers to one

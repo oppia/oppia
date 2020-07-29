@@ -224,7 +224,7 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
     Args:
         augmented_skill_summaries: list(AugmentedSkillSummary). The list
             of augmented skill summaries.
-        status: str. str. The status of the skill.
+        status: str. The status of the skill.
 
     Returns:
         list(AugmentedSkillSummary). The list of AugmentedSkillSummaries
