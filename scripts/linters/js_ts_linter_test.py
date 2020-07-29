@@ -577,7 +577,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Please add a comment at line 22 to '
             'explain the @ts-ignore or @ts-expect-error.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 2)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_ts_ignore_found_success(self):
         def mock_compile_all_ts_files():
