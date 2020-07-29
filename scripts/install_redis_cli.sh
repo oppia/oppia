@@ -4,4 +4,4 @@ make &&
 sudo cp src/redis-server /usr/local/bin/ &&
 sudo cp src/redis-cli /usr/local/bin/ &&
 sudo mkdir -p /etc/redis/ &&
-sudo mv ../../redis.conf /etc/redis/redis.conf
+sudo cp ../../redis.conf /etc/redis/redis.conf
