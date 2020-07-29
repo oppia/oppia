@@ -63,10 +63,27 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             'use_percentages': 'invalid_value'
         }
         sorted_tiles_instance = sorted_tiles(
-            'AnswerFrequencies', option_names, 'invalid_value')
+            'AnswerFrequencies', option_names, True)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected bool, received invalid_value'):
+            sorted_tiles_instance.validate()
+
+    def test_visualization_class_with_invalid_addressed_info_is_supported_value(
+            self):
+        sorted_tiles = visualization_registry.Registry.get_visualization_class(
+            'SortedTiles')
+        option_names = {
+            'header': 'Pretty Tiles!',
+            'use_percentages': True
+        }
+        sorted_tiles_instance = sorted_tiles(
+            'AnswerFrequencies', option_names, 'invalid_value')
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'For visualization SortedTiles, expected a bool value for '
+            'addressed_info_is_supported; received invalid_value'):
             sorted_tiles_instance.validate()
 
     def test_get_all_visualization_ids(self):
