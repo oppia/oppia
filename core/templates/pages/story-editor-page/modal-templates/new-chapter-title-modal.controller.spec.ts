@@ -110,12 +110,13 @@ describe('Create New Chapter Modal Controller', function() {
     $scope.init();
   }));
 
-  it('should evalute $scope variables', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.nodeTitles).toEqual(nodeTitles);
     expect($scope.errorMsg).toBe(null);
   });
 
-  it('should call the StoryUpdateService to update thumbnail filename',
+  it('should update thumbnail filename when story update service is called',
     function() {
       var storyUpdateSpy = spyOn(
         StoryUpdateService, 'setStoryNodeThumbnailFilename');
@@ -124,7 +125,7 @@ describe('Create New Chapter Modal Controller', function() {
       expect($scope.editableThumbnailFilename).toEqual('abc');
     });
 
-  it('should call the StoryUpdateService to update thumbnail bg color',
+  it('should update thumbnail bg color when story update service is called',
     function() {
       var storyUpdateSpy = spyOn(
         StoryUpdateService, 'setStoryNodeThumbnailBgColor');
@@ -133,25 +134,26 @@ describe('Create New Chapter Modal Controller', function() {
       expect($scope.editableThumbnailBgColor).toEqual('abc');
     });
 
-  it('should call the StoryUpdateService to delete the story node', function() {
-    var storyUpdateSpy = spyOn(StoryUpdateService, 'deleteStoryNode');
-    $scope.cancel();
-    expect(storyUpdateSpy).toHaveBeenCalled();
-  });
+  it('should delete the story node when story update service is called',
+    function() {
+      var storyUpdateSpy = spyOn(StoryUpdateService, 'deleteStoryNode');
+      $scope.cancel();
+      expect(storyUpdateSpy).toHaveBeenCalled();
+    });
 
-  it('should call the StoryUpdateService to update the title', function() {
+  it('should update the title when story update service is called', function() {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNodeTitle');
     $scope.updateTitle();
     expect(storyUpdateSpy).toHaveBeenCalled();
   });
 
-  it('should reset the error message', function() {
+  it('should clear error message when resetting error message', function() {
     $scope.errorMsg = 'Error message';
     $scope.resetErrorMsg();
     expect($scope.errorMsg).toBe(null);
   });
 
-  it('should return if the chapter is valid', function() {
+  it('should return when the chapter is valid', function() {
     expect($scope.isValid()).toEqual(false);
     $scope.title = 'title';
     $scope.explorationId = '1';
@@ -162,7 +164,8 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.isValid()).toEqual(false);
   });
 
-  it('should show the exploration invalid error message', function() {
+  it('should show the exploration invalid error message when exploration' +
+    ' is not published', function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(false);
@@ -173,7 +176,7 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.invalidExpId).toEqual(true);
   });
 
-  it('should show the error message if explorationId is already present',
+  it('should show the error message when explorationId is already present',
     function() {
       $scope.explorationId = 'exp_1';
       $scope.updateExplorationId();
@@ -182,7 +185,7 @@ describe('Create New Chapter Modal Controller', function() {
       expect($scope.invalidExpId).toEqual(true);
     });
 
-  it('should show the close the modal if expId is valid', function() {
+  it('should show the close the modal when expId is valid', function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(true);
@@ -193,14 +196,16 @@ describe('Create New Chapter Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalled();
   });
 
-  it('should show call the StoryUpdateService on closing', function() {
-    spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(false);
-    var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNodeExplorationId');
-    $scope.updateExplorationId();
-    expect(storyUpdateSpy).toHaveBeenCalled();
-  });
+  it('should update exploration id when setting story node exploration id',
+    function() {
+      spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(false);
+      var storyUpdateSpy = spyOn(
+        StoryUpdateService, 'setStoryNodeExplorationId');
+      $scope.updateExplorationId();
+      expect(storyUpdateSpy).toHaveBeenCalled();
+    });
 
-  it('should not save if the title is already present', function() {
+  it('should not save when the title is already present', function() {
     $scope.title = nodeTitles[0];
     $scope.save();
     expect($uibModalInstance.close).not.toHaveBeenCalled();

@@ -85,7 +85,8 @@ describe('Community dashboard page', function() {
         '/assets/images/avatar/oppia_avatar_100px.svg');
     });
 
-    it('should evaluate user\'s backend data', function() {
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization and get data from backend', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.username).toBe('username1');
       expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([
@@ -97,24 +98,25 @@ describe('Community dashboard page', function() {
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     });
 
-    it('should change active tab name successfully', function() {
+    it('should change active tab name when clicking on tab', function() {
       var changedTab = 'translateTextTab';
       expect(ctrl.activeTabName).toBe('myContributionTab');
       ctrl.onTabClick(changedTab);
       expect(ctrl.activeTabName).toBe(changedTab);
     });
 
-    it('should change active language successfully', function() {
-      spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
-        .and.callThrough();
+    it('should change active language when clicking on language selector',
+      function() {
+        spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
+          .and.callThrough();
 
-      ctrl.onChangeLanguage('hi');
+        ctrl.onChangeLanguage('hi');
 
-      expect(TranslationLanguageService.setActiveLanguageCode)
-        .toHaveBeenCalledWith('hi');
-      expect(LocalStorageService.updateLastSelectedTranslationLanguageCode)
-        .toHaveBeenCalledWith('hi');
-    });
+        expect(TranslationLanguageService.setActiveLanguageCode)
+          .toHaveBeenCalledWith('hi');
+        expect(LocalStorageService.updateLastSelectedTranslationLanguageCode)
+          .toHaveBeenCalledWith('hi');
+      });
 
     it('should show language selector based on active tab', function() {
       var changedTab = 'translateTextTab';
@@ -144,7 +146,7 @@ describe('Community dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should have no username', function() {
+    it('should have no username logged', function() {
       expect(ctrl.userIsLoggedIn).toBe(false);
       expect(ctrl.username).toBe('');
     });

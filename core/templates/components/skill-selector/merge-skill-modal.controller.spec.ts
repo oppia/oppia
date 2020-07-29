@@ -41,15 +41,15 @@ describe('Merge Skill Modal Controller', function() {
     });
   }));
 
-  it('should evalute $scope properties after controller is initialized',
-    function() {
-      expect($scope.skillSummaries).toBe(skillSummaries);
-      expect($scope.categorizedSkills).toBe(categorizedSkills);
-      expect($scope.allowSkillsFromOtherTopics).toBe(true);
-      expect($scope.selectedSkillId).toBe('');
-    });
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
+    expect($scope.skillSummaries).toBe(skillSummaries);
+    expect($scope.categorizedSkills).toBe(categorizedSkills);
+    expect($scope.allowSkillsFromOtherTopics).toBe(true);
+    expect($scope.selectedSkillId).toBe('');
+  });
 
-  it('should close modal on saving', function() {
+  it('should close modal on save', function() {
     $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       skill: skill,

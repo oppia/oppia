@@ -289,14 +289,15 @@ describe('Learner dashboard page', function() {
       $scope.$apply();
     }));
 
-    it('should evaluate data get from backend', function() {
-      expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
-      expect(ctrl.username).toBe(userInfo.getUsername());
+    it('should get data from backend when controller is initialized',
+      function() {
+        expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
+        expect(ctrl.username).toBe(userInfo.getUsername());
 
-      expect(ctrl.noExplorationActivity).toBe(false);
-      expect(ctrl.noCollectionActivity).toBe(false);
-      expect(ctrl.noActivity).toBe(false);
-    });
+        expect(ctrl.noExplorationActivity).toBe(false);
+        expect(ctrl.noCollectionActivity).toBe(false);
+        expect(ctrl.noActivity).toBe(false);
+      });
 
     it('should sort collection playlist by index changing ui height',
       function() {
@@ -357,8 +358,8 @@ describe('Learner dashboard page', function() {
         '/assets/images/path/to/image.png');
     });
 
-    it('should set a new section as active successfully when fetching message' +
-      ' summary list from backend', function() {
+    it('should set a new section as active when fetching message summary' +
+      ' list from backend', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -447,7 +448,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.showUsernamePopover('abc')).toBe('none');
     });
 
-    it('should go to through pages of incomplete explorations successfully',
+    it('should change page when going through pages of complete collections',
       function() {
         var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
         var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
@@ -461,7 +462,7 @@ describe('Learner dashboard page', function() {
         expect(ctrl.startIncompleteExpIndex).toBe(0);
       });
 
-    it('should go to through pages of incomplete collections successfully',
+    it('should change page when going through pages of incomplete collections',
       function() {
         var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
         var subsection = 'I18N_DASHBOARD_COLLECTIONS';
@@ -475,7 +476,7 @@ describe('Learner dashboard page', function() {
         expect(ctrl.startIncompleteCollectionIndex).toBe(0);
       });
 
-    it('should go to through page of completed explorations successfully',
+    it('should change page when going through pages of complete explorations',
       function() {
         var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
         var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
@@ -588,39 +589,40 @@ describe('Learner dashboard page', function() {
       });
     });
 
-    it('should get thread messages from backend successfully', function() {
-      var threadStatus = 'open';
-      var explorationId = 'exp1';
-      var threadId = 'thread_1';
-      var explorationTitle = 'Exploration Title';
-      var threadMessages = [{
-        message_id: '1',
-        text: 'Feedback 1',
-        updated_status: 'open',
-        suggestion_html: 'An instead of a',
-        current_content_html: 'A orange',
-        description: 'Suggestion for english grammar',
-        author_username: 'username2',
-        author_picture_data_url: 'foo',
-        created_on_msecs: 1200
-      }];
+    it('should get thread messages from backend when thread is selected',
+      function() {
+        var threadStatus = 'open';
+        var explorationId = 'exp1';
+        var threadId = 'thread_1';
+        var explorationTitle = 'Exploration Title';
+        var threadMessages = [{
+          message_id: '1',
+          text: 'Feedback 1',
+          updated_status: 'open',
+          suggestion_html: 'An instead of a',
+          current_content_html: 'A orange',
+          description: 'Suggestion for english grammar',
+          author_username: 'username2',
+          author_picture_data_url: 'foo',
+          created_on_msecs: 1200
+        }];
 
-      expect(ctrl.numberOfUnreadThreads).toBe(10);
+        expect(ctrl.numberOfUnreadThreads).toBe(10);
 
-      $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-        .respond({
-          message_summary_list: threadMessages
-        });
-      ctrl.onClickThread(
-        threadStatus, explorationId, threadId, explorationTitle);
+        $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
+          .respond({
+            message_summary_list: threadMessages
+          });
+        ctrl.onClickThread(
+          threadStatus, explorationId, threadId, explorationTitle);
 
-      expect(ctrl.loadingFeedbacks).toBe(true);
-      expect(ctrl.feedbackThreadActive).toBe(true);
-      expect(ctrl.numberOfUnreadThreads).toBe(9);
-      $httpBackend.flush();
+        expect(ctrl.loadingFeedbacks).toBe(true);
+        expect(ctrl.feedbackThreadActive).toBe(true);
+        expect(ctrl.numberOfUnreadThreads).toBe(9);
+        $httpBackend.flush();
 
-      expect(ctrl.messageSummaries.length).toBe(1);
-    });
+        expect(ctrl.messageSummaries.length).toBe(1);
+      });
 
     it('should show all threads when a thread is clicked', function() {
       var threadStatus = 'open';
@@ -654,43 +656,44 @@ describe('Learner dashboard page', function() {
       expect(ctrl.feedbackThreadActive).toBe(false);
     });
 
-    it('should successfully add a new message in a thread', function() {
-      var threadStatus = 'open';
-      var explorationId = 'exp1';
-      var threadId = 'thread_1';
-      var explorationTitle = 'Exploration Title';
-      var threadMessages = [{
-        message_id: '1',
-        text: 'Feedback 1',
-        updated_status: 'open',
-        suggestion_html: 'An instead of a',
-        current_content_html: 'A orange',
-        description: 'Suggestion for english grammar',
-        author_username: 'username2',
-        author_picture_data_url: 'foo',
-        created_on_msecs: 1200
-      }];
+    it('should add a new message in a thread when thread is selected',
+      function() {
+        var threadStatus = 'open';
+        var explorationId = 'exp1';
+        var threadId = 'thread_1';
+        var explorationTitle = 'Exploration Title';
+        var threadMessages = [{
+          message_id: '1',
+          text: 'Feedback 1',
+          updated_status: 'open',
+          suggestion_html: 'An instead of a',
+          current_content_html: 'A orange',
+          description: 'Suggestion for english grammar',
+          author_username: 'username2',
+          author_picture_data_url: 'foo',
+          created_on_msecs: 1200
+        }];
 
-      $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-        .respond({
-          message_summary_list: threadMessages
-        });
-      ctrl.onClickThread(
-        threadStatus, explorationId, threadId, explorationTitle);
-      $httpBackend.flush();
+        $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
+          .respond({
+            message_summary_list: threadMessages
+          });
+        ctrl.onClickThread(
+          threadStatus, explorationId, threadId, explorationTitle);
+        $httpBackend.flush();
 
-      var threadId = 'thread_1';
-      var message = 'This is a new message';
-      $httpBackend.expect('POST', '/threadhandler/' + threadId).respond(200);
-      ctrl.addNewMessage(threadId, message);
+        var threadId = 'thread_1';
+        var message = 'This is a new message';
+        $httpBackend.expect('POST', '/threadhandler/' + threadId).respond(200);
+        ctrl.addNewMessage(threadId, message);
 
-      expect(ctrl.messageSendingInProgress).toBe(true);
+        expect(ctrl.messageSendingInProgress).toBe(true);
 
-      $httpBackend.flush();
-      expect(ctrl.messageSendingInProgress).toBe(false);
-    });
+        $httpBackend.flush();
+        expect(ctrl.messageSendingInProgress).toBe(false);
+      });
 
-    it('should open suggestion modal with new and old content successfully',
+    it('should show new and old content when opening suggestion modal',
       function() {
         spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
           .and.callThrough();
@@ -719,26 +722,26 @@ describe('Learner dashboard page', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should remove an incomplete exploration activity successfully',
-      function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
-        });
-
-        expect(ctrl.incompleteExplorationsList.length).toBe(12);
-
-        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-        var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-        // Get exploration with id 13.
-        var activity = learnerExplorationSummaryObjectFactory
-          .createFromBackendDict(
-            learnerDashboardData.incomplete_explorations_list[2]);
-        ctrl.openRemoveActivityModal(
-          sectionNameI18nId, subsectionName, activity);
-        $scope.$apply();
-
-        expect(ctrl.incompleteExplorationsList.length).toBe(11);
+    it('should remove an activity from incomplete exploration when closing' +
+      ' remove activity modal', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
       });
+
+      expect(ctrl.incompleteExplorationsList.length).toBe(12);
+
+      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      // Get exploration with id 13.
+      var activity = learnerExplorationSummaryObjectFactory
+        .createFromBackendDict(
+          learnerDashboardData.incomplete_explorations_list[2]);
+      ctrl.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+      $scope.$apply();
+
+      expect(ctrl.incompleteExplorationsList.length).toBe(11);
+    });
 
     it('should not remove an activity if its not present', function() {
       spyOn($uibModal, 'open').and.returnValue({
@@ -760,71 +763,71 @@ describe('Learner dashboard page', function() {
       expect(ctrl.incompleteExplorationsList.length).toBe(12);
     });
 
-    it('should remove an incomplete collection activity successfully',
-      function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
-        });
-
-        expect(ctrl.incompleteCollectionsList.length).toBe(8);
-
-        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-        var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-        // Get collection with id 11.
-
-        var activity = collectionSummaryObjectFactory.createFromBackendDict(
-          learnerDashboardData.incomplete_collections_list[2]);
-
-        ctrl.openRemoveActivityModal(
-          sectionNameI18nId, subsectionName, activity);
-        $scope.$apply();
-
-        expect(ctrl.incompleteCollectionsList.length).toBe(7);
+    it('should remove an activity from incomplete collection when closing' +
+    ' remove activity modal', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
       });
 
-    it('should remove an activity from exploration playlist successfully',
-      function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
-        });
+      expect(ctrl.incompleteCollectionsList.length).toBe(8);
 
-        expect(ctrl.explorationPlaylist.length).toBe(10);
+      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      // Get collection with id 11.
 
-        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-        var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+        learnerDashboardData.incomplete_collections_list[2]);
 
-        // Exploration with id 2.
-        var activity = learnerExplorationSummaryObjectFactory
-          .createFromBackendDict(
-            learnerDashboardData.exploration_playlist[1]);
+      ctrl.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+      $scope.$apply();
 
-        ctrl.openRemoveActivityModal(
-          sectionNameI18nId, subsectionName, activity);
-        $scope.$apply();
+      expect(ctrl.incompleteCollectionsList.length).toBe(7);
+    });
 
-        expect(ctrl.explorationPlaylist.length).toBe(9);
+    it('should remove an activity from exploration playlist when closing' +
+      ' remove activity modal', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
       });
 
-    it('should remove an activity from collection playlist successfully',
-      function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve()
-        });
+      expect(ctrl.explorationPlaylist.length).toBe(10);
 
-        expect(ctrl.collectionPlaylist.length).toBe(8);
+      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
-        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-        var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-        // Get collection with id 2.
-        var activity = collectionSummaryObjectFactory.createFromBackendDict(
-          learnerDashboardData.collection_playlist[1]);
+      // Exploration with id 2.
+      var activity = learnerExplorationSummaryObjectFactory
+        .createFromBackendDict(
+          learnerDashboardData.exploration_playlist[1]);
 
-        ctrl.openRemoveActivityModal(
-          sectionNameI18nId, subsectionName, activity);
-        $scope.$apply();
+      ctrl.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+      $scope.$apply();
 
-        expect(ctrl.collectionPlaylist.length).toBe(7);
+      expect(ctrl.explorationPlaylist.length).toBe(9);
+    });
+
+    it('should remove an activity from collection playlist when closing' +
+      ' remove activity modal', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
       });
+
+      expect(ctrl.collectionPlaylist.length).toBe(8);
+
+      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      // Get collection with id 2.
+      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+        learnerDashboardData.collection_playlist[1]);
+
+      ctrl.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+      $scope.$apply();
+
+      expect(ctrl.collectionPlaylist.length).toBe(7);
+    });
 
     it('should get css classes based on status', function() {
       expect(ctrl.getLabelClass('open')).toBe('badge badge-info');
@@ -839,8 +842,7 @@ describe('Learner dashboard page', function() {
         'Not Actionable');
     });
 
-    it('should get abbreviate locale date string from date time format' +
-      ' service', function() {
+    it('should date formated when getting locale date string', function() {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       var NOW_MILLIS = 1416563100000;
       spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')

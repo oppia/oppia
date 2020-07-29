@@ -265,7 +265,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.isQuestionValid()).toBe(false);
     });
 
-    it('should not submit question', function() {
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization', function() {
       spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
       $scope.done();
 

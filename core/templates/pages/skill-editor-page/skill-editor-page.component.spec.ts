@@ -82,7 +82,7 @@ describe('Skill editor page', function() {
     expect(routingSpy).toHaveBeenCalled();
   });
 
-  it('should open save changes modal with $uibModal if unsaved changes are' +
+  it('should open save changes modal with $uibModal when unsaved changes are' +
     ' present', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
     var modalSpy = spyOn($uibModal, 'open').and.callThrough();
@@ -90,7 +90,7 @@ describe('Skill editor page', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should navigate to questions tab if unsaved changes are not present',
+  it('should navigate to questions tab when unsaved changes are not present',
     function() {
       spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
       var routingSpy = spyOn(

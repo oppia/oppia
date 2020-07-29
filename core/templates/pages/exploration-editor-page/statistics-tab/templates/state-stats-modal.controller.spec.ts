@@ -70,7 +70,8 @@ describe('State Stats Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.stateName).toBe(stateName);
     expect($scope.numEnters).toEqual(stateStats.totalHitCount);
     expect($scope.numQuits)
@@ -79,7 +80,7 @@ describe('State Stats Modal Controller', function() {
     expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
   });
 
-  it('should successfully navigate to state editor', function() {
+  it('should navigate to state editor when changing router', function() {
     spyOn(RouterService, 'navigateToMainTab').and.callThrough();
     $scope.navigateToStateEditor();
 

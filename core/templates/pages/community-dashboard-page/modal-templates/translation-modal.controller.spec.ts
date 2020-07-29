@@ -78,7 +78,8 @@ describe('Translation Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.userIsLoggedIn).toBe(userIsLoggedIn);
     expect($scope.uploadingTranslation).toBe(false);
     expect($scope.activeWrittenTranslation).toEqual({
@@ -97,7 +98,8 @@ describe('Translation Modal Controller', function() {
     expect($scope.loadingData).toBe(false);
   });
 
-  it('should get suggested text to translated again', function() {
+  it('should get suggested text to translated again from backend when' +
+    ' suggesting translated text', function() {
     $httpBackend.flush();
     expect($scope.textToTranslate).toBe('Texto a traducir');
     expect($scope.moreAvailable).toBe(true);

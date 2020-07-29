@@ -125,13 +125,13 @@ describe('Creator dashboard controller', () => {
     });
   }));
 
-  it('should get exploration url successfully', function() {
+  it('should get exploration url when providing an exploration id', function() {
     var explorationId = '1';
     expect(ctrl.getExplorationUrl(explorationId)).toBe(
       '/create/' + explorationId);
   });
 
-  it('should get collection url successfully', function() {
+  it('should get collection url when providing an exploration id', function() {
     var collectionId = '1';
     expect(ctrl.getCollectionUrl(collectionId)).toBe(
       '/collection_editor/create/' + collectionId);
@@ -328,7 +328,8 @@ describe('Creator dashboard controller', () => {
         $rootScope.$apply();
       });
 
-      it('should evaluate data get from backend', function() {
+      it('should initialize correctly $scope properties after controller' +
+        ' initialization and get data from backend', function() {
         var suggestionThreadObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
             dashboardData.threads_for_created_suggestions_list[0],
@@ -345,13 +346,13 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.relativeChangeInTotalPlays).toBe(5);
       });
 
-      it('should change active tab name successfully', function() {
+      it('should change active tab name when clicking on tab', function() {
         expect(ctrl.activeTab).toBe('myExplorations');
         ctrl.setActiveTab('suggestions');
         expect(ctrl.activeTab).toBe('suggestions');
       });
 
-      it('should set my explorations view correctly', function() {
+      it('should set explorations to backend when chaning view', function() {
         $httpBackend.expect('POST', '/creatordashboardhandler/data')
           .respond(200);
         ctrl.setMyExplorationsView('a');
@@ -361,7 +362,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should change explorations sorting options by number of open' +
-        ' threads or new open threads', function() {
+        ' threads or new open threads when sorting explorations', function() {
         expect(ctrl.isCurrentSortDescending).toBe(true);
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('numOpenThreads');
@@ -372,7 +373,7 @@ describe('Creator dashboard controller', () => {
       });
 
       it('should change subscription sorting options by username or new' +
-        ' subscriber', function() {
+        ' subscriber when sorting subscription', function() {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
         expect(ctrl.currentSubscribersSortType).toBe('username');
         ctrl.setSubscriptionSortingOptions('username');
@@ -452,38 +453,38 @@ describe('Creator dashboard controller', () => {
           'This exploration is private. Publish it to receive statistics.');
       });
 
-      it('should set active thread from my suggestions list successfully',
-        function() {
-          var threadId = 'exp1';
-          var messages = [{
-            author_username: '',
-            created_om_msecs: 0,
-            entity_type: '',
-            entity_id: '',
-            message_id: '',
-            text: '',
-            updated_status: '',
-            updated_subject: '',
-          }];
-          var suggestionThreadObject = (
-            SuggestionThreadObjectFactory.createFromBackendDicts(
-              dashboardData.threads_for_created_suggestions_list[0],
-              dashboardData.created_suggestions_list[0]));
-          suggestionThreadObject.setMessages(messages.map(m => (
-            ThreadMessageObjectFactory.createFromBackendDict(m))));
+      it('should set active thread from my suggestions list when changing' +
+        ' active thread', function() {
+        var threadId = 'exp1';
+        var messages = [{
+          author_username: '',
+          created_om_msecs: 0,
+          entity_type: '',
+          entity_id: '',
+          message_id: '',
+          text: '',
+          updated_status: '',
+          updated_subject: '',
+        }];
+        var suggestionThreadObject = (
+          SuggestionThreadObjectFactory.createFromBackendDicts(
+            dashboardData.threads_for_created_suggestions_list[0],
+            dashboardData.created_suggestions_list[0]));
+        suggestionThreadObject.setMessages(messages.map(m => (
+          ThreadMessageObjectFactory.createFromBackendDict(m))));
 
-          $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({
-            messages: messages
-          });
-          ctrl.setActiveThread(threadId);
-          $httpBackend.flush();
-
-          expect(ctrl.activeThread).toEqual(suggestionThreadObject);
-          expect(ctrl.canReviewActiveThread).toBe(false);
+        $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({
+          messages: messages
         });
+        ctrl.setActiveThread(threadId);
+        $httpBackend.flush();
+
+        expect(ctrl.activeThread).toEqual(suggestionThreadObject);
+        expect(ctrl.canReviewActiveThread).toBe(false);
+      });
 
       it('should set active thread from suggestions to review list' +
-        ' successfully', function() {
+        ' when cleaning active thread', function() {
         var threadId = 'exp2';
         var suggestionToReviewObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(

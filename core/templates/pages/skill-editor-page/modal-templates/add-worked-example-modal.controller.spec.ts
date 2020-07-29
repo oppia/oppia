@@ -34,12 +34,13 @@ describe('Add Worked Example Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.tmpWorkedExampleQuestionHtml).toEqual('');
     expect($scope.tmpWorkedExampleExplanationHtml).toBe('');
   });
 
-  it('should save worked example successfully and close modal', function() {
+  it('should close modal when saving work example', function() {
     $scope.saveWorkedExample();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       workedExampleQuestionHtml: '',

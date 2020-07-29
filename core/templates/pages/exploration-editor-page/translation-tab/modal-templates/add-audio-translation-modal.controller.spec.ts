@@ -59,7 +59,8 @@ describe('Add Audio Translation Modal Controller', function() {
     });
   }));
 
-  it('should evalute $scope properties  ', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.errorMessage).toBe(null);
     expect($scope.saveButtonText).toBe('Save');
     expect($scope.saveInProgress).toBe(false);

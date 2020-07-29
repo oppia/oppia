@@ -52,7 +52,8 @@ describe('Email Dashboard Result Page', function() {
     });
   }));
 
-  it('should evalutate ctrl properties after its initialization', function() {
+  it('should initialize correctly ctrl properties after controller' +
+    ' initialization', function() {
     ctrl.$onInit();
 
     expect(ctrl.emailOption).toBe('all');
@@ -76,7 +77,7 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.testEmailSentSuccesfully).toBe(false);
   });
 
-  it('should sucessfully submit email', function() {
+  it('should send email when submitting email', function() {
     ctrl.$onInit();
     ctrl.emailSubject = 'Subject';
     ctrl.emailBody = 'Body';
@@ -146,7 +147,7 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.invalid.maxRecipients).toBe(true);
   });
 
-  it('should reset form successfully', function() {
+  it('should clear form when resetting form', function() {
     ctrl.emailSubject = 'Subject';
     ctrl.emailBody = 'Body';
     ctrl.emailOption = 'custom';
@@ -158,7 +159,7 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.emailOption).toBe('all');
   });
 
-  it('should sucessfully cancel email', function() {
+  it('should discard email when canceling email', function() {
     ctrl.$onInit();
 
     $httpBackend.expectPOST('/emaildashboardcancelresult/0').respond(200);
@@ -184,7 +185,7 @@ describe('Email Dashboard Result Page', function() {
     expect(windowRef.nativeWindow.location.href).toBe('');
   });
 
-  it('should send test email successfully', function() {
+  it('should send test email to backend when testing submissions', function() {
     ctrl.$onInit();
     ctrl.emailSubject = 'Subject';
     ctrl.emailBody = 'Body';

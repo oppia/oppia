@@ -56,7 +56,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.contentHtml).toBe(contentHtml);
     expect($scope.contentHtml).toBe(contentHtml);
     expect($scope.reviewable).toBe(reviewable);
@@ -64,7 +65,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
     expect($scope.reviewMessage).toBe('');
   });
 
-  it('should successfully accept suggestion', function() {
+  it('should accept suggestion in suggestion modal service when clicking on' +
+    ' accept', function() {
     $scope.reviewMessage = 'Review message example';
     $scope.commitMessage = 'Commit message example';
     $scope.accept();
@@ -77,7 +79,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
   });
 
-  it('should successfully reject suggestion', function() {
+  it('should reject suggestion in suggestion modal service when clicking on' +
+    ' reject', function() {
     $scope.reviewMessage = 'Review message example';
     $scope.reject();
 
@@ -88,7 +91,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
   });
 
-  it('should successfully cancel suggestion', function() {
+  it('should cancel suggestion in suggestion modal service when clicking on' +
+  ' cancel', function() {
     $scope.cancel();
 
     expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(

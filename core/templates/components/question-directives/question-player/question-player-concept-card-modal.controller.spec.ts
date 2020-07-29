@@ -109,14 +109,14 @@ describe('Question Player Concept Card Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties after controller is initialized',
-    function() {
-      expect($scope.skillIds).toEqual(skillIds);
-      expect($scope.skills).toEqual(skillsObject);
-      expect($scope.index).toBe(0);
-      expect($scope.modalHeader).toEqual(skillsObject[0]);
-      expect($scope.isInTestMode).toBe(true);
-    });
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
+    expect($scope.skillIds).toEqual(skillIds);
+    expect($scope.skills).toEqual(skillsObject);
+    expect($scope.index).toBe(0);
+    expect($scope.modalHeader).toEqual(skillsObject[0]);
+    expect($scope.isInTestMode).toBe(true);
+  });
 
   it('should change current skill concept card when going to next concept' +
     ' card', function() {
@@ -131,7 +131,7 @@ describe('Question Player Concept Card Modal Controller', function() {
     expect($scope.modalHeader).toBe(undefined);
   });
 
-  it('should retry test by changing window location', function() {
+  it('should refresh page when retrying a test', function() {
     $scope.retryTest();
     expect(mockWindow.location.replace).toHaveBeenCalledWith('pathname');
   });

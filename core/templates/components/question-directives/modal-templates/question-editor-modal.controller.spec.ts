@@ -164,7 +164,8 @@ describe('Question Editor Modal Controller', function() {
       });
     }));
 
-    it('should evaluate $scope properties', function() {
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization', function() {
       expect($scope.question).toEqual(question);
       expect($scope.questionStateData).toBe(questionStateData);
       expect($scope.associatedSkillSummaries).toEqual(associatedSkillSummaries);
@@ -176,7 +177,7 @@ describe('Question Editor Modal Controller', function() {
       expect($scope.skillNames).toEqual(skillNames);
     });
 
-    it('should get skill editor url', function() {
+    it('should get skill editor url based on skill id', function() {
       expect($scope.getSkillEditorUrl('1')).toBe('/skill_editor/1');
       expect($scope.getSkillEditorUrl('undefined')).toBe(
         '/skill_editor/undefined');

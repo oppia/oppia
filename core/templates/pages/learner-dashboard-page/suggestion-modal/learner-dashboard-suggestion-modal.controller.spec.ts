@@ -48,7 +48,8 @@ describe('Learner Dashboard Suggestion Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.newContent).toBe(newContent);
     expect($scope.oldContent).toBe(oldContent);
     expect($scope.description).toBe(description);

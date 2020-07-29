@@ -78,7 +78,8 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
     }));
 
-    it('should evaluate $scope properties', function() {
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization', function() {
       expect(ctrl.requireTitleToBeSpecified).toBe(false);
       expect(ctrl.requireObjectiveToBeSpecified).toBe(false);
       expect(ctrl.requireCategoryToBeSpecified).toBe(false);
@@ -88,21 +89,24 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       expect(ctrl.newCategory).toBe(collectionDict.category);
     });
 
-    it('should save a collection successfully', function() {
-      ctrl.newTitle = 'New title';
-      ctrl.newObjective = 'New objective';
-      ctrl.newCategory = 'Algorithm';
-      expect(ctrl.isSavingAllowed()).toBe(true);
+    it('should save a collection when it has title, objective and category',
+      function() {
+        ctrl.newTitle = 'New title';
+        ctrl.newObjective = 'New objective';
+        ctrl.newCategory = 'Algorithm';
+        expect(ctrl.isSavingAllowed()).toBe(true);
 
-      ctrl.save();
+        ctrl.save();
 
-      expect(CollectionUpdateService.setCollectionTitle).toHaveBeenCalled();
-      expect(CollectionUpdateService.setCollectionObjective).toHaveBeenCalled();
-      expect(CollectionUpdateService.setCollectionCategory).toHaveBeenCalled();
+        expect(CollectionUpdateService.setCollectionTitle).toHaveBeenCalled();
+        expect(CollectionUpdateService.setCollectionObjective)
+          .toHaveBeenCalled();
+        expect(CollectionUpdateService.setCollectionCategory)
+          .toHaveBeenCalled();
 
-      expect($uibModalInstance.close).toHaveBeenCalledWith([
-        'title', 'objective', 'category']);
-    });
+        expect($uibModalInstance.close).toHaveBeenCalledWith([
+          'title', 'objective', 'category']);
+      });
 
     it('should cancel the modal on dismiss', function() {
       ctrl.cancel();
@@ -151,7 +155,8 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
     }));
 
-    it('should evaluate $scope properties', function() {
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization', function() {
       expect(ctrl.requireTitleToBeSpecified).toBe(true);
       expect(ctrl.requireObjectiveToBeSpecified).toBe(true);
       expect(ctrl.requireCategoryToBeSpecified).toBe(true);
@@ -161,7 +166,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       expect(ctrl.newCategory).toBe(collectionDict.category);
     });
 
-    it('should not save a collection if title is empty', function() {
+    it('should not save a collection when title is empty', function() {
       ctrl.newTitle = '';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = 'Algorithm';
@@ -174,7 +179,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
 
-    it('should not save a collection if objective is empty', function() {
+    it('should not save a collection when objective is empty', function() {
       ctrl.newTitle = 'New title';
       ctrl.newObjective = '';
       ctrl.newCategory = 'Algorithm';
@@ -187,7 +192,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
 
-    it('should not save a collection if category is empty', function() {
+    it('should not save a collection when category is empty', function() {
       ctrl.newTitle = 'New title';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = '';

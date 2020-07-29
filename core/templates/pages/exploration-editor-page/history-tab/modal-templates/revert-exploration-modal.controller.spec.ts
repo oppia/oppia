@@ -43,11 +43,12 @@ describe('Revert Exploration Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.version).toBe(version);
   });
 
-  it('should get exploration url', function() {
+  it('should get exploration url when providing exploration id', function() {
     expect($scope.getExplorationUrl('0')).toBe('/explore/exp1?v=0');
     expect($scope.getExplorationUrl('1')).toBe('/explore/exp1?v=1');
     expect($scope.getExplorationUrl()).toBe('/explore/exp1?v=undefined');

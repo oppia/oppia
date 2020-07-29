@@ -47,7 +47,8 @@ describe('Collection Editor Save Modal Controller', function() {
     });
   }));
 
-  it('should evaluate $scope properties', function() {
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
     expect($scope.isCollectionPrivate).toBe(isPrivate);
   });
 });

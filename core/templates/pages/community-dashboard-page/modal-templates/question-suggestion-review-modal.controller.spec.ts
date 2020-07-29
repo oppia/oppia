@@ -131,7 +131,8 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should evaluate $scope properties', function() {
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization', function() {
       expect($scope.authorName).toBe(authorName);
       expect($scope.contentHtml).toBe(contentHtml);
       expect($scope.reviewable).toBe(reviewable);
@@ -146,13 +147,15 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect($scope.skillRubricExplanations).toEqual(['explanation']);
     });
 
-    it('should define validation error as null', function() {
-      expect($scope.validationError).toBe(undefined);
-      $scope.questionChanged();
-      expect($scope.validationError).toBe(null);
-    });
+    it('should define validation error as null when question changes',
+      function() {
+        expect($scope.validationError).toBe(undefined);
+        $scope.questionChanged();
+        expect($scope.validationError).toBe(null);
+      });
 
-    it('should successfully accept suggestion', function() {
+    it('should accept suggestion in suggestion modal when clicking accept' +
+      ' suggestion', function() {
       $scope.reviewMessage = 'Review message example';
       $scope.accept();
 
@@ -164,7 +167,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         });
     });
 
-    it('should successfully reject suggestion', function() {
+    it('should reject suggestion in suggestion modal when clicking reject' +
+    ' suggestion', function() {
       $scope.reviewMessage = 'Review message example';
       $scope.reject();
 
@@ -175,7 +179,8 @@ describe('Question Suggestion Review Modal Controller', function() {
         });
     });
 
-    it('should successfully cancel suggestion', function() {
+    it('should cancel suggestion in suggestion modal when clicking cancel' +
+    ' suggestion', function() {
       $scope.cancel();
 
       expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
@@ -269,10 +274,10 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should validate that the skill rubric explanation has been injected',
-      function() {
-        expect($scope.skillRubricExplanations).toBe(
-          'This rubric has not yet been specified.');
-      });
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization', function() {
+      expect($scope.skillRubricExplanations).toBe(
+        'This rubric has not yet been specified.');
+    });
   });
 });

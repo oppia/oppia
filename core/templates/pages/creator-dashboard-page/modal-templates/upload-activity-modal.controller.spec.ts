@@ -47,7 +47,7 @@ describe('Upload Activity Modal Controller', function() {
     });
   }));
 
-  it('should save activity successfully ', function() {
+  it('should close modal when saving activity ', function() {
     var documentCopy = angular.copy(document);
     var file = {
       size: 100,
@@ -69,7 +69,7 @@ describe('Upload Activity Modal Controller', function() {
     document = documentCopy;
   });
 
-  it('should not save activity if file is empty', function() {
+  it('should not save activity when file is empty', function() {
     var documentCopy = angular.copy(document);
     spyOn(AlertsService, 'addWarning').and.callThrough();
     // The document has strict type rules which will fail typescript lint tests
