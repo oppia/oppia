@@ -199,7 +199,8 @@ class BaseHandler(webapp2.RequestHandler):
             if user_settings.deleted:
                 self.user_is_scheduled_for_deletion = user_settings.deleted
             elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                  user_services.has_fully_registered(user_settings.user_id)):
+                  user_services.has_fully_registered_account(
+                      user_settings.user_id)):
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
