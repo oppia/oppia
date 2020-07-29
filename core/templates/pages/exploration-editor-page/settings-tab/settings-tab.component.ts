@@ -116,8 +116,8 @@ angular.module('oppia').component('settingsTab', {
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
-        RouterService, ExplorationTitleService, ExplorationWarningsService,
-        UrlInterpolationService, UserEmailPreferencesService,
+        ExplorationTitleService, ExplorationWarningsService,
+        RouterService, UrlInterpolationService, UserEmailPreferencesService,
         UserExplorationPermissionsService, WindowRef, ALL_CATEGORIES,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
       var ctrl = this;
