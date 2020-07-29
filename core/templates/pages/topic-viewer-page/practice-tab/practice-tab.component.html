@@ -9,14 +9,14 @@
       </div>
       <mat-card-content>
         <div *ngFor="let subtopic of availableSubtopics; let i = index">
-          <mat-checkbox class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]">
+          <mat-checkbox color = "primary" class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]">
             {{ subtopic.getTitle() }}
           </mat-checkbox>
         </div>
       </mat-card-content>
       <mat-card-actions>
         <div class="fx-row fx-main-center fx-cross-center full-width">
-          <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button">
+          <button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button">
             <span [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
           </button>
         </div>
@@ -62,8 +62,14 @@
   }
 
   .practice-tab .practice-session-button {
+    align-self: center;
     background-color: #00645C;
+    border-radius: 0.4em;
     color: white;
+    font-family: "Roboto", Arial, sans-serif;
+    margin-top: 20px;
+    text-transform: uppercase;
+    width: 200px;
   }
 
   .practice-tab .practice-session-button:disabled {
