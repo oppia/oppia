@@ -88,7 +88,7 @@ describe('EditProfilePictureModalController', function() {
       // not assignable to parameter of type 'HTMLCanvasElement'"". This
       // is because 'HTMLCanvasElement' has around 250 more properties. We
       // only need to define one for testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({
         toDataURL: () => mockUrl
       });

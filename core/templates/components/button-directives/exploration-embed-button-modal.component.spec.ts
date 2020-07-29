@@ -90,7 +90,7 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     const addRange = jasmine.createSpy('addRange');
     // TS ignore is used here because we are faking the getSelection function
     // for this test.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn(window, 'getSelection').and.returnValue({
       removeAllRanges: removeAllRanges,
       addRange: addRange

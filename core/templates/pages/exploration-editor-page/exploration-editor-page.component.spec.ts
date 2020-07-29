@@ -511,7 +511,7 @@ describe('Exploration editor page component', function() {
             // around 170 more properties than just one (offset). We are
             // suppressing this error because we need only offset for testing
             // purposes.
-            // @ts-ignore
+            // @ts-expect-error
             offset: () => ({
               top: 5
             })
@@ -536,7 +536,7 @@ describe('Exploration editor page component', function() {
             // around 170 more properties than just one (offset). We are
             // suppressing this error because we need only offset for testing
             // purposes.
-            // @ts-ignore
+            // @ts-expect-error
             offset: () => ({
               top: 20
             })
@@ -561,7 +561,7 @@ describe('Exploration editor page component', function() {
             // around 170 more properties than just one (offset). We are
             // suppressing this error because we need only offset for testing
             // purposes.
-            // @ts-ignore
+            // @ts-expect-error
             offset: () => ({
               top: 5
             })
@@ -586,7 +586,7 @@ describe('Exploration editor page component', function() {
             // around 170 more properties than just one (offset). We are
             // suppressing this error because we need only offset for testing
             // purposes.
-            // @ts-ignore
+            // @ts-expect-error
             offset: () => ({
               top: 20
             })
@@ -611,7 +611,7 @@ describe('Exploration editor page component', function() {
             // around 170 more properties than just one (offset). We are
             // suppressing this error because we need only offset for testing
             // purposes.
-            // @ts-ignore
+            // @ts-expect-error
             offset: () => ({
               top: 5
             })
@@ -636,7 +636,7 @@ describe('Exploration editor page component', function() {
             // around 170 more properties than just one (offset). We are
             // suppressing this error because we need only offset for testing
             // purposes.
-            // @ts-ignore
+            // @ts-expect-error
             offset: () => ({
               top: 20
             })

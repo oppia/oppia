@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. Ts ignore is used and no comment explains
+ * js_ts_linter_test.py. Ts ignore is used but no comment explains
  * the ts-ignore.
  */
 

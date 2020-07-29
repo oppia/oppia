@@ -41,7 +41,7 @@ describe('Navigation Service', () => {
     // There is a typescript error here because the type of element doesn't
     // match the type of JQLite. We need this type of element for testing
     // purposes.
-    // @ts-ignore
+    // @ts-expect-error
     angularElementSpy = spyOn(angular, 'element').and.returnValue(element);
     focusAngularElementSpy = spyOn(element, 'focus').and.callThrough();
     blurAngularElementSpy = spyOn(findReturn, 'blur').and.callThrough();

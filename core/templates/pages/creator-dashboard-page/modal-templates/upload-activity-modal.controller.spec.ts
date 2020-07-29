@@ -55,8 +55,8 @@ describe('Upload Activity Modal Controller', function() {
     };
     // There is a typescript error here because the actual getElementById
     // returns more properties than just files. We need to suppress this error
-    // because we need only files for testing.
-    // @ts-ignore
+    // because we need only "files" property for testing.
+    // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(function() {
       return {
         files: [file]
@@ -76,7 +76,7 @@ describe('Upload Activity Modal Controller', function() {
     // There is a typescript error here because the actual getElementById
     // returns more properties than just files. We need to suppress this error
     // because we need only files for testing.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(function() {
       return {
         files: []

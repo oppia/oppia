@@ -161,8 +161,8 @@ describe('High bounce rate task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
-        // Task type should be 'high bounce rate' but is not to test
-        // validations.
+        // Task type should be 'high bounce rate' but we set it to an invalid
+        // value in order to test validations.
         // @ts-expect-error
         task_type: '???',
         target_type: 'state',

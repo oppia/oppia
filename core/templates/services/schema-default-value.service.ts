@@ -111,10 +111,7 @@ export class SchemaDefaultValueService {
     } else if (schema.type === 'int' || schema.type === 'float') {
       return 0;
     } else {
-      // We are expecting a ts error here because ideally this block
-      // should never be reached.
-      // @ts-expect-error
-      this.logger.error('Invalid schema type: ' + schema.type);
+      this.logger.error('Invalid schema: ' + JSON.stringify(schema));
     }
   }
 }

@@ -161,7 +161,7 @@ describe('Speech Synthesis Chunker Service', () => {
         // mockSpeechSynthesisUtteran doesn't match the actual
         // SpeechSynthesisUtterance. We need to suppress this error
         // for testing purposes.
-        // @ts-ignore
+        // @ts-expect-error
         mockSpeechSynthesisUtteran);
     });
 

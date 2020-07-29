@@ -135,8 +135,10 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
     // First get ahold of the legacy getUserMedia, if present.
     var getUserMedia = (
       // This throws "Property 'webkitGetUserMedia' does not exist on
-      // type 'Navigator'." We need to suppress this because some browsers
-      // may have this functionality.
+      // type 'Navigator'." This is because this API is Deprecated.
+      // (https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia)
+      // We need to suppress this because some browsers
+      // still have this functionality.
       // @ts-ignore
       navigator.webkitGetUserMedia || navigator.mozGetUserMedia);
 

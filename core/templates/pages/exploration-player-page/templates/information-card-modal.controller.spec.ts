@@ -102,9 +102,9 @@ describe('Information Card Modal Controller', function() {
   it('should get title wrapper css', function() {
     spyOn(document, 'querySelectorAll')
       // There is a typescript error here because it expects around 120
-      // more properties than just one(clientWidth). We need only one
+      // more properties than just one (clientWidth). We need only one
       // clientWidth for testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       .withArgs('.oppia-info-card-logo-thumbnail').and.returnValue([{
         clientWidth: 200
       }]);

@@ -1,7 +1,4 @@
 {
-  "core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts": [
-    "spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({"
-  ],
   "core/templates/mathjaxConfig.ts": [
     "skipStartupTypeset: true,"
   ],
@@ -9,94 +6,11 @@
     "request.body = body;",
     "request.body = {"
   ],
-  "extensions/objects/templates/svg-filename-editor.component.spec.ts": [
-    "spyOn($, 'ajax').and.callFake(function() {",
-    "spyOn(window, 'Image').and.returnValue(new mockImageObject());",
-    "spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());"
-  ],
   "core/templates/Polyfills.ts": [
     "navigator.mediaDevices = {};",
     "navigator.webkitGetUserMedia || navigator.mozGetUserMedia);"
   ],
-  "core/templates/pages/exploration-editor-page/exploration-editor-page.component.spec.ts": [
-    "offset: () => ({"
-  ],
-  "core/templates/services/navigation.service.spec.ts": [
-    "angularElementSpy = spyOn(angular, 'element').and.returnValue(element);"
-  ],
-  "core/templates/services/assets-backend-api.service.spec.ts": [
-    "spyOn($, 'ajax').and.callFake(function() {",
-    "$.ajax.calls.mostRecent().args[0].data);"
-  ],
-  "core/templates/pages/exploration-player-page/templates/information-card-modal.controller.spec.ts": [
-    ".withArgs('.oppia-info-card-logo-thumbnail').and.returnValue([{"
-  ],
-  "core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts": [
-    "spyOn(window, 'getSelection').and.returnValue({"
-  ],
-  "core/templates/services/csrf-token.service.spec.ts": [
-    "spyOn($, 'ajax').and.returnValue(Promise.resolve("
-  ],
-  "core/templates/services/date-time-format.service.spec.ts": [
-    "spyOn(window, 'Date').and.callFake(MockDateContructor);"
-  ],
-  "core/templates/domain/statistics/PlaythroughObjectFactorySpec.ts": [
-    "expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError("
-  ],
-  "extensions/interactions/EndExploration/directives/end-exploration-validation.service.spec.ts": [
-    "customizationArguments.recommendedExplorationIds.value = [1];",
-    "customizationArguments.recommendedExplorationIds.value = 'ExpID0';"
-  ],
-  "extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts": [
-    "currentState, {}, answerGroups, goodDefaultOutcome);"
-  ],
-  "core/templates/domain/statistics/LearnerActionObjectFactorySpec.ts": [
-    "learnerActionObjectFactory.createFromBackendDict(playthroughDict);"
-  ],
-  "core/templates/pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.spec.ts": [
-    "window.google = {};"
-  ],
-  "core/templates/services/speech-synthesis-chunker.service.spec.ts": [
-    "mockSpeechSynthesisUtteran);"
-  ],
-  "core/templates/pages/creator-dashboard-page/modal-templates/upload-activity-modal.controller.spec.ts": [
-    "spyOn(document, 'getElementById').and.callFake(function() {",
-    "spyOn(document, 'getElementById').and.callFake(function() {"
-  ],
-  "core/templates/domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactorySpec.ts": [
-    "task_type: '???',"
-  ],
-  "core/templates/pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.spec.ts": [
-    "window.google = {};"
-  ],
-  "core/templates/pages/exploration-editor-page/modal-templates/post-publish-modal.controller.spec.ts": [
-    "spyOn(window, 'getSelection').and.returnValue({"
-  ],
-  "core/templates/domain/improvements/IneffectiveFeedbackLoopTaskObjectFactorySpec.ts": [
-    "task_type: '???',"
-  ],
-  "extensions/interactions/CodeRepl/directives/code-repl-validation.service.spec.ts": [
-    "customizationArguments.language.value = 1;",
-    "customizationArguments.placeholder.value = 1;",
-    "customizationArguments.preCode.value = 1;",
-    "customizationArguments.postCode.value = 1;"
-  ],
   "core/templates/services/schema-default-value.service.ts": [
     "this.logger.error('Invalid schema type: ' + schema.type);"
-  ],
-  "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts": [
-    "filterOptions.sort = 'Invalid sort value';"
-  ],
-  "core/templates/domain/improvements/NeedsGuidingResponsesTaskObjectFactorySpec.ts": [
-    "task_type: '???',"
-  ],
-  "core/templates/domain/improvements/HighBounceRateTaskObjectFactorySpec.ts": [
-    "task_type: '???',"
-  ],
-  "core/templates/domain/story/StoryObjectFactorySpec.ts": [
-    "sampleStoryBackendDict);"
-  ],
-  "core/templates/domain/statistics/PlaythroughIssueObjectFactorySpec.ts": [
-    "piof.createFromBackendDict(playthroughDict);"
   ]
 }

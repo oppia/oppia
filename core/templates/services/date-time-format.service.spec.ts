@@ -52,7 +52,7 @@ describe('datetimeformatter', () => {
     // doesn't seem to be a good way to set the timezone locale directly).
     // Need TS ignore here because DateContructor has some properties on the
     // function and this function doesn't really have those properties.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
 

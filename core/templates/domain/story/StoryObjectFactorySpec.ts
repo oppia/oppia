@@ -58,8 +58,8 @@ describe('Story object factory', () => {
       language_code: 'en'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
-      // SampleStoryBackendDict should have a thumbail but doesn't to test
-      // validations.
+      // SampleStoryBackendDict should have a thumbnail but we didn't add that
+      // property in order to test validations.
       // @ts-expect-error
       sampleStoryBackendDict);
   });

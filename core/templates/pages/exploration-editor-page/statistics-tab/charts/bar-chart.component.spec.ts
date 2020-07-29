@@ -54,7 +54,7 @@ describe('Bar Chart component', function() {
       // There is a typescript error here because it expects properties
       // matching actual window.google. We are suppressing this error because
       // we don't need those properties for testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on
       // properties that doesn't have a get access type.
@@ -105,7 +105,7 @@ describe('Bar Chart component', function() {
       // There is a typescript error here because it expects properties
       // matching actual window.google. We are suppressing this error because
       // we don't need those properties for testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on
       // properties that doesn't have a get access type.
@@ -157,7 +157,7 @@ describe('Bar Chart component', function() {
         // There is a typescript error here because it expects properties
         // matching actual window.google. We are suppressing this error because
         // we don't need those properties for testing purposes.
-        // @ts-ignore
+        // @ts-expect-error
         window.google = {};
         // This approach was choosen because spyOnProperty() doesn't work on
         // properties that doesn't have a get access type.

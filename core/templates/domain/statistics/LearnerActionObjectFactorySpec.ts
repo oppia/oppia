@@ -208,7 +208,8 @@ describe('Learner Action Object Factory', () => {
     };
 
     expect(() => {
-      // Here playthrough dict is assigned a invalid action_type to test errors.
+      // Here playthrough dict is assigned a invalid action_type in order to
+      // test validations.
       // @ts-expect-error
       learnerActionObjectFactory.createFromBackendDict(playthroughDict);
     }).toThrowError(

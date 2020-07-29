@@ -197,7 +197,7 @@ describe('Assets Backend API Service', function() {
       // There is an error here because the type of function we are using here
       // doesn't match the type of actually $.ajax. We need to do this for
       // testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.resolve(successMessage);
@@ -219,7 +219,7 @@ describe('Assets Backend API Service', function() {
       // There is an error here because the type of function we are using here
       // doesn't match the type of actually $.ajax. We need to do this for
       // testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.resolve(successMessage);
@@ -234,7 +234,7 @@ describe('Assets Backend API Service', function() {
             // There is an error here because the type of function we are using
             // doesn't match the type of actually $.ajax. We need to do this for
             // testing purposes.
-            // @ts-ignore
+            // @ts-expect-error
             $.ajax.calls.mostRecent().args[0].data);
           expect(dataArguementForAjaxCall instanceof FormData).toBeTruthy();
           var rawImageSentToBackend = null;
@@ -264,7 +264,7 @@ describe('Assets Backend API Service', function() {
       // There is an error here because the type of function we are using here
       // doesn't match the type of actually $.ajax. We need to do this for
       // testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.reject({
@@ -297,7 +297,7 @@ describe('Assets Backend API Service', function() {
       // There is an error here because the type of function we are using here
       // doesn't match the type of actually $.ajax. We need to do this for
       // testing purposes.
-      // @ts-ignore
+      // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.reject({

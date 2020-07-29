@@ -298,8 +298,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('Starting ts ignore check')
             python_utils.PRINT('----------------------------------------')
 
-        ts_ignore_pattern = r'@ts-(ignore|expect-error)'
+        ts_ignore_pattern = r'@ts-ignore'
         comment_pattern = r'^ *// '
+        comment_with_ts_error_pattern = r'^ *// This throws'
 
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
@@ -308,6 +309,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 file_content = self.file_cache.read(file_path)
                 previous_line_has_ts_ignore = False
                 previous_line_has_comment = False
+                previous_line_has_comment_with_ts_error = False
 
                 for line_number, line in enumerate(file_content.split('\n')):
                     if previous_line_has_ts_ignore:
@@ -327,8 +329,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         failed = True
                         previous_line_has_ts_ignore = False
                         summary_message = (
-                            '%s --> @ts-ignore or @ts-expect-error found '
-                            'at line %s. Please add this exception in %s.' % (
+                            '%s --> @ts-ignore found at line %s. '
+                            'Please add this exception in %s.' % (
                                 file_path, line_number,
                                 TS_IGNORE_EXCEPTIONS_FILEPATH))
                         python_utils.PRINT(summary_message)
@@ -340,18 +342,28 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
                     if (
                             previous_line_has_ts_ignore and
-                            not previous_line_has_comment):
+                            not previous_line_has_comment_with_ts_error):
                         failed = True
                         summary_message = (
-                            '%s --> Please add a comment at line %s to '
-                            'explain the @ts-ignore or @ts-expect-error.' % (
-                                file_path, line_number))
+                            '%s --> Please add a comment above the @ts-ignore. '
+                            'explain the @ts-ignore at line %s. The format of '
+                            'comment should be -> This throws "...". This '
+                            'needs to be suppressed because ...' % (
+                                file_path, line_number + 1))
                         python_utils.PRINT(summary_message)
                         summary_messages.append(summary_message)
                         python_utils.PRINT('')
 
                     previous_line_has_comment = bool(
                         re.findall(comment_pattern, line))
+
+                    previous_line_has_comment_with_ts_error = (
+                        bool(
+                            re.findall(
+                                comment_with_ts_error_pattern, line))
+                        or (
+                            previous_line_has_comment_with_ts_error and
+                            previous_line_has_comment))
 
             if failed:
                 summary_message = (
@@ -360,6 +372,50 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             else:
                 summary_message = (
                     '%s TS ignore check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
+
+    def _check_ts_expect_error(self):
+        """Checks if ts expect error is used in non spec file."""
+        summary_messages = []
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting ts expect error check')
+            python_utils.PRINT('----------------------------------------')
+
+        ts_expect_error_pattern = r'@ts-expect-error'
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            failed = False
+
+            for file_path in self.all_filepaths:
+                file_content = self.file_cache.read(file_path)
+                for line_number, line in enumerate(file_content.split('\n')):
+                    if (
+                            re.findall(ts_expect_error_pattern, line) and not
+                            (
+                                file_path.endswith('.spec.ts') or
+                                file_path.endswith('Spec.ts'))):
+                        failed = True
+                        summary_message = (
+                            '%s --> @ts-expect-error found at line %s. '
+                            'It can be used only in spec files.' % (
+                                file_path, line_number + 1))
+                        python_utils.PRINT(summary_message)
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT('')
+
+            if failed:
+                summary_message = (
+                    '%s TS expect error check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s TS expect error check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
 
             python_utils.PRINT(summary_message)
@@ -1080,6 +1136,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._get_expressions_from_parsed_script())
 
         ts_ignore_messages = self._check_ts_ignore()
+        ts_expect_error_messages = self._check_ts_expect_error()
         extra_js_files_messages = self._check_extra_js_files()
         http_requests_messages = self._check_http_requests()
         js_and_ts_component_messages = (
@@ -1095,11 +1152,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         all_messages = (
-            ts_ignore_messages + extra_js_files_messages +
-            http_requests_messages + js_and_ts_component_messages +
-            directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages + constant_declaration_messages +
-            comments_style_messages)
+            ts_ignore_messages + ts_expect_error_messages +
+            extra_js_files_messages + http_requests_messages +
+            js_and_ts_component_messages + directive_scope_messages +
+            sorted_dependencies_messages + controller_dependency_messages +
+            constant_declaration_messages + comments_style_messages)
         return all_messages
 
 

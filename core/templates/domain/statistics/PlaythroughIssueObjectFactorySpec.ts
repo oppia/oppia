@@ -121,7 +121,8 @@ describe('Playthrough Issue Object Factory', () => {
     };
 
     expect(() => {
-      // Here is playthrough dict has invalid issue_type to test validations.
+      // Here is playthrough dict has invalid issue_type in order to test
+      // validations.
       // @ts-expect-error
       piof.createFromBackendDict(playthroughDict);
     }).toThrowError(

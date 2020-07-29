@@ -29,7 +29,7 @@ describe('Csrf Token Service', function() {
     csrfTokenService = new CsrfTokenService();
     // TODO(#8035): Remove the use of $.ajax in csrf-token.service
     // and hence this ts-ignore once all the services are migrated
-    // @ts-ignore
+    // @ts-expect-error
     spyOn($, 'ajax').and.returnValue(Promise.resolve(
       {token: 'sample-csrf-token'}));
   });

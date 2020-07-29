@@ -143,7 +143,7 @@ describe('SvgFilenameEditor', function() {
     // There is a typescript error here because the type of mockImageObject
     // doesn't match the type of actual window.Image. We are suppressing this
     // error because we need mockImageObject for testing purposes.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
@@ -397,7 +397,7 @@ describe('SvgFilenameEditor', function() {
     // There is an error here because the type of function we are using here
     // doesn't match the type of actual $.ajax. We need to do this for
     // testing purposes.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.resolve(responseText);
@@ -424,7 +424,7 @@ describe('SvgFilenameEditor', function() {
     // There is an error here because the type of function we are using here
     // doesn't match the type of actual $.ajax. We need to do this for
     // testing purposes.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.reject({
@@ -594,12 +594,12 @@ describe('SvgFilenameEditor with image save destination as ' +
     // There is a typescript error here because the type of mockImageObject
     // doesn't match the type of actual window.Image. We are suppressing this
     // error because we need mockImageObject for testing purposes.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
     // There is a typescript error here because the type of mockReaderObject
     // doesn't match the type of actual window.FileReader. We are suppressing
     // this error because we need mockReaderObject for testing purposes.
-    // @ts-ignore
+    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');

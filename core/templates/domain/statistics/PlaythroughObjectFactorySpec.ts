@@ -233,9 +233,9 @@ describe('Playthrough Object Factory', () => {
       actions: []
     };
 
-    // TS ignore is used because playthrough dict is assigned a invalid type
-    // to test errors.
-    // @ts-ignore
+    // Here playthrough dict is assigned a invalid issue_type in order
+    // to test validations.
+    // @ts-expect-error
     expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError(
       'Backend dict does not match any known issue type: ' +
       JSON.stringify(playthroughDict));
