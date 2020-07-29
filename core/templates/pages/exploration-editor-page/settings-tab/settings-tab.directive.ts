@@ -77,9 +77,12 @@ require(
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('settingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -106,10 +109,10 @@ angular.module('oppia').directive('settingsTab', [
         'ExplorationParamSpecsService', 'ExplorationRightsService',
         'ExplorationStatesService', 'ExplorationTagsService',
         'ExplorationTitleService', 'ExplorationWarningsService',
-        'UrlInterpolationService', 'UserEmailPreferencesService',
-        'UserExplorationPermissionsService', 'ALL_CATEGORIES',
-        'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON', 'DEFAULT_COLOR',
-        'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
+        'RouterService', 'UrlInterpolationService',
+        'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+        'ALL_CATEGORIES', 'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON',
+        'DEFAULT_COLOR', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, ChangeListService,
@@ -122,12 +125,12 @@ angular.module('oppia').directive('settingsTab', [
             ExplorationParamSpecsService, ExplorationRightsService,
             ExplorationStatesService, ExplorationTagsService,
             ExplorationTitleService, ExplorationWarningsService,
-            UrlInterpolationService, UserEmailPreferencesService,
-            UserExplorationPermissionsService, ALL_CATEGORIES,
-            CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON, DEFAULT_COLOR,
-            EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
+            RouterService, UrlInterpolationService,
+            UserEmailPreferencesService, UserExplorationPermissionsService,
+            ALL_CATEGORIES, CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON,
+            DEFAULT_COLOR, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
-
+          ctrl.directiveSubscriptions = new Subscription();
           var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
           var EXPLORE_PAGE_PREFIX = '/explore/';
 
@@ -369,7 +372,12 @@ angular.module('oppia').directive('settingsTab', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
+            console.log('Caught: refreshSettingsTab, SettingsTab');
+            ctrl.directiveSubscriptions.add(
+              RouterService.onRefreshSettingsTab.subscribe(
+                () => ctrl.refreshSettingsTab()
+              )
+            );
             ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
               EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
             ctrl.EditabilityService = EditabilityService;
@@ -433,6 +441,9 @@ angular.module('oppia').directive('settingsTab', [
               width: '16.66666667%',
               'vertical-align': 'top'
             });
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]};

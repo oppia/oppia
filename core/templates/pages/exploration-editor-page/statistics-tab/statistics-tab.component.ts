@@ -17,6 +17,8 @@
  * exploration editor.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'pages/exploration-editor-page/statistics-tab/templates/' +
   'state-stats-modal.controller.ts');
@@ -29,6 +31,7 @@ require('services/alerts.service.ts');
 require('services/compute-graph.service.ts');
 require('services/exploration-stats.service.ts');
 require('services/state-interaction-stats.service.ts');
+require('pages/admin-page/services/admin-router.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -38,15 +41,17 @@ angular.module('oppia').component('statisticsTab', {
   controller: [
     '$q', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
     'ExplorationDataService', 'ExplorationStatsService',
-    'ReadOnlyExplorationBackendApiService', 'StateInteractionStatsService',
-    'StatesObjectFactory', 'UrlInterpolationService',
+    'ReadOnlyExplorationBackendApiService', 'RouterService',
+    'StateInteractionStatsService', 'StatesObjectFactory',
+    'UrlInterpolationService',
     function(
         $q, $scope, $uibModal, AlertsService, ComputeGraphService,
         ExplorationDataService, ExplorationStatsService,
-        ReadOnlyExplorationBackendApiService, StateInteractionStatsService,
-        StatesObjectFactory, UrlInterpolationService) {
+        ReadOnlyExplorationBackendApiService, RouterService,
+        StateInteractionStatsService, StatesObjectFactory,
+        UrlInterpolationService) {
       const expId = ExplorationDataService.explorationId;
-
+      this.directiveSubscriptions = new Subscription();
       const refreshExplorationStatistics = () => {
         $q.all([
           ReadOnlyExplorationBackendApiService.loadLatestExploration(expId),
@@ -125,7 +130,16 @@ angular.module('oppia').component('statisticsTab', {
           }
         };
         $scope.explorationHasBeenVisited = false;
-        $scope.$on('refreshStatisticsTab', refreshExplorationStatistics);
+        console.log('Caught: refreshStatisticsTab, StatsTab');
+        this.directiveSubscriptions.add(
+          RouterService.onRefreshStatisticsTab.subscribe(
+            () => refreshExplorationStatistics()
+          )
+        );
+      };
+
+      this.$onDestroy = function() {
+        this.directiveSubscriptions.unsubscribe();
       };
     },
   ],

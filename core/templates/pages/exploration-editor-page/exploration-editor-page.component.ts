@@ -350,8 +350,8 @@ angular.module('oppia').component('explorationEditorPage', {
               ChangeListService.getChangeList());
             return;
           }
-
-          $scope.$broadcast('refreshStatisticsTab');
+          console.log('Emit: refreshStatisticsTab, ExplorationEditorPage');
+          RouterService.onRefreshStatisticsTab.emit();
           $scope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
