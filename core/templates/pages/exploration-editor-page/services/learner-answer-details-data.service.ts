@@ -58,10 +58,10 @@ export class LearnerAnswerDetailsDataService {
       entityId, stateName, learnerAnswerInfoId) {
     const learnerAnswerInfoDataUrl =
       this.urlInterpolationService.interpolateUrl(
-      this.LEARNER_ANSWER_INFO_DATA_URL, {
-        entity_type: 'exploration',
-        entity_id: entityId
-      });
+        this.LEARNER_ANSWER_INFO_DATA_URL, {
+          entity_type: 'exploration',
+          entity_id: entityId
+        });
     return this.http.delete(learnerAnswerInfoDataUrl, {
       params: {
         state_name: stateName,
