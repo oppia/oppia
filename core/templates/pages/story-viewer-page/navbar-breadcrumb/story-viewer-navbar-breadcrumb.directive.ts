@@ -40,7 +40,8 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
               TOPIC_VIEWER_STORY_URL_TEMPLATE, {
                 abbreviated_topic_name: (
                   UrlService.getAbbrevTopicNameFromLearnerUrl()),
-                classroom_name: UrlService.getClassroomNameFromLearnerUrl()
+                classroom_url_fragment: (
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl())
               });
           };
 

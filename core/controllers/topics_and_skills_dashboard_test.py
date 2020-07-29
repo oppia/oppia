@@ -87,7 +87,10 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.login(self.ADMIN_EMAIL)
         config_services.set_property(
             self.admin_id, 'topic_ids_for_classroom_pages', [{
-                'name': 'math', 'topic_ids': [self.topic_id]}])
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [self.topic_id]
+            }])
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
@@ -184,7 +187,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
         topic_id_2 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Topic1',
-            abbreviated_name='topic1',
+            abbreviated_name='topic-one',
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
@@ -198,7 +201,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
         })
         self.save_new_topic(
             topic_id_2, self.admin_id, name='Topic2',
-            abbreviated_name='topic2',
+            abbreviated_name='topic-two',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
@@ -493,7 +496,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviatedName': 'name1',
+            'abbreviatedName': 'name-one',
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
@@ -518,7 +521,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name that is too long for validation.',
-            'abbreviatedName': 'name2'
+            'abbreviatedName': 'name-two'
         }
         self.post_json(
             self.url, payload, csrf_token=csrf_token, expected_status_int=400)
@@ -529,7 +532,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'name': 'Topic name',
-            'abbreviatedName': 'name3',
+            'abbreviatedName': 'name-three',
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',

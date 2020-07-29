@@ -21,10 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import classroom_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
@@ -239,11 +238,9 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
-        classroom_name = constants.DUMMY_CLASSROOM_NAME
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-            if topic_id in classroom_dict['topic_ids']:
-                classroom_name = classroom_dict['name']
-                break
+        classroom_url_fragment = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
             skill_question_count_dict[skill_id] = (
@@ -251,7 +248,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                     [skill_id]))
 
         self.values.update({
-            'classroom_name': classroom_name,
+            'classroom_url_fragment': classroom_url_fragment,
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_question_count_dict': skill_question_count_dict,

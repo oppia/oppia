@@ -55,7 +55,8 @@ angular.module('oppia').directive('practiceTab', [
               PRACTICE_SESSIONS_URL, {
                 abbreviated_topic_name: (
                   UrlService.getAbbrevTopicNameFromLearnerUrl()),
-                classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
+                classroom_url_fragment: (
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl()),
                 comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
               });
             $window.location.href = practiceSessionsUrl;

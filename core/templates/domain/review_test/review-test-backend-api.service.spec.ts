@@ -47,12 +47,10 @@ describe('Review test backend API service', () => {
       ReviewTestBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getAbbrevTopicNameFromLearnerUrl').and.callFake(() => {
-      return 'abbrev-topic';
-    });
-    spyOn(urlService, 'getClassroomNameFromLearnerUrl').and.callFake(() => {
-      return 'math';
-    });
+    spyOn(urlService, 'getAbbrevTopicNameFromLearnerUrl').and.callFake(
+      () => 'abbrev-topic');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.callFake(
+      () => 'math');
   });
 
   afterEach(() => {
@@ -68,7 +66,7 @@ describe('Review test backend API service', () => {
         successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        '/review_test_handler/data/abbrev-topic/0');
+        '/review_test_handler/data/math/abbrev-topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -88,7 +86,7 @@ describe('Review test backend API service', () => {
         successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        '/review_test_handler/data/abbrev-topic/0');
+        '/review_test_handler/data/math/abbrev-topic/0');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading data.', {
         status: ERROR_STATUS_CODE, statusText: 'Invalid Request'

@@ -32,6 +32,9 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
             android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME,
             constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
         self.assertEqual(
+            android_validation_constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT,
+            constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT)
+        self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_TOPIC_NAME,
             constants.MAX_CHARS_IN_TOPIC_NAME)
         self.assertEqual(

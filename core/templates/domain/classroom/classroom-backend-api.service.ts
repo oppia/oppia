@@ -30,8 +30,14 @@ import {
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface ClassroomTopicSummaryBackendDict {
+interface ClassroomBackendDict {
+  'classroom_url_fragment': string;
   'topic_summary_dicts': TopicSummaryBackendDict[];
+}
+
+interface ClassroomBackendResponse {
+  classroomUrlFragment: string;
+  topicSummaries: TopicSummary[];
 }
 
 interface ClassroomStatusBackendDict {
@@ -43,6 +49,7 @@ interface ClassroomStatusBackendDict {
 })
 export class ClassroomBackendApiService {
   topicSummaryObjects: TopicSummary[] = null;
+  classroomUrlFragment: string = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
@@ -50,14 +57,14 @@ export class ClassroomBackendApiService {
   ) {}
 
   _fetchClassroomData(classroomName: string,
-      successCallback: (value: TopicSummary[]) => void,
+      successCallback: (value: ClassroomBackendResponse) => void,
       errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
         classroom_name: classroomName
       });
 
-    this.http.get<ClassroomTopicSummaryBackendDict>(
+    this.http.get<ClassroomBackendDict>(
       classroomDataUrl).toPromise().then(data => {
       this.topicSummaryObjects = data.topic_summary_dicts.map(
         (summaryDict) => {
@@ -66,7 +73,10 @@ export class ClassroomBackendApiService {
         }
       );
       if (successCallback) {
-        successCallback(this.topicSummaryObjects);
+        successCallback({
+          classroomUrlFragment: data.classroom_url_fragment,
+          topicSummaries: this.topicSummaryObjects
+        });
       }
     }, errorResponse => {
       if (errorCallback) {
@@ -92,7 +102,9 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
+  fetchClassroomData(
+      classroomName: string
+  ): Promise<ClassroomBackendResponse> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
     });

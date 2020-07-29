@@ -63,7 +63,7 @@ describe('Topic viewer page', function() {
   it('should successfully get topic data', function() {
     spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
       topicName);
-    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     var topicDataObject = (
       ReadOnlyTopicObjectFactory.createFromBackendDict({
@@ -114,7 +114,7 @@ describe('Topic viewer page', function() {
   it('should set story tab correctly', function() {
     spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
       topicName);
-    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(UrlService, 'getPathname').and.returnValue(
       `/learn/math/${topicName}/story`);
@@ -125,7 +125,7 @@ describe('Topic viewer page', function() {
   it('should set revision tab correctly', function() {
     spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
       topicName);
-    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(UrlService, 'getPathname').and.returnValue(
       `/learn/math/${topicName}/revision`);
@@ -136,7 +136,7 @@ describe('Topic viewer page', function() {
   it('should set practice tab correctly', function() {
     spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
       topicName);
-    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(UrlService, 'getPathname').and.returnValue(
       `/learn/math/${topicName}/practice`);
@@ -147,7 +147,7 @@ describe('Topic viewer page', function() {
   it('should switch to info tab if practice tab is hidden', function() {
     spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
       topicName);
-    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(UrlService, 'getPathname').and.returnValue(
       `/learn/math/${topicName}/practice`);
@@ -190,7 +190,8 @@ describe('Topic viewer page', function() {
     function() {
       spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
         topicName);
-      spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      spyOn(
+        UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
         'math');
       spyOn(TopicViewerBackendApiService, 'fetchTopicData').and
         .returnValue(

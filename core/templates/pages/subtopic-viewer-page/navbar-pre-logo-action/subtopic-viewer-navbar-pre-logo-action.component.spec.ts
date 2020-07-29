@@ -30,7 +30,7 @@ describe('subtopic viewer pre logo action', function() {
     urlService = TestBed.get(UrlService);
     spyOn(urlService, 'getAbbrevTopicNameFromLearnerUrl')
       .and.returnValue('abbrev');
-    spyOn(urlService, 'getClassroomNameFromLearnerUrl')
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('math');
   });
   beforeEach(angular.mock.inject(function($componentController) {

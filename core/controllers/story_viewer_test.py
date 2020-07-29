@@ -187,7 +187,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         story_services.save_new_story(self.admin_id, story)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/topic/%s' % (feconf.STORY_DATA_HANDLER, new_story_id),
+                '%s/staging/topic/%s'
+                % (feconf.STORY_DATA_HANDLER, new_story_id),
                 expected_status_int=404)
 
     def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
@@ -205,13 +206,15 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'topic_id_1', new_story_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/topics/%s' % (feconf.STORY_DATA_HANDLER, new_story_id),
+                '%s/staging/topics/%s'
+                % (feconf.STORY_DATA_HANDLER, new_story_id),
                 expected_status_int=404)
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/topic/%s' % (feconf.STORY_DATA_HANDLER, 'story_id'))
+                '%s/staging/topic/%s'
+                % (feconf.STORY_DATA_HANDLER, 'story_id'))
             expected_dict = {
                 'story_title': 'Title',
                 'story_description': 'Description',
@@ -223,7 +226,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/topic/%s' % (feconf.STORY_DATA_HANDLER, 'story_id'),
+                '%s/staging/topic/%s'
+                % (feconf.STORY_DATA_HANDLER, 'story_id'),
                 expected_status_int=404)
 
 
@@ -233,7 +237,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
@@ -243,7 +247,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_1
                 ), {}, csrf_token=csrf_token
@@ -257,7 +261,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token
@@ -271,7 +275,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, 'invalid_story',
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
@@ -281,7 +285,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     'invalid_node'
                 ), {}, csrf_token=csrf_token, expected_status_int=404
@@ -294,7 +298,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
@@ -308,7 +312,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_3
                 ), {}, csrf_token=csrf_token
@@ -346,7 +350,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
-                '%s/topic/%s/%s' % (
+                '%s/staging/topic/%s/%s' % (
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_3
                 ), {}, csrf_token=csrf_token

@@ -61,20 +61,24 @@ angular.module('oppia').directive('reviewTestPage', [
               REVIEW_TEST_DATA_URL, {
                 abbreviated_topic_name: (
                   UrlService.getAbbrevTopicNameFromLearnerUrl()),
+                classroom_url_fragment: (
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl()),
                 story_id: ctrl.storyId
               });
             var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
               REVIEW_TESTS_URL, {
                 abbreviated_topic_name: (
                   UrlService.getAbbrevTopicNameFromLearnerUrl()),
-                classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
+                classroom_url_fragment: (
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl()),
                 story_id: ctrl.storyId
               });
             var storyViewerUrl = UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_PAGE, {
                 abbreviated_topic_name: (
                   UrlService.getAbbrevTopicNameFromLearnerUrl()),
-                classroom_name: UrlService.getClassroomNameFromLearnerUrl(),
+                classroom_url_fragment: (
+                  UrlService.getClassroomUrlFragmentFromLearnerUrl()),
                 story_id: ctrl.storyId
               });
             ReviewTestBackendApiService.fetchReviewTestData(ctrl.storyId).then(

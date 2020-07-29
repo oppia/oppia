@@ -58,7 +58,8 @@ describe('Classroom backend API service', function() {
       additional_story_count: 0,
       topic_model_created_on: 231241343,
       topic_model_last_updated: 3454354354
-    }]
+    }],
+    classroom_url_fragment: 'math'
   };
 
   let sampleDataResultsObjects = null;
@@ -78,7 +79,8 @@ describe('Classroom backend API service', function() {
           responseDictionaries.topic_summary_dicts[0]),
         topicSummaryObjectFactory.createFromBackendDict(
           responseDictionaries.topic_summary_dicts[1])
-      ]
+      ],
+      classroom_url_fragment: responseDictionaries.classroom_url_fragment
     };
   });
 
@@ -101,8 +103,10 @@ describe('Classroom backend API service', function() {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.topic_summary_objects);
+      expect(successHandler).toHaveBeenCalledWith({
+        classroomUrlFragment: sampleDataResultsObjects.classroom_url_fragment,
+        topicSummaries: sampleDataResultsObjects.topic_summary_objects
+      });
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -142,8 +146,10 @@ describe('Classroom backend API service', function() {
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
       flushMicrotasks();
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.topic_summary_objects);
+      expect(successHandler).toHaveBeenCalledWith({
+        classroomUrlFragment: sampleDataResultsObjects.classroom_url_fragment,
+        topicSummaries: sampleDataResultsObjects.topic_summary_objects
+      });
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

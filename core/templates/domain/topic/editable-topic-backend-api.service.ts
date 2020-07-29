@@ -52,7 +52,7 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
             },
             skillIdToRubricsDict: angular.copy(
               response.data.skill_id_to_rubrics_dict),
-            classroomName: response.data.classroom_name,
+            classroomUrlFragment: response.data.classroom_url_fragment,
           });
         }
       }, function(errorResponse) {

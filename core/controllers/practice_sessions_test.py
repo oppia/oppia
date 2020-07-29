@@ -100,7 +100,7 @@ class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
             self.get_html_response(
                 '/learn/staging/invalid/practice/session?'
                 'selected_subtopic_ids=1,2',
-                expected_status_int=301)
+                expected_status_int=302)
 
 
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
@@ -108,7 +108,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s?selected_subtopic_ids=1,2' % (
+                '%s/staging/%s?selected_subtopic_ids=1,2' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public-topic-name'),
                 expected_status_int=404)
@@ -127,7 +127,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         topic_services.publish_topic('topic_id_3', self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s?selected_subtopic_ids=1' % (
+                '%s/staging/%s?selected_subtopic_ids=1' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'noskills'),
                 expected_status_int=404)
@@ -136,7 +136,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             # Adding invalid subtopic IDs as well, which should get ignored.
             json_response = self.get_json(
-                '%s/%s?selected_subtopic_ids=1,2,3,4' % (
+                '%s/staging/%s?selected_subtopic_ids=1,2,3,4' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'public-topic-name'))
             self.assertEqual(json_response['topic_name'], 'public_topic_name')
@@ -152,7 +152,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_no_user_can_access_unpublished_topic_practice_session_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s?selected_subtopic_ids=1,2' % (
+                '%s/staging/%s?selected_subtopic_ids=1,2' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'private-topic-name'),
                 expected_status_int=404)
@@ -160,7 +160,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
     def test_get_fails_when_topic_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s?selected_subtopic_ids=1,2' % (
+                '%s/staging/%s?selected_subtopic_ids=1,2' % (
                     feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
                     'invalid'),
                 expected_status_int=404)

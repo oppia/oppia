@@ -92,7 +92,10 @@ describe('Classroom page', () => {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
-        $q.resolve(topicSummaryObjects));
+        $q.resolve({
+          topicSummaries: topicSummaryObjects,
+          classroomUrlFragment: 'math'
+        }));
       spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
       spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(

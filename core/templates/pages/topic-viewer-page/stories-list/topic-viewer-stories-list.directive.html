@@ -3,7 +3,7 @@
     <h2 class="tab-title" translate="I18N_TOPIC_VIEWER_LESSONS"></h2>
     <div ng-repeat="storySummary in $ctrl.getCanonicalStorySummaries()" class="story-info-container">
       <story-summary-tile abbreviated-topic-name="$ctrl.getAbbreviatedTopicName()"
-                          classroom-name="$ctrl.getClassroomName()"
+                          classroom-url-fragment="$ctrl.getClassroomUrlFragment()"
                           story-summary="storySummary">
       </story-summary-tile>
     </div>

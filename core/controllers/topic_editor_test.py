@@ -62,7 +62,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='topic1',
+            abbreviated_name='topic-one',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -84,6 +84,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
             'name': 'math',
+            'url_fragment': 'math',
             'topic_ids': [self.topic_id]
         }]
 
@@ -117,7 +118,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.save_new_topic(
             topic_id, self.admin_id, name='New name',
-            abbreviated_name='topic2',
+            abbreviated_name='topic-two',
             description='New description',
             canonical_story_ids=[canonical_story_id],
             additional_story_ids=[additional_story_id],
@@ -623,7 +624,7 @@ class TopicEditorTests(
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Name 1',
-            abbreviated_name='topic3',
+            abbreviated_name='topic-three',
             description='Description 1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id],

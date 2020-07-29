@@ -467,7 +467,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         config_services.set_property(
             self.user_id_admin, 'topic_ids_for_classroom_pages', [{
-                'name': 'math', 'topic_ids': [topic_id]}])
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [topic_id]
+            }])
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(

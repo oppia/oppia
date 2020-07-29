@@ -13,19 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the review tests.
+ * @fileoverview Validator to check if input is a valid URL fragment.
  */
 
-export class ReviewTestPageConstants {
-  public static REVIEW_TEST_DATA_URL = (
-    '/review_test_handler/data/<classroom_url_fragment>/' +
-    '<abbreviated_topic_name>/<story_id>');
+import { AppConstants } from 'app.constants';
 
-  public static REVIEW_TESTS_URL = (
-    '/learn/<classroom_url_fragment>/<abbreviated_topic_name>/' +
-    'review-test/<story_id>');
-
-  public static STORY_VIEWER_PAGE = (
-    '/learn/<classroom_url_fragment>/<abbreviated_topic_name>/' +
-    'story/<story_id>');
-}
+angular.module('oppia').filter('isUrlFragment', [function() {
+  const VALID_URL_FRAGMENT_REGEX = new RegExp(
+    // @ts-ignore: TODO(#7434): Remove this ignore after we find
+    // a way to get rid of the TS2339 error on AppConstants.
+    AppConstants.VALID_URL_FRAGMENT_REGEX);
+  return function(input, args) {
+    return (
+      VALID_URL_FRAGMENT_REGEX.test(input) &&
+      input.length <= args.charLimit);
+  };
+}]);

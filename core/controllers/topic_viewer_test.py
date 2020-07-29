@@ -136,7 +136,7 @@ class TopicPageDataHandlerTests(
     def test_get_with_no_user_logged_in(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
             expected_dict = {
                 'topic_name': 'public_topic_name',
                 'topic_id': self.topic_id,
@@ -188,7 +188,7 @@ class TopicPageDataHandlerTests(
                     feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
                 json_response = self.get_json(
-                    '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+                    '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
                 messages = self._get_sent_email_messages(
                     feconf.ADMIN_EMAIL_ADDRESS)
                 expected_email_html_body = (
@@ -246,7 +246,7 @@ class TopicPageDataHandlerTests(
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'),
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'),
                 expected_status_int=404)
 
     def test_get_with_no_skills_ids(self):
@@ -257,7 +257,8 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic-with-no-skills'))
+                '%s/staging/%s' % (
+                    feconf.TOPIC_DATA_HANDLER, 'topic-with-no-skills'))
             expected_dict = {
                 'topic_name': 'topic_with_no_skills',
                 'topic_id': self.topic_id,
@@ -294,7 +295,7 @@ class TopicPageDataHandlerTests(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+                '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
             expected_dict = {
                 'topic_name': 'new_topic',
                 'topic_id': self.topic_id,

@@ -9471,7 +9471,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'Topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -9768,7 +9768,7 @@ class TopicSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -9963,7 +9963,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10125,7 +10125,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10302,7 +10302,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10508,7 +10508,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10668,7 +10668,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -10953,7 +10953,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11178,7 +11178,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11391,7 +11391,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11599,7 +11599,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
@@ -11768,7 +11768,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
             'topic%s' % i,
-            'abbrev%s' % i,
+            'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(

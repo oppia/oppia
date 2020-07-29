@@ -70,7 +70,7 @@ describe('Subtopic viewer page', function() {
   it('should succesfully get subtopic data and set context', function() {
     spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
       abbreviatedTopicName);
-    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
     var subtopicDataObject = (
@@ -125,7 +125,8 @@ describe('Subtopic viewer page', function() {
     function() {
       spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
         abbreviatedTopicName);
-      spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+      spyOn(
+        UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
         'math');
       spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
       spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and

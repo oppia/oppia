@@ -170,7 +170,12 @@ VALIDATOR_SPECS = {
             }
         },
         'is_valid_math_equation': {},
-        'is_supported_audio_language_code': {}
+        'is_supported_audio_language_code': {},
+        'is_url_fragment': {
+            'char_limit': {
+                'type': SCHEMA_TYPE_INT,
+            }
+        }
     },
 }
 
@@ -612,6 +617,19 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_supported_audio_language_code(''))
         self.assertFalse(is_supported_audio_language_code('zz'))
         self.assertFalse(is_supported_audio_language_code('test'))
+
+    def test_is_url_fragment(self):
+        validate_url_fragment = schema_utils.get_validator(
+            'is_url_fragment')
+
+        self.assertTrue(validate_url_fragment('math', 20))
+        self.assertTrue(validate_url_fragment('computer-science', 20))
+        self.assertTrue(validate_url_fragment('bio-tech', 20))
+
+        self.assertFalse(validate_url_fragment('', 20))
+        self.assertFalse(validate_url_fragment('Abc', 20))
+        self.assertFalse(validate_url_fragment('abcdefghi', 5))
+        self.assertFalse(validate_url_fragment('!@#$%^&*()_+=', 20))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

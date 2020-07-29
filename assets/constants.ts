@@ -17,9 +17,9 @@ export = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
-  // The term 'staging' is used instead of the classroom name field
+  // The term 'staging' is used instead of the classroom url fragment field
   // in the URL for topics that are not yet attached to a classroom.
-  "DUMMY_CLASSROOM_NAME": "staging",
+  "DUMMY_CLASSROOM_URL_FRAGMENT": "staging",
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
@@ -5231,6 +5231,7 @@ export = {
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
+  "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,

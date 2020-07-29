@@ -36,6 +36,7 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   abbreviatedTopicName: string;
+  classroomUrlFragment: string;
   subtopicTitle: string;
   topicName: string;
   constructor(
@@ -46,8 +47,11 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   ngOnInit(): void {
     this.abbreviatedTopicName = (
       this.urlService.getAbbrevTopicNameFromLearnerUrl());
+    this.classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     this.subtopicViewerBackendApiService.fetchSubtopicData(
       this.abbreviatedTopicName,
+      this.classroomUrlFragment,
       this.urlService.getSubtopicIdFromUrl()).then(
       (subtopicDataObject: ReadOnlySubtopicPageData) => {
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
@@ -57,7 +61,8 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
-        abbreviated_topic_name: this.abbreviatedTopicName
+        abbreviated_topic_name: this.abbreviatedTopicName,
+        classroom_url_fragment: this.classroomUrlFragment
       });
   }
 }

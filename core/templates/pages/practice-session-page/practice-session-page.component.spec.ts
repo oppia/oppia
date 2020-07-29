@@ -61,11 +61,12 @@ describe('Practice session page', function() {
       'abbrev-topic');
     spyOn(UrlService, 'getSelectedSubtopicsFromUrl').and.returnValue(
       '1,2,3,4,5');
-    spyOn(UrlService, 'getClassroomNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
-    $httpBackend.expectGET('/practice_session/data/abbrev-topic?' +
+    $httpBackend.expectGET(
+      '/practice_session/data/math/abbrev-topic?' +
       'selected_subtopic_ids=1%2C2%2C3%2C4%2C5').respond({
       skill_ids_to_descriptions_map: {
         skill_1: 'Description 1',

@@ -18,8 +18,10 @@
 
 export class StoryViewerDomainConstants {
   public static STORY_DATA_URL_TEMPLATE = (
-    '/story_data_handler/<abbreviated_topic_name>/<story_id>');
+    '/story_data_handler/<classroom_url_fragment>/' +
+    '<abbreviated_topic_name>/<story_id>');
 
   public static STORY_PROGRESS_URL_TEMPLATE = (
-    '/story_progress_handler/<abbreviated_topic_name>/<story_id>/<node_id>');
+    '/story_progress_handler/<classroom_url_fragment>/' +
+    '<abbreviated_topic_name>/<story_id>/<node_id>');
 }

@@ -43,12 +43,14 @@ export class TopicViewerBackendApiService {
 
   private _fetchTopicData(
       abbrevTopicName: string,
+      classroomUrlFragment: string,
       successCallback: (value: ReadOnlyTopic) => void,
       errorCallback: (reason: string) => void
   ): void {
     const topicDataUrl = this.urlInterpolation.interpolateUrl(
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
-        abbreviated_topic_name: abbrevTopicName
+        abbreviated_topic_name: abbrevTopicName,
+        classroom_url_fragment: classroomUrlFragment,
       });
     var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
       new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
@@ -67,9 +69,13 @@ export class TopicViewerBackendApiService {
       });
   }
 
-  fetchTopicData(abbrevTopicName: string): Promise<ReadOnlyTopic> {
+  fetchTopicData(
+      abbrevTopicName: string,
+      classroomUrlFragment: string
+  ): Promise<ReadOnlyTopic> {
     return new Promise((resolve, reject) => {
-      this._fetchTopicData(abbrevTopicName, resolve, reject);
+      this._fetchTopicData(
+        abbrevTopicName, classroomUrlFragment, resolve, reject);
     });
   }
 }

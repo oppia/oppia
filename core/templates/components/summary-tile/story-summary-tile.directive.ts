@@ -28,7 +28,7 @@ angular.module('oppia').directive('storySummaryTile', [
       scope: {},
       bindToController: {
         getAbbreviatedTopicName: '&abbreviatedTopicName',
-        getClassroomName: '&classroomName',
+        getClassroomUrlFragment: '&classroomUrlFragment',
         getStorySummary: '&storySummary'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -45,7 +45,7 @@ angular.module('oppia').directive('storySummaryTile', [
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
                 abbreviated_topic_name: ctrl.getAbbreviatedTopicName(),
-                classroom_name: ctrl.getClassroomName(),
+                classroom_url_fragment: ctrl.getClassroomUrlFragment(),
                 story_id: ctrl.getStorySummary().getId()
               });
           };

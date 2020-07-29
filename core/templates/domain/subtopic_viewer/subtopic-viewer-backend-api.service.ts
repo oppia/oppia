@@ -40,12 +40,15 @@ export class SubtopicViewerBackendApiService {
     private urlInterpolation: UrlInterpolationService) {}
 
   private _fetchSubtopicData(
-      abbreviatedTopicName: string, subtopicId: string,
+      abbreviatedTopicName: string,
+      classroomUrlFragment: string,
+      subtopicId: string,
       successCallback: (value: ReadOnlySubtopicPageData) => void,
       errorCallback: (reason: string) => void): void {
     var subtopicDataUrl = this.urlInterpolation.interpolateUrl(
       SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE, {
         abbreviated_topic_name: abbreviatedTopicName,
+        classroom_url_fragment: classroomUrlFragment,
         subtopic_id: subtopicId
       });
 
@@ -66,10 +69,12 @@ export class SubtopicViewerBackendApiService {
 
   fetchSubtopicData(
       abbreviatedTopicName: string,
+      classroomUrlFragment: string,
       subtopicId: string): Promise<ReadOnlySubtopicPageData> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicData(
-        abbreviatedTopicName, subtopicId, resolve, reject);
+        abbreviatedTopicName, classroomUrlFragment,
+        subtopicId, resolve, reject);
     });
   }
 }

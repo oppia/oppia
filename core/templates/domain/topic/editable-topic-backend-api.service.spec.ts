@@ -86,7 +86,7 @@ describe('Editable topic backend API service', function() {
       skill_id_to_rubrics_dict: {
         skill_id_1: []
       },
-      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       skill_question_count_dict: {},
       subtopic_page: {
         id: 'topicId-1',
@@ -130,7 +130,7 @@ describe('Editable topic backend API service', function() {
         groupedSkillSummaries: sampleDataResults.grouped_skill_summary_dicts,
         skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict,
         skillQuestionCountDict: sampleDataResults.skill_question_count_dict,
-        classroomName: sampleDataResults.classroom_name
+        classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
     }

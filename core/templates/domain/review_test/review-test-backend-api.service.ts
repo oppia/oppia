@@ -47,7 +47,8 @@ export class ReviewTestBackendApiService {
         {
           abbreviated_topic_name: (
             this.urlService.getAbbrevTopicNameFromLearnerUrl()),
-          classroom_name: this.urlService.getClassroomNameFromLearnerUrl(),
+          classroom_url_fragment: (
+            this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
           story_id: storyId
         }
       )

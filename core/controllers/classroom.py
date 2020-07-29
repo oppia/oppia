@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_services
 from core.domain import config_domain
 from core.domain import topic_services
 import feconf
@@ -53,16 +54,13 @@ class ClassroomDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        classroom_name_is_valid = False
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-            if classroom_dict['name'] == classroom_name:
-                classroom_name_is_valid = True
-                topic_ids = classroom_dict['topic_ids']
-                break
+        classroom_dict = classroom_services.get_classroom_dict_by_name(
+            classroom_name)
 
-        if not classroom_name_is_valid:
+        if not classroom_dict:
             raise self.PageNotFoundException
 
+        topic_ids = classroom_dict['topic_ids']
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_services.get_multi_topic_rights(topic_ids)
         topic_summary_dicts = [
@@ -71,7 +69,8 @@ class ClassroomDataHandler(base.BaseHandler):
         ]
 
         self.values.update({
-            'topic_summary_dicts': topic_summary_dicts
+            'topic_summary_dicts': topic_summary_dicts,
+            'classroom_url_fragment': classroom_dict['url_fragment']
         })
         self.render_json(self.values)
 

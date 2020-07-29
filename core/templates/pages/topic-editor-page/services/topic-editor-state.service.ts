@@ -69,7 +69,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       current: [],
       others: []
     };
-    var _classroomName = 'staging';
+    var _classroomUrlFragment = 'staging';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -118,8 +118,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
       }
       return null;
     };
-    var _updateClassroomName = function(classroomName) {
-      _classroomName = classroomName;
+    var _updateClassroomUrlFragment = function(classroomUrlFragment) {
+      _classroomUrlFragment = classroomUrlFragment;
     };
     var _updateTopic = function(newBackendTopicDict, skillIdToDescriptionDict) {
       _setTopic(
@@ -181,7 +181,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
               newBackendTopicObject.groupedSkillSummaries);
             _updateSkillIdToRubricsObject(
               newBackendTopicObject.skillIdToRubricsDict);
-            _updateClassroomName(newBackendTopicObject.classroomName);
+            _updateClassroomUrlFragment(
+              newBackendTopicObject.classroomUrlFragment);
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
@@ -439,8 +440,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
       /**
        * Returns the classroom name for the topic.
        */
-      getClassroomName: function() {
-        return _classroomName;
+      getClassroomUrlFragment: function() {
+        return _classroomUrlFragment;
       }
     };
   }

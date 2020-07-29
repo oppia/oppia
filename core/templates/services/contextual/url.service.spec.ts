@@ -145,11 +145,11 @@ describe('Url Service', () => {
   it('should correctly retrieve classroom name from url', () => {
     mockLocation.pathname = '/learn/math/abcdefgijklm';
     expect(
-      urlService.getClassroomNameFromLearnerUrl()
+      urlService.getClassroomUrlFragmentFromLearnerUrl()
     ).toBe('math');
     mockLocation.pathname = '/english/topic-name';
     expect(function() {
-      urlService.getClassroomNameFromLearnerUrl();
+      urlService.getClassroomUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for classroom');
   });
 

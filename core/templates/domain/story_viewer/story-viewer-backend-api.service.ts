@@ -61,12 +61,14 @@ export class StoryViewerBackendApiService {
 
   _fetchStoryData(
       abbreviatedTopicName: string,
+      classroomUrlFragment: string,
       storyId: string,
       successCallback: (value: StoryPlaythrough) => void,
       errorCallback: (reason: string) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
         abbreviated_topic_name: abbreviatedTopicName,
+        classroom_url_fragment: classroomUrlFragment,
         story_id: storyId
       });
 
@@ -85,12 +87,14 @@ export class StoryViewerBackendApiService {
   }
 
   _recordChapterCompletion(
-      abbreviatedTopicName: string, storyId: string, nodeId: string,
+      abbreviatedTopicName: string, classroomUrlFragment: string,
+      storyId: string, nodeId: string,
       successCallback: (value: StoryChapterCompletionResponse) => void,
       errorCallback: (reason: string) => void): void {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
         abbreviated_topic_name: abbreviatedTopicName,
+        classroom_url_fragment: classroomUrlFragment,
         story_id: storyId,
         node_id: nodeId
       });
@@ -110,19 +114,23 @@ export class StoryViewerBackendApiService {
 
   fetchStoryData(
       abbreviatedTopicName:string,
+      classroomUrlFragment: string,
       storyId: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
-      this._fetchStoryData(abbreviatedTopicName, storyId, resolve, reject);
+      this._fetchStoryData(
+        abbreviatedTopicName, classroomUrlFragment, storyId, resolve, reject);
     });
   }
 
   recordChapterCompletion(
       abbreviatedTopicName: string,
+      classroomUrlFragment: string,
       storyId: string,
       nodeId: string): Promise<StoryChapterCompletionResponse> {
     return new Promise((resolve, reject) => {
       this._recordChapterCompletion(
-        abbreviatedTopicName, storyId, nodeId, resolve, reject);
+        abbreviatedTopicName, classroomUrlFragment, storyId,
+        nodeId, resolve, reject);
     });
   }
 }

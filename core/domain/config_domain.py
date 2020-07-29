@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import change_domain
 from core.platform import models
 import feconf
@@ -69,6 +70,15 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
             'name': 'name',
             'schema': {
                 'type': 'unicode'
+            }
+        }, {
+            'name': 'url_fragment',
+            'schema': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_url_fragment',
+                    'char_limit': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
             }
         }, {
             'name': 'topic_ids',
@@ -349,6 +359,7 @@ TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
     'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The set of topic IDs for each classroom page.', [{
         'name': 'math',
+        'url_fragment': 'math',
         'topic_ids': []
     }]
 )

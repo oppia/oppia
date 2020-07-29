@@ -124,7 +124,7 @@ class ReviewTestsPageTests(BaseReviewTestsControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
                 '/learn/staging/topic/review-test/%s' % 'story_id_3',
-                expected_status_int=301)
+                expected_status_int=302)
 
 
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
@@ -132,7 +132,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/topic/%s' % (
+                '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1),
                 expected_status_int=404)
@@ -142,7 +142,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             story_services.record_completed_node_in_story_context(
                 self.viewer_id, self.story_id_1, self.node_id)
             json_response = self.get_json(
-                '%s/topic/%s' % (
+                '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1))
             self.assertEqual(len(json_response['skill_descriptions']), 2)
@@ -156,7 +156,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/topic/%s' % (
+                '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_2),
                 expected_status_int=404)
 
@@ -192,14 +192,14 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             story_services.record_completed_node_in_story_context(
                 self.viewer_id, self.story_id_3, node_id)
             self.get_json(
-                '%s/topic/%s' % (
+                '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_3),
                 expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/topic/%s' % (
+                '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     'story_id_3'),
                 expected_status_int=404)
@@ -207,7 +207,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
     def test_get_fails_when_no_completed_story_node(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/topic/%s' % (
+                '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1),
                 expected_status_int=404)

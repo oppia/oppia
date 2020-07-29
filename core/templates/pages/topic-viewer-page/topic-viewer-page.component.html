@@ -50,7 +50,7 @@
     <div ng-if="$ctrl.activeTab === 'story'">
       <stories-list abbreviated-topic-name="$ctrl.abbreviatedTopicName"
                     canonical-story-summaries="$ctrl.canonicalStorySummaries"
-                    classroom-name="$ctrl.classroomName">
+                    classroom-url-fragment="$ctrl.classroomUrlFragment">
       </stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
@@ -60,7 +60,7 @@
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
       <subtopics-list abbreviated-topic-name="$ctrl.abbreviatedTopicName"
-                      classroom-name="$ctrl.classroomName"
+                      classroom-url-fragment="$ctrl.classroomUrlFragment"
                       subtopics-list="$ctrl.subtopics"
                       topic-id="$ctrl.topicId">
       </subtopics-list>

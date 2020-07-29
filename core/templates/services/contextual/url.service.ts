@@ -85,7 +85,7 @@ export class UrlService {
     throw new Error('Invalid URL for topic');
   }
 
-  getClassroomNameFromLearnerUrl(): string {
+  getClassroomUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[2]);
