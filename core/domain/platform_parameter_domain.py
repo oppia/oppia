@@ -47,6 +47,10 @@ ALLOWED_FEATURE_STAGES = [
 
 ALLOWED_CLIENT_TYPES = ['Web', 'Native']
 
+APP_VERSION_WITH_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+)?$')
+
+APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)$')
+
 
 class PlatformParameterChange(change_domain.BaseChange):
     """Domain object for changes made to a platform parameter object.
@@ -188,11 +192,19 @@ class PlatformParameterFilter(python_utils.OBJECT):
         'server_mode', 'user_locale', 'client_platform', 'client_type',
         'browser_type', 'app_version',
     ]
-    VERSION_EXPR_REGEXP = re.compile(r'^(>|<|=|>=|<=)(\d+(?:\.\d+)*)$')
 
-    def __init__(self, filter_type, filter_value):
+    SUPPORTED_OP_FOR_FILTERS = {
+        'server_mode': ['='],
+        'user_locale': ['='],
+        'client_platform': ['='],
+        'client_type': ['='],
+        'browser_type': ['='],
+        'app_version': ['=', '<', '<=', '>', '>='],
+    }
+
+    def __init__(self, filter_type, conditions):
         self._type = filter_type
-        self._value = filter_value
+        self._conditions = conditions
 
     @property
     def type(self):
@@ -204,13 +216,15 @@ class PlatformParameterFilter(python_utils.OBJECT):
         return self._type
 
     @property
-    def value(self):
-        """Returns filter value.
+    def conditions(self):
+        """Returns filter conditions.
 
         Returns:
-            *. The filter value.
+            list(tuple). The filter conditions. Each element of the list is a
+            2-tuple (op, value), where op is the operator for comparison, value
+            is the value used for comparison.
         """
-        return self._value
+        return self._conditions
 
     def evaluate(self, context):
         """Tries to match the given context with the filter against its
@@ -222,42 +236,91 @@ class PlatformParameterFilter(python_utils.OBJECT):
         Returns:
             bool. True if the filter is matched.
         """
-        if isinstance(self._value, list):
-            for element in self._value:
-                is_matched = self._evaluate_single_value(element, context)
-                if is_matched:
-                    return True
-            return False
-        else:
-            return self._evaluate_single_value(self._value, context)
+        for op, value in self._conditions:
+            is_matched = self._evaluate_single_value(op, value, context)
+            if is_matched:
+                return True
+        return False
 
-    def _evaluate_single_value(self, value, context):
+    def _evaluate_single_value(self, op, value, context):
         """Tries to match the given context with the filter against the
         given value.
 
         Args:
+            op: str. The operator for comparison, e.g. '='.
             value: str. The value to match against.
             context: EvaluationContext. The context for evaluation.
 
         Returns:
             bool. True if the filter is matched.
         """
+        if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
+            raise Exception(
+                'Unsupported comparison operator \'%s\' for %s filter, '
+                'expected one of %s.' % (
+                    op, self._type, self.SUPPORTED_OP_FOR_FILTERS[self._type]))
         matched = False
         if self._type == 'server_mode':
-            matched = context.server_mode == value
+            if op == '=':
+                matched = context.server_mode == value
         elif self._type == 'user_locale':
-            matched = context.user_locale == value
+            if op == '=':
+                matched = context.user_locale == value
         elif self._type == 'client_platform':
-            matched = context.client_platform == value
+            if op == '=':
+                matched = context.client_platform == value
         elif self._type == 'client_type':
-            matched = context.client_type == value
+            if op == '=':
+                matched = context.client_type == value
         elif self._type == 'browser_type':
-            matched = context.browser_type == value
+            if op == '=':
+                matched = context.browser_type == value
         elif self._type == 'app_version':
             if context.app_version is not None:
                 matched = self._match_version_expression(
-                    value, context.app_version)
+                    op, value, context.app_version)
+
         return matched
+
+    def validate(self):
+        """Validates the PlatformParameterFilter domain object."""
+        if self._type not in self.SUPPORTED_FILTER_TYPE:
+            raise utils.ValidationError(
+                'Unsupported filter type %s' % self._type)
+
+        for op, _ in self._conditions:
+            if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
+                raise utils.ValidationError(
+                    'Unsupported comparison operator \'%s\' for %s filter, '
+                    'expected one of %s.' % (
+                        op, self._type,
+                        self.SUPPORTED_OP_FOR_FILTERS[self._type]))
+
+        if self._type == 'server_mode':
+            for _, mode in self._conditions:
+                if mode not in ALLOWED_SERVER_MODES:
+                    raise utils.ValidationError(
+                        'Invalid server mode %s, must be one of %s.' % (
+                            mode, ALLOWED_SERVER_MODES))
+        elif self._type == 'user_locale':
+            for _, locale in self._conditions:
+                if locale not in ALLOWED_USER_LOCALES:
+                    raise utils.ValidationError(
+                        'Invalid user locale %s, must be one of %s.' % (
+                            locale, ALLOWED_USER_LOCALES))
+        elif self._type == 'client_type':
+            for _, client_type in self._conditions:
+                if client_type not in ALLOWED_CLIENT_TYPES:
+                    raise utils.ValidationError(
+                        'Invalid client type %s, must be one of %s.' % (
+                            client_type, ALLOWED_CLIENT_TYPES))
+        elif self._type == 'app_version':
+            for _, version in self._conditions:
+                if not APP_VERSION_WITHOUT_HASH_REGEXP.match(version):
+                    raise utils.ValidationError(
+                        'Invalid version expression %s, expected to match'
+                        'regexp %s.' % (
+                            version, APP_VERSION_WITHOUT_HASH_REGEXP))
 
     def to_dict(self):
         """Returns a dict representation of the PlatformParameterFilter domain
@@ -269,47 +332,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
         """
         return {
             'type': self._type,
-            'value': self._value,
+            'conditions': self._conditions,
         }
-
-    def validate(self):
-        """Validates the PlatformParameterFilter domain object."""
-        if self._type not in self.SUPPORTED_FILTER_TYPE:
-            raise utils.ValidationError(
-                'Unsupported filter type %s' % self._type)
-
-        if isinstance(self._value, list):
-            values = self._value
-        else:
-            values = [self._value]
-
-        if self._type == 'server_mode':
-            for mode in values:
-                if mode not in ALLOWED_SERVER_MODES:
-                    raise utils.ValidationError(
-                        'Invalid server mode %s, must be one of %s.' % (
-                            mode, ALLOWED_SERVER_MODES))
-        elif self._type == 'user_locale':
-            for locale in values:
-                if locale not in ALLOWED_USER_LOCALES:
-                    raise utils.ValidationError(
-                        'Invalid user locale %s, must be one of %s.' % (
-                            locale, ALLOWED_USER_LOCALES))
-        elif self._type == 'client_type':
-            for client_type in values:
-                if client_type not in ALLOWED_CLIENT_TYPES:
-                    raise utils.ValidationError(
-                        'Invalid client type %s, must be one of %s.' % (
-                            client_type, ALLOWED_CLIENT_TYPES))
-        elif self._type == 'app_version':
-            for version_expr in values:
-                if (
-                        version_expr is not None and
-                        not self.VERSION_EXPR_REGEXP.match(version_expr)):
-                    raise utils.ValidationError(
-                        'Invalid version expression %s, expected to match'
-                        'regexp %s.' % (
-                            version_expr, self.VERSION_EXPR_REGEXP))
 
     @classmethod
     def from_dict(cls, filter_dict):
@@ -323,28 +347,29 @@ class PlatformParameterFilter(python_utils.OBJECT):
             PlatformParameterFilter. The corresponding PlatformParameterFilter
             domain object.
         """
-        return cls(filter_dict['type'], filter_dict['value'])
+        return cls(filter_dict['type'], filter_dict['conditions'])
 
     @classmethod
-    def _match_version_expression(cls, expr, client_version):
+    def _match_version_expression(cls, op, value, client_version):
         """Tries to match the version expression against the client version.
 
         Args:
-            expr: str. The version expression (e.g. '>=1.0.0').
-            client_version: str. The client version (e.g. '1.0.1').
+            op: str. The operator for comparison, e.g. '=', '>'.
+            value: str. The version for comparison, e.g. '1.0.1'.
+            client_version: str. The client version, e.g. '1.0.1-3aebf3h'.
 
         Returns:
             bool. True if the expression matches the version.
         """
-        match = cls.VERSION_EXPR_REGEXP.match(expr)
+        match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
         if match:
-            op, version = match.groups()
+            client_version_without_hash = match.group(1)
 
-            is_equal = version == client_version
+            is_equal = value == client_version_without_hash
             is_client_version_smaller = cls._is_first_version_smaller(
-                client_version, version)
+                client_version_without_hash, value)
             is_client_version_larger = cls._is_first_version_smaller(
-                version, client_version
+                value, client_version_without_hash
             )
             if op == '=':
                 return is_equal
@@ -715,19 +740,17 @@ class PlatformParameter(python_utils.OBJECT):
                 server_mode_filter for server_mode_filter in rule.filters
                 if server_mode_filter.type == 'server_mode']
             for server_mode_filter in server_mode_filters:
-                value_list = (
-                    server_mode_filter.value if isinstance(
-                        server_mode_filter.value, list)
-                    else [server_mode_filter.value])
+                server_modes = [
+                    value for _, value in server_mode_filter.conditions]
                 if self._metadata.feature_stage == FEATURE_STAGES.dev:
                     if (
-                            SERVER_MODES.test in value_list or
-                            SERVER_MODES.prod in value_list):
+                            SERVER_MODES.test in server_modes or
+                            SERVER_MODES.prod in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environment.')
                 elif self._metadata.feature_stage == FEATURE_STAGES.test:
-                    if SERVER_MODES.prod in value_list:
+                    if SERVER_MODES.prod in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')
