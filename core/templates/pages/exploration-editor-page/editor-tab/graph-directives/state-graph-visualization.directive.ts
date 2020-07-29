@@ -405,7 +405,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             // If statistics for a different version of the exploration are
             // loaded, this may change the opacities of the nodes.
             $scope.$watch('opacityMap', redrawGraph);
-            // $(window).resize(redrawGraph);
+
             ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
               .subscribe(evt => {
                 redrawGraph();
