@@ -1243,6 +1243,9 @@ class ManageOwnProfileTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_update_profile_preferences(self):
         self.login(self.banned_user_email)
+
+        # Expected status check 401 because a banned user does not have
+        # the rights to manage a profile.
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
