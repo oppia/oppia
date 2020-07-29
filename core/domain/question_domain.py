@@ -642,7 +642,7 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def _convert_states_v35_dict_to_v36_dict(cls, question_state_dict):
+    def _convert_state_v35_dict_to_v36_dict(cls, question_state_dict):
         """Converts from version 35 to 36. Version 35 adds translation support
         for interaction customization arguments. This migration converts
         customization arguments whose schemas have been changed from unicode to
@@ -682,7 +682,7 @@ class Question(python_utils.OBJECT):
         if interaction_id is None:
             question_state_dict['next_content_id_index'] = (
                 max_existing_content_id_index + 1)
-            continue
+            return question_state_dict
 
         class ContentIdCounter(python_utils.OBJECT):
             """This helper class is used to keep track of
@@ -818,7 +818,7 @@ class Question(python_utils.OBJECT):
                 'recorded_voiceovers'][
                     'voiceovers_mapping'][new_content_id] = {}
 
-    return question_state_dict
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(

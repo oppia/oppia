@@ -2635,7 +2635,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v35_dict_to_v36_dict(cls, states_dict):
-        """Converts from version 34 to 35. Version 35 adds translation support
+        """Converts from version 35 to 36. Version 36 adds translation support
         for interaction customization arguments. This migration converts
         customization arguments whose schemas have been changed from unicode to
         SubtitledUnicode or html to SubtitledHtml. It also populates missing
@@ -2971,7 +2971,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 40
+    CURRENT_EXP_SCHEMA_VERSION = 41
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3911,6 +3911,7 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
+    @classmethod
     def _convert_v40_dict_to_v41_dict(cls, exploration_dict):
         """Converts a v40 exploration dict into a v41 exploration dict.
         Adds translation support to customization args.

@@ -644,6 +644,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MathExpressionInput'
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
