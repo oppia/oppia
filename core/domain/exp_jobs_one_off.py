@@ -73,6 +73,41 @@ SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 AUDIO_FILE_PREFIX = 'audio'
 AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
+# This threshold puts a cap on the number of valid inputs, i.e.,
+# expressions/equations that can be yielded by the math expression one-off jobs.
+# The reason for limiting the number of valid inputs yielded by the jobs is that
+# we don't need to closely inspect all of the valid inputs, they are displayed
+# just to make sure that the job output is what we expect.
+VALID_MATH_INPUTS_YIELD_LIMIT = 200
+
+
+class MathExpressionValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of explorations that use the MathExpressionInput
+    along with the validity and type (expression/equation) of the inputs present
+    in the exploration.
+
+    This validation is done by the validator functions present in schema_utils.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            try:
+                exp_fetchers.get_exploration_from_model(item)
+            except Exception:
+                yield (
+                    exp_domain.TYPE_INVALID_EXPRESSION,
+                    'The exploration with ID: %s had some issues during '
+                    'migration. This is most likely due to the exploration '
+                    'having invalid solution(s).' % item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):

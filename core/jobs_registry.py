@@ -50,6 +50,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    exp_jobs_one_off.MathExpressionValidationOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
@@ -82,7 +83,6 @@ ONE_OFF_JOB_MANAGERS = [
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
-    user_jobs_one_off.DraftChangeMathRichTextAuditOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
@@ -101,7 +101,6 @@ AUDIT_JOB_MANAGERS = [
         interaction_validation_jobs_one_off
         .InteractionRTECustomizationArgsValidationJob),
     interaction_validation_jobs_one_off.ItemSelectionInteractionOneOffJob,
-    interaction_validation_jobs_one_off.MathExpressionValidationOneOffJob,
     interaction_validation_jobs_one_off.MultipleChoiceInteractionOneOffJob,
     (
         interaction_validation_jobs_one_off
