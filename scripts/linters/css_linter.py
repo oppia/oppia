@@ -110,7 +110,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         num_files_with_errors = 0
         failed = False
         summary_messages = []
-        verbose_messages = []
+        full_messages = []
 
         num_css_files = len(files_to_lint)
         python_utils.PRINT('Total css files: %s' % num_css_files)
@@ -118,7 +118,6 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             node_path, stylelint_path, '--config=' + self.config_path]
         result_list = []
         for _, filepath in enumerate(files_to_lint):
-            verbose_messages.append('Linting: %s' % filepath)
             proc_args = stylelint_cmd_args + [filepath]
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -137,7 +136,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
 
         if num_files_with_errors:
             for result in result_list:
-                verbose_messages.append(result)
+                full_messages.append(result)
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
             summary_message = ('%s %s CSS file' % (
@@ -147,12 +146,12 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             summary_message = ('%s %s CSS file linted (%.1f secs)' % (
                 linter_utils.SUCCESS_MESSAGE_PREFIX, num_css_files,
                 time.time() - start_time))
-        verbose_messages.append(summary_message)
+        full_messages.append(summary_message)
 
-        verbose_messages.append('CSS linting finished.')
         status = {
+            'name': 'Stylelint'
             'failed': failed,
-            'verbose_messages': verbose_messages,
+            'full_messages': full_messages,
             'summary_messages': summary_messages
         }
         return status
