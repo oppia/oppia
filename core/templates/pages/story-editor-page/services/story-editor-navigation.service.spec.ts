@@ -63,14 +63,7 @@ describe('Story editor navigation service', () => {
     expect(sens.getActiveTab()).toEqual('story_editor');
   });
 
-  it('should return true if url has is in chapter editor tab', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
-      location: mockLocation
-    }));
-    expect(sens.checkIfPresentInChapterEditor()).toEqual(true);
-  });
-
-  it('should return false if the url is not in chapter editor tab', function() {
+  it('should return true if current tab is chapter editor tab', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
       location: mockLocation
     }));
@@ -80,6 +73,18 @@ describe('Story editor navigation service', () => {
     expect(sens.checkIfPresentInChapterEditor()).toEqual(false);
     mockLocation.hash = '/chapter_editor/node_1';
   });
+
+  it('should return false if the active tab is not chapter editor tab',
+    function() {
+      spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
+        location: mockLocation
+      }));
+      expect(sens.checkIfPresentInChapterEditor()).toEqual(true);
+
+      mockLocation.hash = 'story/';
+      expect(sens.checkIfPresentInChapterEditor()).toEqual(false);
+      mockLocation.hash = '/chapter_editor/node_1';
+    });
 
   it('should return true if url is in story preview', function() {
     mockLocation.hash = '/story_preview/';
