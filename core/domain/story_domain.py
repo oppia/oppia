@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import json
 import re
 
 from constants import constants
@@ -643,7 +644,8 @@ class StoryContents(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, story_contents_dict):
+    def from_dict(cls, story_contents_dict, story_version=0,
+            story_created_on=None, story_last_updated=None):
         """Return a StoryContents domain object from a dict.
 
         Args:
@@ -900,19 +902,86 @@ class Story(python_utils.OBJECT):
             'thumbnail_bg_color': self.thumbnail_bg_color
         }
 
+
+    @classmethod
+    def deserialize(cls, memory_cache_json_string):
+        """Return a Story domain object decoded from a memory cache json
+        string.
+
+        Args:
+            memory_cache_json_string: str. A json encoded string that can be
+                decoded into a dictionary representing a Story.
+
+        Returns:
+            Story. The corresponding Story domain object.
+        """
+        try:
+            story_dict = json.loads(memory_cache_json_string)
+        except ValueError:
+            raise Exception(
+                ('Json decoding failed for JSON string associated with class' +
+                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        story = cls.from_dict(story_dict, (
+                story_dict['version'] if 'version' in story_dict
+                else 0),
+            utils.convert_string_to_datetime_object(
+                story_dict['created_on']),
+            utils.convert_string_to_datetime_object(
+                story_dict['last_updated']))
+
+        return story
+
+    def serialize(self):
+        """Returns a JSON string representing this Story domain object to
+        store in the memory cache.
+
+        Returns:
+            str. JSON encoded string encoding all of the information composing
+            a Story.
+        """
+        story_dict = {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'notes': self.notes,
+            'language_code': self.language_code,
+            'story_contents_schema_version': self.story_contents_schema_version,
+            'corresponding_topic_id': self.corresponding_topic_id,
+            'version': self.version,
+            'story_contents': self.story_contents.to_dict(),
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'version': self.version,
+            'created_on': utils.convert_datetime_to_string(self.created_on),
+            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+        }
+
+        try:
+            result = json.dumps(story_dict)
+        except TypeError:
+            raise Exception(
+                ('Object of type %s cannot be JSON serialized. Please ' +
+                 'consult this table for more information on what types are s' +
+                 'erializable: https://docs.python.org/3/library/json.html#py' +
+                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+
+        return result
+
     @classmethod
 <<<<<<< HEAD
     def from_dict(
-        cls, story_dict, story_created_on=None, story_last_updated=None):
+        cls, story_dict, story_version=0,
+         story_created_on=None, story_last_updated=None):
         """Returns a Story domain object from a dict.
 
         Args:
             story_dict: dict. The dict representation of Story
                 object.
+            story_version: int. The version of the Story.
             story_created_on: datetime.datetime. Date and time when the
-                story is created.
+                Story is created.
             story_last_updated: datetime.datetime. Date and time when the
-                story was last updated.
+                Story was last updated.
 
         Returns:
             Story. The corresponding Story domain object.
@@ -924,7 +993,7 @@ class Story(python_utils.OBJECT):
             StoryContents.from_dict(story_dict['story_contents']),
             story_dict['story_contents_schema_version'],
             story_dict['language_code'], story_dict['corresponding_topic_id'],
-            story_dict['version'], story_created_on, story_last_updated)
+            story_version, story_created_on, story_last_updated)
 
         return story
 

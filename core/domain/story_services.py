@@ -516,7 +516,7 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
     story_memcache_key = story_fetchers.get_story_memcache_key(story_id)
-    caching_services.delete_mutli([story_memcache_key])
+    caching_services.delete_multi([story_memcache_key])
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).

@@ -138,10 +138,9 @@ def get_multi(keys):
     values = memory_cache_services.get_multi(keys)
     for key, value in zip(keys, values):
         if value:
-            correct_type_of_dict = _get_correct_dict_type_of_key(key)
-            if correct_type_of_dict:
-                decoded_object = _get_object_from_json_string(
-                    correct_type_of_dict, value)
+            value_type = _get_correct_dict_type_of_key(key)
+            if value_type:
+                decoded_object = value_type.deserialize(value)
                 result_dict[key] = decoded_object
             else:
                 result_dict[key] = value
@@ -163,7 +162,7 @@ def set_multi(key_value_mapping):
 
     for key, value in key_value_mapping.items():
         if _get_correct_dict_type_of_key(key):
-            key_value_mapping[key] = _convert_object_to_json_str(value)
+            key_value_mapping[key] = value.serialize()
     return memory_cache_services.set_multi(key_value_mapping)
 
 def delete_multi(keys):

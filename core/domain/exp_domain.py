@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import functools
+import json
 import re
 import string
 
@@ -766,9 +767,7 @@ class Exploration(python_utils.OBJECT):
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
 
-        exploration.version = (
-            exploration_dict['version'] if 'version' in exploration_dict
-            else exploration_version)
+        exploration.version = exploration_version
 
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
@@ -4020,7 +4019,6 @@ class Exploration(python_utils.OBJECT):
         # The ID is the only property which should not be stored within the
         # YAML representation.
         del exp_dict['id']
-        del exp_dict['version']
 
         return python_utils.yaml_from_dict(exp_dict)
 
@@ -4047,9 +4045,77 @@ class Exploration(python_utils.OBJECT):
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'states': {state_name: state.to_dict()
-                       for (state_name, state) in self.states.items()},
-            'version': self.version
+                       for (state_name, state) in self.states.items()}
         })
+
+    def serialize(self):
+        """Returns a copy of the exploration as a JSON string. It includes all
+        necessary information to represent the exploration.
+
+        Returns:
+            str. JSON encoded string encoding all of the information composing
+            an Exploration.
+        """
+
+        exploration_dict = copy.deepcopy({
+            'id': self.id,
+            'title': self.title,
+            'category': self.category,
+            'author_notes': self.author_notes,
+            'blurb': self.blurb,
+            'states_schema_version': self.states_schema_version,
+            'init_state_name': self.init_state_name,
+            'language_code': self.language_code,
+            'objective': self.objective,
+            'param_changes': self.param_change_dicts,
+            'param_specs': self.param_specs_dict,
+            'tags': self.tags,
+            'auto_tts_enabled': self.auto_tts_enabled,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'states': {state_name: state.to_dict()
+                       for (state_name, state) in self.states.items()},
+            'version': self.version,
+            'created_on': utils.convert_datetime_to_string(self.created_on),
+            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+        })
+
+        try:
+            result = json.dumps(exploration_dict)
+        except TypeError:
+            raise Exception(
+                ('Object of type %s cannot be serialized. Please ' +
+                 'consult this table for more information on what types are s' +
+                 'erializable: https://docs.python.org/3/library/json.html#py' +
+                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+
+        return result
+
+    @classmethod
+    def deserialize(cls, memory_cache_json_string):
+        """Return an Exploration domain object decoded from a memory cache json
+        string.
+
+        Args:
+            memory_cache_json_string: str. A json encoded string that can be
+                decoded into a dictionary representing an Exploration.
+
+            Exploration. The corresponding Exploration domain object.
+        """
+        try:
+            exploration_dict = json.loads(memory_cache_json_string)
+        except ValueError:
+            raise Exception(
+                ('Json decoding failed for JSON string associated with class' +
+                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        exploration = cls.from_dict(exploration_dict, (
+                exploration_dict['version'] if 'version' in exploration_dict
+                else 0),
+            utils.convert_string_to_datetime_object(
+                exploration_dict['created_on']),
+            utils.convert_string_to_datetime_object(
+                exploration_dict['last_updated']))
+
+        return exploration
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the

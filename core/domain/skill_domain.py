@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import json
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -767,15 +768,86 @@ class Skill(python_utils.OBJECT):
             'prerequisite_skill_ids': self.prerequisite_skill_ids
         }
 
+    def serialize(self):
+        """Returns a JSON string representing this Skill domain object to
+        store in the memory cache.
+
+        Returns:
+            str. JSON encoded string encoding all of the information composing
+            a Skill.
+        """
+        skill_dict = {
+            'id': self.id,
+            'description': self.description,
+            'misconceptions': [
+                misconception.to_dict()
+                for misconception in self.misconceptions],
+            'rubrics': [
+                rubric.to_dict() for rubric in self.rubrics],
+            'skill_contents': self.skill_contents.to_dict(),
+            'language_code': self.language_code,
+            'misconceptions_schema_version': self.misconceptions_schema_version,
+            'rubric_schema_version': self.rubric_schema_version,
+            'skill_contents_schema_version': self.skill_contents_schema_version,
+            'version': self.version,
+            'next_misconception_id': self.next_misconception_id,
+            'superseding_skill_id': self.superseding_skill_id,
+            'all_questions_merged': self.all_questions_merged,
+            'prerequisite_skill_ids': self.prerequisite_skill_ids,
+            'version': self.version,
+            'created_on': utils.convert_datetime_to_string(self.created_on),
+            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+        }
+
+        try:
+            result = json.dumps(skill_dict)
+        except TypeError:
+            raise Exception(
+                ('Object of type %s cannot be JSON serialized. Please ' +
+                 'consult this table for more information on what types are s' +
+                 'erializable: https://docs.python.org/3/library/json.html#py' +
+                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+
+        return result
+
+    @classmethod
+    def deserialize(cls, memory_cache_json_string):
+        """Return a Skill domain object decoded from a memory cache json
+        string.
+
+        Args:
+            memory_cache_json_string: str. A json encoded string that can be
+                decoded into a dictionary representing a Skill.
+
+        Returns:
+            Skill. The corresponding Skill domain object.
+        """
+        try:
+            skill_dict = json.loads(memory_cache_json_string)
+        except ValueError:
+            raise Exception(
+                ('Json decoding failed for JSON string associated with class' +
+                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        skill = cls.from_dict(skill_dict, (
+                skill_dict['version'] if 'version' in skill_dict
+                else 0),
+            utils.convert_string_to_datetime_object(
+                skill_dict['created_on']),
+            utils.convert_string_to_datetime_object(
+                skill_dict['last_updated']))
+
+        return skill
+
     @classmethod
     def from_dict(
-        cls, skill_dict, skill_created_on=None,
+        cls, skill_dict, skill_version=0, skill_created_on=None,
         skill_last_updated=None):
         """Returns a Skill domain object from a dict.
 
         Args:
             skill_dict: dict. The dict representation of Skill
                 object.
+            skill_version: int. The version of the Skill.
             skill_created_on: datetime.datetime. Date and time when the
                 skill is created.
             skill_last_updated: datetime.datetime. Date and time when the
@@ -799,11 +871,13 @@ class Skill(python_utils.OBJECT):
             skill_dict['misconceptions_schema_version'],
             skill_dict['rubric_schema_version'],
             skill_dict['skill_contents_schema_version'],
-            skill_dict['language_code'], skill_dict['version'],
+            skill_dict['language_code'],
+            skill_version,
             skill_dict['next_misconception_id'],
             skill_dict['superseding_skill_id'],
             skill_dict['all_questions_merged'],
-            skill_dict['prerequisite_skill_ids'], skill_created_on,
+            skill_dict['prerequisite_skill_ids'],
+            skill_created_on,
             skill_last_updated)
 
         return skill

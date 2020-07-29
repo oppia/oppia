@@ -31,6 +31,7 @@ import unittest
 
 from constants import constants
 from core.controllers import base
+from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -83,6 +84,7 @@ def empty_environ():
     os.environ['USER_IS_ADMIN'] = '0'
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
+    caching_services.flush_memory_cache()
 
 
 def get_filepath_from_filename(filename, rootdir):

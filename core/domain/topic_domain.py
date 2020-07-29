@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import json
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -547,18 +548,68 @@ class Topic(python_utils.OBJECT):
                 self.story_reference_schema_version)
         }
 
+    def serialize(self):
+        """Returns a JSON string representing this Topic domain object to
+        store in the memory cache.
+
+        Returns:
+            str. JSON encoded string encoding all of the information composing
+            a Topic.
+        """
+        topic_dict = {
+            'id': self.id,
+            'name': self.name,
+            'abbreviated_name': self.abbreviated_name,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'description': self.description,
+            'canonical_story_references': [
+                reference.to_dict()
+                for reference in self.canonical_story_references
+            ],
+            'additional_story_references': [
+                reference.to_dict()
+                for reference in self.additional_story_references
+            ],
+            'uncategorized_skill_ids': self.uncategorized_skill_ids,
+            'subtopics': [
+                subtopic.to_dict() for subtopic in self.subtopics
+            ],
+            'subtopic_schema_version': self.subtopic_schema_version,
+            'next_subtopic_id': self.next_subtopic_id,
+            'language_code': self.language_code,
+            'story_reference_schema_version': (
+                self.story_reference_schema_version),
+            'version': self.version,
+            'created_on': utils.convert_datetime_to_string(self.created_on),
+            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+        }
+
+        try:
+            result = json.dumps(topic_dict)
+        except TypeError:
+            raise Exception(
+                ('Object of type %s cannot be JSON serialized. Please ' +
+                 'consult this table for more information on what types are s' +
+                 'erializable: https://docs.python.org/3/library/json.html#py' +
+                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+
+        return result
+
     @classmethod
     def from_dict(
-        cls, topic_dict, topic_created_on=None, topic_last_updated=None):
+        cls, topic_dict, topic_version=0, topic_created_on=None,
+        topic_last_updated=None):
         """Returns a Topic domain object from a dict.
 
         Args:
             topic_dict: dict. The dict representation of Topic
                 object.
+            topic_version: int. The version of the Topic.
             topic_created_on: datetime.datetime. Date and time when the
-                topic is created.
+                Topic is created.
             topic_last_updated: datetime.datetime. Date and time when the
-                topic was last updated.
+                Topic was last updated.
 
         Returns:
             Topic. The corresponding Topic domain object.
@@ -582,10 +633,37 @@ class Topic(python_utils.OBJECT):
             ],
             topic_dict['subtopic_schema_version'],
             topic_dict['next_subtopic_id'],
-            topic_dict['language_code'], topic_dict['version'],
+            topic_dict['language_code'], topic_version,
             topic_dict['story_reference_schema_version'], topic_created_on,
             topic_last_updated)
 
+        return topic
+
+    @classmethod
+    def deserialize(cls, memory_cache_json_string):
+        """Return a Topic domain object decoded from a memory cache json
+        string.
+
+        Args:
+            memory_cache_json_string: str. A json encoded string that can be
+                decoded into a dictionary representing a Topic.
+
+        Returns:
+            Topic. The corresponding Topic domain object.
+        """
+        try:
+            topic_dict = json.loads(memory_cache_json_string)
+        except ValueError:
+            raise Exception(
+                ('Json decoding failed for JSON string associated with class' +
+                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        topic = cls.from_dict(
+            topic_dict,
+            topic_dict['version'] if 'version' in topic_dict else 0,
+            utils.convert_string_to_datetime_object(
+                topic_dict['created_on']),
+            utils.convert_string_to_datetime_object(
+                topic_dict['last_updated']))
         return topic
 
     @classmethod

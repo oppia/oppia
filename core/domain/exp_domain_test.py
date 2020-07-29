@@ -891,7 +891,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         """Test that titles, categories and objectives are validated only in
         'strict' mode.
         """
-        caching_services.flush_memory_cache()
         self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
