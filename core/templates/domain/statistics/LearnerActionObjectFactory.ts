@@ -23,11 +23,11 @@ import { Injectable } from '@angular/core';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
 
-export interface IExplorationStartCustomizationArgs {
+export interface ExplorationStartCustomizationArgs {
   'state_name': {value: string};
 }
 
-export interface IAnswerSubmitCustomizationArgs {
+export interface AnswerSubmitCustomizationArgs {
   'state_name': {value: string};
   'dest_state_name': {value: string};
   'interaction_id': {value: string};
@@ -36,7 +36,7 @@ export interface IAnswerSubmitCustomizationArgs {
   'time_spent_state_in_msecs': {value: number};
 }
 
-export interface IExplorationQuitCustomizationArgs {
+export interface ExplorationQuitCustomizationArgs {
   'state_name': {value: string};
   'time_spent_in_state_in_msecs': {value: number};
 }
@@ -46,33 +46,33 @@ export interface IExplorationQuitCustomizationArgs {
 // on the type of ActionType.
 type ActionCustomizationArgs<ActionType> = (
   ActionType extends 'ExplorationStart' ?
-  IExplorationStartCustomizationArgs :
-  ActionType extends 'AnswerSubmit' ? IAnswerSubmitCustomizationArgs :
+  ExplorationStartCustomizationArgs :
+  ActionType extends 'AnswerSubmit' ? AnswerSubmitCustomizationArgs :
   ActionType extends 'ExplorationQuit' ?
-  IExplorationQuitCustomizationArgs : never);
+  ExplorationQuitCustomizationArgs : never);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This interface takes the type of backend dict according to the ActionType
 // parameter.
-interface ILearnerActionBackendDictBase<ActionType> {
+interface LearnerActionBackendDictBase<ActionType> {
   'action_type': ActionType;
   'action_customization_args': ActionCustomizationArgs<ActionType>;
   'schema_version': number;
 }
 
-export type IExplorationStartLearnerActionBackendDict = (
-  ILearnerActionBackendDictBase<'ExplorationStart'>);
+export type ExplorationStartLearnerActionBackendDict = (
+  LearnerActionBackendDictBase<'ExplorationStart'>);
 
-export type IAnswerSubmitLearnerActionBackendDict = (
-  ILearnerActionBackendDictBase<'AnswerSubmit'>);
+export type AnswerSubmitLearnerActionBackendDict = (
+  LearnerActionBackendDictBase<'AnswerSubmit'>);
 
-export type IExplorationQuitLearnerActionBackendDict = (
-  ILearnerActionBackendDictBase<'ExplorationQuit'>);
+export type ExplorationQuitLearnerActionBackendDict = (
+  LearnerActionBackendDictBase<'ExplorationQuit'>);
 
-export type ILearnerActionBackendDict = (
-  IExplorationStartLearnerActionBackendDict |
-  IAnswerSubmitLearnerActionBackendDict |
-  IExplorationQuitLearnerActionBackendDict);
+export type LearnerActionBackendDict = (
+  ExplorationStartLearnerActionBackendDict |
+  AnswerSubmitLearnerActionBackendDict |
+  ExplorationQuitLearnerActionBackendDict);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This class takes the type according to the ActionType parameter.
@@ -82,7 +82,7 @@ class LearnerActionBase<ActionType> {
       public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
       public schemaVersion: number) {}
 
-  toBackendDict(): ILearnerActionBackendDictBase<ActionType> {
+  toBackendDict(): LearnerActionBackendDictBase<ActionType> {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -110,7 +110,7 @@ export type LearnerAction = (
 })
 export class LearnerActionObjectFactory {
   createNewExplorationStartAction(
-      actionCustomizationArgs: IExplorationStartCustomizationArgs
+      actionCustomizationArgs: ExplorationStartCustomizationArgs
   ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
       'ExplorationStart', actionCustomizationArgs,
@@ -118,7 +118,7 @@ export class LearnerActionObjectFactory {
   }
 
   createNewAnswerSubmitAction(
-      actionCustomizationArgs: IAnswerSubmitCustomizationArgs
+      actionCustomizationArgs: AnswerSubmitCustomizationArgs
   ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
       'AnswerSubmit', actionCustomizationArgs,
@@ -126,7 +126,7 @@ export class LearnerActionObjectFactory {
   }
 
   createNewExplorationQuitAction(
-      actionCustomizationArgs: IExplorationQuitCustomizationArgs
+      actionCustomizationArgs: ExplorationQuitCustomizationArgs
   ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
       'ExplorationQuit', actionCustomizationArgs,
@@ -147,7 +147,7 @@ export class LearnerActionObjectFactory {
    * @returns {LearnerAction}
    */
   createFromBackendDict(
-      learnerActionBackendDict: ILearnerActionBackendDict): LearnerAction {
+      learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
     switch (learnerActionBackendDict.action_type) {
       case 'ExplorationStart':
         return new ExplorationStartLearnerAction(

@@ -35,8 +35,12 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
+from core.domain import platform_parameter_domain
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
@@ -45,6 +49,7 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -284,7 +289,9 @@ class BaseModelValidator(python_utils.OBJECT):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_external_id_relationships() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_external_id_relationships(cls, item):
@@ -436,7 +443,9 @@ class BaseSummaryModelValidator(BaseModelValidator):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_external_model_properties() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_external_model_properties(
@@ -650,7 +659,9 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _get_change_domain_class() method is missing from the derived '
+            'class. It should be implemented in the derived class.')
 
     @classmethod
     def _validate_commit_cmds_schema(cls, item):
@@ -1883,7 +1894,7 @@ class ConfigPropertyModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*$'
+        return r'^[A-Za-z0-9_]{1,100}$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1909,7 +1920,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1935,7 +1946,7 @@ class ConfigPropertySnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d+$'
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -3006,6 +3017,113 @@ class ExplorationContextModelValidator(BaseModelValidator):
                 'story_ids', story_models.StoryModel, [item.story_id]),
             ExternalModelFetcherDetails(
                 'exp_ids', exp_models.ExplorationModel, [item.id])]
+
+
+class ExplorationMathRichTextInfoModelValidator(BaseModelValidator):
+    """Class for validating ExplorationMathRichTextInfoModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'exploration_ids', exp_models.ExplorationModel, [item.id])]
+
+    @classmethod
+    def _validate_latex_strings_info(
+            cls, item, field_name_to_external_model_references):
+        """Validate that LaTeX strings and other related information in the
+        model is valid and matches the corresponding exploration.
+        The LaTeX strings present in this model is valid if the LaTeX strings
+        without SVG filenames in the exploration matches this list, also the
+        estimated SVG size of these LaTeX strings should be same. We also verify
+        that the field 'math_images_generation_required' is valid by checking
+        each 'svg_filename' field in the actual exploration.
+
+        Args:
+            item: ndb.Model. ExplorationMathRichTextInfoModel to validate.
+            field_name_to_external_model_references:
+                dict(str, (list(ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exploration_model_references = (
+            field_name_to_external_model_references['exploration_ids'])
+
+        for exploration_model_reference in exploration_model_references:
+            exploration_model = exploration_model_reference.model_instance
+            if exploration_model is None or exploration_model.deleted:
+                model_class = exploration_model_reference.class_name
+                model_id = exploration_model_reference.model_id
+                cls._add_error(
+                    'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id))
+                continue
+            html_strings_in_exploration = ''
+            for state_dict in exploration_model.states.values():
+                state = state_domain.State.from_dict(state_dict)
+                html_strings_in_exploration += (
+                    ''.join(state.get_all_html_content_strings()))
+
+            latex_strings_without_svg = (
+                html_validation_service.
+                get_latex_strings_without_svg_from_html(
+                    html_strings_in_exploration))
+            decoded_latex_strings_without_svg = [
+                string.decode('utf-8') for string in latex_strings_without_svg]
+            math_rich_text_info = (
+                exp_domain.ExplorationMathRichTextInfo(
+                    exploration_model.id,
+                    item.math_images_generation_required,
+                    latex_strings_without_svg))
+            approx_size_of_math_svgs_bytes = (
+                math_rich_text_info.get_svg_size_in_bytes())
+
+            if decoded_latex_strings_without_svg != (
+                    item.latex_strings_without_svg):
+                cls._add_error(
+                    'latex strings check',
+                    'Entity id %s: latex strings in the model does not match '
+                    'latex strings in the exploration model' % (
+                        item.id))
+            if (approx_size_of_math_svgs_bytes !=
+                    item.estimated_max_size_of_images_in_bytes):
+                cls._add_error(
+                    'svg size check',
+                    'Entity id %s: estimated svg size in the model does not'
+                    ' match estimated svg size in the exploration model' % (
+                        item.id))
+            if not item.math_images_generation_required:
+                filenames = (
+                    html_validation_service.
+                    extract_svg_filenames_in_math_rte_components(
+                        html_strings_in_exploration))
+                for filename in filenames:
+                    file_system_class = (
+                        fs_services.get_entity_file_system_class())
+                    fs = fs_domain.AbstractFileSystem(file_system_class(
+                        feconf.ENTITY_TYPE_EXPLORATION, exploration_model.id))
+                    filepath = 'image/%s' % filename
+                    if not fs.isfile(filepath):
+                        cls._add_error(
+                            'image generation requirement check',
+                            'Entity id %s: status of image generation does not'
+                            ' match the image generation requirement for the'
+                            ' exploration model' % (
+                                item.id))
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_latex_strings_info]
 
 
 class QuestionSkillLinkModelValidator(BaseModelValidator):
@@ -6212,6 +6330,83 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
         return [cls._validate_user_settings_with_same_id_not_exist]
 
 
+class PlatformParameterModelValidator(BaseModelValidator):
+    """Class for validating PlatformParameterModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^[A-Za-z0-9_]{1,100}$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version)
+            for version in python_utils.RANGE(1, item.version + 1)]
+        return [
+            ExternalModelFetcherDetails(
+                'snapshot_metadata_ids',
+                config_models.PlatformParameterSnapshotMetadataModel,
+                snapshot_model_ids
+            ),
+            ExternalModelFetcherDetails(
+                'snapshot_content_ids',
+                config_models.PlatformParameterSnapshotContentModel,
+                snapshot_model_ids
+            ),
+        ]
+
+
+class PlatformParameterSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating PlatformParameterSnapshotMetadataModel."""
+
+    EXTERNAL_MODEL_NAME = 'platform parameter'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return platform_parameter_domain.PlatformParameterChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'platform_parameter_ids',
+                config_models.PlatformParameterModel,
+                [item.id[:item.id.find('-')]]
+            ),
+            ExternalModelFetcherDetails(
+                'committer_ids',
+                user_models.UserSettingsModel,
+                [item.committer_id]
+            )
+        ]
+
+
+class PlatformParameterSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating PlatformParameterSnapshotContentModel."""
+
+    EXTERNAL_MODEL_NAME = 'platform parameter'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^[A-Za-z0-9_]{1,100}-\d+$'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'platform_parameter_ids',
+                config_models.PlatformParameterModel,
+                [item.id[:item.id.find('-')]]
+            )
+        ]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -6238,12 +6433,19 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ConfigPropertySnapshotMetadataModelValidator),
     config_models.ConfigPropertySnapshotContentModel: (
         ConfigPropertySnapshotContentModelValidator),
+    config_models.PlatformParameterModel: PlatformParameterModelValidator,
+    config_models.PlatformParameterSnapshotMetadataModel: (
+        PlatformParameterSnapshotMetadataModelValidator),
+    config_models.PlatformParameterSnapshotContentModel: (
+        PlatformParameterSnapshotContentModelValidator),
     email_models.SentEmailModel: SentEmailModelValidator,
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
         GeneralFeedbackEmailReplyToIdModelValidator),
     exp_models.ExplorationContextModel: (
         ExplorationContextModelValidator),
+    exp_models.ExplorationMathRichTextInfoModel: (
+        ExplorationMathRichTextInfoModelValidator),
     exp_models.ExplorationModel: ExplorationModelValidator,
     exp_models.ExplorationSnapshotMetadataModel: (
         ExplorationSnapshotMetadataModelValidator),
@@ -6386,8 +6588,14 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        raise NotImplementedError
+        """Return a list of datastore class references to map over.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
+        """
+        raise NotImplementedError(
+            'The entity_classes_to_map_over() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
 
     @staticmethod
     def map(model_instance):
@@ -6742,6 +6950,15 @@ class ExplorationContextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationContextModel]
+
+
+class ExplorationMathRichTextInfoModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationMathRichTextInfoModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationMathRichTextInfoModel]
 
 
 class QuestionSnapshotMetadataModelAuditOneOffJob(
@@ -7207,3 +7424,29 @@ class PseudonymizedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PseudonymizedUserModel]
+
+
+class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.PlatformParameterModel]
+
+
+class PlatformParameterSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.PlatformParameterSnapshotMetadataModel]
+
+
+class PlatformParameterSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates PlatformParameterSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.PlatformParameterSnapshotContentModel]
