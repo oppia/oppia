@@ -45,7 +45,7 @@ ALLOWED_SERVER_MODES = [
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
 
-ALLOWED_CLIENT_TYPES = ['Web', 'Native']
+ALLOWED_CLIENT_TYPES = ['Web', 'Android']
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+)?$')
 
@@ -70,12 +70,9 @@ class PlatformParameterChange(change_domain.BaseChange):
 class EvaluationContext(python_utils.OBJECT):
     """Domain object representing the context for parameter evaluation."""
 
-    APP_VERSION_REGEXP = re.compile(r'^\d+(?:\.\d+)*$')
-
     def __init__(
-            self, client_platform, client_type, browser_type,
+            self, client_type, browser_type,
             app_version, user_locale, server_mode):
-        self._client_platform = client_platform
         self._client_type = client_type
         self._browser_type = browser_type
         self._app_version = app_version
@@ -83,20 +80,11 @@ class EvaluationContext(python_utils.OBJECT):
         self._server_mode = server_mode
 
     @property
-    def client_platform(self):
-        """Returns client platform.
-
-        Returns:
-            str. The client platform, e.g. 'Windows', 'Linux', 'Android'.
-        """
-        return self._client_platform
-
-    @property
     def client_type(self):
         """Returns client type.
 
         Returns:
-            str. The client type, e.g. 'Web', 'Native'.
+            str. The client type, e.g. 'Web', 'Android'.
         """
         return self._client_type
 
@@ -106,7 +94,7 @@ class EvaluationContext(python_utils.OBJECT):
 
         Returns:
             str|None. The client browser type, e.g. 'Chrome', 'FireFox',
-            'Edge'. None if the client is a native app.
+            'Edge'. None if the client is a native, i.e. Android app.
         """
         return self._browser_type
 
@@ -149,10 +137,10 @@ class EvaluationContext(python_utils.OBJECT):
                     self._client_type, ALLOWED_CLIENT_TYPES))
         if (
                 self._app_version is not None and
-                self.APP_VERSION_REGEXP.match(self._app_version) is None):
+                APP_VERSION_WITH_HASH_REGEXP.match(self._app_version) is None):
             raise utils.ValidationError(
                 'Invalid version %s, expected to match regexp %s' % (
-                    self._app_version, self.APP_VERSION_REGEXP))
+                    self._app_version, APP_VERSION_WITH_HASH_REGEXP))
         if self._user_locale not in ALLOWED_USER_LOCALES:
             raise utils.ValidationError(
                 'Invalid user locale %s, must be one of %s.' % (
@@ -176,7 +164,6 @@ class EvaluationContext(python_utils.OBJECT):
             object.
         """
         return cls(
-            client_context_dict.get('client_platform'),
             client_context_dict.get('client_type'),
             client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
@@ -189,14 +176,13 @@ class PlatformParameterFilter(python_utils.OBJECT):
     """Domain object for filters in platform parameters."""
 
     SUPPORTED_FILTER_TYPE = [
-        'server_mode', 'user_locale', 'client_platform', 'client_type',
-        'browser_type', 'app_version',
+        'server_mode', 'user_locale', 'client_type', 'browser_type',
+        'app_version',
     ]
 
     SUPPORTED_OP_FOR_FILTERS = {
         'server_mode': ['='],
         'user_locale': ['='],
-        'client_platform': ['='],
         'client_type': ['='],
         'browser_type': ['='],
         'app_version': ['=', '<', '<=', '>', '>='],
@@ -266,9 +252,6 @@ class PlatformParameterFilter(python_utils.OBJECT):
         elif self._type == 'user_locale':
             if op == '=':
                 matched = context.user_locale == value
-        elif self._type == 'client_platform':
-            if op == '=':
-                matched = context.client_platform == value
         elif self._type == 'client_type':
             if op == '=':
                 matched = context.client_type == value
@@ -814,7 +797,8 @@ class Registry(python_utils.OBJECT):
                 one of the following: 'bool', 'number', 'string'.
             is_feature: bool. True if the platform parameter is a feature flag.
             feature_stage: str|None. The stage of the feature, required if
-                'is_feature' is True.
+                'is_feature' is True, must be one of the following:
+                'dev', 'test', 'prod'.
 
         Returns:
             PlatformParameter. The created platform parameter.
@@ -1045,12 +1029,3 @@ class Registry(python_utils.OBJECT):
         cached_parameter = memcache_services.get_multi([memcache_key]).get(
             memcache_key)
         return cached_parameter
-
-
-# Platform parameters should all be defined below.
-
-Registry.create_feature_flag(
-    'Dummy_Feature',
-    'This is a dummy feature flag',
-    FEATURE_STAGES.dev,
-)

@@ -96,8 +96,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
     def test_create_feature_context_from_dict(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
                 'user_locale': 'en',
@@ -106,8 +105,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
                 'server_mode': 'dev',
             },
         )
-        self.assertEqual(context.client_platform, 'Android')
-        self.assertEqual(context.client_type, 'Native')
+        self.assertEqual(context.client_type, 'Android')
         self.assertEqual(context.browser_type, None)
         self.assertEqual(context.app_version, '1.0.0')
         self.assertEqual(context.user_locale, 'en')
@@ -116,8 +114,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
     def test_validate(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
                 'user_locale': 'en',
@@ -131,7 +128,6 @@ class EvaluationContextTest(test_utils.GenericTestBase):
     def test_validate_with_invalid_client_type_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
                 'client_type': 'invalid',
                 'browser_type': None,
                 'app_version': '1.0.0',
@@ -148,8 +144,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
     def test_validate_with_invalid_app_version_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': 'a.a.a',
                 'user_locale': 'en',
@@ -164,8 +159,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
     def test_validate_with_invalid_user_locale_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
                 'user_locale': 'invalid',
@@ -181,8 +175,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
     def test_validate_with_invalid_server_mode_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
                 'user_locale': 'en',
@@ -200,15 +193,13 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
     """Test for the PlatformParameterFilter."""
 
     def create_example_context(
-            self, client_platform='Android',
-            client_type='Native', browser_type=None, app_version='1.2.3',
+            self, client_type='Android', browser_type=None, app_version='1.2.3',
             user_locale='en', mode='dev'):
         """Creates and returns an EvaluationContext using the given
         arguments.
         """
         return parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': client_platform,
                 'client_type': client_type,
                 'browser_type': browser_type,
                 'app_version': app_version,
@@ -262,21 +253,6 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(en_context))
         self.assertFalse(filter_domain.evaluate(zh_context))
 
-    def test_evaluate_client_platform_filter(self):
-        filter_dict = {
-            'type': 'client_platform',
-            'conditions': [('=', 'Linux')]
-        }
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        linux_context = self.create_example_context(client_platform='Linux')
-        windows_context = self.create_example_context(client_platform='Windows')
-
-        self.assertTrue(filter_domain.evaluate(linux_context))
-        self.assertFalse(filter_domain.evaluate(windows_context))
-
     def test_evaluate_client_type_filter(self):
         filter_dict = {'type': 'client_type', 'conditions': [('=', 'Web')]}
         filter_domain = (
@@ -284,7 +260,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             .PlatformParameterFilter.from_dict(filter_dict))
 
         web_context = self.create_example_context(client_type='Web')
-        native_context = self.create_example_context(client_type='Native')
+        native_context = self.create_example_context(client_type='Android')
 
         self.assertTrue(filter_domain.evaluate(web_context))
         self.assertFalse(filter_domain.evaluate(native_context))
@@ -588,8 +564,7 @@ class PlatformParameterRuleTest(test_utils.GenericTestBase):
         )
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
                 'user_locale': 'en',
@@ -613,8 +588,7 @@ class PlatformParameterRuleTest(test_utils.GenericTestBase):
         )
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
                 'user_locale': 'en',
@@ -861,8 +835,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
 
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
                 'user_locale': 'en',
@@ -900,8 +873,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
 
         prod_context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
                 'user_locale': 'en',
@@ -1265,8 +1237,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_evaluate_all_parameters(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_platform': 'Android',
-                'client_type': 'Native',
+                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
                 'user_locale': 'en',
@@ -1319,16 +1290,3 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'parameter_b': False,
             }
         )
-
-
-class ExistingPlatformParameterValidityTest(test_utils.GenericTestBase):
-    """Tests to validate all platform parameter registered in
-    core/domain/platform_parameter_domain.py.
-    """
-
-    def test_all_parameters_are_valid(self):
-        all_names = (
-            parameter_domain.Registry.get_all_platform_parameter_names())
-        for name in all_names:
-            param = parameter_domain.Registry.get_platform_parameter(name)
-            param.validate()
