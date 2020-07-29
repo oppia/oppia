@@ -89,7 +89,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             trimmed_error_messages.append(error_message)
         return '\n'.join(trimmed_error_messages) + '\n'
 
-    def _lint_css_files(self):
+    def lint_css_files(self):
         """Prints a list of lint errors in the given list of CSS files.
 
         Returns:
@@ -149,7 +149,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         full_messages.append(summary_message)
 
         status = {
-            'name': 'Stylelint'
+            'name': 'Stylelint',
             'failed': failed,
             'full_messages': full_messages,
             'summary_messages': summary_messages
@@ -169,7 +169,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 'There are no HTML or CSS files to lint.')
             return []
 
-        return [self._lint_css_files()]
+        return [self.lint_css_files()]
 
 
 def get_linters(config_path, files_to_lint, verbose_mode_enabled=False):
