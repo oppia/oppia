@@ -27,7 +27,7 @@ require(
   'welcome-translation-modal.controller.ts');
 require(
   'pages/exploration-editor-page/translation-tab/' +
-  'state-translation-status-graph/state-translation-status-graph.directive.ts');
+  'state-translation-status-graph/state-translation-status-graph.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translator-overview/' +
   'translator-overview.directive.ts');

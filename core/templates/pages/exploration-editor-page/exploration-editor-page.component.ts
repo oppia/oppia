@@ -33,7 +33,7 @@ require(
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navbar-breadcrumb.directive.ts');
+  'editor-navbar-breadcrumb.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navigation.directive.ts');
@@ -70,7 +70,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.directive.ts');
+  'playthrough-issues.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
