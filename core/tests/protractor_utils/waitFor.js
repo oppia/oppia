@@ -164,6 +164,7 @@ exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.presenceOf = presenceOf;
 exports.visibilityOf = visibilityOf;
+exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
