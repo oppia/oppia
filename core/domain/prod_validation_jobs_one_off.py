@@ -5857,7 +5857,8 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         """Validates that explorations for model are marked as deleted.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
         """
         user_model = user_models.UserSettingsModel.get_by_id(item.id)
         if user_model is None or not user_model.deleted:
@@ -5871,7 +5872,8 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         """Validates that explorations for model are marked as deleted.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
         """
         exp_ids = item.exploration_ids
         not_marked_exp_ids = []
@@ -5891,7 +5893,8 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
         """Validates that collections for model are marked as deleted.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
         """
         col_ids = item.collection_ids
         not_marked_col_ids = []
@@ -5907,11 +5910,32 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
                 'deleted' % (item.id, not_marked_col_ids))
 
     @classmethod
+    def _validate_activity_mapping_contains_only_allowed_keys(cls, item):
+        """Validates that activity_mappings keys are only from
+        the core.platform.models.NAMES enum.
+
+        Args:
+            item: PendingDeletionRequestModel. Pending deletion request model
+                to validate.
+        """
+        incorrect_keys = []
+        for key in item.activity_mappings.keys():
+            if key not in [name for name in models.NAMES.__dict__]:
+                incorrect_keys.append(key)
+
+        if incorrect_keys:
+            cls._add_error(
+                'correct activity_mappings check',
+                'Entity id %s: activity_mappings contains keys %s that are not '
+                'allowed' % (item.id, incorrect_keys))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_user_settings_are_marked_deleted,
             cls._validate_explorations_are_marked_deleted,
-            cls._validate_collections_are_marked_deleted]
+            cls._validate_collections_are_marked_deleted,
+            cls._validate_activity_mapping_contains_only_allowed_keys]
 
 
 class TaskEntryModelValidator(BaseModelValidator):

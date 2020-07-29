@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import python_utils
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -68,3 +69,14 @@ class PendingDeletionRequest(python_utils.OBJECT):
             domain object.
         """
         return cls(user_id, email, False, exploration_ids, collection_ids, {})
+
+    def validate(self):
+        """Checks that the domain object is valid.
+
+        Raises:
+            ValidationError: activity_mappings contain wrong key.
+        """
+        for key in self.activity_mappings.keys():
+            if key not in [name for name in models.NAMES.__dict__]:
+                raise utils.ValidationError(
+                    'activity_mappings contain wrong key')

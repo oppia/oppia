@@ -2143,9 +2143,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # A dict mapping model IDs to pseudonymous user IDs. Each typeof activity
-    # isgrouped under different key (story, skill, question). For each activity,
-    # we use a different pseudonymous user ID. Note that all these pseudonymous
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of activity
+    # is grouped under different key (story, skill, question), the keys need to
+    # be from the core.platform.models.NAMES enum. For each activity, we use
+    # a different pseudonymous user ID. Note that all these pseudonymous
     # user IDs originate from the same about-to-be-deleted user.
     # Example structure: {
     #   'skill': {'skill_id': 'pseudo_user_id_1'},

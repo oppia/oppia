@@ -69,6 +69,7 @@ def save_pending_deletion_request(pending_deletion_request):
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
     """
+    pending_deletion_request.validate()
     pending_deletion_request_dict = {
         'email': pending_deletion_request.email,
         'deletion_complete': pending_deletion_request.deletion_complete,
@@ -175,11 +176,8 @@ def verify_user_deleted(pending_deletion_request):
     """
     user_id = pending_deletion_request.user_id
     return all((
-        _verify_improvements_models_deleted(user_id),
-        _verify_question_models_pseudonymized(user_id),
-        _verify_skill_models_pseudonymized(user_id),
-        _verify_story_models_pseudonymized(user_id),
-        _verify_user_models_deleted(user_id)
+        _verify_basic_models_deleted(user_id),
+        _verify_activity_models_deleted(user_id),
     ))
 
 
@@ -464,9 +462,9 @@ def _delete_user_models(user_id):
             model_class.apply_deletion_policy(user_id)
 
 
-def _verify_improvements_models_deleted(user_id):
-    """Verify that the improvements models for the user with user_id are
-    deleted.
+def _verify_basic_models_deleted(user_id):
+    """Verify that the models that do not represent any activity for the user
+    with user_id are deleted.
 
     Args:
         user_id: str. The id of the user to be deleted.
@@ -476,7 +474,7 @@ def _verify_improvements_models_deleted(user_id):
         otherwise.
     """
     for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.improvements]):
+            [models.NAMES.improvements, models.NAMES.user]):
         if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE] and
@@ -485,8 +483,9 @@ def _verify_improvements_models_deleted(user_id):
     return True
 
 
-def _verify_question_models_pseudonymized(user_id):
-    """Verify that the question models for the user with user_id are deleted.
+def _verify_activity_models_deleted(user_id):
+    """Verify that the activity models (question, skill, story) for the user
+    with user_id are deleted.
 
     Args:
         user_id: str. The id of the user to be deleted.
@@ -499,59 +498,11 @@ def _verify_question_models_pseudonymized(user_id):
         question_models.QuestionModel.has_reference_to_user_id(user_id),
         question_models.QuestionCommitLogEntryModel
         .has_reference_to_user_id(user_id),
-        question_models.QuestionSummaryModel.has_reference_to_user_id(user_id)
-    ))
-
-
-def _verify_skill_models_pseudonymized(user_id):
-    """Verify that the skill models for the user with user_id are deleted.
-
-    Args:
-        user_id: str. The id of the user to be deleted.
-
-    Returns:
-        bool. True if all the skill models were correctly pseudonymized, False
-        otherwise.
-    """
-    return not any((
+        question_models.QuestionSummaryModel.has_reference_to_user_id(user_id),
         skill_models.SkillModel.has_reference_to_user_id(user_id),
         skill_models.SkillCommitLogEntryModel.has_reference_to_user_id(user_id),
         skill_models.SkillSummaryModel.has_reference_to_user_id(user_id),
-    ))
-
-
-def _verify_story_models_pseudonymized(user_id):
-    """Verify that the story models for the user with user_id are deleted.
-
-    Args:
-        user_id: str. The id of the user to be deleted.
-
-    Returns:
-        bool. True if all the story models were correctly pseudonymized, False
-        otherwise.
-    """
-    return not any((
         story_models.StoryModel.has_reference_to_user_id(user_id),
         story_models.StoryCommitLogEntryModel.has_reference_to_user_id(user_id),
         story_models.StorySummaryModel.has_reference_to_user_id(user_id),
     ))
-
-
-def _verify_user_models_deleted(user_id):
-    """Verify that the user models for the user with user_id are deleted.
-
-    Args:
-        user_id: str. The id of the user to be deleted.
-
-    Returns:
-        bool. True if all the user models were correctly deleted, False
-        otherwise.
-    """
-    for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.user]):
-        if (model_class.get_deletion_policy() not in
-                [base_models.DELETION_POLICY.KEEP,
-                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
-                model_class.has_reference_to_user_id(user_id)):
-            return False
-    return True
