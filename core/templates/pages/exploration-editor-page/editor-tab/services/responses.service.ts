@@ -72,6 +72,7 @@ angular.module('oppia').factory('ResponsesService', [
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
     var _answerGroupsChangedEventEmitter = new EventEmitter();
+    var _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
     var _verifySolution = function() {
       // This checks if the solution is valid once a rule has been changed or
@@ -117,7 +118,7 @@ angular.module('oppia').factory('ResponsesService', [
       if (newAnswerGroups && oldAnswerGroups &&
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
-        console.log('Emitted');
+        console.log('Emitted: answerGroupsChanged');
         _answerGroupsChangedEventEmitter.emit();
         _verifySolution();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
@@ -469,6 +470,10 @@ angular.module('oppia').factory('ResponsesService', [
 
       get onAnswerGroupsChanged() {
         return _answerGroupsChangedEventEmitter;
+      },
+
+      get onInitializeAnswerGroups() {
+        return _initializeAnswerGroupsEventEmitter;
       }
     };
   }
