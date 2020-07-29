@@ -538,7 +538,7 @@ MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
 
 # We generate images for existing math rich text components in batches. This
 # gives the maximum number of entities in a batch.
-MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH = 10
+MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH = 2
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
