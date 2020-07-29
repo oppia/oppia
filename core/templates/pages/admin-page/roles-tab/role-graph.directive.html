@@ -103,7 +103,7 @@
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select id="$ctrl.formData.viewCommunityReviewers.filterCriterion" ng-model="$ctrl.formData.viewCommunityReviewers.filterCriterion" class="form-control">
+              <select id="$ctrl.formData.viewCommunityReviewers.filterCriterion" ng-model="$ctrl.formData.viewCommunityReviewers.filterCriterion" class="form-control protractor-test-reviewer-role-method">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
@@ -113,7 +113,7 @@
                ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
             <label for="review-categories-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select id="review-categories-input" sng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.viewCommunityReviewers.category" class="form-control">
+              <select id="review-categories-input" ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.viewCommunityReviewers.category" class="form-control protractor-test-reviewer-role-value">
               </select>
             </div>
           </div>
@@ -137,7 +137,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success"
+          <button type="submit" class="btn btn-success protractor-test-view-reviewer-role-button"
                   ng-disabled="!$ctrl.formData.viewCommunityReviewers.isValid()"
                   value="view role">
             View Role
@@ -163,7 +163,7 @@
               </tbody>
             </table>
           </div>
-          <div ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
+          <div ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE" class="protractor-test-reviewer-roles-result">
             <strong>Usernames:</strong> <[$ctrl.result.usernames]>
           </div>
         </div>
@@ -175,14 +175,14 @@
           <div class="d-xl-inline-flex form-group">
             <label for="add-reviewer-username-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control">
+              <input type="text" id="add-reviewer-username-input" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control protractor-test-add-reviewer-username">
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group">
             <label for="add-community-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select id="add-community-reviewer" ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.addCommunityReviewer.category" class="form-control">
+              <select id="add-community-reviewer" ng-options="value as key for (key, value) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.addCommunityReviewer.category" class="form-control protractor-test-select-reviewer-role">
               </select>
             </div>
           </div>
@@ -198,7 +198,7 @@
             </div>
           </div>
           <button type="submit"
-                  class="btn btn-success"
+                  class="btn btn-success protractor-test-add-reviewer-form-submit-button"
                   ng-disabled="!$ctrl.formData.addCommunityReviewer.isValid()"
                   value="update role">Add Reviewer
           </button>
