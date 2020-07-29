@@ -9,8 +9,5 @@
   "core/templates/Polyfills.ts": [
     "navigator.mediaDevices = {};",
     "navigator.webkitGetUserMedia || navigator.mozGetUserMedia);"
-  ],
-  "core/templates/services/schema-default-value.service.ts": [
-    "this.logger.error('Invalid schema type: ' + schema.type);"
   ]
 }
