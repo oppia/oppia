@@ -226,12 +226,7 @@ angular.module('oppia').component('feedbackTab', {
 
         return $q.all([
           UserBackendApiService.getUserInfoAsync().then(
-            userInfo => {
-              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$apply();
-            }),
+            userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
           ctrl.fetchUpdatedThreads()
         ]).then(() => LoaderService.hideLoadingScreen());
       };
