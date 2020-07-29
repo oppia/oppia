@@ -116,7 +116,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-automatic-text-to-speech.service.ts',
     'exploration-creation.service.ts',
     'exploration-diff.service.ts',
-    'exploration-editor-tab.directive.ts',
     'exploration-engine.service.ts',
     'exploration-footer.directive.ts',
     'exploration-player-state.service.ts',
