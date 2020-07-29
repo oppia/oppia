@@ -14,13 +14,10 @@
 
 /**
  * @fileoverview Valid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. Ts ignore is used and a comment explains
- * the ts-ignore.
+ * js_ts_linter_test.py. Ts expect error is used but it is not a spec file.
  */
 
-let c: string;
+let y: string;
 
-// This throws "Type string can't be assigned to number". We need to
-// suppress this to check the lint tests.
-// @ts-ignore
-let b: number = c;
+// @ts-expect-error
+let b: number = y;

@@ -81,6 +81,10 @@ INVALID_TS_IGNORE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_ts_ignore.ts')
 VALID_TS_IGNORE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_ts_ignore.ts')
+INVALID_TS_EXPECT_ERROR_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_ts_expect_error.ts')
+VALID_TS_EXPECT_ERROR_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_ts_expect_error.spec.ts')
 
 
 class JsTsLintTests(test_utils.LinterTestBase):
@@ -572,11 +576,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
-            ['@ts-ignore or @ts-expect-error found at line 23.'],
+            ['@ts-ignore found at line 23.'],
             self.linter_stdout)
         self.assert_same_list_elements([
-            'Please add a comment at line 22 to '
-            'explain the @ts-ignore or @ts-expect-error.'], self.linter_stdout)
+            'Please add a comment above the @ts-ignore '
+            'explaining the @ts-ignore at line 23.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_ts_ignore_found_success(self):
@@ -607,6 +611,57 @@ class JsTsLintTests(test_utils.LinterTestBase):
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements([
             'SUCCESS  TS ignore check passed'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
+
+    def test_ts_expect_error_error(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    INVALID_TS_EXPECT_ERROR_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with self.print_swap, compile_all_ts_files_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_TS_EXPECT_ERROR_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        self.assert_same_list_elements(
+            ['@ts-expect-error found at line 22.'],
+            self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
+
+    def test_ts_expect_error_success(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    VALID_TS_EXPECT_ERROR_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with self.print_swap, compile_all_ts_files_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [VALID_TS_EXPECT_ERROR_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        self.assert_same_list_elements([
+            'SUCCESS  TS expect error check passed'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_missing_punctuation_at_end_of_comment(self):

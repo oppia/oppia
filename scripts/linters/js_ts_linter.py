@@ -345,9 +345,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             not previous_line_has_comment_with_ts_error):
                         failed = True
                         summary_message = (
-                            '%s --> Please add a comment above the @ts-ignore. '
-                            'explain the @ts-ignore at line %s. The format of '
-                            'comment should be -> This throws "...". This '
+                            '%s --> Please add a comment above the @ts-ignore '
+                            'explaining the @ts-ignore at line %s. The format '
+                            'of comment should be -> This throws "...". This '
                             'needs to be suppressed because ...' % (
                                 file_path, line_number + 1))
                         python_utils.PRINT(summary_message)
