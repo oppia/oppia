@@ -101,7 +101,8 @@ class HomePageRedirectPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        if self.user_id and user_services.has_fully_registered(self.user_id):
+        if self.user_id and user_services.has_fully_registered_account(
+                self.user_id):
             user_settings = user_services.get_user_settings(
                 self.user_id)
             default_dashboard = user_settings.default_dashboard
@@ -768,6 +769,11 @@ URLS = MAPREDUCE_HANDLERS + [
             feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
             constants.TASK_ENTITY_TYPE_EXPLORATION),
         improvements.ExplorationImprovementsHistoryHandler),
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

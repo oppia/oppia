@@ -111,13 +111,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_check_call(unused_commands):
             pass
 
-        # pylint: disable=unused-argument
-        def mock_build_main(args):
+        def mock_build_main(args):  # pylint: disable=unused-argument
             pass
 
-        def mock_popen(args, env, shell):
+        def mock_popen(args, env, shell):  # pylint: disable=unused-argument
             return
-        # pylint: enable=unused-argument
 
         def mock_remove(unused_path):
             pass
@@ -318,7 +316,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
 
         with is_port_open_swap, sleep_swap:
-            run_e2e_tests.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_open(1)
         self.assertEqual(mock_is_port_open.wait_time, 11)
         self.assertEqual(mock_sleep.called_times, 10)
 
@@ -338,10 +336,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
-            run_e2e_tests.wait_for_port_to_be_open(1)
+            common.wait_for_port_to_be_open(1)
         self.assertEqual(
             mock_sleep.sleep_time,
-            run_e2e_tests.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
+            common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
     def test_run_webpack_compilation_success(self):
         def mock_isdir(unused_dirname):
@@ -680,10 +678,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver)
 
         expected_commands = [
-            (['update', '--versions.chrome',
-              CHROME_DRIVER_VERSION],),
-            (['start', '--versions.chrome',
-              CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
+            ([
+                'update', '--versions.chrome',
+                CHROME_DRIVER_VERSION],),
+            ([
+                'start', '--versions.chrome',
+                CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
         ]
 
         run_swap = self.swap_with_checks(
@@ -704,7 +704,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
              '--capabilities.maxInstances=3'], result)
 
     def test_get_parameter_for_negative_sharding_instances(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError, 'Sharding instance should be larger than 0'):
             run_e2e_tests.get_parameter_for_sharding(-3)
 
     def test_get_parameter_for_dev_mode(self):
@@ -866,7 +867,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
@@ -980,7 +981,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
@@ -1118,7 +1119,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
@@ -1236,7 +1237,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_start_google_app_engine_server,
             expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open',
+            common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),

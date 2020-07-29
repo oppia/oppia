@@ -80,8 +80,8 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
     gae_docs = [_dict_to_search_document(d) for d in documents]
 
     try:
-        logging.debug('adding the following docs to index %s: %s',
-                      index.name, documents)
+        logging.debug(
+            'adding the following docs to index %s: %s', index.name, documents)
         results = index.put(gae_docs, deadline=5)
     except gae_search.PutError as e:
         logging.exception('PutError raised.')
@@ -91,8 +91,8 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     return add_documents_to_index(
-                        documents=documents,
-                        index=index.name,
+                        documents,
+                        index.name,
                         retries=new_retries)
 
         # At this pint, either we don't have any tries left, or none of the
@@ -211,13 +211,15 @@ def delete_documents_from_index(
 
     for ind, doc_id in enumerate(doc_ids):
         if not isinstance(doc_id, python_utils.BASESTRING):
-            raise ValueError('all doc_ids must be string, got %s at index %d' %
-                             (type(doc_id), ind))
+            raise ValueError(
+                'all doc_ids must be string, got %s at index %d' % (
+                    type(doc_id), ind))
 
     index = gae_search.Index(index)
     try:
-        logging.debug('Attempting to delete documents from index %s, ids: %s' %
-                      (index.name, ', '.join(doc_ids)))
+        logging.debug(
+            'Attempting to delete documents from index %s, ids: %s' %
+            (index.name, ', '.join(doc_ids)))
         index.delete(doc_ids, deadline=5)
     except gae_search.DeleteError as e:
         logging.exception('Something went wrong during deletion.')
@@ -227,8 +229,8 @@ def delete_documents_from_index(
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     delete_documents_from_index(
-                        doc_ids=doc_ids,
-                        index=index.name,
+                        doc_ids,
+                        index.name,
                         retries=new_retries)
                     return
 
@@ -255,9 +257,9 @@ def clear_index(index_name):
         index.delete(doc_ids)
 
 
-def search(query_string, index, cursor=None,
-           limit=feconf.SEARCH_RESULTS_PAGE_SIZE, sort='', ids_only=False,
-           retries=DEFAULT_NUM_RETRIES):
+def search(
+        query_string, index, cursor=None, limit=feconf.SEARCH_RESULTS_PAGE_SIZE,
+        sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 
     Args:
