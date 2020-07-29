@@ -269,7 +269,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
               }
               $scope.hasLoaded = false;
               InteractionDetailsCacheService.reset();
-              console.log('Emitted: initializeAnswerGroups');
               ResponsesService.onInitializeAnswerGroups.emit({
                 interactionId: stateData.interaction.id,
                 answerGroups: stateData.interaction.answerGroups,
@@ -277,13 +276,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 confirmedUnclassifiedAnswers: (
                   stateData.interaction.confirmedUnclassifiedAnswers)
               });
-              // $rootScope.$broadcast('initializeAnswerGroups', {
-              //   interactionId: stateData.interaction.id,
-              //   answerGroups: stateData.interaction.answerGroups,
-              //   defaultOutcome: stateData.interaction.defaultOutcome,
-              //   confirmedUnclassifiedAnswers: (
-              //     stateData.interaction.confirmedUnclassifiedAnswers)
-              // });
 
               _updateInteractionPreview();
               _updateAnswerChoices();

@@ -118,7 +118,6 @@ angular.module('oppia').factory('ResponsesService', [
       if (newAnswerGroups && oldAnswerGroups &&
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
-        console.log('Emitted: answerGroupsChanged');
         _answerGroupsChangedEventEmitter.emit();
         _verifySolution();
         _answerGroupsMemento = angular.copy(newAnswerGroups);

@@ -526,7 +526,6 @@ angular.module('oppia').directive('stateResponses', [
               StateSolicitAnswerDetailsService);
             ctrl.directiveSubscriptions.add(
               ResponsesService.onInitializeAnswerGroups.subscribe((data) => {
-                console.log('Caught: initializeAnswerGroups');
                 ResponsesService.init(data);
                 $scope.answerGroups = ResponsesService.getAnswerGroups();
                 $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
@@ -546,25 +545,6 @@ angular.module('oppia').directive('stateResponses', [
                 $rootScope.$broadcast('externalSave');
               })
             );
-            // $scope.$on('initializeAnswerGroups', function(evt, data) {
-            //   ResponsesService.init(data);
-            //   $scope.answerGroups = ResponsesService.getAnswerGroups();
-            //   $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-
-            //   // If the creator selects an interaction which has only one
-            //   // possible answer, automatically expand the default response.
-            //   // Otherwise, default to having no responses initially selected.
-            //   if ($scope.isCurrentInteractionLinear()) {
-            //     ResponsesService.changeActiveAnswerGroupIndex(0);
-            //   }
-
-            //   // Initialize training data for these answer groups.
-            //   _initializeTrainingData();
-
-            //   $scope.activeAnswerGroupIndex = (
-            //     ResponsesService.getActiveAnswerGroupIndex());
-            //   $rootScope.$broadcast('externalSave');
-            // });
 
             $scope.getStaticImageUrl = function(imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -602,7 +582,6 @@ angular.module('oppia').directive('stateResponses', [
             ctrl.directiveSubscriptions.add(
               ResponsesService.onAnswerGroupsChanged.subscribe(
                 () => {
-                  console.log('Caught answerGroupsChanged');
                   $scope.answerGroups = ResponsesService.getAnswerGroups();
                   $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
                   $scope.activeAnswerGroupIndex =
