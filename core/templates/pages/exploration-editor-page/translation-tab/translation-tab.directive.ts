@@ -158,10 +158,12 @@ angular.module('oppia').directive('translationTab', [
             LoaderService.showLoadingScreen('Loading');
             $scope.isTranslationTabBusy = false;
             $scope.showTranslationTabSubDirectives = false;
-            console.log('Caught: refreshTranslationTab, TranslationTab');
             ctrl.directiveSubscriptions.add(
               RouterService.onRefreshTranslationTab.subscribe(
-                () => initTranslationTab()
+                () => {
+                  console.log('Caught: refreshTranslationTab, TranslationTab');
+                  initTranslationTab();
+                }
               )
             );
             // Toggles the translation tab tutorial on/off.

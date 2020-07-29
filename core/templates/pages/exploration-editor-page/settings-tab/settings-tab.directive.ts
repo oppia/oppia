@@ -372,10 +372,12 @@ angular.module('oppia').directive('settingsTab', [
           };
 
           ctrl.$onInit = function() {
-            console.log('Caught: refreshSettingsTab, SettingsTab');
             ctrl.directiveSubscriptions.add(
               RouterService.onRefreshSettingsTab.subscribe(
-                () => ctrl.refreshSettingsTab()
+                () => {
+                  console.log('Caught: refreshSettingsTab, SettingsTab');
+                  ctrl.refreshSettingsTab();
+                }
               )
             );
             ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (

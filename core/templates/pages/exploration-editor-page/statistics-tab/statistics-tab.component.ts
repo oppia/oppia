@@ -130,10 +130,12 @@ angular.module('oppia').component('statisticsTab', {
           }
         };
         $scope.explorationHasBeenVisited = false;
-        console.log('Caught: refreshStatisticsTab, StatsTab');
         this.directiveSubscriptions.add(
           RouterService.onRefreshStatisticsTab.subscribe(
-            () => refreshExplorationStatistics()
+            () => {
+              refreshExplorationStatistics();
+              console.log('Caught: refreshStatisticsTab, StatisticsTab');
+            }
           )
         );
       };
