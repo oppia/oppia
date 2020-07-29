@@ -70,7 +70,7 @@ describe('State Stats Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.stateName).toBe(stateName);
     expect($scope.numEnters).toEqual(stateStats.totalHitCount);
     expect($scope.numQuits)

@@ -289,7 +289,7 @@ describe('Learner dashboard page', function() {
       $scope.$apply();
     }));
 
-    it('should evaluate information get from backend', function() {
+    it('should evaluate data get from backend', function() {
       expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
       expect(ctrl.username).toBe(userInfo.getUsername());
 
@@ -298,40 +298,42 @@ describe('Learner dashboard page', function() {
       expect(ctrl.noActivity).toBe(false);
     });
 
-    it('should start collection playlist sortable options', function() {
-      var mockedUi = {
-        placeholder: {
-          height: (setHeight) => {
-            if (setHeight) {
-              return setHeight;
+    it('should sort collection playlist by index changing ui height',
+      function() {
+        var mockedUi = {
+          placeholder: {
+            height: (setHeight) => {
+              if (setHeight) {
+                return setHeight;
+              }
+              return 0;
             }
-            return 0;
+          },
+          item: {
+            height: () => 50
           }
-        },
-        item: {
-          height: () => 50
-        }
-      };
-      spyOn(mockedUi.placeholder, 'height').and.callThrough();
+        };
+        spyOn(mockedUi.placeholder, 'height').and.callThrough();
 
-      ctrl.collectionPlaylistSortableOptions.start(null, mockedUi);
-      expect(mockedUi.placeholder.height).toHaveBeenCalled();
-    });
+        ctrl.collectionPlaylistSortableOptions.start(null, mockedUi);
+        expect(mockedUi.placeholder.height).toHaveBeenCalled();
+      });
 
-    it('should sort collection playlist sortable options', function() {
-      var mockedUi = {
-        helper: {
-          css: () => {}
-        }
-      };
-      spyOn(mockedUi.helper, 'css').and.callThrough();
+    it('should stop collection playlist sorting by setting ui top to 0',
+      function() {
+        var mockedUi = {
+          helper: {
+            css: () => {}
+          }
+        };
+        spyOn(mockedUi.helper, 'css').and.callThrough();
 
-      ctrl.collectionPlaylistSortableOptions.stop(null, null);
-      ctrl.collectionPlaylistSortableOptions.sort(null, mockedUi);
-      expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
-    });
+        ctrl.collectionPlaylistSortableOptions.stop(null, null);
+        ctrl.collectionPlaylistSortableOptions.sort(null, mockedUi);
+        expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
+      });
 
-    it('should update collection playlist sortable options', function() {
+    it('should update collection playlist sorting by index', function() {
       var mockedUi = {
         item: {
           sortable: {
@@ -349,31 +351,14 @@ describe('Learner dashboard page', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('should update exploration playlist sortable options', function() {
-      var mockedUi = {
-        item: {
-          sortable: {
-            index: 1
-          }
-        }
-      };
-      $httpBackend.expect(
-        'POST', '/learnerplaylistactivityhandler/exploration/' +
-        (mockedUi.item.sortable.index + 1)).respond(200);
-      ctrl.explorationPlaylistSortableOptions.update(null, mockedUi);
-      $httpBackend.flush();
-
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
     it('should get static image url', function() {
       var imagePath = '/path/to/image.png';
       expect(ctrl.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
     });
 
-    it('should set active section successfully', function() {
+    it('should set a new section as active successfully when fetching message' +
+      ' summary list from backend', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -414,7 +399,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.feedbackThreadActive).toBe(false);
     });
 
-    it('should set active subsection successfully', function() {
+    it('should toggle active subsection type successfully', function() {
       // Active subsection is set as I18N_DASHBOARD_EXPLORATIONS when controller
       // is initialized.
       expect(ctrl.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
@@ -438,7 +423,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.getCollectionUrl()).toBe('/collection/undefined');
     });
 
-    it('should check if application is being used on a mobile', function() {
+    it('should check when application is being used on a mobile', function() {
       // This approach was choosen because spyOn() doesn't work on properties
       // that doesn't have a get access type.
       // Without this approach the test will fail because it'll throw
@@ -462,90 +447,97 @@ describe('Learner dashboard page', function() {
       expect(ctrl.showUsernamePopover('abc')).toBe('none');
     });
 
-    it('should go to through pages of incomplete explorations', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
+    it('should go to through pages of incomplete explorations successfully',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
 
-      expect(ctrl.startIncompleteExpIndex).toBe(0);
+        expect(ctrl.startIncompleteExpIndex).toBe(0);
 
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startIncompleteExpIndex).toBe(8);
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startIncompleteExpIndex).toBe(8);
 
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startIncompleteExpIndex).toBe(0);
-    });
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startIncompleteExpIndex).toBe(0);
+      });
 
-    it('should go to through pages of incomplete collections', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsection = 'I18N_DASHBOARD_COLLECTIONS';
+    it('should go to through pages of incomplete collections successfully',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        var subsection = 'I18N_DASHBOARD_COLLECTIONS';
 
-      expect(ctrl.startIncompleteCollectionIndex).toBe(0);
+        expect(ctrl.startIncompleteCollectionIndex).toBe(0);
 
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startIncompleteCollectionIndex).toBe(8);
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startIncompleteCollectionIndex).toBe(8);
 
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startIncompleteCollectionIndex).toBe(0);
-    });
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startIncompleteCollectionIndex).toBe(0);
+      });
 
-    it('should go to through page of completed explorations', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-      var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
+    it('should go to through page of completed explorations successfully',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
+        var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
 
-      var completedExplorations = learnerDashboardData
-        .completed_explorations_list.map(
-          expSummary => learnerExplorationSummaryObjectFactory
-            .createFromBackendDict(expSummary));
+        var completedExplorations = learnerDashboardData
+          .completed_explorations_list.map(
+            expSummary => learnerExplorationSummaryObjectFactory
+              .createFromBackendDict(expSummary));
 
-      expect(ctrl.startCompletedExpIndex).toBe(0);
-      expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(completedExplorations.slice(0, 8));
+        expect(ctrl.startCompletedExpIndex).toBe(0);
+        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+          .toEqual(completedExplorations.slice(0, 8));
 
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startCompletedExpIndex).toBe(8);
-      expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(completedExplorations.slice(8));
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startCompletedExpIndex).toBe(8);
+        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+          .toEqual(completedExplorations.slice(8));
 
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startCompletedExpIndex).toBe(0);
-      expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
-        .toEqual(completedExplorations.slice(0, 8));
-    });
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startCompletedExpIndex).toBe(0);
+        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+          .toEqual(completedExplorations.slice(0, 8));
+      });
 
-    it('should go to through page of completed collections', function() {
-      var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-      var subsection = 'I18N_DASHBOARD_COLLECTIONS';
+    it('should go to through page of completed collections successfully',
+      function() {
+        var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
+        var subsection = 'I18N_DASHBOARD_COLLECTIONS';
 
-      expect(ctrl.startCompletedCollectionIndex).toBe(0);
+        expect(ctrl.startCompletedCollectionIndex).toBe(0);
 
-      ctrl.goToNextPage(section, subsection);
-      expect(ctrl.startCompletedCollectionIndex).toBe(8);
+        ctrl.goToNextPage(section, subsection);
+        expect(ctrl.startCompletedCollectionIndex).toBe(8);
 
-      ctrl.goToPreviousPage(section, subsection);
-      expect(ctrl.startCompletedCollectionIndex).toBe(0);
-    });
+        ctrl.goToPreviousPage(section, subsection);
+        expect(ctrl.startCompletedCollectionIndex).toBe(0);
+      });
 
-    it('should set explorations sorting options', function() {
-      expect(ctrl.isCurrentExpSortDescending).toBe(true);
-      expect(ctrl.currentExpSortType).toBe('last_played');
-      ctrl.setExplorationsSortingOptions('last_played');
-      expect(ctrl.isCurrentExpSortDescending).toBe(false);
+    it('should change explorations sorting options by title or last played',
+      function() {
+        expect(ctrl.isCurrentExpSortDescending).toBe(true);
+        expect(ctrl.currentExpSortType).toBe('last_played');
+        ctrl.setExplorationsSortingOptions('last_played');
+        expect(ctrl.isCurrentExpSortDescending).toBe(false);
 
-      ctrl.setExplorationsSortingOptions('title');
-      expect(ctrl.currentExpSortType).toBe('title');
-    });
+        ctrl.setExplorationsSortingOptions('title');
+        expect(ctrl.currentExpSortType).toBe('title');
+      });
 
-    it('should set subscription sorting options', function() {
-      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
-      expect(ctrl.currentSubscribersSortType).toBe('username');
-      ctrl.setSubscriptionSortingOptions('username');
-      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
+    it('should change subscription sorting options by username or impact',
+      function() {
+        expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
+        expect(ctrl.currentSubscribersSortType).toBe('username');
+        ctrl.setSubscriptionSortingOptions('username');
+        expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
 
-      ctrl.setSubscriptionSortingOptions('impact');
-      expect(ctrl.currentSubscribersSortType).toBe('impact');
-    });
+        ctrl.setSubscriptionSortingOptions('impact');
+        expect(ctrl.currentSubscribersSortType).toBe('impact');
+      });
 
-    it('should set feedback sorting options', function() {
+    it('should change feedback sorting options by exploration or last update' +
+      ' msecs', function() {
       expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
       expect(ctrl.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
       ctrl.setFeedbackSortingOptions('lastUpdatedMsecs');
@@ -555,7 +547,8 @@ describe('Learner dashboard page', function() {
       expect(ctrl.currentFeedbackThreadsSortType).toBe('exploration');
     });
 
-    it('should get value of exploration sort key property', function() {
+    it('should evaluate value of exploration sort key property as null when' +
+      ' sorting option is last played', function() {
       // The default sort option is exploration last played.
       expect(ctrl.currentExpSortType).toBe('last_played');
 
@@ -564,7 +557,10 @@ describe('Learner dashboard page', function() {
       ctrl.completedExplorationsList.forEach(function(exploration) {
         expect(ctrl.getValueOfExplorationSortKey(exploration)).toBe(null);
       });
+    });
 
+    it('should evaluate value of exploration sort key property as string' +
+      ' when sorting option is title', function() {
       ctrl.setExplorationsSortingOptions('title');
       expect(ctrl.currentExpSortType).toBe('title');
       ctrl.completedExplorationsList.forEach(function(exploration, index) {
@@ -573,7 +569,8 @@ describe('Learner dashboard page', function() {
       });
     });
 
-    it('should get value of subscription sort key property', function() {
+    it('should evaluate value of subscription sort key property as string' +
+      ' when sorting option is username', function() {
       // The default sort option is exploration last played.
       expect(ctrl.currentSubscribersSortType).toBe('username');
 
@@ -591,7 +588,7 @@ describe('Learner dashboard page', function() {
       });
     });
 
-    it('should get messages from a thread', function() {
+    it('should get thread messages from backend successfully', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -693,23 +690,25 @@ describe('Learner dashboard page', function() {
       expect(ctrl.messageSendingInProgress).toBe(false);
     });
 
-    it('should show suggestion modal', function() {
-      spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
-        .and.callThrough();
-      var newContent = 'New content';
-      var oldContent = 'Old content';
-      var description = 'Description';
-      ctrl.showSuggestionModal(newContent, oldContent, description);
+    it('should open suggestion modal with new and old content successfully',
+      function() {
+        spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
+          .and.callThrough();
+        var newContent = 'New content';
+        var oldContent = 'Old content';
+        var description = 'Description';
+        ctrl.showSuggestionModal(newContent, oldContent, description);
 
-      expect(SuggestionModalForLearnerDashboardService.showSuggestionModal)
-        .toHaveBeenCalledWith('edit_exploration_state_content', {
-          newContent: newContent,
-          oldContent: oldContent,
-          description: description
-        });
-    });
+        expect(SuggestionModalForLearnerDashboardService.showSuggestionModal)
+          .toHaveBeenCalledWith('edit_exploration_state_content', {
+            newContent: newContent,
+            oldContent: oldContent,
+            description: description
+          });
+      });
 
-    it('should open uib modal when removing activity', function() {
+    it('should open remove activity modal with $uibModal when removing' +
+      ' activity', function() {
       spyOn($uibModal, 'open').and.callThrough();
 
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
@@ -720,24 +719,26 @@ describe('Learner dashboard page', function() {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should remove an incomplete exploration activity', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
+    it('should remove an incomplete exploration activity successfully',
+      function() {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.resolve()
+        });
+
+        expect(ctrl.incompleteExplorationsList.length).toBe(12);
+
+        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+        // Get exploration with id 13.
+        var activity = learnerExplorationSummaryObjectFactory
+          .createFromBackendDict(
+            learnerDashboardData.incomplete_explorations_list[2]);
+        ctrl.openRemoveActivityModal(
+          sectionNameI18nId, subsectionName, activity);
+        $scope.$apply();
+
+        expect(ctrl.incompleteExplorationsList.length).toBe(11);
       });
-
-      expect(ctrl.incompleteExplorationsList.length).toBe(12);
-
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      // Get exploration with id 13.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict(
-          learnerDashboardData.incomplete_explorations_list[2]);
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
-
-      expect(ctrl.incompleteExplorationsList.length).toBe(11);
-    });
 
     it('should not remove an activity if its not present', function() {
       spyOn($uibModal, 'open').and.returnValue({
@@ -759,65 +760,71 @@ describe('Learner dashboard page', function() {
       expect(ctrl.incompleteExplorationsList.length).toBe(12);
     });
 
-    it('should remove an incomplete collection activity', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
+    it('should remove an incomplete collection activity successfully',
+      function() {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.resolve()
+        });
+
+        expect(ctrl.incompleteCollectionsList.length).toBe(8);
+
+        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+        // Get collection with id 11.
+
+        var activity = collectionSummaryObjectFactory.createFromBackendDict(
+          learnerDashboardData.incomplete_collections_list[2]);
+
+        ctrl.openRemoveActivityModal(
+          sectionNameI18nId, subsectionName, activity);
+        $scope.$apply();
+
+        expect(ctrl.incompleteCollectionsList.length).toBe(7);
       });
 
-      expect(ctrl.incompleteCollectionsList.length).toBe(8);
+    it('should remove an activity from exploration playlist successfully',
+      function() {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.resolve()
+        });
 
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-      // Get collection with id 11.
+        expect(ctrl.explorationPlaylist.length).toBe(10);
 
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
-        learnerDashboardData.incomplete_collections_list[2]);
+        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+        var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
+        // Exploration with id 2.
+        var activity = learnerExplorationSummaryObjectFactory
+          .createFromBackendDict(
+            learnerDashboardData.exploration_playlist[1]);
 
-      expect(ctrl.incompleteCollectionsList.length).toBe(7);
-    });
+        ctrl.openRemoveActivityModal(
+          sectionNameI18nId, subsectionName, activity);
+        $scope.$apply();
 
-    it('should remove an activity from exploration playlist', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
+        expect(ctrl.explorationPlaylist.length).toBe(9);
       });
 
-      expect(ctrl.explorationPlaylist.length).toBe(10);
+    it('should remove an activity from collection playlist successfully',
+      function() {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.resolve()
+        });
 
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+        expect(ctrl.collectionPlaylist.length).toBe(8);
 
-      // Exploration with id 2.
-      var activity = learnerExplorationSummaryObjectFactory
-        .createFromBackendDict(
-          learnerDashboardData.exploration_playlist[1]);
+        var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+        var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+        // Get collection with id 2.
+        var activity = collectionSummaryObjectFactory.createFromBackendDict(
+          learnerDashboardData.collection_playlist[1]);
 
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
+        ctrl.openRemoveActivityModal(
+          sectionNameI18nId, subsectionName, activity);
+        $scope.$apply();
 
-      expect(ctrl.explorationPlaylist.length).toBe(9);
-    });
-
-    it('should remove an activity from collection playlist', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
+        expect(ctrl.collectionPlaylist.length).toBe(7);
       });
-
-      expect(ctrl.collectionPlaylist.length).toBe(8);
-
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
-      // Get collection with id 2.
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
-        learnerDashboardData.collection_playlist[1]);
-
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
-
-      expect(ctrl.collectionPlaylist.length).toBe(7);
-    });
 
     it('should get css classes based on status', function() {
       expect(ctrl.getLabelClass('open')).toBe('badge badge-info');
@@ -832,7 +839,8 @@ describe('Learner dashboard page', function() {
         'Not Actionable');
     });
 
-    it('should get locate date string', function() {
+    it('should get abbreviate locale date string from date time format' +
+      ' service', function() {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       var NOW_MILLIS = 1416563100000;
       spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')

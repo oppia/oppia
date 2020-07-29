@@ -92,7 +92,7 @@ describe('Preferences Controller', function() {
       '/assets/images/path/to/image.png');
   });
 
-  it('should save user bio', function() {
+  it('should save user bio on backend', function() {
     var userBio = 'User bio example';
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match('"update_type":"user_bio"');
@@ -107,7 +107,7 @@ describe('Preferences Controller', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should save subject interests after changing it', function() {
+  it('should save subject interests after changing it on backend', function() {
     var subjectInterests = 'Math';
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
@@ -127,48 +127,50 @@ describe('Preferences Controller', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should save preferred site language code after changing it', function() {
-    var newLanguage = 'es';
-    var isRequestTheExpectOne = function(queryParams) {
-      return decodeURIComponent(queryParams).match(
-        '"update_type":"preferred_site_language_code"');
-    };
+  it('should save preferred site language code after changing it on backend',
+    function() {
+      var newLanguage = 'es';
+      var isRequestTheExpectOne = function(queryParams) {
+        return decodeURIComponent(queryParams).match(
+          '"update_type":"preferred_site_language_code"');
+      };
 
-    $httpBackend.expect(
-      'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-    ctrl.savePreferredSiteLanguageCodes(newLanguage);
-    $httpBackend.flush();
+      $httpBackend.expect(
+        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
+      ctrl.savePreferredSiteLanguageCodes(newLanguage);
+      $httpBackend.flush();
 
-    expect(ctrl.select2DropdownIsShown).toBe(false);
-    $timeout.flush();
-    expect(ctrl.select2DropdownIsShown).toBe(true);
+      expect(ctrl.select2DropdownIsShown).toBe(false);
+      $timeout.flush();
+      expect(ctrl.select2DropdownIsShown).toBe(true);
 
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
 
-  it('should save preferred audio language code after changing it', function() {
-    var newLanguage = 'es';
-    var isRequestTheExpectOne = function(queryParams) {
-      return decodeURIComponent(queryParams).match(
-        '"update_type":"preferred_audio_language_code"');
-    };
+  it('should save preferred audio language code after changing it on backend',
+    function() {
+      var newLanguage = 'es';
+      var isRequestTheExpectOne = function(queryParams) {
+        return decodeURIComponent(queryParams).match(
+          '"update_type":"preferred_audio_language_code"');
+      };
 
-    $httpBackend.expect(
-      'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-    ctrl.savePreferredAudioLanguageCode(newLanguage);
-    $httpBackend.flush();
+      $httpBackend.expect(
+        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
+      ctrl.savePreferredAudioLanguageCode(newLanguage);
+      $httpBackend.flush();
 
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
 
   it('should show username popover based on its length', function() {
     expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
     expect(ctrl.showUsernamePopover('abc')).toBe('none');
   });
 
-  it('should save email preferences', function() {
+  it('should save email preferences on backend successfully', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
         '"update_type":"email_preferences"');
@@ -182,7 +184,7 @@ describe('Preferences Controller', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should save preferred language codes', function() {
+  it('should save preferred language codes on backend', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
         '"update_type":"preferred_language_codes"');
@@ -196,7 +198,7 @@ describe('Preferences Controller', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should save default dashboard', function() {
+  it('should save default dashboard on backend', function() {
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
         '"update_type":"default_dashboard"');
@@ -233,7 +235,7 @@ describe('Preferences Controller', function() {
     }
   });
 
-  it('should edit profile picture modal', function() {
+  it('should change profile picture modal successfully', function() {
     var newPicture = 'new-picture.png';
     spyOn(mockWindow.location, 'reload').and.callThrough();
     spyOn($uibModal, 'open').and.returnValue({
@@ -249,7 +251,7 @@ describe('Preferences Controller', function() {
     expect(mockWindow.location.reload).toHaveBeenCalled();
   });
 
-  it('should edit profile picture modal', function() {
+  it('should not change profile picture modal', function() {
     spyOn(mockWindow.location, 'reload').and.callThrough();
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()

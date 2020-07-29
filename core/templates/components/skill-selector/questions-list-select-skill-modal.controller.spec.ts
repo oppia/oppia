@@ -44,13 +44,14 @@ describe('Questions List Select Skill Modal Controller', function() {
     });
   }));
 
-  it('should check properties set after controller is initialized', function() {
-    expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
-    expect($scope.selectedSkillId).toBe(null);
-    expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
-  });
+  it('should evaluate $scope properties after controller is initialized',
+    function() {
+      expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
+      expect($scope.selectedSkillId).toBe(null);
+      expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
+    });
 
-  it('should check properties set after controller is initialized', function() {
+  it('should save selected skill and close modal', function() {
     $scope.selectedSkillId = '2';
     $scope.save();
     expect($scope.selectedSkillId).toBe('2');

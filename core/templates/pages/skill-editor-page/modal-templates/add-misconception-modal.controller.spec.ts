@@ -94,7 +94,7 @@ describe('Add Misconception Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.skill).toEqual(skillObject);
     expect($scope.misconceptionName).toBe('');
     expect($scope.misconceptionNotes).toBe('');
@@ -102,7 +102,7 @@ describe('Add Misconception Modal Controller', function() {
     expect($scope.misconceptionMustBeAddressed).toBe(true);
   });
 
-  it('should save misconception', function() {
+  it('should save misconception successfully and close modal', function() {
     $scope.saveMisconception();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       misconception: MisconceptionObjectFactory.create(

@@ -43,7 +43,7 @@ describe('Revert Exploration Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.version).toBe(version);
   });
 

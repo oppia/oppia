@@ -164,7 +164,7 @@ describe('Question Editor Modal Controller', function() {
       });
     }));
 
-    it('should init the constiables', function() {
+    it('should evaluate $scope properties', function() {
       expect($scope.question).toEqual(question);
       expect($scope.questionStateData).toBe(questionStateData);
       expect($scope.associatedSkillSummaries).toEqual(associatedSkillSummaries);

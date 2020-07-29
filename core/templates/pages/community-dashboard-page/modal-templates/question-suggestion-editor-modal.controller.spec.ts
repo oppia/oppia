@@ -157,7 +157,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       });
     }));
 
-    it('should init the constiables', function() {
+    it('should evaluate $scope properties', function() {
       expect($scope.canEditQuestion).toBe(true);
       expect($scope.newQuestionIsBeingCreated).toBe(true);
       expect($scope.question).toEqual(question);

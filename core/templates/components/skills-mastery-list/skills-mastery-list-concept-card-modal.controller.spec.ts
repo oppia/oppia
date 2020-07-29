@@ -38,7 +38,7 @@ describe('Skills Mastery List Concept Card Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.skillIds).toEqual([skillId]);
     expect($scope.index).toEqual(0);
     expect($scope.modalHeader).toEqual(skillDescription);

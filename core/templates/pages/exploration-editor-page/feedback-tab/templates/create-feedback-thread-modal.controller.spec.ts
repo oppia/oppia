@@ -36,7 +36,7 @@ describe('Create Feedback Thread Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.newThreadSubject).toEqual('');
     expect($scope.newThreadText).toEqual('');
   });

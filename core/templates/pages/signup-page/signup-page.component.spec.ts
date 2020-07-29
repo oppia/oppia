@@ -201,7 +201,7 @@ describe('Signup page', function() {
         'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
-    it('should get data correctly from the server', function() {
+    it('should get data correctly from backend', function() {
       $httpBackend.flush();
       expect(ctrl.username).toBe('myUsername');
       expect(ctrl.hasAgreedToLatestTerms).toBe(false);
@@ -261,13 +261,13 @@ describe('Signup page', function() {
       expect(mockWindow.location.href).toBe('/another_url');
     });
 
-    it('should get data correctly from the server', function() {
+    it('should get data correctly from backend', function() {
       $httpBackend.flush();
       expect(ctrl.username).toBe('myUsername');
       expect(ctrl.hasAgreedToLatestTerms).toBe(true);
     });
 
-    it('should check that form is valid', function() {
+    it('should check form validity', function() {
       $httpBackend.flush();
       expect(ctrl.isFormValid()).toBe(true);
     });
@@ -299,7 +299,7 @@ describe('Signup page', function() {
       expect(ctrl.warningI18nCode).toEqual('');
     });
 
-  it('should show warning if no username provided', function() {
+  it('should show warning if no username is provided', function() {
     ctrl.updateWarningText('');
     expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
 

@@ -52,7 +52,7 @@ describe('Email Dashboard Result Page', function() {
     });
   }));
 
-  it('should sucessfully init ctrl properties', function() {
+  it('should evalutate ctrl properties after its initialization', function() {
     ctrl.$onInit();
 
     expect(ctrl.emailOption).toBe('all');
@@ -146,7 +146,7 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.invalid.maxRecipients).toBe(true);
   });
 
-  it('should reset form', function() {
+  it('should reset form successfully', function() {
     ctrl.emailSubject = 'Subject';
     ctrl.emailBody = 'Body';
     ctrl.emailOption = 'custom';
@@ -184,7 +184,7 @@ describe('Email Dashboard Result Page', function() {
     expect(windowRef.nativeWindow.location.href).toBe('');
   });
 
-  it('should send test email', function() {
+  it('should send test email successfully', function() {
     ctrl.$onInit();
     ctrl.emailSubject = 'Subject';
     ctrl.emailBody = 'Body';

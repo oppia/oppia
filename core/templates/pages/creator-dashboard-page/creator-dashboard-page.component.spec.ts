@@ -328,7 +328,7 @@ describe('Creator dashboard controller', () => {
         $rootScope.$apply();
       });
 
-      it('should evaluate data from backend', function() {
+      it('should evaluate data get from backend', function() {
         var suggestionThreadObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
             dashboardData.threads_for_created_suggestions_list[0],
@@ -345,7 +345,7 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.relativeChangeInTotalPlays).toBe(5);
       });
 
-      it('should change active tab name', function() {
+      it('should change active tab name successfully', function() {
         expect(ctrl.activeTab).toBe('myExplorations');
         ctrl.setActiveTab('suggestions');
         expect(ctrl.activeTab).toBe('suggestions');
@@ -360,7 +360,8 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.myExplorationsView).toBe('a');
       });
 
-      it('should set explorations sorting options', function() {
+      it('should change explorations sorting options by number of open' +
+        ' threads or new open threads', function() {
         expect(ctrl.isCurrentSortDescending).toBe(true);
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('numOpenThreads');
@@ -370,7 +371,8 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.currentSortType).toBe('new_open');
       });
 
-      it('should set subscription sorting options', function() {
+      it('should change subscription sorting options by username or new' +
+        ' subscriber', function() {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
         expect(ctrl.currentSubscribersSortType).toBe('username');
         ctrl.setSubscriptionSortingOptions('username');
@@ -380,7 +382,8 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.currentSubscribersSortType).toBe('new_subscriber');
       });
 
-      it('should sort subscription function', function() {
+      it('should get value sorted in subscription function by username or' +
+        ' impact', function() {
         var entity = {
           username: 'username'
         };
@@ -391,36 +394,37 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.sortSubscriptionFunction({})).toBe(0);
       });
 
-      it('should sort by function', function() {
-        expect(ctrl.currentSortType).toBe('numOpenThreads');
-        ctrl.setExplorationsSortingOptions('title');
-        expect(ctrl.currentSortType).toBe('title');
+      it('should get value sorted by custom comparator orderBy function',
+        function() {
+          expect(ctrl.currentSortType).toBe('numOpenThreads');
+          ctrl.setExplorationsSortingOptions('title');
+          expect(ctrl.currentSortType).toBe('title');
 
-        expect(ctrl.sortByFunction({
-          title: '',
-          status: 'private'
-        })).toBe('Untitled');
+          expect(ctrl.sortByFunction({
+            title: '',
+            status: 'private'
+          })).toBe('Untitled');
 
-        ctrl.setExplorationsSortingOptions('numViews');
-        expect(ctrl.currentSortType).toBe('numViews');
+          ctrl.setExplorationsSortingOptions('numViews');
+          expect(ctrl.currentSortType).toBe('numViews');
 
-        expect(ctrl.sortByFunction({
-          numViews: '',
-          status: 'private'
-        })).toBe(0);
+          expect(ctrl.sortByFunction({
+            numViews: '',
+            status: 'private'
+          })).toBe(0);
 
-        ctrl.setExplorationsSortingOptions('ratings');
-        expect(ctrl.currentSortType).toBe('ratings');
+          ctrl.setExplorationsSortingOptions('ratings');
+          expect(ctrl.currentSortType).toBe('ratings');
 
-        expect(ctrl.sortByFunction({})).toBe(0);
+          expect(ctrl.sortByFunction({})).toBe(0);
 
-        ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
-        expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
+          ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
+          expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
 
-        expect(ctrl.sortByFunction({
-          lastUpdatedMsec: 1
-        })).toBe(1);
-      });
+          expect(ctrl.sortByFunction({
+            lastUpdatedMsec: 1
+          })).toBe(1);
+        });
 
       it('should update screen width on window resize', function() {
         var innerWidthSpy = spyOnProperty($window, 'innerWidth');
@@ -448,72 +452,75 @@ describe('Creator dashboard controller', () => {
           'This exploration is private. Publish it to receive statistics.');
       });
 
-      it('should set active thread from my suggestions list', function() {
-        var threadId = 'exp1';
-        var messages = [{
-          author_username: '',
-          created_om_msecs: 0,
-          entity_type: '',
-          entity_id: '',
-          message_id: '',
-          text: '',
-          updated_status: '',
-          updated_subject: '',
-        }];
-        var suggestionThreadObject = (
-          SuggestionThreadObjectFactory.createFromBackendDicts(
-            dashboardData.threads_for_created_suggestions_list[0],
-            dashboardData.created_suggestions_list[0]));
-        suggestionThreadObject.setMessages(messages.map(m => (
-          ThreadMessageObjectFactory.createFromBackendDict(m))));
-
-        $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({
-          messages: messages
-        });
-        ctrl.setActiveThread(threadId);
-        $httpBackend.flush();
-
-        expect(ctrl.activeThread).toEqual(suggestionThreadObject);
-        expect(ctrl.canReviewActiveThread).toBe(false);
-      });
-
-      it('should set active thread from suggestions to review list',
+      it('should set active thread from my suggestions list successfully',
         function() {
-          var threadId = 'exp2';
-          var suggestionToReviewObject = (
+          var threadId = 'exp1';
+          var messages = [{
+            author_username: '',
+            created_om_msecs: 0,
+            entity_type: '',
+            entity_id: '',
+            message_id: '',
+            text: '',
+            updated_status: '',
+            updated_subject: '',
+          }];
+          var suggestionThreadObject = (
             SuggestionThreadObjectFactory.createFromBackendDicts(
-              dashboardData.threads_for_suggestions_to_review_list[0],
-              dashboardData.suggestions_to_review_list[0]));
+              dashboardData.threads_for_created_suggestions_list[0],
+              dashboardData.created_suggestions_list[0]));
+          suggestionThreadObject.setMessages(messages.map(m => (
+            ThreadMessageObjectFactory.createFromBackendDict(m))));
 
-          ctrl.clearActiveThread();
-
-          $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
+          $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({
+            messages: messages
+          });
           ctrl.setActiveThread(threadId);
           $httpBackend.flush();
 
-          expect(ctrl.activeThread).toEqual(suggestionToReviewObject);
-          expect(ctrl.canReviewActiveThread).toBe(true);
+          expect(ctrl.activeThread).toEqual(suggestionThreadObject);
+          expect(ctrl.canReviewActiveThread).toBe(false);
         });
 
-      it('should open suggestion modal', function() {
-        var threadId = 'exp1';
+      it('should set active thread from suggestions to review list' +
+        ' successfully', function() {
+        var threadId = 'exp2';
+        var suggestionToReviewObject = (
+          SuggestionThreadObjectFactory.createFromBackendDicts(
+            dashboardData.threads_for_suggestions_to_review_list[0],
+            dashboardData.suggestions_to_review_list[0]));
+
+        ctrl.clearActiveThread();
 
         $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
         ctrl.setActiveThread(threadId);
         $httpBackend.flush();
 
-        // Method showSuggestionModal is mocked otherwise using its original
-        // implementation will throw an error: 'appendTo element not found.
-        // Make sure that the element passed is in DOM.'
-        // This error does not happen often and it's related to the usage of
-        // angular.element in above specs.
-        spyOn(SuggestionModalForCreatorDashboardService, 'showSuggestionModal')
-          .and.callFake(() => {});
-        ctrl.showSuggestionModal();
-
-        expect(SuggestionModalForCreatorDashboardService.showSuggestionModal)
-          .toHaveBeenCalled();
+        expect(ctrl.activeThread).toEqual(suggestionToReviewObject);
+        expect(ctrl.canReviewActiveThread).toBe(true);
       });
+
+      it('should open suggestion modal when clicking on show suggestion modal',
+        function() {
+          var threadId = 'exp1';
+
+          $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
+          ctrl.setActiveThread(threadId);
+          $httpBackend.flush();
+
+          // Method showSuggestionModal is mocked otherwise using its original
+          // implementation will throw an error: 'appendTo element not found.
+          // Make sure that the element passed is in DOM.'
+          // This error does not happen often and it's related to the usage of
+          // angular.element in above specs.
+          spyOn(
+            SuggestionModalForCreatorDashboardService, 'showSuggestionModal')
+            .and.callFake(() => {});
+          ctrl.showSuggestionModal();
+
+          expect(SuggestionModalForCreatorDashboardService.showSuggestionModal)
+            .toHaveBeenCalled();
+        });
     });
 
   describe('when on collections tab', function() {

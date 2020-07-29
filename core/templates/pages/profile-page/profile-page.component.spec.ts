@@ -97,7 +97,7 @@ describe('Profile page', function() {
     windowRefMock.nativeWindow.location.href = '';
   });
 
-  it('should get locate date string', function() {
+  it('should get locale date string from date time format service', function() {
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
     var NOW_MILLIS = 1416563100000;
     spyOn(DateTimeFormatService, 'getLocaleDateString').withArgs(NOW_MILLIS)

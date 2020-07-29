@@ -36,7 +36,7 @@ describe('Translation Tab Busy Modal Controller', function() {
     });
   }));
 
-  it('should init the constiables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.busyMessage).toBe(message);
   });
 });

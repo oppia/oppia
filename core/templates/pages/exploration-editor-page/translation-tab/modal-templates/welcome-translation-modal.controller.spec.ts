@@ -44,7 +44,7 @@ describe('Welcome Translation Modal Controller', function() {
     });
   }));
 
-  it('should init the constiables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.explorationId).toBe(explorationId);
     expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
       .toHaveBeenCalledWith(explorationId);

@@ -58,13 +58,13 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should init the variables', function() {
+      it('should evaluate $scope properties', function() {
         expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
         expect($scope.subsectionName).toEqual(subsectionName);
         expect($scope.activityTitle).toEqual(activity.title);
       });
 
-      it('should remove activity', function() {
+      it('should remove activity from backend', function() {
         $httpBackend.expectDELETE(
           '/learnerplaylistactivityhandler/exploration/1').respond(200);
         $scope.remove();
@@ -104,7 +104,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove activity', function() {
+      it('should remove activity from backend', function() {
         $httpBackend.expectDELETE(
           '/learnerincompleteactivityhandler/collection/1').respond(200);
         $scope.remove();
@@ -136,13 +136,13 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should init the variables', function() {
+      it('should evaluate $scope properties', function() {
         expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
         expect($scope.subsectionName).toEqual(subsectionName);
         expect($scope.activityTitle).toEqual(activity.title);
       });
 
-      it('should not remove activity', function() {
+      it('should not remove activity from backend', function() {
         expect(function() {
           $scope.remove();
         }).toThrowError('Subsection name is not valid.');
@@ -171,7 +171,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove activity', function() {
+      it('should remove activity from backend', function() {
         expect(function() {
           $scope.remove();
         }).toThrowError('Section name is not valid.');

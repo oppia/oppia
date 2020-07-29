@@ -88,7 +88,6 @@ describe('Topic Landing Page', () => {
     fixture.detectChanges();
   });
 
-
   it('should get information from topic identified at pathname', () => {
     windowRef.nativeWindow.location.pathname = '/math/ratios';
     component.ngOnInit();

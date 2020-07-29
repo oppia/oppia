@@ -78,7 +78,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
     }));
 
-    it('should init the variables', function() {
+    it('should evaluate $scope properties', function() {
       expect(ctrl.requireTitleToBeSpecified).toBe(false);
       expect(ctrl.requireObjectiveToBeSpecified).toBe(false);
       expect(ctrl.requireCategoryToBeSpecified).toBe(false);
@@ -88,7 +88,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       expect(ctrl.newCategory).toBe(collectionDict.category);
     });
 
-    it('should save a collection', function() {
+    it('should save a collection successfully', function() {
       ctrl.newTitle = 'New title';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = 'Algorithm';
@@ -151,7 +151,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
     }));
 
-    it('should init the variables', function() {
+    it('should evaluate $scope properties', function() {
       expect(ctrl.requireTitleToBeSpecified).toBe(true);
       expect(ctrl.requireObjectiveToBeSpecified).toBe(true);
       expect(ctrl.requireCategoryToBeSpecified).toBe(true);

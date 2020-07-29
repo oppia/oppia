@@ -70,7 +70,7 @@ describe('Edit Thumbnail Modal Controller', function() {
     expect($scope.updateBackgroundColor).toHaveBeenCalled();
   });
 
-  it('should init the constiables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.uploadedImage).toBe(uploadedImage);
     expect($scope.invalidImageWarningIsShown).toBe(false);
     expect($scope.allowedBgColors).toBe(allowedBgColors);

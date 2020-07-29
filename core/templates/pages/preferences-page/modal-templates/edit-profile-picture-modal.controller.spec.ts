@@ -39,7 +39,7 @@ describe('EditProfilePictureModalController', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.uploadedImage).toBe(null);
     expect($scope.croppedImageDataUrl).toBe('');
     expect($scope.invalidImageWarningIsShown).toBe(false);

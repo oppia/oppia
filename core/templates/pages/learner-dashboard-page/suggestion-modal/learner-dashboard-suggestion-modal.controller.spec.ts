@@ -48,13 +48,13 @@ describe('Learner Dashboard Suggestion Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.newContent).toBe(newContent);
     expect($scope.oldContent).toBe(oldContent);
     expect($scope.description).toBe(description);
   });
 
-  it('should cancel the modal on canceling suggestion modal', function() {
+  it('should dismiss the modal on canceling suggestion modal', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });

@@ -59,7 +59,7 @@ describe('Assign Skill To Topic Modal', function() {
     });
   }));
 
-  it('should initialize the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.topicSummaries).toEqual([topicSummaryDict]);
     expect($scope.selectedTopicIds).toEqual([]);
   });

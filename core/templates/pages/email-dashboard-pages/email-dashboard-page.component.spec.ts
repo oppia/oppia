@@ -85,7 +85,7 @@ describe('Email Dashboard Page', function() {
     }
   });
 
-  it('should reset form', function() {
+  it('should reset form successfully', function() {
     // Mock some values.
     ctrl.hasNotLoggedInForNDays = true;
     ctrl.inactiveInLastNDays = true;
@@ -104,7 +104,7 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.editedFewerThanNExps).toBe(null);
   });
 
-  it('should submit query', function() {
+  it('should submit query successfully', function() {
     // Mock some values.
     ctrl.hasNotLoggedInForNDays = true;
     ctrl.inactiveInLastNDays = true;
@@ -155,7 +155,6 @@ describe('Email Dashboard Page', function() {
 
     expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
   });
-
 
   it('should evaluate when next button is displayed', function() {
     expect(ctrl.showNextButton()).toBe(true);

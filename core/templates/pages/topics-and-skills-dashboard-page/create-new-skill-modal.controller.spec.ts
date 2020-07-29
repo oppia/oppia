@@ -49,7 +49,7 @@ describe('Create new skill modal', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),
       RubricObjectFactory.create(skillDifficulties[1], ['']),

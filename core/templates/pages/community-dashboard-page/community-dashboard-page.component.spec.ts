@@ -76,11 +76,6 @@ describe('Community dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should get username', function() {
-      expect(ctrl.userIsLoggedIn).toBe(true);
-      expect(ctrl.username).toBe('username1');
-    });
-
     it('should set specific properties after $onInit is called', function() {
       expect(ctrl.languageCode).toBe('hi');
       expect(TranslationLanguageService.setActiveLanguageCode)
@@ -91,6 +86,8 @@ describe('Community dashboard page', function() {
     });
 
     it('should evaluate user\'s backend data', function() {
+      expect(ctrl.userIsLoggedIn).toBe(true);
+      expect(ctrl.username).toBe('username1');
       expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([
         'English', 'Portuguese', 'Hindi']);
       expect(ctrl.userCanReviewVoiceoverSuggestionsInLanguages).toEqual([
@@ -100,14 +97,14 @@ describe('Community dashboard page', function() {
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     });
 
-    it('should change active tab name', function() {
+    it('should change active tab name successfully', function() {
       var changedTab = 'translateTextTab';
       expect(ctrl.activeTabName).toBe('myContributionTab');
       ctrl.onTabClick(changedTab);
       expect(ctrl.activeTabName).toBe(changedTab);
     });
 
-    it('should change language', function() {
+    it('should change active language successfully', function() {
       spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
         .and.callThrough();
 

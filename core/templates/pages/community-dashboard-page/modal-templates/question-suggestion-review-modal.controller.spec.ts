@@ -131,7 +131,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       });
     }));
 
-    it('should init the constiables', function() {
+    it('should evaluate $scope properties', function() {
       expect($scope.authorName).toBe(authorName);
       expect($scope.contentHtml).toBe(contentHtml);
       expect($scope.reviewable).toBe(reviewable);

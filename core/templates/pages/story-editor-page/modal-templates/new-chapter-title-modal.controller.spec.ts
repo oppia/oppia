@@ -110,7 +110,7 @@ describe('Create New Chapter Modal Controller', function() {
     $scope.init();
   }));
 
-  it('should init the variables', function() {
+  it('should evalute $scope variables', function() {
     expect($scope.nodeTitles).toEqual(nodeTitles);
     expect($scope.errorMsg).toBe(null);
   });

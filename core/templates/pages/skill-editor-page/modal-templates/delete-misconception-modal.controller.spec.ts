@@ -87,7 +87,7 @@ describe('Delete Misconception Modal Controller', function() {
     });
   }));
 
-  it('should init the variables', function() {
+  it('should evaluate $scope properties', function() {
     expect($scope.skill).toEqual(skillObject);
   });
 
