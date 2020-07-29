@@ -39,16 +39,19 @@ describe('MathEquationEditor', function() {
   let deviceInfoService = null;
 
   class MockGuppy {
+    static focused = true;
     constructor(id: string, config: Object) {}
 
     asciimath() {
       return 'Dummy value';
     }
+    configure(name: string, val: Object): void {}
     static event(name: string, handler: Function): void {
-      handler();
+      handler({focused: MockGuppy.focused});
     }
     static configure(name: string, val: Object): void {}
     static 'remove_global_symbol'(symbol: string): void {}
+    static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
   beforeEach(angular.mock.module('oppia'));
@@ -66,6 +69,7 @@ describe('MathEquationEditor', function() {
     $window = $injector.get('$window');
     ctrl = $componentController('mathEquationEditor');
     $window.Guppy = MockGuppy;
+    ctrl.currentValue = '';
   }));
 
   it('should add the change handler to guppy', function() {
@@ -75,6 +79,14 @@ describe('MathEquationEditor', function() {
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
+  it('should not show warnings if the editor is active', function() {
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      mockGuppyObject);
+    ctrl.warningText = '';
+    ctrl.isCurrentAnswerValid();
+    expect(ctrl.warningText).toBe('');
+  });
+
   it('should initialize ctrl.value with an empty string', function() {
     ctrl.value = null;
     ctrl.$onInit();
@@ -82,16 +94,20 @@ describe('MathEquationEditor', function() {
   });
 
   it('should correctly validate current answer', function() {
-    // This should be validated as true if the editor hasn't been touched.
-    ctrl.value = '';
-    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    // This should not show warnings if the editor hasn't been touched.
+    ctrl.currentValue = '';
+    ctrl.isCurrentAnswerValid();
     expect(ctrl.warningText).toBe('');
 
     ctrl.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
-    ctrl.value = '';
+    ctrl.currentValue = '';
     expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Please enter a non-empty answer.');
+    expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
+
+    ctrl.currentValue = 'x=y';
+    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
+    expect(ctrl.warningText).toBe('');
   });
 
   it('should set the value of showOSK to true', function() {
@@ -101,5 +117,8 @@ describe('MathEquationEditor', function() {
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
     ctrl.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
+
+    MockGuppy.focused = false;
+    ctrl.$onInit();
   });
 });

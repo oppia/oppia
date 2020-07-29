@@ -819,7 +819,7 @@ def has_ever_registered(user_id):
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
 
-def has_fully_registered(user_id):
+def has_fully_registered_account(user_id):
     """Checks if a user has fully registered.
 
     Args:

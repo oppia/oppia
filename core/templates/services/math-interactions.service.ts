@@ -28,8 +28,12 @@ import { AppConstants } from 'app.constants';
 })
 export class MathInteractionsService {
   private warningText = '';
+  // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+  // rid of the TS2339 error on AppConstants.
+  private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
 
-  private cleanErrorMessage(errorMessage: string): string {
+  private cleanErrorMessage(
+      errorMessage: string, expressionString: string): string {
     // The error thrown by nerdamer includes the index of the violation which
     // starts with a colon. That part needs to be removed before displaying
     // the error to the end user. Same rationale applies for stripping the
@@ -53,6 +57,29 @@ export class MathInteractionsService {
     if (errorMessage[errorMessage.length - 1] !== '.') {
       errorMessage += '.';
     }
+    if (errorMessage === 'Division by zero not allowed.') {
+      errorMessage = 'Your answer includes a division by zero, which is ' +
+        'not valid.';
+    }
+    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
+      errorMessage = (
+        'Your answer seems to be missing a variable/number after the "' +
+        errorMessage[0] + '".');
+    }
+    if (errorMessage === 'A prefix operator was expected.') {
+      let symbol1, symbol2;
+      for (let s1 of '/*^') {
+        for (let s2 of '+-/*^') {
+          if (expressionString.indexOf(s1 + s2) !== -1) {
+            symbol1 = s1;
+            symbol2 = s2;
+          }
+        }
+      }
+      errorMessage = (
+        'Your answer has two symbols next to each other: "' + symbol1 +
+        '" and "' + symbol2 + '".');
+    }
     return errorMessage;
   }
 
@@ -60,7 +87,7 @@ export class MathInteractionsService {
     expressionString = expressionString.replace(/\s/g, '');
     let expressionObject;
     if (expressionString.length === 0) {
-      this.warningText = 'Please enter a non-empty answer.';
+      this.warningText = 'Please enter an answer before submitting.';
       return false;
     } else if (expressionString.indexOf('=') !== -1 || expressionString.indexOf(
       '<') !== -1 || expressionString.indexOf('>') !== -1) {
@@ -68,13 +95,20 @@ export class MathInteractionsService {
         'equation/inequality. Please enter an expression instead.';
       return false;
     } else if (expressionString.indexOf('_') !== -1) {
-      this.warningText = 'Invalid character \'_\' present in the expression.';
+      this.warningText = 'Your answer contains an invalid character: "_".';
+      return false;
+    }
+    let invalidIntegers = expressionString.match(
+      /(\d*\.\d*\.\d*)|(\d+\.\D)|(\D\.\d+)|(\d+\.$)/g);
+    if (invalidIntegers !== null) {
+      this.warningText = (
+        'Your answer contains an invalid term: ' + invalidIntegers[0]);
       return false;
     }
     try {
       expressionObject = nerdamer(expressionString);
     } catch (err) {
-      this.warningText = this.cleanErrorMessage(err.message);
+      this.warningText = this.cleanErrorMessage(err.message, expressionString);
       return false;
     }
     if (algebraic && expressionObject.variables().length === 0) {
@@ -83,10 +117,16 @@ export class MathInteractionsService {
         ' mentioned in the question.';
       return false;
     }
-    if (!algebraic && expressionObject.variables().length !== 0) {
-      this.warningText = 'It looks like you have entered some non-numeric' +
-        ' values. Please enter numbers only.';
-      return false;
+    if (!algebraic) {
+      for (let functionName of this.mathFunctionNames) {
+        expressionString = expressionString.replace(
+          new RegExp(functionName, 'g'), '');
+      }
+      if (/[a-zA-Z]/.test(expressionString)) {
+        this.warningText = 'It looks like you have entered some variables. ' +
+          'Please enter numbers only.';
+        return false;
+      }
     }
     this.warningText = '';
     return true;
@@ -95,7 +135,7 @@ export class MathInteractionsService {
   validateEquation(equationString: string): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
-      this.warningText = 'Please enter a non-empty answer.';
+      this.warningText = 'Please enter an answer before submitting.';
       return false;
     } else if (equationString.indexOf(
       '<') !== -1 || equationString.indexOf('>') !== -1) {
@@ -143,6 +183,7 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
+    expressionString = expressionString.replace(/\s/g, '');
     // Assumes that given expressionString is valid.
     // Nerdamer allows multi-character variables so, 'ax+b' will be considered
     // to have variables: [ax, b], but we want a and x to be considered as
@@ -162,14 +203,23 @@ export class MathInteractionsService {
     }
     // Inserting multiplication signs before functions. For eg. 5sqrt(x) should
     // be treated as 5*sqrt(x).
-    // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    for (let functionName of AppConstants.MATH_FUNCTION_NAMES) {
+    for (let functionName of this.mathFunctionNames) {
       expressionString = expressionString.replace(new RegExp(
         '([a-zA-Z0-9\)])' + functionName, 'g'), '$1*' + functionName);
     }
     // Inserting multiplication signs after closing parens.
     expressionString = expressionString.replace(/\)([^\*\+\/\-\^\)])/g, ')*$1');
+    // Inserting multiplication signs before opening parens.
+    // Note: We don't wanna insert signs before opening parens that are part of
+    // functions, for eg., we want to convert a(b) to a*(b) but not sqrt(4) to
+    // sqrt*(4).
+    let removeExtraMultiSymbol = expressionString[0] === '(';
+    expressionString = expressionString.replace(new RegExp(
+      '(?<!\\*|\\+|\\/|\\-|\\^|\\(|' + this.mathFunctionNames.join(
+        '|') + ')\\(', 'g'), '*(');
+    if (removeExtraMultiSymbol) {
+      expressionString = expressionString.slice(1);
+    }
     return expressionString;
   }
 

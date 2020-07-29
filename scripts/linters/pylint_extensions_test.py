@@ -318,6 +318,790 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             pylint_extensions.DocstringParameterChecker)
         self.checker_test_object.setup_method()
 
+    def test_no_newline_below_class_docstring(self):
+        node_no_newline_below_class_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+                        a = 1 + 2
+                """)
+        node_no_newline_below_class_docstring.file = filename
+        node_no_newline_below_class_docstring.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_no_newline_below_class_docstring)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_no_newline_below_class_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_excessive_newline_below_class_docstring(self):
+        node_excessive_newline_below_class_docstring = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+
+
+                        a = 1 + 2
+                """)
+        node_excessive_newline_below_class_docstring.file = filename
+        node_excessive_newline_below_class_docstring.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_excessive_newline_below_class_docstring)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_excessive_newline_below_class_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_inline_comment_after_class_docstring(self):
+        node_inline_comment_after_class_docstring = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+                        # This is a comment.
+                        def func():
+                            a = 1 + 2
+                """)
+        node_inline_comment_after_class_docstring.file = filename
+        node_inline_comment_after_class_docstring.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_inline_comment_after_class_docstring)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_inline_comment_after_class_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_multiline_class_argument_with_incorrect_style(self):
+        node_multiline_class_argument_with_incorrect_style = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(
+                            dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+                        a = 1 + 2
+                """)
+        node_multiline_class_argument_with_incorrect_style.file = filename
+        node_multiline_class_argument_with_incorrect_style.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_multiline_class_argument_with_incorrect_style)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_multiline_class_argument_with_incorrect_style)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+
+    def test_multiline_class_argument_with_correct_style(self):
+        node_multiline_class_argument_with_correct_style = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(
+                            dummy_class):
+                        \"\"\"This is a docstring.\"\"\"
+
+                        a = 1 + 2
+                """)
+        node_multiline_class_argument_with_correct_style.file = filename
+        node_multiline_class_argument_with_correct_style.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_multiline_class_argument_with_correct_style)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_single_newline_below_class_docstring(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        \"\"\"This is a multiline docstring.\"\"\"
+
+                        a = 1 + 2
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_class_with_no_docstring(self):
+        node_class_with_no_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc=None)
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+                        a = 1 + 2
+                """)
+        node_class_with_no_docstring.file = filename
+        node_class_with_no_docstring.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_class_with_no_docstring)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_newline_before_docstring_with_correct_style(self):
+        node_newline_before_docstring_with_correct_style = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+
+                        \"\"\"This is a multiline docstring.\"\"\"
+
+                        a = 1 + 2
+                """)
+        node_newline_before_docstring_with_correct_style.file = filename
+        node_newline_before_docstring_with_correct_style.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_newline_before_docstring_with_correct_style)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_newline_before_docstring_with_incorrect_style(self):
+        node_newline_before_docstring_with_incorrect_style = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'))
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class ClassName(dummy_class):
+
+                        \"\"\"This is a multiline docstring.\"\"\"
+                        a = 1 + 2
+                """)
+        node_newline_before_docstring_with_incorrect_style.file = filename
+        node_newline_before_docstring_with_incorrect_style.path = filename
+
+        self.checker_test_object.checker.visit_classdef(
+            node_newline_before_docstring_with_incorrect_style)
+
+        message = testutils.Message(
+            msg_id='newline-below-class-docstring',
+            node=node_newline_before_docstring_with_incorrect_style)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_space_after_docstring(self):
+        node_space_after_docstring = astroid.extract_node(
+            u"""def func():
+                    \"\"\" Hello world.\"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='space-after-triple-quote',
+            node=node_space_after_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_space_after_docstring)
+
+    def test_single_line_docstring_span_two_lines(self):
+        node_single_line_docstring_span_two_lines = astroid.extract_node(
+            u"""def func(): #@
+                    \"\"\"This is a docstring.
+                    \"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='single-line-docstring-span-two-lines',
+            node=node_single_line_docstring_span_two_lines)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_single_line_docstring_span_two_lines)
+
+    def test_no_period_at_end(self):
+        node_no_period_at_end = astroid.extract_node(
+            u"""def func(): #@
+                    \"\"\"This is a docstring\"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='no-period-used',
+            node=node_no_period_at_end)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_no_period_at_end)
+
+    def test_empty_line_before_end_of_docstring(self):
+        node_empty_line_before_end = astroid.extract_node(
+            u"""def func(): #@
+                    \"\"\"This is a docstring.
+
+                    \"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='empty-line-before-end', node=node_empty_line_before_end)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_empty_line_before_end)
+
+    def test_no_period_at_end_of_a_multiline_docstring(self):
+        node_no_period_at_end = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Args:
+                            arg: variable
+                    \"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='no-period-used', node=node_no_period_at_end)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_no_period_at_end)
+
+    def test_no_newline_at_end_of_multi_line_docstring(self):
+        node_no_newline_at_end = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Args:
+                            arg: variable.\"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='no-newline-used-at-end', node=node_no_newline_at_end)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_no_newline_at_end)
+
+    def test_no_newline_above_args(self):
+        node_single_newline_above_args = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Do something.
+                Args:
+                    arg: argument.
+                \"\"\"
+        """)
+
+        message = testutils.Message(
+            msg_id='single-space-above-args',
+            node=node_single_newline_above_args)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_single_newline_above_args)
+
+
+    def test_no_newline_above_raises(self):
+        node_single_newline_above_raises = astroid.extract_node(
+            u"""def func(): #@
+                    \"\"\"Raises exception.
+                    Raises:
+                        raises_exception.
+                    \"\"\"
+                    raise exception
+        """)
+
+        message = testutils.Message(
+            msg_id='single-space-above-raises',
+            node=node_single_newline_above_raises
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_single_newline_above_raises)
+
+    def test_no_newline_above_return(self):
+        node_with_no_space_above_return = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Returns something.
+                Returns:
+                    returns_something.
+                \"\"\"
+                return something
+        """)
+
+        message = testutils.Message(
+            msg_id='single-space-above-returns',
+            node=node_with_no_space_above_return
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_space_above_return)
+
+    def test_varying_combination_of_newline_above_args(self):
+        node_newline_above_args_raises = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Raises exception.
+
+                Args:
+                    arg: argument
+                Raises:
+                    raises_something.
+                \"\"\"
+                raise exception
+        """)
+
+        message = testutils.Message(
+            msg_id='single-space-above-raises',
+            node=node_newline_above_args_raises
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_newline_above_args_raises)
+
+
+        node_newline_above_args_returns = astroid.extract_node(
+            u"""def func(arg): #@
+                \"\"\"Returns Something.
+
+                Args:
+                    arg: argument
+                Returns:
+                    returns_something.
+                \"\"\"
+                return something
+        """)
+
+        message = testutils.Message(
+            msg_id='single-space-above-returns',
+            node=node_newline_above_args_returns
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_newline_above_args_returns)
+
+        node_newline_above_returns_raises = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Do something.
+
+
+
+                Raises:
+                    raises_exception
+
+                Returns:
+                    returns_something.
+                \"\"\"
+                raise something
+                return something
+        """)
+
+        message = testutils.Message(
+            msg_id='single-space-above-raises',
+            node=node_newline_above_returns_raises
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_newline_above_returns_raises)
+
+    def test_excessive_newline_above_args(self):
+        node_with_two_newline = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"Returns something.
+
+
+                    Args:
+                        arg: argument
+
+
+                    Returns:
+                        returns_something
+
+
+                    Yield:
+                        yield_something.
+                    \"\"\"
+                    return True
+                    yield something
+        """)
+
+        message1 = testutils.Message(
+            msg_id='single-space-above-args',
+            node=node_with_two_newline
+        )
+
+        message2 = testutils.Message(
+            msg_id='single-space-above-returns',
+            node=node_with_two_newline
+        )
+
+        message3 = testutils.Message(
+            msg_id='single-space-above-yield',
+            node=node_with_two_newline
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message1, message2, message3):
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_two_newline)
+
+    def test_return_in_comment(self):
+        node_with_return_in_comment = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"Returns something.
+
+                    Args:
+                        arg: argument
+
+                    Returns:
+                        returns_something.
+                    \"\"\"
+                    "Returns: something"
+                    return something
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_return_in_comment)
+
+    def test_function_with_no_args(self):
+        node_with_no_args = astroid.extract_node(
+            u"""def func():
+                \"\"\"Do something.\"\"\"
+
+                a = 1 + 2
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_args)
+
+    def test_well_placed_newline(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"Returns something.
+
+                    Args:
+                        arg: argument
+
+                    Returns:
+                        returns_something
+
+                    Raises:
+                        raises something
+
+                    Yield:
+                        yield_something.
+                    \"\"\"
+                    raise something
+                    yield something
+                    return something
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+    def test_invalid_parameter_indentation_in_docstring(self):
+        raises_invalid_indentation_node = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Raises:
+                        NoVariableException: variable.
+                    \"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='4-space-indentation-in-docstring',
+            node=raises_invalid_indentation_node)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                raises_invalid_indentation_node)
+
+        return_invalid_indentation_node = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Returns:
+                        str. If :true,
+                            individual key=value pairs.
+                    \"\"\"
+                    Something
+        """)
+        message = testutils.Message(
+            msg_id='4-space-indentation-in-docstring',
+            node=return_invalid_indentation_node)
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                return_invalid_indentation_node)
+
+    def test_invalid_description_indentation_docstring(self):
+        invalid_raises_description_indentation_node = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Raises:
+                            AssertionError: if the
+                            schema is not valid.
+                    \"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='8-space-indentation-in-docstring',
+            node=invalid_raises_description_indentation_node)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                invalid_raises_description_indentation_node)
+
+        invalid_return_description_indentation_node = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Returns:
+                            str. If :true,
+                                individual key=value pairs.
+                    \"\"\"
+                    return Something
+        """)
+        message = testutils.Message(
+            msg_id='4-space-indentation-in-docstring',
+            node=invalid_return_description_indentation_node)
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                invalid_return_description_indentation_node)
+
+        invalid_yield_description_indentation_node = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Yields:
+                            str. If :true,
+                                incorrent indentation line.
+                    \"\"\"
+                    yield Something
+        """)
+        message = testutils.Message(
+            msg_id='4-space-indentation-in-docstring',
+            node=invalid_yield_description_indentation_node)
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                invalid_yield_description_indentation_node)
+
+    def test_malformed_parameter_docstring(self):
+        invalid_parameter_name = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Raises:
+                            Incorrect-Exception: if the
+                            schema is not valid.
+                    \"\"\"
+                    Something
+        """)
+
+        message = testutils.Message(
+            msg_id='malformed-parameter',
+            node=invalid_parameter_name)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                invalid_parameter_name)
+
+    def test_well_formed_single_line_docstring(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.\"\"\"
+                    Something
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+    def test_well_formed_multi_line_docstring(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Args:
+                            arg: variable.
+                    \"\"\"
+                    Something
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+    def test_well_formed_multi_line_description_docstring(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Args:
+                            arg: bool. If true, individual key=value
+                                pairs separated by '&' are
+                                generated for each element of the value
+                                sequence for the key.
+                    \"\"\"
+                    Something
+        """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Raises:
+                            doseq: bool. If true, individual
+                                key=value pairs separated by '&' are
+                                generated for each element of
+                                the value sequence for the key
+                                temp temp temp temp.
+                            query: dict or tuple. The query to be encoded.
+                    \"\"\"
+                    Something
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg):
+                    \"\"\"This is a docstring.
+
+                        Returns:
+                            str. The string parsed using
+                            Jinja templating. Returns an error
+                            string in case of error in parsing.
+
+                        Yields:
+                            tuple. For ExplorationStatsModel,
+                            a 2-tuple of the form (exp_id, value)
+                            where value is of the form.
+                    \"\"\"
+                    if True:
+                        return Something
+                    else:
+                        yield something
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(arg): #@
+                    \"\"\"This is a docstring.
+
+                        Returns:
+                            str. From this item there
+                            is things:
+                                Jinja templating. Returns an error
+                            string in case of error in parsing.
+
+                        Yields:
+                            tuple. For ExplorationStatsModel:
+                                {key
+                                    (sym)
+                                }
+                    \"\"\"
+                    if True:
+                        return Something
+                    else:
+                        yield (a, b)
+        """)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
     def test_checks_args_formatting_docstring(self):
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
@@ -1440,332 +2224,6 @@ class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
-
-    def setUp(self):
-        super(SingleNewlineAboveArgsCheckerTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.SingleNewlineAboveArgsChecker)
-        self.checker_test_object.setup_method()
-
-    def test_no_newline_above_args(self):
-        node_single_newline_above_args = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func(arg):
-                        \"\"\"Do something.
-                        Args:
-                            arg: argument
-                        \"\"\"
-                        do something
-                """)
-        node_single_newline_above_args.file = filename
-        node_single_newline_above_args.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_single_newline_above_args)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-args',
-                line=2
-            ),
-        ):
-            temp_file.close()
-
-    def test_no_newline_above_raises(self):
-        node_single_newline_above_raises = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func():
-                        \"\"\"Raises exception.
-                        Raises:
-                            raises_exception
-                        \"\"\"
-                        raises_exception
-                """)
-        node_single_newline_above_raises.file = filename
-        node_single_newline_above_raises.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_single_newline_above_raises)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-raises',
-                line=2
-            ),
-        ):
-            temp_file.close()
-
-    def test_no_newline_above_return(self):
-        node_with_no_space_above_return = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func():
-                    \"\"\"Returns something.
-                    Returns:
-                        returns_something
-                    \"\"\"
-                    returns_something
-                """)
-        node_with_no_space_above_return.file = filename
-        node_with_no_space_above_return.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_space_above_return)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-returns',
-                line=2
-            ),
-        ):
-            temp_file.close()
-
-    def test_varying_combination_of_newline_above_args(self):
-        node_newline_above_args_raises = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func(arg):
-                    \"\"\"Raises exception.
-
-                    Args:
-                        arg: argument
-                    Raises:
-                        raises_something
-                    \"\"\"
-                    raises_exception
-                """)
-        node_newline_above_args_raises.file = filename
-        node_newline_above_args_raises.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_newline_above_args_raises)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-raises',
-                line=5
-            ),
-        ):
-            temp_file.close()
-
-        node_newline_above_args_returns = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func(arg):
-                    \"\"\"Returns Something.
-
-                    Args:
-                        arg: argument
-                    Returns:
-                        returns_something
-                    \"\"\"
-                    returns_something
-                """)
-        node_newline_above_args_returns.file = filename
-        node_newline_above_args_returns.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_newline_above_args_returns)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-returns',
-                line=5
-            ),
-        ):
-            temp_file.close()
-
-        node_newline_above_returns_raises = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func():
-                    \"\"\"Do something.
-
-
-
-                    Raises:
-                        raises_exception
-
-                    Returns:
-                        returns_something
-                    \"\"\"
-                    raises_exception
-                    returns_something
-                """)
-        node_newline_above_returns_raises.file = filename
-        node_newline_above_returns_raises.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_newline_above_returns_raises)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-raises',
-                line=5
-            ),
-        ):
-            temp_file.close()
-
-    def test_excessive_newline_above_args(self):
-        node_with_two_newline = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func(arg):
-                        \"\"\"Returns something.
-
-
-                        Args:
-                            arg: argument
-
-
-                        Returns:
-                            returns_something
-                        \"\"\"
-                        returns something
-                """)
-        node_with_two_newline.file = filename
-        node_with_two_newline.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_two_newline)
-
-        with self.checker_test_object.assertAddsMessages(
-            testutils.Message(
-                msg_id='single-space-above-args',
-                line=4
-            ),
-            testutils.Message(
-                msg_id='single-space-above-returns',
-                line=8
-            ),
-        ):
-            temp_file.close()
-
-    def test_return_in_comment(self):
-        node_with_return_in_comment = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func(arg):
-                        \"\"\"Returns something.
-
-                        Args:
-                            arg: argument
-
-                        Returns:
-                            returns_something
-                        \"\"\"
-                        "Returns: something"
-                        returns_something
-                """)
-        node_with_return_in_comment.file = filename
-        node_with_return_in_comment.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_return_in_comment)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_function_with_no_args(self):
-        node_with_no_args = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func():
-                    \"\"\"Do something.\"\"\"
-
-                    do something
-                """)
-        node_with_no_args.file = filename
-        node_with_no_args.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_args)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_well_placed_newline(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def func(arg):
-                        \"\"\"Returns something.
-
-                        Args:
-                            arg: argument
-
-                        Returns:
-                            returns_something
-
-                        Raises:
-                            raises something
-                        \"\"\"
-                        raises_something
-                        returns_something
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-
 class DivisionOperatorCheckerTests(unittest.TestCase):
 
     def setUp(self):
@@ -2012,454 +2470,6 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class DocstringCheckerTests(unittest.TestCase):
-
-    def setUp(self):
-        super(DocstringCheckerTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DocstringChecker)
-        self.checker_test_object.setup_method()
-
-    def test_space_after_docstring(self):
-        node_space_after_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(something):
-                        \"\"\" Hello world.\"\"\"
-                        Something
-                """)
-        node_space_after_docstring.file = filename
-        node_space_after_docstring.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_space_after_docstring)
-
-        message = testutils.Message(
-            msg_id='space-after-triple-quote',
-            line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_single_line_docstring_span_two_lines(self):
-        node_single_line_docstring_span_two_lines = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                        \"\"\"
-                        Something
-                """)
-        node_single_line_docstring_span_two_lines.file = filename
-        node_single_line_docstring_span_two_lines.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_single_line_docstring_span_two_lines)
-
-        message = testutils.Message(
-            msg_id='single-line-docstring-span-two-lines',
-            line=3)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_no_period_at_end(self):
-        node_no_period_at_end = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring\"\"\"
-                        Something
-                """)
-        node_no_period_at_end.file = filename
-        node_no_period_at_end.path = filename
-
-        self.checker_test_object.checker.process_module(node_no_period_at_end)
-
-        message = testutils.Message(
-            msg_id='no-period-used',
-            line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_empty_line_before_end_of_docstring(self):
-        node_empty_line_before_end = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-
-                        \"\"\"
-                        Something
-                """)
-        node_empty_line_before_end.file = filename
-        node_empty_line_before_end.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_empty_line_before_end)
-
-        message = testutils.Message(
-            msg_id='empty-line-before-end',
-            line=4)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_no_period_at_end_of_a_multiline_docstring(self):
-        node_no_period_at_end = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Args:
-                                arg: variable
-                        \"\"\"
-                        Something
-                """)
-        node_no_period_at_end.file = filename
-        node_no_period_at_end.path = filename
-
-        self.checker_test_object.checker.process_module(node_no_period_at_end)
-
-        message = testutils.Message(
-            msg_id='no-period-used',
-            line=5)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_no_newline_at_end_of_multi_line_docstring(self):
-        node_no_newline_at_end = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Args:
-                                arg: variable.\"\"\"
-                        Something
-                """)
-        node_no_newline_at_end.file = filename
-        node_no_newline_at_end.path = filename
-
-        self.checker_test_object.checker.process_module(node_no_newline_at_end)
-
-        message = testutils.Message(
-            msg_id='no-newline-used-at-end',
-            line=4)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_invalid_parameter_indentation_in_docstring(self):
-        raises_invalid_indentation_node = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Raises:
-                            NoVariableException: variable.
-                        \"\"\"
-                        Something
-                """)
-        raises_invalid_indentation_node.file = filename
-        raises_invalid_indentation_node.path = filename
-
-        self.checker_test_object.checker.process_module(
-            raises_invalid_indentation_node)
-
-        message = testutils.Message(
-            msg_id='4-space-indentation-in-docstring',
-            line=4)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Returns:
-                            str. If :true,
-                                individual key=value pairs.
-                        \"\"\"
-                        Something
-                """)
-        message = testutils.Message(
-            msg_id='4-space-indentation-in-docstring',
-            line=4)
-        self.checker_test_object.checker.process_module(
-            raises_invalid_indentation_node)
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_invalid_description_indentation_docstring(self):
-        invalid_description_indentation_node = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Raises:
-                                AssertionError: if the
-                                schema is not valid.
-                        \"\"\"
-                        Something
-                """)
-        invalid_description_indentation_node.file = filename
-        invalid_description_indentation_node.path = filename
-
-        self.checker_test_object.checker.process_module(
-            invalid_description_indentation_node)
-
-        message = testutils.Message(
-            msg_id='8-space-indentation-in-docstring',
-            line=5)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Returns:
-                                str. If :true,
-                                    individual key=value pairs.
-                        \"\"\"
-                        Something
-                """)
-        message = testutils.Message(
-            msg_id='4-space-indentation-in-docstring',
-            line=5)
-        self.checker_test_object.checker.process_module(
-            invalid_description_indentation_node)
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Yields:
-                                str. If :true,
-                                  incorrent indentation line.
-                        \"\"\"
-                        Something
-                """)
-        message = testutils.Message(
-            msg_id='4-space-indentation-in-docstring',
-            line=5)
-        self.checker_test_object.checker.process_module(
-            invalid_description_indentation_node)
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_malformed_parameter_docstring(self):
-        invalid_parameter_name = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Raises:
-                                Incorrect-Exception: if the
-                                schema is not valid.
-                        \"\"\"
-                        Something
-                """)
-        invalid_parameter_name.file = filename
-        invalid_parameter_name.path = filename
-
-        self.checker_test_object.checker.process_module(
-            invalid_parameter_name)
-
-        message = testutils.Message(
-            msg_id='malformed-parameter',
-            line=4)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_well_formed_single_line_docstring(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.\"\"\"
-                        Something
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_well_formed_multi_line_docstring(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Args:
-                                arg: variable.
-                        \"\"\"
-                        Something
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_well_formed_multi_line_description_docstring(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Args:
-                                query: dict or tuple. The query to be encoded.
-                                doseq: bool. If true, individual key=value
-                                    pairs separated by '&' are
-                                    generated for each element of the value
-                                    sequence for the key.
-                        \"\"\"
-                        Something
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Raises:
-                                doseq: bool. If true, individual
-                                    key=value pairs separated by '&' are
-                                    generated for each element of
-                                    the value sequence for the key
-                                    temp temp temp temp.
-                                query: dict or tuple. The query to be encoded.
-                        \"\"\"
-                        Something
-                """)
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Returns:
-                                str. The string parsed using
-                                Jinja templating. Returns an error
-                                string in case of error in parsing.
-                            Yields:
-                                tuple. For ExplorationStatsModel,
-                                a 2-tuple of the form (exp_id, value)
-                                where value is of the form.
-                        \"\"\"
-                        Something
-                """)
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""class ABC(arg):
-                        \"\"\"This is a docstring.
-                            Returns:
-                                str. From this item there
-                                is things:
-                                    Jinja templating. Returns an error
-                                string in case of error in parsing.
-                            Yields:
-                                tuple. For ExplorationStatsModel:
-                                    {key
-                                        (sym)
-                                    }
-                        \"\"\"
-                        Something
-                """)
-        self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-
 class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 
     def setUp(self):
@@ -2646,260 +2656,6 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
             line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-
-class NewlineBelowClassDocstringTests(unittest.TestCase):
-
-    def setUp(self):
-        super(NewlineBelowClassDocstringTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.NewlineBelowClassDocstring)
-        self.checker_test_object.setup_method()
-
-    def test_no_newline_below_class_docstring(self):
-        node_no_newline_below_class_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        a = 1 + 2
-                """)
-        node_no_newline_below_class_docstring.file = filename
-        node_no_newline_below_class_docstring.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_no_newline_below_class_docstring)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_no_newline_below_class_docstring)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_excessive_newline_below_class_docstring(self):
-        node_excessive_newline_below_class_docstring = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-
-                        a = 1 + 2
-                """)
-        node_excessive_newline_below_class_docstring.file = filename
-        node_excessive_newline_below_class_docstring.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_excessive_newline_below_class_docstring)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_excessive_newline_below_class_docstring)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_inline_comment_after_class_docstring(self):
-        node_inline_comment_after_class_docstring = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        # This is a comment.
-                        def func():
-                            a = 1 + 2
-                """)
-        node_inline_comment_after_class_docstring.file = filename
-        node_inline_comment_after_class_docstring.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_inline_comment_after_class_docstring)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_inline_comment_after_class_docstring)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_multiline_class_argument_with_incorrect_style(self):
-        node_multiline_class_argument_with_incorrect_style = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(
-                            dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-                        a = 1 + 2
-                """)
-        node_multiline_class_argument_with_incorrect_style.file = filename
-        node_multiline_class_argument_with_incorrect_style.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_multiline_class_argument_with_incorrect_style)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_multiline_class_argument_with_incorrect_style)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-
-    def test_multiline_class_argument_with_correct_style(self):
-        node_multiline_class_argument_with_correct_style = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(
-                            dummy_class):
-                        \"\"\"This is a docstring.\"\"\"
-
-                        a = 1 + 2
-                """)
-        node_multiline_class_argument_with_correct_style.file = filename
-        node_multiline_class_argument_with_correct_style.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_multiline_class_argument_with_correct_style)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_single_newline_below_class_docstring(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        \"\"\"This is a multiline docstring.\"\"\"
-
-                        a = 1 + 2
-                """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_with_no_error_message)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_class_with_no_docstring(self):
-        node_class_with_no_docstring = astroid.scoped_nodes.Module(
-            name='test',
-            doc=None)
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-                        a = 1 + 2
-                """)
-        node_class_with_no_docstring.file = filename
-        node_class_with_no_docstring.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_class_with_no_docstring)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_newline_before_docstring_with_correct_style(self):
-        node_newline_before_docstring_with_correct_style = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-
-                        \"\"\"This is a multiline docstring.\"\"\"
-
-                        a = 1 + 2
-                """)
-        node_newline_before_docstring_with_correct_style.file = filename
-        node_newline_before_docstring_with_correct_style.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_newline_before_docstring_with_correct_style)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_newline_before_docstring_with_incorrect_style(self):
-        node_newline_before_docstring_with_incorrect_style = (
-            astroid.scoped_nodes.Module(
-                name='test',
-                doc='Custom test'))
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    class ClassName(dummy_class):
-
-                        \"\"\"This is a multiline docstring.\"\"\"
-                        a = 1 + 2
-                """)
-        node_newline_before_docstring_with_incorrect_style.file = filename
-        node_newline_before_docstring_with_incorrect_style.path = filename
-
-        self.checker_test_object.checker.visit_classdef(
-            node_newline_before_docstring_with_incorrect_style)
-
-        message = testutils.Message(
-            msg_id='newline-below-class-docstring',
-            node=node_newline_before_docstring_with_incorrect_style)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
