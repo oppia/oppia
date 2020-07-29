@@ -457,7 +457,7 @@ def get_chrome_driver_version():
             'version to be used, please follow the instructions mentioned '
             'in the following URL:\n'
             'https://chromedriver.chromium.org/downloads/version-selection' % (
-                ' '.join(arg.replace(' ', '\ ') for arg in popen_args)
+                ' '.join(arg.replace(' ', r'\ ') for arg in popen_args)
             )
         )
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
