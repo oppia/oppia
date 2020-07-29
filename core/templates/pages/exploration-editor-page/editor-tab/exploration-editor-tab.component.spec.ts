@@ -64,7 +64,8 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
