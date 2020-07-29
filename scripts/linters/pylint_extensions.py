@@ -666,6 +666,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
         re_yields_line = re_returns_line
 
+        re_raise_line = re.compile(
+            r"""
+            \s* ({type}:)+                    # identifier
+            \s* (.*)[.]+                          # beginning of description
+        """.format(
+            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+        ), flags=re.X | re.S | re.M)
+
         if node_doc.has_params():
             entries = node_doc._parse_section(  # pylint: disable=protected-access
                 _check_docs_utils.GoogleDocstring.re_param_section)
@@ -691,6 +699,14 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 match = re_yields_line.match(entry)
                 if not match:
                     self.add_message('malformed-yields-section', node=node)
+        
+        if node_doc.exceptions():
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_raise_section)
+            for entry in entries:
+                match = re_raise_line.match(entry)
+                if not match:
+                    self.add_message('malformed-raises-section', node=node)
 
     def check_functiondef_params(self, node, node_doc):
         """Checks whether all parameters in a function definition are
@@ -888,14 +904,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
                                 '4-space-indentation-in-docstring',
                                 node=node)
                         in_description = True
-                    # If the line starts off with a regex like this but failed
-                    # the last check, then it is a malformed parameter so we
-                    # notify the user.
-                    elif (re.search(br'^[^ ]+: ', stripped_line) and
-                          not in_description):
-                        self.add_message(
-                            'malformed-raises-section',
-                            node=node)
                     # In a description line that is wrapped around (doesn't
                     # start off with the parameter name), we need to make sure
                     # the indentation is 8.
@@ -1077,7 +1085,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
             return
 
         found_excs = doc.exceptions()
+        python_utils.PRINT(found_excs)
+        python_utils.PRINT(expected_excs)
         missing_excs = expected_excs - found_excs
+        python_utils.PRINT(missing_excs)
         self._add_raise_message(missing_excs, func_node)
 
     def visit_return(self, node):

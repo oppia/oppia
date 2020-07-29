@@ -209,6 +209,14 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_yields_line = re_returns_line
 
+    re_raise_line = re.compile(
+        r"""
+        \s* ({type}:)?                    # identifier
+        \s* (.*)                         # beginning of description
+    """.format(
+        type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+    ), flags=re.X | re.S | re.M)
+
 
 class ASTDocStringChecker(python_utils.OBJECT):
     """Checks that docstrings meet the code style."""

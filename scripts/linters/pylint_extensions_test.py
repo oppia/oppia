@@ -622,6 +622,26 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_yields_section)
 
+    def test_malformed_raises_section(self):
+        node_malformed_raises_section = astroid.extract_node(
+            u"""def func(): #@
+                \"\"\"Raise an exception.
+
+                Raises:
+                    Exception. argument description.
+                \"\"\"
+                raise Exception()
+        """)
+
+        message = testutils.Message(
+            msg_id='malformed-raises-section',
+            node=node_malformed_raises_section
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_malformed_raises_section)
+
     def test_well_formated_args_section(self):
         node_with_no_error_message = astroid.extract_node(
             u"""def func(arg): #@
@@ -740,10 +760,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     Something
         """)
 
-        message = testutils.Message(
+        message1 = testutils.Message(
             msg_id='no-period-used', node=node_no_period_at_end)
+        message2 = testutils.Message(
+            msg_id='malformed-args-section', node=node_no_period_at_end)
 
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertAddsMessages(message1, message2):
             self.checker_test_object.checker.visit_functiondef(
                 node_no_period_at_end)
 
@@ -787,7 +809,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             u"""def func(): #@
                     \"\"\"Raises exception.
                     Raises:
-                        raises_exception. description.
+                        raises_exception: description.
                     \"\"\"
                     raise exception
         """)
@@ -828,7 +850,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 Args:
                     arg: argument. description.
                 Raises:
-                    raises_something. description.
+                    raises_something: description.
                 \"\"\"
                 raise exception
         """)
@@ -973,9 +995,9 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                         returns_something. This is description.
 
                     Raises:
-                        raises. something
+                        raises: something.
 
-                    Yield:
+                    Yields:
                         yield_something. This is description.
                     \"\"\"
                     raise something
@@ -1035,11 +1057,18 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     Something
         """)
 
-        message = testutils.Message(
+        message1 = testutils.Message(
             msg_id='8-space-indentation-in-docstring',
             node=invalid_raises_description_indentation_node)
+        message2 = testutils.Message(
+            msg_id='malformed-raises-section',
+            node=invalid_raises_description_indentation_node)
+        message3 = testutils.Message(
+            msg_id='malformed-raises-section',
+            node=invalid_raises_description_indentation_node)
 
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertAddsMessages(
+            message1, message2, message3):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_raises_description_indentation_node)
 
@@ -1089,11 +1118,14 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     Something
         """)
 
-        message = testutils.Message(
+        message1 = testutils.Message(
+            msg_id='malformed-raises-section',
+            node=invalid_parameter_name)
+        message2 = testutils.Message(
             msg_id='malformed-raises-section',
             node=invalid_parameter_name)
 
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertAddsMessages(message1, message2):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_parameter_name)
 
@@ -1196,7 +1228,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                             tuple. For ExplorationStatsModel:
                                 {key
                                     (sym)
-                                }
+                                }.
                     \"\"\"
                     if True:
                         return Something
@@ -1305,7 +1337,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     Incorrect description indentation
                         {
                             key:
-                        }
+                        }.
 
             Returns:
                 int. The test result.
