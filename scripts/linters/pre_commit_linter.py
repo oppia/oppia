@@ -126,11 +126,15 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'beautifulsoup4-4.9.1'),
     os.path.join('third_party', 'bleach-3.1.5'),
     os.path.join('third_party', 'callbacks-0.3.0'),
+    os.path.join('third_party', 'future-0.17.1'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.22.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
+    os.path.join('third_party', 'graphy-1.0.0'),
+    os.path.join('third_party', 'html5lib-python-1.1'),
     os.path.join('third_party', 'mutagen-1.43.0'),
     os.path.join('third_party', 'packaging-20.4'),
+    os.path.join('third_party', 'simplejson-3.17.0'),
     os.path.join('third_party', 'pylatexenc-2.6'),
     os.path.join('third_party', 'soupsieve-1.9.5'),
     os.path.join('third_party', 'six-1.15.0'),
@@ -300,8 +304,9 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
         for file_name in files:
             filepath = os.path.relpath(
                 os.path.join(_dir, file_name), os.getcwd())
-            if not any([fnmatch.fnmatch(filepath, gp) for gp in
-                        excluded_glob_patterns]):
+            if not any([
+                    fnmatch.fnmatch(filepath, gp) for gp in
+                    excluded_glob_patterns]):
                 files_in_directory.append(filepath)
     return files_in_directory
 
@@ -574,7 +579,8 @@ def main(args=None):
     if errors_stacktrace:
         _print_errors_stacktrace(errors_stacktrace)
 
-    if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
+    if any([
+            message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
             message in lint_messages]) or errors_stacktrace:
         _print_summary_of_error_messages(lint_messages)
         python_utils.PRINT('---------------------------')

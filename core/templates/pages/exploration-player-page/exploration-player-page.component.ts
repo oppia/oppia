@@ -15,6 +15,7 @@
 /**
  * @fileoverview Component for the explaration player page.
  */
+import 'mousetrap';
 
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require('base-components/base-content.directive.ts');
@@ -36,10 +37,10 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
-    'ContextService', 'PageTitleService',
+    'ContextService', '$timeout', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService',
     function(
-        ContextService, PageTitleService,
+        ContextService, $timeout, PageTitleService,
         ReadOnlyExplorationBackendApiService) {
       var ctrl = this;
       ctrl.$onInit = function() {
@@ -58,6 +59,41 @@ angular.module('oppia').component('explorationPlayerPage', {
             angular.element('meta[property="og:description"]').attr(
               'content', response.exploration.objective);
           });
+
+        var bindExplorationPlayerShortcuts = function() {
+          Mousetrap.bind('s', function() {
+            document.getElementById('skipToMainContentId').focus();
+            return false;
+          });
+
+          Mousetrap.bind('k', function() {
+            var previousButton = document.getElementById('backButtonId');
+            if (previousButton !== null) {
+              previousButton.focus();
+            }
+            return false;
+          });
+
+          Mousetrap.bind('j', function() {
+            var nextButton = <HTMLElement>document.querySelector(
+              '.protractor-test-next-button');
+            var continueToNextCardButton = <HTMLElement>document.querySelector(
+              '.protractor-test-continue-to-next-card-button');
+            var continueButton = <HTMLElement>document.querySelector(
+              '.protractor-test-continue-button');
+            if (nextButton !== null) {
+              nextButton.focus();
+            }
+            if (continueToNextCardButton !== null) {
+              continueToNextCardButton.focus();
+            }
+            if (continueButton !== null) {
+              continueButton.focus();
+            }
+            return false;
+          });
+        };
+        bindExplorationPlayerShortcuts();
       };
     }
   ]
