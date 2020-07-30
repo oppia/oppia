@@ -716,7 +716,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         self._check_for_mandatory_pattern_in_file(
                             pattern_list, filepath, failed))
                     summary_messages.extend(mandatory_summary_messages)
-                    full_messages = summary_messages
+                    full_messages += summary_messages
 
             if failed:
                 summary_message = (
@@ -794,7 +794,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                                 REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
                             summary_messages.append(summary_message)
                             total_error_count += 1
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s Pattern check failed, see errors above '
@@ -823,6 +823,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
     def _check_newline_at_eof(self):
         """This function is used to detect newline at the end of file."""
         summary_messages = []
+        full_messages = []
         files_to_lint = self.all_filepaths
         failed = False
 
@@ -838,7 +839,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         'end of file.' % filepath)
                     summary_messages.append(summary_message)
                     failed = True
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s Newline at the eof check failed.' % (

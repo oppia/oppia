@@ -107,6 +107,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
            with test_only in their names are in test files.
         """
         summary_messages = []
+        full_messages = []
         files_to_check = self.py_filepaths
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
@@ -128,7 +129,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
                         summary_messages.append(summary_message)
                         failed = True
 
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s Function defintion checks failed,'
@@ -178,6 +179,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             return class_names
 
         summary_messages = []
+        full_messages = []
         failed = False
         jobs_in_cron = [
             'DashboardStatsOneOffJob',
@@ -247,7 +249,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     ',\n'.join(sorted(non_registered_validation_jobs))))
             summary_messages.append(summary_message)
 
-        full_messages = summary_messages
+        full_messages += summary_messages
         summary_message = (
             '%s Job registry check %s' % (
                 (linter_utils.FAILED_MESSAGE_PREFIX, 'failed') if failed else
@@ -508,6 +510,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         has imports placed in alphabetical order.
         """
         summary_messages = []
+        full_messages = []
         files_to_check = self.all_filepaths
         failed = False
         stdout = python_utils.string_io()

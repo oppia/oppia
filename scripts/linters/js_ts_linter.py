@@ -236,6 +236,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         ]
 
         summary_messages = []
+        full_messages = []
 
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
@@ -258,7 +259,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             file_path))
                     summary_messages.append(summary_message)
 
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s HTTP requests check failed' % (
@@ -283,6 +284,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         build.JS_FILEPATHS_NOT_TO_BUILD.
         """
         summary_messages = []
+        full_messages = []
         failed = False
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
@@ -304,7 +306,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     'build.py. Otherwise, rename them to .ts\n')
                 summary_messages.append(err_msg)
 
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s Extra JS files check failed, see '
@@ -334,6 +336,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             filepath.endswith('App.ts')]
         failed = False
         summary_messages = []
+        full_messages = []
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         stdout = sys.stdout
         for filepath in files_to_check:
@@ -357,7 +360,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             summary_messages.append(summary_message)
                             break
         
-        full_messages = summary_messages
+        full_messages += summary_messages
         with linter_utils.redirect_stdout(stdout):
             if failed:
                 summary_message = (
@@ -386,6 +389,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         files_to_check = self.all_filepaths
         failed = False
         summary_messages = []
+        full_messages = []
         components_to_check = ['directive']
 
         stdout = sys.stdout
@@ -490,7 +494,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                 summary_messages.append(
                                                     summary_message)
 
-        full_messages = summary_messages
+        full_messages += summary_messages
         with linter_utils.redirect_stdout(stdout):
             if failed:
                 summary_message = (
@@ -521,6 +525,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
+        full_messages = []
 
         stdout = sys.stdout
         for filepath in files_to_check:
@@ -588,7 +593,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     'sorted order.'
                                     % (property_value, filepath))
                                 summary_messages.append(summary_message)
-        full_messages = summary_messages
+        full_messages += summary_messages
         with linter_utils.redirect_stdout(stdout):
             if failed:
                 summary_message = (
@@ -617,6 +622,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         files_to_check = self.all_filepaths
         failed = False
         summary_messages = []
+        full_messages = []
 
         # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
         pattern_to_match = (
@@ -646,7 +652,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             'exactly match.' % (
                                 filepath, stringfied_dependencies,
                                 function_parameters))
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s Controller dependency line break check failed, '
@@ -674,6 +680,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         AngularJS) and in *.constants.ts (for Angular 8).
         """
         summary_messages = []
+        full_messages = []
         failed = False
         stdout = sys.stdout
 
@@ -828,7 +835,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             % filepath)
                         summary_messages.append(summary_message)
 
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s Constants declaration check failed, '
@@ -858,6 +865,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         in the comment.
         """
         summary_messages = []
+        full_messages = []
         files_to_check = self.all_filepaths
         allowed_terminating_punctuations = [
             '.', '?', ';', ',', '{', '^', ')', '}', '>']
@@ -931,7 +939,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     filepath, line_num + 1))
                             summary_messages.append(summary_message)
 
-            full_messages = summary_messages
+            full_messages += summary_messages
             if failed:
                 summary_message = (
                     '%s Comments check failed, fix files that have bad '

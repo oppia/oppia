@@ -181,7 +181,13 @@ class TestingTaskSpec(python_utils.OBJECT):
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        return run_shell_cmd(exc_list)
+        result = run_shell_cmd(exc_list)
+
+        stdout = {
+            'name': None,
+            'full_messages': result
+        }
+        return [stdout]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -385,7 +391,7 @@ def main(args=None):
         else:
             try:
                 tests_run_regex_match = re.search(
-                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output[0]['full_messages'])
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 python_utils.PRINT(

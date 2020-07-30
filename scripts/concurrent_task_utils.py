@@ -60,9 +60,16 @@ class TaskThread(threading.Thread):
         try:
             self.output = self.func()
             if self.verbose:
-                log('LOG %s:' % self.name, show_time=True)
-                log(self.output)
-                log('----------------------------------------')
+                for stdout in self.output:
+                    if stdout['name']:
+                        log('Starting %s check' % stdout['name'], show_time=True)
+                        log('----------------------------------------')
+                        for message in stdout['full_messages']:
+                            log(message)
+                    else:
+                        log('LOG %s:' % self.name, show_time=True)
+                        log(stdout['full_messages'])
+                        log('----------------------------------------')
             log(
                 'FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)

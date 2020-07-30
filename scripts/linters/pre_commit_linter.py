@@ -437,7 +437,7 @@ def _print_summary_of_error_messages(lint_messages):
                 python_utils.PRINT(message)
 
 
-def _get_task_output(lint_messages, task, semaphore):
+def _get_task_output(lint_messages, failed, task):
     """Returns output of running tasks.
 
     Args:
@@ -446,11 +446,12 @@ def _get_task_output(lint_messages, task, semaphore):
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
-    python_utils.PRINT(task.output)
     if task.output:
-        lint_messages += []
-    semaphore.release()
-
+        for output in task.output:
+            lint_messages += output['summary_messages']
+            if output['failed']:
+                failed = True
+    return failed
 
 def _print_errors_stacktrace(errors_stacktrace):
     """Print errors stacktrace caught during linter execution.
@@ -551,17 +552,13 @@ def main(args=None):
         tasks_third_party, third_party_semaphore)
 
     lint_messages = []
-
-    # Prepare semaphore for locking mechanism.
-    semaphore = threading.Semaphore(1)
+    failed = False
 
     for task in tasks_custom:
-        semaphore.acquire()
-        _get_task_output(lint_messages, task, semaphore)
+        failed = _get_task_output(lint_messages, failed, task)
 
     for task in tasks_third_party:
-        semaphore.acquire()
-        _get_task_output(lint_messages, task, semaphore)
+        failed = _get_task_output(lint_messages, failed, task)
 
     lint_messages += codeowner_linter.check_codeowner_file(
         FILE_CACHE, verbose_mode_enabled)
@@ -580,9 +577,7 @@ def main(args=None):
     if errors_stacktrace:
         _print_errors_stacktrace(errors_stacktrace)
 
-    if any([
-            message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
-            message in lint_messages]) or errors_stacktrace:
+    if failed:
         _print_summary_of_error_messages(lint_messages)
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
