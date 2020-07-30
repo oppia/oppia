@@ -233,7 +233,9 @@ describe('Playthrough Object Factory', () => {
       actions: []
     };
 
-    // Here playthrough dict is assigned a invalid issue_type in order
+    // This throws "Type 'string' is not assignable to type
+    // '"CyclicStateTransitions"'." This is because 'playthroughDict' has an
+    // invalid value of 'issue_type' property. We need to do that in order
     // to test validations.
     // @ts-expect-error
     expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError(

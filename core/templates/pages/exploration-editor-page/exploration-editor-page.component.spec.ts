@@ -507,10 +507,11 @@ describe('Exploration editor page component', function() {
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element')
           .withArgs('#tutorialStateContent').and.returnValue({
-            // There is a typescript error here because angular element expects
-            // around 170 more properties than just one (offset). We are
-            // suppressing this error because we need only offset for testing
-            // purposes.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
             // @ts-expect-error
             offset: () => ({
               top: 5
@@ -532,10 +533,11 @@ describe('Exploration editor page component', function() {
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element')
           .withArgs('#tutorialStateInteraction').and.returnValue({
-            // There is a typescript error here because angular element expects
-            // around 170 more properties than just one (offset). We are
-            // suppressing this error because we need only offset for testing
-            // purposes.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
             // @ts-expect-error
             offset: () => ({
               top: 20
@@ -557,10 +559,11 @@ describe('Exploration editor page component', function() {
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element')
           .withArgs('#tutorialPreviewTab').and.returnValue({
-            // There is a typescript error here because angular element expects
-            // around 170 more properties than just one (offset). We are
-            // suppressing this error because we need only offset for testing
-            // purposes.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
             // @ts-expect-error
             offset: () => ({
               top: 5
@@ -582,10 +585,11 @@ describe('Exploration editor page component', function() {
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element')
           .withArgs('#tutorialStateInteraction').and.returnValue({
-            // There is a typescript error here because angular element expects
-            // around 170 more properties than just one (offset). We are
-            // suppressing this error because we need only offset for testing
-            // purposes.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
             // @ts-expect-error
             offset: () => ({
               top: 20
@@ -607,10 +611,11 @@ describe('Exploration editor page component', function() {
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element')
           .withArgs('#tutorialPreviewTab').and.returnValue({
-            // There is a typescript error here because angular element expects
-            // around 170 more properties than just one (offset). We are
-            // suppressing this error because we need only offset for testing
-            // purposes.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
             // @ts-expect-error
             offset: () => ({
               top: 5
@@ -632,10 +637,11 @@ describe('Exploration editor page component', function() {
         var animateSpy = spyOn(element, 'animate').and.callThrough();
         spyOn(angular, 'element')
           .withArgs('#tutorialStateInteraction').and.returnValue({
-            // There is a typescript error here because angular element expects
-            // around 170 more properties than just one (offset). We are
-            // suppressing this error because we need only offset for testing
-            // purposes.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
             // @ts-expect-error
             offset: () => ({
               top: 20

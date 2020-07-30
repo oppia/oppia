@@ -50,9 +50,11 @@ describe('Pie Chart component', function() {
         draw: () => {}
       };
 
-      // There is a typescript error here because it expects properties
-      // matching actual window.google. We are suppressing this error because
-      // we don't need those properties for testing purposes.
+      // This throws "Type '{}' is missing the following properties from type
+      // 'typeof google': load, setOnLoadCallback, charts, visualization".
+      // This is because it expect properties matching actual window.google.
+      // We are suppressing this error because we don't need those properties
+      // for testing purposes.
       // @ts-expect-error
       window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on
@@ -105,9 +107,11 @@ describe('Pie Chart component', function() {
         draw: () => {}
       };
 
-      // There is a typescript error here because it expects properties
-      // matching actual window.google. We are suppressing this error because
-      // we don't need those properties for testing purposes.
+      // This throws "Type '{}' is missing the following properties from type
+      // 'typeof google': load, setOnLoadCallback, charts, visualization".
+      // This is because it expect properties matching actual window.google.
+      // We are suppressing this error because we don't need those properties
+      // for testing purposes.
       // @ts-expect-error
       window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on
@@ -161,9 +165,11 @@ describe('Pie Chart component', function() {
         draw: () => {}
       };
 
-      // There is a typescript error here because it expects properties
-      // matching actual window.google. We are suppressing this error because
-      // we don't need those properties for testing purposes.
+      // This throws "Type '{}' is missing the following properties from type
+      // 'typeof google': load, setOnLoadCallback, charts, visualization".
+      // This is because it expect properties matching actual window.google.
+      // We are suppressing this error because we don't need those properties
+      // for testing purposes.
       // @ts-expect-error
       window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on

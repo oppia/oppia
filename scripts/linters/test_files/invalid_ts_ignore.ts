@@ -20,5 +20,13 @@
 
 let a: string;
 
+// 1. No comment to explain the @ts-ignore.
+
 // @ts-ignore
 let b: number = a;
+
+// 2. Comment with invalid format
+
+// We need ts-ignore here to test lint checks.
+// @ts-ignore
+b = a;

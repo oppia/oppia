@@ -388,26 +388,53 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('----------------------------------------')
 
         ts_expect_error_pattern = r'@ts-expect-error'
+        comment_pattern = r'^ *// '
+        comment_with_ts_error_pattern = r'^ *// This throws'
 
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
+            previous_line_has_comment = False
+            previous_line_has_comment_with_ts_error = False
 
             for file_path in self.all_filepaths:
                 file_content = self.file_cache.read(file_path)
                 for line_number, line in enumerate(file_content.split('\n')):
-                    if (
-                            re.findall(ts_expect_error_pattern, line) and not
-                            (
+                    if re.findall(ts_expect_error_pattern, line):
+                        if not (
                                 file_path.endswith('.spec.ts') or
-                                file_path.endswith('Spec.ts'))):
-                        failed = True
-                        summary_message = (
-                            '%s --> @ts-expect-error found at line %s. '
-                            'It can be used only in spec files.' % (
-                                file_path, line_number + 1))
-                        python_utils.PRINT(summary_message)
-                        summary_messages.append(summary_message)
-                        python_utils.PRINT('')
+                                file_path.endswith('Spec.ts')):
+                            failed = True
+                            summary_message = (
+                                '%s --> @ts-expect-error found at line %s. '
+                                'It can be used only in spec files.' % (
+                                    file_path, line_number + 1))
+                            python_utils.PRINT(summary_message)
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT('')
+
+                        if not previous_line_has_comment_with_ts_error:
+                            failed = True
+                            summary_message = (
+                                '%s --> Please add a comment above the '
+                                '@ts-expect-error explaining the '
+                                '@ts-expect-error at line %s. The format '
+                                'of comment should be -> This throws "...". '
+                                'This needs to be suppressed because ...' % (
+                                    file_path, line_number + 1))
+                            python_utils.PRINT(summary_message)
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT('')
+
+                    previous_line_has_comment = bool(
+                        re.findall(comment_pattern, line))
+
+                    previous_line_has_comment_with_ts_error = (
+                        bool(
+                            re.findall(
+                                comment_with_ts_error_pattern, line))
+                        or (
+                            previous_line_has_comment_with_ts_error and
+                            previous_line_has_comment))
 
             if failed:
                 summary_message = (

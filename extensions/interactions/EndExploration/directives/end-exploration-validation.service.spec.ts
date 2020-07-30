@@ -136,8 +136,9 @@ describe('EndExplorationValidationService', () => {
 
   it('should catch non-string value for recommended exploration ID',
     () => {
-      // Here we are assigning the wrong type of
-      // value to test the warnings.
+      // This throws "Type 'number' is not assignable to type 'string'."
+      // Here we are assigning the wrong type of value to
+      // "customizationArguments" in order to test validations.
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
@@ -150,8 +151,9 @@ describe('EndExplorationValidationService', () => {
 
   it('should have warnings for non-list format of recommended exploration IDs',
     () => {
-      // Here we are assigning the wrong type of
-      // value to test the warnings.
+      // This throws "Type '"ExpID0"' is not assignable to type 'string[]'."
+      // Here we are assigning the wrong type of value to
+      // "customizationArguments" in order to test validations.
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(

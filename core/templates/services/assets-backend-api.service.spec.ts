@@ -194,9 +194,10 @@ describe('Assets Backend API Service', function() {
 
     it('should successfully save an audio', function(done) {
       var successMessage = 'Audio was successfully saved.';
-      // There is an error here because the type of function we are using here
-      // doesn't match the type of actually $.ajax. We need to do this for
-      // testing purposes.
+      // This throws "Argument of type '() => Promise<any, any, any>' is not
+      // assignable to parameter of type '{ (url: string, ...):
+      // jqXHR<any>; ...}'.". We need to suppress this error because we need
+      // to mock $.ajax to this function for testing purposes.
       // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
@@ -216,9 +217,10 @@ describe('Assets Backend API Service', function() {
 
     it('should successfully save a math SVG', function(done) {
       var successMessage = 'Math SVG was successfully saved.';
-      // There is an error here because the type of function we are using here
-      // doesn't match the type of actually $.ajax. We need to do this for
-      // testing purposes.
+      // This throws "Argument of type '() => Promise<any, any, any>' is not
+      // assignable to parameter of type '{ (url: string, ...):
+      // jqXHR<any>; ...}'.". We need to suppress this error because we need
+      // to mock $.ajax to this function for testing purposes.
       // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
@@ -231,9 +233,10 @@ describe('Assets Backend API Service', function() {
         .then(function(response) {
           // Below checks assert that the correct data is sent to the backend.
           var dataArguementForAjaxCall = (
-            // There is an error here because the type of function we are using
-            // doesn't match the type of actually $.ajax. We need to do this for
-            // testing purposes.
+            // This throws "Property 'calls' does not exist on type
+            // '{ (url: string, ...): jqXHR<any>; ... }'." This is because
+            // $.ajax is not the actual $.ajax, it is the mocked to the function
+            // which has this property. We did this for testing purposes.
             // @ts-expect-error
             $.ajax.calls.mostRecent().args[0].data);
           expect(dataArguementForAjaxCall instanceof FormData).toBeTruthy();
@@ -261,9 +264,10 @@ describe('Assets Backend API Service', function() {
 
     it('should handle rejection when saving a math SVG fails ', function(done) {
       var errorMessage = 'Math SVG was not successfully saved.';
-      // There is an error here because the type of function we are using here
-      // doesn't match the type of actually $.ajax. We need to do this for
-      // testing purposes.
+      // This throws "Argument of type '() => Promise<any, any, any>' is not
+      // assignable to parameter of type '{ (url: string, ...):
+      // jqXHR<any>; ...}'.". We need to suppress this error because we need
+      // to mock $.ajax to this function for testing purposes.
       // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
@@ -294,9 +298,10 @@ describe('Assets Backend API Service', function() {
 
     it('should handle rejection when saving a file fails', function(done) {
       var errorMessage = 'Error on saving audio';
-      // There is an error here because the type of function we are using here
-      // doesn't match the type of actually $.ajax. We need to do this for
-      // testing purposes.
+      // This throws "Argument of type '() => Promise<any, any, any>' is not
+      // assignable to parameter of type '{ (url: string, ...):
+      // jqXHR<any>; ...}'.". We need to suppress this error because we need
+      // to mock $.ajax to this function for testing purposes.
       // @ts-expect-error
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();

@@ -128,8 +128,10 @@ describe('Ineffective feedback loop task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
-        // Here the task_type should be 'ineffective_feedback_loop' but but we
-        // set it to an invalid value in order to test validations.
+        // This throws "Type '"???"' is not assignable to type
+        // '"ineffective_feedback_loop"'." This is because 'task_type'
+        // should be equal to 'ineffective_feedback_loop' but we set it
+        // to an invalid value in order to test validations.
         // @ts-expect-error
         task_type: '???',
         target_type: 'state',

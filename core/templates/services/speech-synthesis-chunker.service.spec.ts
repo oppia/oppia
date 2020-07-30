@@ -157,10 +157,12 @@ describe('Speech Synthesis Chunker Service', () => {
 
     beforeEach(() => {
       spyOn(window, 'SpeechSynthesisUtterance').and.returnValue(
-        // There is a typescript error here because the type of
-        // mockSpeechSynthesisUtteran doesn't match the actual
-        // SpeechSynthesisUtterance. We need to suppress this error
-        // for testing purposes.
+        // This throws "Argument of type '{ speak: () => void; onend:
+        // () => void; }' is not assignable to parameter of type
+        // 'SpeechSynthesisUtterance'.". This is because
+        // 'SpeechSynthesisUtterance' has around 10 more properties.
+        // We have only defined the properties we need
+        // in 'mockSpeechSynthesisUtteran'.
         // @ts-expect-error
         mockSpeechSynthesisUtteran);
     });

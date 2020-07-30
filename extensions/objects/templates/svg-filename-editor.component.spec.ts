@@ -140,9 +140,10 @@ describe('SvgFilenameEditor', function() {
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
     });
-    // There is a typescript error here because the type of mockImageObject
-    // doesn't match the type of actual window.Image. We are suppressing this
-    // error because we need mockImageObject for testing purposes.
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
 
@@ -394,9 +395,10 @@ describe('SvgFilenameEditor', function() {
     var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
     /* eslint-enable quotes */
 
-    // There is an error here because the type of function we are using here
-    // doesn't match the type of actual $.ajax. We need to do this for
-    // testing purposes.
+    // This throws "Argument of type '() => Promise<any, any, any>' is not
+    // assignable to parameter of type '{ (url: string, ...):
+    // jqXHR<any>; ...}'.". We need to suppress this error because we need
+    // to mock $.ajax to this function purposes.
     // @ts-expect-error
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
@@ -421,9 +423,10 @@ describe('SvgFilenameEditor', function() {
   it('should handle rejection when saving an svg file fails', function() {
     svgFilenameCtrl.createRect();
     var errorMessage = 'Error on saving svg file';
-    // There is an error here because the type of function we are using here
-    // doesn't match the type of actual $.ajax. We need to do this for
-    // testing purposes.
+    // This throws "Argument of type '() => Promise<any, any, any>' is not
+    // assignable to parameter of type '{ (url: string, ...):
+    // jqXHR<any>; ...}'.". We need to suppress this error because we need
+    // to mock $.ajax to this function purposes.
     // @ts-expect-error
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
@@ -591,14 +594,16 @@ describe('SvgFilenameEditor with image save destination as ' +
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
 
-    // There is a typescript error here because the type of mockImageObject
-    // doesn't match the type of actual window.Image. We are suppressing this
-    // error because we need mockImageObject for testing purposes.
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
-    // There is a typescript error here because the type of mockReaderObject
-    // doesn't match the type of actual window.FileReader. We are suppressing
-    // this error because we need mockReaderObject for testing purposes.
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". This is because
+    // 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 

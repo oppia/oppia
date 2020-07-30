@@ -118,7 +118,7 @@ if (!('outerHTML' in SVGElement.prototype)) {
 // so we set an empty object first.
 if (navigator.mediaDevices === undefined) {
   // This throws "Cannot assign to 'mediaDevices' because it
-  // is a read-only property. We need to suppress this since some browsers
+  // is a read-only property." We need to suppress this since some browsers
   // may not have this property at all. So, we need to set it to an empty
   // object.
   // @ts-ignore
@@ -135,7 +135,7 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
     // First get ahold of the legacy getUserMedia, if present.
     var getUserMedia = (
       // This throws "Property 'webkitGetUserMedia' does not exist on
-      // type 'Navigator'." This is because this API is Deprecated.
+      // type 'Navigator'." This is because this API is deprecated.
       // (https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia)
       // We need to suppress this because some browsers
       // still have this functionality.

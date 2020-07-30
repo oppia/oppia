@@ -576,11 +576,21 @@ class JsTsLintTests(test_utils.LinterTestBase):
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
-            ['@ts-ignore found at line 23.'],
+            ['@ts-ignore found at line 25.'],
+            self.linter_stdout)
+        self.assert_same_list_elements(
+            ['@ts-ignore found at line 31.'],
             self.linter_stdout)
         self.assert_same_list_elements([
             'Please add a comment above the @ts-ignore '
-            'explaining the @ts-ignore at line 23.'], self.linter_stdout)
+            'explaining the @ts-ignore at line 25. The format '
+            'of comment should be -> This throws "...". '
+            'This needs to be suppressed because ...'], self.linter_stdout)
+        self.assert_same_list_elements([
+            'Please add a comment above the @ts-ignore '
+            'explaining the @ts-ignore at line 31. The format '
+            'of comment should be -> This throws "...". '
+            'This needs to be suppressed because ...'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_ts_ignore_found_success(self):
@@ -635,7 +645,24 @@ class JsTsLintTests(test_utils.LinterTestBase):
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         self.assert_same_list_elements(
-            ['@ts-expect-error found at line 22.'],
+            ['@ts-expect-error found at line 24.'],
+            self.linter_stdout)
+        self.assert_same_list_elements(
+            ['@ts-expect-error found at line 30.'],
+            self.linter_stdout)
+        self.assert_same_list_elements(
+            ['Please add a comment above the '
+            '@ts-expect-error explaining the '
+            '@ts-expect-error at line 24. The format '
+            'of comment should be -> This throws "...". '
+            'This needs to be suppressed because ...'],
+            self.linter_stdout)
+        self.assert_same_list_elements(
+            ['Please add a comment above the '
+            '@ts-expect-error explaining the '
+            '@ts-expect-error at line 30. The format '
+            'of comment should be -> This throws "...". '
+            'This needs to be suppressed because ...'],
             self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 

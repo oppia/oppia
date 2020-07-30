@@ -19,5 +19,7 @@
 
 let x: string;
 
+// This throws "Type 'string' is not assignable to type 'number'."
+// We need this to test the lint checks.
 // @ts-expect-error
 let b: number = x;

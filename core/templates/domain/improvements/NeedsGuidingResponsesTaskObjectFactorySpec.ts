@@ -130,8 +130,10 @@ describe('Needs guiding responses task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
-        // The task type should be of type needs_guiding_responses but we set
-        // it to an invalid value in order to test validations.
+        // This throws "Type '"???"' is not assignable to type
+        // '"needs_guiding_responses"'." This is because 'task_type'
+        // should be equal to 'needs_guiding_responses' but we set it
+        // to an invalid value in order to test validations.
         // @ts-expect-error
         task_type: '???',
         target_type: 'state',

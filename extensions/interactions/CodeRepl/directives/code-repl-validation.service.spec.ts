@@ -86,7 +86,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for programming language', () => {
-    // The customizationArguments.language.value should be a string.
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
@@ -98,7 +100,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for placeholder text', () => {
-    // The customizationArguments.placeholder.value should be a string.
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
@@ -110,7 +114,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for preCode text', () => {
-    // The customizationArguments.preCode.value should be a string.
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
@@ -122,7 +128,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for postCode text', () => {
-    // The customizationArguments.postCode.value should be a string.
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(

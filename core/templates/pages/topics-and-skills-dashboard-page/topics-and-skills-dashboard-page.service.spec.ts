@@ -139,7 +139,10 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic3]);
 
-    // Here an invalid sort value is used to test validations.
+    // This throws "Type '"Invalid sort value"' is not assignable to
+    // type 'ETopicSortOptions'.". This is because 'Invalid sort value'
+    // is not a valid sort option. We set the sort filter option to
+    // 'Invalid sort value' to test validations.
     // @ts-expect-error
     filterOptions.sort = 'Invalid sort value';
     expect(() => {

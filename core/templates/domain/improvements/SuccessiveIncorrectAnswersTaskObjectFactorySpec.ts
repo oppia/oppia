@@ -131,7 +131,9 @@ describe('Successive incorrect answers task', function() {
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
-        // The task_type should be 'successive_incorrect_answers' but we set it
+        // This throws "Type '"???"' is not assignable to type
+        // '"successive_incorrect_answers"'." This is because 'task_type'
+        // should be equal to 'successive_incorrect_answers' but we set it
         // to an invalid value in order to test validations.
         // @ts-expect-error
         task_type: '???',
