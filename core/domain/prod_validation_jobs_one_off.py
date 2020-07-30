@@ -287,7 +287,7 @@ class BaseModelValidator(python_utils.OBJECT):
             the class and ids for a single type of external model to fetch.
 
         Raises:
-            NotImplementedError. This function has not yet been implemented.
+            NotImplementedError: This function has not yet been implemented.
         """
         raise NotImplementedError(
             'The _get_external_id_relationships() method is missing from the '
@@ -441,7 +441,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
             in external model.
 
         Raises:
-            NotImplementedError. This function has not yet been implemented.
+            NotImplementedError: This function has not yet been implemented.
         """
         raise NotImplementedError(
             'The _get_external_model_properties() method is missing from the '
@@ -657,7 +657,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             changes made by commit commands of the model.
 
         Raises:
-            NotImplementedError. This function has not yet been implemented.
+            NotImplementedError: This function has not yet been implemented.
         """
         raise NotImplementedError(
             'The _get_change_domain_class() method is missing from the derived '
@@ -6058,7 +6058,7 @@ class TaskEntryModelValidator(BaseModelValidator):
 
         Args:
             item: improvements_models.TaskEntryModel. The TaskEntry model
-                object.
+                object to get the composite entity id.
         """
         expected_composite_entity_id = (
             improvements_models.TaskEntryModel.generate_composite_entity_id(
@@ -6076,8 +6076,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         """Validates the fields of the item relating to the status field.
 
         Args:
-            item: improvements_models.TaskEntryModel. The TaskEntry model
-                object.
+            item: improvements_models.TaskEntryModel. The item to check the
+                status for.
         """
         if item.status == improvements_models.TASK_STATUS_OPEN:
             if item.resolver_id:
@@ -6108,8 +6108,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         name.
 
         Args:
-            item: improvements_models.TaskEntryModel. The TaskEntry model
-                object.
+            item: improvements_models.TaskEntryModel. The item to fetch and
+                check the target id.
         """
         try:
             exp_model = exp_models.ExplorationModel.get(
@@ -6593,7 +6593,7 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         """Return a list of datastore class references to map over.
 
         Raises:
-            NotImplementedError. This function has not yet been implemented.
+            NotImplementedError: This function has not yet been implemented.
         """
         raise NotImplementedError(
             'The entity_classes_to_map_over() method is missing from the '

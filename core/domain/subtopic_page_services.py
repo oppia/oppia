@@ -64,10 +64,11 @@ def get_subtopic_page_from_model(subtopic_page_model):
     """Returns a domain object for an SubtopicPage given a subtopic page model.
 
     Args:
-        subtopic_page_model: SubtopicPageModel. Subtopic page model object.
+        subtopic_page_model: SubtopicPageModel. The subtopic page model to get
+            the corresponding domain object.
 
     Returns:
-        SubtopicPage. domain object of SubtopicPage.
+        SubtopicPage. The domain object corresponding to the given model object.
     """
     versioned_page_contents = {
         'schema_version': subtopic_page_model.page_contents_schema_version,

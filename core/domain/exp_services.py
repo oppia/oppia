@@ -1403,7 +1403,7 @@ def get_image_filenames_from_exploration(exploration):
     """Get the image filenames from the exploration.
 
     Args:
-        exploration: object(Exploration). The exploration itself.
+        exploration: Exploration. The exploration to get the image filenames.
 
     Returns:
         list(str). List containing the name of the image files in exploration.

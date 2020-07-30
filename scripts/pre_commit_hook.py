@@ -58,7 +58,7 @@ def install_hook():
     It ensures that oppia/ is the root folder.
 
     Raises:
-        ValueError if chmod command fails.
+        ValueError: if chmod command fails.
     """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
@@ -103,7 +103,7 @@ def does_diff_include_package_lock_file():
         bool. Whether the diff includes package-lock.json.
 
     Raises:
-        ValueError if git command fails.
+        ValueError: if git command fails.
     """
 
     git_cmd = ['git', 'diff', '--name-only', '--cached']

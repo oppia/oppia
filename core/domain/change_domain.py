@@ -42,7 +42,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
             attributes of a command with values for the attributes.
 
     Raises:
-        ValidationError. Any required attribute is missing or an extra attribute
+        ValidationError: Any required attribute is missing or an extra attribute
             exists or the value of an attribute is not allowed.
     """
 
@@ -144,7 +144,7 @@ class BaseChange(python_utils.OBJECT):
                 attributes of a command.
 
         Raises:
-            ValidationError. The change dict does not contain the cmd key,
+            ValidationError: The change dict does not contain the cmd key,
                 or the cmd name is not allowed for the Change domain object
                 or the command attributes are missing or extra.
         """

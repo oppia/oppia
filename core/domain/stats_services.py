@@ -51,7 +51,7 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
         exp_issue_dict: dict. Dict representing the exploration issue.
 
     Raises:
-        Exception. The issue_schema_version is invalid.
+        Exception: The issue_schema_version is invalid.
     """
     issue_schema_version = exp_issue_dict['schema_version']
     if issue_schema_version is None or issue_schema_version < 1:
@@ -81,7 +81,7 @@ def _migrate_to_latest_action_schema(learner_action_dict):
         learner_action_dict: dict. Dict representing the learner action.
 
     Raises:
-        Exception. The action_schema_version is invalid.
+        Exception: The action_schema_version is invalid.
     """
     action_schema_version = learner_action_dict['schema_version']
     if action_schema_version is None or action_schema_version < 1:
@@ -289,7 +289,7 @@ def _handle_exp_issues_after_state_rename(
             renamed versions. This mapping contains state names only if it is
             actually renamed.
         playthrough_ids_by_state_name: dict. The dict mapping old state names to
-            their new ones
+            their new ones.
 
     Returns:
         ExplorationIssue. The exploration issue domain object.

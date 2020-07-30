@@ -103,7 +103,7 @@ def cut_release_branch():
     """Calls the cut_release_or_hotfix_branch script to cut a release branch.
 
     Raises:
-        AssertionError. The version entered is invalid.
+        AssertionError: The version entered is invalid.
     """
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/releases')

@@ -35,10 +35,10 @@ def run_in_transaction(fn, *args, **kwargs):
         **kwargs: args. Arbitrary keyword arguments passed to the callable.
 
     Returns:
-        function_return. Whatever fn() returns.
+        *. Whatever fn() returns.
 
     Raises:
-        *: Whatever fn() raises.
+        Exception: Whatever fn() raises.
         datastore_errors.TransactionFailedError: The transaction failed.
     """
     return ndb.transaction(

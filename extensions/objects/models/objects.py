@@ -708,7 +708,7 @@ class Graph(BaseObject):
             dict. The normalized object containing the Graph schema.
 
         Raises:
-            TypeError. Cannot convert to the Graph schema.
+            TypeError: Cannot convert to the Graph schema.
         """
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)

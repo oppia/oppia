@@ -167,7 +167,7 @@ def git_diff_name_status(left, right, diff_filter=''):
         diff_filter: arguments given to --diff-filter (ACMRTD...)
 
     Returns:
-        list. List of FileDiffs (tuple with name/status)
+        list. List of FileDiffs (tuple with name/status).
 
     Raises:
         ValueError: Raise ValueError if git command fails.
@@ -208,7 +208,7 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
 
     Returns:
         list(str). List of file names that are modified, changed, renamed or
-        added but not deleted
+        added but not deleted.
 
     Raises:
         ValueError: Raise ValueError if git command fails.

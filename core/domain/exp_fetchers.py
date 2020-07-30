@@ -102,7 +102,7 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
         list(Exploration). List of Exploration domain objects.
 
     Raises:
-        Exception. One or more of the given versions of the exploration could
+        Exception: One or more of the given versions of the exploration could
             not be converted to the latest schema version.
     """
     explorations = []

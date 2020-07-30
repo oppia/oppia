@@ -495,7 +495,7 @@ def get_exploration_rights(exploration_id, strict=True):
         ActivityRights. The rights object for the given exploration.
 
     Raises:
-        EntityNotFoundError. The exploration with ID exploration_id was not
+        EntityNotFoundError: The exploration with ID exploration_id was not
             found in the datastore.
     """
     model = exp_models.ExplorationRightsModel.get(
@@ -608,7 +608,7 @@ def get_collection_rights(collection_id, strict=True):
         ActivityRights. The rights object for the collection.
 
     Raises:
-        EntityNotFoundError. The collection with ID collection_id is not found
+        EntityNotFoundError: The collection with ID collection_id is not found
             in the datastore.
     """
     model = collection_models.CollectionRightsModel.get(
@@ -674,7 +674,7 @@ def _get_activity_rights(activity_type, activity_id):
         ActivityRights. The rights object associated with the given activity.
 
     Raises:
-        Exception. activity_type provided is unknown.
+        Exception: activity_type provided is unknown.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         return get_exploration_rights(activity_id, strict=False)
@@ -950,15 +950,15 @@ def _assign_role(
             constants.ACTIVITY_TYPE_COLLECTION
 
     Raises:
-        Exception. The committer does not have rights to modify a role.
-        Exception. The user already owns the activity.
-        Exception. The user can already edit the activity.
-        Exception. The user can already voiceover the activity.
-        Exception. The activity is already publicly editable.
-        Exception. The activity is already publicly translatable.
-        Exception. The user can already view the activity.
-        Exception. The activity is already publicly viewable.
-        Exception. The role is invalid.
+        Exception: The committer does not have rights to modify a role.
+        Exception: The user already owns the activity.
+        Exception: The user can already edit the activity.
+        Exception: The user can already voiceover the activity.
+        Exception: The activity is already publicly editable.
+        Exception: The activity is already publicly translatable.
+        Exception: The user can already view the activity.
+        Exception: The activity is already publicly viewable.
+        Exception: The role is invalid.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
@@ -1134,7 +1134,7 @@ def _publish_activity(committer, activity_id, activity_type):
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have rights to publish the
@@ -1162,7 +1162,7 @@ def _unpublish_activity(committer, activity_id, activity_type):
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have rights to unpublish the
@@ -1201,10 +1201,10 @@ def assign_role_for_exploration(
         new_role: str. The name of the new role: One of
             ROLE_OWNER
             ROLE_EDITOR
-            ROLE_VOICE_ARTIST
+            ROLE_VOICE_ARTIST.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _assign_role.
     """
     _assign_role(
@@ -1223,7 +1223,7 @@ def release_ownership_of_exploration(committer, exploration_id):
         exploration_id: str. ID of the exploration.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _release_ownership_of_activity.
     """
     _release_ownership_of_activity(
@@ -1245,9 +1245,9 @@ def set_private_viewability_of_exploration(
             viewable (by anyone with the link).
 
     Raises:
-        Exception. The committer does not have the permission to perform change
+        Exception: The committer does not have the permission to perform change
             action.
-        Exception. If the viewable_if_private property is already as desired.
+        Exception: If the viewable_if_private property is already as desired.
     """
     committer_id = committer.user_id
     exploration_rights = get_exploration_rights(exploration_id)
@@ -1294,7 +1294,7 @@ def publish_exploration(committer, exploration_id):
         exploration_id: str. ID of the exploration.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _publish_activity.
     """
     _publish_activity(
@@ -1309,7 +1309,7 @@ def unpublish_exploration(committer, exploration_id):
         exploration_id: str. ID of the exploration.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _unpublish_activity.
     """
     _unpublish_activity(
@@ -1331,10 +1331,10 @@ def assign_role_for_collection(
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role: One of
             ROLE_OWNER
-            ROLE_EDITOR
+            ROLE_EDITOR.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _assign_role.
     """
     _assign_role(
@@ -1353,7 +1353,7 @@ def release_ownership_of_collection(committer, collection_id):
         collection_id: str. ID of the collection.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _release_ownership_of_activity.
     """
     _release_ownership_of_activity(
@@ -1371,7 +1371,7 @@ def publish_collection(committer, collection_id):
         collection_id: str. ID of the collection.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _publish_activity.
     """
     _publish_activity(
@@ -1386,7 +1386,7 @@ def unpublish_collection(committer, collection_id):
         collection_id: str. ID of the collection.
 
     Raises:
-        Exception. This could potentially throw an exception from
+        Exception: This could potentially throw an exception from
             _unpublish_activity.
     """
     _unpublish_activity(

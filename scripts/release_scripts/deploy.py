@@ -279,7 +279,7 @@ def switch_version(app_name, current_release_version):
         current_release_version: str. The version of the current release.
 
     Raises:
-        Exception. The library page does not load correctly.
+        Exception: The library page does not load correctly.
     """
     release_version_library_url = (
         'https://%s-dot-%s.appspot.com/community-library' % (
@@ -313,7 +313,7 @@ def check_breakage(app_name, current_release_version):
         current_release_version: str. The version of the current release.
 
     Raises:
-        Exception. There is major breakage found through test server logs.
+        Exception: There is major breakage found through test server logs.
     """
     # If this is a test server deployment and the current release version is
     # already serving, open the GAE error logs.

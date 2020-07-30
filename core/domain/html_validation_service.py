@@ -759,7 +759,7 @@ def validate_customization_args_in_tag(tag):
         tag: bs4.element.Tag. The html tag to be validated.
 
     Yields:
-        Error. Error message if the attributes of tag are invalid.
+        str. Error message if the attributes of tag are invalid.
     """
 
     component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long

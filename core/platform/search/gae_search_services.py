@@ -59,7 +59,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
             If there is a key named 'language_code', its value will be used as
             the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
             is used.
-        index: str. The name of the index to insert the document into
+        index: str. The name of the index to insert the document into.
         retries: int. The number of times to retry inserting the documents.
 
     Returns:
@@ -197,7 +197,7 @@ def delete_documents_from_index(
     Args:
         doc_ids: list(str). A list of document ids of documents to be deleted
             from the index.
-        index: str. The name of the index to delete the document from
+        index: str. The name of the index to delete the document from.
         retries: int. The number of times to retry deleting the documents.
 
     Raises:

@@ -855,7 +855,7 @@ class Story(python_utils.OBJECT):
         exploration id.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story,
+            exp_id: str. The ID of the exploration linked to the story.
 
         Returns:
             list(str)|None. The list of prerequisite skill ids for the
@@ -870,7 +870,7 @@ class Story(python_utils.OBJECT):
         """Checks whether an exploration is present in the story.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story,
+            exp_id: str. The ID of the exploration linked to the story.
 
         Returns:
             bool. Whether the exploration is linked to the story.
@@ -1297,7 +1297,7 @@ class Story(python_utils.OBJECT):
             to_index: int. The index at which to insert the moved node.
 
         Raises:
-            Exception. Invalid input.
+            Exception: Invalid input.
         """
         if not isinstance(from_index, int):
             raise Exception(

@@ -33,8 +33,8 @@ def get_featured_activity_references():
     """Gets a list of ActivityReference domain models.
 
     Returns:
-        list. A list of all ActivityReference domain objects that are
-        currently featured.
+        list(ActivityReference). A list of all ActivityReference domain objects
+        that are currently featured.
     """
     featured_model_instance = (
         activity_models.ActivityReferencesModel.get_or_create(
@@ -49,8 +49,9 @@ def update_featured_activity_references(featured_activity_references):
     """Updates the current list of featured activity references.
 
     Args:
-        featured_activity_references: list. A list of ActivityReference domain
-            objects representing the full list of 'featured' activities.
+        featured_activity_references: list(ActivityReference). A list of
+            ActivityReference domain objects representing the full list of
+            'featured' activities.
 
     Raises:
         Exception: The input list of ActivityReference domain objects has
@@ -119,11 +120,12 @@ def split_by_type(activity_references):
     in the input list.
 
     Args:
-        activity_references: list. A list of ActivityReference domain objects.
+        activity_references: list(ActivityReference). The domain object
+            containing exploration ids and collection ids. 
 
     Returns:
-        (list, list). A 2-tuple whose first element is a list of all exploration
-        ids represented in the input list, and whose second element
+        (list(str), list(str)). A 2-tuple whose first element is a list of all
+        exploration ids represented in the input list, and whose second element
         is a list of all collection ids represented in the input list.
 
     Raises:

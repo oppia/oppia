@@ -232,13 +232,13 @@ class Normalizers(python_utils.OBJECT):
             obj: str. a string representing a URL.
 
         Returns:
-            url(str). An empty string if the URL does not start with http:// or
+            str. An empty string if the URL does not start with http:// or
             https:// except when the string is empty. Otherwise, returns the
             original URL.
 
         Raises:
             AssertionError: The string is non-empty and does not start with
-                http:// or https://
+                http:// or https://.
         """
         if obj == '':
             return obj

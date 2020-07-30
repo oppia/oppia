@@ -160,11 +160,12 @@ def get_collection_summary_from_model(collection_summary_model):
     collection summary model.
 
     Args:
-        collection_summary_model: CollectionSummaryModel. collection summary
-            model object.
+        collection_summary_model: CollectionSummaryModel. The model object
+            to extract domain object for oppia collection summary.
 
     Returns:
-        CollectionSummary. CollectionSummary domain object.
+        CollectionSummary. The collection summary domain object extracted
+        from collection summary model.
     """
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
@@ -434,7 +435,7 @@ def get_valid_completed_exploration_ids(user_id, collection):
 
     Args:
         user_id: str. ID of the given user.
-        collection: Collection. The Collection object.
+        collection: Collection. The collection to fetch exploration from.
 
     Returns:
         list(str). A filtered version of the return value of
@@ -519,7 +520,7 @@ def get_collection_summaries_matching_ids(collection_ids):
     exist).
 
     Args:
-        collection_ids: list. A list of collection ids.
+        collection_ids: list(str). A list of collection ids.
 
     Returns:
         list(CollectionSummary). A list with the corresponding summary domain
@@ -1055,8 +1056,8 @@ def save_collection_summary(collection_summary):
     entity in the datastore.
 
     Args:
-        collection_summary: object. The collection summary object to be saved
-            in the datastore.
+        collection_summary: CollectionSummaryModel. The collection summary
+            object to be saved in the datastore.
     """
     collection_summary_dict = {
         'title': collection_summary.title,

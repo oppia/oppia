@@ -241,7 +241,7 @@ class BaseModel(ndb.Model):
         """Stores the given ndb.Model instances.
 
         Args:
-            entities: list(ndb.Model). List of ndb Model.
+            entities: list(ndb.Model). List of model instances to be stored.
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
         """
@@ -255,7 +255,7 @@ class BaseModel(ndb.Model):
         """Stores the given ndb.Model instances asynchronously.
 
         Args:
-            entities: list(ndb.Model). List of ndb.Model.
+            entities: list(ndb.Model).The list of model instances to be stored.
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
 
@@ -272,7 +272,8 @@ class BaseModel(ndb.Model):
         """Deletes the given ndb.Model instances.
 
         Args:
-            entities: list(ndb.Model). List of ndb.Model.
+            entities: list(ndb.Model). The list of model instances to be
+                deleted.
         """
         keys = [entity.key for entity in entities]
         ndb.delete_multi(keys)
@@ -340,7 +341,7 @@ class BaseModel(ndb.Model):
         descending order (newly updated first).
 
         Args:
-            query: ndb.Query. List of ndb.Query.
+            query: ndb.Query. The query object to be used to fetch entities.
             page_size: int. The maximum number of entities to be returned.
             urlsafe_start_cursor: str or None. If provided, the list of returned
                 entities starts from this datastore cursor. Otherwise,
@@ -597,7 +598,7 @@ class VersionedModel(BaseModel):
         snapshot id.
 
         Args:
-            snapshot_id: str. The snapshot id.
+            snapshot_id: str. The given snapshot id.
 
         Returns:
             VersionedModel. Reconstituted instance.
@@ -621,8 +622,8 @@ class VersionedModel(BaseModel):
         """Gets a unique snapshot id for this instance and version.
 
         Args:
-            instance_id: str. The instance id.
-            version_number: int. The version number.
+            instance_id: str. The given instance id.
+            version_number: int. The given version number.
 
         Returns:
             str. The unique snapshot id corresponding to the given instance and
@@ -845,7 +846,7 @@ class VersionedModel(BaseModel):
         """Reverts model to previous version.
 
         Args:
-            model: VersionedModel. The version model object.
+            model: VersionedModel. The model instance to revert.
             committer_id: str. The user_id of the user who committed the change.
             commit_message: str. The commit description message.
             version_number: int. Version to revert to.
@@ -895,8 +896,8 @@ class VersionedModel(BaseModel):
         snapshot metadata is not used.
 
         Args:
-            entity_id: str. The entity id.
-            version_number: int. The version number.
+            entity_id: str. The given entity id.
+            version_number: int. The given version number.
             strict: bool. Whether to fail noisily if no entity with the given id
                 exists in the datastore. Default is True.
 
@@ -938,10 +939,10 @@ class VersionedModel(BaseModel):
             versions.
 
         Raises:
-            ValueError. The given entity_id is invalid.
-            ValueError. Requested version number cannot be higher than the
+            ValueError: The given entity_id is invalid.
+            ValueError: Requested version number cannot be higher than the
                 current version number.
-            ValueError. At least one version number is invalid.
+            ValueError: At least one version number is invalid.
         """
         instances = []
 
@@ -979,7 +980,7 @@ class VersionedModel(BaseModel):
         """Gets model instance.
 
         Args:
-            entity_id: str. The entity id.
+            entity_id: str. The given entity id.
             strict: bool. Whether to fail noisily if no entity with the given id
                 exists in the datastore. Default is True.
             version: int. Version we want to get. Default is None.

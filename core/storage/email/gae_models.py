@@ -407,7 +407,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """Generates the unique reply-to id.
 
         Raises:
-            Exception. When unique id generator produces too many collisions.
+            Exception: When unique id generator produces too many collisions.
 
         Returns:
             str. The unique reply-to id if there are no collisions.

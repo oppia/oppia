@@ -243,7 +243,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill_difficulty: float. The difficulty between [0, 1] of the skill.
 
         Raises:
-            Exception. The given question is already linked to the given skill.
+            Exception: The given question is already linked to the given skill.
 
         Returns:
             QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel

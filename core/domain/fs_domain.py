@@ -90,7 +90,7 @@ class GeneralFileSystem(python_utils.OBJECT):
             entity_id: str. The ID of the corresponding entity.
 
         Raises:
-            ValidationError. When parameters passed in are invalid.
+            ValidationError: When parameters passed in are invalid.
         """
         if entity_name not in ALLOWED_ENTITY_NAMES:
             raise utils.ValidationError(

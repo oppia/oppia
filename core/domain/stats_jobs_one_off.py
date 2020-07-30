@@ -592,7 +592,8 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationStatsModel. The Exploration stats model object.
+            item: ExplorationStatsModel. The Exploration stats model object to
+                fetch its properties.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
@@ -768,7 +769,8 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationStatsModel. The Exploration stats model object.
+            item: ExplorationStatsModel. The Exploration stats model object to
+                fetch its properties.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
@@ -968,8 +970,8 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationAnnotationsModel or StateCounterModel. The
-                ExplorationAnnotations or StateCounter model object.
+            item: ExplorationAnnotationsModel or StateCounterModel. The object
+                to fetch its properties.
 
         Yields:
             tuple. Different for different models:

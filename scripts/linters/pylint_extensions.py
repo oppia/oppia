@@ -639,8 +639,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
             node_doc: Docstring. Pylint Docstring class instance representing
                 a node's docstring.
         """
-        # The regexes are taken from the pylint codebase and then later modified
-        # in accorance to our needs. Link: https://github.com/PyCQA/pylint/blob/
+        # The regexes are taken from the pylint codebase and are modified
+        # according to our needs. Link: https://github.com/PyCQA/pylint/blob/
         # e89c361668aeead9fd192d5289c186611ef779ca/pylint/extensions/
         # _check_docs_utils.py#L428.
         re_param_line = re.compile(
@@ -651,7 +651,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 ({type}|\S*|[\s\S]*)
                 (?:,\s+optional)?
                 [.]+\s )+ \s*
-            \s*  (.*)[.]+                   # beginning of optional description
+            \s*  [A-Z](.*)[.]+              # beginning of optional description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -659,7 +659,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         re_returns_line = re.compile(
             r"""
             \s* (({type}|\S*|[\s\S]*).[.]+\s)+              # identifier
-            \s* (.*)[.]+                          # beginning of description
+            \s* [A-Z](.*)[.]+                        # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -669,7 +669,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         re_raise_line = re.compile(
             r"""
             \s* ({type}:)+                    # identifier
-            \s* (.*)[.]+                          # beginning of description
+            \s* [A-Z](.*)[.]+                       # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -699,7 +699,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 match = re_yields_line.match(entry)
                 if not match:
                     self.add_message('malformed-yields-section', node=node)
-        
+
         if node_doc.exceptions():
             entries = node_doc._parse_section(  # pylint: disable=protected-access
                 _check_docs_utils.GoogleDocstring.re_raise_section)

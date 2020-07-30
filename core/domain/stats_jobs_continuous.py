@@ -104,7 +104,7 @@ class InteractionAnswerSummariesMRJobManager(
 
         Args:
             key: str. The unique key of the form:
-                <exploration_id>:<exploration_version>:<state_name>
+                <exploration_id>:<exploration_version>:<state_name>.
             stringified_values: list(str). A list of stringified_values of the
                 submitted answers.
 

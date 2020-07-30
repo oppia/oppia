@@ -73,8 +73,8 @@ def link_multiple_skills_for_question(
             0 and 1 (inclusive).
 
     Raises:
-        Exception. The lengths of the skill_ids and skill_difficulties
-        lists are different.
+        Exception: The lengths of the skill_ids and skill_difficulties
+            lists are different.
     """
     if len(skill_ids) != len(skill_difficulties):
         raise Exception(
@@ -133,7 +133,7 @@ def update_question_skill_link_difficulty(
         new_difficulty: float. New difficulty value.
 
     Raises:
-        Exception. Given question and skill are not linked.
+        Exception: Given question and skill are not linked.
     """
     question_skill_link_id = (
         question_models.QuestionSkillLinkModel.get_model_id(
@@ -438,8 +438,8 @@ def get_displayable_question_skill_link_details(
             questions are to be returned. This value should be urlsafe.
 
     Raises:
-        Exception. Querying linked question summaries for more than 3 skills at
-        a time is not supported currently.
+        Exception: Querying linked question summaries for more than 3 skills at
+            a time is not supported currently.
 
     Returns:
         list(QuestionSummary), list(MergedQuestionSkillLink), str|None.
@@ -661,10 +661,11 @@ def get_question_summary_from_model(question_summary_model):
 
     Args:
         question_summary_model: QuestionSummaryModel. The QuestionSummary model
-            object.
+            object to fetch corresponding QuestionSummary domain object.
 
     Returns:
-        QuestionSummary. The domain object of QuestionSummary.
+        QuestionSummary. The domain object corresponding to the given question
+            summary model.
     """
     return question_domain.QuestionSummary(
         question_summary_model.id,
@@ -684,7 +685,7 @@ def get_interaction_id_for_question(question_id):
         str. The ID of the interaction of the question.
 
     Raises:
-        Exception. The question does not exists of the ID question_id.
+        Exception: The question does not exists of the ID question_id.
     """
     question = get_question_by_id(question_id, strict=False)
     if question is None:

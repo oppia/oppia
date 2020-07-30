@@ -93,10 +93,11 @@ def get_topic_summary_from_model(topic_summary_model):
     topic summary model.
 
     Args:
-        topic_summary_model: TopicSummaryModel. Topic summary model object.
+        topic_summary_model: TopicSummaryModel. The topic summary model object
+            to get the corresponding domain object.
 
     Returns:
-        TopicSummary. Domain object for an Oppia topic summary.
+        TopicSummary. The domain object corresponding to the given model object.
     """
     return topic_domain.TopicSummary(
         topic_summary_model.id, topic_summary_model.name,
@@ -192,7 +193,7 @@ def save_new_topic(committer_id, topic):
         topic: Topic. Topic to be saved.
 
     Raises:
-        Exception. Topic with same name already exists.
+        Exception: Topic with same name already exists.
     """
     existing_topic = topic_fetchers.get_topic_by_name(topic.name)
     if existing_topic is not None:
@@ -218,7 +219,7 @@ def apply_change_list(topic_id, change_list):
             topic.
 
     Raises:
-        Exception. The incoming changelist had simultaneuous creation and
+        Exception: The incoming changelist had simultaneuous creation and
             deletion of subtopics.
 
     Returns:
@@ -551,9 +552,9 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id: str. ID of the committer.
 
     Raises:
-        Exception. The given story does not exist.
-        Exception. The story is already published.
-        Exception. The user does not have enough rights to publish the story.
+        Exception: The given story does not exist.
+        Exception: The story is already published.
+        Exception: The user does not have enough rights to publish the story.
     """
     def _are_nodes_valid_for_publishing(story_nodes):
         """Validates the story nodes before publishing.
@@ -610,9 +611,9 @@ def unpublish_story(topic_id, story_id, committer_id):
         committer_id: str. ID of the committer.
 
     Raises:
-        Exception. The given story does not exist.
-        Exception. The story is already unpublished.
-        Exception. The user does not have enough rights to unpublish the story.
+        Exception: The given story does not exist.
+        Exception: The story is already unpublished.
+        Exception: The user does not have enough rights to unpublish the story.
     """
     user = user_services.UserActionsInfo(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
@@ -876,9 +877,9 @@ def publish_topic(topic_id, committer_id):
         committer_id: str. ID of the committer.
 
     Raises:
-        Exception. The given topic does not exist.
-        Exception. The topic is already published.
-        Exception. The user does not have enough rights to publish the topic.
+        Exception: The given topic does not exist.
+        Exception: The topic is already published.
+        Exception: The user does not have enough rights to publish the topic.
     """
     topic_rights = get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
@@ -908,9 +909,9 @@ def unpublish_topic(topic_id, committer_id):
         committer_id: str. ID of the committer.
 
     Raises:
-        Exception. The given topic does not exist.
-        Exception. The topic is already unpublished.
-        Exception. The user does not have enough rights to unpublish the topic.
+        Exception: The given topic does not exist.
+        Exception: The topic is already unpublished.
+        Exception: The user does not have enough rights to unpublish the topic.
     """
     topic_rights = get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
@@ -979,7 +980,7 @@ def get_topic_rights(topic_id, strict=True):
         TopicRights. The rights object associated with the given topic.
 
     Raises:
-        EntityNotFoundError. The topic with ID topic_id was not
+        EntityNotFoundError: The topic with ID topic_id was not
             found in the datastore.
     """
 
@@ -1094,7 +1095,7 @@ def deassign_user_from_all_topics(committer, user_id):
         user_id: str. The ID of the user.
 
     Raises:
-        Exception. The committer does not have rights to modify a role.
+        Exception: The committer does not have rights to modify a role.
     """
     topic_rights_list = get_topic_rights_with_user(user_id)
     for topic_rights in topic_rights_list:
@@ -1121,10 +1122,10 @@ def assign_role(committer, assignee, new_role, topic_id):
         topic_id: str. ID of the topic.
 
     Raises:
-        Exception. The committer does not have rights to modify a role.
-        Exception. The assignee is already a manager for the topic.
-        Exception. The assignee doesn't have enough rights to become a manager.
-        Exception. The role is invalid.
+        Exception: The committer does not have rights to modify a role.
+        Exception: The assignee is already a manager for the topic.
+        Exception: The assignee doesn't have enough rights to become a manager.
+        Exception: The role is invalid.
     """
     committer_id = committer.user_id
     topic_rights = get_topic_rights(topic_id)

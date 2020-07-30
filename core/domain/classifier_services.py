@@ -117,7 +117,7 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
             exploration versions diff class.
 
     Raises:
-        Exception. This method should not be called by exploration with version
+        Exception: This method should not be called by exploration with version
             number 1.
 
     Returns:
@@ -181,8 +181,8 @@ def convert_strings_to_float_numbers_in_classifier_data(
             strings to floats.
 
     Raises:
-        Exception. If classifier data contains an object whose type is other
-        than integer, string, dict or list.
+        Exception: If classifier data contains an object whose type is other
+            than integer, string, dict or list.
 
     Returns:
         dict|list|string|int|float. Original classifier data dict with
@@ -275,7 +275,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
         status: str. The status to which the job needs to be updated.
 
     Raises:
-        Exception. The ClassifierTrainingJobModel corresponding to the job_id
+        Exception: The ClassifierTrainingJobModel corresponding to the job_id
             of the ClassifierTrainingJob does not exist.
     """
     classifier_training_job_models = (
@@ -393,7 +393,7 @@ def store_classifier_data(job_id, classifier_data):
             in the job.
 
     Raises:
-        Exception. The ClassifierTrainingJobModel corresponding to the job_id
+        Exception: The ClassifierTrainingJobModel corresponding to the job_id
             of the ClassifierTrainingJob does not exist.
     """
     classifier_training_job_model = (

@@ -1148,7 +1148,7 @@ class WrittenTranslations(python_utils.OBJECT):
         """Validates properties of the WrittenTranslations.
 
         Args:
-            expected_content_id_list: list. A list of content id which are
+            expected_content_id_list: list(str). A list of content id which are
                 expected to be inside they WrittenTranslations.
 
         Raises:
@@ -1379,7 +1379,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Validates properties of the RecordedVoiceovers.
 
         Args:
-            expected_content_id_list: list. A list of content id which are
+            expected_content_id_list: list(str). A list of content id which are
                 expected to be inside they RecordedVoiceovers.
 
         Raises:
@@ -1526,10 +1526,10 @@ class RuleSpec(python_utils.OBJECT):
         for all the parameters the rule expects.
 
         Args:
-            rule_params_list: list. A list of parameters used by the rule
-                represented by this RuleSpec instance, to be used to validate
-                the inputs of this RuleSpec. Each element of the list represents
-                a single parameter and is a tuple with two elements:
+            rule_params_list: list(str, object(*)). A list of parameters used by
+                the rule represented by this RuleSpec instance, to be used to
+                validate the inputs of this RuleSpec. Each element of the list
+                represents a single parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
                     1: The typed object instance for that
                         parameter (e.g. Real).

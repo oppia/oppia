@@ -231,7 +231,7 @@ class Misconception(python_utils.OBJECT):
             misconception_id: int. The misconception id to be validated.
 
         Raises:
-            ValidationError. The misconception id is invalid.
+            ValidationError: The misconception id is invalid.
         """
         if not isinstance(misconception_id, int):
             raise utils.ValidationError(

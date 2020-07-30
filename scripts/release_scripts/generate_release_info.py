@@ -112,8 +112,8 @@ def gather_logs(start, stop='HEAD'):
     """Gathers the logs between the start and endpoint.
 
     Args:
-        start: str. Tag, Branch or SHA1 of start point
-        stop: str. Tag, Branch or SHA1 of end point, defaults to HEAD
+        start: str. Tag, Branch or SHA1 of start point.
+        stop: str. Tag, Branch or SHA1 of end point, defaults to HEAD.
 
     Returns:
         list(Log). List of Logs.
@@ -135,7 +135,7 @@ def extract_issues(logs):
     """Extract references to issues out of a list of Logs
 
     Args:
-        logs: list(Log). List of Logs to parse
+        logs: list(Log). List of Logs to parse.
 
     Returns:
         set(str). Set of found issues as links to Github.
@@ -214,7 +214,7 @@ def check_versions(current_release):
         current_release: str. The current release tag to diff against.
 
     Returns:
-        list. List of variable names that changed.
+        list(str). List of variable names that changed.
     """
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)

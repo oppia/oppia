@@ -123,10 +123,12 @@ def get_story_summary_from_model(story_summary_model):
     story summary model.
 
     Args:
-        story_summary_model: StorySummaryModel. StorySummaryModel object.
+        story_summary_model: StorySummaryModel. The story summary model object
+            to get the corresponding domain object.
 
     Returns:
-        StorySummary. Domain object for an Oppia summary.
+        StorySummary. The corresponding domain object to the given story
+        summary model object.
     """
     return story_domain.StorySummary(
         story_summary_model.id, story_summary_model.title,
@@ -333,8 +335,8 @@ def get_node_index_by_story_id_and_node_id(story_id, node_id):
         int. The index of the corresponding node.
 
     Raises:
-        Exception. The given story does not exist.
-        Exception. The given node does not exist in the story.
+        Exception: The given story does not exist.
+        Exception: The given node does not exist in the story.
     """
     try:
         story = get_story_by_id(story_id)

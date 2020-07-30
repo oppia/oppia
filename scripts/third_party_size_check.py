@@ -44,8 +44,8 @@ def _get_skip_files_list():
         list. The list of files which are to be skipped.
 
     Raises:
-        yaml.YAMLError if failed to parse app_dev.yaml.
-        IOError if failed to open app_dev.yaml in read mode.
+        yaml.YAMLError: if failed to parse app_dev.yaml.
+        IOError: if failed to open app_dev.yaml in read mode.
     """
     try:
         with python_utils.open_file('./app_dev.yaml', 'r') as app_dev_yaml:

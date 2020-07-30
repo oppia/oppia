@@ -380,10 +380,12 @@ def get_skill_summary_from_model(skill_summary_model):
     skill summary model.
 
     Args:
-        skill_summary_model: SkillSummaryModel. The skill summary model object.
+        skill_summary_model: SkillSummaryModel. The skill summary model object
+            to get corresponding domain object.
 
     Returns:
-        SkillSummary. Domain object for an oppia skill summary.
+        SkillSummary. The domain object corresponding to given skill summmary
+        model.
     """
     return skill_domain.SkillSummary(
         skill_summary_model.id, skill_summary_model.description,

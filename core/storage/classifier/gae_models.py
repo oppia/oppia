@@ -160,8 +160,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            list. List of the ClassifierTrainingJobModels with status new or
-            pending.
+            list(ClassifierTrainingJobModel). List of the
+            ClassifierTrainingJobModels with status new or pending.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
