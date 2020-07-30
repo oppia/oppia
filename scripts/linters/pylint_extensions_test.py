@@ -568,7 +568,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Does nothing.
 
                 Args:
-                    arg: argument description.
+                    arg: Argument description.
                 \"\"\"
                 a = True
         """)
@@ -588,7 +588,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Return True.
 
                 Returns:
-                    arg: argument description.
+                    arg: Argument description.
                 \"\"\"
                 return True
         """)
@@ -608,7 +608,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Yield true.
 
                 Yields:
-                    yields: argument description.
+                    yields: Argument description.
                 \"\"\"
                 yield True
         """)
@@ -628,7 +628,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Raise an exception.
 
                 Raises:
-                    Exception. argument description.
+                    Exception. Argument description.
                 \"\"\"
                 raise Exception()
         """)
@@ -648,7 +648,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Does nothing.
 
                 Args:
-                    arg: argument. description.
+                    arg: argument. Description.
                 \"\"\"
                 a = True
         """)
@@ -663,7 +663,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Does nothing.
 
                 Returns:
-                    int. argument description.
+                    int. Argument escription.
                 \"\"\"
                 return args
         """)
@@ -678,7 +678,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Does nothing.
 
                 Yields:
-                    arg. argument description.
+                    arg. Argument description.
                 \"\"\"
                 yield args
         """)
@@ -755,7 +755,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable. desciption
+                            arg: variable. Desciption
                     \"\"\"
                     Something
         """)
@@ -775,7 +775,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable. description.\"\"\"
+                            arg: variable. Description.\"\"\"
                     Something
         """)
 
@@ -791,7 +791,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             u"""def func(arg): #@
                 \"\"\"Do something.
                 Args:
-                    arg: argument. description.
+                    arg: argument. Description.
                 \"\"\"
         """)
 
@@ -809,7 +809,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             u"""def func(): #@
                     \"\"\"Raises exception.
                     Raises:
-                        raises_exception: description.
+                        raises_exception: Description.
                     \"\"\"
                     raise exception
         """)
@@ -828,7 +828,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             u"""def func(): #@
                 \"\"\"Returns something.
                 Returns:
-                    returns_something. description.
+                    returns_something. Description.
                 \"\"\"
                 return something
         """)
@@ -848,9 +848,9 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Raises exception.
 
                 Args:
-                    arg: argument. description.
+                    arg: argument. Description.
                 Raises:
-                    raises_something: description.
+                    raises_something: Description.
                 \"\"\"
                 raise exception
         """)
@@ -870,9 +870,9 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 \"\"\"Returns Something.
 
                 Args:
-                    arg: argument. description.
+                    arg: argument. Description.
                 Returns:
-                    returns_something. description.
+                    returns_something. Description.
                 \"\"\"
                 return something
         """)
@@ -893,10 +893,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
 
                 Raises:
-                    raises_exception: description.
+                    raises_exception: Description.
 
                 Returns:
-                    returns_something. description.
+                    returns_something. Description.
                 \"\"\"
                 raise something
                 return something
@@ -922,11 +922,11 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
 
                     Returns:
-                        int. returns something.
+                        int. Returns something.
 
 
                     Yields:
-                        yield_something. description.
+                        yield_something. Description.
                     \"\"\"
                     return True
                     yield something
@@ -958,10 +958,10 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"Returns something.
 
                     Args:
-                        arg: argument. description.
+                        arg: argument. Description.
 
                     Returns:
-                        returns_something. description.
+                        returns_something. Description.
                     \"\"\"
                     "Returns: something"
                     return something
@@ -995,7 +995,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                         returns_something. This is description.
 
                     Raises:
-                        raises: something.
+                        raises: Something.
 
                     Yields:
                         yield_something. This is description.
@@ -1015,7 +1015,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Raises:
-                        NoVariableException: variable.
+                        NoVariableException: Variable.
                     \"\"\"
                     Something
         """)
@@ -1051,7 +1051,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Raises:
-                            AssertionError: if the
+                            AssertionError: If the
                             schema is not valid.
                     \"\"\"
                     Something
@@ -1112,7 +1112,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Raises:
-                            Incorrect-Exception: if the
+                            Incorrect-Exception: If the
                             schema is not valid.
                     \"\"\"
                     Something
@@ -1146,7 +1146,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Args:
-                            arg: variable. description.
+                            arg: variable. Description.
                     \"\"\"
                     Something
         """)
@@ -1178,12 +1178,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     \"\"\"This is a docstring.
 
                         Raises:
-                            doseq: bool. If true, individual
+                            doseq: If true, individual
                                 key=value pairs separated by '&' are
                                 generated for each element of
                                 the value sequence for the key
                                 temp temp temp temp.
-                            query: dict or tuple. The query to be encoded.
+                            query: The query to be encoded.
                     \"\"\"
                     Something
         """)

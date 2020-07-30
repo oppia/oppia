@@ -211,10 +211,10 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_raise_line = re.compile(
         r"""
-        \s* ({type}:)?                    # identifier
+        \s* ({type}|\S*)?                    # identifier
         \s* (.*)                         # beginning of description
     """.format(
-        type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+        type=re_multiple_type,
     ), flags=re.X | re.S | re.M)
 
 
