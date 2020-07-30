@@ -46,7 +46,8 @@ export class CommandExecutorService {
   }
 
   sendParentReadyState() {
-    this.windowRef.nativeWindow.parent.postMessage('Ready to receive hostname', '*');
+    this.windowRef.nativeWindow.parent.postMessage(
+      'Ready to receive hostname', '*');
   }
 
   getOuterFrameEvents(windowRef) {
@@ -58,12 +59,12 @@ export class CommandExecutorService {
         message = message + messageArray[i] + ' ';
       }
       message = message.substr(0, message.length - 1);
-      if (command !== 'HOSTNAME' && this.hostname == '') {
+      if (command !== 'HOSTNAME' && this.hostname === '') {
         return;
       } else if (command === 'CONTINUE' || command === 'SUBMIT') {
         this.commandToFunctionMap[command](windowRef);
-      } else if (command == 'HOSTNAME'){
-       this.setHostname(windowRef, message);
+      } else if (command === 'HOSTNAME') {
+        this.setHostname(windowRef, message);
       } else {
         this.commandToFunctionMap[command](windowRef, message);
       }
@@ -98,8 +99,8 @@ export class CommandExecutorService {
     if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message) >= 0) {
       this.hostname = message;
     }
-    if (this.cachedOuterFrameMessage !== '' 
-    && this.cachedOuterFrameMessage != undefined) {
+    if (this.cachedOuterFrameMessage !== '' &&
+    this.cachedOuterFrameMessage !== undefined) {
       windowRef.nativeWindow.parent.postMessage(this.cachedOuterFrameMessage,
         this.hostname);
     }
