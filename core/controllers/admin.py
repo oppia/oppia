@@ -604,21 +604,12 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        type_of_latex_svg_generation = (
-            self.request.get('type_of_latex_svg_generation'))
-        if type_of_latex_svg_generation == 'test_run':
-            all_explorations_latex_mapping = (
-                exp_services.get_all_latex_strings_from_explorations())
-            self.render_json({
-                'all_explorations_latex_mapping': all_explorations_latex_mapping
-            })
-        else:
-            latex_strings_to_exp_id_mapping = (
-                exp_services.get_batch_of_exps_for_latex_svg_generation())
-            self.render_json({
-                'latex_strings_to_exp_id_mapping': (
-                    latex_strings_to_exp_id_mapping)
-            })
+        latex_strings_to_exp_id_mapping = (
+            exp_services.get_batch_of_exps_for_latex_svg_generation())
+        self.render_json({
+            'latex_strings_to_exp_id_mapping': (
+                latex_strings_to_exp_id_mapping)
+        })
 
     @acl_decorators.can_access_admin_page
     def post(self):

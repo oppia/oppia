@@ -1932,43 +1932,6 @@ def get_number_explorations_having_latex_strings_without_svgs():
     return number_of_explorations_having_latex_strings_without_svgs
 
 
-def get_all_latex_strings_from_explorations():
-    """Returns all the LaTeX strings from all explorations which have LaTeX
-    strings without SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-
-    Returns:
-        dict(str, dict(str, list(str))). The dict having each key as an exp_id
-        value as a dict having all the states as keys and the corresponding
-        values as the list of LaTeX strings in that particular state.
-    """
-
-    latex_strings_mapping = {}
-    exploration_math_rich_text_info_models = (
-        exp_models.ExplorationMathRichTextInfoModel.get_all().filter(
-            exp_models.  # pylint: disable=singleton-comparison
-            ExplorationMathRichTextInfoModel.
-            math_images_generation_required == True))
-    exploration_ids_to_fetch = []
-    for model in exploration_math_rich_text_info_models:
-        exploration_ids_to_fetch.append(model.id)
-    explorations_dict = exp_fetchers.get_multiple_explorations_by_id(
-        exploration_ids_to_fetch)
-    for exp_id, exploration in explorations_dict.items():
-        latex_strings_mapping[exp_id] = {}
-        for state_name, state in exploration.states.items():
-            html_string = ''.join(state.get_all_html_content_strings())
-            latex_strings_without_svg = (
-                html_validation_service.
-                get_latex_strings_without_svg_from_html(html_string))
-            if len(latex_strings_without_svg) > 0:
-                latex_strings_mapping[exp_id][state_name] = (
-                    latex_strings_without_svg)
-    return latex_strings_mapping
-
-
 def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
     """Saves an SVG for each LaTeX string without an SVG in an exploration
     and updates the exploration. Also the corresponding valid draft changes are
