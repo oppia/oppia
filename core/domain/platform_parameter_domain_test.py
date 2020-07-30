@@ -90,7 +90,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
             param_change_dict)
 
 
-class EvaluationContextTest(test_utils.GenericTestBase):
+class EvaluationContextTests(test_utils.GenericTestBase):
     """Test for the EvaluationContext."""
 
     def test_create_feature_context_from_dict(self):
@@ -111,7 +111,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
         self.assertEqual(context.user_locale, 'en')
         self.assertEqual(context.server_mode, 'dev')
 
-    def test_validate(self):
+    def test_validate_passes_without_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'Android',
@@ -138,7 +138,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
             },
         )
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid client type'):
+            utils.ValidationError, 'Invalid client type \'invalid\''):
             context.validate()
 
     def test_validate_with_invalid_browser_type_raises_exception(self):
@@ -154,7 +154,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
             },
         )
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid browser type'):
+            utils.ValidationError, 'Invalid browser type \'Invalid\''):
             context.validate()
 
     def test_validate_with_invalid_app_version_raises_exception(self):
@@ -169,7 +169,8 @@ class EvaluationContextTest(test_utils.GenericTestBase):
                 'server_mode': 'dev',
             },
         )
-        with self.assertRaisesRegexp(utils.ValidationError, 'Invalid version'):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid version \'a.a.a\''):
             context.validate()
 
     def test_validate_with_invalid_user_locale_raises_exception(self):
@@ -185,7 +186,7 @@ class EvaluationContextTest(test_utils.GenericTestBase):
             },
         )
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid user locale'):
+            utils.ValidationError, 'Invalid user locale \'invalid\''):
             context.validate()
 
     def test_validate_with_invalid_server_mode_raises_exception(self):
@@ -201,11 +202,11 @@ class EvaluationContextTest(test_utils.GenericTestBase):
             },
         )
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid server mode'):
+            utils.ValidationError, 'Invalid server mode \'invalid\''):
             context.validate()
 
 
-class PlatformParameterFilterTest(test_utils.GenericTestBase):
+class PlatformParameterFilterTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterFilter."""
 
     def create_example_context(
@@ -245,7 +246,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
-    def test_evaluate_mode_filter(self):
+    def test_evaluate_server_mode_filter(self):
         filter_dict = {'type': 'server_mode', 'conditions': [('=', 'dev')]}
         filter_domain = (
             parameter_domain
@@ -293,18 +294,6 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertTrue(filter_domain.evaluate(chrome_context))
         self.assertFalse(filter_domain.evaluate(firefox_context))
 
-    def test_evaluate_app_version_filter(self):
-        filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        true_context = self.create_example_context(app_version='1.2.3')
-        false_context = self.create_example_context(app_version='1.2.4')
-
-        self.assertTrue(filter_domain.evaluate(true_context))
-        self.assertFalse(filter_domain.evaluate(false_context))
-
     def test_evaluate_app_version_filter_with_eq_comparison(self):
         filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
         filter_domain = (
@@ -321,11 +310,17 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='0.2.3')))
+        self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.1.2')))
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.3')))
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='1.3.0')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='2.0.0')))
 
     def test_evaluate_app_version_filter_with_gte_comparison(self):
         filter_dict = {'type': 'app_version', 'conditions': [('>=', '1.2.3')]}
@@ -333,11 +328,17 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='0.2.3')))
+        self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.1.2')))
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.3')))
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='1.3.0')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='2.0.0')))
 
     def test_evaluate_app_version_filter_with_lt_comparison(self):
         filter_dict = {'type': 'app_version', 'conditions': [('<', '1.2.3')]}
@@ -345,11 +346,23 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='0.3.4')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='1.1.0')))
+        self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.1.2')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='1.2.2')))
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.3')))
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
+        self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='1.3.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='1.10.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='2.0.0')))
 
     def test_evaluate_app_version_filter_with_lte_comparison(self):
         filter_dict = {'type': 'app_version', 'conditions': [('<=', '1.2.3')]}
@@ -357,11 +370,21 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.1')))
+            self.create_example_context(app_version='0.3.4')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='1.1.0')))
+        self.assertTrue(filter_domain.evaluate(
+            self.create_example_context(app_version='1.2.2')))
         self.assertTrue(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.3')))
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version='1.2.4')))
+        self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='1.3.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='1.10.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self.create_example_context(app_version='2.0.0')))
 
     def test_evaluate_filter_with_multiple_values(self):
         filter_dict = {
@@ -409,17 +432,6 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self.create_example_context(app_version=None)))
 
-    def test_evaluate_app_version_filter_with_invalid_version_not_match(self):
-        filter_dict = {
-            'type': 'app_version',
-            'conditions': [('=', '1.2.3'), ('=', '1.2.4')]
-        }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict)
-
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.a.3')))
-
     def test_evaluate_filter_with_unsupported_operation_raises_exception(self):
         filter_domain = (
             parameter_domain
@@ -427,8 +439,18 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 {'type': 'server_mode', 'conditions': [('!=', 'dev')]}
             ))
         with self.assertRaisesRegexp(
-            Exception, 'Unsupported comparison operator'):
+            Exception, 'Unsupported comparison operator \'!=\''):
             filter_domain.evaluate(self.create_example_context())
+
+    def test_validate_filter_passes_without_exception(self):
+        filter_dict = {
+            'type': 'server_mode',
+            'conditions': [('=', 'dev'), ('=', 'prod')]
+        }
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        filter_domain.validate()
 
     def test_validate_filter_with_invalid_type_raises_exception(self):
         filter_domain = (
@@ -437,7 +459,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 {'type': 'invalid', 'conditions': [('=', 'value1')]}
             ))
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Unsupported filter type'):
+            utils.ValidationError, 'Unsupported filter type \'invalid\''):
             filter_domain.validate()
 
     def test_validate_filter_with_unsupported_operation_raises_exception(self):
@@ -447,7 +469,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 {'type': 'server_mode', 'conditions': [('!=', 'dev')]}
             ))
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Unsupported comparison operator'):
+            utils.ValidationError, 'Unsupported comparison operator \'!=\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_server_mode_raises_exception(self):
@@ -457,7 +479,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 {'type': 'server_mode', 'conditions': [('=', 'invalid')]}
             ))
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid server mode'):
+            utils.ValidationError, 'Invalid server mode \'invalid\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_user_locale_raises_exception(self):
@@ -467,7 +489,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 {'type': 'user_locale', 'conditions': [('=', 'invalid')]}
             ))
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid user locale'):
+            utils.ValidationError, 'Invalid user locale \'invalid\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_client_type_raises_exception(self):
@@ -477,7 +499,7 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
                 {'type': 'client_type', 'conditions': [('=', 'invalid')]}
             ))
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid client type'):
+            utils.ValidationError, 'Invalid client type \'invalid\''):
             filter_domain.validate()
 
     def test_validate_filter_with_invalid_version_expr_raises_exception(self):
@@ -488,15 +510,24 @@ class PlatformParameterFilterTest(test_utils.GenericTestBase):
             ))
 
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid version expression'):
+            utils.ValidationError, 'Invalid version expression \'1.a.2\''):
             filter_domain.validate()
 
 
-class PlatformParameterRuleTest(test_utils.GenericTestBase):
+class PlatformParameterRuleTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterRule."""
 
     def test_from_dict(self):
-        filters = [{'type': 'app_version', 'conditions': [('=', '1.2.3')]}]
+        filters = [
+            {
+                'type': 'app_version',
+                'conditions': [('=', '1.2.3')]
+            },
+            {
+                'type': 'server_mode',
+                'conditions': [('=', 'dev'), ('=', 'test')]
+            }
+        ]
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': filters,
@@ -509,7 +540,7 @@ class PlatformParameterRuleTest(test_utils.GenericTestBase):
         filter_domain = rule.filters[0]
         self.assertIsInstance(
             filter_domain, parameter_domain.PlatformParameterFilter)
-        self.assertEqual(len(rule.filters), 1)
+        self.assertEqual(len(rule.filters), 2)
         self.assertEqual(filter_domain.type, 'app_version')
         self.assertEqual(filter_domain.conditions, [('=', '1.2.3')])
         self.assertEqual(rule.value_when_matched, False)
@@ -628,11 +659,11 @@ class PlatformParameterRuleTest(test_utils.GenericTestBase):
             feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Unsupported filter type'):
+            utils.ValidationError, 'Unsupported filter type \'invalid\''):
             rule.validate()
 
 
-class PlatformParameterMetadataTest(test_utils.GenericTestBase):
+class PlatformParameterMetadataTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterMetadata."""
 
     def test_from_dict(self):
@@ -653,7 +684,7 @@ class PlatformParameterMetadataTest(test_utils.GenericTestBase):
         self.assertDictEqual(metadata.to_dict(), metadata_dict)
 
 
-class PlatformParameterTest(test_utils.GenericTestBase):
+class PlatformParameterTests(test_utils.GenericTestBase):
     """Test for the PlatformParameter."""
 
     def test_from_dict(self):
@@ -718,7 +749,66 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             },
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid parameter name'):
+            utils.ValidationError,
+            'Invalid parameter name \'%s\'' % param.name):
+            param.validate()
+
+        param1 = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter.name',
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', 'dev')]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
+            'metadata': {
+                'is_feature': False,
+                'feature_stage': None,
+            },
+        })
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Invalid parameter name \'%s\'' % param1.name):
+            param1.validate()
+
+    def test_validate_with_long_name_raises_exception(self):
+        long_name = 'Long_' * 50 + 'Name'
+        param = parameter_domain.PlatformParameter.from_dict({
+            'name': long_name,
+            'description': 'for test',
+            'data_type': 'string',
+            'rules': [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', 'dev')]
+                        }
+                    ],
+                    'value_when_matched': '222'
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': '333',
+            'metadata': {
+                'is_feature': False,
+                'feature_stage': None,
+            },
+        })
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Invalid parameter name \'%s\'' % long_name):
             param.validate()
 
     def test_validate_with_unsupported_data_type_raises_exception(self):
@@ -746,7 +836,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             },
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Unsupported data type'):
+            utils.ValidationError, 'Unsupported data type \'InvalidType\''):
             param.validate()
 
     def test_validate_with_inconsistent_data_type_in_rules_raises_exception(
@@ -775,7 +865,8 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             },
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected bool'):
+            utils.ValidationError,
+            'Expected bool, received \'222\' in value_when_matched'):
             param.validate()
 
     def test_validate_with_inconsistent_default_value_type_raises_exception(
@@ -794,7 +885,8 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             },
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected bool'):
+            utils.ValidationError,
+            'Expected bool, received \'111\' in default value'):
             param.validate()
 
     def test_to_dict(self):
@@ -938,7 +1030,8 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             }
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'must be bool'):
+            utils.ValidationError,
+            'Data type of feature flags must be bool, got \'string\' instead'):
             parameter.validate()
 
     def test_validate_feature_with_invalid_stage_raises_exception(self):
@@ -956,7 +1049,7 @@ class PlatformParameterTest(test_utils.GenericTestBase):
             }
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid feature stage'):
+            utils.ValidationError, 'Invalid feature stage, got \'Invalid\''):
             parameter.validate()
 
     def test_validate_feature_with_no_mode_filter_raises_exception(self):
@@ -1089,7 +1182,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_platform_parameter_with_invalid_type_failure(self):
         with self.assertRaisesRegexp(
-            Exception, 'Unsupported data type'):
+            Exception, 'Unsupported data type \'Invalid\''):
             parameter_domain.Registry.create_platform_parameter(
                 'parameter_a', 'test', 'Invalid')
 
@@ -1132,10 +1225,11 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 parameter_name))
 
     def test_create_platform_parameter_with_the_same_name_failure(self):
-        parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
-        with self.assertRaisesRegexp(Exception, 'already exists'):
-            self.create_example_parameter_with_name(parameter_name)
+        param_name = 'parameter_a'
+        self.create_example_parameter_with_name(param_name)
+        with self.assertRaisesRegexp(
+            Exception, 'Parameter with name %s already exists' % param_name):
+            self.create_example_parameter_with_name(param_name)
 
     def test_get_non_existing_parameter_failure(self):
         with self.assertRaisesRegexp(Exception, 'not found'):

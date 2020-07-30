@@ -96,7 +96,7 @@ class EvaluationContext(python_utils.OBJECT):
 
         Returns:
             str|None. The client browser type, e.g. 'Chrome', 'FireFox',
-            'Edge'. None if the client is a native, i.e. Android app.
+            'Edge'. None if the client type is native, i.e. Android app.
         """
         return self._browser_type
 
@@ -135,31 +135,31 @@ class EvaluationContext(python_utils.OBJECT):
         """Validates the EvaluationContext domain object."""
         if self._client_type not in ALLOWED_CLIENT_TYPES:
             raise utils.ValidationError(
-                'Invalid client type %s, must be one of %s.' % (
+                'Invalid client type \'%s\', must be one of %s.' % (
                     self._client_type, ALLOWED_CLIENT_TYPES))
 
         if (
                 self._browser_type is not None and
                 self._browser_type not in ALLOWED_BROWSER_TYPES):
             raise utils.ValidationError(
-                'Invalid browser type %s, must be one of %s.' % (
+                'Invalid browser type \'%s\', must be one of %s.' % (
                     self._browser_type, ALLOWED_BROWSER_TYPES))
 
         if (
                 self._app_version is not None and
                 APP_VERSION_WITH_HASH_REGEXP.match(self._app_version) is None):
             raise utils.ValidationError(
-                'Invalid version %s, expected to match regexp %s' % (
+                'Invalid version \'%s\', expected to match regexp %s.' % (
                     self._app_version, APP_VERSION_WITH_HASH_REGEXP))
 
         if self._user_locale not in ALLOWED_USER_LOCALES:
             raise utils.ValidationError(
-                'Invalid user locale %s, must be one of %s.' % (
+                'Invalid user locale \'%s\', must be one of %s.' % (
                     self._user_locale, ALLOWED_USER_LOCALES))
 
         if self._server_mode not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
-                'Invalid server mode %s, must be one of %s.' % (
+                'Invalid server mode \'%s\', must be one of %s.' % (
                     self._server_mode, ALLOWED_SERVER_MODES))
 
     @classmethod
@@ -218,9 +218,9 @@ class PlatformParameterFilter(python_utils.OBJECT):
         """Returns filter conditions.
 
         Returns:
-            list(tuple). The filter conditions. Each element of the list is a
-            2-tuple (op, value), where op is the operator for comparison, value
-            is the value used for comparison.
+            list((str, str)). The filter conditions. Each element of the list
+            is a 2-tuple (op, value), where op is the operator for comparison,
+            value is the value used for comparison.
         """
         return self._conditions
 
@@ -281,7 +281,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
         """Validates the PlatformParameterFilter domain object."""
         if self._type not in self.SUPPORTED_FILTER_TYPE:
             raise utils.ValidationError(
-                'Unsupported filter type %s' % self._type)
+                'Unsupported filter type \'%s\'' % self._type)
 
         for op, _ in self._conditions:
             if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
@@ -295,25 +295,25 @@ class PlatformParameterFilter(python_utils.OBJECT):
             for _, mode in self._conditions:
                 if mode not in ALLOWED_SERVER_MODES:
                     raise utils.ValidationError(
-                        'Invalid server mode %s, must be one of %s.' % (
+                        'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))
         elif self._type == 'user_locale':
             for _, locale in self._conditions:
                 if locale not in ALLOWED_USER_LOCALES:
                     raise utils.ValidationError(
-                        'Invalid user locale %s, must be one of %s.' % (
+                        'Invalid user locale \'%s\', must be one of %s.' % (
                             locale, ALLOWED_USER_LOCALES))
         elif self._type == 'client_type':
             for _, client_type in self._conditions:
                 if client_type not in ALLOWED_CLIENT_TYPES:
                     raise utils.ValidationError(
-                        'Invalid client type %s, must be one of %s.' % (
+                        'Invalid client type \'%s\', must be one of %s.' % (
                             client_type, ALLOWED_CLIENT_TYPES))
         elif self._type == 'app_version':
             for _, version in self._conditions:
                 if not APP_VERSION_WITHOUT_HASH_REGEXP.match(version):
                     raise utils.ValidationError(
-                        'Invalid version expression %s, expected to match'
+                        'Invalid version expression \'%s\', expected to match'
                         'regexp %s.' % (
                             version, APP_VERSION_WITHOUT_HASH_REGEXP))
 
@@ -344,8 +344,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
         """
         return cls(filter_dict['type'], filter_dict['conditions'])
 
-    @classmethod
-    def _match_version_expression(cls, op, value, client_version):
+    def _match_version_expression(self, op, value, client_version):
         """Tries to match the version expression against the client version.
 
         Args:
@@ -357,29 +356,26 @@ class PlatformParameterFilter(python_utils.OBJECT):
             bool. True if the expression matches the version.
         """
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
-        if match:
-            client_version_without_hash = match.group(1)
+        client_version_without_hash = match.group(1)
 
-            is_equal = value == client_version_without_hash
-            is_client_version_smaller = cls._is_first_version_smaller(
-                client_version_without_hash, value)
-            is_client_version_larger = cls._is_first_version_smaller(
-                value, client_version_without_hash
-            )
-            if op == '=':
-                return is_equal
-            elif op == '<':
-                return is_client_version_smaller
-            elif op == '<=':
-                return is_equal or is_client_version_smaller
-            elif op == '>':
-                return is_client_version_larger
-            elif op == '>=':
-                return is_equal or is_client_version_larger
-        return False
+        is_equal = value == client_version_without_hash
+        is_client_version_smaller = self._is_first_version_smaller(
+            client_version_without_hash, value)
+        is_client_version_larger = self._is_first_version_smaller(
+            value, client_version_without_hash
+        )
+        if op == '=':
+            return is_equal
+        elif op == '<':
+            return is_client_version_smaller
+        elif op == '<=':
+            return is_equal or is_client_version_smaller
+        elif op == '>':
+            return is_client_version_larger
+        elif op == '>=':
+            return is_equal or is_client_version_larger
 
-    @staticmethod
-    def _is_first_version_smaller(version_a, version_b):
+    def _is_first_version_smaller(self, version_a, version_b):
         """Compares two version strings, return True if the first version is
         smaller.
 
@@ -656,23 +652,22 @@ class PlatformParameter(python_utils.OBJECT):
         """Validates the PlatformParameter domain object."""
         if re.match(self.PARAMETER_NAME_REGEXP, self._name) is None:
             raise utils.ValidationError(
-                'Invalid parameter name, expected to match regexp %s, '
-                'got %s.' % (
-                    self.PARAMETER_NAME_REGEXP, self._name))
+                'Invalid parameter name \'%s\', expected to match regexp '
+                '%s.' % (self._name, self.PARAMETER_NAME_REGEXP))
 
         if self._data_type not in self.DATA_TYPE_PREDICATES_DICT:
             raise utils.ValidationError(
-                'Unsupported data type: %s.' % self._data_type)
+                'Unsupported data type \'%s\'.' % self._data_type)
 
         predicate = self.DATA_TYPE_PREDICATES_DICT[self.data_type]
         if not predicate(self._default_value):
             raise utils.ValidationError(
-                'Expected %s, received %s in default value.' % (
+                'Expected %s, received \'%s\' in default value.' % (
                     self._data_type, self._default_value))
         for rule in self._rules:
             if not predicate(rule.value_when_matched):
                 raise utils.ValidationError(
-                    'Expected %s, received %s in value_when_matched' % (
+                    'Expected %s, received \'%s\' in value_when_matched.' % (
                         self._data_type, rule.value_when_matched))
             if not rule.has_server_mode_filter():
                 raise utils.ValidationError(
@@ -721,12 +716,12 @@ class PlatformParameter(python_utils.OBJECT):
         """
         if self._data_type != 'bool':
             raise utils.ValidationError(
-                'Data type of feature flags must be bool, got %s '
+                'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
         if self._metadata.feature_stage not in ALLOWED_FEATURE_STAGES:
             raise utils.ValidationError(
-                'Invalid feature stage, expected one of %s, got %s.' % (
-                    ALLOWED_FEATURE_STAGES, self._data_type))
+                'Invalid feature stage, got \'%s\', expected one of %s.' % (
+                    self._metadata.feature_stage, ALLOWED_FEATURE_STAGES))
 
         enabling_rules = [
             rule for rule in self._rules if rule.value_when_matched]
@@ -791,6 +786,12 @@ class PlatformParameter(python_utils.OBJECT):
 class Registry(python_utils.OBJECT):
     """Registry of all platform parameters."""
 
+    DEFAULT_VALUE_BY_TYPE_DICT = {
+        'bool': False,
+        'number': 0,
+        'string': '',
+    }
+
     # The keys of parameter_registry are the property names, and the values
     # are PlatformParameter instances with initial settings defined in this
     # file.
@@ -814,15 +815,12 @@ class Registry(python_utils.OBJECT):
         Returns:
             PlatformParameter. The created platform parameter.
         """
-        default = None
-        if data_type == 'bool':
-            default = False
-        elif data_type == 'number':
-            default = 0
-        elif data_type == 'string':
-            default = ''
+        if data_type in cls.DEFAULT_VALUE_BY_TYPE_DICT:
+            default = cls.DEFAULT_VALUE_BY_TYPE_DICT[data_type]
         else:
-            raise Exception('Unsupported data type %s.' % data_type)
+            raise Exception(
+                'Unsupported data type \'%s\', must be one of'' %s.' % (
+                    data_type, list(cls.DEFAULT_VALUE_BY_TYPE_DICT.keys())))
 
         param_dict = {
             'name': name,
