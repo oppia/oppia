@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for settingsTab.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
@@ -39,8 +40,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
-
 
 class MockRouterService {
   private refreshSettingsTabEmitter: EventEmitter<void>;

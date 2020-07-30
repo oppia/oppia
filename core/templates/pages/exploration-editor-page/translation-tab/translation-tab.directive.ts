@@ -81,18 +81,19 @@ angular.module('oppia').directive('translationTab', [
             TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
           var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
-            '#tutorialTranslationLanguage';
+          '#tutorialTranslationLanguage';
           var _ID_TUTORIAL_TRANSLATION_STATE = '#tutorialTranslationState';
           var _ID_TUTORIAL_TRANSLATION_OVERVIEW =
-            '#tutorialTranslationOverview';
+          '#tutorialTranslationOverview';
           // Replace the ng-joyride template with one that uses
           // <[...]> interpolators instead of/ {{...}} interpolators.
           var ngJoyrideTemplate =
-            $templateCache.get('ng-joyride-title-tplv1.html');
+          $templateCache.get('ng-joyride-title-tplv1.html');
           ngJoyrideTemplate = ngJoyrideTemplate.replace(
             /\{\{/g, '<[').replace(/\}\}/g, ']>');
+
+          ctrl.directiveSubscriptions = new Subscription();
 
           var initTranslationTab = function() {
             StateTutorialFirstTimeService.initTranslation(

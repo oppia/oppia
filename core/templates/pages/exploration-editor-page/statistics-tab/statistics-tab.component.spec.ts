@@ -31,7 +31,7 @@ class MockRouterService {
   get onRefreshStatisticsTab() {
     return this.refreshStatsticsTabEmitter;
   }
-  set Emitter(val) {
+  set refreshStatisticsTabEmitter(val) {
     this.refreshStatsticsTabEmitter = val;
   }
 }
@@ -155,7 +155,7 @@ describe('Statistics Tab Component', function() {
         visualizationsInfo: {}
       }));
 
-    routerService.Emitter = new EventEmitter();
+    routerService.refreshStatisticsTabEmitter = new EventEmitter();
     $scope = $rootScope.$new();
     ctrl = $componentController('statisticsTab', {
       $scope: $scope,

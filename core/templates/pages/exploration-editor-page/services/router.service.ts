@@ -66,9 +66,12 @@ angular.module('oppia').factory('RouterService', [
 
     var activeTabName = TABS.MAIN.name;
 
-    var _refreshSettingsTabEventEmitter = new EventEmitter();
-    var _refreshStatisticsTabEventEmitter = new EventEmitter();
-    var _refreshTranslationTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshSettingsTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshStatisticsTabEventEmitter = new EventEmitter();
+    /** @private */
+    var refreshTranslationTabEventEmitter = new EventEmitter();
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -96,7 +99,7 @@ angular.module('oppia').factory('RouterService', [
               StateEditorService.setActiveStateName(
                 ExplorationInitStateNameService.savedMemento);
             }
-            _refreshTranslationTabEventEmitter.emit();
+            refreshTranslationTabEventEmitter.emit();
           }
         }, 300);
       } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
@@ -104,10 +107,10 @@ angular.module('oppia').factory('RouterService', [
         _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === TABS.SETTINGS.path) {
         activeTabName = TABS.SETTINGS.name;
-        _refreshSettingsTabEventEmitter.emit();
+        refreshSettingsTabEventEmitter.emit();
       } else if (newPath === TABS.STATS.path) {
         activeTabName = TABS.STATS.name;
-        _refreshStatisticsTabEventEmitter.emit();
+        refreshStatisticsTabEventEmitter.emit();
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
         $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
@@ -267,13 +270,13 @@ angular.module('oppia').factory('RouterService', [
         $location.path(TABS.FEEDBACK.path);
       },
       get onRefreshSettingsTab() {
-        return _refreshSettingsTabEventEmitter;
+        return refreshSettingsTabEventEmitter;
       },
       get onRefreshStatisticsTab() {
-        return _refreshStatisticsTabEventEmitter;
+        return refreshStatisticsTabEventEmitter;
       },
       get onRefreshTranslationTab() {
-        return _refreshTranslationTabEventEmitter;
+        return refreshTranslationTabEventEmitter;
       }
     };
 

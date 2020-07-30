@@ -121,9 +121,10 @@ angular.module('oppia').component('settingsTab', {
         UserExplorationPermissionsService, WindowRef, ALL_CATEGORIES,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
       var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
       var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
       var EXPLORE_PAGE_PREFIX = '/explore/';
+
+      ctrl.directiveSubscriptions = new Subscription();
 
       ctrl.getExplorePageUrl = function() {
         return (

@@ -50,8 +50,8 @@ angular.module('oppia').component('statisticsTab', {
         ReadOnlyExplorationBackendApiService, RouterService,
         StateInteractionStatsService, StatesObjectFactory,
         UrlInterpolationService) {
-      const expId = ExplorationDataService.explorationId;
       this.directiveSubscriptions = new Subscription();
+      const expId = ExplorationDataService.explorationId;
       const refreshExplorationStatistics = () => {
         $q.all([
           ReadOnlyExplorationBackendApiService.loadLatestExploration(expId),
