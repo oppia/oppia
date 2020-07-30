@@ -415,7 +415,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_valid_pillow_path(self):
         # We need to re-import appengine_config here to make it look like a
         # local variable so that we can again re-import appengine_config later.
-        import appengine_config
+        import main
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Invalid path for oppia_tools library: invalid_path')
 
@@ -435,14 +435,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         pil_path_swap = self.swap(os.path, 'join', mock_os_path_join_for_pillow)
         # We need to delete the existing module else the re-importing
         # would just call the existing module.
-        del sys.modules['appengine_config']
+        del sys.modules['main']
 
         with assert_raises_regexp_context_manager, pil_path_swap:
             # This pragma is needed since we are re-importing under
             # invalid conditions. The pylint error messages
             # 'reimported', 'unused-variable', 'redefined-outer-name' and
             # 'unused-import' would appear if this line was not disabled.
-            import appengine_config  # pylint: disable-all
+            import main  # pylint: disable-all
 
     def test_valid_protobuf_path(self):
         # We need to re-import appengine_config here to make it look like a
@@ -480,7 +480,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_valid_third_party_library_path(self):
         # We need to re-import appengine_config here to make it look like a
         # local variable so that we can again re-import appengine_config later.
-        import appengine_config
+        import main
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Invalid path for third_party library: invalid_path')
 
@@ -501,14 +501,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             os.path, 'join', mock_os_path_join_for_third_party_lib)
         # We need to delete the existing module else the re-importing
         # would just call the existing module.
-        del sys.modules['appengine_config']
+        del sys.modules['main']
 
         with assert_raises_regexp_context_manager, third_party_lib_path_swap:
             # This pragma is needed since we are re-importing under
             # invalid conditions. The pylint error messages
             # 'reimported', 'unused-variable', 'redefined-outer-name' and
             # 'unused-import' would appear if this line was not disabled.
-            import appengine_config  # pylint: disable-all
+            import main  # pylint: disable-all
 
     def test_authorization_wrapper_with_x_app_engine_task_name(self):
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
