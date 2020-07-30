@@ -30,5 +30,7 @@ import subprocess  # pylint: disable=unused-import
 import sys  # pylint: disable=unused-import
 import threading  # pylint: disable=unused-import
 
+
 def fun():
-    print 'hello'
+    """Function docstring."""
+    python_utils.PRINT('hello')

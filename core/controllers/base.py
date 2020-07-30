@@ -199,7 +199,8 @@ class BaseHandler(webapp2.RequestHandler):
             if user_settings.deleted:
                 self.user_is_scheduled_for_deletion = user_settings.deleted
             elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                  user_services.has_fully_registered(user_settings.user_id)):
+                  user_services.has_fully_registered_account(
+                      user_settings.user_id)):
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
@@ -409,8 +410,8 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
-                logging.warning('Not a recognized return type: '
-                                'defaulting to render JSON.')
+                logging.warning(
+                    'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):

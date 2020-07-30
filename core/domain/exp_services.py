@@ -59,7 +59,6 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-transaction_services = models.Registry.import_transaction_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -365,66 +364,57 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(
                         state_domain.SubtitledHtml.from_dict(change.new_value))
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     state.update_interaction_answer_groups(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
                         )
                     state.update_interaction_default_outcome(new_outcome)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if not isinstance(change.new_value, list):
-                        raise Exception('Expected hints_list to be a list,'
-                                        ' received %s' % change.new_value)
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
                     new_hints_list = [state_domain.Hint.from_dict(hint_dict)
                                       for hint_dict in change.new_value]
                     state.update_interaction_hints(new_hints_list)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     new_solution = None
                     if change.new_value is not None:
                         new_solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value)
                     state.update_interaction_solution(new_solution)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
@@ -449,9 +439,8 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected written_translations to be a dict, '
@@ -540,8 +529,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         Exception: The versions of the given exploration and the currently
             stored exploration model do not match.
     """
-    exploration_is_public = rights_manager.is_exploration_public(exploration.id)
-    exploration.validate(strict=exploration_is_public)
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+        exploration.validate(strict=True)
+    else:
+        exploration.validate()
 
     exploration_model = exp_models.ExplorationModel.get(exploration.id)
 
@@ -556,8 +548,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (exploration_model.version, exploration.version))
 
-    old_states = (
-        exp_fetchers.get_exploration_from_model(exploration_model).states)
+    old_states = exp_fetchers.get_exploration_from_model(
+        exploration_model).states
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -577,41 +569,29 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
 
-    exploration.version += 1
     change_list_dict = [change.to_dict() for change in change_list]
+    exploration_model.commit(committer_id, commit_message, change_list_dict)
+    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
+    memcache_services.delete(exp_memcache_key)
+
+    exploration.version += 1
+
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
+    # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        exp_versions_diff, None)
 
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-
-    def _update_storage_models():
-        """Groups all storage calls into a function call so that they can be
-        performed as an atomic transaction.
-        """
-        exploration_model.commit(committer_id, commit_message, change_list_dict)
-        # Note: the memcache will not be reinstated if the transaction fails.
-        # However, it must be deleted before creating the exploration summary
-        # because otherwise the wrong version will be used.
-        memcache_services.delete(exp_memcache_key)
-
-        stats_services.create_stats_model(new_exp_stats)
-
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff=exp_versions_diff,
-            revert_to_version=None)
-
-    transaction_services.run_in_transaction(_update_storage_models)
+    stats_services.create_stats_model(new_exp_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         trainable_states_dict = exploration.get_trainable_states_dict(
             old_states, exp_versions_diff)
-        state_names_with_changed_answer_groups = (
-            trainable_states_dict['state_names_with_changed_answer_groups'])
-        state_names_with_unchanged_answer_groups = (
-            trainable_states_dict['state_names_with_unchanged_answer_groups'])
+        state_names_with_changed_answer_groups = trainable_states_dict[
+            'state_names_with_changed_answer_groups']
+        state_names_with_unchanged_answer_groups = trainable_states_dict[
+            'state_names_with_unchanged_answer_groups']
         state_names_to_train_classifier = state_names_with_changed_answer_groups
         if state_names_with_unchanged_answer_groups:
             state_names_without_classifier = (
@@ -623,6 +603,10 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         if state_names_to_train_classifier:
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train_classifier)
+
+    # Trigger exploration issues model updation.
+    stats_services.update_exp_issues_for_new_exp_version(
+        exploration, exp_versions_diff, None)
 
 
 def _create_exploration(
@@ -640,9 +624,12 @@ def _create_exploration(
             changes made in this model, which should give sufficient information
             to reconstruct the commit.
     """
+    # This line is needed because otherwise a rights object will be created,
+    # but the creation of an exploration object will fail.
     exploration.validate()
+    rights_manager.create_new_exploration_rights(exploration.id, committer_id)
 
-    exploration_model = exp_models.ExplorationModel(
+    model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
         title=exploration.title,
@@ -659,32 +646,16 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled)
-
-    exploration.version += 1
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled
+    )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmds_dict)
+    exploration.version += 1
 
-    new_exp_stats = stats_services.get_stats_for_new_exploration(
+    # Trigger statistics model creation.
+    exploration_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
-
-    def _update_storage_models():
-        """Groups all storage calls into a function call so that they can be
-        performed as an atomic transaction.
-        """
-        # Rights to the exploration need to be created before the actual
-        # exploration.
-        rights_manager.create_new_exploration_rights(
-            exploration.id, committer_id)
-
-        exploration_model.commit(committer_id, commit_message, commit_cmds_dict)
-        create_exploration_summary(exploration.id, committer_id)
-
-        stats_services.create_stats_model(new_exp_stats)
-
-        stats_services.create_exp_issues_for_new_exploration(
-            exploration.id, exploration.version)
-
-    transaction_services.run_in_transaction(_update_storage_models)
+    stats_services.create_stats_model(exploration_stats)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -697,6 +668,12 @@ def _create_exploration(
         if state_names_to_train:
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
+
+    # Trigger exploration issues model creation.
+    stats_services.create_exp_issues_for_new_exploration(
+        exploration.id, exploration.version)
+
+    create_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -1149,7 +1126,11 @@ def delete_exploration_summaries(exploration_ids):
             deleted.
     """
     summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
-    exp_models.ExpSummaryModel.delete_multi(summary_models)
+    existing_summary_models = [
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
+    exp_models.ExpSummaryModel.delete_multi(existing_summary_models)
 
 
 def revert_exploration(
@@ -1168,8 +1149,8 @@ def revert_exploration(
         Exception:  does not match the version of the currently-stored
             exploration model.
     """
-    exploration_model = (
-        exp_models.ExplorationModel.get(exploration_id, strict=False))
+    exploration_model = exp_models.ExplorationModel.get(
+        exploration_id, strict=False)
 
     if current_version > exploration_model.version:
         raise Exception(
@@ -1184,51 +1165,40 @@ def revert_exploration(
 
     # Validate the previous version of the exploration before committing the
     # change.
-    exploration_is_public = rights_manager.is_exploration_public(exploration_id)
-    exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
+    exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
-    exploration_to_revert_to.validate(strict=exploration_is_public)
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+        exploration.validate(strict=True)
+    else:
+        exploration.validate()
 
-    exploration_at_current_version = exp_fetchers.get_exploration_by_id(
+    exp_models.ExplorationModel.revert(
+        exploration_model, committer_id,
+        'Reverted exploration to version %s' % revert_to_version,
+        revert_to_version)
+    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
+    memcache_services.delete(exp_memcache_key)
+
+    # Update the exploration summary, but since this is just a revert do
+    # not add the committer of the revert to the list of contributors.
+    update_exploration_summary(exploration_id, None)
+
+    exploration_stats = stats_services.get_stats_for_new_exp_version(
+        exploration.id, current_version + 1, exploration.states,
+        None, revert_to_version)
+    stats_services.create_stats_model(exploration_stats)
+
+    current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
-
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration_id)
-
-    new_exp_stats = stats_services.get_stats_for_new_exp_version(
-        exploration_id, current_version + 1,
-        exploration_to_revert_to.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
-
-    def _update_storage_models():
-        """Groups all storage calls into a function call so that they can be
-        performed as an atomic transaction.
-        """
-        exp_models.ExplorationModel.revert(
-            exploration_model, committer_id,
-            'Reverted exploration to version %s' % revert_to_version,
-            revert_to_version)
-
-        # Note: the memcache will not be reinstated if the transaction fails.
-        # However, it must be deleted before creating the exploration summary
-        # because otherwise the wrong version will be used.
-        memcache_services.delete(exp_memcache_key)
-
-        # Update the exploration summary, but since this is just a revert so
-        # not add the committer of the revert to the list of contributors.
-        update_exploration_summary(exploration_id, None)
-
-        stats_services.create_stats_model(new_exp_stats)
-
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration_at_current_version, exp_versions_diff=None,
-            revert_to_version=revert_to_version)
-
-    transaction_services.run_in_transaction(_update_storage_models)
+    stats_services.update_exp_issues_for_new_exp_version(
+        current_exploration, None, revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        (classifier_services
-         .create_classifier_training_job_for_reverted_exploration(
-             exploration_at_current_version, exploration_to_revert_to))
+        exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
+            exploration_id, version=revert_to_version)
+        classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
+            current_exploration, exploration_to_revert_to)
 
 
 # Creation and deletion methods.
@@ -1342,8 +1312,9 @@ def delete_demo(exploration_id):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if not exploration:
-        logging.info('Exploration with id %s was not deleted, because it '
-                     'does not exist.' % exploration_id)
+        logging.info(
+            'Exploration with id %s was not deleted, because it '
+            'does not exist.' % exploration_id)
     else:
         delete_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
@@ -1591,10 +1562,11 @@ def get_user_exploration_data(
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                     and exp_user_data.draft_change_list else None)
-    draft_change_list_id = (exp_user_data.draft_change_list_id
-                            if exp_user_data else 0)
+    draft_changes = (
+        exp_user_data.draft_change_list if exp_user_data
+        and exp_user_data.draft_change_list else None)
+    draft_change_list_id = (
+        exp_user_data.draft_change_list_id if exp_user_data else 0)
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
@@ -1706,8 +1678,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]
-            if (
-                    exploration.version >
+            if (exploration.version >
                     exp_user_data.draft_change_list_exp_version):
                 logging.info(
                     'Exploration and draft versions out of sync, trying '
@@ -1779,3 +1750,37 @@ def get_interaction_id_for_state(exp_id, state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')
+
+
+def save_multi_exploration_math_rich_text_info_model(
+        exploration_math_rich_text_info_list):
+    """Saves multiple instances of ExplorationMathRichTextInfoModel to the
+    datastore.
+
+    Args:
+        exploration_math_rich_text_info_list:
+        list(ExplorationMathRichTextInfoModel). A list of
+            ExplorationMathRichTextInfoModel domain objects.
+    """
+
+    exploration_math_rich_text_info_models = []
+    for exploration_math_rich_text_info in (
+            exploration_math_rich_text_info_list):
+        latex_strings_without_svg = (
+            exploration_math_rich_text_info.latex_strings_without_svg)
+        math_images_generation_required = (
+            exploration_math_rich_text_info.math_images_generation_required)
+        exp_id = (
+            exploration_math_rich_text_info.exp_id)
+        estimated_max_size_of_images_in_bytes = (
+            exploration_math_rich_text_info.get_svg_size_in_bytes())
+        exploration_math_rich_text_info_models.append(
+            exp_models.ExplorationMathRichTextInfoModel(
+                id=exp_id,
+                math_images_generation_required=math_images_generation_required,
+                latex_strings_without_svg=latex_strings_without_svg,
+                estimated_max_size_of_images_in_bytes=(
+                    estimated_max_size_of_images_in_bytes)))
+
+    exp_models.ExplorationMathRichTextInfoModel.put_multi(
+        exploration_math_rich_text_info_models)

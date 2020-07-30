@@ -674,7 +674,6 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
         # "Yields:" section yields 2 objects and the Yields/Returns are
         # generally supposed to only yield 1 object which messes up the
         # indentation checking. This is the only case of this happening.
-        # pylint: disable=4-space-indentation-in-docstring
         """Returns a coroutine which runs the job pipeline and stores results.
 
         Args:
@@ -685,10 +684,10 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Yields:
             MapreducePipeline. Ready to start processing. Expects the output of
-                that pipeline to be sent back.
+            that pipeline to be sent back.
             StoreMapReduceResults. Will be constructed with whatever output the
-                caller sends back to the coroutine.
-        """# pylint: enable=4-space-indentation-in-docstring
+            caller sends back to the coroutine.
+        """
 
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={

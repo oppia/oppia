@@ -51,12 +51,12 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
 
         self.story_1 = story_domain.Story.create_default_story(
-            self.story_id_1, 'story_title', self.topic_id_1)
+            self.story_id_1, 'story_title', 'description', self.topic_id_1)
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'story_title', self.topic_id_2)
+            self.story_id_2, 'story_title', 'description', self.topic_id_2)
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
 
@@ -132,7 +132,8 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
                 expected_status_int=404)
 
 
-class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
+class TopicPageDataHandlerTests(
+        BaseTopicViewerControllerTests, test_utils.EmailTestBase):
 
     def test_get_with_no_user_logged_in(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
@@ -185,13 +186,13 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.login(self.NEW_USER_EMAIL)
             with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-                messages = self.mail_stub.get_sent_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                messages = self._get_sent_email_messages(
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
                 json_response = self.get_json(
                     '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
-                messages = self.mail_stub.get_sent_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                messages = self._get_sent_email_messages(
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 expected_email_html_body = (
                     'The deleted skills: %s are still'
                     ' present in topic with id %s' % (
