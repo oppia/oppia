@@ -25,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -65,7 +66,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         edited_exploration_ids = set()
 
         edits = [ast.literal_eval(v) for v in version_and_exp_ids]
-
         for edit in edits:
             edited_exploration_ids.add(edit['exploration_id'])
             if edit['version_string'] == '1':
@@ -79,6 +79,41 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
+
+
+class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for creating and populating UserAuthModel for
+    all registered users.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+        user_id = item.id
+        gae_id = [item.gae_id]
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, gae_id[0])
+
+        # For current migration, one user_id will strictly have one gae_id
+        # associated with it and vice versa.
+        if user_auth_model is None:
+            user_models.UserAuthModel(
+                id=user_id,
+                gae_id=gae_id
+            ).put()
+        elif user_auth_model.id != user_id:
+            # because <user_id, gae_id> tuple coming from UserSettingsModel
+            # currently is the source of truth
+            user_models.UserAuthModel.delete_by_id(user_auth_model.id)
+            user_models.UserAuthModel(
+                id=user_id,
+                gae_id=gae_id
+            ).put()
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
