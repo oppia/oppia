@@ -44,7 +44,6 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 
-
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
 describe('Exploration editor page component', function() {
