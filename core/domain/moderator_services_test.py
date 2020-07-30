@@ -24,7 +24,7 @@ from core.tests import test_utils
 import feconf
 
 
-class FlagExplorationEmailEnqueueTaskTests(test_utils.GenericTestBase):
+class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
     """Test that flag-exploration-email-tasks works as expected."""
 
     def setUp(self):
@@ -87,7 +87,8 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             # Make sure correct email is sent.
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),

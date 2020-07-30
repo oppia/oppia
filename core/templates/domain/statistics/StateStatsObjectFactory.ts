@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IStateStatsBackendDict {
+export interface StateStatsBackendDict {
   'total_answers_count': number;
   'useful_feedback_count': number;
   'total_hit_count': number;
@@ -42,7 +42,7 @@ export class StateStats {
   providedIn: 'root'
 })
 export class StateStatsObjectFactory {
-  createFromBackendDict(backendDict: IStateStatsBackendDict): StateStats {
+  createFromBackendDict(backendDict: StateStatsBackendDict): StateStats {
     return new StateStats(
       backendDict.total_answers_count, backendDict.useful_feedback_count,
       backendDict.total_hit_count, backendDict.first_hit_count,

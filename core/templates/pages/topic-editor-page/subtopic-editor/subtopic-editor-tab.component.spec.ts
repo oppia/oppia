@@ -32,6 +32,7 @@ describe('Subtopic editor tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var ContextService = null;
+  var skillSummary = null;
   var ImageUploadHelperService = null;
   var directive = null;
   var TopicEditorStateService = null;
@@ -39,10 +40,11 @@ describe('Subtopic editor tab', function() {
   var EntityCreationService = null;
   var SubtopicValidationService = null;
   var TopicEditorRoutingService = null;
+  var WindowDimensionsService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var QuestionBackendApiService = null;
-  var SkillSummaryObjectFactory = null;
+  var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -56,7 +58,9 @@ describe('Subtopic editor tab', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
+    ShortSkillSummaryObjectFactory = $injector.get(
+      'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     QuestionBackendApiService = $injector.get('QuestionBackendApiService');
@@ -68,6 +72,9 @@ describe('Subtopic editor tab', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
+    skillSummary = ShortSkillSummaryObjectFactory.create(
+      'skill_1', 'Description 1');
+    topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
 
@@ -79,9 +86,12 @@ describe('Subtopic editor tab', function() {
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
-
+    var MockWindowDimensionsService = {
+      isWindowNarrow: () => false
+    };
     ctrl = $componentController('subtopicEditorTab', {
-      QuestionBackendApiService: MockQuestionBackendApiService
+      QuestionBackendApiService: MockQuestionBackendApiService,
+      WindowDimensionsService: MockWindowDimensionsService
     });
     ctrl.$onInit();
   }));
@@ -120,7 +130,6 @@ describe('Subtopic editor tab', function() {
       expect(thubmnailSpy).not.toHaveBeenCalled();
     });
 
-
   it('should call TopicUpdateService if subtopic thumbnail bg color updates',
     function() {
       var thubmnailBgSpy = (
@@ -151,42 +160,17 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.schemaEditorIsShown).toEqual(true);
   });
 
-  it('should call TopicUpdateService to delete uncategorized skill',
-    function() {
-      var uncategorizedSkillSpy = (
-        spyOn(TopicUpdateService, 'removeUncategorizedSkill'));
-      var skillSummary = SkillSummaryObjectFactory.create(
-        '1', 'Skill description');
-      ctrl.deleteUncategorizedSkillFromTopic(skillSummary);
-      expect(uncategorizedSkillSpy).toHaveBeenCalled();
-    });
-
   it('should return if skill is deleted', function() {
-    var skillSummary = SkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummaryObjectFactory.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
 
-  it('should record skill summary to move and subtopic Id', function() {
-    var skillSummary = SkillSummaryObjectFactory.create(
-      '1', 'Skill description');
-    ctrl.onMoveSkillStart(1, skillSummary);
-    expect(ctrl.skillSummaryToMove).toEqual(skillSummary);
-    expect(ctrl.oldSubtopicId).toEqual(1);
+  it('should call SkillCreationService to create skill', function() {
+    var skillSpy = spyOn(EntityCreationService, 'createSkill');
+    ctrl.createSkill();
+    expect(skillSpy).toHaveBeenCalled();
   });
-
-  it('should call TopicUpdateService when skill is moved', function() {
-    var moveSkillSpy = spyOn(TopicUpdateService, 'moveSkillToSubtopic');
-    ctrl.onMoveSkillFinish(1);
-    expect(moveSkillSpy).toHaveBeenCalled();
-  });
-
-  it('should call TopicUpdateService when skill is removed from subtopic',
-    function() {
-      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      ctrl.onMoveSkillFinish(null);
-      expect(removeSkillSpy).toHaveBeenCalled();
-    });
 
   it('should call TopicUpdateService when skill is rearranged',
     function() {
@@ -208,20 +192,6 @@ describe('Subtopic editor tab', function() {
   it('should record the index of the skill to move', function() {
     ctrl.onRearrangeMoveSkillStart(10);
     expect(ctrl.fromIndex).toEqual(10);
-  });
-
-  it('should not call TopicUpdateService when skill is moved to same subtopic',
-    function() {
-      var removeSkillSpy = spyOn(TopicUpdateService, 'removeSkillFromSubtopic');
-      ctrl.oldSubtopicId = null;
-      ctrl.onMoveSkillFinish(null);
-      expect(removeSkillSpy).not.toHaveBeenCalled();
-    });
-
-  it('should call SkillCreationService to create skill', function() {
-    var skillSpy = spyOn(EntityCreationService, 'createSkill');
-    ctrl.createSkill();
-    expect(skillSpy).toHaveBeenCalled();
   });
 
   it('should set the error message if subtopic title is invalid', function() {
@@ -250,5 +220,53 @@ describe('Subtopic editor tab', function() {
       ctrl.htmlData = 'new html data';
       ctrl.updateHtmlData();
       expect(updateSubtopicSpy).toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if skill is removed from subtopic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromSubtopic(0, null);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if skill is removed from topic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromTopic(skillSummary);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should set skill edit options index', function() {
+    ctrl.showSkillEditOptions(10);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(10);
+    ctrl.showSkillEditOptions(20);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(20);
+  });
+
+  it('should toggle skills list preview', function() {
+    expect(ctrl.skillsListIsShown).toEqual(true);
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(false);
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(true);
+    ctrl.togglePreviewSkillCard();
+  });
+
+  it('should toggle subtopic preview', function() {
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicPreview();
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicPreview();
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicPreview();
+  });
+
+  it('should call TopicEditorRoutingService to navigate To Topic Editor',
+    function() {
+      var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
+      ctrl.navigateToTopicEditor();
+      expect(navigateSpy).toHaveBeenCalled();
     });
 });

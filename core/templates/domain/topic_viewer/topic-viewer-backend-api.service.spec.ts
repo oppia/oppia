@@ -22,8 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -41,11 +41,11 @@ describe('Topic viewer backend API service', () => {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
     $provide.value(
       'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
-        new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
-        new SkillSummaryObjectFactory()));
+        new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
+        new ShortSkillSummaryObjectFactory()));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -75,7 +75,8 @@ describe('Topic viewer backend API service', () => {
         node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       additional_story_dicts: [{
         id: '1',
@@ -84,7 +85,8 @@ describe('Topic viewer backend API service', () => {
         node_count: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        published: true
+        published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -137,7 +139,9 @@ describe('Topic viewer backend API service', () => {
       const req = httpTestingController.expectOne(
         '/topic_data_handler/0');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error fetching topic 0.', {
+      req.flush({
+        error: 'Error fetching topic 0.'
+      }, {
         status: 500,
         statusText: 'Error fetching topic 0.'
       });

@@ -126,16 +126,12 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                     skills_list.append(skill_dict)
                 categorized_skills_dict[topic.name][
                     subtopic.title] = skills_list
-        categorized_skills_dict['untriaged_skills'] = []
+
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
-                categorized_skills_dict['untriaged_skills'].append({
-                    'skill_id': skill_id,
-                    'skill_description': skill_summary_dict['description']
-                })
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -217,9 +213,10 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Number of skills to fetch should be a number.')
 
-        if (keywords is not None and (not isinstance(keywords, list) or not all(
-                [isinstance(keyword, python_utils.BASESTRING)
-                 for keyword in keywords]))):
+        if (keywords is not None and (not isinstance(keywords, list) or (
+                not all(
+                    [isinstance(keyword, python_utils.BASESTRING)
+                     for keyword in keywords])))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 

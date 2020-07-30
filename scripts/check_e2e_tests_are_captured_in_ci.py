@@ -30,7 +30,7 @@ import utils
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'accessibility', 'adminPage', 'classroomPage',
-    'classroomPageFileUploadFeatures', 'collections', 'embedding',
+    'classroomPageFileUploadFeatures', 'collections',
     'fileUploadExtensions', 'fileUploadFeatures', 'library', 'navigation',
     'playVoiceovers', 'preferences', 'profileFeatures', 'profileMenu',
     'publication', 'subscriptions', 'topicsAndSkillsDashboard',
@@ -167,8 +167,9 @@ def main():
     """Test the travis ci file and protractor.conf.js to have same
     e2e test suites.
     """
-    python_utils.PRINT('Checking all e2e test files are captured '
-                       'in protractor.conf.js...')
+    python_utils.PRINT(
+        'Checking all e2e test files are captured '
+        'in protractor.conf.js...')
     protractor_test_suite_files = get_e2e_test_filenames_from_protractor_dir()
     protractor_conf_test_suites = (
         get_e2e_test_filenames_from_protractor_conf_file())
@@ -188,26 +189,31 @@ def main():
         protractor_test_suites.remove(excluded_test)
 
     if not travis_e2e_suites:
-        raise Exception('The e2e test suites that have been extracted from '
-                        'jobs section from travis.ci are empty.')
+        raise Exception(
+            'The e2e test suites that have been extracted from '
+            'jobs section from travis.ci are empty.')
     if not travis_e2e_scripts:
-        raise Exception('The e2e test suites that have been extracted from '
-                        'script section from travis.ci are empty.')
+        raise Exception(
+            'The e2e test suites that have been extracted from '
+            'script section from travis.ci are empty.')
     if not protractor_test_suites:
-        raise Exception('The e2e test suites that have been extracted from '
-                        'protractor.conf.js are empty.')
+        raise Exception(
+            'The e2e test suites that have been extracted from '
+            'protractor.conf.js are empty.')
 
     if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in travis_e2e_scripts:
-        raise Exception('{} is expected to be in the e2e test suites '
-                        'extracted from the script section of .travis.yml '
-                        'file, but it is missing.'
-                        .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
+        raise Exception(
+            '{} is expected to be in the e2e test suites '
+            'extracted from the script section of .travis.yml '
+            'file, but it is missing.'
+            .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
     if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in protractor_test_suites:
-        raise Exception('{} is expected to be in the e2e test suites '
-                        'extracted from the protractor.conf.js file, '
-                        'but it is missing.'
-                        .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
+        raise Exception(
+            '{} is expected to be in the e2e test suites '
+            'extracted from the protractor.conf.js file, '
+            'but it is missing.'
+            .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
     if protractor_test_suites != travis_e2e_scripts:
         raise Exception(

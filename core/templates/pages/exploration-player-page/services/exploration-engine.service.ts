@@ -239,7 +239,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
       ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
         _explorationId).then(function(featuresData) {
         alwaysAskLearnersForAnswerDetails = (
-          featuresData.always_ask_learners_for_answer_details);
+          featuresData.alwaysAskLearnersForAnswerDetails);
       });
     };
 
