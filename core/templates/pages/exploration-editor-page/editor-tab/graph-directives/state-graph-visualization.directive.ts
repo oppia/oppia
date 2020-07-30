@@ -84,13 +84,13 @@ angular.module('oppia').directive('stateGraphVisualization', [
       controller: [
         '$element', '$filter', '$scope', '$timeout',
         'ExplorationWarningsService', 'StateGraphLayoutService',
-        'TranslationStatusService', 'WindowDimensionsService',
-        'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
+        'TranslationStatusService', 'MAX_NODES_PER_ROW',
+        'MAX_NODE_LABEL_LENGTH',
         function(
             $element, $filter, $scope, $timeout,
             ExplorationWarningsService, StateGraphLayoutService,
-            TranslationStatusService, WindowDimensionsService,
-            MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+            TranslationStatusService, MAX_NODES_PER_ROW,
+            MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
           var graphBounds = {
             bottom: 0,
@@ -405,18 +405,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             // If statistics for a different version of the exploration are
             // loaded, this may change the opacities of the nodes.
             $scope.$watch('opacityMap', redrawGraph);
-
-            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent()
-              .subscribe(evt => {
-                redrawGraph();
-                $scope.$applyAsync();
-              });
-          };
-
-          ctrl.$onDestroy = function() {
-            if (ctrl.resizeSubscription) {
-              ctrl.resizeSubscription.unsubscribe();
-            }
+            $(window).resize(redrawGraph);
           };
         }
       ]
