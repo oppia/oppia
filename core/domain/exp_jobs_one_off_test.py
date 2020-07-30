@@ -3057,34 +3057,6 @@ class ExplorationMigrationToV41AuditJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
-    # def test_migration_job_fails_with_invalid_exploration(self):
-    #     observed_log_messages = []
-
-    #     def _mock_logging_function(msg, *args):
-    #         """Mocks logging.error()."""
-    #         observed_log_messages.append(msg % args)
-
-    #     exploration = exp_domain.Exploration.create_default_exploration(
-    #         self.VALID_EXP_ID, title='title', category='category')
-    #     exp_services.save_new_exploration(self.albert_id, exploration)
-
-    #     exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
-    #     exploration_model.language_code = 'invalid_language_code'
-    #     exploration_model.commit(
-    #         self.albert_id, 'Changed language_code.', [])
-    #     memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
-
-    #     job_id = exp_jobs_one_off.ExplorationMigrationToV41AuditJob.create_new()
-    #     exp_jobs_one_off.ExplorationMigrationToV41AuditJob.enqueue(job_id)
-    #     with self.swap(logging, 'error', _mock_logging_function):
-    #         self.process_and_flush_pending_tasks()
-
-    #     self.assertEqual(
-    #         observed_log_messages,
-    #         ['Exploration %s failed non-strict validation: '
-    #          'Invalid language_code: invalid_language_code'
-    #          % (self.VALID_EXP_ID)])
-
     def test_migration_audit_job_only_runs_for_v35(self):
         """Tests that the exploration migration job does not convert
         explorations with a state schema that is not 35.
@@ -3102,95 +3074,13 @@ class ExplorationMigrationToV41AuditJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             actual_output,
             [
-                u"[u'WRONG_STATE_VERSION', [u'Exploration exp_id1 was not " +
-                "migrated because its states schema verison is 0']]"
+                u'[u\'WRONG_STATE_VERSION\', [u\'Exploration exp_id1 was not ' +
+                'migrated because its states schema verison is 0\']]'
             ])
-    
+
     def test_migration_job_audit_success(self):
         """Test that Exploration Migration to v41 audit job runs correctly on
         explorations of state schema v35.
-        """
-        states_dict = state_domain.State.from_dict({
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {},
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
-                },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': 'Hint 1'
-                    }
-                }],
-                'solution': {
-                    'correct_answer': {
-                        'ascii': 'x+y',
-                        'latex': 'x+y'
-                    },
-                    'answer_is_exclusive': False,
-                    'explanation': {
-                        'html': 'Solution explanation',
-                        'content_id': 'content_2'
-                    }
-                },
-                'id': 'MathExpressionInput'
-            },
-            'next_content_id_index': 0,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        }).to_dict()
-
-        self.save_new_exp_with_states_schema_v35(
-            self.NEW_EXP_ID, self.albert_id, {
-                'Introduction': states_dict
-            })
-
-        job_id = exp_jobs_one_off.ExplorationMigrationToV41AuditJob.create_new()
-        exp_jobs_one_off.ExplorationMigrationToV41AuditJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationMigrationToV41AuditJob.get_output(
-                job_id)
-        )
-
-        expected_output = ['[u\'SUCCESS\', 1]']
-        self.assertEqual(actual_output, expected_output)
-
-    def test_migration_job_audit_failure(self):
-        """Test that Exploration Migration to v41 audit job correctly catches
-        errors when testing state migration.
         """
         states_dict = state_domain.State.from_dict({
             'content': {

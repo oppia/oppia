@@ -3923,7 +3923,7 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _convert_v40_dict_to_v41_dict(cls, exploration_dict):
+    def convert_v40_dict_to_v41_dict(cls, exploration_dict):
         """Converts a v40 exploration dict into a v41 exploration dict.
         Adds translation support to customization args.
 
@@ -4177,7 +4177,7 @@ class Exploration(python_utils.OBJECT):
             exploration_schema_version = 40
 
         if exploration_schema_version == 40:
-            exploration_dict = cls._convert_v40_dict_to_v41_dict(
+            exploration_dict = cls.convert_v40_dict_to_v41_dict(
                 exploration_dict)
             exploration_schema_version = 41
 

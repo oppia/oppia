@@ -735,7 +735,8 @@ class ExplorationMigrationToV41AuditJob(jobs.BaseMapReduceOneOffJobManager):
 
         if item.states_schema_version == 35:
             try:
-                exp_domain.Exploration._convert_v40_dict_to_v41_dict(item.to_dict())
+                exp_domain.Exploration.convert_v40_dict_to_v41_dict(
+                    item.to_dict())
                 yield ('SUCCESS', None)
             except Exception as e:
                 error_message = (
