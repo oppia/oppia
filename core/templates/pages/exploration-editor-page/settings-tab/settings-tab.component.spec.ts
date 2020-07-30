@@ -43,12 +43,12 @@ import { EventEmitter } from '@angular/core';
 
 
 class MockRouterService {
-  private sampleEmitter: EventEmitter<void>;
+  private refreshSettingsTabEmitter: EventEmitter<void>;
   get onRefreshSettingsTab() {
-    return this.sampleEmitter;
+    return this.refreshSettingsTabEmitter;
   }
   set Emitter(val) {
-    this.sampleEmitter = val;
+    this.refreshSettingsTabEmitter = val;
   }
 }
 

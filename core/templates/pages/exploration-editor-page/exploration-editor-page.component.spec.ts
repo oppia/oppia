@@ -73,7 +73,7 @@ describe('Exploration editor page component', function() {
   var stass = null;
   var tds = null;
   var ueps = null;
-  var sampleEmitter = new EventEmitter();
+  var refreshGraphEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -298,7 +298,7 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
-      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(sampleEmitter);
+      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
 
       explorationData.is_version_of_draft_valid = true;
 
@@ -361,7 +361,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when refreshing graph', () => {
       // $rootScope.$broadcast('refreshGraph');
-      sampleEmitter.emit();
+      refreshGraphEmitter.emit();
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
