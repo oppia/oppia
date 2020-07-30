@@ -116,7 +116,7 @@ class DragAndDropSortInputInteractionOneOffJob(
 
 class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
-    Multiple selection interaction and have rules that do not correspond to any
+    Multiple choice interaction and have rules that do not correspond to any
     answer choices.
     """
 
