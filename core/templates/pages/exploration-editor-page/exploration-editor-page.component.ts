@@ -33,7 +33,7 @@ require(
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navbar-breadcrumb.directive.ts');
+  'editor-navbar-breadcrumb.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navigation.directive.ts');
@@ -58,19 +58,17 @@ require('pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.component.ts');
-require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
+require('pages/exploration-editor-page/history-tab/history-tab.component.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.component.ts');
-require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.ts');
+require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.directive.ts');
+  'playthrough-issues.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
