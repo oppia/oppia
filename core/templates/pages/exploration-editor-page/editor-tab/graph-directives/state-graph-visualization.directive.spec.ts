@@ -178,7 +178,7 @@ describe('State Graph Visualization directive', function() {
 
     $element = angular.element(
       '<div state-graph-visualization allowPanning="true"></div>');
-    var directive = $injector.get('stateGraphVisualizationDirective')[0];
+    var directive = $injector.get('StateGraphVisualizationDirective')[0];
 
     ctrl = $injector.instantiate(directive.controller, {
       $element: $element,
