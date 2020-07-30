@@ -89,7 +89,7 @@ export class CommandExecutorService {
   }
 
   setHostname(windowRef, name) {
-    if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(name) >= 10) {
+    if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(name) >= 0) {
       this.hostname = name;
     }
     if (this.cachedOuterFrameMessage !== '') {

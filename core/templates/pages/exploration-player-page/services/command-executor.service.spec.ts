@@ -35,11 +35,14 @@ describe('Command executor service', () => {
   var addBoolean = false;
   var deleteBoolean = false;
   var mcBoolean = false;
+  var secondaryContinueBoolean = false;
   var setupWindowRef = function(windowRef: WindowRef) {
+    wrf.nativeWindow.document.body.innerHTML = '';
     continueBoolean = false;
     addBoolean = false;
     deleteBoolean = false;
     mcBoolean = false;
+    secondaryContinueBoolean = false;
     var testPage = windowRef.nativeWindow.document.createElement(
       'TESTING_SUITE');
     var continueButton = windowRef.nativeWindow.document.createElement(
@@ -49,6 +52,13 @@ describe('Command executor service', () => {
     continueButton.onclick = function() {
       continueBoolean = true;
     };
+    var secondaryContinueButton = 
+      windowRef.nativeWindow.document.createElement('BUTTON');
+    secondaryContinueButton.classList.add(
+      'protractor-test-next-card-button');
+    secondaryContinueButton.onclick = function() {
+      secondaryContinueBoolean = true;
+    }
     var textbox = windowRef.nativeWindow.document.createElement(
       'INPUT') as HTMLInputElement;
     textbox.classList.add(
@@ -58,7 +68,6 @@ describe('Command executor service', () => {
       'BUTTON');
     addButton.classList.add('btn');
     addButton.classList.add('btn-secondary');
-    addButton.classList.add('btn-sm');
     addButton.onclick = function() {
       addBoolean = true;
     };
@@ -97,6 +106,7 @@ describe('Command executor service', () => {
     testPage.appendChild(mc2);
     testPage.appendChild(mc3);
     testPage.appendChild(mc4);
+    testPage.appendChild(secondaryContinueButton);
     wrf.nativeWindow.document.body.appendChild(testPage);
   };
   it('should properly click the continue button', () => {
@@ -165,4 +175,21 @@ describe('Command executor service', () => {
     ces.selectItemBullet(wrf, '2');
     expect(mcBoolean).toEqual(true);
   });
+
+  it('should click the submit button', () => {
+    setupWindowRef(wrf);
+    ces.submit(wrf);
+    expect(continueBoolean).toEqual(true);
+  });
+
+  it('should click continue in the second type of continue button', 
+    () => {
+      setupWindowRef(wrf);
+      var suite = 
+        wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
+      suite.querySelector(
+        '.oppia-learner-confirm-button').remove();
+      ces.continueClick(wrf);
+      expect(secondaryContinueBoolean).toEqual(true);
+    });
 });
