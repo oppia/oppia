@@ -4049,16 +4049,11 @@ class Exploration(python_utils.OBJECT):
         })
 
     def serialize(self):
-        """Returns a copy of the Exploration as a JSON string. It includes all
-        of the necessary information to represent an Exploration.
-
-        Raises:
-            Exception: The dictionary object representing the Exploration is not
-                JSON serializable.
+        """Returns the object serialized as a JSON string.
 
         Returns:
             str. JSON-encoded string encoding all of the information composing
-            an Exploration.
+            the object.
         """
         exploration_dict = copy.deepcopy({
             'id': self.id,
@@ -4088,39 +4083,21 @@ class Exploration(python_utils.OBJECT):
             exploration_dict['last_updated'] = utils.convert_datetime_to_string(
                 self.last_updated)
 
-        try:
-            result = json.dumps(exploration_dict)
-        except TypeError:
-            raise Exception((
-                'Object of type %s cannot be serialized. Please ' +
-                'consult this table for more information on what types are s' +
-                'erializable: https://docs.python.org/3/library/json.html#py' +
-                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
-
-        return result
+        return json.dumps(exploration_dict)
 
     @classmethod
-    def deserialize(cls, memory_cache_json_string):
-        """Return an Exploration domain object decoded from a JSON string
-        retrieved from the memory cache.
+    def deserialize(cls, json_string):
+        """Return an Exploration domain object decoded from a Json string.
 
         Args:
-            memory_cache_json_string: str. A JSON-encoded string that can be
+            json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing an Exploration. Only call
                 on strings returned from caching_services.get_multi.
-
-        Raises:
-            Exception: The string is not a valid JSON string.
 
         Returns:
             Exploration. The corresponding Exploration domain object.
         """
-        try:
-            exploration_dict = json.loads(memory_cache_json_string)
-        except ValueError:
-            raise Exception((
-                'Json decoding failed for JSON string associated with class' +
-                ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        exploration_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_datetime_object(
                 exploration_dict['created_on'])
@@ -4131,9 +4108,7 @@ class Exploration(python_utils.OBJECT):
             if 'last_updated' in exploration_dict else None)
         exploration = cls.from_dict(
             exploration_dict,
-            exploration_version=(
-                exploration_dict['version'] if 'version' in exploration_dict
-                else 0),
+            exploration_version=exploration_dict['version'],
             exploration_created_on=created_on,
             exploration_last_updated=last_updated)
 

@@ -247,8 +247,8 @@ libraries:
 
 env_variables:
   PYTHONHTTPSVERIFY: 1
-# Replace this with the correct Redis Host and Port when switching to prod
-# server.
+  # Replace this with the correct Redis Host and Port when switching to prod
+  # server.
   REDISHOST: 'localhost'
   REDISPORT: '6379'
 

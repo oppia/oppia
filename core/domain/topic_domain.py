@@ -549,16 +549,11 @@ class Topic(python_utils.OBJECT):
         }
 
     def serialize(self):
-        """Returns a JSON string representing this Topic domain object to
-        store in the memory cache.
-
-        Raises:
-            Exception: The dictionary object representing this Topic is not
-                JSON serializable.
+        """Returns the object serialized as a JSON string.
 
         Returns:
             str. JSON-encoded string encoding all of the information composing
-            a Topic.
+            the object.
         """
         topic_dict = {
             'id': self.id,
@@ -595,16 +590,8 @@ class Topic(python_utils.OBJECT):
             topic_dict['last_updated'] = utils.convert_datetime_to_string(
                 self.last_updated)
 
-        try:
-            result = json.dumps(topic_dict)
-        except TypeError:
-            raise Exception((
-                'Object of type %s cannot be JSON serialized. Please ' +
-                'consult this table for more information on what types are s' +
-                'erializable: https://docs.python.org/3/library/json.html#py' +
-                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+        return json.dumps(topic_dict)
 
-        return result
 
     @classmethod
     def from_dict(
@@ -650,27 +637,19 @@ class Topic(python_utils.OBJECT):
         return topic
 
     @classmethod
-    def deserialize(cls, memory_cache_json_string):
-        """Return a Topic domain object decoded from a JSON string
-        retrieved from the memory cache.
+    def deserialize(cls, json_string):
+        """Return a Topic domain object decoded from a Json string.
 
         Args:
-            memory_cache_json_string: str. A JSON-encoded string that can be
+            json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing a Topic.  Only call
                 on strings returned from caching_services.get_multi.
-
-        Raises:
-            Exception: The string is not a valid JSON string.
 
         Returns:
             Topic. The corresponding Topic domain object.
         """
-        try:
-            topic_dict = json.loads(memory_cache_json_string)
-        except ValueError:
-            raise Exception((
-                'Json decoding failed for JSON string associated with class' +
-                ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        topic_dict = json.loads(json_string)
+
         created_on = (
             utils.convert_string_to_datetime_object(
                 topic_dict['created_on'])
@@ -681,8 +660,7 @@ class Topic(python_utils.OBJECT):
             if 'last_updated' in topic_dict else None)
         topic = cls.from_dict(
             topic_dict,
-            topic_version=(
-                topic_dict['version'] if 'version' in topic_dict else 0),
+            topic_version=topic_dict['version'],
             topic_created_on=created_on,
             topic_last_updated=last_updated)
         return topic

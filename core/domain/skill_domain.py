@@ -769,16 +769,11 @@ class Skill(python_utils.OBJECT):
         }
 
     def serialize(self):
-        """Returns a JSON string representing this Skill domain object to
-        store in the memory cache.
-
-        Raises:
-            Exception: The dictionary object representing the Skill is not
-                JSON serializable.
+        """Returns the object serialized as a JSON string.
 
         Returns:
             str. JSON-encoded string encoding all of the information composing
-            a Skill.
+            the object.
         """
         skill_dict = {
             'id': self.id,
@@ -797,9 +792,7 @@ class Skill(python_utils.OBJECT):
             'next_misconception_id': self.next_misconception_id,
             'superseding_skill_id': self.superseding_skill_id,
             'all_questions_merged': self.all_questions_merged,
-            'prerequisite_skill_ids': self.prerequisite_skill_ids,
-            'created_on': utils.convert_datetime_to_string(self.created_on),
-            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+            'prerequisite_skill_ids': self.prerequisite_skill_ids
         }
 
         if self.created_on:
@@ -810,39 +803,21 @@ class Skill(python_utils.OBJECT):
             skill_dict['last_updated'] = utils.convert_datetime_to_string(
                 self.last_updated)
 
-        try:
-            result = json.dumps(skill_dict)
-        except TypeError:
-            raise Exception((
-                'Object of type %s cannot be JSON serialized. Please ' +
-                'consult this table for more information on what types are s' +
-                'erializable: https://docs.python.org/3/library/json.html#py' +
-                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
-
-        return result
+        return json.dumps(skill_dict)
 
     @classmethod
-    def deserialize(cls, memory_cache_json_string):
-        """Return a Skill domain object decoded from a JSON string
-        retrieved from the memory cache.
-
-        Raises:
-            Exception: The string is not a valid JSON string.
+    def deserialize(cls, json_string):
+        """Return a Skill domain object decoded from a Json string.
 
         Args:
-            memory_cache_json_string: str. A JSON-encoded string that can be
+            json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing a Skill. Only call
                 on strings returned from caching_services.get_multi.
 
         Returns:
             Skill. The corresponding Skill domain object.
         """
-        try:
-            skill_dict = json.loads(memory_cache_json_string)
-        except ValueError:
-            raise Exception((
-                'Json decoding failed for JSON string associated with class' +
-                ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        skill_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_datetime_object(
                 skill_dict['created_on'])
@@ -853,8 +828,7 @@ class Skill(python_utils.OBJECT):
             if 'last_updated' in skill_dict else None)
         skill = cls.from_dict(
             skill_dict,
-            skill_version=(
-                skill_dict['version'] if 'version' in skill_dict else 0),
+            skill_version=skill_dict['version'],
             skill_created_on=created_on,
             skill_last_updated=last_updated)
 

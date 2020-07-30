@@ -32,8 +32,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         super(CachingServicesUnitTests, self).setUp()
         self.keys = ['a', 'b', 'c']
         self.non_existent_keys = ['d', 'e']
-        # Redis can only store strings so integers must be casted to correct
-        # values.
+        # Redis can only store strings so integers must be cast to string
+        # values in order for comparison to work.
         self.key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         self.string_caching_response = caching_services.set_multi(
             self.key_value_mapping)

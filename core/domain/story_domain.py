@@ -903,27 +903,18 @@ class Story(python_utils.OBJECT):
 
 
     @classmethod
-    def deserialize(cls, memory_cache_json_string):
-        """Return a Story domain object decoded from a JSON string
-        retrieved from the memory cache.
+    def deserialize(cls, json_string):
+        """Return a Story domain object decoded from a Json string.
 
         Args:
-            memory_cache_json_string: str. A JSON-encoded string that can be
+            json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing a Story. Only call
                 on strings returned from caching_services.get_multi.
-
-        Raises:
-            Exception: The string is not a valid JSON string.
 
         Returns:
             Story. The corresponding Story domain object.
         """
-        try:
-            story_dict = json.loads(memory_cache_json_string)
-        except ValueError:
-            raise Exception((
-                'Json decoding failed for JSON string associated with class' +
-                ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        story_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_datetime_object(
                 story_dict['created_on'])
@@ -935,24 +926,18 @@ class Story(python_utils.OBJECT):
 
         story = cls.from_dict(
             story_dict,
-            story_version=(
-                story_dict['version'] if 'version' in story_dict else 0),
+            story_version=story_dict['version'],
             story_created_on=created_on,
             story_last_updated=last_updated)
 
         return story
 
     def serialize(self):
-        """Returns a JSON string representing this Story domain object to
-        store in the memory cache.
-
-        Raises:
-            Exception: The dictionary object representing the Story is not
-                JSON serializable.
+        """Returns the object serialized as a JSON string.
 
         Returns:
             str. JSON-encoded string encoding all of the information composing
-            a Story.
+            the object.
         """
         story_dict = {
             'id': self.id,
@@ -976,16 +961,7 @@ class Story(python_utils.OBJECT):
             story_dict['last_updated'] = utils.convert_datetime_to_string(
                 self.last_updated)
 
-        try:
-            result = json.dumps(story_dict)
-        except TypeError:
-            raise Exception((
-                'Object of type %s cannot be JSON serialized. Please ' +
-                'consult this table for more information on what types are s' +
-                'erializable: https://docs.python.org/3/library/json.html#py' +
-                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
-
-        return result
+        return json.dumps(story_dict)
 
     @classmethod
     def from_dict(
