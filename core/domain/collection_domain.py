@@ -363,13 +363,19 @@ class Collection(python_utils.OBJECT):
             raise Exception(
                 ('Json decoding failed for JSON string associated with class' +
                  ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        created_on = (
+            utils.convert_string_to_datetime_object(
+                collection_dict['created_on'])
+            if 'created_on' in collection_dict else None)
+        last_updated = (
+            utils.convert_string_to_datetime_object(
+                collection_dict['last_updated'])
+            if 'last_updated' in collection_dict else None)
         collection = cls.from_dict(
             collection_dict,
             collection_dict['version'] if 'version' in collection_dict else 0,
-            utils.convert_string_to_datetime_object(
-                collection_dict['created_on']),
-            utils.convert_string_to_datetime_object(
-                collection_dict['last_updated']))
+            created_on,
+            last_updated)
 
         return collection
 
@@ -396,6 +402,14 @@ class Collection(python_utils.OBJECT):
             'created_on': utils.convert_datetime_to_string(self.created_on),
             'last_updated': utils.convert_datetime_to_string(self.last_updated)
         }
+
+        if self.created_on:
+            collection_dict['created_on'] = utils.convert_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            collection_dict['last_updated'] = utils.convert_datetime_to_string(
+                self.last_updated)
 
         try:
             result = json.dumps(collection_dict)

@@ -634,9 +634,15 @@ class Topic(python_utils.OBJECT):
             topic_dict['subtopic_schema_version'],
             topic_dict['next_subtopic_id'],
             topic_dict['language_code'], topic_version,
-            topic_dict['story_reference_schema_version'], topic_created_on,
-            topic_last_updated)
+            topic_dict['story_reference_schema_version'])
 
+        if self.created_on:
+            topic_dict['created_on'] = utils.convert_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            topic_dict['last_updated'] = utils.convert_datetime_to_string(
+                self.last_updated)
         return topic
 
     @classmethod
@@ -657,13 +663,19 @@ class Topic(python_utils.OBJECT):
             raise Exception(
                 ('Json decoding failed for JSON string associated with class' +
                  ' %s.' % python_utils.convert_to_bytes(type(cls))))
+        created_on = (
+            utils.convert_string_to_datetime_object(
+                topic_dict['created_on'])
+            if 'created_on' in topic_dict else None)
+        last_updated = (
+            utils.convert_string_to_datetime_object(
+                topic_dict['last_updated'])
+            if 'last_updated' in topic_dict else None)
         topic = cls.from_dict(
             topic_dict,
             topic_dict['version'] if 'version' in topic_dict else 0,
-            utils.convert_string_to_datetime_object(
-                topic_dict['created_on']),
-            utils.convert_string_to_datetime_object(
-                topic_dict['last_updated']))
+            created_on,
+            last_updated)
         return topic
 
     @classmethod

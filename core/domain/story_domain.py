@@ -921,13 +921,20 @@ class Story(python_utils.OBJECT):
             raise Exception(
                 ('Json decoding failed for JSON string associated with class' +
                  ' %s.' % python_utils.convert_to_bytes(type(cls))))
-        story = cls.from_dict(story_dict, (
-                story_dict['version'] if 'version' in story_dict
-                else 0),
+        created_on = (
             utils.convert_string_to_datetime_object(
-                story_dict['created_on']),
+                story_dict['created_on'])
+            if 'created_on' in story_dict else None)
+        last_updated = (
             utils.convert_string_to_datetime_object(
-                story_dict['last_updated']))
+                story_dict['last_updated'])
+            if 'last_updated' in story_dict else None)
+
+        story = cls.from_dict(
+            story_dict,
+            story_dict['version'] if 'version' in story_dict else 0,
+            created_on,
+            last_updated)
 
         return story
 
@@ -951,10 +958,16 @@ class Story(python_utils.OBJECT):
             'story_contents': self.story_contents.to_dict(),
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
-            'version': self.version,
-            'created_on': utils.convert_datetime_to_string(self.created_on),
-            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+            'version': self.version
         }
+
+        if self.created_on:
+            story_dict['created_on'] = utils.convert_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            story_dict['last_updated'] = utils.convert_datetime_to_string(
+                self.last_updated)
 
         try:
             result = json.dumps(story_dict)

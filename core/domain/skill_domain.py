@@ -799,6 +799,14 @@ class Skill(python_utils.OBJECT):
             'last_updated': utils.convert_datetime_to_string(self.last_updated)
         }
 
+        if self.created_on:
+            skill_dict['created_on'] = utils.convert_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            skill_dict['last_updated'] = utils.convert_datetime_to_string(
+                self.last_updated)
+
         try:
             result = json.dumps(skill_dict)
         except TypeError:
@@ -828,13 +836,19 @@ class Skill(python_utils.OBJECT):
             raise Exception(
                 ('Json decoding failed for JSON string associated with class' +
                  ' %s.' % python_utils.convert_to_bytes(type(cls))))
-        skill = cls.from_dict(skill_dict, (
-                skill_dict['version'] if 'version' in skill_dict
-                else 0),
+        created_on = (
             utils.convert_string_to_datetime_object(
-                skill_dict['created_on']),
+                skill_dict['created_on'])
+            if 'created_on' in skill_dict else None)
+        last_updated = (
             utils.convert_string_to_datetime_object(
-                skill_dict['last_updated']))
+                skill_dict['last_updated'])
+            if 'last_updated' in skill_dict else None)
+        skill = cls.from_dict(
+            skill_dict,
+            skill_dict['version'] if 'version' in skill_dict else 0,
+            created_on,
+            last_updated)
 
         return skill
 

@@ -4056,7 +4056,6 @@ class Exploration(python_utils.OBJECT):
             str. JSON encoded string encoding all of the information composing
             an Exploration.
         """
-
         exploration_dict = copy.deepcopy({
             'id': self.id,
             'title': self.title,
@@ -4074,10 +4073,16 @@ class Exploration(python_utils.OBJECT):
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()},
-            'version': self.version,
-            'created_on': utils.convert_datetime_to_string(self.created_on),
-            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+            'version': self.version
         })
+
+        if self.created_on:
+            exploration_dict['created_on'] = utils.convert_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            exploration_dict['last_updated'] = utils.convert_datetime_to_string(
+                self.last_updated)
 
         try:
             result = json.dumps(exploration_dict)
@@ -4107,13 +4112,20 @@ class Exploration(python_utils.OBJECT):
             raise Exception(
                 ('Json decoding failed for JSON string associated with class' +
                  ' %s.' % python_utils.convert_to_bytes(type(cls))))
-        exploration = cls.from_dict(exploration_dict, (
-                exploration_dict['version'] if 'version' in exploration_dict
+        created_on = (
+            utils.convert_string_to_datetime_object(
+                exploration_dict['created_on'])
+            if 'created_on' in exploration_dict else None)
+        last_updated = (
+            utils.convert_string_to_datetime_object(
+                exploration_dict['last_updated'])
+            if 'last_updated' in exploration_dict else None)
+        exploration = cls.from_dict(
+            exploration_dict,
+            (exploration_dict['version'] if 'version' in exploration_dict
                 else 0),
-            utils.convert_string_to_datetime_object(
-                exploration_dict['created_on']),
-            utils.convert_string_to_datetime_object(
-                exploration_dict['last_updated']))
+            created_on,
+            last_updated)
 
         return exploration
 
