@@ -22,20 +22,27 @@ import { Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import {
+  TopicSummaryBackendDict,
+  TopicSummary,
+  TopicSummaryObjectFactory
+} from 'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+interface ClassroomTopicSummaryBackendDict {
+  'topic_summary_dicts': TopicSummaryBackendDict[];
+}
+
+interface ClassroomStatusBackendDict {
+  'classroom_page_is_shown': boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassroomBackendApiService {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  topicSummaryObjects: any = null;
+  topicSummaryObjects: TopicSummary[] = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
@@ -48,14 +55,15 @@ export class ClassroomBackendApiService {
    * @param {any} errorCallback 
    */
   _fetchClassroomData(classroomName: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      successCallback: (value: TopicSummary[]) => void,
+      errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
         classroom_name: classroomName
       });
 
-    this.http.get(classroomDataUrl).toPromise().then((data: any) => {
+    this.http.get<ClassroomTopicSummaryBackendDict>(
+      classroomDataUrl).toPromise().then(data => {
       this.topicSummaryObjects = data.topic_summary_dicts.map(
         (summaryDict) => {
           return this.topicSummaryObjectFactory.createFromBackendDict(
@@ -65,20 +73,48 @@ export class ClassroomBackendApiService {
       if (successCallback) {
         successCallback(this.topicSummaryObjects);
       }
-    }, (error: any) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
+
+  _fetchClassroomPageIsShownStatus(
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void): void {
+    const classroomStatusHandlerUrl = '/classroom_page_status_handler';
+
+    this.http.get<ClassroomStatusBackendDict>(
+      classroomStatusHandlerUrl).toPromise().then(data => {
+      if (successCallback) {
+        successCallback(data.classroom_page_is_shown);
+      }
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
+  }
+<<<<<<< HEAD
   /**
    * 
    * @param classroomName 
    * 
    */
   fetchClassroomData(classroomName: string): Promise<Object> {
+=======
+
+  fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
+>>>>>>> upstream/develop
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
+    });
+  }
+
+  fetchClassroomPageIsShownStatus(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
   }
 }

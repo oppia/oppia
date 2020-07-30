@@ -52,3 +52,113 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         retrieved_model2 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 2)
         self.assertEqual(retrieved_model2.value, 'd')
+
+
+class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
+    """Test PlatformParameterModel class."""
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_get_export_policy_is_not_applicable(self):
+        self.assertEqual(
+            config_models.PlatformParameterModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_create_model(self):
+        param_model = config_models.PlatformParameterModel.create(
+            param_name='parameter_name',
+            rule_dicts=[{'filters': [], 'value_when_matched': False}],
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+        )
+        self.assertEqual(param_model.id, 'parameter_name')
+        self.assertEqual(
+            param_model.rule_schema_version,
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION)
+        self.assertEqual(
+            param_model.rules,
+            [{'filters': [], 'value_when_matched': False}])
+
+    def test_commit(self):
+        parameter_name = 'parameter_name'
+        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=parameter_name,
+            rule_dicts=rule_dicts,
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+        )
+
+        param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+
+        retrieved_model1 = config_models.PlatformParameterModel.get_version(
+            parameter_name, 1)
+        self.assertEqual(retrieved_model1.rules, rule_dicts)
+
+        new_rules = [
+            {
+                'filters': [
+                    {'type': 'app_version', 'value': '>1.2.3'}
+                ],
+                'value_when_matched': True
+            },
+            {'filters': [], 'value_when_matched': False},
+        ]
+
+        retrieved_model1.rules = new_rules
+        retrieved_model1.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+        retrieved_model2 = config_models.PlatformParameterModel.get_version(
+            parameter_name, 2)
+
+        self.assertEqual(retrieved_model2.rules, new_rules)
+
+    def test_commit_is_persistent_in_storage(self):
+        parameter_name = 'parameter_name'
+        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=parameter_name,
+            rule_dicts=rule_dicts,
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+        )
+
+        param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+
+        retrieved_model1 = config_models.PlatformParameterModel.get_version(
+            parameter_name, 1)
+        self.assertEqual(retrieved_model1.rules, rule_dicts)
+
+    def test_commit_with_updated_rules(self):
+        parameter_name = 'parameter_name'
+        rule_dicts = [{'filters': [], 'value_when_matched': False}]
+
+        param_model = config_models.PlatformParameterModel.create(
+            param_name=parameter_name,
+            rule_dicts=rule_dicts,
+            rule_schema_version=(
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+        )
+        param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+
+        new_rules = [
+            {
+                'filters': [
+                    {'type': 'app_version', 'value': '>1.2.3'}
+                ],
+                'value_when_matched': True
+            },
+            {'filters': [], 'value_when_matched': False},
+        ]
+
+        param_model.rules = new_rules
+        param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+        retrieved_model = config_models.PlatformParameterModel.get_version(
+            parameter_name, 2)
+
+        self.assertEqual(retrieved_model.rules, new_rules)

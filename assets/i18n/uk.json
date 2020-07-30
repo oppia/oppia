@@ -251,7 +251,6 @@
 	"I18N_SIGNUP_COMPLETE_REGISTRATION": "Завершіть свою реєстрацію",
 	"I18N_SIGNUP_EMAIL": "Ел. пошта",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Будь ласка, введіть ім'я користувача.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Ім'я користувача може містити не більше 50 символів.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Це ім'я користувача недоступне.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Імена користувачів можуть мати тільки буквено-цифрові символи.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "На жаль, це ім'я користувача вже зайнято.",

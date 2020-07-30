@@ -50,7 +50,7 @@
           <search-bar enable-dropup="false"></search-bar>
         </div>
 
-        <div class="oppia-classroom-div" ng-if="SHOW_CLASSROOM_CALLOUT">
+        <div class="oppia-classroom-div" ng-if="$ctrl.CLASSROOM_PAGE_IS_SHOWN">
           <div class="oppia-classroom-text">
             <h2 class="oppia-classroom-h2" translate="I18N_CLASSROOM_CALLOUT_HEADING_2"></h2>
             <h1 class="oppia-classroom-h1" translate="I18N_CLASSROOM_CALLOUT_HEADING_1"></h1>
@@ -196,13 +196,13 @@
     border-radius: 10px;
     height: 300px;
     margin: 0px 45px;
+    overflow: hidden;
     padding: 30px 45px 45px 45px;
     position: relative;
-    overflow: hidden;
   }
   .oppia-classroom-text {
-    width: 62%;
     float: left;
+    width: 62%;
   }
   .oppia-classroom-h1 {
     color: #033e39;
@@ -213,14 +213,14 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
   .oppia-classroom-p {
-    margin-top: 25px;
     color: #383838;
     font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+    margin-top: 25px;
   }
   .oppia-classroom-div > img {
-    position: absolute;
     bottom: 0;
     height: 100%;
+    position: absolute;
     transform: translateY(50px);
   }
   .oppia-classroom-text > a {
@@ -235,7 +235,7 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
   }
   .oppia-library-h2 {
-    color: #04857c;
+    color: #047C74;
     font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
     padding-bottom: 1em;
   }
@@ -248,8 +248,8 @@
     width: 100vw;
   }
   .oppia-library-group-header-container {
-    max-width: 928px;
     margin: 0 -15px 0 0;
+    max-width: 928px;
     min-width: 315px;
     width: calc(100% - 120px);
     width: -moz-calc(100% - 120px);
@@ -336,8 +336,8 @@
     white-space: nowrap;
   }
   .oppia-library-carousel {
-    height: 282px;
     float: left;
+    height: 282px;
     max-width: 848px;
     overflow: hidden;
     position: relative;
@@ -372,8 +372,8 @@
       font-size: 0.9em;
     }
     .oppia-classroom-p {
-      margin-top: 20px;
       font-size: 0.95em;
+      margin-top: 20px;
     }
     .oppia-classroom-div > img {
       height: 80%;
@@ -382,17 +382,17 @@
   }
   @media (max-width: 727px) {
     .oppia-classroom-div {
-      padding: 20px;
       height: 345px;
+      padding: 20px;
     }
     .oppia-classroom-text {
       float: none;
       width: 100%;
     }
     .oppia-classroom-text > a {
+      float: left;
       margin-top: 50px;
       width: 140px;
-      float: left;
     }
     .oppia-classroom-div > img {
       height: 60%;
@@ -402,9 +402,9 @@
   }
   @media (max-width: 450px) {
     .oppia-classroom-text > a {
+      font-size: 0.75em;
       margin-top: 40px;
       width: fit-content;
-      font-size: 0.75em;
     }
     .oppia-classroom-div > img {
       height: 45%;

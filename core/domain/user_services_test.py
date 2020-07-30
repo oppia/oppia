@@ -47,6 +47,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -66,6 +67,21 @@ class MockUserStatsMRJobManager(
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
+
+    def test_is_user_id_correct(self):
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SYSTEM_COMMITTER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+        self.assertFalse(
+            user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
+        self.assertFalse(user_services.is_user_id_correct('uid_' + 'a' * 31))
+        self.assertFalse(user_services.is_user_id_correct('a' * 36))
 
     def test_set_and_get_username(self):
         gae_id = 'someUser'
@@ -106,7 +122,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return None for usernames that don't exists.
         self.assertEqual(
             [None, 'name1'],
-            user_services.get_usernames(['fakeUser', 'test1']))
+            user_services.get_usernames(['fakeUser', user_ids[0]]))
 
     def test_get_usernames_empty_list(self):
         # Return empty list when no user id passed.
@@ -150,19 +166,38 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(
             gae_id, 'user@example.com').user_id
-        bad_usernames = [
-            ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020',
-            'AbcOppiaMigrationBotXyz', 'OppiaMigrATIONBOTXyz',
-            'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB',
-            'xyzOppia', 'oppiaXyz', 'abcOppiaXyz']
-        for username in bad_usernames:
-            with self.assertRaises(utils.ValidationError):
+        bad_usernames_with_expected_error_message = [
+            (' bob ', 'Usernames can only have alphanumeric characters.'),
+            ('@', 'Usernames can only have alphanumeric characters.'),
+            ('', 'Empty username supplied.'),
+            ('a' * 100, 'A username can have at most 30 characters.'),
+            ('ADMIN', 'This username is not available.'),
+            ('admin', 'This username is not available.'),
+            ('AdMiN2020', 'This username is not available.'),
+            ('AbcOppiaMigrationBotXyz', 'This username is not available.'),
+            ('OppiaMigrATIONBOTXyz', 'This username is not available.'),
+            ('AbcOppiaSuggestionBotXyz', 'This username is not available.'),
+            ('AAAOPPIASuggestionBotBBB', 'This username is not available.'),
+            ('xyzOppia', 'This username is not available.'),
+            ('oppiaXyz', 'This username is not available.'),
+            ('abcOppiaXyz', 'This username is not available.')]
+        for username, error_msg in bad_usernames_with_expected_error_message:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
     def test_invalid_emails(self):
-        bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
-        for email in bad_email_addresses:
-            with self.assertRaises(utils.ValidationError):
+        bad_email_addresses_with_expected_error_message = [
+            ('@', 'Invalid email address: @'),
+            ('@@', 'Invalid email address: @@'),
+            ('abc', 'Invalid email address: abc'),
+            ('', 'No user email specified.'),
+            (None, 'Expected email to be a string, received None'),
+            (
+                ['a', '@', 'b.com'],
+                r'Expected email to be a string, received '
+                r'\[u\'a\', u\'@\', u\'b.com\'\]')]
+        for email, error_msg in bad_email_addresses_with_expected_error_message:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):
@@ -256,7 +291,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_user_settings_by_gae_id('id_x', strict=True)
 
     def test_fetch_gravatar_success(self):
@@ -523,40 +558,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
 
         user_services.update_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_mark_user_for_deletion(self):
         gae_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
-        exploration_ids = ['exp_id']
-        collection_ids = ['col_id']
 
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_services.mark_user_for_deletion(
-            user_id, exploration_ids, collection_ids)
+        user_services.mark_user_for_deletion(user_id)
 
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertTrue(user_settings.deleted)
-
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(user_id))
-        self.assertEqual(
-            pending_deletion_model.email, user_settings.email)
-        self.assertFalse(
-            pending_deletion_model.deletion_complete)
-        self.assertEqual(
-            pending_deletion_model.exploration_ids, exploration_ids)
-        self.assertEqual(
-            pending_deletion_model.collection_ids, collection_ids)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -601,9 +624,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'day': 5
             })
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError,
+            'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''):
             user_services.parse_date_from_string(test_datetime_strings[2])
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(ValueError, 'unconverted data remains: 2'):
             user_services.parse_date_from_string(test_datetime_strings[3])
 
     def test_record_user_started_state_translation_tutorial(self):
@@ -1105,6 +1130,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for testing the time the user last edited an
     exploration updates correctly.
     """
+
     EXP_ID = 'exp'
 
     def setUp(self):
@@ -1175,6 +1201,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for the time the user last created an exploration
     updates correctly.
     """
+
     EXP_ID_A = 'exp_a'
     EXP_ID_B = 'exp_b'
 
@@ -1236,15 +1263,29 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-    def test_gae_id_is_user_id(self):
-        self.assertEqual(
-            self.user_settings.user_id, self.user_settings.gae_id
-        )
-
     def test_validate_non_str_user_id(self):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_user_id(self):
+        self.user_settings.user_id = 'uid_' + 'a' * 31 + 'A'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'uid_' + 'a' * 31
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
         ):
             self.user_settings.validate()
 
@@ -1294,7 +1335,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
-        self.assertFalse(user_services.has_fully_registered(None))
+        self.assertFalse(user_services.has_fully_registered_account(None))
 
     def test_cannot_create_new_user_with_existing_user_id(self):
         with self.assertRaisesRegexp(
@@ -1352,6 +1393,22 @@ class UserSettingsTests(test_utils.GenericTestBase):
             '[Awaiting user registration: u..@example.com]']
 
         self.assertEqual(user_ids, expected_user_ids)
+
+    def test_created_on_gets_updated_correctly(self):
+        # created_on should not be updated upon updating other attributes of
+        # the user settings model.
+        user_settings = user_services.create_new_user(
+            'gae_id', 'user@example.com')
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(
+            user_settings.user_id)
+        time_of_creation = user_settings_model.created_on
+
+        user_services.update_user_bio(user_settings.user_id, 'New bio.')
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(
+            user_settings.user_id)
+        self.assertEqual(user_settings_model.created_on, time_of_creation)
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
@@ -1554,10 +1611,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.translator_id, 'hi')
 
         all_reviewers = user_services.get_all_community_reviewers()
-        self.assertEqual(len(all_reviewers), 2)
-
-        self.assertEqual(all_reviewers[0].id, self.voice_artist_id)
-        self.assertEqual(all_reviewers[1].id, self.translator_id)
+        self.assertItemsEqual(
+            [reviewer.id for reviewer in all_reviewers],
+            [self.voice_artist_id, self.translator_id])
 
     def test_remove_translation_review_rights_in_language(self):
         user_services.allow_user_to_review_translation_in_language(

@@ -21,14 +21,14 @@ angular.module('oppia').directive('codemirrorMergeview', [
     return {
       restrict: 'E',
       link: function(scope, element, attrs) {
-        // Require CodeMirror
+        // Require CodeMirror.
         if (angular.isUndefined(window.CodeMirror)) {
           throw new Error('CodeMirror not found.');
         }
 
         var options = scope.$eval(attrs.options);
         // 'value', 'orig' are initial values of left and right
-        // pane respectively
+        // pane respectively.
         var codeMirrorInstance = new window.CodeMirror.MergeView(
           element[0], angular.extend({
             value: ' ',
@@ -42,14 +42,14 @@ angular.module('oppia').directive('codemirrorMergeview', [
           throw new Error('Right pane value is not defined.');
         }
 
-        // Watch for changes and set value in left pane
+        // Watch for changes and set value in left pane.
         scope.$watch(attrs.leftValue, function(newValue) {
           if (angular.isString(newValue)) {
             codeMirrorInstance.edit.setValue(newValue);
           }
         });
 
-        // Watch for changes and set value in right pane
+        // Watch for changes and set value in right pane.
         scope.$watch(attrs.rightValue, function(newValue) {
           if (angular.isString(newValue)) {
             codeMirrorInstance.right.orig.setValue(newValue);

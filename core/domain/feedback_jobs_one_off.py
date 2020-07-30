@@ -100,33 +100,3 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             thread_model.last_nonempty_message_author_id = message_author_id
             return True
         return False
-
-
-class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for deleting GeneralFeedbackThreadUserModels with user_id
-    equal to None or 'None'.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [feedback_models.GeneralFeedbackThreadUserModel]
-
-    @staticmethod
-    def map(model_instance):
-        """Implements the map function for this job."""
-        if model_instance.user_id is None:
-            model_instance.delete()
-            yield ('SUCCESS-DELETED-NONE', model_instance.id)
-        elif model_instance.user_id == 'None':
-            model_instance.delete()
-            yield ('SUCCESS-DELETED-STRING', model_instance.id)
-        else:
-            yield ('SUCCESS-NOT_DELETED', model_instance.id)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == 'SUCCESS-NOT_DELETED':
-            yield (key, len(values))
-        else:
-            yield (key, values)

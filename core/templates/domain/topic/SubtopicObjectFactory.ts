@@ -20,21 +20,37 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
+
+export interface SubtopicBackendDict {
+  'id': number;
+  'title': string;
+  'skill_ids': string[];
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+}
+
+export interface SkillIdToDescriptionMap {
+  [skillId: string]: string;
+}
 
 export class Subtopic {
-  _id: any;
-  _title: any;
-  _skillSummaries: any;
-  _skillSummaryObjectFactory: SkillSummaryObjectFactory;
+  _id: number;
+  _title: string;
+  _skillSummaries: ShortSkillSummary[];
+  _skillIds: string[];
+  _skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   constructor(
-      subtopicId, title, skillIds, skillIdToDescriptionMap,
-      skillSummaryObjectFactory, thumbnailFilename, thumbnailBgColor) {
+      subtopicId: number, title: string, skillIds: string[],
+      skillIdToDescriptionMap: SkillIdToDescriptionMap,
+      skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
+      thumbnailFilename: string, thumbnailBgColor: string) {
     this._id = subtopicId;
     this._title = title;
+    this._skillIds = skillIds;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
@@ -45,28 +61,28 @@ export class Subtopic {
       });
   }
 
-  getId() {
+  getId(): number {
     return this._id;
   }
 
-  decrementId() {
+  decrementId(): number {
     return --this._id;
   }
 
-  incrementId() {
+  incrementId(): number {
     return ++this._id;
   }
 
   // Returns the title of the subtopic.
-  getTitle() {
+  getTitle(): string {
     return this._title;
   }
 
-  setTitle(title) {
+  setTitle(title): void {
     this._title = title;
   }
 
-  validate() {
+  validate(): string[] {
     var issues = [];
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
@@ -94,17 +110,21 @@ export class Subtopic {
   }
 
   // Returns the summaries of the skills in the subtopic.
-  getSkillSummaries() {
+  getSkillSummaries(): ShortSkillSummary[] {
     return this._skillSummaries.slice();
   }
 
-  hasSkill(skillId) {
+  getSkillIds(): Array<string> {
+    return this._skillIds.slice();
+  }
+
+  hasSkill(skillId: string): boolean {
     return this._skillSummaries.some(function(skillSummary) {
       return skillSummary.getId() === skillId;
     });
   }
 
-  addSkill(skillId, skillDescription) {
+  addSkill(skillId: string, skillDescription: string): boolean {
     if (!this.hasSkill(skillId)) {
       this._skillSummaries.push(this._skillSummaryObjectFactory.create(
         skillId, skillDescription));
@@ -113,7 +133,7 @@ export class Subtopic {
     return false;
   }
 
-  removeSkill(skillId) {
+  removeSkill(skillId: string): void {
     var index = this._skillSummaries.map(function(skillSummary) {
       return skillSummary.getId();
     }).indexOf(skillId);
@@ -145,9 +165,12 @@ export class Subtopic {
   providedIn: 'root'
 })
 export class SubtopicObjectFactory {
-  constructor(private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
+  constructor(
+    private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
 
-  create(subtopicBackendDict, skillIdToDescriptionMap) {
+  create(
+      subtopicBackendDict: SubtopicBackendDict,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap) {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
@@ -155,7 +178,7 @@ export class SubtopicObjectFactory {
       subtopicBackendDict.thumbnail_bg_color);
   }
 
-  createFromTitle(subtopicId, title) {
+  createFromTitle(subtopicId: number, title: string): Subtopic {
     return this.create({
       id: subtopicId,
       title: title,

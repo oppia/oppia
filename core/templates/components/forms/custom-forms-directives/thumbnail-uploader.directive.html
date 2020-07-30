@@ -4,13 +4,18 @@
          style="height: 100px; width: 180px"
          ng-style="{background: getBgColor()}">
       <div class="oppia-click-to-start-editing protractor-test-photo-button"
-           ng-click="showEditThumbnailModal()">
+           ng-click="showEditThumbnailModal()"
+           aria-label="upload or edit thumbnail">
       </div>
       <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
       <img ng-show="!thumbnailIsLoading"
            ng-src="<[editableThumbnailDataUrl]>"
            class="img-thumbnail protractor-test-custom-photo"
            ng-style="{background: getBgColor()}">
+
+      <img ng-if="useLocalStorage && newThumbnailDataUrl"
+           ng-src="<[newThumbnailDataUrl]>"
+           class="img-thumbnail protractor-test-custom-photo">
     </div>
   </div>
 </div>
@@ -28,8 +33,8 @@
   }
 
   .img-thumbnail {
+    border: none;
     max-height: 100%;
     max-width: 100%;
-    border: none;
   }
 </style>

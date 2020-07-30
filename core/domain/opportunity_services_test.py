@@ -73,12 +73,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A story',
-            corresponding_topic_id=self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -426,8 +425,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         with self.assertRaisesRegexp(
             Exception,
-            ('SkillOpportunity corresponding to skill ID %s already exists.'
-             % self.SKILL_ID)):
+            'SkillOpportunity corresponding to skill ID %s already exists.'
+            % self.SKILL_ID):
             opportunity_services.create_skill_opportunity(
                 self.SKILL_ID, 'description')
 
@@ -554,6 +553,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
 class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     """Test the opportunity services methods."""
+
     def setUp(self):
         super(OpportunityServicesUnitTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -574,12 +574,11 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A story',
-            corresponding_topic_id=self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -613,6 +612,35 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunities[0],
             opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(opportunities[0].id, '0')
+
+    def test_get_exploration_opportunity_summaries_by_ids_warns_if_invalid_id(
+            self):
+        """Tests that a warning is logged if there is no
+        ExplorationOpportunitySummaryModel associated with one of the ids.
+        """
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.warning()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+
+        with logging_swap:
+            opportunities = (
+                opportunity_services.
+                get_exploration_opportunity_summaries_by_ids(
+                    ['badID'])
+            )
+
+        self.assertEqual(len(opportunities), 0)
+        self.assertEqual(
+            observed_log_messages,
+            [
+                'When getting the exploration opportunity summary models for '
+                'ids: [u\'badID\'], one of the models was None.'
+            ]
+        )
 
     def test_get_exploration_opportunity_summary_from_model_populates_new_lang(
             self):

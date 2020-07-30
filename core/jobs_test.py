@@ -113,7 +113,10 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
-        assert_raises_context_manager = self.assertRaises(Exception)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception,
+            r'Invalid status code change for job '
+            r'MockJobManagerOne-\w+-\w+: from new to failed')
 
         job_id = MockJobManagerOne.create_new()
         store_map_reduce_results = jobs.StoreMapReduceResults()
@@ -526,6 +529,7 @@ class MockSumModel(ndb.Model):
 
 class TestDeferredJobManager(jobs.BaseDeferredJobManager):
     """Base class for testing deferred jobs."""
+
     pass
 
 
@@ -534,6 +538,7 @@ class TestAdditionJobManager(TestDeferredJobManager):
 
     The result is stored in a MockSumModel entity with id SUM_MODEL_ID.
     """
+
     @classmethod
     def _run(cls, additional_job_params):
         total = sum([
@@ -789,9 +794,24 @@ class JobRegistryTests(test_utils.GenericTestBase):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertTrue(issubclass(klass, jobs.BaseJobManager))
 
+    def test_is_abstract_method_raises_exception_for_abstract_classes(self):
+        class TestMockAbstractClass(jobs.BaseJobManager):
+            """A sample Abstract Class."""
+
+            pass
+
+        mock_abstract_base_classes = [TestMockAbstractClass]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Tried to directly create a job using the abstract base '
+            'manager class TestMockAbstractClass, which is not allowed.'):
+            with self.swap(
+                jobs, 'ABSTRACT_BASE_CLASSES', mock_abstract_base_classes):
+                TestMockAbstractClass.create_new()
+
     def test_each_one_off_class_is_not_abstract(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
-            self.assertFalse(klass._is_abstract())  # pylint: disable=protected-access
+            klass.create_new()
 
     def test_validity_of_each_continuous_computation_class(self):
         for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
@@ -1178,7 +1198,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
             # The batch job has not run yet, so no entity for self.EXP_ID will
             # have been created in the batch model yet.
-            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            with self.assertRaisesRegexp(
+                base_models.BaseModel.EntityNotFoundError,
+                'Entity for class ExplorationAnnotationsModel with id exp_id '
+                'not found'):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
             # Launch the batch computation.
@@ -1249,7 +1272,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             # The batch job result should still be 0, since the event arrived
             # after the batch job started.
-            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            with self.assertRaisesRegexp(
+                base_models.BaseModel.EntityNotFoundError,
+                'Entity for class ExplorationAnnotationsModel with id exp_id '
+                'not found'):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
     def test_cannot_start_new_job_while_existing_job_still_running(self):

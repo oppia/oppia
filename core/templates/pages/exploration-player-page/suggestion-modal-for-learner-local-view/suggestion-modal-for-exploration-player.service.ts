@@ -18,12 +18,14 @@
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'pages/exploration-player-page/templates/' +
+  'exploration-player-suggestion-modal.controller.ts');
 
-require('pages/exploration-player-page/services/exploration-engine.service.ts');
-require('pages/exploration-player-page/services/player-position.service.ts');
-require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/alerts.service.ts');
-require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
   '$http', '$uibModal', 'AlertsService',
@@ -34,47 +36,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
           'pages/exploration-player-page/templates/' +
           'exploration-player-suggestion-modal.directive.html'),
         backdrop: 'static',
-        resolve: {},
-        controller: [
-          '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
-          'PlayerPositionService', 'PlayerTranscriptService',
-          'SuggestionModalService',
-          function(
-              $scope, $timeout, $uibModalInstance, ExplorationEngineService,
-              PlayerPositionService, PlayerTranscriptService,
-              SuggestionModalService) {
-            var stateName = PlayerPositionService.getCurrentStateName();
-            var displayedCard = PlayerTranscriptService.getCard(
-              PlayerPositionService.getDisplayedCardIndex());
-            $scope.originalHtml = displayedCard.getContentHtml();
-            $scope.description = '';
-            // ng-model needs to bind to a property of an object on
-            // the scope (the property cannot sit directly on the scope)
-            // Reference https://stackoverflow.com/q/12618342
-            $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
-            $scope.showEditor = false;
-            // Rte initially displays content unrendered for a split second
-            $timeout(function() {
-              $scope.showEditor = true;
-            }, 500);
-
-            $scope.cancelSuggestion = function() {
-              SuggestionModalService.cancelSuggestion($uibModalInstance);
-            };
-
-            $scope.submitSuggestion = function() {
-              var data = {
-                target_id: ExplorationEngineService.getExplorationId(),
-                version: ExplorationEngineService.getExplorationVersion(),
-                stateName: stateName,
-                suggestion_type: 'edit_exploration_state_content',
-                target_type: 'exploration',
-                description: $scope.description,
-                suggestionHtml: $scope.suggestionData.suggestionHtml,
-              };
-              $uibModalInstance.close(data);
-            };
-          }],
+        controller: 'ExplorationPlayerSuggestionModalController'
       }).result.then(function(result) {
         var data = {
           suggestion_type: result.suggestion_type,
@@ -103,15 +65,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             'pages/exploration-player-page/templates/' +
             'learner-suggestion-submitted-modal.template.html'),
           backdrop: true,
-          resolve: {},
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.close = function() {
-                $uibModalInstance.dismiss();
-              };
-            }
-          ]
+          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {}, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

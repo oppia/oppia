@@ -48,6 +48,7 @@ search_services = models.Registry.import_search_services()
 
 class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -197,6 +198,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'ab@example.com'
@@ -279,7 +281,7 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
     USER_2_EMAIL = '2@example.com'
     USER_2_USERNAME = '123456789123456789124'
     USER_3_EMAIL = '3@example.com'
-    USER_3_USERNAME = '123456789123456789123456789123456789'
+    USER_3_USERNAME = 'a' * 30
     USER_4_EMAIL = '4@example.com'
     # Username 4 length is 20, so it shouldn't be in the output.
     USER_4_USERNAME = '12345678912345678912'
@@ -302,7 +304,7 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = [u'[u\'Length: 21\', u"Usernames: [\'%s\', \'%s\']"]'
                            % (self.USER_1_USERNAME, self.USER_2_USERNAME),
-                           u'[u\'Length: 36\', u"Usernames: [\'%s\']"]'
+                           u'[u\'Length: 30\', u"Usernames: [\'%s\']"]'
                            % self.USER_3_USERNAME]
 
         actual_output = self._run_one_off_job()
@@ -312,6 +314,7 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
 class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off long userbio length job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_A_BIO = 'I am less than 500'
@@ -408,6 +411,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     COLLECTION_ID_1 = 'col_id_1'
@@ -807,6 +811,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -1180,64 +1185,6 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self.owner_id).first_contribution_msec)
 
 
-class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
-
-    FETCHED_GRAVATAR = 'fetched_gravatar'
-
-    def setUp(self):
-        super(UserProfilePictureOneOffJobTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def _mock_fetch_gravatar(self, unused_email):
-        """Mocks user_services.fetch_gravatar()."""
-        return self.FETCHED_GRAVATAR
-
-    def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
-        user_services.update_profile_picture_data_url(self.owner_id, None)
-
-        # Before the job runs, the data URL is None.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertIsNone(user_settings.profile_picture_data_url)
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL has been updated.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url, self.FETCHED_GRAVATAR)
-
-    def test_profile_picture_is_not_regenerated_if_it_already_exists(self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, 'manually_added_data_url')
-
-        # Before the job runs, the data URL is the manually-added one.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url, 'manually_added_data_url')
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL is still the manually-added one.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url,
-            'manually_added_data_url')
-
-
 class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -1419,12 +1366,13 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 3)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 3)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.activity_ids), 3)
+
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.activity_ids), 3)
 
         job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
         job_id = job.create_new()
@@ -1434,12 +1382,13 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 0)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 0)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.activity_ids), 0)
+
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.activity_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
             u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '

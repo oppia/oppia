@@ -31,38 +31,106 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 const constants = require('constants.ts');
+const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
-describe('Constants Generating', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+describe('App', function() {
+  describe('Generating Constants', function() {
+    beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.value(
+        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+      $provide.value(
+        'WrittenTranslationObjectFactory',
+        new WrittenTranslationObjectFactory());
+      $provide.value(
+        'WrittenTranslationsObjectFactory',
+        new WrittenTranslationsObjectFactory(
+          new WrittenTranslationObjectFactory()));
+    }));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
 
-  var $injector = null;
-  beforeEach(angular.mock.inject(function(_$injector_) {
-    $injector = _$injector_.get('$injector');
-  }));
+    var $injector = null;
+    beforeEach(angular.mock.inject(function(_$injector_) {
+      $injector = _$injector_.get('$injector');
+    }));
 
-  it('should transform all key value pairs to angular constants', function() {
-    for (var constantName in constants) {
-      expect($injector.has(constantName)).toBe(true);
-      expect($injector.get(constantName)).toEqual(constants[constantName]);
-    }
+    it('should transform all key value pairs to angular constants',
+      function() {
+        for (var constantName in constants) {
+          expect($injector.has(constantName)).toBe(true);
+          expect($injector.get(constantName)).toEqual(constants[constantName]);
+        }
+      });
+  });
+
+  describe('Exception Handler', function() {
+    beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      $provide.constant('DEV_MODE', false);
+    }));
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
+
+    var $exceptionHandler = null;
+    var $log = null;
+    beforeEach(angular.mock.inject(function(
+        _$exceptionHandler_, _$log_) {
+      $exceptionHandler = _$exceptionHandler_;
+      $log = _$log_;
+      spyOn($log, 'error');
+      spyOn(sourceMappedStackTrace, 'mapStackTrace');
+    }));
+
+    it('should handle non-Error type exceptions gracefully', function() {
+      var testException = (error, regex) => {
+        $exceptionHandler(error);
+        var expectedError = new Error(error);
+        expect(sourceMappedStackTrace.mapStackTrace).toHaveBeenCalledWith(
+          jasmine.stringMatching(regex),
+          jasmine.any(Function));
+        expect($log.error).toHaveBeenCalledWith(expectedError);
+      };
+      testException('something', /^Error: something/);
+      testException('', /^Error: /);
+      testException(undefined, /^Error: /);
+      testException(null, /^Error: null/);
+      testException({
+        a: 'something'
+      }, /^Error: \[object Object\]/);
+      testException({}, /^Error: \[object Object\]/);
+    });
+
+    it('should handle Error type exceptions correctly', function() {
+      var expectedError = new Error('something');
+      $exceptionHandler(expectedError);
+      expect(sourceMappedStackTrace.mapStackTrace).toHaveBeenCalledWith(
+        jasmine.stringMatching(/^Error: something/),
+        jasmine.any(Function));
+      expect($log.error).toHaveBeenCalledWith(expectedError);
+    });
+
+    it('should ignore exceptions with status code -1', function() {
+      $exceptionHandler('Possibly unhandled rejection: { "status":-1 }');
+      expect(sourceMappedStackTrace.mapStackTrace).not.toHaveBeenCalled();
+      expect($log.error).not.toHaveBeenCalled();
+    });
+
+    it('should ignore $templateRequest:tpload error with status code -1',
+      function() {
+        $exceptionHandler('[$templateRequest:tpload]?p1=-1&p2=');
+        expect(sourceMappedStackTrace.mapStackTrace).not.toHaveBeenCalled();
+        expect($log.error).not.toHaveBeenCalled();
+      });
   });
 });

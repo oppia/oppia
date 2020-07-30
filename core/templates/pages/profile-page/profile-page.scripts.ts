@@ -20,7 +20,7 @@
 // main module the elements are attached to.
 require('pages/profile-page/profile-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');
-require('pages/profile-page/profile-page.controller.ts');
-require('pages/profile-page/profile-page-navbar.directive.ts');
+require('pages/profile-page/profile-page.component.ts');

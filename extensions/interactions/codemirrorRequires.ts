@@ -16,12 +16,7 @@
  * @fileoverview Loads scripts needed for ui-codemirror.
  */
 
-const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
-Object.defineProperty(window, 'CodeMirror', {
-  value: CodeMirror,
-  writable: false
-});
-
+window.CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
 require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
 require('static/code-mirror-5.17.0/mode/python/python.js');
 require('static/code-mirror-5.17.0/mode/yaml/yaml.js');

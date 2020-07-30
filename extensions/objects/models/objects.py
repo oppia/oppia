@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import expression_parser
 import python_utils
 import schema_utils
 
@@ -53,10 +54,10 @@ class BaseObject(python_utils.OBJECT):
 
         Returns:
             *. A normalized Python object describing the Object specified by
-                this class.
+            this class.
 
         Raises:
-          TypeError: The Python object cannot be normalized.
+            TypeError: The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
@@ -309,12 +310,31 @@ class SetOfNormalizedString(BaseObject):
     }
 
 
-class MathLatexString(BaseObject):
-    """Math LaTeX string class."""
+class MathExpressionContent(BaseObject):
+    """Math Expression Content class."""
 
-    description = 'A LaTeX string.'
+    description = 'The Math Expression to be displayed.'
+    default_value = {
+        'raw_latex': '',
+        'svg_filename': ''
+    }
 
-    SCHEMA = UnicodeString.SCHEMA
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'raw_latex',
+            'description': 'Latex value',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'svg_filename',
+            'description': 'SVG filename',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
 
 
 class SanitizedUrl(BaseObject):
@@ -352,8 +372,9 @@ class SkillSelector(BaseObject):
 class MusicPhrase(BaseObject):
     """List of Objects that represent a musical phrase."""
 
-    description = ('A musical phrase that contains zero or more notes, rests, '
-                   'and time signature.')
+    description = (
+        'A musical phrase that contains zero or more notes, rests, '
+        'and time signature.')
     default_value = []
 
     # The maximum number of notes allowed in a music phrase.
@@ -447,6 +468,16 @@ class Filepath(BaseObject):
     SCHEMA = UnicodeString.SCHEMA
 
 
+class SvgFilename(BaseObject):
+    """A string representing a filename of the saved
+    svg file created using svg editor.
+    """
+
+    description = 'A string representing the saved svg filename'
+
+    SCHEMA = UnicodeString.SCHEMA
+
+
 class CheckedProof(BaseObject):
     """A proof attempt and any errors it makes."""
 
@@ -462,17 +493,17 @@ class CheckedProof(BaseObject):
 
         Returns:
             dict. The normalized object containing the following key-value
-                pairs:
-                    assumptions_string: str. The string containing the
-                        assumptions.
-                    target_string: str. The target string of the proof.
-                    proof_string: str. The proof string.
-                    correct: bool. Whether the proof is correct.
-                    error_category: str. The category of the error.
-                    error_code: str. The error code.
-                    error_message: str. The error message.
-                    error_line_number: str. The line number at which the
-                        error has occurred.
+            pairs:
+                assumptions_string: str. The string containing the
+                    assumptions.
+                target_string: str. The target string of the proof.
+                proof_string: str. The proof string.
+                correct: bool. Whether the proof is correct.
+                error_category: str. The category of the error.
+                error_code: str. The error code.
+                error_message: str. The error message.
+                error_line_number: str. The line number at which the
+                    error has occurred.
 
         Raises:
             TypeError: Cannot convert to the CheckedProof schema.
@@ -511,26 +542,26 @@ class LogicQuestion(BaseObject):
 
         Returns:
             dict. The normalized object containing the following key-value
-                pairs:
-                    assumptions: list(dict(str, *)). The list containing all the
-                        assumptions in the dict format containing following
-                        key-value pairs:
-                            top_kind_name: str. The top kind name in the
-                                expression.
-                            top_operator_name: str. The top operator name
-                                in the expression.
-                            arguments: list. A list of arguments.
-                            dummies: list. A list of dummy values.
-                    results: list(dict(str, *)). The list containing the final
-                        results of the required proof in the dict format
-                        containing following key-value pairs:
-                            top_kind_name: str. The top kind name in the
-                                expression.
-                            top_operator_name: str. The top operator name
-                                in the expression.
-                            arguments: list. A list of arguments.
-                            dummies: list. A list of dummy values.
-                    default_proof_string: str. The default proof string.
+            pairs:
+                assumptions: list(dict(str, *)). The list containing all the
+                    assumptions in the dict format containing following
+                    key-value pairs:
+                        top_kind_name: str. The top kind name in the
+                            expression.
+                        top_operator_name: str. The top operator name
+                            in the expression.
+                        arguments: list(str). A list of arguments.
+                        dummies: list. A list of dummy values.
+                results: list(dict(str, *)). The list containing the final
+                    results of the required proof in the dict format
+                    containing following key-value pairs:
+                        top_kind_name: str. The top kind name in the
+                            expression.
+                        top_operator_name: str. The top operator name
+                            in the expression.
+                        arguments: list(str). A list of arguments.
+                        dummies: list. A list of dummy values.
+                default_proof_string: str. The default proof string.
 
         Raises:
             TypeError: Cannot convert to LogicQuestion schema.
@@ -760,7 +791,7 @@ class NormalizedRectangle2D(BaseObject):
 
         Returns:
             list(list(float)). The normalized object containing list of lists of
-                float values as coordinates of the rectangle.
+            float values as coordinates of the rectangle.
 
         Raises:
             TypeError: Cannot convert to the NormalizedRectangle2D schema.
@@ -942,6 +973,7 @@ class Fraction(BaseObject):
 
 class Units(BaseObject):
     """Units class."""
+
     # Validation of the units is performed only in the frontend using math.js.
     # math.js is not available in the backend.
 
@@ -1035,3 +1067,82 @@ class DragAndDropPositiveInt(BaseObject):
     default_value = 1
 
     SCHEMA = PositiveInt.SCHEMA
+
+
+class AlgebraicExpression(BaseObject):
+    """Class for algebraic expressions. Stores a unicode string representing a
+    valid algebraic expression.
+    """
+
+    description = 'A unicode string for an algebraic expression.'
+    default_value = ''
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_algebraic_expression'
+        }]
+    }
+
+
+class AlgebraicIdentifier(BaseObject):
+    """Class for an algebraic identifier.
+    An algebraic identifier could be an english alphabet (uppercase/lowercase)
+    or a greek letter represented as a single word.
+    """
+
+    description = 'A string representing an algebraic identifier.'
+    default_value = 'x'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': expression_parser.VALID_ALGEBRAIC_IDENTIFIERS
+    }
+
+
+class MathEquation(BaseObject):
+    """Class for math equations. Stores a unicode string representing a
+    valid math equation.
+    """
+
+    description = 'A unicode string for a math equation.'
+    default_value = ''
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_math_equation'
+        }]
+    }
+
+
+class NumericExpression(BaseObject):
+    """Class for numeric expressions. Stores a unicode string representing a
+    valid numeric expression.
+    """
+
+    description = 'A unicode string for an numeric expression.'
+    default_value = ''
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_math_expression',
+            'algebraic': False
+        }]
+    }
+
+
+class PositionOfTerms(BaseObject):
+    """Class for position of terms. Denotes the position of terms relative to
+    the equals sign in a math equation.
+    """
+
+    description = (
+        'The position of terms relative to the equals sign in a math equation.')
+    default_value = 'both'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': ['lhs', 'rhs', 'both', 'irrelevant']
+    }

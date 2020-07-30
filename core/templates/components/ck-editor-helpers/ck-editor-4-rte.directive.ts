@@ -17,12 +17,24 @@
  */
 
 require('third-party-imports/ckeditor.import.ts');
+
+require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
+interface UiConfig {
+  (): UiConfig;
+  'hide_complex_extensions': boolean;
+  'startupFocusEnabled'?: boolean;
+}
+
+interface CkeditorCustomScope extends ng.IScope {
+  uiConfig: UiConfig;
+}
+
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService',
-  function(ContextService, RteHelperService) {
+  'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
+  function(CkEditorCopyContentService, ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {
@@ -34,7 +46,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
                 '</div></div>',
       require: '?ngModel',
 
-      link: function(scope: ICustomScope, el, attr, ngModel) {
+      link: function(scope: CkeditorCustomScope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
@@ -89,7 +101,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
                                        inlineWrapperRule +
                                        blockWrapperRule +
                                        blockOverlayRule;
-
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
         }).join(',');
@@ -259,6 +270,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
           // Clean up CKEditor instance when directive is removed.
           ck.destroy();
         });
+
+        CkEditorCopyContentService.bindPasteHandler(ck);
       }
     };
   }

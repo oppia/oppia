@@ -50,7 +50,7 @@ describe('Factory for Change domain objects', () => {
       backendChangeObject, applyFunc, reverseFunc);
 
     const fakeDomainObject = {
-      domain_property_name: 'fake value'
+      property_name: 'fake value'
     };
     changeDomainObject.applyChange(fakeDomainObject);
 
@@ -70,7 +70,7 @@ describe('Factory for Change domain objects', () => {
       backendChangeObject, applyFunc, reverseFunc);
 
     const fakeDomainObject = {
-      domain_property_name: 'fake value'
+      property_name: 'fake value'
     };
     changeDomainObject.reverseChange(fakeDomainObject);
 

@@ -194,7 +194,6 @@
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Pošalji i počni doprinositi",
 	"I18N_SIGNUP_CLOSE_BUTTON": "Zatvori",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Upišite korisničko ime.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Korisničko ime smije imati najviše 50 znakova.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Korisničko ime je nedostupno.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Ovo polje je obavezno.",
 	"I18N_SIGNUP_LOADING": "Učitavam",

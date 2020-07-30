@@ -812,14 +812,20 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            r'unsupported operand type\(s\) for \+=: \'NoneType\' and \'int\''):
             stats_services.get_exp_issues_from_model(exp_issues_model)
 
     def test_actual_update_exp_issue_from_model_raises_error(self):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _convert_issue_v1_dict_to_v2_dict\(\) method is missing from '
+            r'the derived class. It should be implemented in the '
+            r'derived class.'):
             stats_domain.ExplorationIssue.update_exp_issue_from_model(
                 exp_issue_dict)
 
@@ -997,14 +1003,20 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            r'unsupported operand type\(s\) for \+=: \'NoneType\' and \'int\''):
             stats_services.get_playthrough_from_model(playthrough_model)
 
     def test_actual_update_learner_action_from_model_raises_error(self):
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
         learner_action_dict = learner_action.to_dict()
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _convert_action_v1_dict_to_v2_dict\(\) method is missing from'
+            r' the derived class. It should be implemented in the '
+            r'derived class.'):
             stats_domain.LearnerAction.update_learner_action_from_model(
                 learner_action_dict)
 
@@ -1507,6 +1519,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
     """Tests CategorizedAnswerFrequencyLists for basic domain object
     operations.
     """
+
     ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
     ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
     ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)

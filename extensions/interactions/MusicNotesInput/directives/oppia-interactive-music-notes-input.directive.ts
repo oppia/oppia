@@ -33,6 +33,45 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/html-escaper.service.ts');
 
+interface MusicNote {
+  baseNoteMidiNumber: number;
+  offset: number;
+  noteId: string;
+  noteStart: {
+    num: number;
+    den: number;
+  };
+}
+
+interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
+  CONTAINER_HEIGHT?: number;
+  CONTAINER_WIDTH?: number;
+  HORIZONTAL_GRID_SPACING?: number;
+  SOUNDFONT_URL?: string;
+  VERTICAL_GRID_SPACING?: number;
+  _addNoteToNoteSequence?: ((note: MusicNote) => void);
+  _currentNoteId?: number;
+  _removeNotesFromNoteSequenceWithId?: ((noteId: string) => void);
+  _sortNoteSequence?: (() => void);
+  clearSequence?: (() => void);
+  generateNoteId?: (() => string);
+  getLastAnswer?: (() => string);
+  init?: (() => void);
+  initialSequence?: string;
+  interactionIsActive?: boolean;
+  noteSequence?: {
+    note: MusicNote
+  }[];
+  playCurrentSequence?: (() => void);
+  playSequenceToGuess?: (() => void);
+  reinitStaff?: (() => void);
+  sequenceToGuess?: Array<Object>;
+  staffBottom?: number;
+  staffTop?: number;
+  submitAnswer?: (() => void);
+  topPositionForCenterOfTopStaffLine?: number;
+}
+
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   '$timeout', 'AlertsService', 'CurrentInteractionService',
   'HtmlEscaperService', 'MusicNotesInputRulesService',
@@ -49,7 +88,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         getLastAnswer: '&lastAnswer',
       },
       template: require('./music-notes-input-interaction.directive.html'),
-      link: function(scope: ICustomScope, element, attrs) {
+      link: function(
+          scope: InteractiveMusicNotesInputCustomScope, element, attrs) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
         // details.
@@ -189,14 +229,17 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // start of the exploration and can be removed by the learner.
         var initializeNoteSequence = function(initialNotesToAdd) {
           for (var i = 0; i < initialNotesToAdd.length; i++) {
-            var initialNote = _convertReadableNoteToNote(initialNotesToAdd[i]);
-            initialNote = Object.assign(initialNote, {
+            var { baseNoteMidiNumber, offset } = (
+              _convertReadableNoteToNote(initialNotesToAdd[i]));
+            var initialNote = {
+              baseNoteMidiNumber: baseNoteMidiNumber,
+              offset: offset,
               noteId: scope.generateNoteId(),
               noteStart: {
                 num: i,
                 den: 1
               }
-            });
+            };
             scope._addNoteToNoteSequence(initialNote);
           }
         };
@@ -519,7 +562,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // If a note position is taken, return true,
-        // otherwise the position is available
+        // otherwise the position is available.
         var checkIfNotePositionTaken = function(leftPos) {
           if (getNoteStartFromLeftPos(leftPos)) {
             var newNoteToCheck = getNoteStartFromLeftPos(leftPos);
@@ -718,7 +761,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // For each note in a sequence, add a noteDuration property.
-        // TODO(wagnerdmike): - add more options for note durations.
+        // TODO(wagnerdmike): - Add more options for note durations.
         var _makeAllNotesHaveDurationOne = function(noteArray) {
           for (var i = 0; i < noteArray.length; i++) {
             noteArray[i].noteDuration = {
@@ -805,7 +848,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(wagnerdmike): - add chord functionality.
+        // TODO(wagnerdmike): - Add chord functionality.
         var convertSequenceToGuessToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {
@@ -819,7 +862,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(wagnerdmike): - add chord functionality.
+        // TODO(wagnerdmike): - Add chord functionality.
         var convertNoteSequenceToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {

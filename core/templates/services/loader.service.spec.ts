@@ -25,7 +25,7 @@ describe('Loader Service', () => {
   let subscriptions: Subscription;
   beforeEach(() => {
     subscriptions = new Subscription();
-    subscriptions.add(loaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.add(loaderService.onLoadingMessageChange.subscribe(
       (message) => loadingMessage = message
     ));
   });

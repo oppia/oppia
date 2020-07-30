@@ -222,9 +222,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID
-        )
+            self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.story.add_node(self.NODE_ID_2, 'Node title 2')
         self.story.update_node_destination_node_ids(
@@ -313,7 +311,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'id': self.STORY_ID,
             'title': 'Title',
             'description': 'Description',
-            'node_count': 0
+            'node_titles': [],
+            'thumbnail_bg_color': None,
+            'thumbnail_filename': None
         }
 
         self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
@@ -324,13 +324,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', topic_id)
+            self.STORY_ID, 'Title', 'Description', topic_id)
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'description': feconf.DEFAULT_STORY_DESCRIPTION,
+            'description': 'Description',
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
                 'nodes': [],
@@ -930,8 +930,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_3)
         ]
-        self._assert_validation_error(
-            'The node with id node_3 is disconnected from the story graph.')
 
         # Case 4: Graph with duplicate nodes.
         node_1 = {
@@ -1100,6 +1098,153 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         ]
         self.story.validate()
 
+    def test_rearrange_node_in_story_fail_with_invalid_from_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.story.rearrange_node_in_story(None, 2)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received a'):
+            self.story.rearrange_node_in_story('a', 2)
+
+    def test_rearrange_node_in_story_fail_with_invalid_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.story.rearrange_node_in_story(1, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received a'):
+            self.story.rearrange_node_in_story(1, 'a')
+
+    def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(self):
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1', 'skill_0'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_4', 'node_3'],
+            'acquired_skill_ids': ['skill_3', 'skill_4'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2)
+        ]
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(10, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(-1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(0, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.story.rearrange_node_in_story(0, -1)
+
+    def test_rearrange_node_in_story_fail_with_identical_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index and to_index values to be '
+                       'different.'):
+            self.story.rearrange_node_in_story(1, 1)
+
+    def test_rearrange_node_in_story(self):
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1', 'skill_0'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_4', 'node_3'],
+            'acquired_skill_ids': ['skill_3', 'skill_4'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': ['skill_4'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+
+        nodes = self.story.story_contents.nodes
+
+        self.assertEqual(nodes[0].id, 'node_1')
+        self.assertEqual(nodes[1].id, 'node_2')
+        self.assertEqual(nodes[2].id, 'node_3')
+
+        self.story.rearrange_node_in_story(1, 0)
+        self.assertEqual(nodes[0].id, 'node_2')
+        self.assertEqual(nodes[1].id, 'node_1')
+        self.assertEqual(nodes[2].id, 'node_3')
+
+        self.story.rearrange_node_in_story(2, 1)
+        self.assertEqual(nodes[0].id, 'node_2')
+        self.assertEqual(nodes[1].id, 'node_3')
+        self.assertEqual(nodes[2].id, 'node_1')
+
+        self.story.rearrange_node_in_story(2, 0)
+        self.assertEqual(nodes[0].id, 'node_1')
+        self.assertEqual(nodes[1].id, 'node_2')
+        self.assertEqual(nodes[2].id, 'node_3')
+
     def test_story_contents_export_import(self):
         """Test that to_dict and from_dict preserve all data within a
         story_contents object.
@@ -1163,8 +1308,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_story_summary_creation(self):
         curr_time = datetime.datetime.utcnow()
         story_summary = story_domain.StorySummary(
-            'story_id', 'title', 'description', 'en', 1, 1, curr_time,
-            curr_time)
+            'story_id', 'title', 'description', 'en', 1, ['Title 1'], '#F8BF74',
+            'image.svg', curr_time, curr_time)
 
         expected_dict = {
             'id': 'story_id',
@@ -1172,7 +1317,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'description': 'description',
             'language_code': 'en',
             'version': 1,
-            'node_count': 1,
+            'node_titles': ['Title 1'],
+            'thumbnail_bg_color': '#F8BF74',
+            'thumbnail_filename': 'image.svg',
             'story_model_created_on': utils.get_time_in_millisecs(curr_time),
             'story_model_last_updated': utils.get_time_in_millisecs(curr_time),
         }
@@ -1192,18 +1339,51 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'story_model_last_updated': time_in_millisecs,
             'description': 'description',
             'title': 'title',
-            'node_count': 10,
+            'node_titles': ['Title 1', 'Title 2'],
+            'thumbnail_bg_color': '#F8BF74',
+            'thumbnail_filename': 'image.svg',
             'language_code': 'en',
             'id': 'story_id'
         }
 
         self.story_summary = story_domain.StorySummary(
-            'story_id', 'title', 'description', 'en', 1, 10,
-            current_time, current_time)
+            'story_id', 'title', 'description', 'en', 1, ['Title 1', 'Title 2'],
+            '#F8BF74', 'image.svg', current_time, current_time)
 
     def test_story_summary_gets_created(self):
         self.assertEqual(
             self.story_summary.to_dict(), self.story_summary_dict)
+
+    def _assert_validation_error(self, expected_error_substring):
+        """Checks that the story summary passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.story_summary.validate()
+
+    def test_thumbnail_filename_validation(self):
+        self.story_summary.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received')
+
+    def test_thumbnail_bg_validation(self):
+        self.story_summary.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Story thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.story_summary.thumbnail_bg_color = '#F8BF74'
+        self.story_summary.thumbnail_filename = None
+        self._assert_validation_error(
+            'Story thumbnail image is not provided.')
+        self.story_summary.thumbnail_bg_color = None
+        self.story_summary.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Story thumbnail background color is not specified.')
 
     def test_validation_passes_with_valid_properties(self):
         self.story_summary.validate()
@@ -1227,19 +1407,17 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'Expected description to be a string, received 0'):
             self.story_summary.validate()
 
-    def test_validation_fails_with_invalid_node_count(self):
-        self.story_summary.node_count = '10'
+    def test_validation_fails_with_invalid_node_titles(self):
+        self.story_summary.node_titles = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected node_count to be an int, received \'10\''):
+            'Expected node_titles to be a list, received \'10\''):
             self.story_summary.validate()
 
-    def test_validation_fails_with_negative_node_count(self):
-        self.story_summary.node_count = -1
+        self.story_summary.node_titles = [5]
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected node_count to be non-negative, '
-                'received \'-1\'')):
+            utils.ValidationError,
+            'Expected each chapter title to be a string, received 5'):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):

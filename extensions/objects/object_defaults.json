@@ -41,5 +41,10 @@
         "denominator": 1
       },
       "units": []
-    }
+    },
+    "AlgebraicExpression": "",
+    "NumericExpression": "",
+    "AlgebraicIdentifier": "x",
+    "MathEquation": "",
+    "PositionOfTerms": "both"
 }

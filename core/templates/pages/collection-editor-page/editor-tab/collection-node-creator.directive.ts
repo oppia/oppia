@@ -16,7 +16,7 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/collection/collection-node-object.factory.ts');
 require('domain/collection/collection-update.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
 require('domain/summary/exploration-summary-backend-api.service.ts');
@@ -65,14 +65,13 @@ angular.module('oppia').directive('collectionNodeCreator', [
               ctrl.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
                 searchQuery
-              ).then(function(explorationMetadata) {
+              ).then(function(explorationMetadataList) {
                 var options = [];
-                explorationMetadata.getMetadataList().
-                  map(function(item) {
-                    if (!ctrl.collection.containsCollectionNode(item.id)) {
-                      options.push(item.title + ' (' + item.id + ')');
-                    }
-                  });
+                explorationMetadataList.map(function(item) {
+                  if (!ctrl.collection.containsCollectionNode(item.id)) {
+                    options.push(item.title + ' (' + item.id + ')');
+                  }
+                });
                 return options;
               }, function() {
                 AlertsService.addWarning(
@@ -155,7 +154,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
               title: title
             }).then(function(response) {
               ctrl.newExplorationTitle = '';
-              var newExplorationId = response.data.explorationId;
+              var newExplorationId = response.data.exploration_id;
 
               SiteAnalyticsService
                 .registerCreateNewExplorationInCollectionEvent(

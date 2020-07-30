@@ -22,19 +22,16 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface IAnswerStatsBackendDict {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'answer' is a dict with underscore_cased keys which gives
-  // tslint errors against underscore_casing in favor of camelCasing.
-  answer: any;
+import { InteractionAnswer } from
+  'interactions/answer-defs';
+
+export interface AnswerStatsBackendDict {
+  answer: InteractionAnswer;
   frequency: number;
 }
 
 export class AnswerStats {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'answer' is a dict with underscore_cased keys which gives
-  // tslint errors against underscore_casing in favor of camelCasing.
-  answer: any;
+  answer: InteractionAnswer;
   answerHtml: string;
   frequency: number;
   isAddressed: boolean;
@@ -48,7 +45,7 @@ export class AnswerStats {
    *    associated state's answer groups.
    */
   constructor(
-      answer: any, answerHtml: string, frequency: number,
+      answer: InteractionAnswer, answerHtml: string, frequency: number,
       isAddressed: boolean) {
     /** @type {*} */
     this.answer = cloneDeep(answer);
@@ -81,7 +78,7 @@ export class AnswerStats {
   }
 
   /** @returns {answer, frequency: number} */
-  toBackendDict(): IAnswerStatsBackendDict {
+  toBackendDict(): AnswerStatsBackendDict {
     return {
       answer: cloneDeep(this.answer),
       frequency: this.frequency
@@ -103,7 +100,7 @@ export class AnswerStatsObjectFactory {
    * @returns {AnswerStats}
    */
   createFromBackendDict(
-      backendDict: IAnswerStatsBackendDict): AnswerStats {
+      backendDict: AnswerStatsBackendDict): AnswerStats {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string') ?

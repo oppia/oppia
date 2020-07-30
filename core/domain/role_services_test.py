@@ -27,6 +27,7 @@ import python_utils
 
 class RoleDomainUnitTests(test_utils.GenericTestBase):
     """Tests for PARENT_ROLES and ROLE_ACTIONS."""
+
     PARENT_ROLES = role_services.PARENT_ROLES
     ACTIONS = role_services.ROLE_ACTIONS
 
@@ -113,6 +114,7 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
             set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_COLLECTION_EDITOR]))
 
         # Sets are compared as their element order don't need to be same.
-        self.assertEqual(set(collection_editor_actions),
-                         set(role_services.get_all_actions(
-                             feconf.ROLE_ID_COLLECTION_EDITOR)))
+        self.assertEqual(
+            set(collection_editor_actions),
+            set(role_services.get_all_actions(
+                feconf.ROLE_ID_COLLECTION_EDITOR)))

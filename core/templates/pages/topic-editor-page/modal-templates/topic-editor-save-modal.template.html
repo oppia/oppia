@@ -12,7 +12,7 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
-  <button class="btn btn-success protractor-test-close-save-modal-button" ng-disabled="!commitMessage" ng-click="save(commitMessage)">
+  <button class="btn btn-success protractor-test-close-save-modal-button" ng-disabled="!commitMessage" ng-click="confirm(commitMessage)">
     <span ng-if="!isTopicPublished">Save Draft</span>
     <span ng-if="isTopicPublished">Publish Changes</span>
   </button>

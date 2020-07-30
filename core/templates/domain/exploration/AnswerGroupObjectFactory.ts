@@ -20,22 +20,26 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Outcome, OutcomeObjectFactory } from
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
+import { Rule, RuleBackendDict, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
+
+export interface AnswerGroupBackendDict {
+  'rule_specs': RuleBackendDict[];
+  'outcome': OutcomeBackendDict;
+  'training_data': InteractionAnswer;
+  'tagged_skill_misconception_id': string;
+}
 
 export class AnswerGroup {
   rules: Rule[];
   outcome: Outcome;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'trainingData' is an array of dicts with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  trainingData: any;
+  trainingData: InteractionAnswer;
   taggedSkillMisconceptionId: string;
   constructor(
-      rules: Rule[], outcome: Outcome, trainingData: any,
+      rules: Rule[], outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string) {
     this.rules = rules;
     this.outcome = outcome;
@@ -43,10 +47,7 @@ export class AnswerGroup {
     this.taggedSkillMisconceptionId = taggedSkillMisconceptionId;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): AnswerGroupBackendDict {
     return {
       rule_specs: this.rules.map((rule: Rule) => {
         return rule.toBackendDict();
@@ -66,30 +67,19 @@ export class AnswerGroupObjectFactory {
     private outcomeObjectFactory: OutcomeObjectFactory,
     private ruleObjectFactory: RuleObjectFactory) {}
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'ruleBackendDicts' is a complex object with elements as keys
-  // having varying types. An exact type needs tobe found.
-  generateRulesFromBackend(ruleBackendDicts: any) {
-    return ruleBackendDicts.map((ruleBackendDict: any) => {
-      return this.ruleObjectFactory.createFromBackendDict(ruleBackendDict);
-    });
+  generateRulesFromBackend(ruleBackendDicts: RuleBackendDict[]): Rule[] {
+    return ruleBackendDicts.map(this.ruleObjectFactory.createFromBackendDict);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'trainingData' is an array of dicts with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   createNew(
-      rules: Rule[], outcome: Outcome, trainingData: any,
+      rules: Rule[], outcome: Outcome, trainingData: InteractionAnswer,
       taggedSkillMisconceptionId: string): AnswerGroup {
     return new AnswerGroup(
       rules, outcome, trainingData, taggedSkillMisconceptionId);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'answerGroupBackendDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(answerGroupBackendDict: any): AnswerGroup {
+  createFromBackendDict(
+      answerGroupBackendDict: AnswerGroupBackendDict): AnswerGroup {
     return new AnswerGroup(
       this.generateRulesFromBackend(answerGroupBackendDict.rule_specs),
       this.outcomeObjectFactory.createFromBackendDict(

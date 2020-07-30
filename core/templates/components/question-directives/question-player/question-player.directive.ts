@@ -18,6 +18,9 @@
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
@@ -78,17 +81,23 @@ require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/question-directives/question-player/' +
   'question-player.constants.ajs.ts');
+require(
+  'components/question-directives/question-player/' +
+  'question-player-concept-card-modal.controller.ts');
+require(
+  'components/question-directives/question-player/' +
+  'skill-mastery-modal.controller.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('components/concept-card/concept-card.directive.ts');
-require('components/skill-mastery/skill-mastery.directive.ts');
+require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -180,8 +189,15 @@ angular.module('oppia').directive('questionPlayer', [
           ctrl.getActionButtonIconHtml = function(actionButtonType) {
             var iconHtml = '';
             if (actionButtonType === 'BOOST_SCORE') {
-              iconHtml = '<img class="action-button-icon" src="' +
-              getStaticImageUrl('/icons/rocket@2x.png') + '"/>';
+              iconHtml = `<picture>
+              <source type="image/webp" 
+              srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
+              <source type="image/png" 
+              srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
+              <img alt=""
+                   class="action-button-icon" 
+                   src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
+              </picture>`;
             } else if (actionButtonType === 'RETRY_SESSION') {
               iconHtml = '<i class="material-icons md-36 ' +
               'action-button-icon">&#xE5D5</i>';
@@ -230,39 +246,15 @@ angular.module('oppia').directive('questionPlayer', [
                 '/components/concept-card/concept-card-modal.template.html'
               ),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', '$window',
-                'UrlService',
-                function(
-                    $scope, $uibModalInstance, $window,
-                    UrlService) {
-                  $scope.skillIds = skillIds;
-                  $scope.skills = skills;
-                  $scope.index = 0;
-                  $scope.modalHeader = $scope.skills[$scope.index];
-                  $scope.isInTestMode = true;
-
-                  $scope.isLastConceptCard = function() {
-                    return $scope.index === $scope.skills.length - 1;
-                  };
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.goToNextConceptCard = function() {
-                    $scope.index++;
-                    $scope.modalHeader = $scope.skills[$scope.index];
-                  };
-
-                  $scope.retryTest = function() {
-                    $window.location.replace(UrlService.getPathname());
-                  };
-                }
-              ]
+              resolve: {
+                skills: () => skills,
+                skillIds: () => skillIds,
+              },
+              controller: 'QuestionPlayerConceptCardModalController'
             }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -378,14 +370,14 @@ angular.module('oppia').directive('questionPlayer', [
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {
-                // If questionScore goes negative, set it to 0
+                // If questionScore goes negative, set it to 0.
                 questionScore = Math.max(
                   0, questionScore - totalHintsPenalty - wrongAnswerPenalty);
               }
-              // Calculate total score
+              // Calculate total score.
               ctrl.totalScore += questionScore;
 
-              // Calculate scores per skill
+              // Calculate scores per skill.
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }
@@ -520,33 +512,23 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           ctrl.openSkillMasteryModal = function(skillId) {
+            var masteryPerSkillMapping = ctrl.masteryPerSkillMapping;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/question-player/' +
                 'skill-mastery-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.skillId = skillId;
-                  $scope.userIsLoggedIn = ctrl.userIsLoggedIn;
-                  if ($scope.userIsLoggedIn) {
-                    $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
-                  }
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.openConceptCardModal = function(skillId) {
-                    openConceptCardModal([skillId]);
-                  };
-                }
-              ]
+              resolve: {
+                masteryPerSkillMapping: () => masteryPerSkillMapping,
+                openConceptCardModal: () => openConceptCardModal,
+                skillId: () => skillId,
+                userIsLoggedIn: () => ctrl.userIsLoggedIn,
+              },
+              controller: 'SkillMasteryModalController'
             }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

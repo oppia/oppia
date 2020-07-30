@@ -161,8 +161,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
             states_schema_version if necessary.
 
     Returns:
-       Exploration. The exploration domain object corresponding to the given
-       exploration model.
+        Exploration. The exploration domain object corresponding to the given
+        exploration model.
     """
 
     # Ensure the original exploration model does not get altered.
@@ -347,7 +347,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
     Raises:
         ValueError: When strict is True and at least one of the given exp_ids
-        is invalid.
+            is invalid.
     """
     exp_ids = set(exp_ids)
     result = {}
@@ -371,8 +371,9 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             exploration = get_exploration_from_model(model)
             db_results_dict[eid] = exploration
         else:
-            logging.info('Tried to fetch exploration with id %s, but no such '
-                         'exploration exists in the datastore' % eid)
+            logging.info(
+                'Tried to fetch exploration with id %s, but no such '
+                'exploration exists in the datastore' % eid)
             not_found.append(eid)
 
     if strict and not_found:

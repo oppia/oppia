@@ -21,8 +21,10 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { DragAndDropSortInputCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -36,11 +38,8 @@ export class DragAndDropSortInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: DragAndDropSortInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -86,13 +85,10 @@ export class DragAndDropSortInputValidationService {
     return warningsList;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: DragAndDropSortInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
     var seenItems = [];
     var ranges = [];
@@ -129,8 +125,9 @@ export class DragAndDropSortInputValidationService {
         var inputs = rules[j].inputs;
         var rule = rules[j];
         if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
-          for (var i = 0; i < rule.inputs.x.length; i++) {
-            if (rule.inputs.x[i].length > 1) {
+          var xInputs = <string[][]>inputs.x;
+          for (var k = 0; k < xInputs.length; k++) {
+            if (xInputs[k].length > 1) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Multiple items in a single position are not allowed.'
@@ -148,25 +145,56 @@ export class DragAndDropSortInputValidationService {
         areAnyItemsDuplicated = false;
 
         switch (rule.type) {
+          case 'HasElementXAtPositionY':
+            if (!customizationArgs.choices.value.includes(<string>inputs.x)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'contains a choice that does not match any of ' +
+                  'the choices in the customization arguments.')
+              });
+            }
+            if (inputs.y > customizationArgs.choices.value.length) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'refers to an invalid choice position.')
+              });
+            }
+            break;
           case 'HasElementXBeforeElementY':
             if (inputs.x === inputs.y) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because both the ' +
-                  'selected elements are same.')
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'will never be matched because both the selected ' +
+                  'elements are same.')
+              });
+            }
+            if (
+              !customizationArgs.choices.value.includes(<string>inputs.x) ||
+              !customizationArgs.choices.value.includes(<string>inputs.y)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'contains choices that do not match any of ' +
+                  'the choices in the customization arguments.')
               });
             }
             break;
           case 'IsEqualToOrdering':
           case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
-            for (var k = 0; k < inputs.x.length; k++) {
+            var xInputs = <string[][]>inputs.x;
+            for (var k = 0; k < xInputs.length; k++) {
               if (inputs.x[k].length === 0) {
                 areAnyItemsEmpty = true;
               } else {
-                for (var l = 0; l < inputs.x[k].length; l++) {
-                  var item = inputs.x[k][l];
+                for (var l = 0; l < xInputs[k].length; l++) {
+                  var item = xInputs[k][l];
                   if (item.trim().length === 0) {
                     areAnyItemsEmpty = true;
                   }
@@ -178,10 +206,11 @@ export class DragAndDropSortInputValidationService {
               }
             }
 
-            if (areAnyItemsEmpty) {
+            if (areAnyItemsEmpty || xInputs.length === 0) {
+              var message = areAnyItemsEmpty ? 'the items are' : 'the list is';
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are nonempty.'
+                message: `Please ensure ${message} nonempty.`
               });
             }
 
@@ -189,6 +218,33 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Please ensure the items are unique.'
+              });
+            }
+
+            if (!customizationArgs.allowMultipleItemsInSamePosition.value &&
+                rule.type === (
+                  'IsEqualToOrderingWithOneItemAtIncorrectPosition')) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                  (i + 1) + ' will never be matched because there will be ' +
+                  'at least 2 elements at incorrect positions if multiple ' +
+                  'elements cannot occupy the same position.')
+              });
+            }
+            var sortedCustomArgsChoices = (
+              customizationArgs.choices.value.sort());
+            var flattenedAndSortedXInputs = (
+              xInputs.reduce((acc, val) => acc.concat(val), []).sort());
+            if (
+              !angular.equals(
+                sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'options do not match customization argument choices.')
               });
             }
             break;
@@ -205,11 +261,10 @@ export class DragAndDropSortInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
-                  '.')
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'will never be matched because it is made redundant by ' +
+                  `rule ${ranges[k].ruleIndex} from answer group ` +
+                  `${ranges[k].answerGroupIndex}.`)
               });
             }
           }

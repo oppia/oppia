@@ -20,38 +20,39 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = function(interactionEditor, graphDict) {
+var customizeInteraction = async function(interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
     '.protractor-test-graph-input-viz-container'));
   if (graphDict) {
-    forms.GraphEditor(graphInputContainer).clearDefaultGraph();
-    forms.GraphEditor(graphInputContainer).setValue(graphDict);
+    await forms.GraphEditor(graphInputContainer).clearDefaultGraph();
+    await forms.GraphEditor(graphInputContainer).setValue(graphDict);
   }
 };
 
-var expectInteractionDetailsToMatch = function(interactionEditor, graphDict) {
+var expectInteractionDetailsToMatch = async function(
+    interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
     '.protractor-test-graph-input-viz-container'));
   if (graphDict) {
-    forms.GraphEditor(graphInputContainer)
+    await forms.GraphEditor(graphInputContainer)
       .expectCurrentGraphToBe(graphDict);
   }
 };
 
-var submitAnswer = function(conversationInput, graphDict) {
+var submitAnswer = async function(conversationInput, graphDict) {
   // Assuming graph container is empty or already has the necessary nodes to
   // draw edges on. Otherwise, should allow user to add nodes before creating
   // new nodes.
   var graphInputContainer = conversationInput.element(by.css(
     '.protractor-test-graph-input-viz-container'));
   if (graphDict) {
-    forms.GraphEditor(graphInputContainer).setValue(graphDict);
+    await forms.GraphEditor(graphInputContainer).setValue(graphDict);
   }
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
-  waitFor.elementToBeClickable(
+  await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');
-  submitAnswerButton.click();
+  await submitAnswerButton.click();
 };
 
 var answerObjectType = 'Graph';

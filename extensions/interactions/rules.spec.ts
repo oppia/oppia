@@ -34,28 +34,36 @@ import { LogicProofRulesService } from
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 /* eslint-disable max-len */
+import { AlgebraicExpressionInputRulesService } from
+  'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { DragAndDropSortInputRulesService } from
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { MathEquationInputRulesService } from
+  'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { NumericExpressionInputRulesService } from
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { ImageClickAnswer, MathExpressionAnswer } from './answer-defs';
+import { ImageClickRuleInputs, MathExpressionRuleInputs } from './rule-input-defs';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
   var rulesServices = {};
-  var ruleTemplates;
+  var ruleTemplates: RuleTemplates;
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -63,12 +71,17 @@ describe('Rule spec services', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
+    $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
+    $provide.value('AlgebraicExpressionInputRulesService',
+      new AlgebraicExpressionInputRulesService());
     $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());
+    $provide.value('MathEquationInputRulesService',
+      new MathEquationInputRulesService());
     $provide.value(
       'MultipleChoiceInputRulesService', new MultipleChoiceInputRulesService());
     $provide.value('NumericInputRulesService', new NumericInputRulesService());
@@ -85,6 +98,8 @@ describe('Rule spec services', function() {
         new NumberWithUnitsObjectFactory(
           new UnitsObjectFactory(), new FractionObjectFactory(),
         ), new UtilsService()));
+    $provide.value('NumericExpressionInputRulesService',
+      new NumericExpressionInputRulesService());
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
         new FractionObjectFactory(), new UtilsService()));
@@ -100,18 +115,14 @@ describe('Rule spec services', function() {
     $provide.value('ContinueRulesService', {});
     $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
-      // TODO(#7165): Replace 'any' with the exact type. This has been
-      // typed as 'any' since 'answer' is a complex object having varying types.
-      // A general type needs to be found. Same goes for 'inputs'.
-      IsInRegion: function(answer: any, inputs: any) {
+      IsInRegion: function(
+          answer: ImageClickAnswer, inputs: ImageClickRuleInputs) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
     $provide.value('MathExpressionInputRulesService', {
-      // TODO(#7165): Replace 'any' with the exact type. This has been
-      // typed as 'any' since 'answer' is a complex object having varying types.
-      // A general type needs to be found. Same goes for 'inputs'.
-      IsMathematicallyEquivalentTo: function(answer: any, inputs: any) {
+      IsMathematicallyEquivalentTo: function(
+          answer: MathExpressionAnswer, inputs: MathExpressionRuleInputs) {
         return (
           MathExpression.fromLatex(answer.latex).equals(
             MathExpression.fromLatex(inputs.x)));

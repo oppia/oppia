@@ -45,7 +45,12 @@ fdescribe('Editable story backend API service', () => {
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });
+<<<<<<< HEAD
     // Sample story object returnable from the backend
+=======
+
+    // Sample story object returnable from the backend.
+>>>>>>> upstream/develop
     sampleDataResults = {
       story: {
         id: 'storyId',
@@ -163,6 +168,7 @@ fdescribe('Editable story backend API service', () => {
       var storyWrapper = {
         story: story
       };
+<<<<<<< HEAD
       // var req = httpTestingController.expectOne(
         // '/story_editor_handler/data/storyId');
       // expect(req.request.method).toEqual('PUT');
@@ -170,6 +176,15 @@ fdescribe('Editable story backend API service', () => {
       // flushMicrotasks();
       // Send a request to update a story
       editableStoryBackendApiService.updateStory(
+=======
+
+      $httpBackend.expect(
+        'PUT', '/story_editor_handler/data/storyId').respond(
+        storyWrapper);
+
+      // Send a request to update story.
+      EditableStoryBackendApiService.updateStory(
+>>>>>>> upstream/develop
         story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne(
@@ -211,6 +226,7 @@ fdescribe('Editable story backend API service', () => {
   it('should publish a story', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
+<<<<<<< HEAD
     // send a request to update story
     editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true).then(successHandler, failHandler);
@@ -219,6 +235,17 @@ fdescribe('Editable story backend API service', () => {
     expect(req.request.method).toEqual('PUT');
     req.flush(200);
     flushMicrotasks();
+=======
+
+    $httpBackend.expect(
+      'PUT', '/story_publish_handler/storyId').respond();
+
+    // Send a request to update story.
+    EditableStoryBackendApiService.changeStoryPublicationStatus(
+      'storyId', true
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
+>>>>>>> upstream/develop
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();

@@ -23,35 +23,49 @@ var SubscriptionDashboardPage = function() {
     by.css('.protractor-test-subscription-button'));
   var subscriptionName = element.all(
     by.css('.protractor-test-subscription-name'));
+  var subscribeLabel = element(by.css('.protractor-test-subscribe-label'));
+  var unsubscribeLabel = element(by.css('.protractor-test-unsubscribe-label'));
 
-  this.navigateToUserSubscriptionPage = function(userName) {
-    browser.get('/profile/' + userName);
-    return waitFor.pageToFullyLoad();
+  this.navigateToUserSubscriptionPage = async function(userName) {
+    await browser.get('/profile/' + userName);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectSubscriptionFirstNameToMatch = function(name) {
-    waitFor.visibilityOf(
-      subscriptionName.first(), 'First Subscriber Name is not visible');
-    expect(subscriptionName.first().getText()).toMatch(name);
+  this.expectSubscriptionFirstNameToMatch = async function(name) {
+    var firstSubscriberNameElem = await subscriptionName.first();
+    await waitFor.visibilityOf(
+      firstSubscriberNameElem, 'First Subscriber Name is not visible');
+    expect(await firstSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionLastNameToMatch = function(name) {
-    waitFor.visibilityOf(
-      subscriptionName.last(), 'Last Subscriber Name is not visible');
-    expect(subscriptionName.last().getText()).toMatch(name);
+  this.expectSubscriptionLastNameToMatch = async function(name) {
+    var lastSubscriberNameElem = await subscriptionName.last();
+    await waitFor.visibilityOf(
+      lastSubscriberNameElem, 'Last Subscriber Name is not visible');
+    expect(await lastSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionCountToEqual = function(value) {
-    waitFor.visibilityOf(
-      subscriptionName.first(),
+  this.expectSubscriptionCountToEqual = async function(value) {
+    await waitFor.visibilityOf(
+      await subscriptionName.first(),
       'Subscriber Name Card takes too long to appear');
-    expect(subscriptionName.count()).toEqual(value);
+    expect(await subscriptionName.count()).toEqual(value);
   };
 
-  this.navigateToSubscriptionButton = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToSubscriptionButton = async function() {
+    await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
-    subscriptionButton.click();
+    var subscribeButtonStatusBeforeClick = await subscriptionButton.getText();
+    await subscriptionButton.click();
+    if (subscribeButtonStatusBeforeClick === 'SUBSCRIBE') {
+      await waitFor.visibilityOf(
+        unsubscribeLabel,
+        'Unsubscribe button is not visible.');
+    } else {
+      await waitFor.visibilityOf(
+        subscribeLabel,
+        'Subscribe button is not visible.');
+    }
   };
 };
 

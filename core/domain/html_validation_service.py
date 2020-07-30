@@ -27,13 +27,11 @@ import bs4
 from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import image_services
 from core.domain import rte_component_registry
-from core.platform import models
-
+from extensions.objects.models import objects
 import feconf
 import python_utils
-
-gae_image_services = models.Registry.import_gae_image_services()
 
 
 def escape_html(unescaped_html_data):
@@ -702,7 +700,7 @@ def add_caption_attr_to_image(html_string):
 
     Returns:
         str. Updated HTML string with the caption attribute for all
-            oppia-noninteractive-image tags.
+        oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
@@ -724,7 +722,7 @@ def validate_customization_args(html_list):
 
     Returns:
         dict: Dictionary of all the invalid customisation args where
-            key is a Rich Text Component and value is the invalid html string.
+        key is a Rich Text Component and value is the invalid html string.
     """
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
@@ -833,7 +831,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
 
     Returns:
         str. Updated HTML string with the dimensions for all
-            oppia-noninteractive-image tags.
+        oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
@@ -871,7 +869,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
     filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))
-        height, width = gae_image_services.get_image_dimensions(content)
+        height, width = image_services.get_image_dimensions(content)
     except IOError:
         height = 120
         width = 120
@@ -907,6 +905,194 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         else:
             invalid_elements.append(element.name)
     return (invalid_elements, invalid_attrs)
+
+
+def check_for_math_component_in_html(html_string):
+    """Checks for existence of Math component tags inside an HTML string.
+
+    Args:
+        html_string: str. HTML string to check.
+
+    Returns:
+        str. Updated HTML string with all Math component tags having the new
+        attribute.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    math_tags = soup.findAll(name='oppia-noninteractive-math')
+    return bool(math_tags)
+
+
+def get_latex_strings_without_svg_from_html(html_string):
+    """Extract LaTeX strings from math rich-text components whose svg_filename
+    field is empty.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). List of unique LaTeX strings from math-tags without svg
+        filename.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    latex_strings = set()
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        raw_latex = (
+            objects.UnicodeString.normalize(math_content_dict['raw_latex']))
+        svg_filename = (
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+        if svg_filename == '':
+            latex_strings.add(raw_latex.encode('utf-8'))
+
+    unique_latex_strings = list(latex_strings)
+    return unique_latex_strings
+
+
+def extract_svg_filenames_in_math_rte_components(html_string):
+    """Extracts the svg_filenames from all the math-rich text components in
+    an HTML string.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of svg_filenames present in the HTML.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    filenames = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        math_content_dict = (
+            json.loads(unescape_html(
+                math_tag['math_content-with-value'])))
+        svg_filename = math_content_dict['svg_filename']
+        if svg_filename != '':
+            normalized_svg_filename = (
+                objects.UnicodeString.normalize(svg_filename))
+            filenames.append(normalized_svg_filename)
+    return filenames
+
+
+def add_math_content_to_math_rte_components(html_string):
+    """Replaces the attribute raw_latex-with-value in all Math component tags
+    with a new attribute math_content-with-value. The new attribute has an
+    additional field for storing SVG filenames. The field for SVG filename will
+    be an empty string.
+
+    Args:
+        html_string: str. HTML string to modify.
+
+    Returns:
+        str. Updated HTML string with all Math component tags having the new
+        attribute.
+    """
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        if math_tag.has_attr('raw_latex-with-value'):
+            try:
+                # The raw_latex attribute value should be enclosed in
+                # double quotes(&amp;quot;) and should be a valid unicode
+                # string.
+                raw_latex = (
+                    json.loads(unescape_html(math_tag['raw_latex-with-value'])))
+                normalized_raw_latex = (
+                    objects.UnicodeString.normalize(raw_latex))
+            except Exception as e:
+                error_message = (
+                    'Invalid raw_latex string found in the math tag : %s' % (
+                        python_utils.UNICODE(e)))
+                raise Exception(error_message)
+            math_content_dict = {
+                'raw_latex': normalized_raw_latex,
+                'svg_filename': ''
+            }
+            # Normalize and validate the value before adding to the math
+            # tag.
+            normalized_math_content_dict = (
+                objects.MathExpressionContent.normalize(math_content_dict))
+            # Add the new attribute math_expression_contents-with-value.
+            math_tag['math_content-with-value'] = (
+                escape_html(
+                    json.dumps(normalized_math_content_dict, sort_keys=True)))
+            # Delete the attribute raw_latex-with-value.
+            del math_tag['raw_latex-with-value']
+        elif math_tag.has_attr('math_content-with-value'):
+            pass
+        else:
+            raise Exception(
+                'Invalid math tag with no proper attribute found.')
+    # We need to replace the <br/> tags (if any) with  <br> because for passing
+    # the textangular migration tests we need to have only <br> tags.
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
+
+
+def validate_math_tags_in_html(html_string):
+    """Returns a list of all invalid math tags in the given HTML.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of invalid math tags in the HTML string.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    error_list = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        if math_tag.has_attr('raw_latex-with-value'):
+            try:
+                # The raw_latex attribute value should be enclosed in
+                # double quotes(&amp;quot;) and should be a valid unicode
+                # string.
+                raw_latex = (
+                    json.loads(unescape_html(math_tag['raw_latex-with-value'])))
+                objects.UnicodeString.normalize(raw_latex)
+            except Exception:
+                error_list.append(math_tag)
+        else:
+            error_list.append(math_tag)
+    return error_list
+
+
+def validate_math_tags_in_html_with_attribute_math_content(html_string):
+    """Returns a list of all invalid new schema math tags in the given HTML.
+    The old schema has the attribute raw_latex-with-value while the new schema
+    has the attribute math-content-with-value which includes a field for storing
+    reference to SVGs.
+
+    Args:
+        html_string: str. The HTML string.
+
+    Returns:
+        list(str). A list of invalid math tags in the HTML string.
+    """
+
+    soup = bs4.BeautifulSoup(
+        html_string.encode(encoding='utf-8'), 'html.parser')
+    error_list = []
+    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
+        if math_tag.has_attr('math_content-with-value'):
+            try:
+                math_content_dict = (
+                    json.loads(unescape_html(
+                        math_tag['math_content-with-value'])))
+                raw_latex = math_content_dict['raw_latex']
+                svg_filename = math_content_dict['svg_filename']
+                objects.UnicodeString.normalize(svg_filename)
+                objects.UnicodeString.normalize(raw_latex)
+            except Exception:
+                error_list.append(math_tag)
+        else:
+            error_list.append(math_tag)
+    return error_list
 
 
 def is_parsable_as_xml(xml_string):

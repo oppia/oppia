@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for QuestionSummaryObjectFactory.
  */
 
-import { QuestionSummaryObjectFactory } from
+import { QuestionSummaryBackendDict, QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 
 describe('Question summary object factory', () => {
   let questionSummaryObjectFactory: QuestionSummaryObjectFactory;
-  let summaryDict: any;
+  let summaryDict: QuestionSummaryBackendDict;
 
   beforeEach(() => {
     questionSummaryObjectFactory = new QuestionSummaryObjectFactory();

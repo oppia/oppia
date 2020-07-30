@@ -16,7 +16,45 @@
  * @fileoverview Directive for Alert Messages
  */
 
-require('services/alerts.service.ts');
+import { AlertsService, Message } from 'services/alerts.service';
+
+interface ToastrActionConfig {
+  allowHtml?: boolean;
+  closeButton?: boolean | string;
+  closeHtml?: string;
+  extendedTimeOut?: number;
+  extraData?: Object;
+  iconClass?: string;
+  messageClass?: string;
+  progressBar?: boolean;
+  tapToDismiss?: boolean;
+  templates?: string;
+  timeOut?: number;
+  titleClass?: string;
+  toastClass?: string;
+  onHidden?: Function;
+  onShown?: Function;
+  onTap?: Function;
+}
+
+interface ToastrAction {
+  (message: string, config?: ToastrActionConfig): void;
+  (message: string, heading: string, config?: ToastrActionConfig): void;
+}
+
+interface Toastr {
+  success: ToastrAction;
+  info: ToastrAction;
+  warning: ToastrAction;
+  error: ToastrAction;
+}
+
+interface AlertMessageCustomScope extends ng.IScope {
+  AlertsService: AlertsService
+  toastr: Toastr;
+
+  getMessage: () => Message;
+}
 
 angular.module('oppia').directive('alertMessage', [function() {
   return {
@@ -33,7 +71,7 @@ angular.module('oppia').directive('alertMessage', [function() {
         $scope.toastr = toastr;
       }
     ],
-    link: function(scope: ICustomScope) {
+    link: function(scope: AlertMessageCustomScope) {
       var message = scope.getMessage();
       if (message.type === 'info') {
         scope.toastr.info(message.content, {

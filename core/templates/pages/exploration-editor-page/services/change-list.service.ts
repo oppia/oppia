@@ -39,7 +39,7 @@ angular.module('oppia').factory('ChangeListService', [
     // undone change.
     var undoneChangeStack = [];
     var loadingMessage = '';
-    LoaderService.getLoadingMessageSubject().subscribe(
+    LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     );
     // All these constants should correspond to those in exp_domain.py.

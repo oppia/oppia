@@ -2,32 +2,33 @@
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Oppia | Free, Online and Interactive Lessons for Anyone"})
-    <link rel="prerender" href="/library">
+    <link rel="prerender" href="/community-library">
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <content>
-          <splash-page class="protractor-test-splash-page"></splash-page>
-        </content>
-      </base-content>
-    </div>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <content>
+            <splash-page class="protractor-test-splash-page"></splash-page>
+          </content>
+        </base-content>
+      </div>
 
-    <style>
-      @media (min-width: 608px) {
-        .oppia-splash-overlapping-image-1 {
-          margin-top: -105px;
+      <style>
+        @media (min-width: 608px) {
+          .oppia-splash-overlapping-image-1 {
+            margin-top: -105px;
+          }
         }
-      }
 
-      @media (max-width: 608px) {
-        .oppia-splash-overlapping-image-1 {
-          margin-top: -30px;
+        @media (max-width: 608px) {
+          .oppia-splash-overlapping-image-1 {
+            margin-top: -30px;
+          }
         }
-      }
-    </style>
+      </style>
 
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

@@ -25,10 +25,10 @@ from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
+import utils
 
-(base_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.feedback])
+(base_models, feedback_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.feedback, models.NAMES.user])
 
 CREATED_ON_FIELD = 'created_on'
 LAST_UPDATED_FIELD = 'last_updated'
@@ -43,6 +43,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
     ENTITY_ID = 'exp_id_2'
     USER_ID = 'user_1'
+    OLD_USER_1_ID = 'user_1_old'
+    NEW_USER_1_ID = 'user_1_new'
+    OLD_USER_2_ID = 'user_2_old'
+    NEW_USER_2_ID = 'user_2_new'
     STATUS = 'open'
     SUBJECT = 'dummy subject'
     HAS_SUGGESTION = True
@@ -52,6 +56,17 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(FeedbackThreadModelTest, self).setUp()
+
+        user_models.UserSettingsModel(
+            id=self.NEW_USER_1_ID,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.NEW_USER_2_ID,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
 
         self.feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
             id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
@@ -78,22 +93,6 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             feedback_models.GeneralFeedbackThreadModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.GeneralFeedbackThreadModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackThreadModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackThreadModel.original_author_id))
 
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
@@ -143,7 +142,8 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 'has_suggestion': self.HAS_SUGGESTION,
                 'summary': self.SUMMARY,
                 'message_count': self.MESSAGE_COUNT,
-                'last_updated': self.feedback_thread_model.last_updated
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    self.feedback_thread_model.last_updated)
             }
         }
         self.assertEqual(user_data, test_data)
@@ -176,22 +176,6 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             feedback_models.GeneralFeedbackMessageModel
             .has_reference_to_user_id('id_x'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.GeneralFeedbackMessageModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackMessageModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackMessageModel.author_id))
 
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
@@ -320,6 +304,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadUserModel class."""
+
     USER_ID_A = 'user.id.a'
     USER_ID_B = 'user_id_b'
     THREAD_ID_A = 'exploration.exp_id.thread_id_a'
@@ -361,12 +346,6 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             feedback_models.GeneralFeedbackThreadUserModel
             .has_reference_to_user_id('id_x'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.GeneralFeedbackThreadUserModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
@@ -497,12 +476,6 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
             feedback_models.FeedbackAnalyticsModel
             .has_reference_to_user_id('id_x'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.FeedbackAnalyticsModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
     """Tests for FeedbackMessageEmailDataModel class."""
@@ -520,12 +493,6 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             feedback_models.UnsentFeedbackEmailModel
             .has_reference_to_user_id('id_x'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            feedback_models.UnsentFeedbackEmailModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

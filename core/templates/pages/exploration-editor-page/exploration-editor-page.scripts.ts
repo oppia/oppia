@@ -21,14 +21,15 @@
 // main module the elements are attached to.
 require('pages/exploration-editor-page/exploration-editor-page.module.ts');
 require('App.ts');
+require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navbar-breadcrumb.directive.ts');
+  'editor-navbar-breadcrumb.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navigation.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
-require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
+require('pages/exploration-editor-page/exploration-editor-page.component.ts');

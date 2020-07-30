@@ -18,6 +18,9 @@
 
 require('directives/angular-html-bind.directive.ts');
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/question-difficulty-selector/' +
   'question-difficulty-selector.directive.ts');
 require(
@@ -27,25 +30,41 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.constants.ajs.ts');
 require(
+  'components/skill-selector/' +
+  'questions-list-select-skill-modal.controller.ts');
+require(
   'components/skill-selector/skill-selector.directive.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
+require(
+  'components/question-directives/modal-templates/' +
+  'change-question-difficulty-modal.controller.ts');
+require(
+  'components/question-directives/modal-templates/' +
+  'question-editor-modal.controller.ts');
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'questions-list-select-skill-and-difficulty-modal.controller.ts');
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
-require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
+require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/contextual/url.service.ts');
+require('services/image-local-storage.service.ts');
+require('services/question-validation.service.ts');
 
 angular.module('oppia').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -62,7 +81,9 @@ angular.module('oppia').directive('questionsList', [
         canEditQuestion: '&',
         getSkillIdToRubricsObject: '&skillIdToRubricsObject',
         getSelectedSkillId: '&selectedSkillId',
-        getGroupedSkillSummaries: '='
+        getGroupedSkillSummaries: '=',
+        getSkillsCategorizedByTopics: '=',
+        getUntriagedSkillSummaries: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-directives/questions-list/' +
@@ -70,24 +91,28 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
-        'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
-        'SkillBackendApiService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
-        'SkillSummaryObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
+        '$location', 'AlertsService', 'ContextService',
+        'EditableQuestionBackendApiService', 'ImageLocalStorageService',
+        'MisconceptionObjectFactory', 'QuestionCreationService',
+        'QuestionObjectFactory', 'QuestionsListService',
+        'QuestionUndoRedoService', 'SkillBackendApiService',
+        'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
+        'StateEditorService', 'UndoRedoService',
+        'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
-        'MODE_SELECT_SKILL', 'SKILL_DIFFICULTIES', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
+        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, QuestionCreationService, UrlService,
-            NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
-            SkillBackendApiService, MisconceptionObjectFactory,
-            QuestionObjectFactory, SkillDifficultyObjectFactory,
-            SkillSummaryObjectFactory, DEFAULT_SKILL_DIFFICULTY,
+            $location, AlertsService, ContextService,
+            EditableQuestionBackendApiService, ImageLocalStorageService,
+            MisconceptionObjectFactory, QuestionCreationService,
+            QuestionObjectFactory, QuestionsListService,
+            QuestionUndoRedoService, SkillBackendApiService,
+            SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
+            StateEditorService, UndoRedoService,
+            UrlService, DEFAULT_SKILL_DIFFICULTY,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
-            MODE_SELECT_SKILL, SKILL_DIFFICULTIES, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService, QuestionsListService) {
+            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
@@ -133,29 +158,30 @@ angular.module('oppia').directive('questionsList', [
             );
           };
 
-          ctrl.getDifficultyString = function(difficulty) {
-            if (difficulty === 0.3) {
-              return SKILL_DIFFICULTIES[0];
-            } else if (difficulty === 0.6) {
-              return SKILL_DIFFICULTIES[1];
-            } else {
-              return SKILL_DIFFICULTIES[2];
-            }
-          };
+          ctrl.getDifficultyString = (
+            QuestionCreationService.getDifficultyString);
 
           ctrl.saveAndPublishQuestion = function(commitMessage) {
-            var validationErrors = ctrl.question.validate(
-              ctrl.misconceptionsBySkill);
+            var validationErrors = ctrl.question.getValidationErrorMessage();
+            var unaddressedMisconceptions = (
+              ctrl.question.getUnaddressedMisconceptionNames(
+                ctrl.misconceptionsBySkill));
+            var unaddressedMisconceptionsErrorString = (
+              `Remaining misconceptions that need to be addressed: ${
+                unaddressedMisconceptions.join(', ')}`);
 
-            if (validationErrors) {
-              AlertsService.addWarning(validationErrors);
+            if (validationErrors || unaddressedMisconceptions.length) {
+              AlertsService.addWarning(
+                validationErrors || unaddressedMisconceptionsErrorString);
               return;
             }
             _reInitializeSelectedSkillIds();
             if (!ctrl.questionIsBeingUpdated) {
+              var imagesData = ImageLocalStorageService.getStoredImagesData();
+              ImageLocalStorageService.flushStoredImagesData();
               EditableQuestionBackendApiService.createQuestion(
                 ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
-                ctrl.question.toBackendDict(true)
+                ctrl.question.toBackendDict(true), imagesData
               ).then(function() {
                 QuestionsListService.resetPageNumber();
                 ctrl.getQuestionSummariesAsync(
@@ -197,7 +223,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
             ctrl.newQuestionIsBeingCreated = true;
-            ctrl.openQuestionEditor();
+            ctrl.openQuestionEditor(ctrl.newQuestionSkillDifficulties[0]);
           };
 
           ctrl.createQuestion = function() {
@@ -224,81 +250,20 @@ angular.module('oppia').directive('questionsList', [
                 summary.isSelected = false;
                 return summary;
               });
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  var init = function() {
-                    $scope.countOfSkillsToPrioritize =
-                      countOfSkillsToPrioritize;
-                    $scope.instructionMessage = (
-                      'Select the skill(s) to link the question to:');
-                    $scope.currentMode = currentMode;
-                    $scope.linkedSkillsWithDifficulty =
-                      linkedSkillsWithDifficulty;
-                    $scope.skillSummaries = allSkillSummaries;
-                    $scope.skillSummariesInitial = [];
-                    $scope.skillSummariesFinal = [];
-
-                    for (var idx in allSkillSummaries) {
-                      if (idx < countOfSkillsToPrioritize) {
-                        $scope.skillSummariesInitial.push(
-                          allSkillSummaries[idx]);
-                      } else {
-                        $scope.skillSummariesFinal.push(
-                          allSkillSummaries[idx]);
-                      }
-                    }
-                    $scope.skillIdToRubricsObject = skillIdToRubricsObject;
-                  };
-
-                  $scope.selectOrDeselectSkill = function(summary) {
-                    if (!summary.isSelected) {
-                      $scope.linkedSkillsWithDifficulty.push(
-                        SkillDifficultyObjectFactory.create(
-                          summary.id, summary.description,
-                          DEFAULT_SKILL_DIFFICULTY));
-                      summary.isSelected = true;
-                    } else {
-                      var idIndex = $scope.linkedSkillsWithDifficulty.map(
-                        function(linkedSkillWithDifficulty) {
-                          return linkedSkillWithDifficulty.getId();
-                        }).indexOf(summary.id);
-                      $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
-                      summary.isSelected = false;
-                    }
-                  };
-
-                  $scope.goToSelectSkillView = function() {
-                    $scope.currentMode = MODE_SELECT_SKILL;
-                  };
-
-                  $scope.goToNextStep = function() {
-                    $scope.currentMode = MODE_SELECT_DIFFICULTY;
-                  };
-
-                  $scope.startQuestionCreation = function() {
-                    $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
-                  };
-
-                  $scope.cancelModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('ok');
-                  };
-
-                  init();
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(linkedSkillsWithDifficulty) {
+              resolve: {
+                allSkillSummaries: () => allSkillSummaries,
+                countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
+                currentMode: () => currentMode,
+                linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
+                skillIdToRubricsObject: () => skillIdToRubricsObject
+              },
+              controller: 'QuestionsListSelectSkillAndDifficultyModalController'
+            }).result.then(function(linkedSkillsWithDifficulty) {
               ctrl.newQuestionSkillIds = [];
               ctrl.newQuestionSkillDifficulties = [];
               linkedSkillsWithDifficulty.forEach(
@@ -356,7 +321,7 @@ angular.module('oppia').directive('questionsList', [
                           misconception);
                       });
                     ctrl.associatedSkillSummaries.push(
-                      SkillSummaryObjectFactory.create(
+                      ShortSkillSummaryObjectFactory.create(
                         skillDict.id, skillDict.description));
                   });
                 }
@@ -440,34 +405,17 @@ angular.module('oppia').directive('questionsList', [
             var oldLinkedSkillWithDifficulty = angular.copy(
               linkedSkillsWithDifficulty);
             var skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
                 'change-question-difficulty-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  var init = function() {
-                    $scope.linkedSkillsWithDifficulty =
-                      linkedSkillsWithDifficulty;
-                    $scope.skillIdToRubricsObject = skillIdToRubricsObject;
-                  };
-
-                  $scope.cancelModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.done = function() {
-                    $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
-                  };
-
-                  init();
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(linkedSkillsWithDifficulty) {
+              resolve: {
+                linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
+                skillIdToRubricsObject: () => skillIdToRubricsObject
+              },
+              controller: 'ChangeQuestionDifficultyModalController'
+            }).result.then(function(linkedSkillsWithDifficulty) {
               var changedDifficultyCount = 0, count = 0;
               _reInitializeSelectedSkillIds();
               for (var idx in linkedSkillsWithDifficulty) {
@@ -514,246 +462,60 @@ angular.module('oppia').directive('questionsList', [
             var misconceptionsBySkill = ctrl.misconceptionsBySkill;
             var associatedSkillSummaries = ctrl.associatedSkillSummaries;
             var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
+            var categorizedSkills = ctrl.getSkillsCategorizedByTopics;
+            var untriagedSkillSummaries = ctrl.untriagedSkillSummaries;
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
             var selectedSkillId = ctrl.selectedSkillId;
+            ImageLocalStorageService.flushStoredImagesData();
+            if (newQuestionIsBeingCreated) {
+              ContextService.setImageSaveDestinationToLocalStorage();
+            }
             $location.hash(questionId);
-            var modalInstance = $uibModal.open({
+            var skillIdToNameMapping = (
+              ctrl.getAllSkillSummaries().reduce((obj, skill) => (
+                obj[skill.getId()] = skill.getDescription(), obj), {}));
+            var skillIdToRubricMapping = ctrl.getSkillIdToRubricsObject();
+            var skillNames = [];
+            var rubrics = [];
+            if (ctrl.newQuestionIsBeingCreated &&
+                ctrl.selectSkillModalIsShown()) {
+              skillNames = ctrl.newQuestionSkillIds.map(
+                skillId => skillIdToNameMapping[skillId]);
+              rubrics = ctrl.newQuestionSkillIds.map(
+                (skillId, index) => skillIdToRubricMapping[skillId].find(
+                  rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
+                    parseFloat(ctrl.newQuestionSkillDifficulties[index]))));
+            } else {
+              skillNames = [skillIdToNameMapping[ctrl.selectedSkillId]];
+              rubrics = [skillIdToRubricMapping[ctrl.selectedSkillId].find(
+                rubric => rubric.getDifficulty() === ctrl.getDifficultyString(
+                  parseFloat(questionDifficulty)))];
+            }
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
                 'question-editor-modal.directive.html'),
               backdrop: 'static',
               keyboard: false,
-              controller: [
-                '$scope', '$uibModalInstance', 'StateEditorService',
-                'UndoRedoService',
-                function(
-                    $scope, $uibModalInstance, StateEditorService,
-                    UndoRedoService) {
-                  var returnModalObject = {
-                    skillLinkageModificationsArray: [],
-                    commitMessage: ''
-                  };
-                  $scope.question = question;
-                  $scope.questionStateData = questionStateData;
-                  $scope.associatedSkillSummaries =
-                    angular.copy(associatedSkillSummaries);
-                  $scope.questionId = questionId;
-                  $scope.misconceptionsBySkill = misconceptionsBySkill;
-                  $scope.canEditQuestion = canEditQuestion;
-                  $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
-
-                  if (!newQuestionIsBeingCreated) {
-                    $scope.validationError = $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                  }
-
-                  $scope.removeErrors = function() {
-                    $scope.validationError = null;
-                  };
-                  $scope.getSkillEditorUrl = function(skillId) {
-                    return '/skill_editor/' + skillId;
-                  };
-                  $scope.questionChanged = function() {
-                    $scope.removeErrors();
-                  };
-                  $scope.removeSkill = function(skillId) {
-                    if ($scope.associatedSkillSummaries.length === 1) {
-                      AlertsService.addInfoMessage(
-                        'A question should be linked to at least one skill.');
-                      return;
-                    }
-                    returnModalObject.skillLinkageModificationsArray.push({
-                      id: skillId,
-                      task: 'remove'
-                    });
-                    $scope.associatedSkillSummaries =
-                      $scope.associatedSkillSummaries.filter(function(summary) {
-                        return summary.getId() !== skillId;
-                      });
-                  };
-                  $scope.undo = function() {
-                    $scope.associatedSkillSummaries = associatedSkillSummaries;
-                    returnModalObject.skillLinkageModificationsArray = [];
-                  };
-                  $scope.addSkill = function() {
-                    var skillsInSameTopicCount =
-                      groupedSkillSummaries.current.length;
-                    var sortedSkillSummaries =
-                      groupedSkillSummaries.current.concat(
-                        groupedSkillSummaries.others);
-                    var modalInstance = $uibModal.open({
-                      templateUrl:
-                        UrlInterpolationService.getDirectiveTemplateUrl(
-                          '/components/skill-selector/' +
-                          'select-skill-modal.template.html'),
-                      backdrop: true,
-                      controller: [
-                        '$scope', '$uibModalInstance',
-                        function($scope, $uibModalInstance) {
-                          $scope.skillSummaries = sortedSkillSummaries;
-                          $scope.selectedSkillId = null;
-                          $scope.countOfSkillsToPrioritize =
-                            skillsInSameTopicCount;
-                          $scope.save = function() {
-                            for (var idx in sortedSkillSummaries) {
-                              if (
-                                $scope.selectedSkillId ===
-                                sortedSkillSummaries[idx].id) {
-                                $uibModalInstance.close(
-                                  sortedSkillSummaries[idx]);
-                              }
-                            }
-                          };
-                          $scope.cancel = function() {
-                            $uibModalInstance.dismiss('cancel');
-                          };
-                        }
-                      ]
-                    });
-
-                    modalInstance.result.then(function(summary) {
-                      for (var idx in $scope.associatedSkillSummaries) {
-                        if (
-                          $scope.associatedSkillSummaries[idx].getId() ===
-                          summary.id) {
-                          AlertsService.addInfoMessage(
-                            'Skill already linked to question');
-                          return;
-                        }
-                      }
-                      $scope.associatedSkillSummaries.push(
-                        SkillSummaryObjectFactory.create(
-                          summary.id, summary.description));
-                      returnModalObject.skillLinkageModificationsArray.push({
-                        id: summary.id,
-                        task: 'add'
-                      });
-                    }, function() {
-                      // Note to developers:
-                      // This callback is triggered when the Cancel button is
-                      // clicked. No further action is needed.
-                    });
-                  };
-
-                  // The saveAndCommit function is called when the contents of
-                  // a question is changed or the skill linkages are modified.
-                  // The user has to enter a commit message if the contents of
-                  // the question is edited but, if only the skill linkages are
-                  // modified then no commit message is required from the user
-                  // as there is already a default commit message present in the
-                  // backend for modification of skill linkages.
-                  $scope.saveAndCommit = function() {
-                    $scope.validationError = $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                    if ($scope.validationError) {
-                      return;
-                    }
-                    if (!StateEditorService.isCurrentSolutionValid()) {
-                      $scope.validationError =
-                        'The solution is invalid and does not ' +
-                        'correspond to a correct answer';
-                      return;
-                    }
-
-                    if (QuestionUndoRedoService.hasChanges()) {
-                      var modalInstance = $uibModal.open({
-                        templateUrl:
-                               UrlInterpolationService.getDirectiveTemplateUrl(
-                                 '/components/question-directives' +
-                                 '/modal-templates/' +
-                                 'question-editor-save-modal.template.html'),
-                        backdrop: true,
-                        controller: [
-                          '$scope', '$uibModalInstance',
-                          function($scope, $uibModalInstance) {
-                            $scope.save = function(commitMessage) {
-                              $uibModalInstance.close(commitMessage);
-                            };
-                            $scope.cancel = function() {
-                              $uibModalInstance.dismiss('cancel');
-                            };
-                          }
-                        ]
-                      });
-                      modalInstance.result.then(function(commitMessage) {
-                        returnModalObject.commitMessage = commitMessage;
-                        $uibModalInstance.close(returnModalObject);
-                      }, function() {
-                        // Note to developers:
-                        // This callback is triggered when the Cancel button is
-                        // clicked. No further action is needed.
-                      });
-                    } else {
-                      $uibModalInstance.close(returnModalObject);
-                    }
-                  };
-                  $scope.isSaveAndCommitButtonDisabled = function() {
-                    return !(QuestionUndoRedoService.hasChanges() ||
-                        (returnModalObject.skillLinkageModificationsArray.length
-                        ) > 0);
-                  };
-
-
-                  $scope.done = function() {
-                    $scope.validationError = $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                    if ($scope.validationError) {
-                      return;
-                    }
-                    if (!StateEditorService.isCurrentSolutionValid()) {
-                      $scope.validationError =
-                        'The solution is invalid and does not ' +
-                        'correspond to a correct answer';
-                      return;
-                    }
-                    $uibModalInstance.close(returnModalObject);
-                  };
-                  // Checking if Question contains all requirement to enable
-                  // Save and Publish Question
-                  $scope.isSaveButtonDisabled = function() {
-                    return $scope.question.validate(
-                      $scope.misconceptionsBySkill);
-                  };
-
-                  $scope.cancel = function() {
-                    if (QuestionUndoRedoService.hasChanges()) {
-                      var modalInstance = $uibModal.open({
-                        templateUrl:
-                          UrlInterpolationService.getDirectiveTemplateUrl(
-                            '/components/question-directives/modal-templates/' +
-                            'confirm-question-modal-exit-modal.directive.html'),
-                        backdrop: true,
-                        controller: [
-                          '$scope', '$uibModalInstance',
-                          function($scope, $uibModalInstance) {
-                            $scope.cancel = function() {
-                              $uibModalInstance.dismiss('cancel');
-                            };
-
-                            $scope.close = function() {
-                              $uibModalInstance.close();
-                            };
-                          }
-                        ]
-                      });
-                      modalInstance.result.then(function() {
-                        $uibModalInstance.dismiss('cancel');
-                      }, function() {
-                        // Note to developers:
-                        // This callback is triggered when the Cancel button is
-                        // clicked. No further action is needed.
-                      });
-                    } else {
-                      $uibModalInstance.dismiss('cancel');
-                    }
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(modalObject) {
+              resolve: {
+                untriagedSkillSummaries: () => untriagedSkillSummaries,
+                associatedSkillSummaries: () => associatedSkillSummaries,
+                canEditQuestion: () => canEditQuestion,
+                categorizedSkills: () => categorizedSkills,
+                groupedSkillSummaries: () => groupedSkillSummaries,
+                misconceptionsBySkill: () => misconceptionsBySkill,
+                newQuestionIsBeingCreated: () => newQuestionIsBeingCreated,
+                question: () => question,
+                questionId: () => questionId,
+                questionStateData: () => questionStateData,
+                rubrics: () => rubrics,
+                skillNames: () => skillNames
+              },
+              controller: 'QuestionEditorModalController',
+            }).result.then(function(modalObject) {
+              ContextService.resetImageSaveDestination();
               $location.hash(null);
               ctrl.editorIsOpen = false;
               if (modalObject.skillLinkageModificationsArray.length > 0) {
@@ -771,9 +533,11 @@ angular.module('oppia').directive('questionsList', [
                     }, 500);
                   });
               } else {
+                ContextService.resetImageSaveDestination();
                 ctrl.saveAndPublishQuestion(modalObject.commitMessage);
               }
             }, function() {
+              ContextService.resetImageSaveDestination();
               ctrl.editorIsOpen = false;
               $location.hash(null);
             });

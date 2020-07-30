@@ -42,60 +42,63 @@ describe('Library pages tour', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  var visitRecentlyPublishedPage = function() {
-    browser.get('library/recently_published');
-    waitFor.pageToFullyLoad();
+  var visitRecentlyPublishedPage = async function() {
+    await browser.get('community-library/recently-published');
+    await waitFor.pageToFullyLoad();
   };
 
-  var rateExploration = function() {
+  var rateExploration = async function() {
     var adminPage = new AdminPage.AdminPage();
-    users.createUser('random@gmail.com', 'random');
-    users.login('random@gmail.com', true);
+    await users.createUser('random@gmail.com', 'random');
+    await users.login('random@gmail.com', true);
     // We need an exploration to rate here.
     if (browser.isMobile) {
-      adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
+      await adminPage.reloadExploration(
+        'protractor_mobile_test_exploration.yaml');
     } else {
-      workflow.createAndPublishExploration(
+      await workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
         EXPLORATION_LANGUAGE
       );
     }
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.rateExploration(EXPLORATION_RATING);
-    users.logout();
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE);
+    await libraryPage.playExploration(EXPLORATION_TITLE);
+    await explorationPlayerPage.rateExploration(EXPLORATION_RATING);
+    await users.logout();
   };
 
-  it('visits the search page', function() {
-    libraryPage.get();
-    libraryPage.findExploration(SEARCH_TERM);
-    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
+  it('visits the search page', async function() {
+    await libraryPage.get();
+    await libraryPage.findExploration(SEARCH_TERM);
+    expect(await browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
-  it('visits the library index page', function() {
-    libraryPage.get();
+  it('visits the library index page', async function() {
+    await libraryPage.get();
   });
 
-  it('visits the top rated page', function() {
+  it('visits the top rated page', async function() {
     // To visit the top rated page, at least one
     // exploration has to be rated by the user.
-    rateExploration();
-    libraryPage.get();
-    element(by.css('.protractor-test-library-top-rated')).click();
-    waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toContain('library/top_rated');
+    await rateExploration();
+    await libraryPage.get();
+    await element(by.css('.protractor-test-library-top-rated')).click();
+    await waitFor.pageToFullyLoad();
+    expect(await browser.getCurrentUrl()).toContain(
+      'community-library/top-rated');
   });
 
-  it('visits the recent explorations page', function() {
-    visitRecentlyPublishedPage();
-    expect(browser.getCurrentUrl()).toContain('library/recently_published');
+  it('visits the recent explorations page', async function() {
+    await visitRecentlyPublishedPage();
+    expect(await browser.getCurrentUrl()).toContain(
+      'community-library/recently-published');
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
 
@@ -114,68 +117,71 @@ describe('Rating', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  var addRating = function(userEmail, userName, explorationName, ratingValue) {
-    users.createUser(userEmail, userName);
-    users.login(userEmail);
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_RATINGTEST);
-    libraryPage.playExploration(EXPLORATION_RATINGTEST);
+  var addRating = async function(
+      userEmail, userName, explorationName, ratingValue) {
+    await users.createUser(userEmail, userName);
+    await users.login(userEmail);
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_RATINGTEST);
+    await libraryPage.playExploration(EXPLORATION_RATINGTEST);
 
     // The exploration header is only visible in desktop browsers.
     if (!browser.isMobile) {
-      explorationPlayerPage.expectExplorationNameToBe(explorationName);
+      await explorationPlayerPage.expectExplorationNameToBe(explorationName);
     }
-    explorationPlayerPage.rateExploration(ratingValue);
-    users.logout();
+    await explorationPlayerPage.rateExploration(ratingValue);
+    await users.logout();
   };
 
   it('should display ratings on exploration when minimum ratings have been ' +
-     'submitted', function() {
-    users.createUser('user11@explorationRating.com', 'user11Rating');
+     'submitted', async function() {
+    await users.createUser('user11@explorationRating.com', 'user11Rating');
     // Create a test exploration.
-    users.login('user11@explorationRating.com', true);
+    await users.login('user11@explorationRating.com', true);
 
     // We need a test exploration here.
     if (browser.isMobile) {
       // In case of a mobile device, load a demo test exploration
       // from the admin page.
-      adminPage.reloadExploration('rating_test.yaml');
+      await adminPage.reloadExploration('rating_test.yaml');
     } else {
       // For a desktop browser, create and publish an exploration.
-      workflow.createAndPublishExploration(
+      await workflow.createAndPublishExploration(
         EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
         'this is an objective', LANGUAGE_ENGLISH);
     }
-    users.logout();
+    await users.logout();
 
     // Create test users, play exploration and review them after completion.
     for (var i = 0; i < MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS - 1; i++) {
       var userEmail = 'NoDisplay' + i + '@explorationRating.com';
       var username = 'NoDisplay' + i;
-      addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
+      await addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
     }
 
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_RATINGTEST);
-    libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_RATINGTEST);
+    await libraryPage.expectExplorationRatingToEqual(
+      EXPLORATION_RATINGTEST, 'N/A');
 
     var userEmail = 'Display@explorationRating.com';
     var username = 'Display';
-    addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
+    await addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
 
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_RATINGTEST);
-    libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_RATINGTEST);
+    await libraryPage.expectExplorationRatingToEqual(
+      EXPLORATION_RATINGTEST, '4.0');
 
-    libraryPage.playExploration(EXPLORATION_RATINGTEST);
+    await libraryPage.playExploration(EXPLORATION_RATINGTEST);
     // The information card is only visible in desktop browsers.
     if (!browser.isMobile) {
-      explorationPlayerPage.expectExplorationRatingOnInformationCardToEqual(
-        '4.0');
+      await explorationPlayerPage.
+        expectExplorationRatingOnInformationCardToEqual('4.0');
     }
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

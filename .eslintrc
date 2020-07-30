@@ -9,6 +9,7 @@
   "plugins": [
     "angular",
     "html",
+    "unused-imports",
     "@typescript-eslint"
   ],
   "overrides": [{
@@ -49,6 +50,14 @@
       "error",
       {
         "properties": "never"
+      }
+    ],
+    "capitalized-comments": [
+      "error",
+      "always",
+      {
+        "ignorePattern": "disable-bad-pattern-check|fall-through",
+        "ignoreConsecutiveComments": true
       }
     ],
     "comma-spacing": [
@@ -226,6 +235,8 @@
         "before": false
       }
     ],
+    "unused-imports/no-unused-imports-ts": "error",
+    "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
     "wrap-iife": [
       "error",

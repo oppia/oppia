@@ -58,7 +58,7 @@ describe('NumericInputValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        audio_translations: {},
+        content_id: '',
         html: ''
       },
       labelled_as_correct: false,
@@ -88,7 +88,7 @@ describe('NumericInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });
@@ -145,4 +145,24 @@ describe('NumericInputValidationService', () => {
           'because it is made redundant by rule 1 from answer group 1.'
       }]);
     });
+
+  it('should generate errors in the given input', () => {
+    expect(validatorService.getErrorString(undefined)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(null)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(1200000000E+27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(1200000000E-27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(999999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(99.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(-9.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(-2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(34.56)).toEqual(undefined);
+  });
 });

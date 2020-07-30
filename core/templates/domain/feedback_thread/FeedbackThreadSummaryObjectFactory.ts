@@ -20,14 +20,29 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface FeedbackThreadSummaryBackendDict {
+  'status': string;
+  'original_author_id': string;
+  'last_updated_msecs': number;
+  'last_message_text': string;
+  'total_message_count': number;
+  'last_message_is_read': boolean;
+  'second_last_message_is_read': boolean;
+  'author_last_message': string;
+  'author_second_last_message': string;
+  'exploration_title': string;
+  'exploration_id': string;
+  'thread_id': string;
+}
+
 export class FeedbackThreadSummary {
   status: string;
   originalAuthorId: string;
   lastUpdatedMsecs: number;
   lastMessageText: string;
   totalMessageCount: number;
-  lastMessageRead: boolean;
-  secondLastMessageRead: boolean;
+  lastMessageIsRead: boolean;
+  secondLastMessageIsRead: boolean;
   authorLastMessage: string;
   authorSecondLastMessage: string;
   explorationTitle: string;
@@ -37,7 +52,7 @@ export class FeedbackThreadSummary {
   constructor(
       status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
-      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
       authorLastMessage: string, authorSecondLastMessage: string,
       explorationTitle: string, explorationId: string, threadId: string) {
     this.status = status;
@@ -45,8 +60,8 @@ export class FeedbackThreadSummary {
     this.lastUpdatedMsecs = lastUpdatedMsecs;
     this.lastMessageText = lastMessageText;
     this.totalMessageCount = totalMessageCount;
-    this.lastMessageRead = lastMessageRead;
-    this.secondLastMessageRead = secondLastMessageRead;
+    this.lastMessageIsRead = lastMessageIsRead;
+    this.secondLastMessageIsRead = secondLastMessageIsRead;
     this.authorLastMessage = authorLastMessage;
     this.authorSecondLastMessage = authorSecondLastMessage;
     this.explorationTitle = explorationTitle;
@@ -56,9 +71,9 @@ export class FeedbackThreadSummary {
 
   markTheLastTwoMessagesAsRead(): void {
     if (this.authorSecondLastMessage) {
-      this.secondLastMessageRead = true;
+      this.secondLastMessageIsRead = true;
     }
-    this.lastMessageRead = true;
+    this.lastMessageIsRead = true;
   }
 
   appendNewMessage(lastMessageText: string, authorLastMessage: string): void {
@@ -67,8 +82,8 @@ export class FeedbackThreadSummary {
     this.authorSecondLastMessage = this.authorLastMessage;
     this.authorLastMessage = authorLastMessage;
     this.totalMessageCount += 1;
-    this.lastMessageRead = true;
-    this.secondLastMessageRead = true;
+    this.lastMessageIsRead = true;
+    this.secondLastMessageIsRead = true;
   }
 }
 
@@ -79,18 +94,19 @@ export class FeedbackThreadSummaryObjectFactory {
   create(
       status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
-      lastMessageRead: boolean, secondLastMessageRead: boolean,
+      lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
       authorLastMessage: string, authorSecondLastMessage: string,
       explorationTitle: string, explorationId: string,
       threadId: string): FeedbackThreadSummary {
     return new FeedbackThreadSummary(status, originalAuthorId, lastUpdatedMsecs,
-      lastMessageText, totalMessageCount, lastMessageRead,
-      secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
+      lastMessageText, totalMessageCount, lastMessageIsRead,
+      secondLastMessageIsRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
   }
 
   createFromBackendDict(
-      feedbackThreadSummaryBackendDict: any): FeedbackThreadSummary {
+      feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict):
+      FeedbackThreadSummary {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,

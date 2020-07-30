@@ -17,7 +17,7 @@
            ng-class="{'oppia-prevent-selection': isEditable()}"
            title="Translated Content">
         <span  class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.getHtml() === ''">
-          This section has not been translated yet. Click to add a translation!
+          This section has not been translated yet. <span ng-if="isEditable()">Click to add a translation!</span>
         </span>
         <span ng-if="activeWrittenTranslation">
           <angular-html-bind html-data="activeWrittenTranslation.getHtml()"
@@ -32,8 +32,8 @@
   </div>
 
   <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
-    <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
-    </schema-based-editor>
+    <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
+    <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html"></schema-based-editor>
     <div style="margin-top: 2px;">
       <button type="button"
               class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-translation"
@@ -48,10 +48,10 @@
 <style>
   .oppia-translated-content-header {
     background: #ccc;
-    height: 16px;
-    text-align: center;
     font-size: 12px;
     font-style: italic;
+    height: 16px;
+    text-align: center;
   }
   .oppia-editor-edit-icon {
     position: absolute;
