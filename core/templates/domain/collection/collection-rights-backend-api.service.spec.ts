@@ -102,7 +102,9 @@ describe('Collection rights backend API service', function() {
           .expectOne('/collection_editor_handler/rights/1');
 
         expect(req.request.method).toEqual('GET');
-        req.flush('Error fetching collection rights.', {
+        req.flush({
+          error: 'Error fetching collection rights.'
+        }, {
           status: 404,
           statusText: 'Error fetching collection rights.'
         });
@@ -150,7 +152,9 @@ describe('Collection rights backend API service', function() {
           .expectOne('/collection_editor_handler/publish/0');
 
         expect(req.request.method).toEqual('PUT');
-        req.flush('Error loading collection 0.', {
+        req.flush({
+          error: 'Error loading collection 0.'
+        }, {
           status: 500,
           statusText: 'Error loading collection 0.'
         });
@@ -158,7 +162,7 @@ describe('Collection rights backend API service', function() {
         flushMicrotasks();
 
         expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
       }));
   });
 
@@ -197,7 +201,9 @@ describe('Collection rights backend API service', function() {
           .expectOne('/collection_editor_handler/unpublish/0');
 
         expect(req.request.method).toEqual('PUT');
-        req.flush('Error loading collection 0.', {
+        req.flush({
+          error: 'Error loading collection 0.'
+        }, {
           status: 500,
           statusText: 'Error loading collection 0.'
         });
@@ -205,7 +211,7 @@ describe('Collection rights backend API service', function() {
         flushMicrotasks();
 
         expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
       }));
   });
 

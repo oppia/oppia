@@ -25,7 +25,8 @@ require(
 require(
   'pages/story-editor-page/modal-templates/' +
   'new-chapter-title-modal.controller.ts');
-
+require('pages/topic-editor-page/modal-templates/' +
+    'preview-thumbnail.component.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');
@@ -355,11 +356,17 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.oldOutline = newOutline;
           };
 
+          $scope.togglePreview = function() {
+            $scope.chapterPreviewCardIsShown = (
+              !$scope.chapterPreviewCardIsShown);
+          };
+
           ctrl.$onInit = function() {
             // Regex pattern for exploration id,
             // EXPLORATION_AND_SKILL_ID_PATTERN
             // is not being used here, as the chapter of the story can be saved
             // with empty exploration id.
+            $scope.chapterPreviewCardIsShown = false;
             $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.expIdCanBeSaved = true;
             ctrl.directiveSubscriptions.add(

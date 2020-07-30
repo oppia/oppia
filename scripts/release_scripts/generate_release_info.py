@@ -31,7 +31,8 @@ import release_constants
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
 import github # isort:skip  pylint: disable=wrong-import-position
@@ -221,10 +222,10 @@ def check_versions(current_release):
     with python_utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
         new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
-        old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 old_feconf)[0]
-        new_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 new_feconf)[0]
+        old_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, old_feconf)[0]
+        new_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, new_feconf)[0]
         if old_version != new_version:
             feconf_changed_version.append(variable)
     return feconf_changed_version
@@ -322,8 +323,9 @@ def main(personal_access_token):
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
-            out.write('\n### Feconf version changes:\nThis indicates that a '
-                      'migration may be needed\n\n')
+            out.write(
+                '\n### Feconf version changes:\nThis indicates that a '
+                'migration may be needed\n\n')
             for var in feconf_version_changes:
                 out.write('* %s\n' % var)
 

@@ -51,18 +51,21 @@ angular.module('oppia').directive('storyEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
-        '$scope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
+        '$scope', '$window', 'StoryEditorStateService', 'StoryUpdateService',
+        'UndoRedoService', 'StoryEditorNavigationService',
+        'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
         'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
         'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
-            $scope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
+            $scope, $window, StoryEditorStateService, StoryUpdateService,
+            UndoRedoService, StoryEditorNavigationService,
+            EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
             AlertsService, MAX_CHARS_IN_STORY_TITLE,
             MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
+          var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
@@ -160,9 +163,9 @@ angular.module('oppia').directive('storyEditor', [
               resolve: {
                 nodeTitles: () => nodeTitles
               },
-              controller: 'NewChapterTitleModalController'
-            }).result.then(function(title) {
-              StoryUpdateService.addStoryNode($scope.story, title);
+              windowClass: 'create-new-chapter',
+              controller: 'CreateNewChapterModalController'
+            }).result.then(function() {
               _initEditor();
               // If the first node is added, open it just after creation.
               if ($scope.story.getStoryContents().getNodes().length === 1) {
@@ -185,9 +188,43 @@ angular.module('oppia').directive('storyEditor', [
             _initEditor();
           };
 
+          $scope.navigateToChapterWithId = function(id, index) {
+            StoryEditorNavigationService.navigateToChapterEditorWithId(
+              id, index);
+          };
+
           $scope.updateStoryDescriptionStatus = function(description) {
             $scope.editableDescriptionIsEmpty = (description === '');
             $scope.storyDescriptionChanged = true;
+          };
+
+          $scope.returnToTopicEditorPage = function() {
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/story-editor-page/modal-templates/' +
+                    'story-save-pending-changes-modal.template.html'),
+                backdrop: true,
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
+            } else {
+              const topicId = (
+                StoryEditorStateService.getStory().getCorrespondingTopicId());
+              $window.open(
+                UrlInterpolationService.interpolateUrl(
+                  TOPIC_EDITOR_URL_TEMPLATE, {
+                    topic_id: topicId
+                  }
+                ), '_self');
+            }
+          };
+
+          $scope.getTopicName = function() {
+            return StoryEditorStateService.getTopicName();
           };
 
           $scope.updateStoryTitle = function(newTitle) {
@@ -224,6 +261,11 @@ angular.module('oppia').directive('storyEditor', [
 
           $scope.togglePreview = function() {
             $scope.storyPreviewCardIsShown = !($scope.storyPreviewCardIsShown);
+          };
+
+          $scope.toggleChapterEditOptions = function(chapterIndex) {
+            $scope.selectedChapterIndex = (
+              $scope.selectedChapterIndex === chapterIndex) ? -1 : chapterIndex;
           };
 
           ctrl.$onInit = function() {
