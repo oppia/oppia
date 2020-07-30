@@ -27,15 +27,33 @@ describe('Story editor page', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
+  var $rootScope = null;
   var $uibModal = null;
   var PageTitleService = null;
   var StoryEditorStateService = null;
+  var StoryEditorNavigationService = null;
+  var EditableStoryBackendApiService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
   var UrlService = null;
 
   var mockedWindow = {
     open: () => {}
+  };
+  var MockStoryEditorNavigationService = {
+    activeTab: 'story_editor',
+    checkIfPresentInChapterEditor: () => this.activeTab === 'chapter_editor',
+    checkIfPresentInStoryPreviewTab: () => this.activeTab === 'story_preview',
+    getActiveTab: () => this.activeTab,
+    navigateToChapterEditor: () => {
+      this.activeTab = 'chapter_editor';
+    },
+    navigateToStoryEditor: () => {
+      this.activeTab = 'story_editor';
+    },
+    navigateToStoryPreviewTab: () => {
+      this.activeTab = 'story_preview';
+    }
   };
   var story = null;
 
@@ -52,23 +70,50 @@ describe('Story editor page', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     PageTitleService = $injector.get('PageTitleService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
+    StoryEditorNavigationService = $injector.get(
+      'StoryEditorNavigationService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
+    EditableStoryBackendApiService = $injector.get(
+      'EditableStoryBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
-
     story = StoryObjectFactory.createFromBackendDict({
       id: '2',
       title: 'Story title',
       description: 'Story description',
       notes: 'Story notes',
       story_contents: {
-        initial_node_id: '',
-        nodes: [],
-        next_node_id: ''
+        initial_node_id: 'node_2',
+        nodes: [{
+          id: 'node_2',
+          title: 'Title 2',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: 'asd4242',
+          outline_is_finalized: false,
+          description: 'Description',
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
+        }, {
+          id: 'node_3',
+          title: 'Title 3',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          description: 'Description',
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
+        }],
+        next_node_id: 'node_4'
       },
       language_code: 'en',
       version: 1,
@@ -76,11 +121,16 @@ describe('Story editor page', function() {
       thumbnail_bg_color: null,
       thumbnail_filename: null
     });
+    var MockEditableStoryBackendApiService = {
+      validateExplorations: () => Promise.resolve([])
+    };
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('storyEditorPage', {
-      $scope: $scope
+      $scope: $scope,
+      StoryEditorNavigationService: MockStoryEditorNavigationService,
+      EditableStoryBackendApiService: MockEditableStoryBackendApiService
     });
   }));
 
@@ -89,7 +139,7 @@ describe('Story editor page', function() {
     spyOn(StoryEditorStateService, 'loadStory').and.stub();
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () => true;
     ctrl.$onInit();
     $scope.$broadcast('storyInitialized');
     $scope.$broadcast('storyReinitialized');
@@ -133,4 +183,85 @@ describe('Story editor page', function() {
       expect(mockedWindow.open).toHaveBeenCalledWith(
         '/topic_editor/2', '_self');
     });
+
+  it('should return the active tab', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+    MockStoryEditorNavigationService.navigateToStoryEditor();
+    expect(ctrl.getActiveTab()).toEqual('story_editor');
+  });
+
+  it('should return warning count', function() {
+    spyOn(StoryEditorStateService, 'loadStory').and.stub();
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    MockStoryEditorNavigationService.navigateToStoryEditor();
+    ctrl.$onInit();
+    expect(ctrl.getTotalWarningsCount()).toEqual(0);
+  });
+
+  it('should toggle the display of warnings', function() {
+    ctrl.toggleWarnings();
+    expect(ctrl.warningsAreShown).toEqual(true);
+    ctrl.toggleWarnings();
+    expect(ctrl.warningsAreShown).toEqual(false);
+    ctrl.toggleWarnings();
+    expect(ctrl.warningsAreShown).toEqual(true);
+  });
+
+  it('should return true if the main editor tab is select', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+    expect(ctrl.isMainEditorTabSelected()).toEqual(true);
+
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
+    expect(ctrl.isMainEditorTabSelected()).toEqual(false);
+  });
+
+  it('should check if url contains story preview', function() {
+    spyOn(StoryEditorStateService, 'loadStory').and.stub();
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = (
+      () => false);
+    MockStoryEditorNavigationService.checkIfPresentInStoryPreviewTab = (
+      () => true);
+    MockStoryEditorNavigationService.getActiveTab = (
+      () => 'story_preview');
+    ctrl.$onInit();
+    expect(ctrl.isMainEditorTabSelected()).toEqual(false);
+
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+  });
+
+  it('should navigate to story editor', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+    ctrl.navigateToStoryEditor();
+    expect(ctrl.getActiveTab()).toEqual('story_editor');
+  });
+
+  it('should navigate to story preview tab', function() {
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
+    ctrl.navigateToStoryPreviewTab();
+    expect(ctrl.getActiveTab()).toEqual('story_preview');
+  });
+
+  it('should return the navbar helper text', function() {
+    MockStoryEditorNavigationService.activeTab = 'chapter_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'chapter_editor';
+    expect(ctrl.getNavbarText()).toEqual('Chapter Editor');
+
+    MockStoryEditorNavigationService.activeTab = 'story_preview';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_preview';
+    expect(ctrl.getNavbarText()).toEqual('Story Preview');
+
+    MockStoryEditorNavigationService.activeTab = 'story_editor';
+    MockStoryEditorNavigationService.getActiveTab = () => 'story_editor';
+    expect(ctrl.getNavbarText()).toEqual('Story Editor');
+  });
 });
