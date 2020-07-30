@@ -52,13 +52,13 @@ describe('Command executor service', () => {
     continueButton.onclick = function() {
       continueBoolean = true;
     };
-    var secondaryContinueButton = 
+    var secondaryContinueButton =
       windowRef.nativeWindow.document.createElement('BUTTON');
     secondaryContinueButton.classList.add(
       'protractor-test-next-card-button');
     secondaryContinueButton.onclick = function() {
       secondaryContinueBoolean = true;
-    }
+    };
     var textbox = windowRef.nativeWindow.document.createElement(
       'INPUT') as HTMLInputElement;
     textbox.classList.add(
@@ -182,10 +182,10 @@ describe('Command executor service', () => {
     expect(continueBoolean).toEqual(true);
   });
 
-  it('should click continue in the second type of continue button', 
+  it('should click continue in the second type of continue button',
     () => {
       setupWindowRef(wrf);
-      var suite = 
+      var suite =
         wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
       suite.querySelector(
         '.oppia-learner-confirm-button').remove();
