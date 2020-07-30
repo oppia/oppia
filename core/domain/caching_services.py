@@ -38,9 +38,10 @@ def flush_memory_cache():
 def _get_correct_type_of_key(key):
     """In the memory cache, values are stored as (key, value) pairs where values
     can be string representations of Oppia objects, e.g Collection,
-    Exploration, etc. These dictionary types can be identified by the key that
+    Exploration, etc. These object types can be identified by the key that
     the memory cache uses to store the dictionaries. This function returns the
-    correct type of the saved memory cache value using the key.
+    correct type of the saved memory cache value using the key, so that the
+    encoded string can be decoded into an object.
 
     Args:
         key: str. The key string used in the memory cache.

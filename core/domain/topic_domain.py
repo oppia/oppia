@@ -651,7 +651,7 @@ class Topic(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, memory_cache_json_string):
-        """Return a Topic domain object decoded from a json string
+        """Return a Topic domain object decoded from a JSON string
         retrieved from the memory cache.
 
         Args:

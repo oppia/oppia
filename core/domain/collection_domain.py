@@ -347,7 +347,7 @@ class Collection(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, memory_cache_json_string):
-        """Return a Collection domain object decoded from a json string
+        """Return a Collection domain object decoded from a JSON string
         retrieved from the memory cache.
 
         Args:
