@@ -365,9 +365,7 @@ class ExplorationMathSvgFilenameValidationOneOffJob(
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        exploration_status = (
-            rights_manager.get_exploration_rights(
-                item.id).status)
+        invalid_tags_info_in_exp = []
         for state_name, state in exploration.states.items():
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
@@ -375,19 +373,33 @@ class ExplorationMathSvgFilenameValidationOneOffJob(
                 validate_svg_filenames_in_math_rich_text(
                     feconf.ENTITY_TYPE_EXPLORATION, item.id, html_string))
             if len(error_list) > 0:
-                key = (
-                    'exp_id: %s, exp_status: %s failed validation.' % (
-                        item.id, exploration_status))
-                value_dict = {
+                invalid_tags_info_in_state = {
                     'state_name': state_name,
                     'error_list': error_list,
                     'no_of_invalid_tags': len(error_list)
                 }
-                yield (key, value_dict)
+                invalid_tags_info_in_exp.append(invalid_tags_info_in_state)
+        if len(invalid_tags_info_in_exp) > 0:
+            yield ('Found invalid tags', (item.id, invalid_tags_info_in_exp))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        no_of_invalid_tags = 0
+        invalid_tags_info = {}
+        for exp_id, invalid_tags_info_in_exp in final_values:
+            invalid_tags_info[exp_id] = []
+            for value in invalid_tags_info_in_exp:
+                no_of_invalid_tags += value['no_of_invalid_tags']
+                del value['no_of_invalid_tags']
+                invalid_tags_info[exp_id].append(value)
+
+        final_value_dict = {
+            'no_of_explorations_with_no_svgs': len(final_values),
+            'no_of_invalid_tags': no_of_invalid_tags,
+        }
+        yield ('Overall result.', final_value_dict)
+        yield ('Detailed information on invalid tags. ', invalid_tags_info)
 
 
 class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

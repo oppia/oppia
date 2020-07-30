@@ -2097,35 +2097,28 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             exp_jobs_one_off
             .ExplorationMathSvgFilenameValidationOneOffJob.get_output(job_id))
 
-        actual_output_list = ast.literal_eval(actual_output[0])
+        detailed_info_output = ast.literal_eval(actual_output[1])
+
         invalid_tag1 = (
-            '\'<oppia-noninteractive-math math_content-with-v'
+            '<oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-            ';img1.svg&amp;quot;}"></oppia-noninteractive-math>\'')
+            ';img1.svg&amp;quot;}"></oppia-noninteractive-math>')
         invalid_tag2 = (
-            '\'<oppia-noninteractive-math math_content-with-v'
+            '<oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-'
             '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
-            ';img2.svg&amp;quot;}"></oppia-noninteractive-math>\'')
+            ';img2.svg&amp;quot;}"></oppia-noninteractive-math>')
         expected_invalid_tags = [invalid_tag1, invalid_tag2]
-
-        no_of_invalid_tags_in_output = 0
-
-        for output in actual_output_list[1]:
-            list_starting_index = output.find('[')
-            list_finishing_index = output.find(']')
-            stringified_error_list = (
-                output[list_starting_index + 1:list_finishing_index].split(
-                    'math>\', '))
-            no_of_invalid_tags_in_output = (
-                no_of_invalid_tags_in_output + len(stringified_error_list))
-            for invalid_tag in stringified_error_list:
-                if not invalid_tag.endswith('math>\''):
-                    invalid_tag = invalid_tag + 'math>\''
+        exp_error_info = detailed_info_output[1][self.VALID_EXP_ID]
+        for state_error_info in exp_error_info:
+            for invalid_tag in state_error_info['error_list']:
                 self.assertTrue(invalid_tag in expected_invalid_tags)
 
-        self.assertEqual(no_of_invalid_tags_in_output, 12)
+        overall_result = ast.literal_eval(actual_output[0])
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(
+            overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
