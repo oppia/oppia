@@ -265,7 +265,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
             ctrl.directiveSubscriptions.add(
               StateEditorService.onStateEditorInitialized.subscribe(
                 (stateData) => {
-                  console.log('Caught: stateEditorInitialized in state-interaction-editor');
                   if (stateData === undefined || $.isEmptyObject(stateData)) {
                     throw new Error(
                       'Expected stateData to be defined but ' +

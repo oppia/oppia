@@ -545,7 +545,6 @@ angular.module('oppia').directive('questionPlayer', [
             ctrl.directiveSubscriptions.add(
               ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
                 (result) => {
-                  console.log('Caught: totalQuestionsReceived');
                   updateTotalQuestions(result);
                 }
               )

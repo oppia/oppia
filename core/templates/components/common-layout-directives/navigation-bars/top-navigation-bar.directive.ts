@@ -248,7 +248,6 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.directiveSubscriptions.add(
               SearchService.onSearchBarLoaded.subscribe(
                 () => {
-                  console.log('Caught: searchBarLoaded');
                   $timeout(truncateNavbar, 100);
                 }
               )

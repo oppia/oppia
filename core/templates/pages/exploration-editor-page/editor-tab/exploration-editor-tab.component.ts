@@ -119,7 +119,6 @@ angular.module('oppia').component('explorationEditorTab', {
             ExplorationStatesService.isInitialized()) {
               var stateData = (
                 ExplorationStatesService.getState(ctrl.stateName));
-              console.log('Emitted: stateEditorInitialized in exploration-editor-tab');
               StateEditorService.onStateEditorInitialized.emit(stateData);
             }
           });

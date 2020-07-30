@@ -175,7 +175,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         questionPlayerConfig.questionCount,
         questionPlayerConfig.questionsSortedByDifficulty
       ).then(function(questionData) {
-        console.log('Emitter: totalQuestionsReceived');
         _totalQuestionsReceivedEventEmitter.emit(questionData.length);
         initializeQuestionPlayerServices(questionData, callback);
       });

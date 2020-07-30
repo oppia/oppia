@@ -104,7 +104,6 @@ angular.module('oppia').directive('questionEditor', [
             var stateData = ctrl.questionStateData;
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              console.log('Emitted: stateEditorInitialized in question-editor');
               StateEditorService.onStateEditorInitialized.emit(stateData);
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
@@ -205,10 +204,7 @@ angular.module('oppia').directive('questionEditor', [
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               StateEditorService.onStateEditorDirectiveInitialized.subscribe(
-                () => {
-                  console.log('Caught: stateEditorDirectiveInitialized');
-                  _init();
-                }
+                () => _init()
               )
             );
 

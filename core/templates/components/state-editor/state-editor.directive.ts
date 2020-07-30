@@ -100,7 +100,6 @@ angular.module('oppia').directive('stateEditor', [
           };
 
           $scope.reinitializeEditor = function() {
-            console.log('Emitted: stateEditorInitialized in question-editor');
             StateEditorService.onStateEditorInitialized.emit($scope.stateData);
           };
           ctrl.$onInit = function() {
@@ -118,7 +117,6 @@ angular.module('oppia').directive('stateEditor', [
             ctrl.directiveSubscriptions.add(
               StateEditorService.onStateEditorInitialized.subscribe(
                 (stateData) => {
-                  console.log('Caught: stateEditorInitialized in question-editor');
                   if (stateData === undefined || $.isEmptyObject(stateData)) {
                     throw new Error(
                       'Expected stateData to be defined but ' +
@@ -147,7 +145,6 @@ angular.module('oppia').directive('stateEditor', [
                 }
               )
             );
-            console.log('Emitted: stateEditorDirectiveInitialized');
             StateEditorService.onStateEditorDirectiveInitialized.emit();
             StateEditorService.updateStateEditorDirectiveInitialised();
           };
