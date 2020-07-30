@@ -137,7 +137,7 @@ class UserSettingsModel(base_models.BaseModel):
     # List of profile user ids associated with a full user profile. This is
     # None if the user model corresponds to a regular profile.
     associated_profile_user_ids = ndb.StringProperty(repeated=True)
-    
+
 
     # DEPRECATED in 2.8.7. Do not use.
     gae_user_id = ndb.StringProperty(required=False, indexed=False)
