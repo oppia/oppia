@@ -36,7 +36,7 @@ require(
   'editor-navbar-breadcrumb.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.directive.ts');
+  'editor-navigation.component.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.component.ts');
