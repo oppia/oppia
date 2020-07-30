@@ -499,7 +499,8 @@ describe('SvgFilenameEditor', function() {
     var mocktoSVG = function(arg) {
       return '<path></path>';
     };
-    var customToSVG = svgFilenameCtrl.customToSVG(mocktoSVG, 'path', 'group1');
+    var customToSVG = svgFilenameCtrl.createCustomToSVG(
+      mocktoSVG, 'path', 'group1');
     expect(customToSVG()).toBe('<path id="group1"/>');
     expect(svgFilenameCtrl.diagramStatus).toBe('editing');
   });

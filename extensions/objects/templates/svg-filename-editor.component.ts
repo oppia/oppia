@@ -132,7 +132,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
       ctrl.objectIsSelected = false;
       ctrl.pieChartDataLimit = 10;
-      var defaultDataInput = [{
+      ctrl.groupCount = 0;
+      ctrl.pieChartDataInput = [{
         name: 'Data name 1',
         data: 10,
         color: '#ff0000',
@@ -144,8 +145,6 @@ angular.module('oppia').component('svgFilenameEditor', {
         color: '#00ff00',
         angle: 0
       }];
-      ctrl.groupCount = 0;
-      ctrl.pieChartDataInput = defaultDataInput;
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
@@ -391,7 +390,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         return ctrl.diagramStatus === STATUS_SAVED;
       };
 
-      ctrl.customToSVG = function(toSVG, type, id) {
+      ctrl.createCustomToSVG = function(toSVG, type, id) {
         return function() {
           var svgString = toSVG.call(this);
           var domParser = new DOMParser();
@@ -424,7 +423,8 @@ angular.module('oppia').component('svgFilenameEditor', {
                     if (groupedObjects.length <= objId.slice(5)) {
                       groupedObjects.push([]);
                     }
-                    obj.toSVG = ctrl.customToSVG(obj.toSVG, obj.type, obj.id);
+                    obj.toSVG = ctrl.createCustomToSVG(
+                      obj.toSVG, obj.type, obj.id);
                     groupedObjects[objId.slice(5)].push(obj);
                   }
                 } else {
@@ -814,7 +814,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           strokeUniform: true,
           id: 'group' + ctrl.groupCount
         });
-        arc.toSVG = ctrl.customToSVG(arc.toSVG, 'path', arc.id);
+        arc.toSVG = ctrl.createCustomToSVG(arc.toSVG, 'path', arc.id);
         var p1 = new polyPoint (height + center.x, center.y + halfChord);
         var p2 = new polyPoint (height + center.x, center.y - halfChord);
         var tri = new fabric.Polygon([center, p1, p2, center], {
@@ -824,7 +824,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           strokeUniform: true,
           id: 'group' + ctrl.groupCount
         });
-        tri.toSVG = ctrl.customToSVG(tri.toSVG, tri.type, tri.id);
+        tri.toSVG = ctrl.createCustomToSVG(tri.toSVG, tri.type, tri.id);
         var rotationAngle = (startAngle + halfAngle) * radiansToDegrees;
         var slice = new fabric.Group([arc, tri], {
           originX: 'center',
@@ -865,6 +865,8 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.pieChartDataInput[i].color));
           currentAngle += ctrl.pieChartDataInput[i].angle;
         }
+        // This is to prevent the text from being too small. This can be
+        // changed again using editor.
         ctrl.fabricjsOptions.size = '18px';
         var size = ctrl.fabricjsOptions.size;
         var text = new fabric.Textbox(legendText, {
@@ -897,7 +899,19 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.drawMode = DRAW_MODE_PIECHART;
         } else {
           createChart();
-          ctrl.pieChartDataInput = defaultDataInput;
+          ctrl.pieChartDataInput = [{
+            name: 'Data name 1',
+            data: 10,
+            color: '#ff0000',
+            angle: 0
+          },
+          {
+            name: 'Data name 2',
+            data: 10,
+            color: '#00ff00',
+            angle: 0
+          }];
+          $scope.$applyAsync();
         }
       };
 

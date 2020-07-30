@@ -10,7 +10,7 @@
     <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
       <canvas ng-attr-id="<[$ctrl.canvasID]>" class="fabric-canvas-container"></canvas>
     </div>
-    <div ng-if="$ctrl.isDrawModePieChart()" class="fabric-canvas" style="background-color: #ffffff; overflow: auto; bottom: 0px;">
+    <div ng-if="$ctrl.isDrawModePieChart()" class="fabric-canvas pie-chart-form">
       <div class="container">
         <div class="row">
           <div class="col-md-5 col-sm-5 col-4">
@@ -37,7 +37,10 @@
           </div>
         </div>
         <div class="row">
-          <button type="button" class="btn btn-outline-secondary btn-block" ng-click="$ctrl.onAddItem()">Add item +</button>
+          <button ng-if="$ctrl.pieChartDataInput.length < $ctrl.pieChartDataLimit" type="button"
+                  class="btn btn-outline-secondary btn-block" ng-click="$ctrl.onAddItem()">
+                  Add item +
+          </button>
         </div>
       </div>
     </div>
@@ -86,7 +89,7 @@
         <button class="icon-tool toolbar-button thin-button protractor-test-create-piechart"
                 ng-class="{'disabled' : !$ctrl.isPieChartEnabled()}" ng-click="$ctrl.createPieChart()"
                 tooltip-placement="left" uib-tooltip="Pie Chart" ng-disabled="!$ctrl.isPieChartEnabled()">
-          <i class="fas fa-chart-pie" style="font-size: 22px;"></i>
+          <i class="fas fa-chart-pie pie-chart"></i>
         </button>
         <div class="vert-bottom-toolbar">
           <div>
@@ -247,6 +250,12 @@
     top: 31px;
   }
 
+  .svg-editor .fabric-canvas.pie-chart-form {
+    background-color: #ffffff;
+    bottom: 0px;
+    overflow: auto;
+  }
+
   .svg-editor .fabric-canvas::-webkit-scrollbar {
     -webkit-appearance: none;
     height: 7px;
@@ -348,6 +357,10 @@
 
   .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
     font-size: 21px;
+  }
+
+  .svg-editor .vertical-toolbar .toolbar-button .pie-chart {
+    font-size: 22px;
   }
 
   .svg-editor .vertical-toolbar .tooltip-inner {
