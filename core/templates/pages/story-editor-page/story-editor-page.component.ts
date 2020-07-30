@@ -186,7 +186,6 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorStateService.onStoryReinitialized.subscribe(
             () => _initPage()
           ));
-        StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         ctrl.validationIssues = [];
         ctrl.prepublishValidationIssues = [];
         ctrl.explorationValidationIssues = [];

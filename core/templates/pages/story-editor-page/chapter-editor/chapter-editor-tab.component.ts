@@ -23,15 +23,16 @@ require('pages/story-editor-page/services/story-editor-navigation.service');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('chapterEditorTab', {
   template: require('./chapter-editor-tab.component.html'),
   controller: [
     '$scope', 'StoryEditorNavigationService', 'StoryEditorStateService',
-    'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
     function(
-        $scope, StoryEditorNavigationService, StoryEditorStateService,
-        EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+        $scope, StoryEditorNavigationService, StoryEditorStateService) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var _initEditor = function() {
         ctrl.story = StoryEditorStateService.getStory();
         ctrl.storyContents = ctrl.story.getStoryContents();
@@ -57,9 +58,20 @@ angular.module('oppia').component('chapterEditorTab', {
       };
 
       ctrl.$onInit = function() {
-        $scope.$on(EVENT_STORY_INITIALIZED, _initEditor);
-        $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
+        ctrl.directiveSubscriptions.add(
+          StoryEditorStateService.onStoryInitialized.subscribe(
+            () => _initEditor()
+          )
+        );
+        ctrl.directiveSubscriptions.add(
+          StoryEditorStateService.onStoryReinitialized.subscribe(
+            () => _initEditor()
+          )
+        );
         _initEditor();
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
