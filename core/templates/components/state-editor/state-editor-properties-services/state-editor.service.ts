@@ -20,7 +20,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
 /* eslint-disable max-len */
 import { AnswerGroup } from
@@ -69,6 +69,8 @@ export class StateEditorService {
   stateHintsEditorInitialised: boolean = false;
   stateSolutionEditorInitialised: boolean = false;
   stateEditorDirectiveInitialised: boolean = false;
+  _stateEditorInitializedEventEmitter = new EventEmitter();
+  _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
 
   updateStateContentEditorInitialised(): void {
     this.stateContentEditorInitialised = true;
@@ -236,6 +238,14 @@ export class StateEditorService {
 
   deleteCurrentSolutionValidity(): void {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
+  }
+
+  get onStateEditorInitialized() {
+    return this._stateEditorInitializedEventEmitter;
+  }
+
+  get onStateEditorDirectiveInitialized() {
+    return this._stateEditorDirectiveInitializedEventEmitter;
   }
 }
 

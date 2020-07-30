@@ -39,6 +39,8 @@ require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -69,6 +71,7 @@ angular.module('oppia').directive('questionEditor', [
             QuestionObjectFactory, QuestionUpdateService, ResponsesService,
             SolutionValidityService, StateEditorService, INTERACTION_SPECS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.getStateContentPlaceholder = function() {
             return 'Type your question here.';
           };
@@ -101,7 +104,8 @@ angular.module('oppia').directive('questionEditor', [
             var stateData = ctrl.questionStateData;
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
+              console.log('Emitted: stateEditorInitialized in question-editor');
+              StateEditorService.onStateEditorInitialized.emit(stateData);
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
                 ctrl.interactionIsShown = true;
@@ -199,9 +203,14 @@ angular.module('oppia').directive('questionEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-              _init();
-            });
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onStateEditorDirectiveInitialized.subscribe(
+                () => {
+                  console.log('Caught: stateEditorDirectiveInitialized');
+                  _init();
+                }
+              )
+            );
 
             $scope.$on('interactionEditorInitialized', function(evt) {
               _init();
@@ -227,6 +236,9 @@ angular.module('oppia').directive('questionEditor', [
             // The _init function is written separately since it is also called
             // in $scope.$on when some external events are triggered.
             _init();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
