@@ -92,8 +92,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
                         self.filepath, next_line_expected_indentation,
                         next_line_column_number, tag, line_number + 1))
                 self.summary_messages.append(summary_message)
-                concurrent_task_utils.log(summary_message)
-                concurrent_task_utils.log('')
                 self.failed = True
 
         if tag_line.startswith(opening_tag) and (
@@ -105,8 +103,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     self.filepath, expected_indentation,
                     column_number, tag, line_number))
             self.summary_messages.append(summary_message)
-            concurrent_task_utils.log(summary_message)
-            concurrent_task_utils.log('')
             self.failed = True
 
         if tag not in self.void_elements:
@@ -114,8 +110,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
             self.indentation_level += 1
 
         if self.debug:
-            concurrent_task_utils.log('DEBUG MODE: Start tag_stack')
-            concurrent_task_utils.log(self.tag_stack)
+            python_utils.PRINT('DEBUG MODE: Start tag_stack')
+            python_utils.PRINT(self.tag_stack)
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -146,8 +142,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
                             self.filepath, value, attr,
                             tag, line_number))
                     self.summary_messages.append(summary_message)
-                    concurrent_task_utils.log(summary_message)
-                    concurrent_task_utils.log('')
 
         for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
@@ -170,8 +164,6 @@ class CustomHTMLParser(html.parser.HTMLParser):
                         self.filepath, tag,
                         line_num_of_error, line_number))
                 self.summary_messages.append(summary_message)
-                concurrent_task_utils.log(summary_message)
-                concurrent_task_utils.log('')
                 self.failed = True
 
     def handle_endtag(self, tag):
@@ -204,15 +196,13 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     self.filepath, tag, line_number,
                     last_starttag, last_starttag_line_num))
             self.summary_messages.append(summary_message)
-            concurrent_task_utils.log(summary_message)
-            concurrent_task_utils.log('')
             self.failed = True
 
         self.indentation_level -= 1
 
         if self.debug:
-            concurrent_task_utils.log('DEBUG MODE: End tag_stack')
-            concurrent_task_utils.log(self.tag_stack)
+            python_utils.PRINT('DEBUG MODE: End tag_stack')
+            python_utils.PRINT(self.tag_stack)
 
     def handle_data(self, data):
         """Handle indentation level.
@@ -268,17 +258,12 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
     def _check_html_tags_and_attributes(self):
         """This function checks the indentation of lines in HTML files."""
-
-        if self.verbose_mode_enabled:
-            concurrent_task_utils.log('Starting HTML tag and attribute check')
-            concurrent_task_utils.log(
-                '----------------------------------------')
-
         html_files_to_lint = self.html_filepaths
         stdout = sys.stdout
 
         failed = False
         summary_messages = []
+        full_messages = []
 
         with linter_utils.redirect_stdout(stdout):
             for filepath in html_files_to_lint:
@@ -297,20 +282,22 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                 summary_message = (
                     '%s HTML tag and attribute check failed, fix the HTML '
                     'files listed above.' % linter_utils.FAILED_MESSAGE_PREFIX)
-                concurrent_task_utils.log(summary_message)
-                summary_messages.append(summary_message)
+                full_messages.append(summary_message)
+                full_messages.extend(parser.summary_messages)
                 summary_messages.extend(parser.summary_messages)
             else:
                 summary_message = (
                     '%s HTML tag and attribute check passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
+                full_messages.append(summary_message)
 
-                concurrent_task_utils.log(summary_message)
-                summary_messages.append(summary_message)
-
-            concurrent_task_utils.log('')
-
-        return summary_messages
+        status = {
+            'name': 'HTML tag and attribute',
+            'failed': failed,
+            'full_messages': full_messages,
+            'summary_messages': summary_messages
+        }
+        return status
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -321,13 +308,13 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         """
 
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log('There are no HTML files to lint.')
+            python_utils.PRINT('')
+            python_utils.PRINT('There are no HTML files to lint.')
             return []
 
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
-        return self._check_html_tags_and_attributes()
+        return [self._check_html_tags_and_attributes()]
 
 
 class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
@@ -394,23 +381,16 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         htmllint_path = os.path.join(
             'node_modules', 'htmllint-cli', 'bin', 'cli.js')
 
+        failed = False
         error_summary = []
         total_error_count = 0
         summary_messages = []
+        full_messages = []
         stdout = sys.stdout
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         html_files_to_lint = self.html_filepaths
-        if self.verbose_mode_enabled:
-            concurrent_task_utils.log('Starting HTML linter...')
-            concurrent_task_utils.log(
-                '----------------------------------------')
-        concurrent_task_utils.log('')
-        if not self.verbose_mode_enabled:
-            concurrent_task_utils.log('Linting HTML files.')
         for filepath in html_files_to_lint:
             proc_args = htmllint_cmd_args + [filepath]
-            if self.verbose_mode_enabled:
-                concurrent_task_utils.log('Linting %s file' % filepath)
             with linter_utils.redirect_stdout(stdout):
                 proc = subprocess.Popen(
                     proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -423,38 +403,37 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 error_count = (
                     [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
                 if error_count:
+                    failed = True
                     error_summary.append(error_count)
-                    concurrent_task_utils.log(linter_stdout)
+                    full_messages.append(linter_stdout)
                     summary_messages.append(
                         self._get_trimmed_error_output(linter_stdout))
 
         with linter_utils.redirect_stdout(stdout):
-            if self.verbose_mode_enabled:
-                concurrent_task_utils.log(
-                    '----------------------------------------')
             for error_count in error_summary:
                 total_error_count += error_count
             total_files_checked = len(html_files_to_lint)
             if total_error_count:
-                concurrent_task_utils.log(
+                full_messages.append(
                     '(%s files checked, %s errors found)' % (
                         total_files_checked, total_error_count))
                 summary_message = (
                     '%s HTML linting failed, fix the HTML files listed above'
                     '.' % linter_utils.FAILED_MESSAGE_PREFIX)
-                summary_messages.append(summary_message)
+                full_messages.append(summary_message)
             else:
                 summary_message = (
                     '%s HTML linting passed' % (
                         linter_utils.SUCCESS_MESSAGE_PREFIX))
-                summary_messages.append(summary_message)
+                full_messages.append(summary_message)
 
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log(summary_message)
-            concurrent_task_utils.log('HTML linting finished.')
-            concurrent_task_utils.log('')
-
-        return summary_messages
+        status = {
+            'name': 'HTMLLint',
+            'failed': failed,
+            'full_messages': full_messages,
+            'summary_messages': summary_messages
+        }
+        return status
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -464,12 +443,12 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             all_messages: str. All the messages returned by the lint checks.
         """
         if not self.all_filepaths:
-            concurrent_task_utils.log('')
-            concurrent_task_utils.log(
+            python_utils.PRINT('')
+            python_utils.PRINT(
                 'There are no HTML files to lint.')
             return []
 
-        return self._lint_html_files()
+        return [self._lint_html_files()]
 
 
 def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):

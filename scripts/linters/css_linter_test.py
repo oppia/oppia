@@ -64,8 +64,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             '19:16',
             'Unexpected whitespace before \":\"   declaration-colon-space-'
-            'before'], linter_stdout.full_messages)
-        self.assertTrue(linter_stdout.failed)
+            'before'], linter_stdout['full_messages'])
+        self.assertTrue(linter_stdout['failed'])
 
     def test_perform_all_lint_checks_with_invalid_stylelint_path(self):
         def mock_join(*unused_args):
@@ -103,14 +103,14 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         with self.print_swap:
             third_party_linter.perform_all_lint_checks()
         self.assertEqual(
-            ['There are no HTML or CSS files to lint.'],
-            self.linter_stdout)
+            'There are no HTML or CSS files to lint.',
+            self.linter_stdout[1])
 
     def test_perform_all_lint_checks_with_valid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH], False)
         linter_stdout = third_party_linter.lint_css_files()
-        self.assertFalse(linter_stdout.failed)
+        self.assertFalse(linter_stdout['failed'])
 
     def test_get_linters(self):
         custom_linter, third_party_linter = css_linter.get_linters(
