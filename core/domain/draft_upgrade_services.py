@@ -37,6 +37,7 @@ def try_upgrading_draft_to_exp_version(
         draft_change_list, current_draft_version, to_exp_version, exp_id):
     """Try upgrading a list of ExplorationChange domain objects to match the
     latest exploration version.
+
     For now, this handles the scenario where all commits between
     current_draft_version and to_exp_version migrate only the state schema.
 
@@ -184,7 +185,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 # Converting the customization arguments depends on getting an
-                # exploration state of v34. Since we do not yet support passing
+                # exploration state of v35, because we need an interaction's id
+                # to properly convert ExplorationChanges that set customization
+                # arguments. Since we do not yet support passing
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.

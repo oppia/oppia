@@ -120,9 +120,9 @@ class Registry(python_utils.OBJECT):
                 interaction specs for.
 
         Returns:
-            dict. The full specs of each interaction for the given state schema
-            version. A mapping of interaction id to the specs of the
-            interaction. See interaction_specs.json for an example.
+            dict. The interaction specs for the given state schema
+            version, in the form of a mapping of interaction id to the
+            interaction specs- see interaction_specs.json for an example.
 
         Raises:
             Exception: No interaction specs json file found for the given state

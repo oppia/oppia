@@ -2914,6 +2914,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
 
+    def test_update_customization_args_with_non_unique_content_ids(self):
+        """Test that update customization args throws an error when passed
+        customization args with non-unique content ids."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.set_interaction_for_state(init_state, 'MultipleChoiceInput')
+        with self.assertRaisesRegexp(
+            Exception,
+            'All customization argument content_ids should be unique.'
+        ):
+            init_state.update_interaction_customization_args({
+                'choices': {
+                    'value': [{
+                        'content_id': 'non-unique-content-id',
+                        'html': '1'
+                    }, {
+                        'content_id': 'non-unique-content-id',
+                        'html': '2'
+                    }]
+                },
+                'showChoicesInShuffledOrder': {'value': True}
+            })
+
     def test_solution_validation(self):
         """Test validation of state solution."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')

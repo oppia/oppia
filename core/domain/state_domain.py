@@ -2595,6 +2595,11 @@ class State(python_utils.OBJECT):
             self.interaction.customization_args[ca_name].get_content_ids()
             for ca_name in self.interaction.customization_args]))
 
+        if len(new_content_id_list) != len(set(new_content_id_list)):
+            raise Exception(
+                'All customization argument content_ids should be unique. '
+                'Content ids recieved: %s' % new_content_id_list)
+
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
