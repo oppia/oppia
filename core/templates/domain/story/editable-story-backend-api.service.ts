@@ -16,7 +16,7 @@
  * @fileoverview Service to send changes to a story to the backend.
  */
 
- // changes made for #8472
+// changes made for #8472
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -38,16 +38,16 @@ export class EditableStoryBackendApiService {
   private storyDataDict = null;
   private _fetchStory(
       storyId: string,
-      successCallback: (value?: Object) => void,
-      errorCallback: (reason?: any) => void): void {
-    var storyDataUrl = this.urlInterpolation.interpolateUrl(
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: Object | Promise<Object>) => void): void {
+    var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
     this.http.get(
-      storyDataUrl).toPromise().then(
-      (response: any) => {
-        this.storyDataDict = cloneDeep(response);
+      editableStoryDataUrl, { observe: 'response'}).toPromise().then(
+      (response) => {
+        this.storyDataDict = cloneDeep(response.body);
         if (successCallback) {
           successCallback(this.storyDataDict);
         }
@@ -59,24 +59,24 @@ export class EditableStoryBackendApiService {
       });
   }
     private _updateStory = function(
-        storyId: Array<string>, storyVersion: string,
-        commitMessage,
-        changeList,
+        storyId: string, storyVersion: string,
+        commitMessage: string,
+        changeList: string[],
         successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: any) => void): void {
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          story_id: storyId.join(',')
+          story_id: storyId
         });
       var putData = {
         version: storyVersion,
-        commit_message: commitMessage.tostring(),
-        change_dicts: changeList.tostring()
+        commit_message: commitMessage,
+        change_dicts: changeList
       };
-      this.http.post(
+      this.http.put(
         editableStoryDataUrl, putData).toPromise().then(
         (response) => {
-          var story = angular.copy( response.body.story );
+          var story = cloneDeep( response.story );
           if ( successCallback ) {
             successCallback( story );
           }
@@ -87,22 +87,22 @@ export class EditableStoryBackendApiService {
         });
     };
     private _changeStoryPublicationStatus = function(
-        storyId: Array<string>,
-        newStoryStatusIsPublic,
+        storyId: string,
+        newStoryStatusIsPublic: boolean,
         successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: any) => void): void {
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var storyPublishUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
           story_id: storyId
         });
       var putData = {
-        new_story_status_is_public: newStoryStatusIsPublic.join(',')
+        new_story_status_is_public: newStoryStatusIsPublic
       };
-      this.http.post(
+      this.http.put(
         storyPublishUrl, putData).toPromise().then(
         (response) => {
           if (successCallback) {
-            successCallback();
+            successCallback(response.status);
           }
         }, function(errorResponse) {
           if (errorCallback) {
@@ -114,9 +114,9 @@ export class EditableStoryBackendApiService {
 
     private _validateExplorations = function(
         storyId: string,
-        expIds: any,
+        expIds: string[],
         successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: any) => void): void {
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var validateExplorationsUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
           story_id: storyId
@@ -131,7 +131,7 @@ export class EditableStoryBackendApiService {
         .toPromise().then(
           (response) => {
             if (successCallback) {
-              successCallback();
+              successCallback(response.status);
             }
           }, function(errorResponse) {
             if (errorCallback) {
@@ -144,12 +144,12 @@ export class EditableStoryBackendApiService {
     private _deleteStory = function(
         storyId: string,
         successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: any) => void): void {
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var storyDataUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
-      this.http.delete(
+      this.http.request('delete',
         storyDataUrl).toPromise().then(
         (response) => {
           if (successCallback) {
@@ -177,9 +177,9 @@ export class EditableStoryBackendApiService {
        * the success callback, if one is provided to the returned promise
        * object. Errors are passed to the error callback, if one is provided.
        */
-    updateStory(storyId: Array<string>, storyVersion: string,
+    updateStory(storyId: string, storyVersion: string,
         commitMessage: string,
-        changeList: string):
+        changeList: string[]):
       Promise<object> {
       return new Promise((resolve, reject) => {
         this._updateStory(
@@ -187,15 +187,15 @@ export class EditableStoryBackendApiService {
           resolve, reject);
       });
     }
-    changeStoryPublicationStatus(storyId: Array<string>,
-        newStoryStatusIsPublic: string):
+    changeStoryPublicationStatus(storyId: string,
+        newStoryStatusIsPublic: boolean):
     Promise<object> {
       return new Promise((resolve, reject) => {
         this._changeStoryPublicationStatus(
           storyId, newStoryStatusIsPublic, resolve, reject);
       });
     }
-    validateExplorations(storyId: string, expIds: string): Promise<object> {
+    validateExplorations(storyId: string, expIds: string[]): Promise<object> {
       return new Promise((resolve, reject) => {
         this._validateExplorations(
           storyId, expIds, resolve, reject);

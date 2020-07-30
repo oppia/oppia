@@ -41,7 +41,12 @@ export class ClassroomBackendApiService {
     private http: HttpClient,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory
   ) {}
-
+  /**
+   * 
+   * @param {String} classroomName -For the Classroom name
+   * @param {Object} successCallback -
+   * @param {any} errorCallback 
+   */
   _fetchClassroomData(classroomName: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
@@ -66,7 +71,11 @@ export class ClassroomBackendApiService {
       }
     });
   }
-
+  /**
+   * 
+   * @param classroomName 
+   * 
+   */
   fetchClassroomData(classroomName: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
