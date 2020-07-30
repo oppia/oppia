@@ -40,15 +40,29 @@ def subscribe_to_thread(user_id, feedback_thread_id):
         user_id: str. The user ID of the new subscriber.
         feedback_thread_id: str. The ID of the feedback thread.
     """
+    subscribe_to_threads(user_id, [feedback_thread_id])
+
+
+def subscribe_to_threads(user_id, feedback_thread_ids):
+    """Subscribes a user to feedback threads.
+
+    WARNING: Callers of this function should ensure that the user_id and
+    the feedback_thread_ids are valid.
+
+    Args:
+        user_id: str. The user ID of the new subscriber.
+        feedback_thread_id: list(str). The IDs of the feedback threads.
+    """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if (feedback_thread_id not in
+    for feedback_thread_id in feedback_thread_ids:
+        if (feedback_thread_id not in
             subscriptions_model.general_feedback_thread_ids):
-        subscriptions_model.general_feedback_thread_ids.append(
-            feedback_thread_id)
+            subscriptions_model.general_feedback_thread_ids.append(
+                feedback_thread_id)
     subscriptions_model.put()
 
 
