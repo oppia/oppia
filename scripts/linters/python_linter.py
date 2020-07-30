@@ -195,7 +195,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         one_off_jobs_list = []
         validation_jobs_list = []
         for filepath in self.all_filepaths:
-            if filepath.endswith('_validation_jobs_one_off.py'):
+            if filepath.endswith('prod_validation_jobs_one_off.py'):
                 validation_jobs_list.extend(_get_jobs_class_names_in_filepath(
                     filepath, 'ProdValidationAuditOneOffJob'))
             elif filepath.endswith('_jobs_one_off.py'):

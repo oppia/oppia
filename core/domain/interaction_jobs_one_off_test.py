@@ -21,13 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import interaction_validation_jobs_one_off
+from core.domain import interaction_jobs_one_off
 from core.domain import rights_manager
-from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
@@ -217,14 +215,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
@@ -236,14 +234,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule '
@@ -261,14 +259,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Start DragAndDropSortInputInteractionOneOffJob on private
         # exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
@@ -323,7 +321,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self,
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob)
 
 
@@ -392,15 +390,15 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
@@ -443,15 +441,15 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'exp_id0\', '
@@ -511,7 +509,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self,
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob)
 
 
@@ -587,15 +585,15 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
@@ -640,15 +638,15 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'exp_id0\', '
@@ -711,296 +709,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self,
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob)
-
-
-class InteractionRTECustomizationArgsValidationJobTests(
-        test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            InteractionRTECustomizationArgsValidationJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_customization_arg_validation_job_with_single_exp(self):
-        """Check expected errors are produced for invalid html strings in RTE
-        components for a single exploration.
-        """
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2', 'State3'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="'
-                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
-                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
-                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
-                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
-                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
-                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            )
-        }
-        default_outcome2 = state_domain.Outcome(
-            'State1',
-            state_domain.SubtitledHtml(
-                'default_outcome',
-                (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;What is a link?&amp;quot;" url-with-'
-                    'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            ), False, [], None, None
-        )
-        content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            )
-        }
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_interaction_default_outcome(default_outcome2)
-            state3.update_content(
-                state_domain.SubtitledHtml.from_dict(content3_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-            # Start CustomizationArgsValidation job on sample exploration.
-            job_id = (
-                interaction_validation_jobs_one_off
-                .InteractionRTECustomizationArgsValidationOneOffJob.create_new(
-                    ))
-            (
-                interaction_validation_jobs_one_off
-                .InteractionRTECustomizationArgsValidationOneOffJob.enqueue(
-                    job_id))
-            self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationOneOffJob.get_output(
-                job_id))
-
-        expected_output = [(
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
-            'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
-            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp Id: exp_id0\']]'
-        ), (
-            '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\', '
-            'u\'Exp Id: exp_id0\']]'
-        )]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_for_customization_arg_validation_job_with_multiple_exp(self):
-        """Check expected errors are produced for invalid html strings in RTE
-        components for multiple explorations.
-        """
-
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration1.add_states(['State1', 'State2', 'State3'])
-        exp1_state1 = exploration1.states['State1']
-        exp1_state2 = exploration1.states['State2']
-        exp1_state3 = exploration1.states['State3']
-        exp1_content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="'
-                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
-                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
-                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
-                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
-                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
-                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            )
-        }
-        exp1_default_outcome2 = state_domain.Outcome(
-            'State1',
-            state_domain.SubtitledHtml(
-                'default_outcome',
-                (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;What is a link?&amp;quot;" url-with-'
-                    'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            ), False, [], None, None
-        )
-        exp1_content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            )
-        }
-
-        exploration2 = exp_domain.Exploration.create_default_exploration(
-            self.NEW_EXP_ID, title='title', category='category')
-        exploration2.add_states(['State1', 'State2'])
-        exp2_state1 = exploration2.states['State1']
-        exp2_default_outcome1 = state_domain.Outcome(
-            'State2',
-            state_domain.SubtitledHtml(
-                'default_outcome',
-                (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;Test link?&amp;quot;" url-with-'
-                    'value="&amp;quot;test.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            ), False, [], None, None
-        )
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            exp1_state1.update_content(
-                state_domain.SubtitledHtml.from_dict(exp1_content1_dict))
-            exp1_state2.update_interaction_default_outcome(
-                exp1_default_outcome2)
-            exp1_state3.update_content(
-                state_domain.SubtitledHtml.from_dict(exp1_content3_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration1)
-
-            exp2_state1.update_interaction_default_outcome(
-                exp2_default_outcome1)
-            exp_services.save_new_exploration(self.albert_id, exploration2)
-
-            # Start CustomizationArgsValidation job on sample exploration.
-            job_id = (
-                interaction_validation_jobs_one_off
-                .InteractionRTECustomizationArgsValidationOneOffJob.create_new(
-                    ))
-            (
-                interaction_validation_jobs_one_off
-                .InteractionRTECustomizationArgsValidationOneOffJob.enqueue(
-                    job_id))
-            self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationOneOffJob.get_output(
-                job_id))
-
-        expected_output = [(
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' or '
-            '\'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
-            'link.com&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp Id: exp_id0\']]'
-        ), (
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
-            'or \'https://\'; received test.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
-            'link?&amp;quot;" url-with-value="&amp;quot;test.com&amp;quot;">'
-            '</oppia-noninteractive-link></p>\', '
-            'u\'Exp Id: exp_id1\']]'
-        ), (
-            '[u\'Invalid filepath\', [u\'<oppia-noninteractive-image '
-            'alt-with-value="&amp;quot;A circle divided into equal '
-            'fifths.&amp;quot;" caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-            '</oppia-noninteractive-image>\', u\'Exp Id: exp_id0\']]')]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': (
-                '<p><oppia-noninteractive-link text-with-value="'
-                '&amp;quot;What is a link?&amp;quot;" url-with-'
-                'value="&amp;quot;htt://link.com&amp'
-                ';quot;"></oppia-noninteractive-link></p>'
-            ),
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self,
-            interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationOneOffJob)
-
-    def test_validation_job_fails_for_invalid_schema_version(self):
-        """Test that invalid schema version results in job failure."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
-        exploration_model.states_schema_version = 100
-        exploration_model.commit(
-            self.albert_id, 'Changed states_schema_version.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
-
-        job_id = (
-            interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationOneOffJob.create_new())
-        (
-            interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            interaction_validation_jobs_one_off
-            .InteractionRTECustomizationArgsValidationOneOffJob.get_output(
-                job_id))
-        expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
-            'exploration state schemas at present. when loading exploration\', '
-            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
-
-        self.assertEqual(actual_output, expected_output)
 
 
 class InteractionCustomizationArgsValidationOneOffJobTests(
@@ -1052,15 +762,15 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
@@ -1079,15 +789,15 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
         job_id = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.create_new())
         (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'Failed customization args validation for exp id exp_id0\', '
@@ -1123,5 +833,5 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
 
         run_job_for_deleted_exp(
             self,
-            interaction_validation_jobs_one_off
+            interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob)
