@@ -228,7 +228,7 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
-            'name': user.name,
+            'actual_name': user.actual_name,
             'pin': user.pin,
             'associated_profile_user_ids': user.associated_profile_user_ids,
             'preferred_android_language_codes': (

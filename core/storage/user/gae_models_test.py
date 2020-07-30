@@ -57,7 +57,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
-    GENERIC_NAME = 'name'
+    GENERIC_ACTUAL_NAME = 'actual_name'
     GENERIC_PIN = '123'
     ASSOCIATED_PROFILE_IDS = ['profile_1_user_id', 'profile_2_user_id']
 
@@ -99,7 +99,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
             preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
-            name=self.GENERIC_NAME,
+            actual_name=self.GENERIC_ACTUAL_NAME,
             pin=self.GENERIC_PIN,
             associated_profile_user_ids=self.ASSOCIATED_PROFILE_IDS,
             preferred_android_language_codes=self.GENERIC_LANGUAGE_CODES,
@@ -184,7 +184,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'name': None,
+            'actual_name': None,
             'pin': None,
             'associated_profile_user_ids': [],
             'preferred_android_language_codes': [],
@@ -214,7 +214,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'name': self.GENERIC_NAME,
+            'actual_name': self.GENERIC_ACTUAL_NAME,
             'pin': self.GENERIC_PIN,
             'associated_profile_user_ids': self.ASSOCIATED_PROFILE_IDS,
             'preferred_android_language_codes': self.GENERIC_LANGUAGE_CODES,
