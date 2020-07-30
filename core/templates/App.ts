@@ -124,6 +124,7 @@ angular.module('oppia').config([
       'GuestCollectionProgressObjectFactory', 'GuestCollectionProgressService',
       'HtmlEscaperService', 'I18nLanguageCodeService', 'IdGenerationService',
       'ImageFileObjectFactory', 'ImprovementsService',
+      'InteractionObjectFactory', 'KeyboardShortcutService',
       'InteractionRulesRegistryService', 'LanguageUtilService',
       'LearnerAnswerDetailsBackendApiService',
       'LearnerDashboardBackendApiService', 'LearnerParamsService',
