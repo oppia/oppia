@@ -21,7 +21,7 @@ import { CommandExecutorService } from
   'pages/exploration-player-page/services/command-executor.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
-fdescribe('Command executor service', () => {
+describe('Command executor service', () => {
   let ces: CommandExecutorService, wrf: WindowRef;
   beforeEach(() => {
     TestBed.configureTestingModule({
