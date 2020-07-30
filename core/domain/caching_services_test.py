@@ -20,16 +20,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import caching_services
-from core.domain import collection_domain
 from core.domain import exp_domain
-from core.domain import skill_domain
-from core.domain import story_domain
-from core.domain import topic_domain
 from core.domain import exp_fetchers
-from core.domain import collection_services
-from core.domain import topic_fetchers
-from core.domain import skill_fetchers
-from core.domain import story_fetchers
 from core.tests import test_utils
 
 

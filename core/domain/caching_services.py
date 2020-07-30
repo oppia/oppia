@@ -19,13 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
 from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
+import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 

@@ -350,9 +350,7 @@ def main(args=None):
         # Pipe output to /dev/null for silence in console.
         null = python_utils.open_file('/dev/null', 'w')
         command_text = ['redis-cli', '--version']
-        current_process = subprocess.Popen(
-            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        current_process.communicate()[1]
+        subprocess.call(command_text)
         null.close()
         python_utils.PRINT('Redis-cli is already installed.')
     except OSError:

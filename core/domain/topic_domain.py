@@ -673,7 +673,8 @@ class Topic(python_utils.OBJECT):
             if 'last_updated' in topic_dict else None)
         topic = cls.from_dict(
             topic_dict,
-            topic_version=topic_dict['version'] if 'version' in topic_dict else 0,
+            topic_version=(
+                topic_dict['version'] if 'version' in topic_dict else 0),
             topic_created_on=created_on,
             topic_last_updated=last_updated)
         return topic

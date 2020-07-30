@@ -269,7 +269,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_caching_services(self):
         """Tests import memcache services function."""
-        from core.platform.redis_cache_services import redis_cache_service
+        from core.platform.cache import redis_cache_service
         self.assertEqual(
             self.registry_instance.import_caching_services(),
             redis_cache_service)

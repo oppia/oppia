@@ -917,9 +917,9 @@ class Story(python_utils.OBJECT):
         try:
             story_dict = json.loads(memory_cache_json_string)
         except ValueError:
-            raise Exception(
-                ('Json decoding failed for JSON string associated with class' +
-                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+            raise Exception((
+                'Json decoding failed for JSON string associated with class' +
+                ' %s.' % python_utils.convert_to_bytes(type(cls))))
         created_on = (
             utils.convert_string_to_datetime_object(
                 story_dict['created_on'])
@@ -971,18 +971,18 @@ class Story(python_utils.OBJECT):
         try:
             result = json.dumps(story_dict)
         except TypeError:
-            raise Exception(
-                ('Object of type %s cannot be JSON serialized. Please ' +
-                 'consult this table for more information on what types are s' +
-                 'erializable: https://docs.python.org/3/library/json.html#py' +
-                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+            raise Exception((
+                'Object of type %s cannot be JSON serialized. Please ' +
+                'consult this table for more information on what types are s' +
+                'erializable: https://docs.python.org/3/library/json.html#py' +
+                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
 
         return result
 
     @classmethod
     def from_dict(
-        cls, story_dict, story_version=0,
-         story_created_on=None, story_last_updated=None):
+            cls, story_dict, story_version=0,
+            story_created_on=None, story_last_updated=None):
         """Returns a Story domain object from a dict.
 
         Args:
