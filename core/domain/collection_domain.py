@@ -321,13 +321,13 @@ class Collection(python_utils.OBJECT):
         """Return a Collection domain object from a dict.
 
         Args:
-            collection_dict: dict. The dictionary representation of  the
-                collection.
-            collection_version: int. The version of the collection.
+            collection_dict: dict. The dictionary representation of the
+                Collection.
+            collection_version: int. The version of the Collection.
             collection_created_on: datetime.datetime. Date and time when the
-                collection is created.
+                Collection is created.
             collection_last_updated: datetime.datetime. Date and time when
-                the collection is updated last time.
+                the Collection is updated last time.
 
         Returns:
             Collection. The corresponding Collection domain object.
@@ -347,12 +347,16 @@ class Collection(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, memory_cache_json_string):
-        """Return a Collection domain object decoded from a memory cache json
-        string.
+        """Return a Collection domain object decoded from a json string
+        retrieved from the memory cache.
 
         Args:
-            memory_cache_json_string: str. A json encoded string that can be
-                decoded into a dictionary representing a Collection.
+            memory_cache_json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Collection. Only call
+                on strings returned from caching_services.get_multi.
+
+        Raises:
+            Exception: The string is not a valid JSON string.
 
         Returns:
             Collection. The corresponding Collection domain object.
@@ -385,8 +389,12 @@ class Collection(python_utils.OBJECT):
         """Returns a JSON string representing this Collection domain object to
         store in the memory cache.
 
+        Raises:
+            Exception: The dictionary object representing the Collection is not
+                JSON serializable.
+
         Returns:
-            str. JSON encoded string encoding all of the information composing
+            str. JSON-encoded string encoding all of the information composing
             a Collection.
         """
         collection_dict = {

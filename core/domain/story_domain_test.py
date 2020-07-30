@@ -1328,7 +1328,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_export_import_returns_original_object(self):
         """Checks that to_dict and from_dict preserves all the data within a
-        story during export and import.
+        Story during export and import.
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(

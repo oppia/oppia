@@ -61,6 +61,7 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, create dummy users."""
         super(CollectionServicesUnitTests, self).setUp()
+
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)

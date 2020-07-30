@@ -252,6 +252,7 @@ env_variables:
 # server.
   REDISHOST: 'localhost'
   REDISPORT: '6379'
+
 skip_files:
 # .pyc and .pyo files
 - ^(.*/)?.*\.py[co]$

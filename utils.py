@@ -423,29 +423,29 @@ def get_time_in_millisecs(datetime_obj):
 
 
 def convert_datetime_to_string(datetime_obj):
-    """Returns string format of the datetime object.
+    """Returns a human-readable string representing the datetime object.
 
     Args:
         datetime_obj: datetime. An object of type datetime.datetime.
 
     Returns:
-        str. The string format representing the datetime object.
+        str. The string representing the datetime object.
     """
     return datetime_obj.strftime('%m/%d/%Y, %H:%M:%S:%f')
 
 
-def convert_string_to_datetime_object(date_string):
+def convert_string_to_datetime_object(date_time_string):
     """Returns the datetime object equivalent of the date string.
 
     Args:
-        date_string: str. The string format representing the datetime object in
+        date_time_string: str. The string format representing the datetime object in
             the format: Month/Day/Year, Hour:Minute:Second:MicroSecond.
 
     Returns:
-        datetime_obj: datetime. An object of type datetime.datetime
-        corresponding to that string.
+        datetime. An object of type datetime.datetime corresponding to that
+        string.
     """
-    return datetime.datetime.strptime(date_string, '%m/%d/%Y, %H:%M:%S:%f')
+    return datetime.datetime.strptime(date_time_string, '%m/%d/%Y, %H:%M:%S:%f')
 
 
 def get_current_time_in_millisecs():

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility for memory caching."""
+"""Service functions to set and retrieve data from the memory cache."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -31,13 +31,13 @@ memory_cache_services = models.Registry.import_cache_services()
 
 
 def flush_memory_cache():
-    """Flushes the redis cache by wiping all data."""
+    """Flushes the redis cache by wiping all of the data."""
     memory_cache_services.flush_cache()
 
 
 def _get_correct_type_of_key(key):
     """In the memory cache, values are stored as (key, value) pairs where values
-    can be dictionary representations of Oppia objects, e.g Collection,
+    can be string representations of Oppia objects, e.g Collection,
     Exploration, etc. These dictionary types can be identified by the key that
     the memory cache uses to store the dictionaries. This function returns the
     correct type of the saved memory cache value using the key.
@@ -46,9 +46,9 @@ def _get_correct_type_of_key(key):
         key: str. The key string used in the memory cache.
 
     Returns:
-        class|None. Returns the original class of the object that got converted
-        to a dictionary or if this key does not correspond to a class that
-        requires deserialization, None.
+        Collection|Exploration|Skill|Story|Topic|None. Returns the original
+        class of the object that got converted to a dictionary. If this key does
+        not correspond to a class that requires deserialization, return None.
     """
     if key.startswith('collection'):
         return collection_domain.Collection
@@ -65,11 +65,10 @@ def _get_correct_type_of_key(key):
 
 
 def get_multi(keys):
-    """Get a dictionary of the key, value pairs from the memory cache.
+    """Get a dictionary of the {key, value} pairs from the memory cache.
 
     Args:
-        keys: list(str). keys: list(str). List of keys to query the caching
-            service for.
+        keys: list(str). List of keys to query the caching service for.
 
     Returns:
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
@@ -117,7 +116,7 @@ def delete_multi(keys):
         keys: list(str). A list of key strings to delete from the cache.
 
     Returns:
-        bool. True if all operations complete successfully; False otherwise.
+        bool. True if all operations complete successfully. False otherwise.
     """
     if len(keys) == 0:
         return True

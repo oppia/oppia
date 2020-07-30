@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides redis cache services."""
+"""Provides the redis cache service functionality."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -29,12 +29,12 @@ REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
 
 
 def flush_cache():
-    """Flushes the redis database clean."""
+    """Wipes the Redis cache clean."""
     REDIS_CLIENT.flushdb()
 
 
 def get_multi(keys):
-    """Looks up a list of keys in memcache.
+    """Looks up a list of keys in Redis cache.
 
     Args:
         keys: list(str). A list of keys (strings) to look up.
@@ -48,23 +48,22 @@ def get_multi(keys):
 
 
 def set_multi(key_value_mapping):
-    """Sets multiple keys' values at once.
+    """Sets multiple keys' values at once in the Redis cache.
 
     Args:
-        key_value_mapping: a dict of {key: value} pairs. Both the key and value
-            are strings. The value can either be a primitive binary-safe string
-            or the json encoded version of a dictionary using
-            core.domain.caching_services.
+        key_value_mapping: dict(str, str). Both the key and value are strings.
+            The value can either be a primitive binary-safe string or the
+            JSON-encoded string version of the object.
 
     Returns:
-        bool. Whether or not the set action succeeded.
+        bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
     return REDIS_CLIENT.mset(key_value_mapping)
 
 
 def delete(key):
-    """Deletes a key in memcache.
+    """Deletes a key in the Redis cache.
 
     Args:
         key: str. A key (string) to delete.
@@ -73,12 +72,12 @@ def delete(key):
         int. Number of successfully deleted keys.
     """
     assert isinstance(key, python_utils.BASESTRING)
-    return_code = REDIS_CLIENT.delete(key)
-    return return_code
+    number_of_deleted_keys = REDIS_CLIENT.delete(key)
+    return number_of_deleted_keys
 
 
 def delete_multi(keys):
-    """Deletes multiple keys in memcache.
+    """Deletes multiple keys in the Redis cache.
 
     Args:
         keys: list(str). The keys (strings) to delete.
@@ -88,5 +87,5 @@ def delete_multi(keys):
     """
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)
-    return_value = REDIS_CLIENT.delete(*keys)
-    return return_value
+    number_of_deleted_keys = REDIS_CLIENT.delete(*keys)
+    return number_of_deleted_keys

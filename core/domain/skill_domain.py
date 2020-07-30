@@ -772,8 +772,12 @@ class Skill(python_utils.OBJECT):
         """Returns a JSON string representing this Skill domain object to
         store in the memory cache.
 
+        Raises:
+            Exception: The dictionary object representing the Skill is not
+                JSON serializable.
+
         Returns:
-            str. JSON encoded string encoding all of the information composing
+            str. JSON-encoded string encoding all of the information composing
             a Skill.
         """
         skill_dict = {
@@ -819,12 +823,16 @@ class Skill(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, memory_cache_json_string):
-        """Return a Skill domain object decoded from a memory cache json
-        string.
+        """Return a Skill domain object decoded from a json string
+        retrieved from the memory cache.
+
+        Raises:
+            Exception: The string is not a valid JSON string.
 
         Args:
-            memory_cache_json_string: str. A json encoded string that can be
-                decoded into a dictionary representing a Skill.
+            memory_cache_json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Skill. Only call
+                on strings returned from caching_services.get_multi.
 
         Returns:
             Skill. The corresponding Skill domain object.
@@ -859,7 +867,7 @@ class Skill(python_utils.OBJECT):
         """Returns a Skill domain object from a dict.
 
         Args:
-            skill_dict: dict. The dict representation of Skill
+            skill_dict: dict. The dictionary representation of Skill
                 object.
             skill_version: int. The version of the Skill.
             skill_created_on: datetime.datetime. Date and time when the

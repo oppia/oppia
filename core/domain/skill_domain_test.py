@@ -476,7 +476,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_skill_export_import_returns_original_object(self):
         """Checks that to_dict and from_dict preserves all the data within a
-        skill during export and import.
+        Skill during export and import.
         """
         skill_dict = self.skill.to_dict()
         skill_from_dict = skill_domain.Skill.from_dict(skill_dict)

@@ -1252,6 +1252,7 @@ def save_new_exploration_from_yaml_and_assets(
     """
     if assets_list is None:
         assets_list = []
+
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')
@@ -1530,6 +1531,7 @@ def is_version_of_draft_valid(exp_id, version):
         bool. Whether the given version number is the same as the current
         version number of the exploration in the datastore.
     """
+
     return exp_fetchers.get_exploration_by_id(exp_id).version == version
 
 
@@ -1690,6 +1692,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
     updated_exploration = None
+
     if (exp_user_data and exp_user_data.draft_change_list and
             is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
         updated_exploration = apply_change_list(exp_id, draft_change_list)

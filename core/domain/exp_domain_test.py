@@ -895,6 +895,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='', end_state_name='End')
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
         exploration.validate()
+
         with self.assertRaisesRegexp(
             utils.ValidationError, 'title must be specified'
             ):

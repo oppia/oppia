@@ -552,8 +552,12 @@ class Topic(python_utils.OBJECT):
         """Returns a JSON string representing this Topic domain object to
         store in the memory cache.
 
+        Raises:
+            Exception: The dictionary object representing this Topic is not
+                JSON serializable.
+
         Returns:
-            str. JSON encoded string encoding all of the information composing
+            str. JSON-encoded string encoding all of the information composing
             a Topic.
         """
         topic_dict = {
@@ -609,7 +613,7 @@ class Topic(python_utils.OBJECT):
         """Returns a Topic domain object from a dict.
 
         Args:
-            topic_dict: dict. The dict representation of Topic
+            topic_dict: dict. The dictionary representation of Topic
                 object.
             topic_version: int. The version of the Topic.
             topic_created_on: datetime.datetime. Date and time when the
@@ -647,12 +651,16 @@ class Topic(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, memory_cache_json_string):
-        """Return a Topic domain object decoded from a memory cache json
-        string.
+        """Return a Topic domain object decoded from a json string
+        retrieved from the memory cache.
 
         Args:
-            memory_cache_json_string: str. A json encoded string that can be
-                decoded into a dictionary representing a Topic.
+            memory_cache_json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Topic.  Only call
+                on strings returned from caching_services.get_multi.
+
+        Raises:
+            Exception: The string is not a valid JSON string.
 
         Returns:
             Topic. The corresponding Topic domain object.

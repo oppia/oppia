@@ -768,7 +768,6 @@ class Exploration(python_utils.OBJECT):
             for pc in exploration_dict['param_changes']]
 
         exploration.version = exploration_version
-
         exploration.created_on = exploration_created_on
         exploration.last_updated = exploration_last_updated
 
@@ -1028,6 +1027,7 @@ class Exploration(python_utils.OBJECT):
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
                 warnings_list.append(python_utils.UNICODE(e))
+
             if not self.title:
                 warnings_list.append(
                     'A title must be specified (in the \'Settings\' tab).')
@@ -4049,11 +4049,15 @@ class Exploration(python_utils.OBJECT):
         })
 
     def serialize(self):
-        """Returns a copy of the exploration as a JSON string. It includes all
-        necessary information to represent the exploration.
+        """Returns a copy of the Exploration as a JSON string. It includes all
+        of the necessary information to represent an Exploration.
+
+        Raises:
+            Exception: The dictionary object representing the Exploration is not
+                JSON serializable.
 
         Returns:
-            str. JSON encoded string encoding all of the information composing
+            str. JSON-encoded string encoding all of the information composing
             an Exploration.
         """
         exploration_dict = copy.deepcopy({
@@ -4097,12 +4101,16 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, memory_cache_json_string):
-        """Return an Exploration domain object decoded from a memory cache json
-        string.
+        """Return an Exploration domain object decoded from a json string
+        retrieved from the memory cache.
 
         Args:
-            memory_cache_json_string: str. A json encoded string that can be
-                decoded into a dictionary representing an Exploration.
+            memory_cache_json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing an Exploration. Only call
+                on strings returned from caching_services.get_multi.
+
+        Raises:
+            Exception: The string is not a valid JSON string.
 
         Returns:
             Exploration. The corresponding Exploration domain object.

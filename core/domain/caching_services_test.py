@@ -48,6 +48,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_flush_cache_wipes_cache_clean(self):
+        """Tests whether flushing the cache removes the elements in the
+        cache.
+        """
         caching_services.flush_memory_cache()
         self.assertEqual(
             caching_services.get_multi(self.keys), {})
