@@ -461,7 +461,7 @@ angular.module('oppia').directive('questionsList', [
             var associatedSkillSummaries = ctrl.associatedSkillSummaries;
             var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
             var categorizedSkills = ctrl.getSkillsCategorizedByTopics;
-            var untriagedSkillSummaries = ctrl.untriagedSkillSummaries;
+            var untriagedSkillSummaries = ctrl.getUntriagedSkillSummaries();
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
