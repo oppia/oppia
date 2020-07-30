@@ -2318,24 +2318,24 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
-                feconf.GAE_AUTH_METHOD, self.NONREGISTERED_GAE_ID)
+                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID)
         )
 
     def test_get_by_auth_id_for_single_element_in_auth_id_attribute(self):
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_1_ID),
             user_models.UserAuthModel.get_by_auth_id(
-                feconf.GAE_AUTH_METHOD, self.USER_1_GAE_ID[0])
+                feconf.AUTH_METHOD_GAE, self.USER_1_GAE_ID[0])
         )
 
     def test_get_by_auth_id_for_list_in_auth_id_attribute(self):
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_2_ID),
             user_models.UserAuthModel.get_by_auth_id(
-                feconf.GAE_AUTH_METHOD, self.USER_2_GAE_ID[0])
+                feconf.AUTH_METHOD_GAE, self.USER_2_GAE_ID[0])
         )
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_2_ID),
             user_models.UserAuthModel.get_by_auth_id(
-                feconf.GAE_AUTH_METHOD, self.USER_2_GAE_ID[1])
+                feconf.AUTH_METHOD_GAE, self.USER_2_GAE_ID[1])
         )

@@ -1039,4 +1039,4 @@ AVAILABLE_LANDING_PAGES = {
 CLASSROOM_PAGES = ['math']
 
 # Authentication method using GAE ID (google sign in)
-GAE_AUTH_METHOD = 'gae'
+AUTH_METHOD_GAE = 'gae'

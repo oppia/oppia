@@ -2223,7 +2223,7 @@ class UserAuthModel(base_models.BaseModel):
     Instances of this class are keyed by user id.
     """
 
-    # Authentication detail for sign in using google id (GAE).
+    # Authentication detail for sign-in using google id (GAE).
     gae_id = ndb.StringProperty(indexed=True, repeated=True)
 
     @staticmethod
@@ -2235,7 +2235,7 @@ class UserAuthModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Currently, the model hold authentication details relavant only for
+        """Currently, the model holds authentication details relevant only for
         backend, and no exportable user data. It may contain user data in
         the future.
         """
@@ -2277,6 +2277,6 @@ class UserAuthModel(base_models.BaseModel):
             if there exists one, else None.
         """
 
-        if auth_service == feconf.GAE_AUTH_METHOD:
+        if auth_service == feconf.AUTH_METHOD_GAE:
             return cls.query(cls.gae_id == auth_id).get()
         return None
