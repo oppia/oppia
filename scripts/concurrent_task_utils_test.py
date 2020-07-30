@@ -58,7 +58,7 @@ class CreateTaskTests(ConcurrentTaskUtilsTests):
 
     def test_create_task_with_success(self):
         task = concurrent_task_utils.create_task(
-            test_function, self.semaphore)
+            test_function, True, self.semaphore)
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))
 
 
@@ -67,7 +67,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_success(self):
         task = concurrent_task_utils.TaskThread(
-            test_function('unused_arg'), self.semaphore, name='test')
+            test_function('unused_arg'), True, self.semaphore, name='test')
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -78,7 +78,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_exception(self):
         task = concurrent_task_utils.TaskThread(
-            test_function, self.semaphore, name='test')
+            test_function, True, self.semaphore, name='test')
         with self.print_swap:
             task.start()
             task.join()
@@ -92,7 +92,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_single_task(self):
         task = concurrent_task_utils.create_task(
-            test_function('unused_arg'), self.semaphore, name='test')
+            test_function('unused_arg'), True, self.semaphore, name='test')
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
@@ -102,7 +102,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in python_utils.RANGE(6):
             task = concurrent_task_utils.create_task(
-                test_function('unused_arg'), self.semaphore)
+                test_function('unused_arg'), True, self.semaphore)
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
@@ -113,7 +113,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in python_utils.RANGE(6):
             task = concurrent_task_utils.create_task(
-                test_function, self.semaphore)
+                test_function, True, self.semaphore)
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)

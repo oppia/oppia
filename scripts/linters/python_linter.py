@@ -419,7 +419,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
         full_messages.append(summary_message)
 
-        return status = {
+        status = {
             'name': 'Pylint',
             'failed': errors_found,
             'full_messages': full_messages,
@@ -555,8 +555,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('There are no Python files to lint.')
             return []
 
-        linter_stdout.append(
-            self._lint_py_files(config_pylint, config_pycodestyle))
+        linter_stdout.append(self._lint_py_files())
 
         linter_stdout.append(self._lint_py_files_for_python3_compatibility())
 

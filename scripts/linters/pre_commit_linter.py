@@ -446,8 +446,9 @@ def _get_task_output(lint_messages, task, semaphore):
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
+    python_utils.PRINT(task.output)
     if task.output:
-        lint_messages += task.output
+        lint_messages += []
     semaphore.release()
 
 
