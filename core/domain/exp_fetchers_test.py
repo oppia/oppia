@@ -691,6 +691,7 @@ title: Old Title
                 },
                 'id': 'MathExpressionInput'
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -857,6 +858,7 @@ title: Old Title
                 'solution': None,
                 'id': 'MathExpressionInput'
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None

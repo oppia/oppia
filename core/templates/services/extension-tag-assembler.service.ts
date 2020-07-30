@@ -39,7 +39,7 @@ import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 export class ExtensionTagAssemblerService {
   constructor(private htmlEscaperService: HtmlEscaperService,
               private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
-  convertCustomizationArgsToBackendDict(
+  _convertCustomizationArgsToBackendDict(
       customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
     // Because of issues with circular dependencies, we cannot import
@@ -85,7 +85,7 @@ export class ExtensionTagAssemblerService {
   ): JQuery {
     for (const caName in customizationArgs) {
       const caBackendDict = (
-        this.convertCustomizationArgsToBackendDict(customizationArgs));
+        this._convertCustomizationArgsToBackendDict(customizationArgs));
       let caBackendDictValue = caBackendDict[caName].value;
       element.attr(
         this.camelCaseToHyphens.transform(caName) + '-with-value',

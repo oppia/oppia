@@ -144,9 +144,10 @@ describe('Training Panel Component', function() {
     spyOn(generateContentIdService, 'getNextStateId').and.returnValue(
       'feedback_1');
 
-    stateInteractionIdService.init(stateName, 'interaction_1');
+    stateInteractionIdService.init(stateName, 'MultipleChoiceInput');
     stateCustomizationArgsService.init(stateName, {
-      choices: {value: []}
+      choices: {value: []},
+      showChoicesInShuffledOrder: {value: true}
     });
 
     $scope = $rootScope.$new();
@@ -172,8 +173,8 @@ describe('Training Panel Component', function() {
       expect($scope.allOutcomes.length).toBe(2);
       expect($scope.selectedAnswerGroupIndex).toBe(0);
       expect($scope.answerTemplate).toBe(
-        '<oppia-response-interaction_1 answer="{}" choices="[]">' +
-        '</oppia-response-interaction_1>');
+        '<oppia-response-multiple-choice-input answer="{}" choices="[]">' +
+        '</oppia-response-multiple-choice-input>');
     });
 
   it('should evaluate active state name', function() {

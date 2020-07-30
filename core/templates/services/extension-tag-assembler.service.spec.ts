@@ -21,6 +21,7 @@ import { ExtensionTagAssemblerService } from
   './extension-tag-assembler.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('Extension Tag Assembler Service', () => {
   let etas;
@@ -52,6 +53,22 @@ describe('Extension Tag Assembler Service', () => {
     const expectedElement = '<p ' +
       'choices-with-value="&amp;quot;sampleChoice&amp;quot;"' +
       '></p>';
+
+    expect(etas.formatCustomizationArgAttrs(
+      element, interactionCustomizationArgs).get(0).outerHTML).toEqual(
+      expectedElement);
+  });
+
+  it('should format element with complex customization', () => {
+    const element = $('<p>');
+    const interactionCustomizationArgs = {
+      test: {value: {
+        attr: [new SubtitledHtml('html', 'ca_id')]
+      }}
+    };
+    const expectedElement = '<p test-with-value="{&amp;quot;attr&amp;quot;:' +
+      '[{&amp;quot;html&amp;quot;:&amp;quot;html&amp;quot;,&amp;quot;' +
+      'content_id&amp;quot;:&amp;quot;ca_id&amp;quot;}]}"></p>';
 
     expect(etas.formatCustomizationArgAttrs(
       element, interactionCustomizationArgs).get(0).outerHTML).toEqual(

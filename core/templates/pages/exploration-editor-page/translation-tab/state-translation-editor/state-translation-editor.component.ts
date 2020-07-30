@@ -106,9 +106,10 @@ angular.module('oppia').component('stateTranslationEditor', {
           .displayed.getWrittenTranslation(contentId, languageCode));
         var newWrittenTranslation = writtenTranslation;
         if (oldWrittenTranslation === null || (
-          oldWrittenTranslation.html !== newWrittenTranslation.html || (
-            oldWrittenTranslation.needsUpdate !== (
-              newWrittenTranslation.needsUpdate)))) {
+          oldWrittenTranslation.getHtml() !== newWrittenTranslation.getHtml() ||
+          (oldWrittenTranslation.needsUpdate !== (
+            newWrittenTranslation.needsUpdate)))
+        ) {
           var stateName = StateEditorService.getActiveStateName();
           showMarkAudioAsNeedingUpdateModalIfRequired(
             contentId, languageCode);
