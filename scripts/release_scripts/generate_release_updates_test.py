@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess
-import tempfile
 
 from core.tests import test_utils
 import python_utils
@@ -33,10 +32,6 @@ RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
 MOCK_RELEASE_SUMMARY_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'release_summary.md')
-INVALID_RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
-    RELEASE_TEST_DIR, 'invalid_release_mail_message.txt')
-VALID_RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
-    RELEASE_TEST_DIR, 'valid_release_mail_message.txt')
 MOCK_RELEASE_SUMMARY_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'release_summary.md')
 
@@ -96,80 +91,6 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             'git', 'tag', '-a', 'v1.2.3', '-m', 'Version 1.2.3',
             'git', 'push', 'upstream', 'v1.2.3']
         self.assertEqual(all_cmd_tokens, expected_cmd_tokens)
-
-    def test_create_new_file_with_release_message_template(self):
-        temp_mail_file = tempfile.NamedTemporaryFile().name
-        mail_file_swap = self.swap(
-            generate_release_updates,
-            'RELEASE_MAIL_MESSAGE_FILEPATH', temp_mail_file)
-        with self.branch_name_swap, self.input_swap, mail_file_swap:
-            (
-                generate_release_updates
-                .create_new_file_with_release_message_template())
-            with python_utils.open_file(temp_mail_file, 'r') as f:
-                self.assertEqual(
-                    f.read(),
-                    generate_release_updates.RELEASE_MAIL_MESSAGE_TEMPLATE % (
-                        tuple(['1.2.3'] + (
-                            generate_release_updates.SECTIONS_TO_ADD))))
-
-    def test_validate_release_message_with_valid_message(self):
-        check_function_calls = {
-            'ask_user_to_confirm_gets_called': False
-        }
-        def mock_ask_user_to_confirm(unused_msg):
-            check_function_calls['ask_user_to_confirm_gets_called'] = True
-
-        mail_file_swap = self.swap(
-            generate_release_updates, 'RELEASE_MAIL_MESSAGE_FILEPATH',
-            VALID_RELEASE_MAIL_MESSAGE_FILEPATH)
-        ask_user_swap = self.swap(
-            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
-        with mail_file_swap, ask_user_swap:
-            generate_release_updates.validate_release_message()
-        self.assertFalse(
-            check_function_calls['ask_user_to_confirm_gets_called'])
-
-    def test_validate_release_message_with_invalid_message(self):
-        check_function_calls = {
-            'ask_user_to_confirm_gets_called': 0,
-            'read_gets_called': 0
-        }
-        expected_check_function_calls = {
-            'ask_user_to_confirm_gets_called': 2,
-            'read_gets_called': 2
-        }
-
-        def mock_open_file(unused_path, unused_mode):
-            return MockFile()
-        def mock_ask_user_to_confirm(unused_msg):
-            check_function_calls['ask_user_to_confirm_gets_called'] += 1
-
-        with python_utils.open_file(
-            VALID_RELEASE_MAIL_MESSAGE_FILEPATH, 'r') as f:
-            correct_content = f.read()
-        with python_utils.open_file(
-            INVALID_RELEASE_MAIL_MESSAGE_FILEPATH, 'r') as f:
-            wrong_content = f.read()
-
-        class MockFile(python_utils.OBJECT):
-            def read(self):
-                """Read content of the file object."""
-
-                return mock_read()
-        def mock_read():
-            check_function_calls['read_gets_called'] += 1
-            if check_function_calls['read_gets_called'] == 2:
-                return correct_content
-            return wrong_content
-
-        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
-        ask_user_swap = self.swap(
-            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
-
-        with open_file_swap, ask_user_swap:
-            generate_release_updates.validate_release_message()
-        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_prompt_user_to_send_announcement_email(self):
         check_function_calls = {
@@ -261,26 +182,16 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
     def test_function_calls(self):
         check_function_calls = {
             'draft_new_release_gets_called': False,
-            'create_new_file_with_release_message_template_gets_called': False,
-            'validate_release_message_gets_called': False,
             'prompt_user_to_send_announcement_email_gets_called': False,
             'prepare_for_next_release_gets_called': False,
         }
         expected_check_function_calls = {
             'draft_new_release_gets_called': True,
-            'create_new_file_with_release_message_template_gets_called': True,
-            'validate_release_message_gets_called': True,
             'prompt_user_to_send_announcement_email_gets_called': True,
             'prepare_for_next_release_gets_called': True,
         }
         def mock_draft_new_release():
             check_function_calls['draft_new_release_gets_called'] = True
-        def mock_create_new_file_with_release_message_template():
-            check_function_calls[
-                'create_new_file_with_release_message_template_gets_called'
-                ] = True
-        def mock_validate_release_message():
-            check_function_calls['validate_release_message_gets_called'] = True
         def mock_prompt_user_to_send_announcement_email():
             check_function_calls[
                 'prompt_user_to_send_announcement_email_gets_called'] = True
@@ -297,13 +208,6 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         draft_release_swap = self.swap(
             generate_release_updates, 'draft_new_release',
             mock_draft_new_release)
-        write_swap = self.swap(
-            generate_release_updates,
-            'create_new_file_with_release_message_template',
-            mock_create_new_file_with_release_message_template)
-        check_swap = self.swap(
-            generate_release_updates, 'validate_release_message',
-            mock_validate_release_message)
         send_swap = self.swap(
             generate_release_updates, 'prompt_user_to_send_announcement_email',
             mock_prompt_user_to_send_announcement_email)
@@ -314,8 +218,7 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         remove_swap = self.swap(os, 'remove', mock_remove)
 
         with self.branch_name_swap, release_summary_swap, prepare_swap:
-            with write_swap, check_swap, send_swap, exists_swap, remove_swap:
-                with draft_release_swap:
-                    generate_release_updates.main()
+            with send_swap, exists_swap, remove_swap, draft_release_swap:
+                generate_release_updates.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
