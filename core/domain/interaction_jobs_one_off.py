@@ -25,6 +25,7 @@ from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.platform import models
+import utils
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -177,7 +178,7 @@ class InteractionCustomizationArgsValidationOneOffJob(
                     ca_specs,
                     fail_on_validation_errors=True
                 )
-            except Exception as e:
+            except utils.ValidationError as e:
                 error_messages.append('%s: %s' % (state.interaction.id, e))
 
         if error_messages:
