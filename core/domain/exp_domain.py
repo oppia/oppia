@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import functools
+import logging
 import re
 import string
 
@@ -2673,6 +2674,7 @@ class Exploration(python_utils.OBJECT):
 
             interaction_id = state_dict['interaction']['id']
             if interaction_id is None:
+                logging.info('State migration v41: No interaction id')
                 state_dict['next_content_id_index'] = (
                     max_existing_content_id_index + 1)
                 continue
@@ -2716,6 +2718,10 @@ class Exploration(python_utils.OBJECT):
             ca_dict = state_dict['interaction']['customization_args']
             if (interaction_id == 'PencilCodeEditor' and
                     'initial_code' in ca_dict):
+                logging.info(
+                    'State migration v41: PencilCodeEditor initial_code'
+                    'changed to initialCode'
+                )
                 ca_dict['initialCode'] = ca_dict['initial_code']
                 del ca_dict['initial_code']
 
@@ -2746,10 +2752,12 @@ class Exploration(python_utils.OBJECT):
                     schema_utils.is_subtitled_unicode_schema(schema))
                 is_subtitled_html_list_spec = (
                     schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                    schema_utils.is_subtitled_html_schema(schema['items'])
-                )
+                    schema_utils.is_subtitled_html_schema(schema['items']))
 
                 if is_subtitled_html_spec or is_subtitled_unicode_spec:
+                    logging.info(
+                        'State migration v41: SubtitledHtml/SubtitledUnicode'
+                        'migration')
                     # Default is a SubtitledHtml dict or SubtitleUnicode dict.
                     new_value = copy.deepcopy(ca_spec.default_value)
 
@@ -2768,6 +2776,9 @@ class Exploration(python_utils.OBJECT):
 
                     ca_dict[ca_name] = {'value': new_value}
                 elif is_subtitled_html_list_spec:
+                    logging.info(
+                        'State migration v41: SubtitledHtml list'
+                        'migration')
                     new_value = []
 
                     if ca_name in ca_dict:

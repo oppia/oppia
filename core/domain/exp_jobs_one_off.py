@@ -700,3 +700,59 @@ class InteractionCustomizationArgsValidationJob(
         else:
             output_values.append(key[exp_id_index:])
             yield (key[:exp_id_index - 1], output_values)
+
+class ExplorationMigrationToV41AuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for testing the exploration migration from v40 to v41.
+    This job tests the state migration, but does not commit the new exploration
+    state to the store.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationToV41AuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        # Do not upgrade explorations that fail non-strict validation.
+        old_exploration = exp_fetchers.get_exploration_by_id(item.id)
+        try:
+            old_exploration.validate()
+        except Exception as e:
+            error_message = (
+                'Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            logging.error(error_message)
+            yield ('VALIDATION_ERROR', error_message.encode('utf-8'))
+            return
+
+        if item.states_schema_version == 35:
+            try:
+                exp_domain.Exploration._convert_v40_dict_to_v41_dict(item.to_dict())
+                yield ('SUCCESS', None)
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed migration to v41: %s' %
+                    (item.id, e))
+                logging.error(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+        else:
+            error_message = (
+                'Exploration %s was not migrated because its states '
+                'schema verison is %i' %
+                (item.id, item.states_schema_version))
+            yield ('WRONG_STATE_VERSION', error_message.encode('utf-8'))
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
