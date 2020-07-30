@@ -54,6 +54,9 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
 
     });
   }));
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize the variables', function() {
     ctrl.init();
