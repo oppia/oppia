@@ -19,18 +19,19 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import python_utils
-import json
-
-from google.appengine.api import memcache
 import redis
-import logging
 
-redis_client = redis.Redis(host='localhost', port=6379)
+REDIS_HOST = os.environ.get('REDISHOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDISPORT', 6379))
+REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+
 
 def flush_cache():
     """Flushes the redis database clean."""
-    redis_client.flushdb()
+    REDIS_CLIENT.flushdb()
+
 
 def get_multi(keys):
     """Looks up a list of keys in memcache.
@@ -43,7 +44,7 @@ def get_multi(keys):
         are passed in.
     """
     assert isinstance(keys, list)
-    return redis_client.mget(keys)
+    return REDIS_CLIENT.mget(keys)
 
 
 def set_multi(key_value_mapping):
@@ -59,7 +60,7 @@ def set_multi(key_value_mapping):
         bool. Whether or not the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    return redis_client.mset(key_value_mapping)
+    return REDIS_CLIENT.mset(key_value_mapping)
 
 
 def delete(key):
@@ -72,7 +73,7 @@ def delete(key):
         int. Number of successfully deleted keys.
     """
     assert isinstance(key, python_utils.BASESTRING)
-    return_code = redis_client.delete(key)
+    return_code = REDIS_CLIENT.delete(key)
     return return_code
 
 
@@ -87,5 +88,5 @@ def delete_multi(keys):
     """
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)
-    return_value = redis_client.delete(*keys)
+    return_value = REDIS_CLIENT.delete(*keys)
     return return_value

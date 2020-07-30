@@ -348,19 +348,19 @@ def main(args=None):
     # untarred.
     try:
         # Pipe output to /dev/null for silence in console.
-        null = python_utils.open_file("/dev/null", "w")
+        null = python_utils.open_file('/dev/null', 'w')
         command_text = ['redis-cli', '--version']
         current_process = subprocess.Popen(
             command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output_stderr = current_process.communicate()[1]
+        current_process.communicate()[1]
         null.close()
-        python_utils.PRINT("Redis-cli is already installed.")
+        python_utils.PRINT('Redis-cli is already installed.')
     except OSError:
         # Redis-cli is not installed, run the script to install it.
         # NOTE: These should be constants but not sure where to put them since
         # if they go in manifest.json they'll be automatically installed in the
         # incorrect way.
-        python_utils.PRINT("Installing redis-cli...")
+        python_utils.PRINT('Installing redis-cli...')
 
         download_and_untar_files(
             'http://download.redis.io/releases/redis-6.0.6.tar.gz',
@@ -368,12 +368,12 @@ def main(args=None):
             'redis-6.0.6', 'redis-cli-6.0.6')
         # Make the script executable.
         command_text = ['chmod', '+x', 'scripts/install_redis_cli.sh']
-        make_script_executable = subprocess.call(command_text)
+        subprocess.call(command_text)
 
         # Execute the script scripts/intall_redis_cli to install redis_cli.
         command_text = ['sh', './scripts/install_redis_cli.sh']
-        install_redis_cli = subprocess.call(command_text)
-        python_utils.PRINT("Redis-cli installed successfully.")
+        subprocess.call(command_text)
+        python_utils.PRINT('Redis-cli installed successfully.')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

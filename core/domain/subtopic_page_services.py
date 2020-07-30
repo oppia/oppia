@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
-from core.domain import caching_services
 from core.domain import subtopic_page_domain
 from core.platform import models
 import feconf

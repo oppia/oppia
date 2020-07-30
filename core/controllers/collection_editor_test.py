@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_fetchers

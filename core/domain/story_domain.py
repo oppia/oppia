@@ -644,8 +644,7 @@ class StoryContents(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, story_contents_dict, story_version=0,
-            story_created_on=None, story_last_updated=None):
+    def from_dict(cls, story_contents_dict):
         """Return a StoryContents domain object from a dict.
 
         Args:
@@ -932,9 +931,10 @@ class Story(python_utils.OBJECT):
 
         story = cls.from_dict(
             story_dict,
-            story_dict['version'] if 'version' in story_dict else 0,
-            created_on,
-            last_updated)
+            story_version=(
+                story_dict['version'] if 'version' in story_dict else 0),
+            story_created_on=created_on,
+            story_last_updated=last_updated)
 
         return story
 
@@ -954,7 +954,6 @@ class Story(python_utils.OBJECT):
             'language_code': self.language_code,
             'story_contents_schema_version': self.story_contents_schema_version,
             'corresponding_topic_id': self.corresponding_topic_id,
-            'version': self.version,
             'story_contents': self.story_contents.to_dict(),
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,

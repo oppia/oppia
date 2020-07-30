@@ -24,7 +24,6 @@ import os
 import re
 
 from constants import constants
-from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services

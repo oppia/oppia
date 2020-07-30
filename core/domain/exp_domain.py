@@ -4087,11 +4087,11 @@ class Exploration(python_utils.OBJECT):
         try:
             result = json.dumps(exploration_dict)
         except TypeError:
-            raise Exception(
-                ('Object of type %s cannot be serialized. Please ' +
-                 'consult this table for more information on what types are s' +
-                 'erializable: https://docs.python.org/3/library/json.html#py' +
-                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+            raise Exception((
+                'Object of type %s cannot be serialized. Please ' +
+                'consult this table for more information on what types are s' +
+                'erializable: https://docs.python.org/3/library/json.html#py' +
+                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
 
         return result
 
@@ -4104,14 +4104,15 @@ class Exploration(python_utils.OBJECT):
             memory_cache_json_string: str. A json encoded string that can be
                 decoded into a dictionary representing an Exploration.
 
+        Returns:
             Exploration. The corresponding Exploration domain object.
         """
         try:
             exploration_dict = json.loads(memory_cache_json_string)
         except ValueError:
-            raise Exception(
-                ('Json decoding failed for JSON string associated with class' +
-                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+            raise Exception((
+                'Json decoding failed for JSON string associated with class' +
+                ' %s.' % python_utils.convert_to_bytes(type(cls))))
         created_on = (
             utils.convert_string_to_datetime_object(
                 exploration_dict['created_on'])
@@ -4122,10 +4123,11 @@ class Exploration(python_utils.OBJECT):
             if 'last_updated' in exploration_dict else None)
         exploration = cls.from_dict(
             exploration_dict,
-            (exploration_dict['version'] if 'version' in exploration_dict
+            exploration_version=(
+                exploration_dict['version'] if 'version' in exploration_dict
                 else 0),
-            created_on,
-            last_updated)
+            exploration_created_on=created_on,
+            exploration_last_updated=last_updated)
 
         return exploration
 

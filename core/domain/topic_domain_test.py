@@ -872,6 +872,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         topic_from_dict = topic_domain.Topic.from_dict(topic_dict)
         self.assertEqual(topic_from_dict.to_dict(), topic_dict)
 
+
 class TopicChangeTests(test_utils.GenericTestBase):
 
     def test_topic_change_object_with_missing_cmd(self):

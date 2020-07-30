@@ -421,6 +421,7 @@ def get_time_in_millisecs(datetime_obj):
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
     return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
+
 def convert_datetime_to_string(datetime_obj):
     """Returns string format of the datetime object.
 
@@ -430,20 +431,22 @@ def convert_datetime_to_string(datetime_obj):
     Returns:
         str. The string format representing the datetime object.
     """
-    return datetime_obj.strftime("%m/%d/%Y, %H:%M:%S:%f")
+    return datetime_obj.strftime('%m/%d/%Y, %H:%M:%S:%f')
+
 
 def convert_string_to_datetime_object(date_string):
     """Returns the datetime object equivalent of the date string.
 
     Args:
-        str. The string format representing the datetime object in the format:
-            Month/Day/Year, Hour:Minute:Second:MicroSecond.
+        date_string: str. The string format representing the datetime object in
+            the format: Month/Day/Year, Hour:Minute:Second:MicroSecond.
 
     Returns:
         datetime_obj: datetime. An object of type datetime.datetime
         corresponding to that string.
     """
-    return datetime.datetime.strptime(date_string, "%m/%d/%Y, %H:%M:%S:%f")
+    return datetime.datetime.strptime(date_string, '%m/%d/%Y, %H:%M:%S:%f')
+
 
 def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.

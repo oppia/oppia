@@ -24,7 +24,6 @@ import logging
 import os
 
 from constants import constants
-from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import rights_manager

@@ -580,26 +580,32 @@ class Topic(python_utils.OBJECT):
             'language_code': self.language_code,
             'story_reference_schema_version': (
                 self.story_reference_schema_version),
-            'version': self.version,
-            'created_on': utils.convert_datetime_to_string(self.created_on),
-            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+            'version': self.version
         }
+
+        if self.created_on:
+            topic_dict['created_on'] = utils.convert_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            topic_dict['last_updated'] = utils.convert_datetime_to_string(
+                self.last_updated)
 
         try:
             result = json.dumps(topic_dict)
         except TypeError:
-            raise Exception(
-                ('Object of type %s cannot be JSON serialized. Please ' +
-                 'consult this table for more information on what types are s' +
-                 'erializable: https://docs.python.org/3/library/json.html#py' +
-                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+            raise Exception((
+                'Object of type %s cannot be JSON serialized. Please ' +
+                'consult this table for more information on what types are s' +
+                'erializable: https://docs.python.org/3/library/json.html#py' +
+                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
 
         return result
 
     @classmethod
     def from_dict(
-        cls, topic_dict, topic_version=0, topic_created_on=None,
-        topic_last_updated=None):
+            cls, topic_dict, topic_version=0, topic_created_on=None,
+            topic_last_updated=None):
         """Returns a Topic domain object from a dict.
 
         Args:
@@ -634,15 +640,9 @@ class Topic(python_utils.OBJECT):
             topic_dict['subtopic_schema_version'],
             topic_dict['next_subtopic_id'],
             topic_dict['language_code'], topic_version,
-            topic_dict['story_reference_schema_version'])
+            topic_dict['story_reference_schema_version'], topic_created_on,
+            topic_last_updated)
 
-        if self.created_on:
-            topic_dict['created_on'] = utils.convert_datetime_to_string(
-                self.created_on)
-
-        if self.last_updated:
-            topic_dict['last_updated'] = utils.convert_datetime_to_string(
-                self.last_updated)
         return topic
 
     @classmethod
@@ -660,9 +660,9 @@ class Topic(python_utils.OBJECT):
         try:
             topic_dict = json.loads(memory_cache_json_string)
         except ValueError:
-            raise Exception(
-                ('Json decoding failed for JSON string associated with class' +
-                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+            raise Exception((
+                'Json decoding failed for JSON string associated with class' +
+                ' %s.' % python_utils.convert_to_bytes(type(cls))))
         created_on = (
             utils.convert_string_to_datetime_object(
                 topic_dict['created_on'])
@@ -673,9 +673,9 @@ class Topic(python_utils.OBJECT):
             if 'last_updated' in topic_dict else None)
         topic = cls.from_dict(
             topic_dict,
-            topic_dict['version'] if 'version' in topic_dict else 0,
-            created_on,
-            last_updated)
+            topic_version=topic_dict['version'] if 'version' in topic_dict else 0,
+            topic_created_on=created_on,
+            topic_last_updated=last_updated)
         return topic
 
     @classmethod

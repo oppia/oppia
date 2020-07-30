@@ -25,7 +25,6 @@ import os
 import re
 import zipfile
 
-from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain

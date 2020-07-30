@@ -93,7 +93,7 @@ def cleanup():
     command_text = ['redis-cli', 'shutdown']
     # No need to check return values since if the error fails, redis server is
     # shutdown anyways.
-    shutdown_redis_server = subprocess.call(command_text)
+    subprocess.call(command_text)
 
 
 def main(args=None):
@@ -209,6 +209,7 @@ def main(args=None):
 
     for process in background_processes:
         process.wait()
+
 
 if __name__ == '__main__':
     main()

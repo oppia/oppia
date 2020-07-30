@@ -52,7 +52,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.exploration_caching_response = caching_services.set_multi(
             {
                 exp_fetchers.get_exploration_memcache_key(
-                    self.key_base_string) : self.default_exploration
+                    self.key_base_string): self.default_exploration
             })
 
     def test_flush_cache_wipes_cache_clean(self):
@@ -62,36 +62,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         exploration_key = exp_fetchers.get_exploration_memcache_key(
             self.key_base_string)
         self.assertEqual(caching_services.get_multi([exploration_key]), {})
-
-
-    def test_correct_type_retrieval_from_key(self):
-        """ Tests that correct memory cache keys will return the correct
-        object types associated with that key.
-        """
-        self.assertEqual(
-            caching_services._get_correct_type_of_key(
-                exp_fetchers.get_exploration_memcache_key(self.key_base_string)),
-            exp_domain.Exploration)
-        self.assertEqual(
-            caching_services._get_correct_type_of_key(
-                collection_services._get_collection_memcache_key(
-                    self.key_base_string)),
-            collection_domain.Collection)
-        self.assertEqual(
-            caching_services._get_correct_type_of_key(
-                topic_fetchers.get_topic_memcache_key(self.key_base_string)),
-            topic_domain.Topic)
-        self.assertEqual(
-            caching_services._get_correct_type_of_key(
-                skill_fetchers.get_skill_memcache_key(self.key_base_string)),
-            skill_domain.Skill)
-        self.assertEqual(
-            caching_services._get_correct_type_of_key(
-                story_fetchers.get_story_memcache_key(self.key_base_string)),
-            story_domain.Story)
-        self.assertEqual(
-            caching_services._get_correct_type_of_key(
-                self.key_base_string), None)
 
     def test_get_multi_correctly_retrieves_cache_elements(self):
         result = caching_services.get_multi(self.keys)

@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
 import python_utils
 from core.domain import collection_domain
 from core.domain import exp_domain
@@ -30,9 +29,11 @@ from core.platform import models
 
 memory_cache_services = models.Registry.import_cache_services()
 
+
 def flush_memory_cache():
-    """Flushes the redis cache"""
+    """Flushes the redis cache by wiping all data."""
     memory_cache_services.flush_cache()
+
 
 def _get_correct_type_of_key(key):
     """In the memory cache, values are stored as (key, value) pairs where values
@@ -62,6 +63,7 @@ def _get_correct_type_of_key(key):
     else:
         return None
 
+
 def get_multi(keys):
     """Get a dictionary of the key, value pairs from the memory cache.
 
@@ -88,6 +90,7 @@ def get_multi(keys):
 
     return result_dict
 
+
 def set_multi(key_value_mapping):
     """Set multiple keys' values at once to the cache.
 
@@ -105,6 +108,7 @@ def set_multi(key_value_mapping):
         if _get_correct_type_of_key(key):
             key_value_mapping[key] = value.serialize()
     return memory_cache_services.set_multi(key_value_mapping)
+
 
 def delete_multi(keys):
     """Deletes a multiple keys in the cache.

@@ -204,6 +204,7 @@ class StoryChangeTests(test_utils.GenericTestBase):
         story_change_object = story_domain.StoryChange(story_change_dict)
         self.assertEqual(story_change_object.to_dict(), story_change_dict)
 
+
 class StoryDomainUnitTests(test_utils.GenericTestBase):
     """Test the story domain object."""
 
@@ -1331,28 +1332,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', topic_id)
-        expected_story_dict = {
-            'id': self.STORY_ID,
-            'title': 'Title',
-            'thumbnail_filename': None,
-            'thumbnail_bg_color': None,
-            'description': feconf.DEFAULT_STORY_DESCRIPTION,
-            'notes': feconf.DEFAULT_STORY_NOTES,
-            'story_contents': {
-                'nodes': [],
-                'initial_node_id': None,
-                'next_node_id': self.NODE_ID_1
-            },
-            'story_contents_schema_version': (
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'corresponding_topic_id': topic_id,
-            'version': 1
-        }
-        story_dict = self.story.to_dict()
+            self.STORY_ID, 'Title', 'Description', topic_id)
+        story_dict = story.to_dict()
         story_from_dict = story_domain.Story.from_dict(
-            story_dict, story_version=1)
+            story_dict, story_version=0)
         self.assertEqual(story_from_dict.to_dict(), story_dict)
 
 

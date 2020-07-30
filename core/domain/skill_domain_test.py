@@ -482,6 +482,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_from_dict = skill_domain.Skill.from_dict(skill_dict)
         self.assertEqual(skill_from_dict.to_dict(), skill_dict)
 
+
 class SkillChangeTests(test_utils.GenericTestBase):
 
     def test_skill_change_object_with_missing_cmd(self):
@@ -828,4 +829,3 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic_assignments.to_dict(),
             topic_assignments_dict)
-

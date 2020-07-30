@@ -242,7 +242,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 initial_time))
 
     def test_conversion_between_string_and_datetime_object_is_correct(self):
-        now = datetime.datetime.now() # current date and time
+        now = datetime.datetime.utcnow()
         self.assertEqual(
             utils.convert_string_to_datetime_object(
                 utils.convert_datetime_to_string(now)),

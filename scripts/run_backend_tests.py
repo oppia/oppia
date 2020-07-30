@@ -239,13 +239,12 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 
 
 def cleanup():
-    """Cleanup the redis client server when backend tests finish.
-    """
-    python_utils.PRINT('Cleaning up the redis_servers.'])
+    """Cleanup the redis client server when backend tests finish."""
+    python_utils.PRINT('Cleaning up the redis_servers.')
     command_text = ['redis-cli', 'shutdown']
     # No need to check return values since if the error fails, redis server is
     # shutdown anyways.
-    shutdown_redis_server = subprocess.call(command_text)
+    subprocess.call(command_text)
 
 
 def main(args=None):
@@ -268,9 +267,8 @@ def main(args=None):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    # Start the redis local developmental server
-    subprocess.Popen(
-            'redis-server %s' % (common.REDIS_CONF_PATH), shell=True)
+    # Start the redis local developmental server.
+    subprocess.Popen('redis-server %s' % (common.REDIS_CONF_PATH), shell=True)
     atexit.register(cleanup)
 
     if parsed_args.generate_coverage_report:

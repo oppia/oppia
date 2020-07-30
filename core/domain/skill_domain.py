@@ -794,7 +794,6 @@ class Skill(python_utils.OBJECT):
             'superseding_skill_id': self.superseding_skill_id,
             'all_questions_merged': self.all_questions_merged,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
-            'version': self.version,
             'created_on': utils.convert_datetime_to_string(self.created_on),
             'last_updated': utils.convert_datetime_to_string(self.last_updated)
         }
@@ -810,11 +809,11 @@ class Skill(python_utils.OBJECT):
         try:
             result = json.dumps(skill_dict)
         except TypeError:
-            raise Exception(
-                ('Object of type %s cannot be JSON serialized. Please ' +
-                 'consult this table for more information on what types are s' +
-                 'erializable: https://docs.python.org/3/library/json.html#py' +
-                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+            raise Exception((
+                'Object of type %s cannot be JSON serialized. Please ' +
+                'consult this table for more information on what types are s' +
+                'erializable: https://docs.python.org/3/library/json.html#py' +
+                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
 
         return result
 
@@ -833,9 +832,9 @@ class Skill(python_utils.OBJECT):
         try:
             skill_dict = json.loads(memory_cache_json_string)
         except ValueError:
-            raise Exception(
-                ('Json decoding failed for JSON string associated with class' +
-                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+            raise Exception((
+                'Json decoding failed for JSON string associated with class' +
+                ' %s.' % python_utils.convert_to_bytes(type(cls))))
         created_on = (
             utils.convert_string_to_datetime_object(
                 skill_dict['created_on'])
@@ -846,16 +845,17 @@ class Skill(python_utils.OBJECT):
             if 'last_updated' in skill_dict else None)
         skill = cls.from_dict(
             skill_dict,
-            skill_dict['version'] if 'version' in skill_dict else 0,
-            created_on,
-            last_updated)
+            skill_version=(
+                skill_dict['version'] if 'version' in skill_dict else 0),
+            skill_created_on=created_on,
+            skill_last_updated=last_updated)
 
         return skill
 
     @classmethod
     def from_dict(
-        cls, skill_dict, skill_version=0, skill_created_on=None,
-        skill_last_updated=None):
+            cls, skill_dict, skill_version=0, skill_created_on=None,
+            skill_last_updated=None):
         """Returns a Skill domain object from a dict.
 
         Args:

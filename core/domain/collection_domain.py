@@ -360,9 +360,9 @@ class Collection(python_utils.OBJECT):
         try:
             collection_dict = json.loads(memory_cache_json_string)
         except ValueError:
-            raise Exception(
-                ('Json decoding failed for JSON string associated with class' +
-                 ' %s.' % python_utils.convert_to_bytes(type(cls))))
+            raise Exception((
+                'Json decoding failed for JSON string associated with class' +
+                ' %s.' % python_utils.convert_to_bytes(type(cls))))
         created_on = (
             utils.convert_string_to_datetime_object(
                 collection_dict['created_on'])
@@ -373,9 +373,11 @@ class Collection(python_utils.OBJECT):
             if 'last_updated' in collection_dict else None)
         collection = cls.from_dict(
             collection_dict,
-            collection_dict['version'] if 'version' in collection_dict else 0,
-            created_on,
-            last_updated)
+            collection_version=(
+                collection_dict['version'] if 'version' in collection_dict
+                else 0),
+            collection_created_on=created_on,
+            collection_last_updated=last_updated)
 
         return collection
 
@@ -414,11 +416,11 @@ class Collection(python_utils.OBJECT):
         try:
             result = json.dumps(collection_dict)
         except TypeError:
-            raise Exception(
-                ('Object of type %s cannot be JSON serialized. Please ' +
-                 'consult this table for more information on what types are s' +
-                 'erializable: https://docs.python.org/3/library/json.html#py' +
-                 '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
+            raise Exception((
+                'Object of type %s cannot be JSON serialized. Please ' +
+                'consult this table for more information on what types are s' +
+                'erializable: https://docs.python.org/3/library/json.html#py' +
+                '-to-json-table.') % python_utils.convert_to_bytes(type(self)))
 
         return result
 
