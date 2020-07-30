@@ -56,7 +56,6 @@ describe('State Graph Visualization directive', function() {
   var $flushPendingTasks = null;
   var $rootScope = null;
   var $scope = null;
-  var directive = null;
   var explorationWarningsService = null;
   var stateGraphLayoutService = null;
   var translationStatusService = null;
@@ -179,7 +178,7 @@ describe('State Graph Visualization directive', function() {
 
     $element = angular.element(
       '<div state-graph-visualization allowPanning="true"></div>');
-    directive = $injector.get('stateGraphVisualizationDirective')[0];
+    var directive = $injector.get('stateGraphVisualizationDirective')[0];
 
     ctrl = $injector.instantiate(directive.controller, {
       $element: $element,
