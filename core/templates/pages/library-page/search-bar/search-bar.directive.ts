@@ -274,6 +274,7 @@ angular.module('oppia').directive('searchBar', [
 
                 // Notify the function that handles overflow in case the search
                 // elements load after it has already been run.
+                console.log('Emitted: searchBarLoaded');
                 SearchService.onSearchBarLoaded.emit();
               }
             );
