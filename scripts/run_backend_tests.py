@@ -241,9 +241,8 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def cleanup():
     """Cleanup the redis client server when backend tests finish.
     """
-    common.print_each_string_after_two_new_lines([
-        'INFORMATION',
-        'Cleaning up the redis_servers.'])
+    python_utils.PRINT('Cleaning up the redis_servers.'])
+    command_text = ['redis-cli', 'shutdown']
     # No need to check return values since if the error fails, redis server is
     # shutdown anyways.
     shutdown_redis_server = subprocess.call(command_text)
