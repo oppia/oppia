@@ -95,7 +95,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-update.service.ts',
     'CollectionObjectFactory.ts',
     'CollectionPlaythroughObjectFactory.ts',
-    'CommandExecutorService.ts',
+    'command-executor.service.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
     'confirm-delete-state-modal.controller.ts',
