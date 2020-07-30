@@ -17,20 +17,20 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
 import { CommandExecutorService } from
   'pages/exploration-player-page/services/command-executor.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
-describe('Command executor service', () => {
+fdescribe('Command executor service', () => {
   let ces: CommandExecutorService, wrf: WindowRef;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CommandExecutorService, WindowRef]
     });
-
+    
     ces = TestBed.get(CommandExecutorService);
+    wrf = TestBed.get(WindowRef);
+    ces.setHostname(wrf, '*')
   });
   var continueBoolean = false;
   var addBoolean = false;
@@ -46,15 +46,20 @@ describe('Command executor service', () => {
     var continueButton = windowRef.nativeWindow.document.createElement(
       'BUTTON');
     continueButton.classList.add(
-      'oppia-learner-confirm-button md-button md-ink-ripple');
+      'oppia-learner-confirm-button');
     continueButton.onclick = function() {
       continueBoolean = true;
     };
-    var textbox = windowRef.nativeWindow.document.createElement('INPUT');
+    var textbox = windowRef.nativeWindow.document.createElement(
+      'INPUT') as HTMLInputElement;
     textbox.classList.add(
-      'form-control ng-pristine ng-untouched ng-valid ng-empty');
-    var addButton = windowRef.nativeWindow.document.createElement('BUTTON');
-    addButton.classList.add('btn btn-secondary btn-sm');
+      'form-control');
+      textbox.value = 'placeholder'
+    var addButton = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
+    addButton.classList.add('btn');
+    addButton.classList.add('btn-secondary');
+    addButton.classList.add('btn-sm')
     addButton.onclick = function() {
       addBoolean = true;
     };
@@ -64,19 +69,25 @@ describe('Command executor service', () => {
     deleteButton.onclick = function() {
       deleteBoolean = true;
     };
-    var fractionBox = windowRef.nativeWindow.document.createElement('TEXT');
-    fractionBox.classList.add('form-control ng-pristine ng-untouched \n' +
-    'ng-valid ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty');
-    var mc1 = windowRef.nativeWindow.document.createElement('BUTTON');
+    var fractionBox = windowRef.nativeWindow.document.createElement(
+      'TEXT');
+    fractionBox.classList.add('form-control');
+    fractionBox.classList.add(
+      'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r');
+    var mc1 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
     mc1.classList.add('multiple-choice-outer-radio-button');
-    var mc2 = windowRef.nativeWindow.document.createElement('BUTTON');
+    var mc2 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
     mc2.classList.add('multiple-choice-outer-radio-button');
-    continueButton.onclick = function() {
+    mc2.onclick = function() {
       mcBoolean = true;
     };
-    var mc3 = windowRef.nativeWindow.document.createElement('BUTTON');
+    var mc3 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
     mc3.classList.add('multiple-choice-outer-radio-button');
-    var mc4 = windowRef.nativeWindow.document.createElement('BUTTON');
+    var mc4 = windowRef.nativeWindow.document.createElement(
+      'BUTTON');
     mc4.classList.add('multiple-choice-outer-radio-button');
     testPage.appendChild(continueButton);
     testPage.appendChild(textbox);
@@ -87,36 +98,58 @@ describe('Command executor service', () => {
     testPage.appendChild(mc2);
     testPage.appendChild(mc3);
     testPage.appendChild(mc4);
+    wrf.nativeWindow.document.body.appendChild(testPage);
   };
   it('should properly click the continue button', () => {
     setupWindowRef(wrf);
     ces.continueClick(wrf);
-    expect(continueBoolean).toEqual(false);
+    expect(continueBoolean).toEqual(true);
   });
 
   it('should properly enter text', () => {
     setupWindowRef(wrf);
     ces.fillTextBox(wrf, 'testText');
     var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
+      'form-control'
+    )[0] as HTMLInputElement;
     expect(textbox.value).toEqual('testText');
   });
 
-  it('should click the add button and enter text for adding to set',
+  it('should only enter text for adding to set',
     () => {
       setupWindowRef(wrf);
-      ces.addSet(wrf, 1);
+      ces.addSet(wrf, '1');
+      expect(addBoolean).toEqual(false);
+      var textbox = wrf.nativeWindow.document.getElementsByClassName(
+        'form-control'
+        )[0] as HTMLInputElement;
+      expect(textbox.value).toEqual('1');
+    });
+  
+    it('should enter text, click button, then add text to add to set',
+    () => {
+      setupWindowRef(wrf);
+      ces.addSet(wrf, '1');
+      expect(addBoolean).toEqual(false)
+      ces.addSet(wrf, '2')
       expect(addBoolean).toEqual(true);
       var textbox = wrf.nativeWindow.document.getElementsByClassName(
-        'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
-      expect(textbox.value).toEqual(1);
+        'form-control'
+        )[0] as HTMLInputElement;
+      expect(textbox.value).toEqual('1');
+      var textbox = wrf.nativeWindow.document.getElementsByClassName(
+        'form-control'
+        )[1] as HTMLInputElement;
+      expect(textbox.value).toEqual('2');
+
     });
+
 
   it('should delete the set element correctly by clicking the button',
     () => {
       setupWindowRef(wrf);
-      ces.addSet(wrf, 1);
-      ces.removeSet(wrf, 1);
+      ces.addSet(wrf, "1");
+      ces.removeSet(wrf, "1");
       expect(deleteBoolean).toEqual(true);
     });
 
@@ -124,9 +157,16 @@ describe('Command executor service', () => {
     setupWindowRef(wrf);
     ces.enterFraction(wrf, '2/3');
     var fractionbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control ng-pristine ng-untouched \n' +
-      'ng-valid ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty'
-    )[0];
+      'form-control \n' +
+      'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r'
+    )[0] as HTMLInputElement;
     expect(fractionbox.value).toEqual('2/3');
   });
+
+  it('should correctly click the 2nd multiple choice answer', () => {
+    setupWindowRef(wrf);
+    ces.selectItemBullet(wrf,'2');
+    expect(mcBoolean).toEqual(true);
+  });
+
 });

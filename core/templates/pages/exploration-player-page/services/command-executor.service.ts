@@ -21,6 +21,7 @@ import { Injectable, HostListener } from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service.ts';
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
+import {ServicesConstants} from 'services/services.constants';
 
 @Injectable({providedIn: 'root'})
 export class CommandExecutorService {
@@ -39,6 +40,9 @@ export class CommandExecutorService {
   cachedOuterFrameMessage = '';
   constructor(private windowRef: WindowRef) {
     this.getOuterFrameEvents(windowRef);
+    this.setElementsOnPage = 0;
+    this.hostname = '';
+    this.cachedOuterFrameMessage = '';
   }
 
   getOuterFrameEvents(windowRef) {
@@ -83,8 +87,10 @@ export class CommandExecutorService {
     }
   }
 
-  setHostname(windowRef, hostname) {
-    this.hostname = hostname;
+  setHostname(windowRef, name) {
+    if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(name) >= 10) {
+      this.hostname = name;
+    }
     if (this.cachedOuterFrameMessage !== '') {
       windowRef.nativeWindow.parent.postMessage(this.cachedOuterFrameMessage,
         this.hostname);
@@ -94,7 +100,7 @@ export class CommandExecutorService {
   continueClick(windowRef) {
     try {
       var button = windowRef.nativeWindow.document.getElementsByClassName(
-        'oppia-learner-confirm-button md-button md-ink-ripple'
+        'oppia-learner-confirm-button'
       )[0] as HTMLElement;
       button.click();
     } catch {
@@ -107,32 +113,35 @@ export class CommandExecutorService {
 
   fillTextBox(windowRef, text) {
     var box = windowRef.nativeWindow.document.getElementsByClassName(
-      'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
+      'form-control')[0];
     box.value = text;
     var evt = document.createEvent('HTMLEvents');
     evt.initEvent('change', false, true);
     box.dispatchEvent(evt);
     var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'oppia-learner-confirm-button md-button md-ink-ripple')[0] as HTMLElement;
+      'oppia-learner-confirm-button')[0] as HTMLElement;
     button.click();
   }
 
   addSet(windowRef, elements) {
+    if (!this.setElementsOnPage) {
+      this.setElementsOnPage = 0;
+    };
     for (var i = 0; i < elements.length; i++) {
       var box;
       if (this.setElementsOnPage === 0) {
-        var box = windowRef.nativeWindow.document.getElementsByClassName(
-          'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
+        var box = windowRef.nativeWindow.document.querySelector(
+          '.form-control');
         box.value = elements[i];
         this.setElementsOnPage += 1;
       } else {
-        var addButton = windowRef.nativeWindow.document.getElementsByClassName(
-          'btn btn-secondary btn-sm'
-        )[this.setElementsOnPage - 1] as HTMLElement;
+        var addButton = windowRef.nativeWindow.document.querySelectorAll(
+          '.btn-secondary'
+        )[0] as HTMLElement;
         addButton.click();
         this.setElementsOnPage += 1;
-        var box = windowRef.nativeWindow.document.getElementsByClassName(
-          'form-control ng-pristine ng-untouched ng-valid ng-empty')[0];
+        var box = windowRef.nativeWindow.document.querySelectorAll(
+          '.form-control')[this.setElementsOnPage - 1];
         box.value = elements[i];
       }
       var evt = document.createEvent('HTMLEvents');
@@ -142,22 +151,22 @@ export class CommandExecutorService {
   }
 
   removeSet(windowRef, element) {
-    var boxes = windowRef.nativeWindow.document.getElementsByClassName(
-      'form-control ng-pristine ng-untouched ng-valid ng-not-empty');
+    var boxes = windowRef.nativeWindow.document.querySelectorAll(
+      '.form-control');
     for (var i = 0; i < boxes.length; i++) {
       if (boxes[i].value === element) {
         var deleteButton =
-        windowRef.nativeWindow.document.getElementsByClassName(
-          'oppia-delete-list-entry-button');
-        deleteButton[i].click();
+        windowRef.nativeWindow.document.querySelectorAll(
+          '.oppia-delete-list-entry-button')[i];
+        deleteButton.click();
       }
     }
     this.setElementsOnPage -= 1;
   }
 
   enterFraction(windowRef, fraction) {
-    var fractionElementName = 'form-control ng-pristine ng-untouched \n' +
-    'ng-valid ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r ng-empty';
+    var fractionElementName = 
+    'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r';
     var fractionBox = windowRef.nativeWindow.document.getElementsByClassName(
       fractionElementName)[0];
     fractionBox.value = fraction;
@@ -165,7 +174,7 @@ export class CommandExecutorService {
 
   submit(windowRef) {
     var button = windowRef.nativeWindow.document.getElementsByClassName(
-      'oppia-learner-confirm-button md-button md-ink-ripple')[0] as HTMLElement;
+      'oppia-learner-confirm-button')[0] as HTMLElement;
     button.click();
     this.setElementsOnPage = 0;
   }

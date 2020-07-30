@@ -69,4 +69,6 @@ export class ServicesConstants {
 
   public static RTE_COMPONENT_SPECS = (
       require('rich_text_components_definitions.ts'));
+
+  public static WHITELISTED_IFRAME_HOSTS = [];
 }
