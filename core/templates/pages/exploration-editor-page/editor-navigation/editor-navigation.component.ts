@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing Editor Navigation
+ * @fileoverview Component for showing Editor Navigation
  * in editor.
  */
 
@@ -32,9 +32,8 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
-angular.module('oppia').directive('editorNavigation', () => ({
-  restrict: 'E',
-  template: require('./editor-navigation.directive.html'),
+angular.module('oppia').component('editorNavigation', {
+  template: require('./editor-navigation.component.html'),
   controller: [
     '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
@@ -136,5 +135,5 @@ angular.module('oppia').directive('editorNavigation', () => ({
         }
       };
     }
-  ],
-}));
+  ]
+});
