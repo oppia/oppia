@@ -2742,7 +2742,7 @@ div#ng-curtain {
   width: 0;
 }
 .oppia-editor-warnings-error-color {
-  border-color: transparent transparent rgb(244,244,15) transparent;
+  border-color: transparent transparent #FFCC00 transparent;
   color: #333;
 }
 .oppia-editor-warnings-critical-color {
@@ -4294,8 +4294,15 @@ md-card.preview-conversation-skin-supplemental-card {
     padding: 10px;
   }
   .oppia-mobile-collapsible-card {
-    margin-top: 40px;
-    padding: 15px;
+    margin: 40px 0 0;
+    padding: 0;
+  }
+  .oppia-mobile-collapsible-card-header {
+    padding: 18px 15px;
+  }
+  .oppia-mobile-collapsible-card-content {
+    border-top: 1px solid #999999;
+    padding: 20px 26px 15px;
   }
 }
 

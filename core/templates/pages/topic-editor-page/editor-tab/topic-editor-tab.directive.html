@@ -6,52 +6,67 @@
       </a>
       <span><[editableName]></span>
     </p>
-    <md-card class="oppia-long-text">
-      <div class="topic-editor-main-container">
-        <label class="form-heading">Topic Thumbnail</label>
-        <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                            filename="topic.getThumbnailFilename()"
-                            update-filename="updateTopicThumbnailFilename"
-                            bg-color="topic.getThumbnailBgColor()"
-                            update-bg-color="updateTopicThumbnailBgColor"
-                            allowed-bg-colors="allowedBgColors"
-                            aspect-ratio="'4:3'"
-                            preview-title="editableName"
-                            preview-description=""
-                            preview-description-bg-color="'#2F6687'"
-                            preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
-        </thumbnail-uploader>
-        <div class="topic-name">
-          <label for="topicName" class="form-heading protractor-test-topic-name-heading">Topic Name</label>
-          <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
-                 ng-disabled="!topicRights.canEditTopic()"
-                 ng-model="editableName" ng-blur="updateTopicName(editableName)"
-                 placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
-          <span class="oppia-input-box-subtitle">
-            <i>
-              Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+    <md-card class="oppia-long-text oppia-mobile-collapsible-card">
+        <div class="topic-editor-main-container">
+          <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards()">
+            <h3 class="topic-card-header">Details</h3>
+            <i class="fa fa-caret-down"
+               ng-if="!mainTopicCardIsShown"
+               aria-hidden="true">
             </i>
-          </span>
-        </div>
-        <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
-          <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
-          <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
-                    ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
-                    ng-change="updateTopicDescriptionStatus(editableDescription)"
-                    ng-blur="updateTopicDescription(editableDescription)"
-                    placeholder="Enter the description of the topic">
-          </textarea>
-          <span class="oppia-input-box-subtitle">
-            <i>
-              Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+            <i class="fa fa-caret-up"
+               ng-if="mainTopicCardIsShown"
+               aria-hidden="true">
             </i>
-          </span>
-          <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
-            What does this topic contain?
-          </span>
+          </div>
+          <div ng-if="mainTopicCardIsShown">
+            <div class="oppia-mobile-collapsible-card-content">
+          <label class="form-heading">Thumbnail</label>
+          <thumbnail-uploader disabled="!topicRights.canEditTopic()"
+                              filename="topic.getThumbnailFilename()"
+                              update-filename="updateTopicThumbnailFilename"
+                              bg-color="topic.getThumbnailBgColor()"
+                              update-bg-color="updateTopicThumbnailBgColor"
+                              allowed-bg-colors="allowedBgColors"
+                              aspect-ratio="'4:3'"
+                              preview-title="editableName"
+                              preview-description=""
+                              preview-description-bg-color="'#2F6687'"
+                              preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
+          </thumbnail-uploader>
+          <div class="topic-name">
+            <label for="topicName" class="form-heading protractor-test-topic-name-heading">Name</label>
+            <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
+                   ng-disabled="!topicRights.canEditTopic()"
+                   ng-model="editableName" ng-blur="updateTopicName(editableName)"
+                   placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+              </i>
+            </span>
+          </div>
+          <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+            <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
+            <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
+                      ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                      ng-change="updateTopicDescriptionStatus(editableDescription)"
+                      ng-blur="updateTopicDescription(editableDescription)"
+                      placeholder="Enter the description of the topic">
+            </textarea>
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+              </i>
+            </span>
+            <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
+              What does this topic contain?
+            </span>
+          </div>
+            </div>
         </div>
       </div>
-      <div ng-if="topic.getThumbnailFilename()">
+      <div ng-if="topic.getThumbnailFilename() && mainTopicCardIsShown">
         <div ng-if="!topicPreviewCardIsShown" >
           <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
             Expand Preview
@@ -75,24 +90,22 @@
         </div>
       </div>
     </md-card>
-    <md-card class="item-list-card subtopic-skill-card-container">
-      <div class="item-list-card-header">
+    <md-card class="item-list-card subtopic-skill-card-container oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(SUBTOPIC_LIST)">
         <div class="subtopic-reassign-header">
           <h3>Subtopics</h3>
           <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">Reassign</span>
-          <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
-             class="fa fa-angle-down"
+          <i class="fa fa-caret-down"
              ng-if="!subtopicsListIsShown"
              aria-hidden="true">
           </i>
-          <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
-             class="fa fa-angle-up"
+          <i class="fa fa-caret-up"
              ng-if="subtopicsListIsShown"
              aria-hidden="true">
           </i>
         </div>
       </div>
-      <div ng-if="subtopicsListIsShown">
+      <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
         <button class="btn add-subtopic-btn protractor-test-add-subtopic-button" ng-click="createSubtopic()">
           + ADD SUBTOPIC
         </button>
@@ -162,7 +175,7 @@
                         <span>Remove from subtopic</span>
                       </div>
                       <div class="skill-edit-option" ng-click="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
-                        <i class="fa fa-trash"></i>
+                        <i class="fa fa-plus"></i>
                         <span>Change Subtopic</span>
                       </div>
                       <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
@@ -183,21 +196,19 @@
     </md-card>
   </div>
   <div class="topic-info-container">
-    <md-card class="item-list-card">
-      <div class="item-list-card-header">
+    <md-card class="item-list-card oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(STORY_LIST)">
         <h3>Canonical Stories</h3>
-        <i ng-click="togglePreviewListCards(STORY_LIST)"
-           class="fa fa-angle-down"
+        <i class="fa fa-caret-down"
            ng-if="!storiesListIsShown"
            aria-hidden="true">
         </i>
-        <i ng-click="togglePreviewListCards(STORY_LIST)"
-           class="fa fa-angle-up"
+        <i class="fa fa-caret-up"
            ng-if="storiesListIsShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="storiesListIsShown">
+      <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
         <button class="btn add-story-btn protractor-test-create-story-button"
                 ng-click="createCanonicalStory()">
           + ADD STORY
@@ -285,7 +296,7 @@
     height: 110px;
     justify-content: center;
     margin: 30px auto 0;
-    width: 80%;
+    width: 97%;
   }
 
   .topic-editor .subtopic-count,
@@ -300,6 +311,10 @@
   .topic-editor .story-count {
     border-right: none;
   }
+  .topic-editor .topic-card-header {
+    margin-bottom: 30px;
+    margin-left: -20px;
+  }
 
   .topic-editor .skills-list-item {
     align-items: center;
@@ -312,7 +327,7 @@
   .topic-editor .skills-list-item a {
     color: inherit;
     text-decoration: none;
-    width: 95%;
+    width: 75%;
   }
 
   .topic-editor .edit-options-container {
@@ -349,11 +364,12 @@
   }
 
   .topic-editor .form-heading {
-    font-size: 1.2em;
+    font-size: 15px;
   }
 
   .topic-editor .topic-name {
-    margin-bottom: 1.5%;
+    margin-bottom: 25px;
+    margin-top: 32px;
   }
 
   .topic-editor .canonical-stories {
@@ -545,10 +561,15 @@
     }
 
     .topic-editor .item-list-card {
-      padding: 15px 10px;
+      padding: 0;
     }
+
     .topic-editor .entity-count {
       display: none;
+    }
+
+    .topic-editor .subtopic-skill-card-container {
+      margin-top: inherit;
     }
 
     .topic-editor .item-list-card-header {
@@ -557,18 +578,36 @@
       justify-content: space-between;
     }
 
+    .topic-editor .topic-editor-main-container {
+      padding: 0;
+    }
+
+    .topic-editor .skills-list-item a {
+      color: inherit;
+      text-decoration: none;
+      width: 65%;
+    }
+
+    .topic-editor .topic-card-header,
+    .topic-editor .subtopic-reassign-header,
+    .topic-editor .item-list-card-header h3 {
+      font-size: 19px;
+      margin: 0;
+    }
+
+    .topic-editor .subtopic-skill {
+      border-bottom: 1px solid #e3e3e3;
+      padding: 8px 10px 8px 20px;
+    }
+
     .topic-editor .item-list-card-header i {
       display: inline-block;
-      font-size: 25px;
+      font-size: 18px;
     }
 
     .topic-editor .topic-content-container {
       margin-top: 30px;
       width: 100%;
-    }
-
-    .topic-editor .subtopic-skill-card-container {
-      margin-top: 16px;
     }
 
     .topic-editor .subtopic-reassign-header {
@@ -585,7 +624,11 @@
     }
 
     .topic-editor .add-subtopic-btn {
-      width: 50%;
+      width: 44%;
+    }
+
+    .topic-editor .add-skill-btn {
+      margin-left: 3%;
     }
 
     .topic-editor .skill-option-box {

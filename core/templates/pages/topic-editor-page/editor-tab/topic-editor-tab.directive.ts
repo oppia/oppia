@@ -299,11 +299,15 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.togglePreviewListCards = function(listType) {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
             if (listType === $scope.SUBTOPIC_LIST) {
               $scope.subtopicsListIsShown = !$scope.subtopicsListIsShown;
-            }
-            if (listType === $scope.STORY_LIST) {
+            } else if (listType === $scope.STORY_LIST) {
               $scope.storiesListIsShown = !$scope.storiesListIsShown;
+            } else {
+              $scope.mainTopicCardIsShown = !$scope.mainTopicCardIsShown;
             }
           };
 
@@ -378,6 +382,9 @@ angular.module('oppia').directive('topicEditorTab', [
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
+            // $scope.mainTopicCardIsShown = (
+            //   WindowDimensionsService.isWindowNarrow());
+            $scope.mainTopicCardIsShown = true;
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);

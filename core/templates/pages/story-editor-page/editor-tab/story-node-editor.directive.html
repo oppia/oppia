@@ -38,11 +38,18 @@
           </div>
           <div class="story-node-exploration">
             <label class="form-heading"> Exploration ID*</label>
-            <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
-              <input class="form-control protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
-              <span ng-if="!isStoryPublished()" ng-click="updateExplorationId(null)" class="fas fa-trash-alt list-summary"> </span>
-              <div class="save-button-container">
-                <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!expIdCanBeSaved || (explorationId === currentExplorationId)">Save</button>
+            <form class="form-horizontal">
+              <input class="form-control protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()"
+                     ng-focus="toggleExplorationInputButtons()">
+              <div class="save-button-container" ng-if="explorationInputButtonsAreShown">
+                <span ng-if="!isStoryPublished()" ng-click="updateExplorationId(null)" class="fas fa-trash-alt list-summary"></span>
+                <button class="btn btn-default" ng-click="toggleExplorationInputButtons()">Cancel</button>
+                <button type="submit"
+                        class="protractor-test-exploration-id-save-button btn btn-success btn-sm"
+                        ng-click="updateExplorationId(explorationId)"
+                        ng-disabled="!expIdCanBeSaved || (explorationId === currentExplorationId)">
+                  Save
+                </button>
               </div>
               <span class="form-text error-message" ng-if="invalidExpErrorIsShown">
                 <em>Please enter a valid exploration id.</em>
@@ -79,7 +86,7 @@
           </div>
           <div ng-if="chapterPreviewCardIsShown">
             <preview-thumbnail name="editableTitle"
-                               aspect-ratio="'4:3'"
+                               aspect-ratio="'16:9'"
                                filename = "getThumbnailFilename()"
                                description="editableDescription"
                                thumbnail-bg-color="getThumbnailBgColor()"
@@ -107,11 +114,13 @@
             Outline Finalized
             <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
             <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+            <div tabindex="-1" ng-blur="toggleChapterOutlineButtons()" ng-click="toggleChapterOutlineButtons()">
             <schema-based-editor id="storyNodeOutline"
                                  schema="OUTLINE_SCHEMA"
+                                 on-input-blur="toggleChapterOutlineButtons"
                                  local-value="editableOutline">
             </schema-based-editor>
-            <div class="save-button-container">
+            <div class="save-button-container" ng-if="chapterOutlineButtonsAreShown">
               <button type="button"
                       class="btn btn-success save-button protractor-test-node-outline-save-button"
                       ng-disabled="!isOutlineModified(editableOutline)"
@@ -121,6 +130,7 @@
             </div>
           </div>
         </div>
+      </div>
       </md-card>
       <md-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card story-skill-desktop">
         <div class="story-node-header skill-requirements-header">
@@ -278,11 +288,12 @@
   story-node-editor .story-node-content-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
     margin: 0 auto;
     width: 85%;
   }
   story-node-editor .story-node-content {
+    margin-right: 3%;
     width: 50%;
   }
   story-node-editor .story-node-content-info {

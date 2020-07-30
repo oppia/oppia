@@ -225,6 +225,13 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicEditorRoutingService.navigateToMainTab();
       };
 
+      ctrl.toggleSubtopicEditorCard = function() {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
+        ctrl.subtopicEditorCardIsShown = !ctrl.subtopicEditorCardIsShown;
+      };
+
       ctrl.$onInit = function() {
         ctrl.SUBTOPIC_PAGE_SCHEMA = {
           type: 'html',
@@ -236,6 +243,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.skillsListIsShown = (
           !WindowDimensionsService.isWindowNarrow());
         ctrl.subtopicPreviewCardIsShown = false;
+        ctrl.subtopicEditorCardIsShown = true;
         ctrl.schemaEditorIsShown = false;
         $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
         $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);

@@ -100,7 +100,7 @@
             <i class="fa fa-angle-up"></i>
           </button>
         </div>
-        <div ng-if="story.getId() && storyPreviewCardIsShown">
+        <div ng-if="story.getThumbnailFilename() && storyPreviewCardIsShown">
           <preview-thumbnail name="editableTitle"
                              aspect-ratio="'16:9'"
                              description="editableDescription"
@@ -264,11 +264,12 @@
   story-editor .parent-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: center;
     margin: 0 auto;
     width: 90%;
   }
   story-editor .content-container {
+    margin-right: 3%;
     width: 48%;
   }
   story-editor .chapter-list-container {

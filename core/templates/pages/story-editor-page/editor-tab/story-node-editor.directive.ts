@@ -217,6 +217,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
+            $scope.toggleExplorationInputButtons();
             if (StoryEditorStateService.isStoryPublished()) {
               if (explorationId === '' || explorationId === null) {
                 AlertsService.addInfoMessage(
@@ -372,6 +373,17 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.toggleAcquiredSkillsList = function() {
             $scope.acquiredSkillIsShown = !$scope.acquiredSkillIsShown;
           };
+          $scope.toggleExplorationInputButtons = function() {
+            console.log('Hello');
+            $scope.explorationInputButtonsAreShown = (
+              !$scope.explorationInputButtonsAreShown);
+          };
+          $scope.toggleChapterOutlineButtons = function() {
+            console.log('Hello');
+            $scope.chapterOutlineButtonsAreShown = (
+              !$scope.chapterOutlineButtonsAreShown);
+          };
+          $scope.toggleChapterOutlineButtons;
 
           ctrl.$onInit = function() {
             // Regex pattern for exploration id,
@@ -379,6 +391,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             // is not being used here, as the chapter of the story can be saved
             // with empty exploration id.
             $scope.chapterPreviewCardIsShown = false;
+            $scope.explorationInputButtonsAreShown = false;
+            $scope.chapterOutlineButtonsAreShown = false;
             $scope.chapterOutlineIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.prerequisiteSkillIsShown = (

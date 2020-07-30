@@ -105,9 +105,9 @@
     border-radius: 4px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    padding: 35px 0;
+    justify-content: space-evenly;
     text-align: center;
+    width: 100%;
   }
 
   .skill-editor .misconception-count,
@@ -115,16 +115,16 @@
   .skill-editor .create-question {
     border-right: 2px solid #707070;
     display: inline-block;
-    width: 30%;
+    width: 33%;
   }
 
   .skill-editor .count-value {
-    font-size: 25px;
+    font-size: 24px;
     font-weight: bold;
   }
 
   .skill-editor .count-text {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .skill-editor .create-question {
@@ -139,6 +139,19 @@
 
   .skill-editor .create-text {
     color: #0b6c63;
+  }
+  .skill-editor .skill-editor-helper-box {
+    align-items: center;
+    background-color: #FFF;
+    border: 1px solid #aaaac1;
+    border-radius: 6px;
+    box-shadow: none;
+    /* display: flex; */
+    /* flex-wrap: wrap; */
+    height: 110px;
+    justify-content: center;
+    margin: 30px auto 0;
+    width: 85%;
   }
 
   @media screen and (max-width: 1250px) {
