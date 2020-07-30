@@ -107,8 +107,8 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 gae_id=gae_id
             ).put()
         elif user_auth_model.id != user_id:
-            # because <user_id, gae_id> tuple coming from UserSettingsModel
-            # currently is the source of truth
+            # Because <user_id, gae_id> tuple coming from UserSettingsModel
+            # currently is the source of truth.
             user_models.UserAuthModel.delete_by_id(user_auth_model.id)
             user_models.UserAuthModel(
                 id=user_id,

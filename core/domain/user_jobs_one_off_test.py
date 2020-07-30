@@ -236,7 +236,7 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
             self.user_a_id).gae_id
 
         user_models.UserSettingsModel.delete_by_id(self.user_a_id)
-        new_user_id = user_models.UserSettingsModel.get_new_id("")
+        new_user_id = user_models.UserSettingsModel.get_new_id('')
         user_models.UserSettingsModel(
             id=new_user_id,
             gae_id=existing_gae_id,
