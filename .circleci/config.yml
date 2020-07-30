@@ -137,7 +137,7 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="adminPage" --prod_env
           no_output_timeout: 20m
-      -store_artifacts:
+      - store_artifacts:
           path: /home/circleci/oppia/core/protractor-screenshots
       - run:
           name: Run e2e navigation test
