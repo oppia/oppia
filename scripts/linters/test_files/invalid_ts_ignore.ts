@@ -25,7 +25,7 @@ let a: string;
 // @ts-ignore
 let b: number = a;
 
-// 2. Comment with invalid format
+// 2. Comment with invalid format.
 
 // We need ts-ignore here to test lint checks.
 // @ts-ignore

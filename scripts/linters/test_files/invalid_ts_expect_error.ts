@@ -19,12 +19,12 @@
 
 let y: string;
 
-// 1. Invalid Comment
+// 1. No comment.
 
 // @ts-expect-error
 let b: number = y;
 
-// 2. Invalid Comment Format
+// 2. Invalid Comment Format.
 
 // We need expect error to test lint checks.
 // @ts-expect-error
