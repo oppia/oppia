@@ -19,13 +19,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [CommonModule, BrowserAnimationsModule,
-    MatButtonModule, MatCardModule
+    MatButtonModule, MatButtonToggleModule, MatCardModule
   ],
-  exports: [BrowserAnimationsModule, MatButtonModule, MatCardModule]
+  exports: [BrowserAnimationsModule, MatButtonModule,
+    MatButtonToggleModule, MatCardModule
+  ]
 })
 export class MaterialModule {}

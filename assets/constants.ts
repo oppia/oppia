@@ -5321,6 +5321,9 @@ export = {
   "OSK_FUNCTIONS_TAB": "functionsTab",
   "OSK_LETTERS_TAB": "lettersTab",
 
+  "CUSTOM_LETTERS_LATIN_TAB": "latinTab",
+  "CUSTOM_LETTERS_GREEK_TAB": "greekTab",
+
   // Name to human readable form mapping of the position of terms object.
   "POSITION_OF_TERMS_MAPPING": [{
     "name": "lhs",

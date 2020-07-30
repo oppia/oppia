@@ -30,14 +30,49 @@ angular.module('oppia').component('customOskLettersEditor', {
     value: '='
   },
   template: require('./custom-osk-letters-editor.component.html'),
-  controller: ['GREEK_SYMBOLS_LOWERCASE', 'GREEK_SYMBOLS_UPPERCASE',
-    function(GREEK_SYMBOLS_LOWERCASE, GREEK_SYMBOLS_UPPERCASE) {
+  controller: [
+    'GREEK_SYMBOLS_LOWERCASE', 'GREEK_SYMBOLS_UPPERCASE',
+    'CUSTOM_LETTERS_LATIN_TAB', 'CUSTOM_LETTERS_GREEK_TAB',
+    function(
+      GREEK_SYMBOLS_LOWERCASE, GREEK_SYMBOLS_UPPERCASE,
+      CUSTOM_LETTERS_LATIN_TAB, CUSTOM_LETTERS_GREEK_TAB) {
       const ctrl = this;
-      ctrl.
+      ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+      ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
+      ctrl.greekLowerCase = [
+        GREEK_SYMBOLS_LOWERCASE.slice(0, 8).join(''),
+        GREEK_SYMBOLS_LOWERCASE.slice(8, 16).join(''),
+        GREEK_SYMBOLS_LOWERCASE.slice(16, 23).join(''),
+      ];
+      ctrl.greekUpperCase = [
+        GREEK_SYMBOLS_UPPERCASE.slice(0, 8).join(''),
+        GREEK_SYMBOLS_UPPERCASE.slice(8, 16).join(''),
+        GREEK_SYMBOLS_UPPERCASE.slice(16, 23).join(''),
+      ];;
+
+      ctrl.latinTab = CUSTOM_LETTERS_LATIN_TAB;
+      ctrl.greekTab = CUSTOM_LETTERS_GREEK_TAB;
+
+      ctrl.updateLettersList = function(letter) {
+        let index = ctrl.value.indexOf(letter);
+        if (index === -1) {
+          ctrl.value.push(letter);
+        } else {
+          ctrl.value.splice(index, 1);
+        }
+        console.log(ctrl.value);
+      };
+
+      ctrl.changeCase = function(letter) {
+        return ctrl.lettersAreLowercase ? (
+          letter.toLowerCase()) : letter.toUpperCase();
+      };
 
       ctrl.$onInit = function() {
         ctrl.alwaysEditable = true;
-        ctrl.value = [];
+        ctrl.lettersAreLowercase = true;
+        ctrl.currentTab = ctrl.latinTab;
+        console.log(ctrl.greekLowercase);
       };
     }
   ]
