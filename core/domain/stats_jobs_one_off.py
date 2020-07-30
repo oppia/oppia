@@ -1428,8 +1428,6 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
                 yield (
                     'Playthrough Action',
                     all_ca_names == set(action['action_customization_args']))
-        else:
-            raise Exception('Unrecognized entity class to map over')
 
     @staticmethod
     def reduce(key, values):

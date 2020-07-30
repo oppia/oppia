@@ -2746,27 +2746,25 @@ class Exploration(python_utils.OBJECT):
                 ca_name = ca_spec.name
                 content_id_prefix = 'ca_%s_' % ca_name
 
-                is_subtitled_html_spec = (
-                    schema_utils.is_subtitled_html_schema(schema))
+                # We only have to migrate unicode to SubtitledUnicode or
+                # list of html to list of SubtitledHtml. No interactions
+                # were changed from html to SubtitledHtml.
                 is_subtitled_unicode_spec = (
                     schema_utils.is_subtitled_unicode_schema(schema))
                 is_subtitled_html_list_spec = (
                     schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
                     schema_utils.is_subtitled_html_schema(schema['items']))
 
-                if is_subtitled_html_spec or is_subtitled_unicode_spec:
+                if is_subtitled_unicode_spec:
                     logging.info(
-                        'State migration v41: SubtitledHtml/SubtitledUnicode'
-                        'migration')
+                        'State migration v41: SubtitledUnicode migration')
+
                     # Default is a SubtitledHtml dict or SubtitleUnicode dict.
                     new_value = copy.deepcopy(ca_spec.default_value)
 
                     # If available, assign value to html or unicode_str.
                     if ca_name in ca_dict:
-                        if is_subtitled_html_spec:
-                            new_value['html'] = ca_dict[ca_name]['value']
-                        elif is_subtitled_unicode_spec:
-                            new_value['unicode_str'] = ca_dict[ca_name]['value']
+                        new_value['unicode_str'] = ca_dict[ca_name]['value']
 
                     # Assign content_id.
                     new_value['content_id'] = (
@@ -2789,7 +2787,7 @@ class Exploration(python_utils.OBJECT):
                             })
                     else:
                         # Default is a list of SubtitledHtml dict.
-                        new_value.extend(copy.deepcopy(ca_spec.default_values))
+                        new_value.extend(copy.deepcopy(ca_spec.default_value))
 
                     # Assign content_ids.
                     for subtitled_html_dict in new_value:

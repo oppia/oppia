@@ -659,6 +659,17 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
+    def test_unicode_or_none_schema(self):
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE,
+        }
+        mappings = [('a', 'a'), ('', ''), (b'bytes', 'bytes'), (None, None)]
+        invalid_values_with_error_messages = [
+            ([], r'Expected unicode string or None, received'),
+        ]
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
     def test_list_schema_with_len(self):
         schema = {
             'type': schema_utils.SCHEMA_TYPE_LIST,

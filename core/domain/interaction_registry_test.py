@@ -199,3 +199,13 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
                 traverse_schema_to_find_and_validate_subtitled_content(
                     ca_spec['default_value'], ca_spec['schema'])
+
+    def test_get_all_specs_for_state_schema_version_for_unsaved_version(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'No specs json file found for state schema'
+        ):
+            (
+                interaction_registry.Registry
+                .get_all_specs_for_state_schema_version(10)
+            )

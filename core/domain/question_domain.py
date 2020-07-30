@@ -337,185 +337,6 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
-        """Converts from version 34 to 35. Version 35 adds translation support
-        for interaction customization arguments. This migration converts
-        customization arguments whose schemas have been changed from unicode to
-        SubtitledUnicode or html to SubtitledHtml. It also populates missing
-        customization argument keys on all interactions, removes extra
-        customization arguments, normalizes customization arguments against
-        its schema, and changes PencilCodeEditor's customization argument
-        name from initial_code to initialCode.
-
-        Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
-
-        Returns:
-            dict. The converted question_state_dict.
-        """
-        # Find maximum existing content_id index.
-        max_existing_content_id_index = -1
-        translations_mapping = question_state_dict[
-            'written_translations']['translations_mapping']
-        for content_id in translations_mapping:
-            content_id_suffix = content_id.split('_')[-1]
-            if content_id_suffix.isdigit():
-                max_existing_content_id_index = max(
-                    max_existing_content_id_index,
-                    int(content_id_suffix)
-                )
-            for lang_code in translations_mapping[content_id]:
-                translations_mapping[
-                    content_id][lang_code]['data_format'] = 'html'
-                translations_mapping[
-                    content_id][lang_code]['translation'] = (
-                        translations_mapping[content_id][lang_code]['html'])
-                del translations_mapping[content_id][lang_code]['html']
-
-        interaction_id = question_state_dict['interaction']['id']
-        if interaction_id is None:
-            question_state_dict['next_content_id_index'] = (
-                max_existing_content_id_index + 1)
-            return question_state_dict
-
-        class ContentIdCounter(python_utils.OBJECT):
-            """This helper class is used to keep track of
-            next_content_id_index and new_content_ids, and provides a
-            function to generate new content_ids.
-            """
-
-            new_content_ids = []
-
-            def __init__(self, next_content_id_index):
-                """Initializes a ContentIdCounter object.
-
-                Args:
-                    next_content_id_index: The next content id index.
-                """
-                self.next_content_id_index = next_content_id_index
-
-            def generate_content_id(self, content_id_prefix):
-                """Generate a new content_id from the prefix provided and
-                the next content id index.
-
-                Args:
-                    content_id_prefix: str. The prefix of the content_id.
-
-                Returns:
-                    str. The generated content_id.
-                """
-                content_id = '%s%i' % (
-                    content_id_prefix,
-                    self.next_content_id_index)
-                self.next_content_id_index += 1
-                self.new_content_ids.append(content_id)
-                return content_id
-
-        content_id_counter = (
-            ContentIdCounter(max_existing_content_id_index + 1))
-
-        ca_dict = question_state_dict['interaction']['customization_args']
-        if (interaction_id == 'PencilCodeEditor' and
-                'initial_code' in ca_dict):
-            ca_dict['initialCode'] = ca_dict['initial_code']
-            del ca_dict['initial_code']
-
-        # Retrieve a cached version (state schema v35) of
-        # interaction_specs.json to ensure that this migration remains
-        # stable even when interaction_specs.json is changed.
-        ca_specs = [
-            domain.CustomizationArgSpec(
-                ca_spec_dict['name'],
-                ca_spec_dict['description'],
-                ca_spec_dict['schema'],
-                ca_spec_dict['default_value']
-            ) for ca_spec_dict in (
-                interaction_registry.Registry
-                .get_all_specs_for_state_schema_version(35)[
-                    interaction_id]['customization_arg_specs']
-            )
-        ]
-
-        for ca_spec in ca_specs:
-            schema = ca_spec.schema
-            ca_name = ca_spec.name
-            content_id_prefix = 'ca_%s_' % ca_name
-
-            is_subtitled_html_spec = (
-                schema_utils.is_subtitled_html_schema(schema))
-            is_subtitled_unicode_spec = (
-                schema_utils.is_subtitled_unicode_schema(schema))
-            is_subtitled_html_list_spec = (
-                schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                schema_utils.is_subtitled_html_schema(schema['items'])
-            )
-
-            if is_subtitled_html_spec or is_subtitled_unicode_spec:
-                # Default is a SubtitledHtml dict or SubtitleUnicode dict.
-                new_value = copy.deepcopy(ca_spec.default_value)
-
-                # If available, assign value to html or unicode_str.
-                if ca_name in ca_dict:
-                    if is_subtitled_html_spec:
-                        new_value['html'] = ca_dict[ca_name]['value']
-                    elif is_subtitled_unicode_spec:
-                        new_value['unicode_str'] = ca_dict[ca_name]['value']
-
-                # Assign content_id.
-                new_value['content_id'] = (
-                    content_id_counter
-                    .generate_content_id(content_id_prefix)
-                )
-
-                ca_dict[ca_name] = {'value': new_value}
-            elif is_subtitled_html_list_spec:
-                new_value = []
-
-                if ca_name in ca_dict:
-                    # Assign values to html fields.
-                    for html in ca_dict[ca_name]['value']:
-                        new_value.append({
-                            'html': html, 'content_id': None
-                        })
-                else:
-                    # Default is a list of SubtitledHtml dict.
-                    new_value.extend(copy.deepcopy(ca_spec.default_values))
-
-                # Assign content_ids.
-                for subtitled_html_dict in new_value:
-                    subtitled_html_dict['content_id'] = (
-                        content_id_counter
-                        .generate_content_id(content_id_prefix)
-                    )
-
-                ca_dict[ca_name] = {'value': new_value}
-            elif ca_name not in ca_dict:
-                ca_dict[ca_name] = {'value': ca_spec.default_value}
-
-        (
-            customization_args_util
-            .validate_customization_args_and_values(
-                'interaction',
-                interaction_id,
-                ca_dict,
-                ca_specs)
-        )
-
-        question_state_dict['next_content_id_index'] = (
-            content_id_counter.next_content_id_index)
-        for new_content_id in content_id_counter.new_content_ids:
-            question_state_dict[
-                'written_translations'][
-                    'translations_mapping'][new_content_id] = {}
-            question_state_dict[
-                'recorded_voiceovers'][
-                    'voiceovers_mapping'][new_content_id] = {}
-
-        return question_state_dict
-
-    @classmethod
-    def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
         """Converts from version 34 to 35. Version 35 upgrades all explorations
         that use the MathExpressionInput interaction to use one of
         AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
@@ -747,8 +568,9 @@ class Question(python_utils.OBJECT):
             ca_name = ca_spec.name
             content_id_prefix = 'ca_%s_' % ca_name
 
-            is_subtitled_html_spec = (
-                schema_utils.is_subtitled_html_schema(schema))
+            # We only have to migrate unicode to SubtitledUnicode or
+            # list of html to list of SubtitledHtml. No interactions
+            # were changed from html to SubtitledHtml.
             is_subtitled_unicode_spec = (
                 schema_utils.is_subtitled_unicode_schema(schema))
             is_subtitled_html_list_spec = (
@@ -756,16 +578,13 @@ class Question(python_utils.OBJECT):
                 schema_utils.is_subtitled_html_schema(schema['items'])
             )
 
-            if is_subtitled_html_spec or is_subtitled_unicode_spec:
+            if is_subtitled_unicode_spec:
                 # Default is a SubtitledHtml dict or SubtitleUnicode dict.
                 new_value = copy.deepcopy(ca_spec.default_value)
 
                 # If available, assign value to html or unicode_str.
                 if ca_name in ca_dict:
-                    if is_subtitled_html_spec:
-                        new_value['html'] = ca_dict[ca_name]['value']
-                    elif is_subtitled_unicode_spec:
-                        new_value['unicode_str'] = ca_dict[ca_name]['value']
+                    new_value['unicode_str'] = ca_dict[ca_name]['value']
 
                 # Assign content_id.
                 new_value['content_id'] = (
@@ -785,7 +604,7 @@ class Question(python_utils.OBJECT):
                         })
                 else:
                     # Default is a list of SubtitledHtml dict.
-                    new_value.extend(copy.deepcopy(ca_spec.default_values))
+                    new_value.extend(copy.deepcopy(ca_spec.default_value))
 
                 # Assign content_ids.
                 for subtitled_html_dict in new_value:
