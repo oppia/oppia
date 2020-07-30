@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { PlatformParameterResultObjectFactory } from
   './PlatformParameterResultObjectFactory';
 
-fdescribe('PlatformParameterRuleObjectFactory', () => {
+describe('PlatformParameterRuleObjectFactory', () => {
   let factory: PlatformParameterResultObjectFactory;
 
   beforeEach(() => {
