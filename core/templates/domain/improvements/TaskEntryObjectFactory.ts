@@ -31,7 +31,7 @@ import { ImprovementsConstants } from
  * match any task. This is used when, for example, rendering the list of tasks
  * as a table (where the type doesn't matter).
  */
-export interface ITaskEntryBackendDict<TaskType = string> {
+export interface TaskEntryBackendDict<TaskType = string> {
   'entity_type': string;
   'entity_id': string;
   'entity_version': number;
@@ -54,7 +54,7 @@ export interface ITaskEntryBackendDict<TaskType = string> {
  * match any task. This is used when, for example, rendering the list of tasks
  * as a table (where the type doesn't matter).
  */
-export interface ITaskEntryPayloadDict<TaskType = string> {
+export interface TaskEntryPayloadDict<TaskType = string> {
   'entity_version': number;
   'task_type': TaskType;
   'target_id': string;
@@ -84,7 +84,7 @@ export class TaskEntry<TaskType = string> {
   protected issueDescription: string;
   private taskStatus: string;
 
-  constructor(backendDict: ITaskEntryBackendDict<TaskType>) {
+  constructor(backendDict: TaskEntryBackendDict<TaskType>) {
     this.entityType = backendDict.entity_type;
     this.entityId = backendDict.entity_id;
     this.entityVersion = backendDict.entity_version;
@@ -99,7 +99,7 @@ export class TaskEntry<TaskType = string> {
     this.taskStatus = backendDict.status;
   }
 
-  public toBackendDict(): ITaskEntryBackendDict<TaskType> {
+  public toBackendDict(): TaskEntryBackendDict<TaskType> {
     return {
       entity_type: this.entityType,
       entity_id: this.entityId,
@@ -115,7 +115,7 @@ export class TaskEntry<TaskType = string> {
     };
   }
 
-  public toPayloadDict(): ITaskEntryPayloadDict<TaskType> {
+  public toPayloadDict(): TaskEntryPayloadDict<TaskType> {
     return {
       entity_version: this.entityVersion,
       task_type: this.taskType,
@@ -162,7 +162,7 @@ export class TaskEntry<TaskType = string> {
   providedIn: 'root'
 })
 export class TaskEntryObjectFactory {
-  createFromBackendDict(backendDict: ITaskEntryBackendDict): TaskEntry {
+  createFromBackendDict(backendDict: TaskEntryBackendDict): TaskEntry {
     return new TaskEntry(backendDict);
   }
 }

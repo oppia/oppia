@@ -1,5 +1,5 @@
 {
-    "AlgebraicExpression": "x",
+    "AlgebraicExpression": "",
     "AlgebraicIdentifier": "x",
     "CodeString": "",
     "CoordTwoDim": [0.0, 0.0],
@@ -34,7 +34,7 @@
       "numerator": 0,
       "denominator": 1
     },
-    "MathEquation": "x=y",
+    "MathEquation": "",
     "NumberWithUnits": {
       "type": "real",
       "real": 0.0,
@@ -46,6 +46,6 @@
       },
       "units": []
     },
-    "NumericExpression": "1",
+    "NumericExpression": "",
     "PositionOfTerms": "both"
 }

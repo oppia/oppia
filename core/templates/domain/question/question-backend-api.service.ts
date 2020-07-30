@@ -23,8 +23,37 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
+import { QuestionBackendDict } from
+  'domain/question/QuestionObjectFactory';
+import { QuestionSummaryBackendDict } from
+  'domain/question/QuestionSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+interface QuestionCountBackendResponse {
+  'total_question_count': number;
+}
+
+interface QuestionsBackendResponse {
+  'question_dicts': QuestionBackendDict[];
+}
+
+interface AugmentedQuestionSummaryBackendDict {
+  'summary': QuestionSummaryBackendDict[];
+  'skill_ids': string[];
+  'skill_descriptions': string[];
+  'skill_difficulties': number[];
+}
+
+interface QuestionSummariesBackendResponse {
+  'question_summary_dicts': AugmentedQuestionSummaryBackendDict[];
+  'next_start_cursor': string;
+}
+
+interface QuestionSummariesResponse {
+  questionSummaries: AugmentedQuestionSummaryBackendDict[];
+  nextCursor: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,10 +64,10 @@ export class QuestionBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _fetchQuestions(
-      skillIds: any, questionCount: any,
+      skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      successCallback: (value: QuestionBackendDict[]) => void,
+      errorCallback: (reason: string) => void): void {
     if (!this.validateRequestParameters(
       skillIds, questionCount, errorCallback)) {
       return;
@@ -49,40 +78,43 @@ export class QuestionBackendApiService {
         question_count: questionCount.toString(),
         fetch_by_difficulty: questionsSortedByDifficulty.toString()
       });
-    this.http.get(questionDataUrl).toPromise().then((response: any) => {
+    this.http.get<QuestionsBackendResponse>(
+      questionDataUrl
+    ).toPromise().then(response => {
       var questionDicts = cloneDeep(response.question_dicts);
       if (successCallback) {
         successCallback(questionDicts);
       }
-    }, (errorResponse) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
-  private _fetchTotalQuestionCountForSkillIds(skillIds: Array<string>,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: string) => void): void {
+  private _fetchTotalQuestionCountForSkillIds(skillIds: string[],
+      successCallback: (value: number) => void,
+      errorCallback: (reason: string) => void): void {
     var questionsCountUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTION_COUNT_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
       }
     );
-    this.http.get(questionsCountUrl).toPromise().then(
-      (response: {'total_question_count': number}) => {
-        if (successCallback) {
-          successCallback(response.total_question_count);
-        }
-      }, (errorResponse) => {
-        errorCallback(errorResponse.error);
-      });
+    this.http.get<QuestionCountBackendResponse>(
+      questionsCountUrl
+    ).toPromise().then(response => {
+      if (successCallback) {
+        successCallback(response.total_question_count);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
   }
 
   private _fetchQuestionSummaries(
-      skillIds: Array<string>, cursor: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void|boolean {
+      skillIds: string[], cursor: string,
+      successCallback: (value: QuestionSummariesResponse) => void,
+      errorCallback: (reason: string) => void): void|boolean {
     if (!this.isListOfStrings(skillIds)) {
       errorCallback('Skill ids should be a list of strings');
       return false;
@@ -92,7 +124,9 @@ export class QuestionBackendApiService {
         comma_separated_skill_ids: skillIds.join(','),
         cursor: cursor ? cursor : ''
       });
-    this.http.get(questionsDataUrl).toPromise().then((response: any) => {
+    this.http.get<QuestionSummariesBackendResponse>(
+      questionsDataUrl
+    ).toPromise().then(response => {
       var questionSummaries = cloneDeep(
         response.question_summary_dicts);
       var nextCursor = response.next_start_cursor;
@@ -104,7 +138,7 @@ export class QuestionBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse.error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
@@ -113,8 +147,8 @@ export class QuestionBackendApiService {
    * Does basic validation on input.
    */
   private validateRequestParameters(
-      skillIds, questionCount: any,
-      errorCallback: (reason?: any) => void): boolean {
+      skillIds: string[], questionCount: number,
+      errorCallback: (reason: string) => void): boolean {
     if (!this.isListOfStrings(skillIds)) {
       errorCallback('Skill ids should be a list of strings');
       return false;
@@ -131,7 +165,9 @@ export class QuestionBackendApiService {
   /**
    * Checks if given input is a list and has all strings
    */
-  private isListOfStrings(list): boolean {
+  // The type of list is unknown because it can be anything
+  // and if this function returns true. The type of list becomes string[].
+  private isListOfStrings(list: unknown): list is string[] {
     if (!Array.isArray(list)) {
       return false;
     }
@@ -143,7 +179,9 @@ export class QuestionBackendApiService {
   /**
    * Checks if given input is an integer
    */
-  private isInt(n: any): boolean {
+  // The type of n is unknown because it can be anything
+  // and if this function returns true. The type of n becomes number.
+  private isInt(n: unknown): n is number {
     return typeof n === 'number' && n % 1 === 0;
   }
 
@@ -152,8 +190,8 @@ export class QuestionBackendApiService {
    * of questions requested.
    */
   fetchQuestions(
-      skillIds: Array<string>, questionCount: any,
-      questionsSortedByDifficulty: boolean): Promise<object> {
+      skillIds: string[], questionCount: number,
+      questionsSortedByDifficulty: boolean): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchQuestions(
         skillIds, questionCount, questionsSortedByDifficulty,
@@ -161,13 +199,14 @@ export class QuestionBackendApiService {
     });
   }
 
-  fetchTotalQuestionCountForSkillIds(skillIds: Array<string>): Promise<number> {
+  fetchTotalQuestionCountForSkillIds(skillIds: string[]): Promise<number> {
     return new Promise((resolve, reject) => {
       this._fetchTotalQuestionCountForSkillIds(skillIds, resolve, reject);
     });
   }
 
-  fetchQuestionSummaries(skillIds: any, cursor: string): Promise<object> {
+  fetchQuestionSummaries(
+      skillIds: string[], cursor: string): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
       this._fetchQuestionSummaries(skillIds, cursor, resolve, reject);
     });

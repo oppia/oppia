@@ -29,28 +29,23 @@ import {
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class StateTopAnswersStatsBackendApiService {
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient,
-    private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory
-  ) {}
+      private http: HttpClient,
+      private stateTopAnswersStatsObjectFactory:
+        StateTopAnswersStatsObjectFactory,
+      private urlInterpolationService: UrlInterpolationService) {}
 
-  _fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
+  async fetchStatsAsync(expId: string): Promise<StateTopAnswersStats> {
     return this.http.get<StateTopAnswersStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STATE_ANSWER_STATS_URL,
-        {exploration_id: explorationId}
-      )
-    ).toPromise().then(backendDict => this.stateTopAnswersStatsObjectFactory
-      .createFromBackendDict(backendDict));
-  }
-
-  fetchStats(explorationId: string): Promise<StateTopAnswersStats> {
-    return this._fetchStats(explorationId);
+        ServicesConstants.STATE_ANSWER_STATS_URL, {exploration_id: expId}))
+      .toPromise().then(
+        d => this.stateTopAnswersStatsObjectFactory.createFromBackendDict(d),
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        });
   }
 }
 

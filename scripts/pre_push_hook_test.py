@@ -40,12 +40,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         super(PrePushHookTests, self).setUp()
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # pylint: disable=unused-argument
-        def mock_popen(
+        def mock_popen(  # pylint: disable=unused-argument
                 unused_cmd_tokens, stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE):
             return process
-        # pylint: enable=unused-argument
         def mock_get_remote_name():
             return 'remote'
         def mock_get_refs():
@@ -117,15 +115,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process_for_origin_url = subprocess.Popen(
             ['echo', 'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        # pylint: disable=unused-argument
-        def mock_popen(cmd_tokens, stdout, stderr):
+        def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
             if 'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
             elif 'remote.upstream.url' in cmd_tokens:
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        # pylint: enable=unused-argument
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap:
             self.assertEqual(pre_push_hook.get_remote_name(), 'upstream')
@@ -136,10 +132,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.communicate = mock_communicate
-        # pylint: disable=unused-argument
-        def mock_popen(unused_cmd_tokens, stdout, stderr):
+        def mock_popen(unused_cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
             return process
-        # pylint: enable=unused-argument
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegexp(ValueError, 'Error'):
@@ -154,13 +148,11 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process_for_remote_url = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process_for_remote_url.communicate = mock_communicate
-        # pylint: disable=unused-argument
-        def mock_popen(cmd_tokens, stdout, stderr):
+        def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
             if 'config' in cmd_tokens:
                 return process_for_remote_url
             else:
                 return process_for_remote
-        # pylint: enable=unused-argument
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegexp(ValueError, 'Error'):
@@ -176,15 +168,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process_for_origin_url = subprocess.Popen(
             ['echo', 'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        # pylint: disable=unused-argument
-        def mock_popen(cmd_tokens, stdout, stderr):
+        def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
             if 'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
             elif 'remote.upstream.url' in cmd_tokens:
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        # pylint: enable=unused-argument
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegexp(
             Exception,
@@ -209,15 +199,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
         process_for_origin_url = subprocess.Popen(
             ['echo', 'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        # pylint: disable=unused-argument
-        def mock_popen(cmd_tokens, stdout, stderr):
+        def mock_popen(cmd_tokens, stdout, stderr):  # pylint: disable=unused-argument
             if 'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
             elif 'remote.upstream.url' in cmd_tokens:
                 return process_for_upstream_url
             else:
                 return process_for_remote
-        # pylint: enable=unused-argument
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.print_swap:
             self.assertIsNone(pre_push_hook.get_remote_name())
@@ -328,11 +316,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_collect_files_being_pushed_with_non_empty_ref_list(self):
         def mock_get_branch():
             return 'branch-1'
-        # pylint: disable=unused-argument
         def mock_compare_to_remote(
-                unused_remote, unused_local_branch, remote_branch=None):
+                unused_remote, unused_local_branch, remote_branch=None):  # pylint: disable=unused-argument
             return ['A:file1', 'M:file2']
-        # pylint: enable=unused-argument
         def mock_extract_files_to_lint(unused_file_diffs):
             return ['file1', 'file2']
 
@@ -518,7 +504,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, uncommitted_files_swap:
-                with self.assertRaises(SystemExit):
+                with self.assertRaisesRegexp(SystemExit, '1'):
                     pre_push_hook.main(args=[])
         self.assertTrue(
             'Your repo is in a dirty state which prevents the linting from'
@@ -534,7 +520,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
-                with check_output_swap, self.assertRaises(SystemExit):
+                with check_output_swap, self.assertRaisesRegexp(
+                    SystemExit, '1'):
                     pre_push_hook.main(args=[])
         self.assertTrue(
             '\nCould not change branch to branch2. This is most probably '
@@ -546,7 +533,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.assertRaises(SystemExit):
+                    with self.assertRaisesRegexp(SystemExit, '1'):
                         pre_push_hook.main(args=[])
         self.assertTrue(
             'Push failed, please correct the linting issues above.'
@@ -563,7 +550,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
-                        with self.assertRaises(SystemExit):
+                        with self.assertRaisesRegexp(SystemExit, '1'):
                             pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing typescript checks.' in self.print_arr)
@@ -579,7 +566,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap, run_script_and_get_returncode_swap:
-                        with self.assertRaises(SystemExit):
+                        with self.assertRaisesRegexp(SystemExit, '1'):
                             pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
@@ -597,7 +584,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with run_script_and_get_returncode_swap:
                         with self.travis_yml_or_js_files_swap:
-                            with self.assertRaises(SystemExit):
+                            with self.assertRaisesRegexp(SystemExit, '1'):
                                 pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing e2e test configuration check.'

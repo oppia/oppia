@@ -1,173 +1,290 @@
-<div class="node-field">
-  <div class="story-node-thumbnail">
-    <label class="form-heading">Chapter Thumbnail</label>
-    <thumbnail-uploader filename="getThumbnailFilename()"
-                        update-filename="updateThumbnailFilename"
-                        bg-color="getThumbnailBgColor()"
-                        update-bg-color="updateThumbnailBgColor"
-                        allowed-bg-colors="allowedBgColors"
-                        aspect-ratio="'16:9'"
-                        preview-title="editableTitle"
-                        preview-description="editableDescription"
-                        preview-description-bg-color=""
-                        preview-footer="">
-    </thumbnail-uploader>
-  </div>
-  <div class="story-node-field">
-    <label for="storyNodeTitle" class="form-heading">Chapter Title</label>
-    <input id="storyNodeTitle" type="text" class="form-control"
-           ng-model="editableTitle" ng-blur="updateTitle(editableTitle)"
-           placeholder="Enter a title for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" ng-trim="false">
-    <span class="oppia-input-box-subtitle">
-      <i>
-        Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
-      </i>
-    </span>
-  </div>
-  <div class="story-node-field">
-    <label for="storyNodeDescription" class="form-heading">Chapter Description</label>
-    <textarea id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
-              ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
-              placeholder="Enter the description for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_DESCRIPTION]>" ng-trim="false"
-              style="height: 10vh;">
-    </textarea>
-    <span class="oppia-input-box-subtitle">
-      <i>
-        Chapter description should be at most <[MAX_CHARS_IN_CHAPTER_DESCRIPTION]> characters.
-      </i>
-    </span>
-  </div>
-  <div class="protractor-test-add-chapter-outline">
-    <label for="storyNodeOutline" class="form-heading"> Chapter Outline </label> <br>
-    Outline Finalized
-    <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
-    <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
-    <schema-based-editor id="storyNodeOutline"
-                         schema="OUTLINE_SCHEMA"
-                         local-value="editableOutline">
-    </schema-based-editor>
-    <button type="button"
-            class="btn btn-success save-button protractor-test-node-outline-save-button"
-            ng-disabled="!isOutlineModified(editableOutline)"
-            ng-click="updateOutline(editableOutline)">
-      Save
-    </button>
-  </div>
-  <label style="padding-top: 2em;" class="form-heading"> Exploration ID </label>
-  <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
-    <input class="protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
-    <span ng-if="!isStoryPublished()" ng-click="updateExplorationId(null)" class="fas fa-trash-alt list-summary"> </span>
-    <div style="margin-top: 20px;">
-      <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!expIdCanBeSaved || (explorationId === currentExplorationId)">Save</button>
-    </div>
-    <span class="form-text error-message" ng-if="invalidExpErrorIsShown">
-      <em>Please enter a valid exploration id.</em>
-    </span>
-  </form>
-  <label style="padding-top: 2em;" class="form-heading"> Prerequisite Skill IDs </label>
-  <div class="oppia-placeholder">
-    The skill should be one of the skills that are linked to this topic.
-  </div>
-  <div>
-    <md-card class="destination-node-id" ng-repeat="skillId in getPrerequisiteSkillIds()">
-      <div class="skill-description-card protractor-test-prerequisite-skill-description-card">
-        <span class="protractor-test-remove-prerequisite-skill" style="float: right;" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
-          <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-        </span>
-        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
-      </div>
-    </md-card>
-    <button class="btn btn-success btn-sm protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">Add Prerequisite Skill</button>
-  </div>
-  <label style="padding-top: 2em;" class="form-heading"> Acquired Skill IDs </label>
-  <div class="oppia-placeholder">
-    The skill should be one of the skills that are linked to this topic.
-  </div>
-  <div>
-    <md-card class="destination-node-id" ng-repeat="skillId in getAcquiredSkillIds()">
-      <div class="skill-description-card protractor-test-acquired-skill-description-card">
-        <span class="protractor-test-remove-acquired-skill" style="float: right;" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
-          <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-        </span>
-        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
-      </div>
-    </md-card>
-    <button class="btn btn-success btn-sm protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">Add Acquired Skill</button>
-  </div>
-  <div class="node-field">
-    <div ng-if="getDestinationNodeIds().length > 0">
-      <label class="form-heading"> Next Chapter </label>
-      <md-card class="destination-node-id"
-               ng-repeat="nodeId in getDestinationNodeIds()"
-               ng-click="viewNodeEditor(nodeId)">
-        <div class="repeating-card-wrapper protractor-test-next-chapter-card">
-          <[nodeIdToTitleMap[nodeId]]>
-          <span class="protractor-test-remove-destination-button" style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
-            <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+<div class="story-node">
+  <div class="story-node-content-container">
+    <div class="story-node-content">
+      <md-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card">
+        <div class="story-node-header">
+          <span>Chapter Card</span>
+        </div>
+        <div class="chapter-card-inputs">
+          <div class="story-node-title">
+            <label for="storyNodeTitle" class="form-heading">Title*</label>
+            <div>
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  This will be shown to the learner. It overrides the title of the linked exploration.
+                </i>
+              </span>
+            </div>
+            <input id="storyNodeTitle" type="text" class="form-control"
+                   ng-model="editableTitle" ng-blur="updateTitle(editableTitle)"
+                   placeholder="Enter a title for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" ng-trim="false">
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
+              </i>
+            </span>
+          </div>
+          <div class="story-node-description">
+            <label for="storyNodeDescription" class="form-heading">Goal*</label>
+            <textarea id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
+                      ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
+                      placeholder="Enter the description for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_DESCRIPTION]>" ng-trim="false">
+            </textarea>
+            <span class="oppia-input-box-subtitle">
+              <i>
+                Chapter description should be at most <[MAX_CHARS_IN_CHAPTER_DESCRIPTION]> characters.
+              </i>
+            </span>
+          </div>
+          <div class="story-node-exploration">
+            <label class="form-heading"> Exploration ID*</label>
+            <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
+              <input class="form-control protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
+              <span ng-if="!isStoryPublished()" ng-click="updateExplorationId(null)" class="fas fa-trash-alt list-summary"> </span>
+              <div class="save-button-container">
+                <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!expIdCanBeSaved || (explorationId === currentExplorationId)">Save</button>
+              </div>
+              <span class="form-text error-message" ng-if="invalidExpErrorIsShown">
+                <em>Please enter a valid exploration id.</em>
+              </span>
+            </form>
+          </div>
+          <div class="story-node-thumbnail">
+            <label class="form-heading">Thumbnail Image*</label>
+            <thumbnail-uploader filename="getThumbnailFilename()"
+                                update-filename="updateThumbnailFilename"
+                                bg-color="getThumbnailBgColor()"
+                                update-bg-color="updateThumbnailBgColor"
+                                allowed-bg-colors="allowedBgColors"
+                                aspect-ratio="'16:9'"
+                                preview-title="editableTitle"
+                                preview-description="editableDescription"
+                                preview-description-bg-color=""
+                                preview-footer="">
+            </thumbnail-uploader>
+          </div>
+        </div>
+        <div>
+          <div ng-if="!chapterPreviewCardIsShown" >
+            <button class="btn btn-default show-chapter-preview-button" ng-click="togglePreview()">
+              Preview Chapter Card
+              <i class="fa fa-angle-down"></i>
+            </button>
+          </div>
+          <div ng-if="chapterPreviewCardIsShown">
+            <button class="btn btn-default show-chapter-preview-button" ng-click="togglePreview()">
+              Collapse Chapter Card
+              <i class="fa fa-angle-up"></i>
+            </button>
+          </div>
+          <div ng-if="chapterPreviewCardIsShown">
+            <preview-thumbnail name="editableTitle"
+                               filename = "getThumbnailFilename()"
+                               description="editableDescription"
+                               thumbnail-bg-color="getThumbnailBgColor()"
+                               bg-color="getThumbnailBgColor()">
+            </preview-thumbnail>
+          </div>
+        </div>
+      </md-card>
+      <md-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card">
+        <div class="protractor-test-add-chapter-outline">
+          <div class="story-node-header">
+            <span>Chapter Outline</span>
+          </div>
+          <div class="chapter-card-inputs">
+            Outline Finalized
+            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
+            <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+            <schema-based-editor id="storyNodeOutline"
+                                 schema="OUTLINE_SCHEMA"
+                                 local-value="editableOutline">
+            </schema-based-editor>
+            <div class="save-button-container">
+              <button type="button"
+                      class="btn btn-success save-button protractor-test-node-outline-save-button"
+                      ng-disabled="!isOutlineModified(editableOutline)"
+                      ng-click="updateOutline(editableOutline)">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </md-card>
+      <md-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card">
+        <div class="story-node-header skill-requirements-header">
+          <span>Skill Requirements and Achievements</span>
+        </div>
+        <div>
+          <span class="oppia-input-box-subtitle">
+            <i>
+              The skill should be one of the skills that are linked to this topic.
+            </i>
           </span>
+        </div>
+        <div class="story-skill-requirements">
+          <div class="prerequisite-skills">
+            <div class="skill-header">
+              <span>Prerequisite</span>
+            </div>
+            <div>
+              <div class="skills-card-item" ng-repeat="skillId in getPrerequisiteSkillIds()">
+                <div class="skill-description-card protractor-test-prerequisite-skill-description-card">
+                  <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
+                  <span class="protractor-test-remove-prerequisite-skill" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
+                    <i class="material-icons md-18">&#xE14C;</i>
+                  </span>
+                </div>
+              </div>
+              <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">+ ADD PREREQUISITE SKILL</button>
+            </div>
+          </div>
+          <div class="acquired-skills">
+            <div class="skill-header">
+              <span>Acquired</span>
+            </div>
+            <div>
+              <div class="skills-card-item" ng-repeat="skillId in getAcquiredSkillIds()">
+                <div class="skill-description-card protractor-test-acquired-skill-description-card">
+                  <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
+                  <span class="protractor-test-remove-acquired-skill" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
+                    <i class="material-icons md-18">&#xE14C;</i>
+                  </span>
+                </div>
+              </div>
+              <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">+ ADD ACQUIRED SKILL</button>
+            </div>
+          </div>
         </div>
       </md-card>
     </div>
-    <div style="margin-top: 1em;" ng-if="getDestinationNodeIds().length === 0">
-      <label> Select destination chapter </label>
-      <div>
-        <select class="form-control protractor-test-destination-select"
-                ng-model="newNodeId"
-                ng-if="availableNodes.length > 0"
-                ng-options="node.id as node.text for node in availableNodes"
-                style="width: 300px; margin-bottom: 10px;"
-                ng-click="addDestinationNode(newNodeId)">
-          <option value="">Pick an already existing chapter</option>
-        </select>
-        <button class="btn btn-success protractor-test-add-destination-chapter-button"
-                ng-click="addNewDestinationNode()"> Add a new Destination Chapter
-        </button>
-      </div>
+    <div class="story-node-content-info">
+      <md-card class="oppia-page-card oppia-long-text story-node-card story-node-input-card">
+        <div class="story-node-header">
+          <span>To-Do List</span>
+        </div>
+        <div class="chapter-card-inputs">
+          <div class="todo-item-container">
+            <i class="fa fa-minus" ng-if="!isOutlineFinalized()"></i>
+            <i class="fa fa-check todo-completed" ng-if="isOutlineFinalized()"></i>
+            <span>Compete Chapter Outline</span>
+          </div>
+          <div class="todo-item-container">
+            <i class="fa fa-minus" ng-if="!explorationId"></i>
+            <i class="fa fa-check todo-completed" ng-if="explorationId"></i>
+            <span>Link Exploration ID</span>
+          </div>
+          <div class="todo-item-container">
+            <i class="fa fa-minus" ng-if="!editableDescription"></i>
+            <i class="fa fa-check todo-completed" ng-if="editableDescription"></i>
+            <span>Create a Goal</span>
+          </div>
+        </div>
+      </md-card>
     </div>
   </div>
 </div>
 
 <style>
-  story-editor .repeating-card-wrapper {
-      height: 2.5em;
-      padding-left: 0.5em;
-      padding-top: 0.5em;
+  story-node-editor .story-node-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 0 auto;
+    width: 85%;
   }
-
-  story-editor .oppia-placeholder {
-    margin-bottom: 1vh;
+  story-node-editor .story-node-content {
+    width: 50%;
   }
-
-  story-editor .story-node-field {
-    margin-bottom: 3%;
+  story-node-editor .story-node-content-info {
+    margin-right: 5%;
+    width: 30%;
   }
-
-  story-editor .node-field {
-    height: auto;
-    margin-top: 3%;
+  story-node-editor .story-node-card {
+    margin-bottom: 25px;
+    margin-top: 0;
   }
-  story-editor .skill-description-card {
-    max-height: 10em;
-    overflow-wrap: break-word;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    padding-top: 10px;
+  story-node-editor .story-node-input-card {
+    margin-bottom: 20px;
+    margin-top: 0;
+    padding: 0;
   }
-  story-editor .node-field label {
-    margin-bottom: 3%;
+  story-node-editor .chapter-card-inputs {
+    padding: 30px 55px 30px 45px;
   }
-  story-editor .destination-node-id {
-    background-color: #efefef;
+  story-node-editor .story-node-header {
+    margin-bottom: 0;
+    margin-left: 25px;
+    margin-top: 35px;
+  }
+  story-node-editor .story-node-header span {
+    font-size: 17px;
+    font-weight: bold;
+  }
+  story-node-editor .show-chapter-preview-button {
+    border-top: 1px solid #c1c1c1;
+    color: #419889;
+    font-size: 15px;
+    padding: 10px 0;
+    width: 100%;
+  }
+  story-node-editor .skill-requirements-card {
+    padding: 35px 25px;
+  }
+  story-node-editor .story-skill-requirements {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  story-node-editor .skill-requirements-header {
     margin-left: 0;
+    margin-top: 0;
   }
-  story-editor .destination-node-id:hover {
-    background-color: #e0e0e0;
+  story-node-editor .prerequisite-skills,
+  story-node-editor .acquired-skills {
+    display: inline-block;
+    width: 48%;
   }
-  story-editor .node-field .save-button {
-    margin-top: 1.5vh;
+  story-node-editor .add-skill-btn {
+    background-color: #008098;
+    border-radius: 0;
+    color: #FFF;
+    margin-top: 12px;
+    text-align: left;
   }
-  story-editor .error-message {
-    color: #a94442;
-    font-size: 13px;
+  story-node-editor .skill-header {
+    border-bottom: 2px solid #000;
+    margin: 8px 0;
+  }
+  story-node-editor .skill-description-card {
+    border-bottom: 1px solid #e6e6e6;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+  story-node-editor .skill-description-card a {
+    color: inherit;
+    text-decoration: none;
+  }
+  story-node-editor .skill-description-card a:hover {
+    font-weight: bold;
+  }
+  story-node-editor .todo-completed {
+    color: #00FF7F;
+  }
+  story-node-editor .story-node-title,
+  story-node-editor .story-node-description,
+  story-node-editor .story-node-exploration {
+    margin-bottom: 25px;
+  }
+  story-node-editor .todo-item-container {
+    margin-bottom: 5px;
+  }
+  story-node-editor .save-button-container {
+    text-align: right;
+  }
+  story-node-editor .save-button-container button {
+    margin-top: 2px;
   }
 </style>

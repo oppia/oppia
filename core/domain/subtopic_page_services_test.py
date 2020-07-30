@@ -94,8 +94,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
         expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
-        self.assertEqual([subtopic_pages[0].to_dict(), subtopic_pages[1]],
-                         expected_subtopic_pages)
+        self.assertEqual(
+            [subtopic_pages[0].to_dict(), subtopic_pages[1]],
+            expected_subtopic_pages)
         subtopic_ids = []
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
@@ -217,9 +218,15 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         subtopic_page_services.delete_subtopic_page(
             self.user_id, self.TOPIC_ID, 1)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            r'Entity for class SubtopicPageModel with id %s not found' % (
+                subtopic_page_id)):
             topic_models.SubtopicPageModel.get(subtopic_page_id)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            r'Entity for class SubtopicPageModel with id %s not found' % (
+                subtopic_page_id)):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
 

@@ -128,7 +128,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
         if SCHEMA_KEY_LEN in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LEN]
+            assert len(obj) == schema[SCHEMA_KEY_LEN], (
+                'Expected length of %s got %s' % (
+                    schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(item, item_schema) for item in obj
         ]
@@ -221,11 +223,7 @@ class Normalizers(python_utils.OBJECT):
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-# TODO(ankita240796): The disable comment is required since the lint tests
-# fail on circleci with the multiple-statements error on the line even though
-# the line is empty. This is a temporary fix to unblock PRs.
-# Relevant issue: https://github.com/oppia/oppia/issues/7307.
-# pylint: disable=multiple-statements
+
     @staticmethod
     def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.
@@ -392,19 +390,21 @@ class _Validators(python_utils.OBJECT):
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
 
     @staticmethod
-    def is_valid_math_expression(obj, algebraic=True):
+    def is_valid_math_expression(obj, algebraic):
         """Checks if the given obj (a string) represents a valid algebraic or
         numeric expression. Note that purely-numeric expressions are NOT
         considered valid algebraic expressions.
 
         Args:
-            obj: str. The given expression.
+            obj: str. The given math expression string.
             algebraic: bool. True if the given expression is algebraic
                 else numeric.
 
         Returns:
             bool. Whether the given object is a valid expression.
         """
+        if len(obj) == 0:
+            return True
 
         if not expression_parser.is_valid_expression(obj):
             return False
@@ -416,31 +416,59 @@ class _Validators(python_utils.OBJECT):
         return not algebraic ^ expression_is_algebraic
 
     @staticmethod
+    def is_valid_algebraic_expression(obj):
+        """Checks if the given obj (a string) represents a valid algebraic
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid algebraic expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=True)
+
+    @staticmethod
+    def is_valid_numeric_expression(obj):
+        """Checks if the given obj (a string) represents a valid numeric
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid numeric expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=False)
+
+    @staticmethod
     def is_valid_math_equation(obj):
         """Checks if the given obj (a string) represents a valid math equation.
 
         Args:
-            obj: str. A string.
+            obj: str. The given math equation string.
 
         Returns:
             bool. Whether the given object is a valid math equation.
         """
+        if len(obj) == 0:
+            return True
         if obj.count('=') != 1:
             return False
 
-        is_valid_math_expression = get_validator(
-            'is_valid_math_expression')
+        is_valid_algebraic_expression = get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = get_validator(
+            'is_valid_numeric_expression')
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
         # to be a valid algebraic expression.
-        lhs_is_algebraically_valid = is_valid_math_expression(lhs)
-        rhs_is_algebraically_valid = is_valid_math_expression(rhs)
+        lhs_is_algebraically_valid = is_valid_algebraic_expression(lhs)
+        rhs_is_algebraically_valid = is_valid_algebraic_expression(rhs)
 
-        lhs_is_numerically_valid = is_valid_math_expression(
-            lhs, algebraic=False)
-        rhs_is_numerically_valid = is_valid_math_expression(
-            rhs, algebraic=False)
+        lhs_is_numerically_valid = is_valid_numeric_expression(lhs)
+        rhs_is_numerically_valid = is_valid_numeric_expression(rhs)
 
         if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
             return True

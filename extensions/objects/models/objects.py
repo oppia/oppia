@@ -372,8 +372,9 @@ class SkillSelector(BaseObject):
 class MusicPhrase(BaseObject):
     """List of Objects that represent a musical phrase."""
 
-    description = ('A musical phrase that contains zero or more notes, rests, '
-                   'and time signature.')
+    description = (
+        'A musical phrase that contains zero or more notes, rests, '
+        'and time signature.')
     default_value = []
 
     # The maximum number of notes allowed in a music phrase.
@@ -1074,13 +1075,12 @@ class AlgebraicExpression(BaseObject):
     """
 
     description = 'A unicode string for an algebraic expression.'
-    default_value = 'x'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',
         'validators': [{
-            'id': 'is_valid_math_expression',
-            'algebraic': True
+            'id': 'is_valid_algebraic_expression'
         }]
     }
 
@@ -1106,7 +1106,7 @@ class MathEquation(BaseObject):
     """
 
     description = 'A unicode string for a math equation.'
-    default_value = 'x=y'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',
@@ -1122,7 +1122,7 @@ class NumericExpression(BaseObject):
     """
 
     description = 'A unicode string for an numeric expression.'
-    default_value = '1'
+    default_value = ''
 
     SCHEMA = {
         'type': 'unicode',

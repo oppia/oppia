@@ -22,16 +22,16 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import nerdamer from 'nerdamer';
 
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
-import { INumericExpressionAnswer } from 'interactions/answer-defs';
-import { INumericExpressionRuleInputs } from 'interactions/rule-input-defs';
+import { NumericExpressionAnswer } from 'interactions/answer-defs';
+import { NumericExpressionRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NumericExpressionInputRulesService {
   MatchesExactlyWith(
-      answer: INumericExpressionAnswer,
-      inputs: INumericExpressionRuleInputs): boolean {
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs): boolean {
     let mis = new MathInteractionsService();
 
     // The expression is first split into terms by addition and subtraction.
@@ -60,14 +60,14 @@ export class NumericExpressionInputRulesService {
   }
 
   IsEquivalentTo(
-      answer: INumericExpressionAnswer,
-      inputs: INumericExpressionRuleInputs): boolean {
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs): boolean {
     return nerdamer(answer).eq(nerdamer(inputs.x).toString());
   }
 
   ContainsSomeOf(
-      answer: INumericExpressionAnswer,
-      inputs: INumericExpressionRuleInputs): boolean {
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs): boolean {
     // At least one term should match between answer and input.
     let mis = new MathInteractionsService();
 
@@ -86,8 +86,8 @@ export class NumericExpressionInputRulesService {
   }
 
   OmitsSomeOf(
-      answer: INumericExpressionAnswer,
-      inputs: INumericExpressionRuleInputs): boolean {
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs): boolean {
     // There must be at least one term in the input that is not present in the
     // answer.
     let mis = new MathInteractionsService();

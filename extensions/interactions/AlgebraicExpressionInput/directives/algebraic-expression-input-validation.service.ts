@@ -21,9 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { IAlgebraicExpressionInputCustomizationArgs } from
+import { AlgebraicExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { AlgebraicExpressionInputRulesService } from
   './algebraic-expression-input-rules.service';
@@ -47,8 +47,8 @@ export class AlgebraicExpressionInputValidationService {
 
   getAllWarnings(
       stateName: string,
-      customizationArgs: IAlgebraicExpressionInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): IWarning[] {
+      customizationArgs: AlgebraicExpressionInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
     let algebraicRulesService = (
       new AlgebraicExpressionInputRulesService());
