@@ -16,7 +16,11 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
+import { UserBackendApiService } from 'services/user-backend-api.service';
+
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -31,7 +35,7 @@ describe('Editor Navigation Component', function() {
   var ExplorationImprovementsService = null;
   var ExplorationWarningsService = null;
   var ThreadDataService = null;
-  var UserService = null;
+  var userBackendApiService = null;
 
   var explorationId = 'exp1';
   var userInfo = {
@@ -39,6 +43,12 @@ describe('Editor Navigation Component', function() {
   };
   var windowWidth = null;
   var isImprovementsTabEnabledAsyncSpy = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
@@ -50,6 +60,8 @@ describe('Editor Navigation Component', function() {
           return of(new Event('resize'));
         }
       });
+    $provide.value('UserBackendApiService',
+      TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -63,11 +75,11 @@ describe('Editor Navigation Component', function() {
     ExplorationImprovementsService = $injector.get(
       'ExplorationImprovementsService');
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    UserService = $injector.get('UserService');
+    userBackendApiService = $injector.get('UserBackendApiService');
     ThreadDataService = $injector.get('ThreadDataService');
 
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(userInfo);
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(userInfo);
 
     windowWidth = 1200;
 
