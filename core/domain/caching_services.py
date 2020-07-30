@@ -77,7 +77,7 @@ def get_multi(keys):
     if len(keys) == 0:
         return result_dict
     values = memory_cache_services.get_multi(keys)
-    for key, value in zip(keys, values):
+    for key, value in python_utils.ZIP(keys, values):
         if value:
             value_type = _get_correct_type_of_key(key)
             if value_type:

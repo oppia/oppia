@@ -348,7 +348,7 @@ def main(args=None):
     # untarred.
     try:
         # Pipe output to /dev/null for silence in console.
-        null = open("/dev/null", "w")
+        null = python_utils.open_file("/dev/null", "w")
         command_text = ['redis-cli', '--version']
         current_process = subprocess.Popen(
             command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
