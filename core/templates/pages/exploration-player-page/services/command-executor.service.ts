@@ -49,13 +49,16 @@ export class CommandExecutorService {
     windowRef.nativeWindow.addEventListener('message', (event) => {
       var messageArray = event.data.split(' ');
       var command = messageArray[0];
+      console.log(event)
 
       var message = '';
       for (var i = 1; i < messageArray.length; i++) {
         message = message + messageArray[i] + ' ';
       }
       message = message.substr(0, message.length - 1);
-      if (command === 'CONTINUE' || command === 'SUBMIT') {
+      if (command != 'HOSTNAME' && !this.hostname) {
+        return
+      } else if (command === 'CONTINUE' || command === 'SUBMIT') {
         this.commandToFunctionMap[command](windowRef);
       } else {
         this.commandToFunctionMap[command](windowRef, message);
@@ -126,7 +129,7 @@ export class CommandExecutorService {
   addSet(windowRef, elements) {
     if (!this.setElementsOnPage) {
       this.setElementsOnPage = 0;
-    };
+    }
     for (var i = 0; i < elements.length; i++) {
       var box;
       if (this.setElementsOnPage === 0) {
@@ -163,7 +166,6 @@ export class CommandExecutorService {
     }
     this.setElementsOnPage -= 1;
   }
-
   enterFraction(windowRef, fraction) {
     var fractionElementName = 
     'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r';
