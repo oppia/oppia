@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO Unit tests for PlatformParameterMetadataObjectFactory.
+ * @fileoverview Unit tests for PlatformParameterMetadataObjectFactory.
  */
 
 import { TestBed } from '@angular/core/testing';
