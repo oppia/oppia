@@ -479,6 +479,162 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
+    def test_publish_story_creates_exploration_opportunity(self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        # Story is already published, so unpublish first.
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+    def test_publish_story_does_not_create_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
+        self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        # Story and topic are already published, so unpublish first.
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+    def test_publish_topic_creates_exploration_opportunity(self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        # Topic is already published, so unpublish first.
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+    def test_publish_topic_does_not_create_exploration_opportunity_if_story_is_not_published( # pylint: disable=line-too-long
+        self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        # Story and topic are already published, so unpublish first.
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+    def test_unpublish_story_deletes_exploration_opportunity(self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+    def test_unpublish_topic_deletes_exploration_opportunity(self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
     def test_add_question_increments_skill_opportunity_question_count(self):
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')

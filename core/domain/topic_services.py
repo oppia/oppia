@@ -599,8 +599,26 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
-    opportunity_services.create_exploration_opportunities_for_story_and_topic( # pylint: disable=line-too-long
-        story, topic)
+    _create_exploration_opportunities_for_story(story, topic)
+
+
+def _create_exploration_opportunities_for_story(story, topic):
+    """Creates exploration opportunities corresponding to the supplied story iff
+    the topic linked to the story is published.
+
+    Args:
+        story: Story. The story domain object.
+        topic: Topic. The topic domain object corresponding to the story.
+
+    Raises:
+        Exception. The topic rights could not be found.
+    """
+    topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
+    if topic_rights is None:
+        raise Exception('Could not find topic rights.')
+    if topic_rights.topic_is_published:
+        opportunity_services.create_exploration_opportunities_for_story_and_topic( # pylint: disable=line-too-long
+            story, topic)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -635,6 +653,11 @@ def unpublish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Unpublished story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
+
+    # TODO(#10094): Reject corresponding suggestions once new reject_suggestion
+    # functions in #9635 are done.
+    exp_ids = story.story_contents.get_all_linked_exp_ids()
+    opportunity_services.delete_exploration_opportunities(exp_ids)
 
 
 def delete_canonical_story(user_id, topic_id, story_id):
@@ -886,6 +909,12 @@ def publish_topic(topic_id, committer_id):
 
 
 def _create_exploration_opportunities_for_topic(topic):
+    """Creates exploration opportunities corresponding to the supplied topic for
+    each of the topic's published stories.
+
+    Args:
+        topic: Topic. The topic domain object.
+    """
     for story_reference in topic.get_all_story_references():
         if not story_reference.story_is_published:
             continue
@@ -924,6 +953,11 @@ def unpublish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
+
+    # TODO(#10094): Reject corresponding suggestions once new reject_suggestion
+    # functions in #9635 are done.
+    (opportunity_services
+        .delete_exploration_opportunities_corresponding_to_topic(topic_id))
 
 
 def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
