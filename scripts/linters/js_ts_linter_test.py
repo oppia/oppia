@@ -650,20 +650,18 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['@ts-expect-error found at line 30.'],
             self.linter_stdout)
-        self.assert_same_list_elements(
-            ['Please add a comment above the '
+        self.assert_same_list_elements([
+            'Please add a comment above the '
             '@ts-expect-error explaining the '
             '@ts-expect-error at line 24. The format '
             'of comment should be -> This throws "...". '
-            'This needs to be suppressed because ...'],
-            self.linter_stdout)
-        self.assert_same_list_elements(
-            ['Please add a comment above the '
+            'This needs to be suppressed because ...'], self.linter_stdout)
+        self.assert_same_list_elements([
+            'Please add a comment above the '
             '@ts-expect-error explaining the '
             '@ts-expect-error at line 30. The format '
             'of comment should be -> This throws "...". '
-            'This needs to be suppressed because ...'],
-            self.linter_stdout)
+            'This needs to be suppressed because ...'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
     def test_ts_expect_error_success(self):
