@@ -47,8 +47,8 @@ import { StateWrittenTranslationsService } from
 import * as d3 from 'd3';
 import { of } from 'rxjs';
 
-// require('pages/exploration-editor-page/editor-tab/graph-directives/' +
-//   'state-graph-visualization.directive.ts');
+require('pages/exploration-editor-page/editor-tab/graph-directives/' +
+  'state-graph-visualization.directive.ts');
 
 describe('State Graph Visualization directive', function() {
   var ctrl = null;
