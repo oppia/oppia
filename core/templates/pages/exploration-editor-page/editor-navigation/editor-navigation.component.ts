@@ -38,13 +38,13 @@ angular.module('oppia').component('editorNavigation', {
     '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
-    'ThreadDataService', 'UrlInterpolationService', 'UserService',
+    'ThreadDataService', 'UrlInterpolationService', 'UserBackendApiService',
     'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ContextService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
-        ThreadDataService, UrlInterpolationService, UserService,
+        ThreadDataService, UrlInterpolationService, UserBackendApiService,
         WindowDimensionsService) {
       $scope.showUserHelpModal = () => {
         var explorationId = ContextService.getExplorationId();
@@ -122,9 +122,12 @@ angular.module('oppia').component('editorNavigation', {
         $scope.isImprovementsTabEnabled = () => this.improvementsTabIsEnabled;
 
         this.userIsLoggedIn = false;
-        $q.when(UserService.getUserInfoAsync())
+        $q.when(UserBackendApiService.getUserInfoAsync())
           .then(userInfo => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           });
         $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };
