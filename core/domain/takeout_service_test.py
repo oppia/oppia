@@ -327,12 +327,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=1,
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
-            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            name=(self.GENERIC_NAME),
-            pin=(self.GENERIC_PIN),
-            associated_profile_user_ids=(self.ASSOCIATED_PROFILE_IDS),
-            preferred_android_language_codes=(self.GENERIC_LANGUAGE_CODES),
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            name=self.GENERIC_NAME,
+            pin=self.GENERIC_PIN,
+            associated_profile_user_ids=self.ASSOCIATED_PROFILE_IDS,
+            preferred_android_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_android_audio_language_code=(
                 self.GENERIC_LANGUAGE_CODES[0])
         ).put()
