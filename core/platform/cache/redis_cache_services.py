@@ -29,6 +29,7 @@ import logging
 redis_client = redis.Redis(host='localhost', port=6379)
 
 def flush_cache():
+    """Flushes the redis database clean."""
     redis_client.flushdb()
 
 def get_multi(keys):
