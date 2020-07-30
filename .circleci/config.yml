@@ -133,19 +133,22 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Run e2e admin page test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --suite="adminPage" --prod_env
+          no_output_timeout: 20m
+      -store_artifacts:
+          path: /home/circleci/oppia/core/protractor-screenshots
+      - run:
           name: Run e2e navigation test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --skip-build --suite="navigation"
           # Provide a longer time period for this first test (which omits the
           # --skip-build flag), since the webpack build process itself can take
           # up to 10 minutes. If this is not done, then the test may stall due
           # to lack of test output during this time.
           no_output_timeout: 20m
       - check_release_chaneglog_update_branch
-      - run:
-          name: Run e2e admin page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminPage" --prod_env
       - persist_to_workspace:
           root: /home/circleci/
           paths:
