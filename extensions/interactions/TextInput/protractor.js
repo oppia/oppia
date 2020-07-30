@@ -20,7 +20,7 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
   await objects.UnicodeStringEditor(
-    elem.element(by.tagName('schema-based-unicode-editor'))
+    elem.element(by.tagName('schema-based-subtitled-unicode-editor'))
   ).setValue(placeholderText);
   await objects.IntEditor(
     elem.element(by.tagName('schema-based-int-editor'))

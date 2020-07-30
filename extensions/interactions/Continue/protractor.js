@@ -26,7 +26,7 @@ var continueButton = element(by.css('.protractor-test-continue-button'));
 var customizeInteraction = async function(elem, buttonText) {
   if (buttonText) {
     await objects.UnicodeStringEditor(
-      elem.element(by.tagName('schema-based-unicode-editor'))
+      elem.element(by.tagName('schema-based-subtitled-unicode-editor'))
     ).setValue(buttonText);
   }
 };

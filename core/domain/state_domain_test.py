@@ -2916,7 +2916,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_customization_args_with_non_unique_content_ids(self):
         """Test that update customization args throws an error when passed
-        customization args with non-unique content ids."""
+        customization args with non-unique content ids.
+        """
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'MultipleChoiceInput')
