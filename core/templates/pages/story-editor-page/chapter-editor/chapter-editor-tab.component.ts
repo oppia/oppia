@@ -33,7 +33,7 @@ angular.module('oppia').component('chapterEditorTab', {
         $scope, StoryEditorNavigationService, StoryEditorStateService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      var _initEditor = function() {
+      ctrl.initEditor = function() {
         ctrl.story = StoryEditorStateService.getStory();
         ctrl.storyContents = ctrl.story.getStoryContents();
         ctrl.chapterIndex = StoryEditorNavigationService.getChapterIndex();
@@ -60,15 +60,15 @@ angular.module('oppia').component('chapterEditorTab', {
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryInitialized.subscribe(
-            () => _initEditor()
+            () => ctrl.initEditor()
           )
         );
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryReinitialized.subscribe(
-            () => _initEditor()
+            () => ctrl.initEditor()
           )
         );
-        _initEditor();
+        ctrl.initEditor();
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
