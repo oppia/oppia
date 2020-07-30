@@ -518,8 +518,8 @@ def require_moderator_email_prereqs_are_satisfied():
     """Raises an exception if, for any reason, moderator emails cannot be sent.
 
     Raises:
-        Exception: feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
-        Exception: feconf.CAN_SEND_EMAILS is False.
+        Exception: The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
+        Exception: The feconf.CAN_SEND_EMAILS is False.
     """
 
     if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:

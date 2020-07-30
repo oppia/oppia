@@ -236,7 +236,7 @@ def _git_diff_names_only(left, right='HEAD'):
 
     Args:
         left: str. Lefthand timepoint.
-        right: str. rightand timepoint.
+        right: str. Rightand timepoint.
 
     Returns:
         list(str). List of files that are different between the two points.
@@ -254,7 +254,7 @@ def check_setup_scripts(base_release_tag, changed_only=True):
             instead of just the changed ones.
 
     Returns:
-        dict. dict containing of script or boolean indicating whether or not it
+        dict. Dict containing of script or boolean indicating whether or not it
         has changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in

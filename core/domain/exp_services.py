@@ -1146,7 +1146,7 @@ def revert_exploration(
             is to be reverted.
 
     Raises:
-        Exception:  does not match the version of the currently-stored
+        Exception: Does not match the version of the currently-stored
             exploration model.
     """
     exploration_model = exp_models.ExplorationModel.get(

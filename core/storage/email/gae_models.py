@@ -190,7 +190,7 @@ class SentEmailModel(base_models.BaseModel):
             value and sent more recently than sent_datetime_lower_bound.
 
         Raises:
-            Exception: sent_datetime_lower_bound is not a valid
+            Exception: The sent_datetime_lower_bound is not a valid
                 datetime.datetime.
         """
 

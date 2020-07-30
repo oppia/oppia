@@ -438,8 +438,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 fetched.
 
         Raises:
-            ValueError: max_age is neither an instance of datetime.timedelta nor
-                None.
+            ValueError: The max_age is neither an instance of datetime.timedelta
+                nor None.
 
         Returns:
             3-tuple of (results, cursor, more). Where:

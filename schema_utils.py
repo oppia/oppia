@@ -229,7 +229,7 @@ class Normalizers(python_utils.OBJECT):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-            obj: str. a string representing a URL.
+            obj: str. A string representing a URL.
 
         Returns:
             str. An empty string if the URL does not start with http:// or

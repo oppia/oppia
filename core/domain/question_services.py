@@ -38,7 +38,7 @@ def create_new_question(committer_id, question, commit_message):
 
     Args:
         committer_id: str. ID of the committer.
-        question: Question. question domain object.
+        question: Question. Question domain object.
         commit_message: str. A description of changes made to the question.
     """
     question.validate()
@@ -665,7 +665,7 @@ def get_question_summary_from_model(question_summary_model):
 
     Returns:
         QuestionSummary. The domain object corresponding to the given question
-            summary model.
+        summary model.
     """
     return question_domain.QuestionSummary(
         question_summary_model.id,

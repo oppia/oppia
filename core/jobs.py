@@ -1208,7 +1208,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             exists in the datastore.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError: strict == True and no
+            base_models.BaseModel.EntityNotFoundError: The strict == True and no
                 undeleted entity with the given id exists in the datastore.
         """
         if not cls._is_valid_realtime_id(entity_id):

@@ -164,11 +164,11 @@ class UserSettings(python_utils.OBJECT):
         object are valid.
 
         Raises:
-            ValidationError: user_id is not str.
-            ValidationError: gae_id is not str.
-            ValidationError: email is not str.
-            ValidationError: email is invalid.
-            ValidationError: role is not str.
+            ValidationError: The user_id is not str.
+            ValidationError: The gae_id is not str.
+            ValidationError: The email is not str.
+            ValidationError: The email is invalid.
+            ValidationError: The role is not str.
             ValidationError: Given role does not exist.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
@@ -335,7 +335,7 @@ def get_email_from_user_id(user_id):
         user_id: str. The unique ID of the user.
 
     Returns:
-        str. user_email corresponding to the given user_id.
+        str. The user_email corresponding to the given user_id.
 
     Raises:
         Exception: The user is not found.
@@ -499,7 +499,7 @@ def get_user_settings(user_id, strict=False):
         UserSettings domain object.
 
     Raises:
-        Exception: strict is True and given user_id does not exist.
+        Exception: The strict is True and given user_id does not exist.
     """
 
     user_settings = get_users_settings([user_id])[0]
@@ -523,7 +523,7 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
         UserSettings domain object.
 
     Raises:
-        Exception: strict is True and given gae_id does not exist.
+        Exception: The strict is True and given gae_id does not exist.
     """
     user_settings = _transform_user_settings(
         user_models.UserSettingsModel.get_by_gae_id(gae_id))
@@ -689,7 +689,7 @@ def get_system_user():
     """Returns user object with system committer user id.
 
     Returns:
-        UserActionsInfo. user object with system committer user id.
+        UserActionsInfo. User object with system committer user id.
     """
     system_user = UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
     return system_user
@@ -1447,12 +1447,12 @@ class UserContributions(python_utils.OBJECT):
         domain object are valid.
 
         Raises:
-            ValidationError: user_id is not str.
-            ValidationError: created_exploration_ids is not a list.
-            ValidationError: exploration_id in created_exploration_ids
+            ValidationError: The user_id is not str.
+            ValidationError: The created_exploration_ids is not a list.
+            ValidationError: The exploration_id in created_exploration_ids
                 is not str.
-            ValidationError: edited_exploration_ids is not a list.
-            ValidationError: exploration_id in edited_exploration_ids
+            ValidationError: The edited_exploration_ids is not a list.
+            ValidationError: The exploration_id in edited_exploration_ids
                 is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):

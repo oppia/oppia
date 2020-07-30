@@ -1239,7 +1239,7 @@ class Skill(python_utils.OBJECT):
 
         Raises:
             ValueError: There is no misconception with the given id.
-            ValueError: must_be_addressed should be bool.
+            ValueError: The must_be_addressed should be bool.
         """
         if not isinstance(must_be_addressed, bool):
             raise ValueError('must_be_addressed should be a bool value.')

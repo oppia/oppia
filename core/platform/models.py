@@ -225,7 +225,7 @@ class _Gae(Platform):
             setting and DEV_MODE setting.
 
         Raises:
-            Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
+            Exception: The feconf.EMAIL_SERVICE_PROVIDER does not correspond
                 to a valid email_services module.
         """
         if constants.DEV_MODE:

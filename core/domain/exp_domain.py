@@ -442,7 +442,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         """Validates properties of the ExplorationMathRichTextInfo.
 
         Raises:
-            ValidationError: attributes of the ExplorationMathRichTextInfo
+            ValidationError: Attributes of the ExplorationMathRichTextInfo
                 are invalid.
         """
         if not isinstance(self.exp_id, python_utils.BASESTRING):
@@ -3727,8 +3727,8 @@ class Exploration(python_utils.OBJECT):
             schema version provided in 'yaml_content'.
 
         Raises:
-            Exception: 'yaml_content' or the exploration schema version is not
-                valid.
+            Exception: The 'yaml_content' or the exploration schema version is
+                not valid.
         """
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)

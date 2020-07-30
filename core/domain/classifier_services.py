@@ -270,7 +270,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_ids: list(str). list of ID of the ClassifierTrainingJob domain
+        job_ids: list(str). List of ID of the ClassifierTrainingJob domain
             objects.
         status: str. The status to which the job needs to be updated.
 
@@ -312,7 +312,7 @@ def mark_training_jobs_failed(job_ids):
     """Updates the training job's status to failed.
 
     Args:
-        job_ids: list(str). list of ID of the ClassifierTrainingJobs.
+        job_ids: list(str). List of ID of the ClassifierTrainingJobs.
     """
     _update_classifier_training_jobs_status(
         job_ids, feconf.TRAINING_JOB_STATUS_FAILED)

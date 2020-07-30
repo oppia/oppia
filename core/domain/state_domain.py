@@ -1736,7 +1736,7 @@ class SubtitledHtml(python_utils.OBJECT):
         """Create a default SubtitledHtml domain object.
 
         Args:
-            content_id: str. the id of the content.
+            content_id: str. The id of the content.
 
         Returns:
             SubtitledHtml. A default SubtitledHtml domain object, some
@@ -2195,7 +2195,7 @@ class State(python_utils.OBJECT):
                 default outcome.
 
         Raises:
-            Exception: 'confirmed_unclassified_answers' is not a list.
+            Exception: The 'confirmed_unclassified_answers' is not a list.
         """
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(
@@ -2211,7 +2211,7 @@ class State(python_utils.OBJECT):
             hints_list: list(Hint). A list of Hint objects.
 
         Raises:
-            Exception: 'hints_list' is not a list.
+            Exception: The 'hints_list' is not a list.
         """
         if not isinstance(hints_list, list):
             raise Exception(
@@ -2233,7 +2233,7 @@ class State(python_utils.OBJECT):
             solution: Solution. Object of class Solution.
 
         Raises:
-            Exception: 'solution' is not a domain object.
+            Exception: The 'solution' is not a domain object.
         """
         old_content_id_list = []
         new_content_id_list = []

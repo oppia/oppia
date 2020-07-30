@@ -271,7 +271,7 @@ def _get_changed_filepaths():
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
-        list. a list of filepaths of modified files.
+        list. A list of filepaths of modified files.
     """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only',
@@ -293,7 +293,7 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
             to be excluded.
 
     Returns:
-        list. a list of files in directory and subdirectories without excluded
+        list. A list of files in directory and subdirectories without excluded
         files.
     """
     files_in_directory = []

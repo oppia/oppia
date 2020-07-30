@@ -446,7 +446,7 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
             stanza: list(str). Contains all the lines from a lcov stanza.
 
         Raises:
-            Exception: file_path is empty.
+            Exception: The file_path is empty.
             Exception: Total lines number is not found.
             Exception: Covered lines number is not found.
         """

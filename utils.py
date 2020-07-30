@@ -101,7 +101,7 @@ def get_exploration_components_from_dir(dir_path):
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
-        dir_path: str. a full path to the exploration root directory.
+        dir_path: str. A full path to the exploration root directory.
 
     Returns:
         *. A 2-tuple, the first element of which is a yaml string, and the
@@ -109,7 +109,7 @@ def get_exploration_components_from_dir(dir_path):
         The filepath does not include the assets/ prefix.
 
     Raises:
-        Exception: if the following condition doesn't hold: "There
+        Exception: If the following condition doesn't hold: "There
             is exactly one file not in assets/, and this file has a
             .yaml suffix".
     """

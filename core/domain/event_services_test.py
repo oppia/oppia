@@ -232,7 +232,7 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
         directory.
 
         Returns:
-            list(str). a list of Python files.
+            list(str). A list of Python files.
         """
         files_in_directory = []
         for directory, _, files in os.walk('.'):

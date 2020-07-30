@@ -359,7 +359,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             given ID.
 
         Raises:
-            EntityNotFoundError: strict == True and either
+            EntityNotFoundError: If strict == True and either
                 (i) message ID is not valid
                 (ii) message is marked as deleted.
                 No error will be raised if strict == False.

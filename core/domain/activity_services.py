@@ -121,7 +121,7 @@ def split_by_type(activity_references):
 
     Args:
         activity_references: list(ActivityReference). The domain object
-            containing exploration ids and collection ids. 
+            containing exploration ids and collection ids.
 
     Returns:
         (list(str), list(str)). A 2-tuple whose first element is a list of all

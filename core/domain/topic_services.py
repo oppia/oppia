@@ -151,7 +151,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
 
     Args:
         committer_id: str. ID of the committer.
-        topic: Topic. topic domain object.
+        topic: Topic. Topic domain object.
         commit_message: str. A description of changes made to the topic.
         commit_cmds: list(TopicChange). A list of TopicChange objects that
             represent change commands made to the given topic.

@@ -651,7 +651,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 ({type}|\S*|[\s\S]*)
                 (?:,\s+optional)?
                 [.]+\s )+ \s*
-            \s*  [A-Z](.*)[.]+              # beginning of optional description
+            \s*  [A-Z0-9](.*)[.]+            # beginning of optional description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -659,7 +659,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         re_returns_line = re.compile(
             r"""
             \s* (({type}|\S*|[\s\S]*).[.]+\s)+              # identifier
-            \s* [A-Z](.*)[.]+                        # beginning of description
+            \s* [A-Z0-9](.*)[.]+                      # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -669,7 +669,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         re_raise_line = re.compile(
             r"""
             \s* ({type}:)+                    # identifier
-            \s* [A-Z](.*)[.]+                       # beginning of description
+            \s* [A-Z0-9](.*)[.]+                     # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)

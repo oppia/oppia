@@ -253,8 +253,8 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
         the given ids as keys.
 
     Raises:
-        ValueError: 'strict' is True, and one or more of the given collection
-            ids are invalid.
+        ValueError: The 'strict' is True, and one or more of the given
+            collection ids are invalid.
     """
     collection_ids = set(collection_ids)
     result = {}
@@ -769,7 +769,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
 
     Args:
         committer_id: str. ID of the committer.
-        collection: Collection. collection domain object.
+        collection: Collection. Collection domain object.
         commit_message: str. A description of changes made to the collection.
         commit_cmds: list(dict). A list of change commands made to the given
             collection.

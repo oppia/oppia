@@ -88,7 +88,7 @@ class VisualizationsNameTests(test_utils.GenericTestBase):
         directory.
 
         Returns:
-            list(str). a list of Python files.
+            list(str). A list of Python files.
         """
         current_dir = os.getcwd()
         files_in_directory = []

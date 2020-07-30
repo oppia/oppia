@@ -146,12 +146,12 @@ class BaseModel(ndb.Model):
                 exists in the datastore. Default is True.
 
         Returns:
-            None, if strict == False and no undeleted entity with the given id
-            exists in the datastore. Otherwise, the entity instance that
-            corresponds to the given id.
+            None|*. None, if strict == False and no undeleted entity with the
+            given id exists in the datastore. Otherwise, the entity instance
+            that corresponds to the given id.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError: if strict == True and
+            base_models.BaseModel.EntityNotFoundError: If strict == True and
                 no undeleted entity with the given id exists in the datastore.
         """
         entity = cls.get_by_id(entity_id)
@@ -255,7 +255,7 @@ class BaseModel(ndb.Model):
         """Stores the given ndb.Model instances asynchronously.
 
         Args:
-            entities: list(ndb.Model).The list of model instances to be stored.
+            entities: list(ndb.Model). The list of model instances to be stored.
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the entities.
 
@@ -653,7 +653,7 @@ class VersionedModel(BaseModel):
         Raises:
             Exception: No snapshot metadata class has been defined.
             Exception: No snapshot content class has been defined.
-            Exception: commit_cmds is not a list of dicts.
+            Exception: The commit_cmds is not a list of dicts.
         """
         if self.SNAPSHOT_METADATA_CLASS is None:
             raise Exception('No snapshot metadata class defined.')
@@ -815,7 +815,7 @@ class VersionedModel(BaseModel):
 
         Raises:
             Exception: This model instance has been already deleted.
-            Exception: commit_cmd is in invalid format.
+            Exception: The commit_cmd is in invalid format.
         """
         self._require_not_marked_deleted()
 

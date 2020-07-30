@@ -53,7 +53,7 @@ def try_upgrading_draft_to_exp_version(
         objects after upgrade or None if upgrade fails.
 
     Raises:
-        InvalidInputException: current_draft_version is greater than
+        InvalidInputException: The current_draft_version is greater than
             to_exp_version.
     """
     if current_draft_version > to_exp_version:

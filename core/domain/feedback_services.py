@@ -365,7 +365,7 @@ def get_total_open_threads(feedback_analytics_list):
     FeedbackAnalytics domain objects.
 
     Args:
-        feedback_analytics_list: list(FeedbackAnalytics). list of
+        feedback_analytics_list: list(FeedbackAnalytics). A list of
             FeedbackAnalytics objects to get the count of all open threads.
 
     Returns:

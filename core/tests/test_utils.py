@@ -152,7 +152,7 @@ def check_image_png_or_webp(image_string):
     """Checks if the image is in png or webp format only.
 
     Args:
-        image_string: str. image url in base64 format.
+        image_string: str. Image url in base64 format.
 
     Returns:
         boolean. Returns true if image is in WebP format.
@@ -2018,7 +2018,7 @@ tags: []
                     function_that_invokes_popen()
 
         Args:
-            obj: *. the Python object whose attribute you want to swap.
+            obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             new_value: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you

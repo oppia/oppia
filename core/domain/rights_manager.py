@@ -119,7 +119,7 @@ class ActivityRights(python_utils.OBJECT):
         """Validates an ActivityRights object.
 
         Raises:
-            utils.ValidationError: if any of the owners, editors, voice artists
+            utils.ValidationError: If any of the owners, editors, voice artists
                 and viewers lists overlap, or if a community-owned exploration
                 has owners, editors, voice artists or viewers specified.
         """
@@ -674,7 +674,7 @@ def _get_activity_rights(activity_type, activity_id):
         ActivityRights. The rights object associated with the given activity.
 
     Raises:
-        Exception: activity_type provided is unknown.
+        Exception: The activity_type provided is unknown.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         return get_exploration_rights(activity_id, strict=False)
@@ -943,11 +943,11 @@ def _assign_role(
             ROLE_OWNER
             ROLE_EDITOR
             ROLE_VOICE_ARTIST
-            ROLE_VIEWER
+            ROLE_VIEWER.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION
-            constants.ACTIVITY_TYPE_COLLECTION
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception: The committer does not have rights to modify a role.
@@ -1137,7 +1137,7 @@ def _publish_activity(committer, activity_id, activity_type):
             constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
-        Exception. The committer does not have rights to publish the
+        Exception: The committer does not have rights to publish the
             activity.
     """
     committer_id = committer.user_id
@@ -1165,7 +1165,7 @@ def _unpublish_activity(committer, activity_id, activity_type):
             constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
-        Exception. The committer does not have rights to unpublish the
+        Exception: The committer does not have rights to unpublish the
             activity.
     """
     committer_id = committer.user_id

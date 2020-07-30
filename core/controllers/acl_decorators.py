@@ -1191,7 +1191,7 @@ def can_resubmit_suggestion(handler):
 
         Args:
             suggestion_id: str. The ID of the suggestion.
-            **kwargs: *. keyword arguments.
+            **kwargs: *. The keyword arguments.
 
         Returns:
             *. The return value of the decorated function.

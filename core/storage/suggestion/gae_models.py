@@ -253,7 +253,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         score_categories.
 
         Args:
-            score_categories: list(str). list of score categories to query for.
+            score_categories: list(str). List of score categories to query for.
             user_id: list(str). The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.
