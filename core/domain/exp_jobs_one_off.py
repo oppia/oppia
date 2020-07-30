@@ -523,8 +523,7 @@ class RTECustomizationArgsValidationOneOffJob(
             html_list)
 
         for key in err_dict:
-            if err_dict[key]:
-                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
+            yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
