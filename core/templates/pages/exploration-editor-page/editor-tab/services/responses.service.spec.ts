@@ -692,9 +692,11 @@ describe('Responses Service', function() {
   });
 
   it('should fetch EventEmitters', function() {
-    let sampleEventEmitter = new EventEmitter();
-    expect(ResponsesService.onAnswerGroupsChanged).toEqual(sampleEventEmitter);
+    let answerGroupsChangedEventEmitter = new EventEmitter();
+    let initializeAnswerGroupsEventEmitter = new EventEmitter();
+    expect(ResponsesService.onAnswerGroupsChanged).toEqual(
+      answerGroupsChangedEventEmitter);
     expect(ResponsesService.onInitializeAnswerGroups).toEqual(
-      sampleEventEmitter);
+      initializeAnswerGroupsEventEmitter);
   });
 });
