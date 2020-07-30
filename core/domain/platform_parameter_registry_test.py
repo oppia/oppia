@@ -23,7 +23,7 @@ from core.domain import platform_parameter_domain as param_domain
 from core.tests import test_utils
 
 
-class ExistingPlatformParameterValidityTest(test_utils.GenericTestBase):
+class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
     """Tests to validate all platform parameter registered in
     core/domain/platform_parameter_registry.py.
     """
