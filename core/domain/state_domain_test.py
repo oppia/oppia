@@ -3618,13 +3618,13 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 
     def test_traverse_by_schema_and_convert(self):
         html = []
-        def extract_html(value, schema):
+        def extract_html(value, unused_schema):
             """Extracts html from SubtitledHtml values.
 
             Args:
                 value: SubtitledHtml|SubtitledUnicode. The value in the
                     customization argument value to be converted.
-                schema: dict. The schema for the customization argument.
+                unused_schema: dict. The schema for the customization argument.
 
             Returns:
                 SubtitledHtml|SubtitledUnicode. The converted SubtitledHtml
@@ -3647,7 +3647,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 
         state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(
             schema, value, extract_html)
-        
+
         self.assertEqual(html, ['<p>testing</p>'])
 
     def test_traverse_by_schema_and_get(self):
@@ -3671,7 +3671,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
                 [schema_utils.is_subtitled_html_schema],
                 lambda x: x.html)
         )
-        
+
         self.assertEqual(html, ['<p>testing</p>'])
 
 
@@ -3806,7 +3806,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             written_translations.get_content_ids_for_text_translation(),
             ['content_id'])
-    
+
     def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
             self):
         written_translations = state_domain.WrittenTranslations.from_dict({

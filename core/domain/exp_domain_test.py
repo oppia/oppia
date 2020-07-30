@@ -7529,11 +7529,11 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         choices:
-            value:
-            - content_id: ca_choices_2
-              html: ''
+          value:
+          - content_id: ca_choices_2
+            html: ''
         showChoicesInShuffledOrder:
-            value: true
+          value: true
       default_outcome:
         dest: (untitled state)
         feedback:
@@ -7546,20 +7546,23 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_choices_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_choices_2: {}
         content:
-            en:
-                data_format: html
-                translation: <p>Translation</p>
-                needs_update: false
+          en:
+            data_format: html
+            needs_update: false
+            translation: <p>Translation</p>
         default_outcome: {}
         feedback_1: {}
   END:
@@ -7577,6 +7580,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7595,7 +7599,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -7610,20 +7616,26 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 35
+states_schema_version: 36
 tags: []
 title: Title
 """)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
 
     def test_cannot_load_from_yaml_with_no_schema_version(self):

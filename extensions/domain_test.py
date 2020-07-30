@@ -25,7 +25,7 @@ from extensions import domain
 
 class CustomizationArgSpecDomainUnitTests(test_utils.GenericTestBase):
     """Tests for CustomizationArgSpec domain object methods."""
-    
+
     def test_to_dict(self):
         ca_spec = domain.CustomizationArgSpec(
             'name', 'description', {}, None)

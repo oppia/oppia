@@ -604,7 +604,7 @@ class Question(python_utils.OBJECT):
                         })
                 else:
                     # Default is a list of SubtitledHtml dict.
-                    new_value.extend(copy.deepcopy(ca_spec.default_values))
+                    new_value.extend(copy.deepcopy(ca_spec.default_value))
 
                 # Assign content_ids.
                 for subtitled_html_dict in new_value:
