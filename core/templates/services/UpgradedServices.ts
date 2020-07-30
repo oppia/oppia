@@ -398,6 +398,14 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformParameterFilterObjectFactory } from
+  'domain/feature_gating/PlatformParameterFilterObjectFactory';
+import { PlatformParameterMetadataObjectFactory } from
+  'domain/feature_gating/PlatformParameterMetadataObjectFactory';
+import { PlatformParameterObjectFactory } from
+  'domain/feature_gating/PlatformParameterObjectFactory';
+import { PlatformParameterRuleObjectFactory } from
+  'domain/feature_gating/PlatformParameterRuleObjectFactory';
 import { PlayerCorrectnessFeedbackEnabledService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
@@ -826,6 +834,10 @@ export class UpgradedServices {
     upgradedServices['ParamMetadataObjectFactory'] =
       new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
+    upgradedServices['PlatformParameterFilterObjectFactory'] =
+      new PlatformParameterFilterObjectFactory();
+    upgradedServices['PlatformParameterMetadataObjectFactory'] =
+      new PlatformParameterMetadataObjectFactory();
     upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
@@ -1051,6 +1063,9 @@ export class UpgradedServices {
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['PlatformParameterRuleObjectFactory'] =
+      new PlatformParameterRuleObjectFactory(
+        upgradedServices['PlatformParameterFilterObjectFactory']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
@@ -1183,6 +1198,10 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
+    upgradedServices['PlatformParameterObjectFactory'] =
+      new PlatformParameterObjectFactory(
+        upgradedServices['PlatformParameterRuleObjectFactory'],
+        upgradedServices['PlatformParameterMetadataObjectFactory']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(

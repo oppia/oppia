@@ -1,0 +1,103 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating PlatformParameterRule domain objects.
+ */
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import {
+  PlatformParameterFilter,
+  PlatformParameterFilterBackendDict,
+  PlatformParameterFilterObjectFactory,
+  PlatformParameterFilterType
+} from 'domain/feature_gating/PlatformParameterFilterObjectFactory';
+
+
+export type PlatformParameterValue = boolean | number | string;
+
+export interface PlatformParameterRuleBackendDict {
+    'filters': PlatformParameterFilterBackendDict[];
+    'value_when_matched': PlatformParameterValue;
+}
+
+export class PlatformParameterRule {
+  filters: PlatformParameterFilter[];
+  valueWhenMatched: PlatformParameterValue;
+
+  constructor(
+      filters: PlatformParameterFilter[],
+      valueWhenMatched: PlatformParameterValue) {
+    this.filters = filters;
+    this.valueWhenMatched = valueWhenMatched;
+  }
+
+  /**
+   * Creates a dict representation of the instance.
+   *
+   * @returns {PlatformParameterRuleBackendDict} - The dict representation
+   * of the instance.
+   */
+  toBackendDict(): PlatformParameterRuleBackendDict {
+    return {
+      filters: this.filters.map(filter => filter.toBackendDict()),
+      value_when_matched: this.valueWhenMatched
+    };
+  }
+
+  /**
+   * Validates the PlatformParameterRule instance.
+   *
+   * @returns {string[]} - The issue messages found during validation, if any.
+   */
+  validate(): string[] {
+    return [];
+  }
+
+  /**
+   * Checks if there is any filter of server_mode type in the rule.
+   *
+   * @returns {boolean} - True if there's any filter of server_mode type.
+   */
+  hasServerModeFilter(): boolean {
+    return this.filters.some(
+      filter => filter.type === PlatformParameterFilterType.ServerMode);
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PlatformParameterRuleObjectFactory {
+  constructor(
+    private platformParameterFilterObjectFactory:
+      PlatformParameterFilterObjectFactory) {}
+
+  createFromBackendDict(
+      backendDict: PlatformParameterRuleBackendDict): PlatformParameterRule {
+    return new PlatformParameterRule(
+      backendDict.filters.map(
+        filterDict => (
+          this.platformParameterFilterObjectFactory.createFromBackendDict(
+            filterDict)
+        )),
+      backendDict.value_when_matched);
+  }
+}
+
+angular.module('oppia').factory(
+  'PlatformParameterRuleObjectFactory',
+  downgradeInjectable(PlatformParameterRuleObjectFactory));

@@ -442,6 +442,14 @@ import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformParameterFilterObjectFactory } from
+  'domain/feature_gating/PlatformParameterFilterObjectFactory';
+import { PlatformParameterMetadataObjectFactory } from
+  'domain/feature_gating/PlatformParameterMetadataObjectFactory';
+import { PlatformParameterObjectFactory } from
+  'domain/feature_gating/PlatformParameterObjectFactory';
+import { PlatformParameterRuleObjectFactory } from
+  'domain/feature_gating/PlatformParameterRuleObjectFactory';
 import { PlayerCorrectnessFeedbackEnabledService } from
   'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
@@ -893,6 +901,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pencilCodeEditorRulesService: PencilCodeEditorRulesService;
   static pencilCodeEditorValidationService: PencilCodeEditorValidationService;
   static playerCorrectnessFeedbackEnabledService: PlayerCorrectnessFeedbackEnabledService;
+  static platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory;
+  static platformParameterMetadataObjectFactory: PlatformParameterMetadataObjectFactory;
+  static platformParameterObjectFactory: PlatformParameterObjectFactory;
+  static platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory;
   static playerPositionService: PlayerPositionService;
   static playerTranscriptService: PlayerTranscriptService;
   static playthroughBackendApiService: PlaythroughBackendApiService;
@@ -1215,6 +1227,10 @@ private paramSpecsObjectFactory: ParamSpecsObjectFactory,
 private paramTypeObjectFactory: ParamTypeObjectFactory,
 private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
 private pencilCodeEditorValidationService: PencilCodeEditorValidationService,
+private platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory,
+private platformParameterMetadataObjectFactory: PlatformParameterMetadataObjectFactory,
+private platformParameterObjectFactory: PlatformParameterObjectFactory,
+private platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory,
 private playerCorrectnessFeedbackEnabledService: PlayerCorrectnessFeedbackEnabledService,
 private playerPositionService: PlayerPositionService,
 private playerTranscriptService: PlayerTranscriptService,
@@ -1539,6 +1555,10 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.paramTypeObjectFactory = this.paramTypeObjectFactory;
     OppiaAngularRootComponent.pencilCodeEditorRulesService = this.pencilCodeEditorRulesService;
     OppiaAngularRootComponent.pencilCodeEditorValidationService = this.pencilCodeEditorValidationService;
+    OppiaAngularRootComponent.platformParameterFilterObjectFactory = this.platformParameterFilterObjectFactory;
+    OppiaAngularRootComponent.platformParameterMetadataObjectFactory = this.platformParameterMetadataObjectFactory;
+    OppiaAngularRootComponent.platformParameterObjectFactory = this.platformParameterObjectFactory;
+    OppiaAngularRootComponent.platformParameterRuleObjectFactory = this.platformParameterRuleObjectFactory;
     OppiaAngularRootComponent.playerCorrectnessFeedbackEnabledService = this.playerCorrectnessFeedbackEnabledService;
     OppiaAngularRootComponent.playerPositionService = this.playerPositionService;
     OppiaAngularRootComponent.playerTranscriptService = this.playerTranscriptService;
