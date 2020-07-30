@@ -336,7 +336,7 @@ class TopicRightsHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Returns the TopicRights object of a topic."""
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise self.InvalidInputException(
                 'Expected a valid topic id to be provided.')

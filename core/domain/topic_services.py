@@ -406,7 +406,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (topic.id, change_list))
-    topic_rights = get_topic_rights(topic.id, strict=False)
+    topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=False)
     topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
@@ -599,6 +599,8 @@ def publish_story(topic_id, story_id, committer_id):
         committer_id, topic, 'Published story with id %s' % story_id,
         change_list)
     generate_topic_summary(topic.id)
+    opportunity_services.create_exploration_opportunities_for_story_and_topic( # pylint: disable=line-too-long
+        story, topic)
 
 
 def unpublish_story(topic_id, story_id, committer_id):
@@ -850,24 +852,6 @@ def save_topic_summary(topic_summary):
         topic_models.TopicSummaryModel(**topic_summary_dict).put()
 
 
-def get_topic_rights_from_model(topic_rights_model):
-    """Constructs a TopicRights object from the given topic rights model.
-
-    Args:
-        topic_rights_model: TopicRightsModel. Topic rights from the
-            datastore.
-
-    Returns:
-        TopicRights. The rights object created from the model.
-    """
-
-    return topic_domain.TopicRights(
-        topic_rights_model.id,
-        topic_rights_model.manager_ids,
-        topic_rights_model.topic_is_published
-    )
-
-
 def publish_topic(topic_id, committer_id):
     """Marks the given topic as published.
 
@@ -880,7 +864,7 @@ def publish_topic(topic_id, committer_id):
         Exception. The topic is already published.
         Exception. The user does not have enough rights to publish the topic.
     """
-    topic_rights = get_topic_rights(topic_id, strict=False)
+    topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
     topic = topic_fetchers.get_topic_by_id(topic_id)
@@ -898,6 +882,18 @@ def publish_topic(topic_id, committer_id):
     })]
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds)
+    _create_exploration_opportunities_for_topic(topic)
+
+
+def _create_exploration_opportunities_for_topic(topic):
+    for story_reference in topic.get_all_story_references():
+        if not story_reference.story_is_published:
+            continue
+        story = story_fetchers.get_story_by_id(
+            story_reference.story_id, strict=False)
+        if story is not None:
+            opportunity_services.create_exploration_opportunities_for_story_and_topic( # pylint: disable=line-too-long
+                story, topic)
 
 
 def unpublish_topic(topic_id, committer_id):
@@ -912,7 +908,7 @@ def unpublish_topic(topic_id, committer_id):
         Exception. The topic is already unpublished.
         Exception. The user does not have enough rights to unpublish the topic.
     """
-    topic_rights = get_topic_rights(topic_id, strict=False)
+    topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
     user = user_services.UserActionsInfo(committer_id)
@@ -967,30 +963,6 @@ def create_new_topic_rights(topic_id, committer_id):
     ).commit(committer_id, 'Created new topic rights', commit_cmds)
 
 
-def get_topic_rights(topic_id, strict=True):
-    """Retrieves the rights object for the given topic.
-
-    Args:
-        topic_id: str. ID of the topic.
-        strict: bool. Whether to fail noisily if no topic with a given id
-            exists in the datastore.
-
-    Returns:
-        TopicRights. The rights object associated with the given topic.
-
-    Raises:
-        EntityNotFoundError. The topic with ID topic_id was not
-            found in the datastore.
-    """
-
-    model = topic_models.TopicRightsModel.get(topic_id, strict=strict)
-
-    if model is None:
-        return None
-
-    return get_topic_rights_from_model(model)
-
-
 def get_multi_topic_rights(topic_ids):
     """Returns the rights of all topics whose topic ids are passed in.
 
@@ -1004,7 +976,7 @@ def get_multi_topic_rights(topic_ids):
     """
     topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
     topic_rights = [
-        get_topic_rights_from_model(rights) if rights else None
+        topic_fetchers.get_topic_rights_from_model(rights) if rights else None
         for rights in topic_rights_models]
     return topic_rights
 
@@ -1021,7 +993,8 @@ def get_topic_rights_with_user(user_id):
     """
     topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
     return [
-        get_topic_rights_from_model(model) for model in topic_rights_models
+        topic_fetchers.get_topic_rights_from_model(model)
+        for model in topic_rights_models
         if model is not None]
 
 
@@ -1035,7 +1008,7 @@ def get_all_topic_rights():
     topic_rights_models = topic_models.TopicRightsModel.get_all()
     topic_rights = {}
     for model in topic_rights_models:
-        rights = get_topic_rights_from_model(model)
+        rights = topic_fetchers.get_topic_rights_from_model(model)
         topic_rights[rights.id] = rights
     return topic_rights
 
@@ -1056,7 +1029,7 @@ def filter_published_topic_ids(topic_ids):
     for ind, model in enumerate(topic_rights_models):
         if model is None:
             continue
-        rights = get_topic_rights_from_model(model)
+        rights = topic_fetchers.get_topic_rights_from_model(model)
         if rights.topic_is_published:
             published_topic_ids.append(topic_ids[ind])
     return published_topic_ids
@@ -1127,7 +1100,7 @@ def assign_role(committer, assignee, new_role, topic_id):
         Exception. The role is invalid.
     """
     committer_id = committer.user_id
-    topic_rights = get_topic_rights(topic_id)
+    topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
         logging.error(

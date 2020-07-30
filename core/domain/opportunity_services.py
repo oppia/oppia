@@ -189,8 +189,37 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     """
     story = story_fetchers.get_story_by_id(story_id)
     topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
-    explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
+    _create_exploration_opportunities(story, topic, exp_ids)
 
+
+def create_exploration_opportunities_for_story_and_topic(story, topic):
+    """Creates new exploration opportunities corresponding to the supplied
+    story and topic.
+
+    Args:
+        story: Story. The story domain object corresponding to the exploration
+            opportunities.
+        topic: Topic. The topic domain object corresponding to the exploration
+            opportunities.
+    """
+    exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+    _create_exploration_opportunities(story, topic, exp_ids_in_story)
+
+
+def _create_exploration_opportunities(story, topic, exp_ids):
+    """Creates new exploration opportunities corresponding to the supplied
+    story, topic, and exploration IDs.
+
+    Args:
+        story: Story. The story domain object corresponding to the exploration
+            opportunities.
+        topic: Topic. The topic domain object corresponding to the exploration
+            opportunities.
+        exp_ids: list(str). A list of exploration ids for which new
+            opportunities are to be created. All exp_ids must be part of the
+            given story.
+    """
+    explorations = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
     exploration_opportunity_summary_list = []
     for exploration in explorations.values():
         exploration_opportunity_summary_list.append(
@@ -310,8 +339,11 @@ def delete_exploration_opportunities(exp_ids):
     exp_opportunity_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(
             exp_ids))
+    exp_opportunity_models_to_be_deleted = [
+        model for model in exp_opportunity_models
+        if model is not None]
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
-        exp_opportunity_models)
+        exp_opportunity_models_to_be_deleted)
 
 
 def delete_exploration_opportunities_corresponding_to_topic(topic_id):

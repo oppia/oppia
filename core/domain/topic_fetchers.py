@@ -260,3 +260,45 @@ def get_all_topics():
     topics = [
         get_topic_from_model(topic) for topic in backend_topic_models]
     return topics
+
+
+def get_topic_rights(topic_id, strict=True):
+    """Retrieves the rights object for the given topic.
+
+    Args:
+        topic_id: str. ID of the topic.
+        strict: bool. Whether to fail noisily if no topic with a given id
+            exists in the datastore.
+
+    Returns:
+        TopicRights. The rights object associated with the given topic.
+
+    Raises:
+        EntityNotFoundError. The topic with ID topic_id was not
+            found in the datastore.
+    """
+
+    model = topic_models.TopicRightsModel.get(topic_id, strict=strict)
+
+    if model is None:
+        return None
+
+    return get_topic_rights_from_model(model)
+
+
+def get_topic_rights_from_model(topic_rights_model):
+    """Constructs a TopicRights object from the given topic rights model.
+
+    Args:
+        topic_rights_model: TopicRightsModel. Topic rights from the
+            datastore.
+
+    Returns:
+        TopicRights. The rights object created from the model.
+    """
+
+    return topic_domain.TopicRights(
+        topic_rights_model.id,
+        topic_rights_model.manager_ids,
+        topic_rights_model.topic_is_published
+    )

@@ -343,7 +343,8 @@ def validate_explorations_for_story(exp_ids, raise_error):
     return validation_error_messages
 
 
-def _save_story(committer_id, story, commit_message, change_list):
+def _save_story(
+    committer_id, story, commit_message, change_list, is_story_published):
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -353,6 +354,7 @@ def _save_story(committer_id, story, commit_message, change_list):
         story: Story. The story domain object to be saved.
         commit_message: str. The commit message.
         change_list: list(StoryChange). List of changes applied to a story.
+        is_story_published: bool. Whether the supplied story is published.
 
     Raises:
         ValidationError: An invalid exploration was referenced in the
@@ -365,28 +367,9 @@ def _save_story(committer_id, story, commit_message, change_list):
             'Unexpected error: received an invalid change list when trying to '
             'save story %s: %s' % (story.id, change_list))
 
-    topic = topic_fetchers.get_topic_by_id(
-        story.corresponding_topic_id, strict=False)
-    if topic is None:
-        raise utils.ValidationError(
-            'Expected story to only belong to a valid topic, but found no '
-            'topic with ID: %s' % story.corresponding_topic_id)
-
-    story_is_published = False
-    story_is_present_in_topic = False
-    for story_reference in topic.get_all_story_references():
-        if story_reference.story_id == story.id:
-            story_is_present_in_topic = True
-            story_is_published = story_reference.story_is_published
-    if not story_is_present_in_topic:
-        raise Exception(
-            'Expected story to belong to the topic %s, but it is '
-            'neither a part of the canonical stories or the additional '
-            'stories of the topic.' % story.corresponding_topic_id)
-
     story.validate()
 
-    if story_is_published:
+    if is_story_published:
         exp_ids = []
         for node in story.story_contents.nodes:
             if not node.exploration_id:
@@ -430,6 +413,39 @@ def _save_story(committer_id, story, commit_message, change_list):
     story.version += 1
 
 
+def _is_story_published_and_present_in_topic(story):
+    """ Returns whether a story is published. Raises an exception if the story
+    is not present in the corresponding topic's story references.
+
+    Args:
+        story: Story. The story domain object.
+
+    Returns:
+        bool. Whether the supplied story is published.
+    """
+    topic = topic_fetchers.get_topic_by_id(
+        story.corresponding_topic_id, strict=False)
+    if topic is None:
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found no '
+            'topic with ID: %s' % story.corresponding_topic_id)
+
+    is_story_published = False
+    story_is_present_in_topic = False
+    for story_reference in topic.get_all_story_references():
+        if story_reference.story_id == story.id:
+            story_is_present_in_topic = True
+            is_story_published = story_reference.story_is_published
+
+    if not story_is_present_in_topic:
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional '
+            'stories of the topic.' % story.corresponding_topic_id)
+
+    return is_story_published
+
+
 def update_story(
         committer_id, story_id, change_list, commit_message):
     """Updates a story. Commits changes.
@@ -452,9 +468,15 @@ def update_story(
     old_story = story_fetchers.get_story_by_id(story_id)
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
-    _save_story(committer_id, new_story, commit_message, change_list)
+    is_story_published = _is_story_published_and_present_in_topic(new_story)
+    _save_story(
+        committer_id, new_story, commit_message, change_list,
+        is_story_published)
     create_story_summary(new_story.id)
-    opportunity_services.update_exploration_opportunities(old_story, new_story)
+
+    if is_story_published and _is_story_topic_published(new_story):
+        opportunity_services.update_exploration_opportunities(
+            old_story, new_story)
 
     exploration_context_models_to_be_deleted = (
         exp_models.ExplorationContextModel.get_multi(
@@ -479,6 +501,19 @@ def update_story(
         story_id=story_id
     ) for exp_id in exp_ids_added_to_story]
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
+
+
+def _is_story_topic_published(story):
+    """Returns whether the story's corresponding topic is published.
+
+    Args:
+        story: Story. The story domain object.
+
+    Returns:
+        bool. Whether the the story's corresponding topic is published.
+    """
+    topic_rights = topic_fetchers.get_topic_rights(story.corresponding_topic_id)
+    return topic_rights.topic_is_published
 
 
 def delete_story(committer_id, story_id, force_deletion=False):
