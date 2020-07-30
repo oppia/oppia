@@ -28,6 +28,7 @@ from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain.proto import text_classifier_pb2
 from core.platform import models
@@ -83,6 +84,28 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_data_proto.model_json = json.dumps(classifier_data)
         fs_services.save_classifier_data(exp_id, job_id, classifier_data_proto)
         return job_id
+
+    def _get_classifier_data_from_classifier_training_job(
+            self, classifier_training_job):
+        """Retrieves classifier training job from GCS using metadata stored in
+        classifier_training_job.
+
+        Args:
+            classifier_training_job: ClassifierTrainingJob. Domain object
+                containing metadata of the training job which is used to
+                retrieve the trained model.
+
+        Returns:
+            FronzeModel. Protobuf object containing classifier data.
+        """
+        filepath = classifier_training_job.classifier_data_file_name
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        classifier_data = utils.decompress_from_zlib(fs.get(filepath))
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.ParseFromString(classifier_data)
+        return classifier_data_proto
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the handle_trainable_states method and
@@ -368,8 +391,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_training_job.next_scheduled_check_time,
             next_scheduled_check_time)
         self.assertEqual(classifier_training_job.training_data, [])
+
+        classifier_data = (
+            self._get_classifier_data_from_classifier_training_job(
+                classifier_training_job))
         self.assertEqual(
-            json.loads(classifier_training_job.classifier_data.model_json), {})
+            json.loads(classifier_data.model_json), {})
         self.assertEqual(classifier_training_job.state_name, state_name)
         self.assertEqual(
             classifier_training_job.status,
@@ -531,10 +558,13 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             interaction_id, exp_id, 1, next_scheduled_check_time, [],
             state_name, feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
 
+        # Retrieve classifier data from GCS and ensure that content is same.
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(json.loads(
-            classifier_training_job.classifier_data.model_json), {})
+        classifier_data = (
+            self._get_classifier_data_from_classifier_training_job(
+                classifier_training_job))
+        self.assertEqual(json.loads(classifier_data.model_json), {})
 
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.model_json = json.dumps(
@@ -544,8 +574,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
+        classifier_data = (
+            self._get_classifier_data_from_classifier_training_job(
+                classifier_training_job))
         self.assertDictEqual(
-            json.loads(classifier_training_job.classifier_data.model_json),
+            json.loads(classifier_data.model_json),
             {'classifier_data': 'data'})
 
     def test_retrieval_of_classifier_training_jobs_from_exploration_attributes(

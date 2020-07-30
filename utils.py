@@ -747,6 +747,32 @@ def get_hashable_value(value):
         return value
 
 
+def compress_to_zlib(data):
+    """Compress the data to zlib format for efficient storage and communication.
+
+    Args:
+        data: str. Data to be copressed.
+
+    Returns:
+        Compressed data string.
+    """
+    import zlib
+    return zlib.compress(data)
+
+
+def decompress_from_zlib(data):
+    """Decompress the data to zlib format.
+
+    Args:
+        data: str. Data to be decopressed.
+
+    Returns:
+        Decompressed data string.
+    """
+    import zlib
+    return zlib.decompress(data)
+
+
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
 

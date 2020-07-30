@@ -23,5 +23,5 @@ message ClassifierDataMessage {
   string algorithm_id = 1;
 
   // Version of the algorithm. Depends on algorithm ID.
-  int32 algorithm_version = 3;
+  int32 algorithm_version = 2;
 }

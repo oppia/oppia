@@ -429,29 +429,3 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-def compress_to_zlib(data):
-    """Compress the data to zlib format for efficient storage and communication.
-
-    Args:
-        data: str. Data to be copressed.
-
-    Returns:
-        Compressed data string.
-    """
-    import zlib
-    return zlib.compress(data)
-
-
-def decompress_from_zlib(data):
-    """Decompress the data to zlib format.
-
-    Args:
-        data: str. Data to be decopressed.
-
-    Returns:
-        Decompressed data string.
-    """
-    import zlib
-    return zlib.decompress(data)

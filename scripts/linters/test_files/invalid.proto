@@ -23,5 +23,5 @@ message classifier_data_message {
   string AlgorithmID = 1;
 
   // Version of the algorithm. Depends on algorithm ID.
-  int32 algorithm_version = 3;
+  int32 algorithm_version = 2;
 }

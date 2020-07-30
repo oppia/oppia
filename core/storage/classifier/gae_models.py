@@ -216,7 +216,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
     # The IDs of the training job corresponding to the exploration state. Each
-    # algotihm_id corresponding to the interaction of the exploration state is
+    # algorithm_id corresponding to the interaction of the exploration state is
     # mapped to its unique job_id.
     algorithm_id_to_job_id_map = ndb.JsonProperty(
         required=True, indexed=True)
@@ -348,7 +348,8 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 exp_version=job_exploration_mapping.exp_version,
                 state_name=job_exploration_mapping.state_name,
                 algorithm_id_to_job_id_map=(
-                    job_exploration_mapping.algorithm_id_to_job_id_map))
+                    job_exploration_mapping.algorithm_id_to_job_id_map.to_dict()
+                ))
 
             mapping_models.append(mapping_instance)
             mapping_ids.append(instance_id)

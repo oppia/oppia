@@ -20,8 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import datetime
 
-from core.domain import algorithm_proto_registry
-from core.domain.proto import classifier_data_message_pb2
 from core.platform import models
 import feconf
 import python_utils
@@ -71,8 +69,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                     'answers': ['a2', 'a3']
                 }
             ]
-        classifier_data: dict. The actual classifier model used for
-            classification purpose.
         algorithm_version: int. Schema version of the classsifier model to be
             trained. This depends on the algorithm ID.
     """
@@ -80,7 +76,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
     def __init__(
             self, job_id, algorithm_id, interaction_id, exp_id,
             exp_version, next_scheduled_check_time, state_name, status,
-            training_data, classifier_data, algorithm_version):
+            training_data, algorithm_version):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
@@ -114,9 +110,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                         'answers': ['a2', 'a3']
                     }
                 ]
-            classifier_data: Object. The protobuf object containing classifier
-                model parameters.
-            algorithm_version: int. Schema version of the classsifier model to
+            algorithm_version: int. Schema version of the classifier model to
                 be trained. This depends on the algorithm ID.
         """
         self._job_id = job_id
@@ -128,7 +122,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         self._state_name = state_name
         self._status = status
         self._training_data = copy.deepcopy(training_data)
-        self._classifier_data = classifier_data
         self._algorithm_version = algorithm_version
 
     @property
@@ -233,13 +226,14 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         return self._training_data
 
     @property
-    def classifier_data(self):
-        """Returns the classifier data protobuf object.
+    def classifier_data_file_name(self):
+        """Returns file name of the GCS file which stores classifier data
+        for this training job.
 
         Returns:
-            Object. The protobuf object containing classifier model parameters.
+            str. The GCS file name of the classifier data.
         """
-        return self._classifier_data
+        return '%s-classifier-data.pb.xz' % (self.job_id)
 
     @property
     def algorithm_version(self):
@@ -266,16 +260,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                     initial_status, status))
         self._status = status
 
-    def update_classifier_data_proto(self, classifier_data_proto):
-        """Updates the classifier_data attribute of the ClassifierTrainingJob
-        domain object.
-
-        Args:
-            classifier_data_proto: object. The classifier model used for
-                classification.
-        """
-        self._classifier_data = classifier_data_proto
-
     def to_dict(self):
         """Constructs a dict representation of training job domain object.
 
@@ -293,41 +277,8 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             'state_name': self._state_name,
             'status': self._status,
             'training_data': self._training_data,
-            'classifier_data': self._classifier_data,
             'algorithm_version': self._algorithm_version
         }
-
-    def to_player_proto(self):
-        """Constructs a protobuf object containing a training job domain
-        object's algorithm_id, classifier_data and algorithm_version.
-
-        Returns:
-            ClassifierDataMessage. A protobuf object containing training
-            job domain object's algorithm_id, classifier_data and
-            algorithm_version.
-        """
-        classifier_message_proto = (
-            classifier_data_message_pb2.ClassifierDataMessage())
-        classifier_message_proto.algorithm_id = self.algorithm_id
-        classifier_data_proto_name = (
-            algorithm_proto_registry.Registry.
-            get_proto_attribute_name_for_algorithm(
-                self.algorithm_id, self.algorithm_version))
-
-        if not self.classifier_data:
-            raise Exception(
-                'No classifier data found. Unable to generate proto object')
-
-        if self.classifier_data and classifier_data_proto_name is None:
-            raise Exception(
-                'No protobuf class found for classifier with %s '
-                'algorithm id and %d algorithm version' % (
-                    self.algorithm_id, self.algorithm_version))
-
-        getattr(classifier_message_proto, classifier_data_proto_name).CopyFrom(
-            self.classifier_data)
-        classifier_message_proto.algorithm_version = self.algorithm_version
-        return classifier_message_proto
 
     def validate(self):
         """Validates the training job before it is saved to storage."""
@@ -404,19 +355,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
                     'Expected answers to be a list, received %s' %
                     grouped_answers['answers'])
 
-        # Classifier data can be either None (before its stored) or protobuf
-        # object of expected class type.
-        expected_classifier_data_type = (
-            algorithm_proto_registry.Registry.
-            get_proto_attribute_type_for_algorithm(
-                self.algorithm_id, self.algorithm_version))
-        if self.classifier_data and not isinstance(
-                self.classifier_data, expected_classifier_data_type):
-            raise utils.ValidationError(
-                'Expected classifier_data to be a %s|None, received %s' % (
-                    expected_classifier_data_type.__class__.__name__,
-                    self.classifier_data))
-
         if not isinstance(self.algorithm_version, int):
             raise utils.ValidationError(
                 'Expected algorithm_version to be an int, received %s' %
@@ -457,7 +395,8 @@ class TrainingJobExplorationMapping(python_utils.OBJECT):
         self._exp_id = exp_id
         self._exp_version = exp_version
         self._state_name = state_name
-        self._algorithm_id_to_job_id_map = algorithm_id_to_job_id_map
+        self._algorithm_id_to_job_id_map = AlgorithmIDToJobIDMapping(
+            algorithm_id_to_job_id_map)
 
     @property
     def exp_id(self):
@@ -510,7 +449,8 @@ class TrainingJobExplorationMapping(python_utils.OBJECT):
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
             'state_name': self.state_name,
-            'algorithm_id_to_job_id_map': self._algorithm_id_to_job_id_map
+            'algorithm_id_to_job_id_map': (
+                self._algorithm_id_to_job_id_map.to_dict())
         }
 
     def validate(self):
@@ -530,6 +470,111 @@ class TrainingJobExplorationMapping(python_utils.OBJECT):
                 'Expected state_name to be a string, received %s' % (
                     self.state_name))
 
+        self._algorithm_id_to_job_id_map.validate()
+
+
+class AlgorithmIDToJobIDMapping(python_utils.OBJECT):
+    """Domain object for a algorithm_id to training job_id map.
+
+    Each algorithm_id is mapped to a unique job_id which stores the metadata
+    related to the training job for that algorithm_id.
+
+    Attributes:
+        algorithm_id_to_job_id_map. dict. Mapping of algorithm IDs to
+            corresponding unique trainnig job IDs.
+    """
+
+    def __init__(self, algorithm_id_to_job_id_map):
+        """Constructs a AlgorithmIDToJobIDMapping domain object.
+
+        Args:
+            algorithm_id_to_job_id_map: dict. Mapping of algorithm IDs to
+                corresponding unique trainnig job IDs.
+        """
+        self._algorithm_id_to_job_id_map = algorithm_id_to_job_id_map
+
+    @property
+    def algorithm_id_to_job_id_map(self):
+        """Returns the algorithm_id_to_job_id_map of the training jobs.
+
+        Returns:
+            dict. Mapping of algorithm IDs to corresponding unique trainnig
+            job IDs.
+        """
+        return self._algorithm_id_to_job_id_map
+
+    def get_all_algorithm_ids(self):
+        """Return all algorithm ids.
+
+        Returns:
+            List(str). List of algorithm ids present in mapping.
+        """
+        return list(self.algorithm_id_to_job_id_map.keys())
+
+    def algorithm_id_exists(self, algorithm_id):
+        """Returns whether given algorithm_id exists in the mapping or not.
+
+        Args:
+            algorithm_id: str. Algorithm ID to check for membership.
+
+        Returns:
+            Boolean. Whether algorithm_id exists in mapping or not.
+        """
+        return algorithm_id in self.algorithm_id_to_job_id_map
+
+    def get_job_id_for_algorithm_id(self, algorithm_id):
+        """Returns job_id corresponding to given algorithm_id.
+
+        Args:
+            algorithm_id: str. Algorithm ID for which job_id is required.
+
+        Returns:
+            Job ID of the training job corresponding to given algorithm_id.
+
+        Raises:
+            Exception. If algorithm_id is not present in
+            algorithm_id_to_job_id_map.
+        """
+        if algorithm_id not in self._algorithm_id_to_job_id_map:
+            raise Exception(
+                'Job ID correspond to Algorithhm %s does not exist' % (
+                    algorithm_id))
+        return self._algorithm_id_to_job_id_map[algorithm_id]
+
+    def set_job_id_for_algorithm_id(self, algorithm_id, job_id):
+        """Sets job_id corresponding to given algorithm_id for the mapping
+
+        Args:
+            algorithm_id: str. Algorithm ID for which job_id should be set.
+            job_id: str. Job ID.
+        """
+        self._algorithm_id_to_job_id_map[algorithm_id] = job_id
+
+    def remove_algorithm_id(self, algorithm_id):
+        """Removes algorithm_id from the mapping.
+
+        Args:
+            algorithm_id: str. The algorithm_id to remove.
+        """
+        if algorithm_id not in self.algorithm_id_to_job_id_map:
+            raise Exception('Algorithm %s not found in mapping' % algorithm_id)
+        self._algorithm_id_to_job_id_map.pop(algorithm_id)
+
+    def to_dict(self):
+        """Constructs a dict representation of TrainingJobExplorationMapping
+        domain object.
+
+        Returns:
+            A dict representation of TrainingJobExplorationMapping domain
+            object.
+        """
+
+        return self._algorithm_id_to_job_id_map
+
+    def validate(self):
+        """Validates the algorithm_id to job_id map before it is saved to
+        storage.
+        """
         if not isinstance(self.algorithm_id_to_job_id_map, dict):
             raise utils.ValidationError(
                 'Expected algorithm_id_to_job_id_map to be a dict, '

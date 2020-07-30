@@ -25,27 +25,49 @@ import os
 
 from constants import constants
 from core.controllers import classifier
-from core.domain import algorithm_proto_registry
 from core.domain import classifier_services
 from core.domain import config_domain
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain.proto import classifier_data_message_pb2
 from core.domain.proto import text_classifier_pb2
 from core.domain.proto import training_job_response_payload_pb2
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+import utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
 class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
     """Test the handler for storing job result of training job."""
+
+    def _get_classifier_data_from_classifier_training_job(
+            self, classifier_training_job):
+        """Retrieves classifier training job from GCS using metadata stored in
+        classifier_training_job.
+
+        Args:
+            classifier_training_job: ClassifierTrainingJob. Domain object
+                containing metadata of the training job which is used to
+                retrieve the trained model.
+
+        Returns:
+            FronzeModel. Protobuf object containing classifier data.
+        """
+        filepath = classifier_training_job.classifier_data_file_name
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        classifier_data = utils.decompress_from_zlib(fs.get(filepath))
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.ParseFromString(classifier_data)
+        return classifier_data_proto
 
     def setUp(self):
         super(TrainedClassifierHandlerTests, self).setUp()
@@ -114,12 +136,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             text_classifier_pb2.TextClassifierFrozenModel())
         classifier_frozen_model.model_json = json.dumps(self.classifier_data)
 
-        getattr(
-            self.job_result,
-            algorithm_proto_registry.Registry.
-            get_proto_attribute_name_for_algorithm(
-                self.algorithm_id, self.algorithm_version)
-        ).CopyFrom(classifier_frozen_model)
+        self.job_result.text_classifier.CopyFrom(classifier_frozen_model)
 
         self.payload = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
@@ -148,7 +165,9 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 self.exp_id, self.exploration.version, 'Home',
                 self.algorithm_id))
         self.assertIsNotNone(classifier_training_job)
-        classifier_data = classifier_training_job.classifier_data
+        classifier_data = (
+            self._get_classifier_data_from_classifier_training_job(
+                classifier_training_job))
         self.assertEqual(
             json.loads(classifier_data.model_json), self.classifier_data)
         self.assertEqual(
@@ -270,54 +289,23 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             classifier_services.get_classifier_training_job(
                 self.exp_id, self.exploration.version, 'Home',
                 self.algorithm_id))
-        self.assertIsNotNone(classifier_training_job)
-        classifier_data = classifier_training_job.classifier_data
-        self.assertEqual(
-            json.loads(classifier_data.model_json), self.classifier_data)
-        self.assertEqual(
-            classifier_training_job.status,
-            feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         params = {
             'exploration_id': self.exp_id,
             'exploration_version': self.exploration.version,
             'state_name': 'Home',
         }
-        response = self.get_blob(
+        response = self.get_json(
             '/ml/trainedclassifierhandler', params=params,
             expected_status_int=200)
-        classifier_data_message = (
-            classifier_data_message_pb2.ClassifierDataMessage())
-        classifier_data_message.ParseFromString(response.body)
         self.assertEqual(
-            classifier_data_message.algorithm_id, self.algorithm_id)
-        self.assertEqual(
-            classifier_data_message.WhichOneof('classifier_frozen_model'),
-            algorithm_proto_registry.Registry.
-            get_proto_attribute_name_for_algorithm(
-                self.algorithm_id, self.algorithm_version)
-        )
-        self.assertEqual(
-            classifier_data_message.text_classifier.model_json,
-            self.payload.job_result.text_classifier.model_json)
-        self.assertEqual(
-            classifier_data_message.algorithm_version, self.algorithm_version)
+            response['gcs_file_name'],
+            classifier_training_job.classifier_data_file_name)
 
     def test_error_on_incorrect_exploration_id_for_retrieving_model(self):
         self.post_blob(
             '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
             expected_status_int=200)
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job(
-                self.exp_id, self.exploration.version, 'Home',
-                self.algorithm_id))
-        self.assertIsNotNone(classifier_training_job)
-        classifier_data = classifier_training_job.classifier_data
-        self.assertEqual(
-            json.loads(classifier_data.model_json), self.classifier_data)
-        self.assertEqual(
-            classifier_training_job.status,
-            feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         params = {
             'exploration_id': 'fake_exp',
@@ -332,17 +320,6 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         self.post_blob(
             '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
             expected_status_int=200)
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job(
-                self.exp_id, self.exploration.version, 'Home',
-                self.algorithm_id))
-        self.assertIsNotNone(classifier_training_job)
-        classifier_data = classifier_training_job.classifier_data
-        self.assertEqual(
-            json.loads(classifier_data.model_json), self.classifier_data)
-        self.assertEqual(
-            classifier_training_job.status,
-            feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         params = {
             'exploration_id': self.exp_id,
@@ -357,17 +334,6 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         self.post_blob(
             '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
             expected_status_int=200)
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job(
-                self.exp_id, self.exploration.version, 'Home',
-                self.algorithm_id))
-        self.assertIsNotNone(classifier_training_job)
-        classifier_data = classifier_training_job.classifier_data
-        self.assertEqual(
-            json.loads(classifier_data.model_json), self.classifier_data)
-        self.assertEqual(
-            classifier_training_job.status,
-            feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         params = {
             'exploration_id': self.exp_id,
@@ -454,15 +420,6 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             },
         }
 
-        algorithm_proto_registry.Registry.CLASSIFIER_TO_PROTO_MAPPING[
-            'NewTextClassifier'] = {
-                1: {
-                    'attribute_name': 'text_classifier',
-                    'attribute_type': (
-                        text_classifier_pb2.TextClassifierFrozenModel)
-                }
-            }
-
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
@@ -473,9 +430,9 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         training_job_exploration_mapping = (
             classifier_services.get_training_job_exploration_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
-        self.assertIn(
-            'NewTextClassifier',
-            training_job_exploration_mapping.algorithm_id_to_job_id_map)
+        self.assertTrue(
+            training_job_exploration_mapping.algorithm_id_to_job_id_map.
+            algorithm_id_exists('NewTextClassifier'))
 
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
@@ -485,8 +442,9 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 expected_status_int=200)
 
         self.assertEqual(
-            training_job_exploration_mapping.algorithm_id_to_job_id_map[
-                'NewTextClassifier'],
+            (
+                training_job_exploration_mapping.algorithm_id_to_job_id_map.
+                get_job_id_for_algorithm_id('NewTextClassifier')),
             json_response['job_id']
         )
         self.assertEqual(json_response['algorithm_id'], 'NewTextClassifier')
@@ -508,14 +466,6 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 'algorithm_version': 2
             },
         }
-        algorithm_proto_registry.Registry.CLASSIFIER_TO_PROTO_MAPPING[
-            'TextClassifier'] = {
-                2: {
-                    'attribute_name': 'text_classifier',
-                    'attribute_type': (
-                        text_classifier_pb2.TextClassifierFrozenModel)
-                }
-            }
 
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
@@ -527,9 +477,9 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         training_job_exploration_mapping = (
             classifier_services.get_training_job_exploration_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
-        self.assertIn(
-            'TextClassifier',
-            training_job_exploration_mapping.algorithm_id_to_job_id_map)
+        self.assertTrue(
+            training_job_exploration_mapping.algorithm_id_to_job_id_map.
+            algorithm_id_exists('TextClassifier'))
 
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
@@ -539,8 +489,9 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 expected_status_int=200)
 
         self.assertEqual(
-            training_job_exploration_mapping.algorithm_id_to_job_id_map[
-                'TextClassifier'],
+            (
+                training_job_exploration_mapping.algorithm_id_to_job_id_map.
+                get_job_id_for_algorithm_id('TextClassifier')),
             json_response['job_id']
         )
         self.assertEqual(json_response['algorithm_id'], 'TextClassifier')

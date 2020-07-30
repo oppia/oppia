@@ -55,7 +55,7 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
-      "oppiamlProto": {
+      "oppiaMlProto": {
         "version": "0.0.0",
         "downloadFormat": "zip",
         "url": "https://github.com/oppia/oppia-ml-proto/archive/0.0.0.zip",

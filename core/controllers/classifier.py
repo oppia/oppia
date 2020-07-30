@@ -56,7 +56,9 @@ def validate_job_result_message_proto(job_result_proto):
     """Validates the data-type of the message payload data.
 
     Args:
-        job_result_proto: object. The protobuf object containing job result.
+        job_result_proto: JobResult. A protobuf object containing job result
+            data such as algorithm id and FrozenModel of trained classifier
+            model.
 
     Returns:
         bool. Whether the payload dict is valid.
@@ -169,21 +171,24 @@ class TrainedClassifierHandler(base.BaseHandler):
         algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_version']
 
+
         training_job_exploration_mapping = (
             classifier_services.get_training_job_exploration_mapping(
                 exploration_id, exp_version, state_name))
         if not training_job_exploration_mapping:
             raise self.InvalidInputException
 
-        if algorithm_id not in (
-                training_job_exploration_mapping.algorithm_id_to_job_id_map):
+        if not (
+                training_job_exploration_mapping.algorithm_id_to_job_id_map.
+                algorithm_id_exists(algorithm_id)):
             classifier_services.migrate_exploration_training_job(
                 training_job_exploration_mapping)
             raise self.PageNotFoundException
 
         training_job = classifier_services.get_classifier_training_job_by_id(
-            training_job_exploration_mapping.algorithm_id_to_job_id_map[
-                algorithm_id])
+            training_job_exploration_mapping.algorithm_id_to_job_id_map.
+            get_job_id_for_algorithm_id(
+                algorithm_id))
 
         if training_job is None or (
                 training_job.status != feconf.TRAINING_JOB_STATUS_COMPLETE):
@@ -194,8 +199,9 @@ class TrainedClassifierHandler(base.BaseHandler):
                 training_job_exploration_mapping)
             raise self.PageNotFoundException
 
-        return self.render_blob(
-            training_job.to_player_proto().SerializeToString())
+        return self.render_json({
+            'gcs_file_name': training_job.classifier_data_file_name
+        })
 
 
 class NextJobHandler(base.BaseHandler):

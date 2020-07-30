@@ -29,6 +29,7 @@ from core.domain.proto import text_classifier_pb2
 from core.tests import test_utils
 import feconf
 import python_utils
+import utils
 
 
 class FileSystemServicesTests(test_utils.GenericTestBase):
@@ -191,7 +192,11 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
         """Test that classifier data is stored and retrieved correctly."""
         fs_services.save_classifier_data(
             'exp_id', 'job_id', self.classifier_data_proto)
-        classifier_data = fs_services.read_classifier_data('exp_id', 'job_id')
+        filepath = 'job_id-classifier-data.pb.xz'
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id'))
+        classifier_data = utils.decompress_from_zlib(fs.get(filepath))
         classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
         classifier_data_proto.ParseFromString(classifier_data)
         self.assertEqual(
