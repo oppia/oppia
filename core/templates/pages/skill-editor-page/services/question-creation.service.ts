@@ -233,6 +233,7 @@ angular.module('oppia').factory('QuestionCreationService', [
         keyboard: false,
         resolve: {
           associatedSkillSummaries: () => [],
+          untriagedSkillSummaries: () => [],
           canEditQuestion: () => canEditQuestion,
           categorizedSkills: () => [],
           groupedSkillSummaries: () => groupedSkillSummaries,
