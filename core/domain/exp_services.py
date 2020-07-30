@@ -1891,6 +1891,11 @@ def get_batch_of_exps_for_latex_svg_generation():
         if number_of_svgs_in_current_batch >= (
                 max_number_of_svgs_in_math_svgs_batch):
             break
+
+        # This represents the projected number of SVGs in a batch if all the
+        # LaTeX strings in the model is added to the batch. But since we are
+        # limiting the batch also by the number of SVGs, we need to check how
+        # many LaTeX strings from the model we can add to the batch.
         number_of_svgs_in_batch_along_with_latex_strings_in_model = (
             number_of_svgs_in_current_batch + len(
                 list_of_latex_strings_in_model))
@@ -1975,6 +1980,7 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
         extract_svg_filename_latex_mapping_in_math_rte_components(
             html_in_exploration_after_conversion))
 
+    number_of_svg_files_saved = 0
     for filename, raw_latex in filenames_mapping:
         # Some new filenames may already have the images saved from the math
         # rich-text editor, for these files we don't need to save the image
@@ -1995,6 +2001,7 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, feconf.ENTITY_TYPE_EXPLORATION, exp_id, image_file,
                 'image', image_is_compressible)
+            number_of_svg_files_saved += 1
     list_of_latex_string_converted = raw_latex_to_image_data_dict.keys()
     exploration_math_rich_text_info_model = (
         exp_models.ExplorationMathRichTextInfoModel.get_by_id(exp_id))
@@ -2004,17 +2011,20 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
         set(list_of_latex_strings_in_model) - set(
             list_of_latex_string_converted))
 
+    commit_message = (
+        'Technical fix: Added %d SVG images to math tags in the exploration' % (
+            number_of_svg_files_saved))
     if list_of_latex_string_left_to_be_converted == []:
         update_exploration(
             feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
-            'added all SVG images for math tags.')
+            commit_message)
         (
             exploration_math_rich_text_info_model.
             math_images_generation_required) = False
     else:
         update_exploration(
             feconf.MIGRATION_BOT_USER_ID, exp_id, change_lists,
-            'added some SVG images for math tags.')
+            commit_message)
         exploration_math_rich_text_info_model.latex_strings_without_svg = (
             list_of_latex_string_left_to_be_converted)
 

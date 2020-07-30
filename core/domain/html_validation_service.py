@@ -875,13 +875,13 @@ def generate_math_svgs_filename(latex_string_svg_image_dimensions):
         for _ in python_utils.RANGE(10))
     date_object = datetime.datetime.utcnow()
     year = python_utils.UNICODE(date_object.year)
-    month = python_utils.UNICODE(date_object.month)[-2:]
-    day = python_utils.UNICODE(date_object.day)[-2:]
-    hour = python_utils.UNICODE(date_object.hour)[-2:]
-    minute = python_utils.UNICODE(date_object.minute)[-2:]
-    second = python_utils.UNICODE(date_object.second)[-2:]
+    month = (('0%d') % (date_object.month))[-2:]
+    day = (('0%d') % (date_object.day))[-2:]
+    hour = (('0%d') % (date_object.hour))[-2:]
+    minute = (('0%d') % (date_object.minute))[-2:]
+    second = (('0%d') % (date_object.second))[-2:]
 
-    date_time_string = '%s%s%s%s%s%s%s' % (
+    date_time_string = '%s%s%s%s%s%s_%s' % (
         year, month, day, hour, minute, second, random_string)
     filename = 'mathImg_%s_height_%s_width_%s_vertical_%s.svg' % (
         date_time_string, latex_string_svg_image_dimensions.
