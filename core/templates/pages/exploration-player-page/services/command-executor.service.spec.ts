@@ -127,28 +127,28 @@ describe('Command executor service', () => {
 
   it('should enter text, click button, then add text to add to set',
     () => {
-    setupWindowRef(wrf);
-    ces.addSet(wrf, '1');
-    expect(addBoolean).toEqual(false);
-    ces.addSet(wrf, '2');
-    expect(addBoolean).toEqual(true);
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control'
-    )[0] as HTMLInputElement;
-    expect(textbox.value).toEqual('1');
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control'
-    )[1] as HTMLInputElement;
-    expect(textbox.value).toEqual('2');
-  });
+      setupWindowRef(wrf);
+      ces.addSet(wrf, '1');
+      expect(addBoolean).toEqual(false);
+      ces.addSet(wrf, '2');
+      expect(addBoolean).toEqual(true);
+      var textbox = wrf.nativeWindow.document.getElementsByClassName(
+        'form-control'
+      )[0] as HTMLInputElement;
+      expect(textbox.value).toEqual('1');
+      var textbox = wrf.nativeWindow.document.getElementsByClassName(
+        'form-control'
+      )[1] as HTMLInputElement;
+      expect(textbox.value).toEqual('2');
+    });
 
   it('should delete the set element correctly by clicking the button',
     () => {
-    setupWindowRef(wrf);
-    ces.addSet(wrf, '1');
-    ces.removeSet(wrf, '1');
-    expect(deleteBoolean).toEqual(true);
-  });
+      setupWindowRef(wrf);
+      ces.addSet(wrf, '1');
+      ces.removeSet(wrf, '1');
+      expect(deleteBoolean).toEqual(true);
+    });
 
   it('should add the fraction into the correct box', () => {
     setupWindowRef(wrf);
@@ -162,7 +162,7 @@ describe('Command executor service', () => {
 
   it('should correctly click the 2nd multiple choice answer', () => {
     setupWindowRef(wrf);
-    ces.selectItemBullet(wrf , '2');
+    ces.selectItemBullet(wrf, '2');
     expect(mcBoolean).toEqual(true);
   });
 });
