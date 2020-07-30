@@ -182,20 +182,20 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
     }));
 
-    it('should evaluate $scope properties after controller is initialized',
-      function() {
-        expect($scope.isNotHandled).toEqual(true);
-        expect($scope.canEdit).toBe(true);
-        expect($scope.commitMessage).toBe('');
-        expect($scope.reviewMessage).toBe('');
-        expect($scope.canReject).toBe(true);
-        expect($scope.canAccept).toBe(false);
-        expect($scope.currentContent).toBe(currentContent);
-        expect($scope.newContent).toBe(newContent);
-        expect($scope.errorMessage).toEqual(
-          'You have unsaved changes to this exploration. Please save/discard' +
-          ' your unsaved changes if you wish to accept.');
-      });
+    it('should initialize correctly $scope properties after controller' +
+      ' initialization', function() {
+      expect($scope.isNotHandled).toEqual(true);
+      expect($scope.canEdit).toBe(true);
+      expect($scope.commitMessage).toBe('');
+      expect($scope.reviewMessage).toBe('');
+      expect($scope.canReject).toBe(true);
+      expect($scope.canAccept).toBe(false);
+      expect($scope.currentContent).toBe(currentContent);
+      expect($scope.newContent).toBe(newContent);
+      expect($scope.errorMessage).toEqual(
+        'You have unsaved changes to this exploration. Please save/discard' +
+        ' your unsaved changes if you wish to accept.');
+    });
   });
 
   describe('when suggestion is valid but not handled and no exist changes' +

@@ -146,7 +146,7 @@ describe('Community dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should have no username logged', function() {
+    it('should have no user data in dashboard page', function() {
       expect(ctrl.userIsLoggedIn).toBe(false);
       expect(ctrl.username).toBe('');
     });

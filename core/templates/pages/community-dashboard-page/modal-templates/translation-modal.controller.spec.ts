@@ -98,8 +98,8 @@ describe('Translation Modal Controller', function() {
     expect($scope.loadingData).toBe(false);
   });
 
-  it('should get suggested text to translated again from backend when' +
-    ' suggesting translated text', function() {
+  it('should post suggested text to translate from backend when' +
+    ' contributor suggests text to be translated', function() {
     $httpBackend.flush();
     expect($scope.textToTranslate).toBe('Texto a traducir');
     expect($scope.moreAvailable).toBe(true);

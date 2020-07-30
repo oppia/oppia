@@ -125,13 +125,15 @@ describe('Creator dashboard controller', () => {
     });
   }));
 
-  it('should get exploration url when providing an exploration id', function() {
+  it('should go to exploration url when user clicks in the exploration item' +
+    ' in dashboard page', function() {
     var explorationId = '1';
     expect(ctrl.getExplorationUrl(explorationId)).toBe(
       '/create/' + explorationId);
   });
 
-  it('should get collection url when providing an exploration id', function() {
+  it('should go collection url when user clicks in the collection item in' +
+    ' dashboard page', function() {
     var collectionId = '1';
     expect(ctrl.getCollectionUrl(collectionId)).toBe(
       '/collection_editor/create/' + collectionId);
@@ -346,13 +348,15 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.relativeChangeInTotalPlays).toBe(5);
       });
 
-      it('should change active tab name when clicking on tab', function() {
-        expect(ctrl.activeTab).toBe('myExplorations');
-        ctrl.setActiveTab('suggestions');
-        expect(ctrl.activeTab).toBe('suggestions');
-      });
+      it('should change active tab name when creator clicks on tab',
+        function() {
+          expect(ctrl.activeTab).toBe('myExplorations');
+          ctrl.setActiveTab('suggestions');
+          expect(ctrl.activeTab).toBe('suggestions');
+        });
 
-      it('should set explorations to backend when chaning view', function() {
+      it('should set explorations views format to backend when creator' +
+        ' changes format view', function() {
         $httpBackend.expect('POST', '/creatordashboardhandler/data')
           .respond(200);
         ctrl.setMyExplorationsView('a');
@@ -361,24 +365,30 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.myExplorationsView).toBe('a');
       });
 
-      it('should change explorations sorting options by number of open' +
-        ' threads or new open threads when sorting explorations', function() {
+      it('should change order sort of exploration when creator change' +
+        ' exploration order sort to the current one', function() {
         expect(ctrl.isCurrentSortDescending).toBe(true);
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('numOpenThreads');
         expect(ctrl.isCurrentSortDescending).toBe(false);
+      });
 
+      it('should sort exploration by new open threads when creator clicks' +
+        ' on sorting options', function() {
         ctrl.setExplorationsSortingOptions('new_open');
         expect(ctrl.currentSortType).toBe('new_open');
       });
 
-      it('should change subscription sorting options by username or new' +
-        ' subscriber when sorting subscription', function() {
+      it('should change order sort of subscription when creator change' +
+      ' subscription order sort to the current one', function() {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
         expect(ctrl.currentSubscribersSortType).toBe('username');
         ctrl.setSubscriptionSortingOptions('username');
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
+      });
 
+      it('should sort exploration by new subscriber when creator clicks' +
+        ' on sorting options', function() {
         ctrl.setSubscriptionSortingOptions('new_subscriber');
         expect(ctrl.currentSubscribersSortType).toBe('new_subscriber');
       });

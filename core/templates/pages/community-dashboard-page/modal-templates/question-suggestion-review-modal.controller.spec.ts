@@ -147,9 +147,9 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect($scope.skillRubricExplanations).toEqual(['explanation']);
     });
 
-    it('should define validation error as null when question changes',
+    it('should reset validation error when user updates question',
       function() {
-        expect($scope.validationError).toBe(undefined);
+        $scope.validationError = 'This is an error message';
         $scope.questionChanged();
         expect($scope.validationError).toBe(null);
       });

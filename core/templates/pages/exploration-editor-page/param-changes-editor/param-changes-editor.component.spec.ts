@@ -117,12 +117,12 @@ describe('Param Changes Editor Component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate $scope properties after controller initialization',
-    function() {
-      expect($scope.isParamChangesEditorOpen).toBe(false);
-      expect($scope.warningText).toBe('');
-      expect($scope.paramNameChoices).toEqual([]);
-    });
+  it('should initialize correctly $scope properties after controller' +
+    ' initialization', function() {
+    expect($scope.isParamChangesEditorOpen).toBe(false);
+    expect($scope.warningText).toBe('');
+    expect($scope.paramNameChoices).toEqual([]);
+  });
 
   it('should reset customization args from param change when change generator' +
     ' type', function() {
