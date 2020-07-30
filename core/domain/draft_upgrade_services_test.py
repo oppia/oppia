@@ -448,6 +448,63 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_change_list_2_v34_dict_list,
             migrated_draft_change_list_2_v35_dict_list)
 
+    def test_convert_states_v35_dict_to_v36_dict(self):
+        draft_change_list_1_v35 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_customization_args',
+                'new_value': {}
+            })
+        ]
+        draft_change_list_2_v35 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
+            })
+        ]
+        # Migrate exploration to state schema version 36.
+        self.create_and_migrate_new_exploration('35', '36')
+        migrated_draft_change_list_1_v36 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v35, 1, 2, self.EXP_ID))
+        self.assertIsNone(migrated_draft_change_list_1_v36)
+
+        migrated_draft_change_list_2_v36 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_2_v35, 1, 2, self.EXP_ID))
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_2_v35_dict_list = [
+            change.to_dict() for change in draft_change_list_2_v35
+        ]
+        migrated_draft_change_list_2_v36_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_2_v36
+        ]
+        self.assertEqual(
+            draft_change_list_2_v35_dict_list,
+            migrated_draft_change_list_2_v36_dict_list)
+
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'

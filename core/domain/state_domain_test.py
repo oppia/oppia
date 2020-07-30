@@ -33,6 +33,7 @@ from core.domain import interaction_registry
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
+import schema_utils
 import utils
 
 
@@ -2860,6 +2861,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(written_translation, 'needs_update', 20):
                 written_translation.validate()
 
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid data_format'
+            ):
+            with self.swap(written_translation, 'data_format', 'int'):
+                written_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid data_format'
+            ):
+            with self.swap(written_translation, 'data_format', 2):
+                written_translation.validate()
+
     def test_hints_validation(self):
         """Test validation of state hints."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3600,6 +3613,91 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         )
 
 
+class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
+    """Test methods for InteractionCustomizationArg domain object."""
+
+    def test_traverse_by_schema_and_convert(self):
+        html = []
+        def extract_html(value, schema):
+            """Extracts html from SubtitledHtml values.
+
+            Args:
+                value: SubtitledHtml|SubtitledUnicode. The value in the
+                    customization argument value to be converted.
+                schema: dict. The schema for the customization argument.
+
+            Returns:
+                SubtitledHtml|SubtitledUnicode. The converted SubtitledHtml
+                object, if schema_type is 'SubititledHtml', otherwise the
+                unmodified SubtitledUnicode object.
+            """
+            html.append(value.html)
+            return html
+
+        schema = {
+            'type': 'dict',
+            'properties': [{
+                'name': 'content',
+                'schema': schema_utils.generate_subtitled_html_schema({})
+            }]
+        }
+        value = {
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+        }
+
+        state_domain.InteractionCustomizationArg.traverse_by_schema_and_convert(
+            schema, value, extract_html)
+        
+        self.assertEqual(html, ['<p>testing</p>'])
+
+    def test_traverse_by_schema_and_get(self):
+        html = []
+
+        schema = {
+            'type': 'dict',
+            'properties': [{
+                'name': 'content',
+                'schema': schema_utils.generate_subtitled_html_schema({})
+            }]
+        }
+        value = {
+            'content': state_domain.SubtitledHtml('id', '<p>testing</p>')
+        }
+
+        html = (
+            state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
+                schema,
+                value,
+                [schema_utils.is_subtitled_html_schema],
+                lambda x: x.html)
+        )
+        
+        self.assertEqual(html, ['<p>testing</p>'])
+
+
+class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
+    """Test SubtitledUnicode domain object methods."""
+
+    def test_from_and_to_dict(self):
+        subtitled_unicode_dict = {
+            'content_id': 'id',
+            'unicode_str': ''
+        }
+        subtitled_unicode = state_domain.SubtitledUnicode.from_dict(
+            subtitled_unicode_dict)
+        self.assertEqual(subtitled_unicode.to_dict(), subtitled_unicode_dict)
+
+    def test_create_default(self):
+        subtitled_unicode = (
+            state_domain.SubtitledUnicode.create_default_subtitled_unicode(
+                'id')
+        )
+        self.assertEqual(subtitled_unicode.to_dict(), {
+            'content_id': 'id',
+            'unicode_str': ''
+        })
+
+
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
@@ -3708,7 +3806,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             written_translations.get_content_ids_for_text_translation(),
             ['content_id'])
-
+    
     def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
             self):
         written_translations = state_domain.WrittenTranslations.from_dict({

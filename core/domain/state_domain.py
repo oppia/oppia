@@ -1420,7 +1420,7 @@ class WrittenTranslation(python_utils.OBJECT):
         """
         if not isinstance(self.data_format, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid type: %s' % self.data_format)
+                'Invalid data_format: %s' % self.data_format)
 
         if not (self.data_format == self.DATA_FORMAT_UNICODE or
                 self.data_format == self.DATA_FORMAT_HTML):
