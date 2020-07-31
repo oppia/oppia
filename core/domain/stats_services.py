@@ -783,9 +783,11 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         - 'options': dict. The visualization options.
 
         An example of the returned value may be:
-        [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
-        'id': 'BarChart',
-        'data': [{u'frequency': 1, u'answer': 0}]}]
+        [{
+            'options': {'header': 'Pretty Tiles!', 'use_percentages': True},
+            'id': 'SortedTiles',
+            'data': [{'frequency': 1, 'answer': 0}]
+        }]
     """
     if interaction_id is None:
         return []

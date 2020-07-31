@@ -52,7 +52,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
-    exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
+    exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
     exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
     exp_jobs_one_off.ExplorationMathRichTextInfoModelGenerationOneOffJob,
     exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
