@@ -101,8 +101,13 @@ describe('Information Card Modal Controller', function() {
 
   it('should get title wrapper css', function() {
     spyOn(document, 'querySelectorAll')
-      // @ts-ignore document querySelectorAll returns more than clientWidth
-      // property according with lint settings.
+      // This throws "Type '{ clientWidth: number; }' is missing the following
+      // properties from type 'Element': assignedSlot, attributes, classList,
+      // className, and 122 more.". This is because typescript
+      // expects around 120 more properties than just one
+      // (clientWidth). We need only one 'clientWidth' for
+      // testing purposes.
+      // @ts-expect-error
       .withArgs('.oppia-info-card-logo-thumbnail').and.returnValue([{
         clientWidth: 200
       }]);

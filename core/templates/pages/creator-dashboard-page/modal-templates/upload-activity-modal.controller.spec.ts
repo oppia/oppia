@@ -53,9 +53,14 @@ describe('Upload Activity Modal Controller', function() {
       size: 100,
       name: 'file.mp3'
     };
-    // The document has strict type rules which will fail typescript lint tests
-    // without the @ts-ignore.
-    // @ts-ignore
+    // TODO(#10113): Refactor the code to not use the DOM methods.
+    // This throws "Argument of type '() => { files: { size: number;
+    // name: string; }[]; }' is not assignable to parameter of type
+    // '(elementId: string) => HTMLElement'.". This is because the
+    // actual 'getElementById' returns more properties than just "files".
+    // We need to suppress this error because we need only "files"
+    // property for testing.
+    // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(function() {
       return {
         files: [file]
@@ -72,9 +77,14 @@ describe('Upload Activity Modal Controller', function() {
   it('should not save activity if file is empty', function() {
     var documentCopy = angular.copy(document);
     spyOn(AlertsService, 'addWarning').and.callThrough();
-    // The document has strict type rules which will fail typescript lint tests
-    // without the @ts-ignore.
-    // @ts-ignore
+    // TODO(#10113): Refactor the code to not use the DOM methods.
+    // This throws "Argument of type '() => { files: { size: number;
+    // name: string; }[]; }' is not assignable to parameter of type
+    // '(elementId: string) => HTMLElement'.". This is because the
+    // actual 'getElementById' returns more properties than just "files".
+    // We need to suppress this error because we need only "files"
+    // property for testing.
+    // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(function() {
       return {
         files: []

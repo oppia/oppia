@@ -247,7 +247,6 @@ angular.module('oppia').directive('questionsList', [
               ctrl.getGroupedSkillSummaries().current.length;
             var allSkillSummaries = sortedSkillSummaries.map(
               function(summary) {
-                summary.isSelected = false;
                 return summary;
               });
             $uibModal.open({
@@ -391,7 +390,6 @@ angular.module('oppia').directive('questionsList', [
             } else {
               var allSkillSummaries = ctrl.getAllSkillSummaries().filter(
                 function(summary) {
-                  summary.isSelected = false;
                   return skillDescription === summary.getDescription();
                 });
               for (var idx in allSkillSummaries) {
@@ -463,7 +461,7 @@ angular.module('oppia').directive('questionsList', [
             var associatedSkillSummaries = ctrl.associatedSkillSummaries;
             var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
             var categorizedSkills = ctrl.getSkillsCategorizedByTopics;
-            var untriagedSkillSummaries = ctrl.untriagedSkillSummaries;
+            var untriagedSkillSummaries = ctrl.getUntriagedSkillSummaries;
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();

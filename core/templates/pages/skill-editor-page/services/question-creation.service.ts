@@ -130,7 +130,6 @@ angular.module('oppia').factory('QuestionCreationService', [
           groupedSkillSummaries.current.length;
       var allSkillSummaries = sortedSkillSummaries.map(
         function(summary) {
-          summary.isSelected = false;
           return summary;
         });
       $uibModal.open({
@@ -234,6 +233,7 @@ angular.module('oppia').factory('QuestionCreationService', [
         keyboard: false,
         resolve: {
           associatedSkillSummaries: () => [],
+          untriagedSkillSummaries: () => [],
           canEditQuestion: () => canEditQuestion,
           categorizedSkills: () => [],
           groupedSkillSummaries: () => groupedSkillSummaries,

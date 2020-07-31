@@ -121,9 +121,11 @@ describe('Playthrough Issue Object Factory', () => {
     };
 
     expect(() => {
-      // TS ignore is used because playthrough dict is assigned a invalid type
-      // to test errors.
-      // @ts-ignore
+      // This throws "Type 'string' is not assignable to type
+      // '"CyclicStateTransitions"'." This is because 'playthroughDict' has an
+      // invalid value of 'issue_type' property. We need to do that in order
+      // to test validations.
+      // @ts-expect-error
       piof.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known issue type: ' +

@@ -99,13 +99,11 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       var summary = allSkillSummaries[0];
       $scope.selectOrDeselectSkill(summary);
 
-      // @ts-ignore isSelected is not a property from SkillSummaryObjectFactory.
-      expect(summary.isSelected).toBe(true);
+      expect($scope.isSkillSelected(summary.id)).toBe(true);
       expect($scope.linkedSkillsWithDifficulty.length).toBe(1);
 
       $scope.selectOrDeselectSkill(summary);
-      // @ts-ignore isSelected is not a property from SkillSummaryObjectFactory.
-      expect(summary.isSelected).toBe(false);
+      expect($scope.isSkillSelected(summary.id)).toBe(false);
       expect($scope.linkedSkillsWithDifficulty.length).toBe(0);
     });
 

@@ -22,14 +22,14 @@
         <a class="list-group-item protractor-test-skill-item"
            ng-repeat="skillSummary in skillSummariesInitial | filter:skillFilterText"
            ng-click="selectOrDeselectSkill(skillSummary)"
-           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+           ng-class="{'list-group-item-success': (isSkillSelected(skillSummary.id))}">
           <label class="list-group-item-heading"><[skillSummary.description]></label>
         </a>
         <hr ng-if="skillSummariesInitial.length > 0">
         <a class="list-group-item protractor-test-skill-item"
            ng-repeat="skillSummary in skillSummariesFinal | filter:skillFilterText"
            ng-click="selectOrDeselectSkill(skillSummary)"
-           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+           ng-class="{'list-group-item-success': (isSkillSelected(skillSummary.id))}">
           <label class="list-group-item-heading"><[skillSummary.description]></label>
         </a>
       </div>

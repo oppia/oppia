@@ -28,9 +28,10 @@ import { AppConstants } from 'app.constants';
 })
 export class MathInteractionsService {
   private warningText = '';
-  // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+  // TODO(#7434): Use dot notation after we find a way to get
   // rid of the TS2339 error on AppConstants.
-  private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
+  // eslint-disable-next-line dot-notation
+  private mathFunctionNames = AppConstants['MATH_FUNCTION_NAMES'];
 
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
@@ -193,9 +194,10 @@ export class MathInteractionsService {
     let variables = nerdamer(expressionString).variables();
     for (let variable of variables) {
       // We wouldn't want to interpolate '*' signs between valid greek letters.
-      // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
+      // TODO(#7434): Use dot notation after we find a way to get
       // rid of the TS2339 error on AppConstants.
-      if (AppConstants.GREEK_LETTERS.indexOf(variable) === -1) {
+      // eslint-disable-next-line dot-notation
+      if (AppConstants['GREEK_LETTERS'].indexOf(variable) === -1) {
         let separatedVariables = variable.split('').join('*');
         expressionString = expressionString.replace(
           variable, separatedVariables);

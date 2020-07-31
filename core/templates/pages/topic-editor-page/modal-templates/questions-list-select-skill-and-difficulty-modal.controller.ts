@@ -51,6 +51,7 @@ angular.module('oppia').controller(
       $scope.skillSummaries = allSkillSummaries;
       $scope.skillSummariesInitial = [];
       $scope.skillSummariesFinal = [];
+      let selectedSkills = [];
 
       for (var idx in allSkillSummaries) {
         if (idx < countOfSkillsToPrioritize) {
@@ -63,20 +64,25 @@ angular.module('oppia').controller(
       }
       $scope.skillIdToRubricsObject = skillIdToRubricsObject;
 
+      $scope.isSkillSelected = function(skillId) {
+        return selectedSkills.includes(skillId);
+      };
+
       $scope.selectOrDeselectSkill = function(summary) {
-        if (!summary.isSelected) {
+        if (!$scope.isSkillSelected(summary.id)) {
           $scope.linkedSkillsWithDifficulty.push(
             SkillDifficultyObjectFactory.create(
               summary.id, summary.description,
               DEFAULT_SKILL_DIFFICULTY));
-          summary.isSelected = true;
+          selectedSkills.push(summary.id);
         } else {
           var idIndex = $scope.linkedSkillsWithDifficulty.map(
             function(linkedSkillWithDifficulty) {
               return linkedSkillWithDifficulty.getId();
             }).indexOf(summary.id);
           $scope.linkedSkillsWithDifficulty.splice(idIndex, 1);
-          summary.isSelected = false;
+          var index = selectedSkills.indexOf(summary.id);
+          selectedSkills.splice(index, 1);
         }
       };
 

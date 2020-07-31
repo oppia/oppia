@@ -86,8 +86,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for programming language', () => {
-    // TS ignore is used here to test warnings.
-    // @ts-ignore
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -98,8 +100,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for placeholder text', () => {
-    // TS ignore is used here to test warnings.
-    // @ts-ignore
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -110,8 +114,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for preCode text', () => {
-    // TS ignore is used here to test warnings.
-    // @ts-ignore
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);
@@ -122,8 +128,10 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for postCode text', () => {
-    // TS ignore is used here to test warnings.
-    // @ts-ignore
+    // This throws "Type '1' is not assignable to type 'string'."
+    // Here we are assigning the wrong type of value to
+    // "customizationArguments" in order to test validations.
+    // @ts-expect-error
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, [], null);

@@ -157,8 +157,13 @@ describe('Speech Synthesis Chunker Service', () => {
 
     beforeEach(() => {
       spyOn(window, 'SpeechSynthesisUtterance').and.returnValue(
-        // @ts-ignore mock doesn't have all property and methods of a native
-        // SpeechSynthesisUtterance.
+        // This throws "Argument of type '{ speak: () => void; onend:
+        // () => void; }' is not assignable to parameter of type
+        // 'SpeechSynthesisUtterance'.". This is because
+        // 'SpeechSynthesisUtterance' has around 10 more properties.
+        // We have only defined the properties we need
+        // in 'mockSpeechSynthesisUtteran'.
+        // @ts-expect-error
         mockSpeechSynthesisUtteran);
     });
 

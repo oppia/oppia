@@ -140,8 +140,11 @@ describe('SvgFilenameEditor', function() {
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
     });
-    // @ts-ignore inorder to ignore other Image object properties that
-    // should be declared.
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockImageObject'.
+    // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
@@ -392,8 +395,11 @@ describe('SvgFilenameEditor', function() {
     var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
     /* eslint-enable quotes */
 
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
+    // This throws "Argument of type '() => Promise<any, any, any>' is not
+    // assignable to parameter of type '{ (url: string, ...):
+    // jqXHR<any>; ...}'.". We need to suppress this error because we need
+    // to mock $.ajax to this function purposes.
+    // @ts-expect-error
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.resolve(responseText);
@@ -417,8 +423,11 @@ describe('SvgFilenameEditor', function() {
   it('should handle rejection when saving an svg file fails', function() {
     svgFilenameCtrl.createRect();
     var errorMessage = 'Error on saving svg file';
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
+    // This throws "Argument of type '() => Promise<any, any, any>' is not
+    // assignable to parameter of type '{ (url: string, ...):
+    // jqXHR<any>; ...}'.". We need to suppress this error because we need
+    // to mock $.ajax to this function purposes.
+    // @ts-expect-error
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.reject({
@@ -585,11 +594,17 @@ describe('SvgFilenameEditor with image save destination as ' +
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
 
-    // @ts-ignore inorder to ignore other Image object properties that
-    // should be declared.
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockImageObject'.
+    // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
-    // @ts-ignore inorder to ignore other FileReader object properties that
-    // should be declared.
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". This is because
+    // 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
