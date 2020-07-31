@@ -285,6 +285,7 @@ import { ItemSelectionInputRulesService } from
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -551,6 +552,8 @@ import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
+import { StoryEditorNavigationService } from
+  'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -770,6 +773,7 @@ export class UpgradedServices {
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['JobStatusSummaryObjectFactory'] =
       new JobStatusSummaryObjectFactory();
+    upgradedServices['KeyboardShortcutService'] = new KeyboardShortcutService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -1188,6 +1192,8 @@ export class UpgradedServices {
     upgradedServices['StateWrittenTranslationsService'] =
       new StateWrittenTranslationsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StoryEditorNavigationService'] =
+        new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
       new SubtopicPageContentsObjectFactory(
         upgradedServices['RecordedVoiceoversObjectFactory'],

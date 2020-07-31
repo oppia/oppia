@@ -477,7 +477,8 @@ class TestBase(unittest.TestCase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -561,7 +562,8 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_UNTITLED_YAML_CONTENT = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: %s
@@ -712,8 +714,8 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(response.status_int, expected_status_int)
         if not expect_errors:
-            self.assertTrue(response.status_int >= 200 and
-                            response.status_int < 400)
+            self.assertTrue(
+                response.status_int >= 200 and response.status_int < 400)
         else:
             self.assertTrue(response.status_int >= 400)
         self.assertEqual(
@@ -832,8 +834,9 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_json(self, url, payload, csrf_token=None,
-                  expected_status_int=200, upload_files=None):
+    def post_json(
+            self, url, payload, csrf_token=None,
+            expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -1262,6 +1265,66 @@ tags: []
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,
             title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def save_new_exp_with_states_schema_v34(self, exp_id, user_id, states_dict):
+        """Saves a new default exploration with a default version 34 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=34,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
             category='category',
             objective='Old objective',
             language_code='en',
@@ -2314,7 +2377,8 @@ class LinterTestBase(GenericTestBase):
                 method's execution.
         """
         self.assertTrue(
-            any(all(phrase in output for phrase in phrases) for
+            any(
+                all(phrase in output for phrase in phrases) for
                 output in stdout))
 
     def assert_failed_messages_count(self, stdout, expected_failed_count):
