@@ -810,7 +810,7 @@ class InteractionInstance(python_utils.OBJECT):
         # Convert the customization_args to a dictionary of customization arg
         # name to InteractionCustomizationArg, so that we can utilize
         # InteractionCustomizationArg helper functions.
-        # Then, covert back to original dict format afterwards, at the end.
+        # Then, convert back to original dict format afterwards, at the end.
         customization_args = (
             InteractionInstance
             .convert_customization_args_dict_to_customization_args(
@@ -1104,6 +1104,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 not schema_utils.is_subtitled_html_schema(schema) and
                 not schema_utils.is_subtitled_unicode_schema(schema)
         ):
+            # Because a SubtitledHtml and SubtitledUnicode schema is encoded
+            # as a 'type: dict' schema, we exclude them here.
             result = list(itertools.chain.from_iterable([
                 InteractionCustomizationArg.traverse_by_schema_and_get(
                     property_spec['schema'],
@@ -1523,7 +1525,8 @@ class WrittenTranslations(python_utils.OBJECT):
             language_code: str. The language code of the translated html.
             html: str. The translated html.
         """
-        written_translation = WrittenTranslation('html', html, False)
+        written_translation = WrittenTranslation(
+            WrittenTranslation.DATA_FORMAT_HTML, html, False)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 
@@ -2070,15 +2073,19 @@ class SubtitledHtml(python_utils.OBJECT):
 
     def __init__(self, content_id, html):
         """Initializes a SubtitledHtml domain object. Note that initializing
-        the SubtitledHtml object does not clean the html. Before saving the
-        SubtitledHtml object, validate should be called for validation and
+        the SubtitledHtml object does not clean the html. This is because we
+        sometimes need to initalize SubtitledHtml and migrate the contained
+        html from an old schema, but the cleaner would remove invalid tags
+        and attributes before having a chance to migrate it. Before saving the
+        SubtitledHtml object, validate() should be called for validation and
         cleaning of the html.
 
         Args:
             content_id: str. A unique id referring to the other assets for this
                 content.
-            html: str. A piece of user-submitted HTML. This is cleaned in such
-                a way as to contain a restricted set of HTML tags.
+            html: str. A piece of user-submitted HTML. Note that this is NOT
+                cleaned in such a way as to contain a restricted set of HTML
+                tags until the validate() method is called.
         """
         self.content_id = content_id
         self.html = html
@@ -2324,6 +2331,25 @@ class State(python_utils.OBJECT):
                     self.interaction.customization_args[ca_name]
                     .get_content_ids()
                 )
+
+        if len(set(content_id_list)) != len(content_id_list):
+            raise utils.ValidationError(
+                'Expected all content_ids to be unique, '
+                'recieved %s' % content_id_list)
+
+        for content_id in content_id_list:
+            content_id_suffix = content_id.split('_')[-1]
+
+            # Possible values of content_id_suffix are a digit, or from
+            # a 'outcome' (from 'default_outcome'). If the content_id_suffix
+            # is not a digit, we disregard it here.
+            if (
+                content_id_suffix.isdigit() and
+                int(content_id_suffix) > self.next_content_id_index
+            ):
+                raise utils.ValidationError(
+                    'Expected all content id indexes to be less than next '
+                    'content id index, but received content id %s' % content_id)
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
@@ -2983,7 +3009,7 @@ class State(python_utils.OBJECT):
             # SubtitledHtml and SubtitledUnicode.
             ca_specs = (
                 interaction_registry.Registry
-                .get_all_specs_for_state_schema_version(34)[
+                .get_all_specs_for_state_schema_version(35)[
                     interaction_id]['customization_arg_specs']
             )
 

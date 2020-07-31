@@ -18,8 +18,26 @@
   <table style="width: 100%;">
     <tr ng-repeat="item in localValue track by $index">
       <td>
-        <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
+        <!-- If the schema is a SubtitledHtml or SubtitledUnicode schema, we
+          want to pass the nested html/unicode schema instead of the dict schema
+          that encodes content id and html/unicode. -->
+        <schema-based-editor ng-if="!isSubtitledHtmlSchema(itemSchema()) && !isSubtitledUnicodeSchema(itemSchema())"
+                             schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              label-for-focus-target="getFocusLabel($index)"
+                             on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
+                             on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
+        </schema-based-editor>
+        <schema-based-editor ng-if="isSubtitledHtmlSchema(itemSchema())"
+                             schema="itemSchema().properties[0].schema"
+                             local-value="localValue[$index]._html"
+                             is-disabled="isDisabled()" label-for-focus-target="getFocusLabel($index)"
+                             on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
+                             on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
+        </schema-based-editor>
+        <schema-based-editor ng-if="isSubtitledUnicodeSchema(itemSchema())"
+                             schema="itemSchema().properties[0].schema"
+                             local-value="localValue[$index]._unicode"
+                             is-disabled="isDisabled()" label-for-focus-target="getFocusLabel($index)"
                              on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
                              on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>

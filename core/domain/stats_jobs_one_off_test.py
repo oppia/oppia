@@ -1779,17 +1779,28 @@ class StatisticsCustomizationArgsAuditTests(OneOffJobTestBase):
         self.assertItemsEqual(
             self.run_one_off_job(),
             [
-                'EXPECTED: 1 Playthrough Issue objects have the correct ' +
-                'customization argument key(s)',
-                'UNEXPECTED: 1 Playthrough Issue objects have missing or ' +
-                'extra customization argument key(s)',
-                'EXPECTED: 1 ExplorationIssue objects have the correct ' +
-                'customization argument key(s)',
-                'UNEXPECTED: 1 ExplorationIssue objects have missing or ' +
-                'extra customization argument key(s)',
-                'EXPECTED: 1 Playthrough Action objects have the correct ' +
-                'customization argument key(s)',
-                'UNEXPECTED: 1 Playthrough Action objects have missing or ' +
-                'extra customization argument key(s)'
+                (
+                    'EXPECTED: 1 Playthrough Issue objects have the correct '
+                    'customization argument key(s)'),
+                (
+                    '[u\'UNEXPECTED: 1 Playthrough Issue objects have missing'
+                    ' or extra customization argument key(s)\', [u"(False, \''
+                    'EXP_ID\', \'EarlyQuit\')"]]'),
+                (
+                    'EXPECTED: 1 ExplorationIssue objects have the correct '
+                    'customization argument key(s)'),
+                (
+                    '[u\'UNEXPECTED: 1 ExplorationIssue objects have missing or'
+                    ' extra customization argument key(s)\', [u"(False, \'EXP_I'
+                    'D\', \'MultipleIncorrectSubmissions\')"]]'),
+                (
+                    'EXPECTED: 1 Playthrough Action objects have the correct '
+                    'customization argument key(s)'),
+                (
+                    '[u\'UNEXPECTED: 1 Playthrough Action objects have missing '
+                    'or extra customization argument key(s)\', [u"(False, \'EXP'
+                    '_ID\', \'ExplorationStart\')"]]'
+                )
+              
             ]
         )

@@ -75,7 +75,7 @@ angular.module('oppia').factory('QuestionUpdateService', [
           state.interaction.solution.explanation.getContentId());
       }
       const custArgs = state.interaction.customizationArgs;
-      Interaction.getCutomizationArgContentIds(custArgs)
+      Interaction.getCustomizationArgContentIds(custArgs)
         .forEach(allContentIdsSet.add, allContentIdsSet);
       return allContentIdsSet;
     };

@@ -4,9 +4,23 @@
       <label for="<[fieldIds[property.name]]>"><[getHumanReadablePropertyDescription(property)]></label>
       <!-- TODO(sll): This is in the wrong place. It should be on the input field. -->
       <div id="<[fieldIds[property.name]]>">
-        <schema-based-editor schema="property.schema" is-disabled="isDisabled()"
+        <!-- If the schema is a SubtitledHtml or SubtitledUnicode schema, we
+          want to pass the nested html/unicode schema instead of the dict schema
+          that encodes content id and html/unicode. -->
+        <schema-based-editor ng-if="!isSubtitledHtmlSchema(property.schema) && !isSubtitledUnicodeSchema(property.schema)"
+                             schema="property.schema" is-disabled="isDisabled()"
                              local-value="localValue[property.name]"
                              label-for-focus-target="$index === 0 ? labelForFocusTarget() : ''">
+        </schema-based-editor>
+        <schema-based-editor ng-if="isSubtitledHtmlSchema(property.schema)"
+                             schema="property.schema.properties[0].schema"
+                             local-value="localValue[property.name]._html"
+                             is-disabled="isDisabled()" label-for-focus-target="$index === 0 ? labelForFocusTarget() : ''">
+        </schema-based-editor>
+        <schema-based-editor ng-if="isSubtitledUnicodeSchema(property.schema)"
+                             schema="property.schema.properties[0].schema"
+                             local-value="localValue[property.name]._unicode"
+                             is-disabled="isDisabled()" label-for-focus-target="$index === 0 ? labelForFocusTarget() : ''">
         </schema-based-editor>
       </div>
     </div>

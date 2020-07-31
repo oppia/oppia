@@ -31,7 +31,21 @@
   <form ng-if="StateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="interaction-editor-form protractor-test-interaction-editor">
     <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
       <div ng-if="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
-      <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
+      <!-- If the schema is a SubtitledHtml or SubtitledUnicode schema, we
+        want to pass the nested html/unicode schema instead of the dict schema
+        that encodes content id and html/unicode. -->
+      <schema-based-editor ng-if="!isSubtitledHtmlSchema(customizationArgSpec.schema) && !isSubtitledUnicodeSchema(customizationArgSpec.schema)"
+                           ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}"
+                           local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value"
+                           schema="customizationArgSpec.schema">
+      </schema-based-editor>
+      <schema-based-editor ng-if="isSubtitledHtmlSchema(customizationArgSpec.schema)"
+                           local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value._html"
+                           schema="customizationArgSpec.schema.properties[0].schema">
+      </schema-based-editor>
+      <schema-based-editor ng-if="isSubtitledUnicodeSchema(customizationArgSpec.schema)"
+                           local-value="StateCustomizationArgsService.displayed[customizationArgSpec.name].value._unicode"
+                           schema="customizationArgSpec.schema.properties[0].schema">
       </schema-based-editor>
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
       <div style="margin-bottom: 15px;"></div>

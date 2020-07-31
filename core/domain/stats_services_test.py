@@ -1192,6 +1192,12 @@ class AnswerEventTests(test_utils.GenericTestBase):
                     'rows': {'value': 1}
                 }
             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 1
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': second_state_name,
             }), exp_domain.ExplorationChange({
@@ -1218,6 +1224,12 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 }
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 1
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': third_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'Continue',
@@ -1234,6 +1246,12 @@ class AnswerEventTests(test_utils.GenericTestBase):
                         }
                     },
                 }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': third_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 2
             })], 'Add new state')
         exp = exp_fetchers.get_exploration_by_id('eid')
 

@@ -47,12 +47,6 @@ require(
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-subtitled-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-subtitled-unicode-editor.directive.ts');
 require('components/forms/validators/is-at-least.filter.ts');
 require('components/forms/validators/is-at-most.filter.ts');
 require('components/forms/validators/is-float.filter.ts');
@@ -74,16 +68,6 @@ angular.module('oppia').directive('schemaBasedEditor', [
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope',
-        function($scope) {
-          const ctrl = this;
-
-          ctrl.$onInit = () => {
-            $scope.isSubtitledHtmlSchema = (
-              SchemaConstants.isSubtitledHtmlSchema(ctrl.schema()));
-            $scope.isSubtitledUnicodeSchema = (
-              SchemaConstants.isSubtitledUnicodeSchema(ctrl.schema()));
-          };
-        }]
+      controller: [function() {}]
     };
   }]);

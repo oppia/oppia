@@ -113,7 +113,6 @@ export class AppConstants {
 
   // Do not modify these, for backwards-compatibility reasons.
   public static COMPONENT_NAME_CONTENT = 'content';
-  public static COMPONENT_NAME_CUSTOMIZATION_ARG = 'ca';
   public static COMPONENT_NAME_HINT = 'hint';
   public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
@@ -122,6 +121,13 @@ export class AppConstants {
     QUESTION: 'worked_example_question',
     EXPLANATION: 'worked_example_explanation'
   };
+
+  // Do not modify these without a state migration of all existing content ids.
+  // Content id prefixes should indicate what type of content they are
+  // associated with.
+  public static CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS = 'ca';
+  public static CONTENT_ID_PREFIX_HINT = 'hint';
+  public static CONTENT_ID_PREFIX_FEEDBACK = 'feedback';
 
   public static ACTION_TYPE_EXPLORATION_START: 'ExplorationStart' =
     'ExplorationStart';

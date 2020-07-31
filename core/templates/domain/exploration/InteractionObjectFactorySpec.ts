@@ -680,13 +680,14 @@ describe('Interaction object factory', () => {
     }));
   });
 
-  it('should correctly convert it to backend dict', () => {
+  it('should correctly convert an Interaction to backend dict', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
     expect(testInteraction.toBackendDict()).toEqual(interactionDict);
   });
 
-  it('should correctly convert it to backend dict with MultipleChoice', () => {
+  it('should correctly convert an Interaction with MultipleChoice to a ' +
+     'backend dict', () => {
     let mcInteractionDict = {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
@@ -714,7 +715,7 @@ describe('Interaction object factory', () => {
     expect(testInteraction.toBackendDict()).toEqual(mcInteractionDict);
   });
 
-  it('should create a convert customization arguments ' +
+  it('should create customization arguments from backend dict and convert ' +
      'to backend dict for complex nested customization arguments', () => {
     const ca = {
       testCA: {
@@ -767,7 +768,7 @@ describe('Interaction object factory', () => {
       }
     };
 
-    expect(Interaction.getCutomizationArgContentIds(ca)).toEqual(
+    expect(Interaction.getCustomizationArgContentIds(ca)).toEqual(
       ['ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1']);
   });
 });

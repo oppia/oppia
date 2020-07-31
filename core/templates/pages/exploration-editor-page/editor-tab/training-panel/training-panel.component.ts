@@ -45,14 +45,14 @@ angular.module('oppia').component('trainingPanel', {
     'TrainingDataService', 'ResponsesService', 'StateInteractionIdService',
     'StateCustomizationArgsService',
     'OutcomeObjectFactory', 'GenerateContentIdService',
-    'COMPONENT_NAME_FEEDBACK',
+    'CONTENT_ID_PREFIX_FEEDBACK',
     function(
         $scope, ExplorationHtmlFormatterService,
         StateEditorService, ExplorationStatesService,
         TrainingDataService, ResponsesService, StateInteractionIdService,
         StateCustomizationArgsService,
         OutcomeObjectFactory, GenerateContentIdService,
-        COMPONENT_NAME_FEEDBACK) {
+        CONTENT_ID_PREFIX_FEEDBACK) {
       var ctrl = this;
       var _updateAnswerTemplate = function() {
         $scope.answerTemplate = (
@@ -67,7 +67,7 @@ angular.module('oppia').component('trainingPanel', {
 
       $scope.beginAddingNewResponse = function() {
         var contentId = GenerateContentIdService.getNextStateId(
-          COMPONENT_NAME_FEEDBACK);
+          CONTENT_ID_PREFIX_FEEDBACK);
         ctrl.classification.newOutcome = OutcomeObjectFactory.createNew(
           StateEditorService.getActiveStateName(), contentId, '', []);
         ctrl.addingNewResponse = true;

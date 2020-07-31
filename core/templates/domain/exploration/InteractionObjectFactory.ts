@@ -172,7 +172,7 @@ export class Interaction {
     return customizationArgsBackendDict;
   }
 
-  static getCutomizationArgContentIds(
+  static getCustomizationArgContentIds(
       customizationArgs: InteractionCustomizationArgs
   ): string[] {
     const contentIds = [];

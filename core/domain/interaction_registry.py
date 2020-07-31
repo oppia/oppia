@@ -122,7 +122,7 @@ class Registry(python_utils.OBJECT):
         Returns:
             dict. The interaction specs for the given state schema
             version, in the form of a mapping of interaction id to the
-            interaction specs- see interaction_specs.json for an example.
+            interaction specs. See interaction_specs.json for an example.
 
         Raises:
             Exception: No interaction specs json file found for the given state

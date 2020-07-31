@@ -1407,18 +1407,26 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
                     playthrough_issue_registry.Registry.get_issue_by_type(
                         issue['issue_type']).customization_arg_specs)
                 all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
-
                 yield (
                     'ExplorationIssue',
-                    all_ca_names == set(issue['issue_customization_args']))
+                    (
+                        all_ca_names == set(issue['issue_customization_args']),
+                        item.exp_id.encode('utf-8'),
+                        issue['issue_type'].encode('utf-8')
+                    )
+                )
         elif isinstance(item, stats_models.PlaythroughModel):
             ca_specs = playthrough_issue_registry.Registry.get_issue_by_type(
                 item.issue_type).customization_arg_specs
             all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
-
             yield (
                 'Playthrough Issue',
-                all_ca_names == set(item.issue_customization_args))
+                (
+                    all_ca_names == set(item.issue_customization_args),
+                    item.exp_id.encode('utf-8'),
+                    item.issue_type.encode('utf-8')
+                )
+            )
 
             for action in item.actions:
                 ca_specs = (
@@ -1427,24 +1435,31 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
                 all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
                 yield (
                     'Playthrough Action',
-                    all_ca_names == set(action['action_customization_args']))
+                    (
+                        all_ca_names == set(
+                            action['action_customization_args']),
+                        item.exp_id.encode('utf-8'),
+                        action['action_type'].encode('utf-8')
+                    )
+                )
 
     @staticmethod
     def reduce(key, values):
-        expected = sum([value == 'True' for value in values])
-        unexpected = len(values) - expected
+        expected = [value for value in values if value[1:5] == 'True']
+        unexpected = [value for value in values if value[1:6] == 'False']
 
         yield (
             '%s: %i %s objects have %s' % (
                 StatisticsCustomizationArgsAudit.JOB_RESULT_EXPECTED,
-                expected,
+                len(expected),
                 key,
                 StatisticsCustomizationArgsAudit.STATUS_MATCH_KEYS)
         )
         yield (
             '%s: %i %s objects have %s' % (
                 StatisticsCustomizationArgsAudit.JOB_RESULT_UNEXPECTED,
-                unexpected,
+                len(unexpected),
                 key,
-                StatisticsCustomizationArgsAudit.STATUS_MISMATCH_KEYS)
+                StatisticsCustomizationArgsAudit.STATUS_MISMATCH_KEYS),
+            unexpected
         )

@@ -1560,3 +1560,302 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(sorted(
             state_data.written_translations.translations_mapping.keys()), [
                 'content_1', 'feedback_1', 'feedback_3'])
+
+    def test_migrate_question_state_from_v35_to_latest(self):
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {
+                        'en': {
+                            'html': '<p>test</p>',
+                            'needs_update': True
+                        }
+                    }
+                }
+            },
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': None
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state_dict,
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=35))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        migrated_translations_mapping = (
+            question
+            .question_state_data.written_translations.to_dict())
+        self.assertEqual(
+            migrated_translations_mapping,
+            {
+                'translations_mapping': {
+                    'explanation': {
+                        'en': {
+                            'data_format': 'html',
+                            'translation': '<p>test</p>',
+                            'needs_update': True
+                        }
+                    }
+                }
+            })
+
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'initial_code': {
+                        'value': 'code'
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'PencilCodeEditor'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state_dict,
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=35))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migrated_ca = question.question_state_data.to_dict()['interaction'][
+            'customization_args']
+        self.assertEqual(
+            migrated_ca,
+            {
+                'initialCode': {
+                    'value': 'code'
+                }
+            })
+
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'MultipleChoiceInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state_dict,
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=35))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migrated_ca = question.question_state_data.to_dict()['interaction'][
+            'customization_args']
+        self.assertEqual(
+            migrated_ca,
+            {
+                'choices': {
+                    'value': [{'content_id': 'ca_choices_0', 'html': ''}]
+                },
+                'showChoicesInShuffledOrder': {'value': True}
+            })
+
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'interaction': {
+                'answer_groups': [],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'choices': {
+                        'value': ['one', 'two', 'three']
+                    }
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'MultipleChoiceInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+
+        question_model = (
+            question_models.QuestionModel(
+                id='question_id',
+                question_state_data=question_state_dict,
+                language_code='en',
+                version=0,
+                linked_skill_ids=['skill_id'],
+                question_state_data_schema_version=35))
+        commit_cmd = (
+            question_domain.QuestionChange({
+                'cmd': question_domain.CMD_CREATE_NEW
+            }))
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migrated_ca = question.question_state_data.to_dict()['interaction'][
+            'customization_args']
+        self.assertEqual(
+            migrated_ca,
+            {
+                'choices': {
+                    'value': [{
+                        'content_id': 'ca_choices_0',
+                        'html': 'one'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': 'two'
+                    }, {
+                        'content_id': 'ca_choices_2',
+                        'html': 'three'
+                    }]
+                },
+                'showChoicesInShuffledOrder': {'value': True}
+            })

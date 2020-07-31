@@ -151,6 +151,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                     not schema_utils.is_subtitled_unicode_schema(schema) and
                     not schema_utils.is_subtitled_html_schema(schema)
             ):
+                # Because a SubtitledHtml and SubtitledUnicode schema is encoded
+                # as a 'type: dict' schema, we exclude them here.
                 for schema_property in schema['properties']:
                     ca_names_in_schema.append(schema_property['name'])
                     traverse_schema_to_find_names(schema_property['schema'])

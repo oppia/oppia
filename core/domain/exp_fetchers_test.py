@@ -576,7 +576,7 @@ title: Old Title
                 },
                 'id': 'MathExpressionInput'
             },
-            'next_content_id_index': 0,
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -691,7 +691,7 @@ title: Old Title
                 },
                 'id': 'MathExpressionInput'
             },
-            'next_content_id_index': 0,
+            'next_content_id_index': 4,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None

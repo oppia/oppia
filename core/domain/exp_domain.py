@@ -2736,7 +2736,7 @@ class Exploration(python_utils.OBJECT):
                     ca_spec_dict['default_value']
                 ) for ca_spec_dict in (
                     interaction_registry.Registry
-                    .get_all_specs_for_state_schema_version(35)[
+                    .get_all_specs_for_state_schema_version(36)[
                         interaction_id]['customization_arg_specs']
                 )
             ]
@@ -3921,7 +3921,7 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def convert_v40_dict_to_v41_dict(cls, exploration_dict):
+    def _convert_v40_dict_to_v41_dict(cls, exploration_dict):
         """Converts a v40 exploration dict into a v41 exploration dict.
         Adds translation support to customization args.
 

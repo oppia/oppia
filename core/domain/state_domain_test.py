@@ -313,6 +313,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
         solution = state_domain.Solution.from_dict(
@@ -439,6 +440,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rows': {'value': 1}
         }
 
+        state.update_next_content_id_index(3)
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('TextInput')
@@ -565,6 +567,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_answer_groups(state_answer_groups)
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
         solution = state_domain.Solution.from_dict(
@@ -842,6 +845,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('DragAndDropSortInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
+        state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
@@ -2923,6 +2927,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         del hints_list[1]
         init_state.update_interaction_hints(hints_list)
+        init_state.update_next_content_id_index(4)
 
         self.assertEqual(len(init_state.interaction.hints), 2)
         exploration.validate()
@@ -2996,6 +3001,53 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.Solution.from_dict(
                 init_state.interaction.id, solution_dict))
         exploration.validate()
+
+    def test_validate_state_unique_content_ids(self):
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('MultipleChoiceInput')
+        init_state.update_interaction_customization_args({
+            'choices': {
+                'value': [{
+                    'content_id': '',
+                    'html': 'one'
+                }]
+            },
+            'showChoicesInShuffledOrder': {'value': True}
+        })
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected all content_ids to be unique, recieved'
+        ):
+            with self.swap(
+                init_state.interaction.customization_args['choices'].value[0],
+                'content_id',
+                'content'
+            ):
+                exploration.validate()
+
+    def test_validate_state_content_id_indexes(self):
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('MultipleChoiceInput')
+        init_state.update_interaction_customization_args({
+            'choices': {
+                'value': [{
+                    'content_id': 'ca_choices_10',
+                    'html': 'one'
+                }]
+            },
+            'showChoicesInShuffledOrder': {'value': True}
+        })
+        init_state.update_next_content_id_index(9)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected all content id indexes to be less than next '
+            'content id index'
+        ):
+            exploration.validate()
 
     def test_validate_state_solicit_answer_details(self):
         """Test validation of solicit_answer_details."""

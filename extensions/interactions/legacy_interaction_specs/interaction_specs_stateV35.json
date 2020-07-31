@@ -129,20 +129,11 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "dict",
-            "properties": [{
-                "name": "html",
-                "schema": {
-                    "type": "html",
-                    "ui_config": {
-                      "hide_complex_extensions": true,
-                      "placeholder": "Enter an option for the learner to drag and drop."
-                    }
-                }
-            }, {
-                "name": "content_id",
-                "schema": {"type": "unicode_or_none"}
-            }]
+            "type": "html",
+            "ui_config": {
+              "hide_complex_extensions": true,
+              "placeholder": "Enter an option for the learner to drag and drop."
+            }
           },
           "type": "list",
           "validators": [
@@ -156,10 +147,7 @@
           }
         },
         "default_value": [
-          {
-            "content_id": null,
-            "html": ""
-          }
+          ""
         ]
       },
       {
@@ -227,27 +215,20 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "dict",
-            "properties": [{
-                "name": "html",
-                "schema": {
-                    "type": "html",
-                    "ui_config": {
-                      "hide_complex_extensions": true,
-                      "placeholder": "Sample item answer"
-                    }
-                }
-            }, {
-                "name": "content_id",
-                "schema": {"type": "unicode_or_none"}
-            }]
+            "type": "html",
+            "ui_config": {
+              "hide_complex_extensions": true,
+              "placeholder": "Sample item answer"
+            }
           },
           "type": "list",
           "ui_config": {
             "add_element_text": "Add item for selection"
           }
         },
-        "default_value": [{"content_id": null, "html": ""}]
+        "default_value": [
+          ""
+        ]
       }
     ],
     "is_terminal": false,
@@ -277,19 +258,9 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "dict",
-          "properties": [{
-            "name": "unicode_str",
-            "schema": {"type": "unicode"}
-          }, {
-            "name": "content_id",
-            "schema": {"type": "unicode_or_none"}
-          }]
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": "Continue"
-        }
+        "default_value": "Continue"
       }
     ],
     "is_terminal": false,
@@ -466,19 +437,9 @@
         "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
-          "type": "dict",
-          "properties": [{
-            "name": "unicode_str",
-            "schema": {"type": "unicode"}
-          }, {
-            "name": "content_id",
-            "schema": {"type": "unicode_or_none"}
-          }]
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": "Add Item"
-        }
+        "default_value": "Add item"
       }
     ],
     "is_terminal": false,
@@ -654,20 +615,11 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "dict",
-            "properties": [{
-                "name": "html",
-                "schema": {
-                    "type": "html",
-                    "ui_config": {
-                      "hide_complex_extensions": true,
-                      "placeholder": "Enter an option for the learner to select"
-                    }
-                }
-            }, {
-                "name": "content_id",
-                "schema": {"type": "unicode_or_none"}
-            }]
+            "type": "html",
+            "ui_config": {
+              "hide_complex_extensions": true,
+              "placeholder": "Enter an option for the learner to select"
+            }
           },
           "type": "list",
           "validators": [
@@ -680,10 +632,9 @@
             "add_element_text": "Add multiple choice option"
           }
         },
-        "default_value": [{
-          "content_id": null,
-          "html": ""
-        }]
+        "default_value": [
+          ""
+        ]
       }, {
         "name": "showChoicesInShuffledOrder",
         "description": "Shuffle answer choices",
@@ -715,7 +666,7 @@
     "customization_arg_specs": [
       {
         "description": "The initial code",
-        "name": "initialCode",
+        "name": "initial_code",
         "schema": {
           "type": "unicode",
           "ui_config": {
@@ -755,19 +706,9 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "dict",
-          "properties": [{
-            "name": "unicode_str",
-            "schema": {"type": "unicode"}
-          }, {
-            "name": "content_id",
-            "schema": {"type": "unicode_or_none"}
-          }]
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": ""
-        }
+        "default_value": ""
       },
       {
         "description": "Height (in rows)",
@@ -991,19 +932,9 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "dict",
-          "properties": [{
-            "name": "unicode_str",
-            "schema": {"type": "unicode"}
-          }, {
-            "name": "content_id",
-            "schema": {"type": "unicode_or_none"}
-          }]
+          "type": "unicode"
         },
-        "default_value": {
-          "content_id": null,
-          "unicode_str": ""
-        }
+        "default_value": ""
       }
     ],
     "is_terminal": false,
