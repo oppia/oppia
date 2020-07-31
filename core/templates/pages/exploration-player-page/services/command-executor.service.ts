@@ -172,19 +172,26 @@ export class CommandExecutorService {
     }
     this.setElementsOnPage -= 1;
   }
-  enterFraction(windowRef, fraction) {
-    var fractionElementName =
-    'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r';
-    var fractionBox = windowRef.nativeWindow.document.getElementsByClassName(
-      fractionElementName)[0];
-    fractionBox.value = fraction;
-  }
 
   submit(windowRef) {
     var button = windowRef.nativeWindow.document.getElementsByClassName(
       'oppia-learner-confirm-button')[0] as HTMLElement;
     button.click();
     this.setElementsOnPage = 0;
+  }
+
+  enterFraction(windowRef, fraction) {
+    var fractionElementName =
+    'form-control ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r';
+    var fractionBox = windowRef.nativeWindow.document.getElementsByClassName(
+      fractionElementName)[0];
+    fractionBox.value = fraction;
+    var button = windowRef.nativeWindow.document.getElementsByClassName(
+      'oppia-learner-confirm-button')[0] as HTMLElement;
+    button.click();
+    var evt = document.createEvent('HTMLEvents');
+    evt.initEvent('change', false, true);
+    fractionBox.dispatchEvent(evt);
   }
 
   selectItemBullet(windowRef, message) {
