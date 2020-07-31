@@ -239,7 +239,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
-            'next_content_id_index': 1,
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -485,7 +485,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
-            'next_content_id_index': 1,
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -729,7 +729,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
-            'next_content_id_index': 1,
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -1100,7 +1100,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
-            'next_content_id_index': 1,
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -1253,7 +1253,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
-            'next_content_id_index': 1,
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None

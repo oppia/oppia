@@ -5294,13 +5294,21 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    valid_html_content1,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    valid_html_content2
-                ]
-            }
+                'value': [{
+                    'content_id': 'ca_choices_0',
+                    'html': valid_html_content1
+                }, {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>2</p>'
+                }, {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>3</p>'
+                }, {
+                    'content_id': 'ca_choices_3',
+                    'html': valid_html_content2
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         exploration1_state.update_content(
@@ -5308,6 +5316,7 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         exploration1_state.update_interaction_id('DragAndDropSortInput')
         exploration1_state.update_interaction_customization_args(
             customization_args_dict)
+        exploration1_state.update_next_content_id_index(4)
 
         exp_services.save_new_exploration(self.admin_id, exploration1)
         exp_models.ExplorationMathRichTextInfoModel(
@@ -5406,13 +5415,21 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    valid_html_content2,
-                    valid_html_content2,
-                    '<p>3</p>',
-                    valid_html_content3
-                ]
-            }
+                'value': [{
+                    'content_id': 'ca_choices_0',
+                    'html': valid_html_content2
+                }, {
+                    'content_id': 'ca_choices_1',
+                    'html': valid_html_content2
+                }, {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>3</p>'
+                }, {
+                    'content_id': 'ca_choices_3',
+                    'html': valid_html_content3
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         exploration1_state.update_content(
@@ -5420,6 +5437,7 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         exploration1_state.update_interaction_id('DragAndDropSortInput')
         exploration1_state.update_interaction_customization_args(
             customization_args_dict)
+        exploration1_state.update_next_content_id_index(4)
 
         exp_services.save_new_exploration(self.admin_id, exploration1)
         exp_models.ExplorationMathRichTextInfoModel(
@@ -5511,13 +5529,21 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    valid_html_content1,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    valid_html_content2
-                ]
-            }
+                'value': [{
+                    'content_id': 'ca_choices_0',
+                    'html': valid_html_content1
+                }, {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>2</p>'
+                }, {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>3</p>'
+                }, {
+                    'content_id': 'ca_choices_3',
+                    'html': valid_html_content2
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         exploration1_state.update_content(
@@ -5525,6 +5551,7 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
         exploration1_state.update_interaction_id('DragAndDropSortInput')
         exploration1_state.update_interaction_customization_args(
             customization_args_dict)
+        exploration1_state.update_next_content_id_index(4)
 
         exp_services.save_new_exploration(self.admin_id, exploration1)
         svg_file_1 = (
