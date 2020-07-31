@@ -16,9 +16,6 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
-import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
-
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
