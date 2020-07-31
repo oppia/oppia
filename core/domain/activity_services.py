@@ -124,9 +124,9 @@ def split_by_type(activity_references):
             containing exploration ids and collection ids.
 
     Returns:
-        (list(str), list(str)). A 2-tuple whose first element is a list of all
-        exploration ids represented in the input list, and whose second element
-        is a list of all collection ids represented in the input list.
+        tuple(list(str), list(str)). A 2-tuple whose first element is a list of
+        all exploration ids represented in the input list, and whose second
+        element is a list of all collection ids represented in the input list.
 
     Raises:
         Exception. The activity reference type is invalid.

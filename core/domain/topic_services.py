@@ -223,7 +223,7 @@ def apply_change_list(topic_id, change_list):
             deletion of subtopics.
 
     Returns:
-        Topic, dict, list(int), list(int), list(SubtopicPageChange). The
+        tuple(Topic, dict, list(int), list(int), list(SubtopicPageChange)). The
         modified topic object, the modified subtopic pages dict keyed
         by subtopic page id containing the updated domain objects of
         each subtopic page, a list of ids of the deleted subtopics,

@@ -254,7 +254,7 @@ def check_setup_scripts(base_release_tag, changed_only=True):
             instead of just the changed ones.
 
     Returns:
-        dict. Dict containing of script or boolean indicating whether or not it
+        dict. Dict consisting of script or boolean indicating whether or not it
         has changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in

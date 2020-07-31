@@ -907,7 +907,7 @@ class BaseUserModelValidator(BaseModelValidator):
             unused_item: ndb.Model. BaseUserModel to validate.
 
         Returns:
-            list(tuple(str, str, list, str, list). A list of tuple which
+            list(tuple(str, str, list, str, list)). A list of tuple which
             consists of External model name, property name in model, list of
             property value in model, property name in external model, list of
             property value in external model.

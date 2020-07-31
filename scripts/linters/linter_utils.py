@@ -103,7 +103,7 @@ def memoize(func):
         made exactly once.
 
         Returns:
-            args. The value of func(*args, **kwargs).
+            function(*). The value of func(*args, **kwargs).
         """
         func_kwargs = default_func_kwargs.copy()
         func_kwargs.update(kwargs)

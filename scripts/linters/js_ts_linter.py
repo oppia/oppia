@@ -164,8 +164,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         returns the parsed contents as a Python dictionary.
 
         Returns:
-            dict. Contains the contents of js and ts files after
-            validating and parsing the files.
+            dict. A dict which has key as filepath and value as contents of js
+            and ts files after validating and parsing the files.
         """
 
         # Select JS files which need to be checked.
@@ -200,8 +200,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         js and ts files.
 
         Returns:
-            dict. Contains the expressions in the script parsed using js
-            and ts files.
+            dict. A dict which has key as filepath and value as the expressions
+            in the script parsed using js and ts files.
         """
 
         parsed_expressions_in_files = collections.defaultdict(dict)

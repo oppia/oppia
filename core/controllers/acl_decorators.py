@@ -1232,8 +1232,8 @@ def can_publish_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
-            *args: arguments. The arguments in *args.
-            **kwargs: *. Keyword arguments. Keyword arguments present in kwargs.
+            *args: *. The arguments.
+            **kwargs: *. Keyword arguments present in kwargs.
 
         Returns:
             *. The return value of the decorated function.

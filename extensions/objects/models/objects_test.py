@@ -39,8 +39,9 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 method is to be tested.
             mappings: list(tuple(str, str)). The first element of
                 each item is expected to be normalized to the second.
-            invalid_items_with_error_messages: list(tuple(str, str)). Each of
-                the value is expected to raise an Exception when normalized.
+            invalid_items_with_error_messages: list(tuple(str, str)). A list of
+                values and corresponding error messages. Each of the value is
+                expected to raise an Exception when normalized.
         """
         for item in mappings:
             assert object_class.normalize(item[0]) == item[1], (

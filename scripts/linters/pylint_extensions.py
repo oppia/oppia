@@ -464,8 +464,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
             ' relative to section headers.'
         ),
         'W9024': (
-            'Raises section should be the following form: exception_name: '
-            'description',
+            'Raises section should be the following form: Exception_name. '
+            'Description.',
             'malformed-raises-section',
             'The parameter is incorrectly formatted.'
         ),
@@ -524,17 +524,17 @@ class DocstringParameterChecker(checkers.BaseChecker):
         ),
         'W9035': (
             'Arguments should be in following form: variable_name: typeinfo. '
-            'description.',
+            'Description.',
             'malformed-args-section',
             'The parameter is incorrectly formatted.'
         ),
         'W9036': (
-            'Returns should be in the following form: typeinfo. description.',
+            'Returns should be in the following form: typeinfo. Description.',
             'malformed-returns-section',
             'The parameter is incorrectly formatted.'
         ),
         'W9037': (
-            'Yields should be in the following form: typeinfo. description.',
+            'Yields should be in the following form: typeinfo. Description.',
             'malformed-yields-section',
             'The parameter is incorrectly formatted.'
         )
@@ -638,9 +638,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 method definition in the AST.
             node_doc: Docstring. Pylint Docstring class instance representing
                 a node's docstring.
-
-        Raises:
-            Exc. Some exception.
         """
         # The regexes are taken from the pylint codebase and are modified
         # according to our needs. Link: https://github.com/PyCQA/pylint/blob/
@@ -677,6 +674,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
 
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the arguments
+        # from the Args section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
         if node_doc.has_params():
             entries = node_doc._parse_section(  # pylint: disable=protected-access
                 _check_docs_utils.GoogleDocstring.re_param_section)
@@ -685,6 +686,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 if not match:
                     self.add_message('malformed-args-section', node=node)
 
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the returns
+        # from the Returns section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
         if node_doc.has_returns():
             entries = node_doc._parse_section(  # pylint: disable=protected-access
                 _check_docs_utils.GoogleDocstring.re_returns_section)
@@ -694,6 +699,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 if not match:
                     self.add_message('malformed-returns-section', node=node)
 
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the yields
+        # from the Yields section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
         if node_doc.has_yields():
             entries = node_doc._parse_section(  # pylint: disable=protected-access
                 _check_docs_utils.GoogleDocstring.re_yields_section)
@@ -703,6 +712,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 if not match:
                     self.add_message('malformed-yields-section', node=node)
 
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the exceptions
+        # from the Raises section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
         if node_doc.exceptions():
             entries = node_doc._parse_section(  # pylint: disable=protected-access
                 _check_docs_utils.GoogleDocstring.re_raise_section)

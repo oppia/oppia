@@ -1151,8 +1151,8 @@ def revert_exploration(
             is to be reverted.
 
     Raises:
-        Exception. Does not match the version of the currently-stored
-            exploration model.
+        Exception. Version of exploration does not match the version of the
+            currently-stored exploration model.
     """
     exploration_model = exp_models.ExplorationModel.get(
         exploration_id, strict=False)
@@ -1952,7 +1952,7 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
         exp_id: str. The ID of the exploration to update.
 
     Raises:
-        Exception: If any of the SVG images provided fail validation.
+        Exception. If any of the SVG images provided fail validation.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     html_in_exploration_after_conversion = ''

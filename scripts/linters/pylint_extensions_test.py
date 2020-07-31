@@ -760,12 +760,13 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     Something
         """)
 
-        message1 = testutils.Message(
+        no_period_at_end_message = testutils.Message(
             msg_id='no-period-used', node=node_no_period_at_end)
-        message2 = testutils.Message(
+        malformed_args_message = testutils.Message(
             msg_id='malformed-args-section', node=node_no_period_at_end)
 
-        with self.checker_test_object.assertAddsMessages(message1, message2):
+        with self.checker_test_object.assertAddsMessages(
+            no_period_at_end_message, malformed_args_message):
             self.checker_test_object.checker.visit_functiondef(
                 node_no_period_at_end)
 
@@ -932,23 +933,24 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     yield something
         """)
 
-        message1 = testutils.Message(
+        single_space_above_args_message = testutils.Message(
             msg_id='single-space-above-args',
             node=node_with_two_newline
         )
 
-        message2 = testutils.Message(
+        single_space_above_returns_message = testutils.Message(
             msg_id='single-space-above-returns',
             node=node_with_two_newline
         )
 
-        message3 = testutils.Message(
+        single_space_above_yields_message = testutils.Message(
             msg_id='single-space-above-yield',
             node=node_with_two_newline
         )
 
         with self.checker_test_object.assertAddsMessages(
-            message1, message2, message3):
+            single_space_above_args_message, single_space_above_returns_message,
+            single_space_above_yields_message):
             self.checker_test_object.checker.visit_functiondef(
                 node_with_two_newline)
 
@@ -1057,18 +1059,16 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     Something
         """)
 
-        message1 = testutils.Message(
+        incorrect_indentation_message = testutils.Message(
             msg_id='8-space-indentation-in-docstring',
             node=invalid_raises_description_indentation_node)
-        message2 = testutils.Message(
-            msg_id='malformed-raises-section',
-            node=invalid_raises_description_indentation_node)
-        message3 = testutils.Message(
+        malformed_raises_message = testutils.Message(
             msg_id='malformed-raises-section',
             node=invalid_raises_description_indentation_node)
 
         with self.checker_test_object.assertAddsMessages(
-            message1, message2, message3):
+            incorrect_indentation_message, malformed_raises_message,
+            malformed_raises_message):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_raises_description_indentation_node)
 
@@ -1118,14 +1118,12 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                     Something
         """)
 
-        message1 = testutils.Message(
-            msg_id='malformed-raises-section',
-            node=invalid_parameter_name)
-        message2 = testutils.Message(
+        malformed_raises_message = testutils.Message(
             msg_id='malformed-raises-section',
             node=invalid_parameter_name)
 
-        with self.checker_test_object.assertAddsMessages(message1, message2):
+        with self.checker_test_object.assertAddsMessages(
+            malformed_raises_message, malformed_raises_message):
             self.checker_test_object.checker.visit_functiondef(
                 invalid_parameter_name)
 

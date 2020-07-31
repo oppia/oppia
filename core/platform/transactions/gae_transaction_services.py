@@ -31,8 +31,8 @@ def run_in_transaction(fn, *args, **kwargs):
 
     Args:
         fn: callable. A function (or callable) to be called.
-        *args: list. Variable length argument list passed to the callable.
-        **kwargs: args. Arbitrary keyword arguments passed to the callable.
+        *args: list(*). Variable length argument list passed to the callable.
+        **kwargs: *. Arbitrary keyword arguments passed to the callable.
 
     Returns:
         *. Whatever fn() returns.
