@@ -1474,7 +1474,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.learnerDashboardActivityIdsObjectFactory = this.learnerDashboardActivityIdsObjectFactory;
     OppiaAngularRootComponent.learnerDashboardBackendApiService = this.learnerDashboardBackendApiService;
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = this.learnerDashboardIdsBackendApiService;
-    OppiaAngularRootComponent.learnerDetailsDataService=this.learnerDetailsDataService;
+    OppiaAngularRootComponent.learnerDetailsDataService = this.learnerDetailsDataService;
     OppiaAngularRootComponent.learnerExplorationSummaryObjectFactory = this.learnerExplorationSummaryObjectFactory;
     OppiaAngularRootComponent.learnerParamsService = this.learnerParamsService;
     OppiaAngularRootComponent.localStorageService = this.localStorageService;

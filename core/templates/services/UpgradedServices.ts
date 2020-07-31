@@ -782,7 +782,8 @@ export class UpgradedServices {
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
-    upgradedServices['LearnerAnswerDetailsService']=new LearnerAnswerDetailsDataService(
+    upgradedServices['LearnerAnswerDetailsService'] =
+      new LearnerAnswerDetailsDataService(
       upgradedServices['ExplorationDataService'],
       upgradedServices['HttpClient'],
       upgradedServices['UrlInterPolationService']
