@@ -29,7 +29,6 @@ describe('Command executor service', () => {
     });
     ces = TestBed.get(CommandExecutorService);
     wrf = TestBed.get(WindowRef);
-    ces.setHostname(wrf, '*');
   });
   var continueBoolean = false;
   var addBoolean = false;
