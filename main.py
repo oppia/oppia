@@ -18,55 +18,114 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-
+import os
+import sys
 from constants import constants
-from core.controllers import acl_decorators
-from core.controllers import admin
-from core.controllers import base
-from core.controllers import classifier
-from core.controllers import classroom
-from core.controllers import collection_editor
-from core.controllers import collection_viewer
-from core.controllers import community_dashboard
-from core.controllers import concept_card_viewer
-from core.controllers import creator_dashboard
-from core.controllers import custom_landing_pages
-from core.controllers import editor
-from core.controllers import email_dashboard
-from core.controllers import features
-from core.controllers import feedback
-from core.controllers import learner_dashboard
-from core.controllers import learner_playlist
-from core.controllers import library
-from core.controllers import moderator
-from core.controllers import pages
-from core.controllers import practice_sessions
-from core.controllers import profile
-from core.controllers import question_editor
-from core.controllers import questions_list
-from core.controllers import reader
-from core.controllers import recent_commits
-from core.controllers import resources
-from core.controllers import review_tests
-from core.controllers import skill_editor
-from core.controllers import skill_mastery
-from core.controllers import story_editor
-from core.controllers import story_viewer
-from core.controllers import subscriptions
-from core.controllers import subtopic_viewer
-from core.controllers import suggestion
-from core.controllers import topic_editor
-from core.controllers import topic_viewer
-from core.controllers import topics_and_skills_dashboard
-from core.controllers import voice_artist
-from core.domain import user_services
-from core.platform import models
-import feconf
 
-from mapreduce import main as mapreduce_main
-from mapreduce import parameters as mapreduce_parameters
-import webapp2
-from webapp2_extras import routes
+ROOT_PATH = os.path.dirname(__file__)
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
+
+# oppia_tools/ is available locally (in both dev and prod mode). However,
+# on the GAE production server, oppia_tools/ is not available, and the default
+# PIL third-party library is used instead.
+#
+# We cannot special-case this using DEV_MODE because it is possible to run
+# Oppia in production mode locally, where a built-in PIL won't be available.
+# Hence the check for oppia_tools instead.
+if os.path.isdir(OPPIA_TOOLS_PATH):
+    PIL_PATH = os.path.join(
+        OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
+    if not os.path.isdir(PIL_PATH):
+        raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
+    sys.path.insert(0, PIL_PATH)
+
+THIRD_PARTY_LIBS = [
+    os.path.join(
+        ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.6.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.9.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.5'),
+    os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'future-0.17.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.43.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'packaging-20.4'),
+    os.path.join(ROOT_PATH, 'third_party', 'pylatexenc-2.6'),
+    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.17.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'six-1.15.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.5'),
+    os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
+]
+
+for lib_path in THIRD_PARTY_LIBS:
+    if not os.path.isdir(lib_path):
+        raise Exception('Invalid path for third_party library: %s' % lib_path)
+    sys.path.insert(0, lib_path)
+
+# The system path insertions above MUST be run before the imports below because
+# each of the imports below uses various third_party libraries in their
+# execution. During the import of a python module, the python interpreter also
+# loads imports specific to that module. For example, the acl_decorators module
+# imports backports.functools_lru_cache so importing acl_decorators will
+# automatically force the python interpreter to import backports as part of the
+# acl_decorators import execution. The system path setup above lets the python
+# compiler know where to look when these third_party imports occur.
+# As such, any imports of non system-standard modules should occur after the
+# third_party libraries are added to the system path.
+
+from core.controllers import acl_decorators # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import admin # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import base # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import classifier # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import classroom # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import collection_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import collection_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import community_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import concept_card_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import creator_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import custom_landing_pages # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import email_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import features # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import feedback # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import improvements # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import learner_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import learner_playlist # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import library # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import moderator # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import pages # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import practice_sessions # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import profile # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import question_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import questions_list # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import reader # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import recent_commits # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import resources # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import review_tests # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import skill_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import skill_mastery # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import story_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import story_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import subscriptions # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import subtopic_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import suggestion # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import topic_editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import topic_viewer # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import topics_and_skills_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import voice_artist # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.domain import user_services # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.platform import models # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+import feconf # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+
+from mapreduce import main as mapreduce_main # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from mapreduce import parameters as mapreduce_parameters # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+import webapp2 # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from webapp2_extras import routes # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -97,9 +156,11 @@ class HomePageRedirectPage(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
+
     @acl_decorators.open_access
     def get(self):
-        if self.user_id and user_services.has_fully_registered(self.user_id):
+        if self.user_id and user_services.has_fully_registered_account(
+                self.user_id):
             user_settings = user_services.get_user_settings(
                 self.user_id)
             default_dashboard = user_settings.default_dashboard
@@ -113,6 +174,7 @@ class HomePageRedirectPage(base.BaseHandler):
 
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
+
     @acl_decorators.open_access
     def get(self):
         self.redirect('/')
@@ -209,6 +271,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
+    get_redirect_route(
+        r'/adminmathsvghandler', admin.ExplorationsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -223,7 +287,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/communityreviewerrightsdatahandler',
         admin.CommunityReviewerRightsDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
+        community_dashboard.CommunityDashboardPage),
 
+    get_redirect_route(
+        '/notifications_dashboard',
+        creator_dashboard.OldNotificationsDashboardRedirectPage),
+    get_redirect_route(
+        '/community_dashboard',
+        creator_dashboard.OldCommunityDashboardRedirectPage),
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
         creator_dashboard.NotificationsDashboardPage),
@@ -232,6 +305,9 @@ URLS = MAPREDUCE_HANDLERS + [
         creator_dashboard.NotificationsDashboardHandler),
     get_redirect_route(
         r'/notificationshandler', creator_dashboard.NotificationsHandler),
+    get_redirect_route(
+        '/creator_dashboard',
+        creator_dashboard.OldCreatorDashboardRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CREATOR_DASHBOARD_URL,
         creator_dashboard.CreatorDashboardPage),
@@ -254,6 +330,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/usercommunityrightsdatahandler',
         community_dashboard.UserCommunityRightsDataHandler),
     get_redirect_route(
+        r'/retrivefeaturedtranslationlanguages',
+        community_dashboard.FeaturedTranslationLanguagesHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -262,6 +341,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
         questions_list.QuestionsListHandler),
+    get_redirect_route(
+        r'%s/<comma_separated_skill_ids>' % feconf.QUESTION_COUNT_URL_PREFIX,
+        questions_list.QuestionCountDataHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
@@ -309,6 +391,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExplorationHandler),
     get_redirect_route(
+        '/learner_dashboard',
+        learner_dashboard.OldLearnerDashboardRedirectPage),
+    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
@@ -330,6 +415,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.UNASSIGN_SKILL_DATA_HANDLER_URL,
+        topics_and_skills_dashboard.TopicAssignmentsHandler),
+    get_redirect_route(
+        r'%s' % feconf.SKILL_DASHBOARD_DATA_URL,
+        topics_and_skills_dashboard.SkillsDashboardPageDataHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' %
@@ -370,6 +461,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
 
+    get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(
@@ -537,8 +629,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
-        r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
-        editor.StateRulesStatsHandler),
+        r'/createhandler/state_interaction_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
+        editor.StateInteractionStatsHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
         editor.StateAnswerStatisticsHandler),
@@ -698,6 +790,9 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 
+    get_redirect_route(
+        '/classroom_page_status_handler', classroom.ClassroomPageStatusHandler),
+
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
@@ -719,9 +814,26 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(
-        r'/sendDummyMailToAdminHandler', admin.SendDummyMailToAdminHandler),
+        r'/senddummymailtoadminhandler', admin.SendDummyMailToAdminHandler),
+    get_redirect_route(r'/updateusernamehandler', admin.UpdateUsernameHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsHandler),
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsHistoryHandler),
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -758,22 +870,5 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-URLS_TO_SERVE = []
-
-if (feconf.ENABLE_MAINTENANCE_MODE and
-        not current_user_services.is_current_user_super_admin()):
-    # Show only the maintenance mode page.
-    URLS_TO_SERVE = [
-        get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
-        get_redirect_route(r'/adminhandler', admin.AdminHandler),
-        get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-        get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
-        get_redirect_route(
-            r'/admintopicscsvdownloadhandler',
-            admin.AdminTopicsCsvFileDownloader),
-        get_redirect_route(r'/<:.*>', pages.MaintenancePage)]
-else:
-    URLS_TO_SERVE = URLS
-
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS_TO_SERVE, debug=feconf.DEBUG))
+    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

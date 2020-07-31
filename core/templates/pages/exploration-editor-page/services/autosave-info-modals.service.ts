@@ -18,25 +18,21 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/changes-in-human-readable-form/' +
-    'changes-in-human-readable-form.directive');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/local-storage.service.ts');
+require('pages/exploration-editor-page/modal-templates/' +
+  'save-validation-fail-modal.controller.ts');
+require('pages/exploration-editor-page/modal-templates/' +
+  'save-version-mismatch-modal.controller.ts');
+require(
+  'pages/exploration-editor-page/modal-templates/' +
+  'lost-changes-modal.controller.ts');
 
 angular.module('oppia').factory('AutosaveInfoModalsService', [
-  '$log', '$timeout', '$uibModal', '$window',
-  'ExplorationDataService', 'LocalStorageService',
-  'LostChangeObjectFactory', 'UrlInterpolationService',
+  '$uibModal', 'LocalStorageService', 'UrlInterpolationService',
   function(
-      $log, $timeout, $uibModal, $window,
-      ExplorationDataService, LocalStorageService,
-      LostChangeObjectFactory, UrlInterpolationService) {
+      $uibModal, LocalStorageService, UrlInterpolationService) {
     var _isModalOpen = false;
-    var _refreshPage = function(delay) {
-      $timeout(function() {
-        $window.location.reload();
-      }, delay);
-    };
 
     return {
       showNonStrictValidationFailModal: function() {
@@ -46,14 +42,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
             'save-validation-fail-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.closeAndRefresh = function() {
-                $uibModalInstance.dismiss('cancel');
-                _refreshPage(20);
-              };
-            }
-          ]
+          controller: 'SaveValidationFailModalController'
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
@@ -72,24 +61,10 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
             'save-version-mismatch-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
-          controller: ['$scope', function($scope) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.discardChanges = function() {
-              ExplorationDataService.discardDraft(function() {
-                _refreshPage(20);
-              });
-            };
-
-            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
-            if ($scope.hasLostChanges) {
-              // TODO(sll): This should also include changes to exploration
-              // properties (such as the exploration title, category, etc.).
-              $scope.lostChanges = lostChanges.map(
-                LostChangeObjectFactory.createNew);
-              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
-            }
-          }],
+          resolve: {
+            lostChanges: () => lostChanges
+          },
+          controller: 'SaveVersionMismatchModalController',
           windowClass: 'oppia-autosave-version-mismatch-modal'
         }).result.then(function() {
           _isModalOpen = false;
@@ -106,23 +81,17 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
             'lost-changes-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
-          controller: ['$scope', '$uibModalInstance', function(
-              $scope, $uibModalInstance) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.close = function() {
-              LocalStorageService.removeExplorationDraft(explorationId);
-              $uibModalInstance.dismiss('cancel');
-            };
-
-            $scope.lostChanges = lostChanges.map(
-              LostChangeObjectFactory.createNew);
-            $log.error('Lost changes: ' + JSON.stringify(lostChanges));
-          }],
+          resolve: {
+            lostChanges: () => lostChanges
+          },
+          controller: 'LostChangesModalController',
           windowClass: 'oppia-lost-changes-modal'
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
+          // When the user clicks on discard changes button, signal backend
+          // to discard the draft and reload the page thereafter.
+          LocalStorageService.removeExplorationDraft(explorationId);
           _isModalOpen = false;
         });
 

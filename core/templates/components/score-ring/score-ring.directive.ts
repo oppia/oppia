@@ -51,10 +51,10 @@ angular.module('oppia').directive('scoreRing', [
 
           ctrl.getScoreOuterRingColor = function() {
             if (ctrl.testIsPassed()) {
-              // return color green when passed.
+              // Return color green when passed.
               return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
             } else {
-              // return color orange when failed.
+              // Return color orange when failed.
               return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
             }
           };

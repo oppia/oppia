@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import question_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import summary_services
@@ -64,8 +65,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', self.TOPIC_ID)
-        story.description = ('Description')
+            self.STORY_ID, 'Title', 'Description', self.TOPIC_ID)
+
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_7], user=self.admin))
@@ -182,7 +183,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_can_not_access_story_viewer_page_with_unpublished_story(self):
         new_story_id = 'new_story_id'
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', self.TOPIC_ID)
+            new_story_id, 'Title', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.admin_id, story)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
@@ -197,7 +198,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', 'topic_id_1')
+            new_story_id, 'Title', 'Description', 'topic_id_1')
         story_services.save_new_story(self.admin_id, story)
         topic_services.publish_story(
             'topic_id_1', new_story_id, self.admin_id)
@@ -213,7 +214,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             expected_dict = {
                 'story_title': 'Title',
                 'story_description': 'Description',
-                'story_nodes': [self.node_2, self.node_1, self.node_3]
+                'story_nodes': [self.node_2, self.node_1, self.node_3],
+                'topic_name': 'Topic'
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -299,6 +301,44 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_returns_empty_list_when_user_completes_story(self):
         csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            json_response = self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    self.NODE_ID_3
+                ), {}, csrf_token=csrf_token
+            )
+        self.assertEqual(len(json_response['summaries']), 0)
+        self.assertIsNone(json_response['next_node_id'])
+        self.assertFalse(json_response['ready_for_review_test'])
+
+    def test_post_returns_ready_for_review_when_acquired_skills_exist(self):
+        csrf_token = self.get_new_csrf_token()
+        self.save_new_skill(
+            'skill_1', self.admin_id, description='Skill Description')
+        self.save_new_question(
+            'question_1', self.admin_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        question_services.create_new_question_skill_link(
+            self.admin_id, 'question_1', 'skill_1', 0.3)
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                'node_id': self.NODE_ID_1,
+                'old_value': [],
+                'new_value': ['skill_1']
+            })
+        ]
+        story_services.update_story(
+            self.admin_id, self.STORY_ID, changelist,
+            'Added acquired skill.')
+
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(

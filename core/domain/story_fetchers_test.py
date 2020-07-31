@@ -47,9 +47,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
-        self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+        self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         changelist = [
@@ -65,7 +63,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -91,7 +89,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Title 1'])
+        self.assertEqual(story_summary.thumbnail_bg_color, None)
+        self.assertEqual(story_summary.thumbnail_filename, None)
 
     def test_get_story_by_id_with_valid_ids_returns_correct_dict(self):
         expected_story = self.story.to_dict()
@@ -119,7 +119,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
+        self.assertEqual(story_summary.node_titles, ['Title 1'])
+        self.assertEqual(story_summary.thumbnail_bg_color, None)
+        self.assertEqual(story_summary.thumbnail_filename, None)
 
     def test_get_node_index_by_story_id_and_node_id(self):
         # Tests correct node index should be returned when story and node exist.

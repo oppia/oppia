@@ -101,6 +101,7 @@ class BaseJobManager(python_utils.OBJECT):
     Each entire batch is not run in a transaction, but subclasses can still
     perform (a) or (c) transactionally if they wish to.
     """
+
     @classmethod
     def _is_abstract(cls):
         """Checks if the job is created using the abstract base manager class.
@@ -247,6 +248,7 @@ class BaseJobManager(python_utils.OBJECT):
             ordering, instead of simply using `collections.Counter` which has
             non-deterministic ordering.
             """
+
             pass
 
         # Consolidate the lines of output since repeating them isn't useful.
@@ -426,7 +428,7 @@ class BaseJobManager(python_utils.OBJECT):
 
         Returns:
             float. The time the job got finished in milliseconds after the
-                Epoch.
+            Epoch.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -668,6 +670,10 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
     """
 
     def run(self, job_id, job_class_str, kwargs):
+        # Disabling 4 space indentation checker for this docstring because this
+        # "Yields:" section yields 2 objects and the Yields/Returns are
+        # generally supposed to only yield 1 object which messes up the
+        # indentation checking. This is the only case of this happening.
         """Returns a coroutine which runs the job pipeline and stores results.
 
         Args:
@@ -678,10 +684,11 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
         Yields:
             MapreducePipeline. Ready to start processing. Expects the output of
-                that pipeline to be sent back.
+            that pipeline to be sent back.
             StoreMapReduceResults. Will be constructed with whatever output the
-                caller sends back to the coroutine.
+            caller sends back to the coroutine.
         """
+
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access
@@ -756,6 +763,7 @@ class BaseMapReduceJobManager(BaseJobManager):
     mapreduce/lib/pipeline internals. This is used to generate URLs pointing at
     the pipeline support UI.
     """
+
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
 
     @staticmethod
@@ -952,6 +960,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
     classes in the datastore and pass them to mapper functions in MapReduce
     jobs.
     """
+
     _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'
 
@@ -973,7 +982,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
         Returns:
             *. An instance of the InputReader configured using the input shard
-                state.
+            state.
         """
         return cls(input_readers.DatastoreInputReader.from_json(
             input_shard_state[cls._READER_LIST_PARAM]))
@@ -1050,6 +1059,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     are used to perform background calculations that take place outside the
     usual client request/response cycle.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
@@ -1082,7 +1092,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
         Returns:
             bool. Whether the entity was created before the given MR job was
-                queued.
+            queued.
         """
         created_on_msec = utils.get_time_in_millisecs(entity.created_on)
         job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
@@ -1137,6 +1147,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     when doing creations, gets, puts, and queries. This ensures that the
     relevant layer prefix gets appended.
     """
+
     realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
 
     @classmethod
@@ -1178,7 +1189,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
         Returns:
             bool. Whether the realtime_id represents a valid (realtime layer,
-                entity) pair.
+            entity) pair.
         """
         return realtime_id.startswith('0:') or realtime_id.startswith('1:')
 
@@ -1193,8 +1204,8 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
         Returns:
             * or None. The entity instance that corresponds to the given id, or
-                None if strict == False and no undeleted entity with the given
-                id exists in the datastore.
+            None if strict == False and no undeleted entity with the given id
+            exists in the datastore.
 
         Raises:
             base_models.BaseModel.EntityNotFoundError: strict == True and no
@@ -1262,6 +1273,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
     Queries arising during the time interval B will use the results of the
     second batch run, plus data from the realtime layer R0.
     """
+
     # TODO(sll): In the previous docstring, quantify what 'small' means
     # once we have some experience with this running in production.
 
@@ -1376,7 +1388,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         Returns:
             str. Unique identifier for the given entity for storage in active
-                realtime layer.
+            realtime layer.
         """
         return cls._get_realtime_datastore_class().get_realtime_id(
             cls._get_active_realtime_index(), entity_id)
@@ -1391,7 +1403,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         Returns:
             list(str). Unique identifiers for each given entity for storage in
-                the currently active realtime layer.
+            the currently active realtime layer.
         """
         realtime_datastore_class = cls._get_realtime_datastore_class()
         active_realtime_index = cls._get_active_realtime_index()
@@ -1483,7 +1495,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         Returns:
             str. The unique id of the new batch job beginning/continuing the
-                computation.
+            computation.
 
         Raises:
             Exception: The computation wasn't idle before trying to start.
@@ -1724,23 +1736,23 @@ def get_data_for_unfinished_jobs():
 
     Returns:
         list(dict). Each dict represents a continuous computation and contains
-            the following keys:
-                computation_type: str. The type of the computation.
-                status_code: str. The current status of the computation.
-                last_started_msec: float or None. When a batch job for the
-                    computation was last started, in milliseconds since the
-                    epoch.
-                last_finished_msec: float or None. When a batch job for the
-                    computation last finished, in milliseconds since the epoch.
-                last_stopped_msec: float or None. When a batch job for the
-                    computation was last stopped, in milliseconds since the
-                    epoch.
-                active_realtime_layer_index: int or None. The index of the
-                    active realtime layer.
-                is_startable: bool. Whether an admin should be allowed to start
-                    this computation.
-                is_stoppable: bool. Whether an admin should be allowed to stop
-                    this computation.
+        the following keys:
+            computation_type: str. The type of the computation.
+            status_code: str. The current status of the computation.
+            last_started_msec: float or None. When a batch job for the
+                computation was last started, in milliseconds since the
+                epoch.
+            last_finished_msec: float or None. When a batch job for the
+                computation last finished, in milliseconds since the epoch.
+            last_stopped_msec: float or None. When a batch job for the
+                computation was last stopped, in milliseconds since the
+                epoch.
+            active_realtime_layer_index: int or None. The index of the
+                active realtime layer.
+            is_startable: bool. Whether an admin should be allowed to start
+                this computation.
+            is_stoppable: bool. Whether an admin should be allowed to stop
+                this computation.
     """
     unfinished_job_models = job_models.JobModel.get_all_unfinished_jobs(
         NUM_JOBS_IN_DASHBOARD_LIMIT)
@@ -1769,23 +1781,23 @@ def get_continuous_computations_info(cc_classes):
 
     Returns:
         list(dict). Each dict represents a continuous computation and contains
-            the following keys:
-                computation_type: str. The type of the computation.
-                status_code: str. The current status of the computation.
-                last_started_msec: float or None. When a batch job for the
-                    computation was last started, in milliseconds since the
-                    epoch.
-                last_finished_msec: float or None. When a batch job for the
-                    computation last finished, in milliseconds since the epoch.
-                last_stopped_msec: float or None. When a batch job for the
-                    computation was last stopped, in milliseconds since the
-                    epoch.
-                active_realtime_layer_index: int or None. The index of the
-                    active realtime layer.
-                is_startable: bool. Whether an admin should be allowed to start
-                    this computation.
-                is_stoppable: bool. Whether an admin should be allowed to stop
-                    this computation.
+        the following keys:
+            computation_type: str. The type of the computation.
+            status_code: str. The current status of the computation.
+            last_started_msec: float or None. When a batch job for the
+                computation was last started, in milliseconds since the
+                epoch.
+            last_finished_msec: float or None. When a batch job for the
+                computation last finished, in milliseconds since the epoch.
+            last_stopped_msec: float or None. When a batch job for the
+                computation was last stopped, in milliseconds since the
+                epoch.
+            active_realtime_layer_index: int or None. The index of the
+                active realtime layer.
+            is_startable: bool. Whether an admin should be allowed to start
+                this computation.
+            is_stoppable: bool. Whether an admin should be allowed to stop
+                this computation.
     """
     cc_models = job_models.ContinuousComputationModel.get_multi(
         [cc_class.__name__ for cc_class in cc_classes])

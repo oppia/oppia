@@ -311,7 +311,6 @@
 	"I18N_SIGNUP_EMAIL_PREFERENCES": "이메일 환경 설정",
 	"I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN": "이 설정은 환경 설정 페이지에서 언제든지 바꿀 수 있습니다.",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "사용자 이름을 입력해 주십시오.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "사용자 이름은 최대 50자까지 가능합니다.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "이 사용자 이름은 사용할 수 없습니다.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "사용자 이름은 영숫자만 포함할 수 있습니다.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "죄송합니다. 이 사용자 이름은 이미 사용 중입니다.",

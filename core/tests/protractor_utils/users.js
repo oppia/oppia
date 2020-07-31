@@ -17,96 +17,96 @@
  * carrying out end-to-end testing with protractor.
  */
 
-var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
-var login = function(email, isSuperAdmin = false) {
+var login = async function(email, isSuperAdmin = false) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;
-  driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+  await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
-  driver.findElement(protractor.By.name('email')).clear();
-  driver.findElement(protractor.By.name('email')).sendKeys(email);
+  await (await driver.findElement(protractor.By.name('email'))).clear();
+  await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
   if (isSuperAdmin) {
-    driver.findElement(protractor.By.name('admin')).click();
+    await (await driver.findElement(protractor.By.name('admin'))).click();
   }
-  driver.findElement(protractor.By.id('submit-login')).click();
+  await (await driver.findElement(protractor.By.id('submit-login'))).click();
 };
 
-var logout = function() {
+var logout = async function() {
   var driver = browser.driver;
-  driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
-  driver.findElement(protractor.By.id('submit-logout')).click();
+  await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+  await (await driver.findElement(protractor.By.id('submit-logout'))).click();
 };
 
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
-var _completeSignup = function(username) {
+var _completeSignup = async function(username) {
   // This is required since there is a redirect which can be considered
   // as a client side navigation and the tests fail since Angular is
   // not found due to the navigation interfering with protractor's
   // bootstrapping.
-  browser.waitForAngularEnabled(false);
-  browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
-  browser.waitForAngularEnabled(true);
+  await browser.waitForAngularEnabled(false);
+  await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
+  await browser.waitForAngularEnabled(true);
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));
   var registerUser = element(by.css('.protractor-test-register-user'));
-  waitFor.visibilityOf(usernameInput, 'No username input field was displayed');
-  usernameInput.sendKeys(username);
-  agreeToTermsCheckbox.click();
-  registerUser.click();
-  waitFor.pageToFullyLoad();
+  await waitFor.visibilityOf(
+    usernameInput, 'No username input field was displayed');
+  await usernameInput.sendKeys(username);
+  await agreeToTermsCheckbox.click();
+  await registerUser.click();
+  await waitFor.pageToFullyLoad();
 };
 
-var createUser = function(email, username) {
-  createAndLoginUser(email, username);
-  logout();
+var createUser = async function(email, username) {
+  await createAndLoginUser(email, username);
+  await logout();
 };
 
-var createAndLoginUser = function(email, username) {
-  login(email);
-  _completeSignup(username);
+var createAndLoginUser = async function(email, username) {
+  await login(email);
+  await _completeSignup(username);
 };
 
-var createModerator = function(email, username) {
-  login(email, true);
-  _completeSignup(username);
-  adminPage.get();
-  adminPage.updateRole(username, 'moderator');
-  logout();
+var createModerator = async function(email, username) {
+  await login(email, true);
+  await _completeSignup(username);
+  await adminPage.get();
+  await adminPage.updateRole(username, 'moderator');
+  await logout();
 };
 
-var createAdmin = function(email, username) {
-  createAndLoginAdminUser(email, username);
-  logout();
+var createAdmin = async function(email, username) {
+  await createAndLoginAdminUser(email, username);
+  await logout();
 };
 
-var createAndLoginAdminUser = function(email, username) {
-  login(email, true);
-  _completeSignup(username);
-  adminPage.get();
-  adminPage.updateRole(username, 'admin');
+var createAndLoginAdminUser = async function(email, username) {
+  await login(email, true);
+  await _completeSignup(username);
+  await adminPage.get();
+  await adminPage.updateRole(username, 'admin');
 };
 
-var createAdminMobile = function(email, username) {
-  createAndLoginAdminUserMobile(email, username);
-  logout();
+var createAdminMobile = async function(email, username) {
+  await createAndLoginAdminUserMobile(email, username);
+  await logout();
 };
 
-var createAndLoginAdminUserMobile = function(email, username) {
-  login(email, true);
-  _completeSignup(username);
+var createAndLoginAdminUserMobile = async function(email, username) {
+  await login(email, true);
+  await _completeSignup(username);
 };
 
-var isAdmin = function() {
-  return element(by.css('.protractor-test-admin-text')).isPresent();
+var isAdmin = async function() {
+  return await element(by.css('.protractor-test-admin-text')).isPresent();
 };
 
 exports.isAdmin = isAdmin;

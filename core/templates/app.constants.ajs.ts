@@ -168,3 +168,9 @@ angular.module('oppia').constant(
   'COLLECTION_DATA_URL_TEMPLATE', AppConstants.COLLECTION_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
+
+angular.module('oppia').constant(
+  'IMAGE_SAVE_DESTINATION_SERVER', AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+angular.module('oppia').constant(
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);

@@ -29,6 +29,7 @@ require(
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/debouncer.service.ts');
+require('services/guppy-configuration.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
@@ -46,11 +47,11 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
       controller: [
         '$scope', '$attrs', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
-        'CurrentInteractionService',
+        'CurrentInteractionService', 'GuppyConfigurationService',
         function(
             $scope, $attrs, $element, LABEL_FOR_CLEARING_FOCUS,
             DebouncerService, DeviceInfoService, WindowDimensionsService,
-            CurrentInteractionService) {
+            CurrentInteractionService, GuppyConfigurationService) {
           var ctrl = this;
           var guppyDivElt, guppyDivId, guppyInstance: Guppy;
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
@@ -169,27 +170,15 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               answer, MathExpressionInputRulesService);
           };
           ctrl.$onInit = function() {
+            GuppyConfigurationService.init();
             guppyDivElt = $element[0].querySelector('.guppy-div');
 
-            // Dynamically assigns a unique id to the guppy-div
+            // Dynamically assigns a unique id to the guppy-div.
             guppyDivElt.setAttribute(
               'id', 'guppy_' + Math.floor(Math.random() * 100000000));
             guppyDivId = guppyDivElt.id;
             guppyInstance = new Guppy(guppyDivId, {
-              settings: {
-                empty_content: (
-                  '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
-                buttons: []
-              },
               events: {
-                done: function(e) {
-                  ctrl.submitAnswer();
-                },
-                change: function(e) {
-                  // Need to manually trigger the digest cycle
-                  // to make any 'watchers' aware of changes in answer.
-                  $scope.$apply();
-                },
                 ready: function() {
                   if (DeviceInfoService.isMobileUserAgent() &&
                     DeviceInfoService.hasTouchEvents()) {
@@ -206,9 +195,18 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 }
               }
             });
+            guppyInstance.event('change', (e) => {
+              // Need to manually trigger the digest cycle
+              // to make any 'watchers' aware of changes in answer.
+              $scope.$apply();
+            });
+            guppyInstance.event('done', (e) => {
+              ctrl.submitAnswer();
+            });
+
             if (angular.equals(Guppy.Symbols.symbols, {})) {
               Guppy.init({
-                symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+                symbols: ['/third_party/static/guppy-175999/sym/symbols.json',
                   oppiaSymbolsUrl]});
             }
             guppyInstance.render();

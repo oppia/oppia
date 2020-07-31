@@ -205,8 +205,9 @@ def create_message(
         if suggestion:
             suggestion.put()
 
-    if (feconf.CAN_SEND_EMAILS and feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id)):
+    if (feconf.CAN_SEND_EMAILS and (
+            feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
+            user_services.is_user_registered(author_id))):
         _add_message_to_email_buffer(
             author_id, thread_id, message_id, len(text), old_status, new_status)
 
@@ -312,7 +313,7 @@ def get_next_page_of_all_feedback_messages(
             started from the beginning of the list of all messages.
 
     Returns:
-        tuple(messages_on_page, next_urlsafe_start_cursor, more), where:
+        tuple(messages_on_page, next_urlsafe_start_cursor, more). Where:
             messages_on_page: list(FeedbackMessage). Contains the slice of
                 messages that are part of the page pointed to by the given start
                 cursor.
@@ -423,7 +424,7 @@ def get_exp_thread_summaries(user_id, thread_ids):
             the summaries.
 
     Returns:
-        tuple(thread_summaries, number_of_unread_threads), where:
+        tuple(thread_summaries, number_of_unread_threads). Where:
             thread_summaries: list(FeedbackThreadSummary).
             number_of_unread_threads: int. The number of threads not read by the
                 user.
@@ -542,7 +543,8 @@ def get_closed_threads(entity_type, entity_id, has_suggestion):
     """
     return [
         thread for thread in get_threads(entity_type, entity_id)
-        if (thread.has_suggestion == has_suggestion and
+        if (
+            thread.has_suggestion == has_suggestion and
             thread.status != feedback_models.STATUS_CHOICES_OPEN)
     ]
 
@@ -750,7 +752,7 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
         author_id: str. One author of the given exploration_id.
 
     Returns:
-        tuple(batch_recipients, other_recipients), where:
+        tuple(batch_recipients, other_recipients). Where:
             batch_recipients: list(str). The user_ids of the authors excluding
                 the given author.
             other_recipients: list(str). The user_ids of the other participants

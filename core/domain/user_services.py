@@ -36,9 +36,9 @@ import utils
 from google.appengine.api import urlfetch
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, audit_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.audit])
 
-MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
 GRAVATAR_SIZE_PX = 150
 # Data url for images/avatar/user_blue_72px.png.
@@ -117,8 +117,8 @@ class UserSettings(python_utils.OBJECT):
             profile_picture_data_url: str or None. User uploaded profile
                 picture as a dataURI string.
             default_dashboard: str|None. The default dashboard of the user.
-            creator_dashboard_display_pref: str. The creator dashboard
-            dashboard of the user.
+            creator_dashboard_display_pref: str. The creator dashboard of the
+                user.
             user_bio: str. User-specified biography.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.
@@ -176,6 +176,8 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
@@ -275,10 +277,10 @@ class UserSettings(python_utils.OBJECT):
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
-        elif len(username) > MAX_USERNAME_LENGTH:
+        elif len(username) > constants.MAX_USERNAME_LENGTH:
             raise utils.ValidationError(
                 'A username can have at most %s characters.'
-                % MAX_USERNAME_LENGTH)
+                % constants.MAX_USERNAME_LENGTH)
         elif not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(
                 'Usernames can only have alphanumeric characters.')
@@ -291,6 +293,26 @@ class UserSettings(python_utils.OBJECT):
                 if reserved_username in username.lower().strip():
                     raise utils.ValidationError(
                         'This username is not available.')
+
+
+def is_user_id_correct(user_id):
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
+    """
+    if user_id in feconf.SYSTEM_USERS.keys():
+        return True
+
+    return all((
+        user_id.islower(),
+        user_id.startswith('uid_'),
+        len(user_id) == user_models.USER_ID_LENGTH))
 
 
 def is_username_taken(username):
@@ -680,36 +702,46 @@ def _save_user_settings(user_settings):
         user_settings: UserSettings domain object.
     """
     user_settings.validate()
-    user_models.UserSettingsModel(
-        id=user_settings.user_id,
-        gae_id=user_settings.gae_id,
-        email=user_settings.email,
-        role=user_settings.role,
-        username=user_settings.username,
-        normalized_username=user_settings.normalized_username,
-        last_agreed_to_terms=user_settings.last_agreed_to_terms,
-        last_started_state_editor_tutorial=(
+
+    user_settings_dict = {
+        'gae_id': user_settings.gae_id,
+        'email': user_settings.email,
+        'role': user_settings.role,
+        'username': user_settings.username,
+        'normalized_username': user_settings.normalized_username,
+        'last_agreed_to_terms': user_settings.last_agreed_to_terms,
+        'last_started_state_editor_tutorial': (
             user_settings.last_started_state_editor_tutorial),
-        last_started_state_translation_tutorial=(
+        'last_started_state_translation_tutorial': (
             user_settings.last_started_state_translation_tutorial),
-        last_logged_in=user_settings.last_logged_in,
-        last_edited_an_exploration=user_settings.last_edited_an_exploration,
-        last_created_an_exploration=(
+        'last_logged_in': user_settings.last_logged_in,
+        'last_edited_an_exploration': user_settings.last_edited_an_exploration,
+        'last_created_an_exploration': (
             user_settings.last_created_an_exploration),
-        profile_picture_data_url=user_settings.profile_picture_data_url,
-        default_dashboard=user_settings.default_dashboard,
-        creator_dashboard_display_pref=(
+        'profile_picture_data_url': user_settings.profile_picture_data_url,
+        'default_dashboard': user_settings.default_dashboard,
+        'creator_dashboard_display_pref': (
             user_settings.creator_dashboard_display_pref),
-        user_bio=user_settings.user_bio,
-        subject_interests=user_settings.subject_interests,
-        first_contribution_msec=user_settings.first_contribution_msec,
-        preferred_language_codes=user_settings.preferred_language_codes,
-        preferred_site_language_code=(
+        'user_bio': user_settings.user_bio,
+        'subject_interests': user_settings.subject_interests,
+        'first_contribution_msec': user_settings.first_contribution_msec,
+        'preferred_language_codes': user_settings.preferred_language_codes,
+        'preferred_site_language_code': (
             user_settings.preferred_site_language_code),
-        preferred_audio_language_code=(
+        'preferred_audio_language_code': (
             user_settings.preferred_audio_language_code),
-        deleted=user_settings.deleted
-    ).put()
+        'deleted': user_settings.deleted
+    }
+
+    # If user with the given user_id already exists, update that model
+    # with the given user settings, otherwise, create a new one.
+    user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
+    if user_model is not None:
+        user_model.populate(**user_settings_dict)
+        user_model.put()
+    else:
+        user_settings_dict['id'] = user_settings.user_id
+        user_models.UserSettingsModel(**user_settings_dict).put()
 
 
 def _transform_user_settings(user_settings_model):
@@ -719,7 +751,7 @@ def _transform_user_settings(user_settings_model):
         user_settings_model: UserSettingsModel.
 
     Returns:
-         UserSettings. Domain object for user settings.
+        UserSettings. Domain object for user settings.
     """
     if user_settings_model:
         return UserSettings(
@@ -787,7 +819,7 @@ def has_ever_registered(user_id):
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
 
-def has_fully_registered(user_id):
+def has_fully_registered_account(user_id):
     """Checks if a user has fully registered.
 
     Args:
@@ -822,8 +854,7 @@ def create_new_user(gae_id, email):
     if user_settings is not None:
         raise Exception('User %s already exists.' % gae_id)
 
-    # TODO(#7848): Generate user_id together with the migration.
-    user_id = gae_id
+    user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
@@ -877,8 +908,6 @@ def get_usernames(user_ids):
     return usernames
 
 
-# NB: If we ever allow usernames to change, update the
-# config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
     """Updates the username of the user with the given user_id.
 
@@ -1080,28 +1109,15 @@ def update_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def mark_user_for_deletion(
-        user_id, exploration_ids, collection_ids):
-    """Set deleted of the user with given user_id to True and create
-    PendingDeletionRequestModel for that user.
+def mark_user_for_deletion(user_id):
+    """Set the 'deleted' property of the user with given user_id to True.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
-        exploration_ids: list(str). List of exploration ids that were soft
-            deleted and should be hard deleted later.
-        collection_ids: list(str). List of collection ids that were soft
-            deleted and should be hard deleted later.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-
-    user_models.PendingDeletionRequestModel(
-        id=user_id,
-        email=user_settings.email,
-        exploration_ids=exploration_ids,
-        collection_ids=collection_ids,
-    ).put()
 
 
 def get_human_readable_user_ids(user_ids):
@@ -1119,7 +1135,7 @@ def get_human_readable_user_ids(user_ids):
 
     Raises:
         Exception: At least one of the user_ids does not correspond to a valid
-        UserSettingsModel.
+            UserSettingsModel.
     """
     users_settings = get_users_settings(user_ids)
     usernames = []
@@ -1290,7 +1306,7 @@ def get_users_email_preferences(user_ids):
     """Get email preferences for the list of users.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
 
     Returns:
@@ -1374,7 +1390,7 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     with given user_id.
 
     Args:
-        user_ids: list. A list of user IDs for whom we want to get email
+        user_ids: list(str). A list of user IDs for whom we want to get email
             preferences.
         exploration_id: str. The exploration id.
 
@@ -2002,3 +2018,19 @@ def get_community_reviewer_usernames(review_category, language_code=None):
         raise Exception('Invalid review category: %s' % review_category)
 
     return get_usernames(reviewer_ids)
+
+
+def log_username_change(committer_id, old_username, new_username):
+    """Stores the query to role structure in UsernameChangeAuditModel.
+
+    Args:
+        committer_id: str. The ID of the user that is making the change.
+        old_username: str. The current username that is being changed.
+        new_username: str. The new username that the current one is being
+            changed to.
+    """
+
+    model_id = '%s.%d' % (committer_id, utils.get_current_time_in_millisecs())
+    audit_models.UsernameChangeAuditModel(
+        id=model_id, committer_id=committer_id, old_username=old_username,
+        new_username=new_username).put()

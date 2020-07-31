@@ -17,9 +17,9 @@
  * domain objects.
  */
 
-export interface ISubtitledHtmlBackendDict {
+export interface SubtitledHtmlBackendDict {
   'content_id': string;
-  html: string;
+  'html': string;
 }
 
 import { Injectable } from '@angular/core';
@@ -49,7 +49,7 @@ export class SubtitledHtml {
     return !this._html;
   }
 
-  toBackendDict(): ISubtitledHtmlBackendDict {
+  toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
       content_id: this._contentId
@@ -66,7 +66,7 @@ export class SubtitledHtml {
 })
 export class SubtitledHtmlObjectFactory {
   createFromBackendDict(
-      subtitledHtmlBackendDict: ISubtitledHtmlBackendDict): SubtitledHtml {
+      subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }

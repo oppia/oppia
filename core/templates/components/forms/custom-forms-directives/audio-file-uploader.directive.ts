@@ -19,6 +19,15 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 
+interface AudioFileUploaderScope extends ng.IScope {
+  inputFieldClassName?: string;
+  inputFieldFormId?: string;
+  onFileCleared?: (() => void);
+  droppedFile?: FileList;
+  errorMessage?: string;
+  onFileChanged?: (file: File, fileName?: string) => void;
+}
+
 angular.module('oppia').directive('audioFileUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {
@@ -32,7 +41,7 @@ angular.module('oppia').directive('audioFileUploader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
         'audio-file-uploader.directive.html'),
-      link: function(scope: ICustomScope, elt) {
+      link: function(scope: AudioFileUploaderScope, elt) {
         var ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
 
 

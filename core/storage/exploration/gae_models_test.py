@@ -53,11 +53,6 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExplorationModel
             .has_reference_to_user_id('x_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            exp_models.ExplorationModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
@@ -91,15 +86,36 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationModel.get_export_policy(),
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
-    def test_get_user_id_migration_policy(self):
+
+class ExplorationMathRichTextInfoModelUnitTests(test_utils.GenericTestBase):
+    """Tests the ExplorationMathRichTextInfoModel class."""
+
+    def setUp(self):
+        super(ExplorationMathRichTextInfoModelUnitTests, self).setUp()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id',
+            math_images_generation_required=True,
+            estimated_max_size_of_images_in_bytes=1000).put()
+
+    def test_get_deletion_policy(self):
         self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_get_export_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
             exp_models.ExplorationContextModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+            .has_reference_to_user_id('any_id'))
 
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
+
     EXPLORATION_ID_1 = '1'
     EXPLORATION_ID_2 = '2'
     EXPLORATION_ID_3 = '3'
@@ -192,38 +208,38 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExplorationRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
-    def test_transform_dict_to_valid_format_basic(self):
+    def test_convert_to_valid_dict_format_basic(self):
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(self.exp_1_dict))
+            .convert_to_valid_dict(self.exp_1_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
-    def test_transform_dict_to_valid_format_all_viewer_ids(self):
+    def test_convert_to_valid_dict_format_all_viewer_ids(self):
         broken_dict = dict(**self.exp_1_dict)
         broken_dict['all_viewer_ids'] = [self.USER_ID_1, self.USER_ID_2]
 
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(broken_dict))
+            .convert_to_valid_dict(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
-    def test_transform_dict_to_valid_format_status(self):
+    def test_convert_to_valid_dict_format_status(self):
         broken_dict = dict(**self.exp_1_dict)
         broken_dict['status'] = 'publicized'
 
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(broken_dict))
+            .convert_to_valid_dict(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
-    def test_transform_dict_to_valid_format_translator_ids(self):
+    def test_convert_to_valid_dict_format_translator_ids(self):
         broken_dict = dict(**self.exp_1_dict)
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_1]
 
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(broken_dict))
+            .convert_to_valid_dict(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
     def test_has_reference_to_user_id(self):
@@ -243,133 +259,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             self.assertFalse(
                 exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            exp_models.ExplorationRightsModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        exp_models.ExplorationRightsModel(
-            id=self.EXPLORATION_ID_1,
-            owner_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            editor_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            voice_artist_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            viewer_ids=[
-                self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        ).save(
-            self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        exp_models.ExplorationRightsModel(
-            id=self.EXPLORATION_ID_2,
-            owner_ids=[self.USER_ID_4_OLD],
-            editor_ids=[self.USER_ID_4_OLD],
-            voice_artist_ids=[self.USER_ID_5_OLD],
-            viewer_ids=[self.USER_ID_6_OLD],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        ).save(
-            self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        exp_models.ExplorationRightsModel(
-            id=self.EXPLORATION_ID_3,
-            owner_ids=[self.USER_ID_4_OLD, self.USER_ID_5_OLD],
-            editor_ids=[self.USER_ID_5_OLD],
-            voice_artist_ids=[self.USER_ID_6_OLD],
-            viewer_ids=[],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        ).save(
-            self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
-
-        exp_models.ExplorationRightsModel.migrate_model(
-            self.USER_ID_4_OLD, self.USER_ID_4_NEW)
-        exp_models.ExplorationRightsModel.migrate_model(
-            self.USER_ID_5_OLD, self.USER_ID_5_NEW)
-        exp_models.ExplorationRightsModel.migrate_model(
-            self.USER_ID_6_OLD, self.USER_ID_6_NEW)
-
-        migrated_model_1 = exp_models.ExplorationRightsModel.get_by_id(
-            self.EXPLORATION_ID_1)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.owner_ids)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.voice_artist_ids)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
-            migrated_model_1.viewer_ids)
-
-        migrated_model_2 = exp_models.ExplorationRightsModel.get_by_id(
-            self.EXPLORATION_ID_2)
-        self.assertEqual([self.USER_ID_4_NEW], migrated_model_2.owner_ids)
-        self.assertEqual([self.USER_ID_4_NEW], migrated_model_2.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_5_NEW], migrated_model_2.voice_artist_ids)
-        self.assertEqual([self.USER_ID_6_NEW], migrated_model_2.viewer_ids)
-
-        migrated_model_3 = exp_models.ExplorationRightsModel.get_by_id(
-            self.EXPLORATION_ID_3)
-        self.assertEqual(
-            [self.USER_ID_4_NEW, self.USER_ID_5_NEW],
-            migrated_model_3.owner_ids)
-        self.assertEqual([self.USER_ID_5_NEW], migrated_model_3.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_6_NEW], migrated_model_3.voice_artist_ids)
-        self.assertEqual([], migrated_model_3.viewer_ids)
-
-    def test_verify_model_user_ids_exist(self):
-        model = exp_models.ExplorationRightsModel(
-            id=self.EXPLORATION_ID_1,
-            owner_ids=[self.USER_ID_1, self.USER_ID_2],
-            editor_ids=[self.USER_ID_1, self.USER_ID_2],
-            voice_artist_ids=[self.USER_ID_1, self.USER_ID_2],
-            viewer_ids=[self.USER_ID_1, self.USER_ID_2],
-            community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
-            viewable_if_private=False,
-            first_published_msec=0.0
-        )
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1, self.USER_ID_2]
-        model.editor_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.editor_ids = [self.USER_ID_1, self.USER_ID_2]
-        model.voice_artist_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.voice_artist_ids = [self.USER_ID_1, self.USER_ID_2]
-        model.viewer_ids = [self.USER_ID_1, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
 
     def test_save(self):
         exp_models.ExplorationRightsModel(
@@ -463,8 +352,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = exp_models.ExplorationCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
         commit.put()
@@ -478,13 +366,11 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_get_all_non_private_commits(self):
         private_commit = (
             exp_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'committer_id', 'username', 'msg',
-                'create', [{}],
+                'a', 1, 'committer_id', 'msg', 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         public_commit = (
             exp_models.ExplorationCommitLogEntryModel.create(
-                'b', 1, 'committer_id', 'username', 'msg',
-                'create', [{}],
+                'b', 1, 'committer_id', 'msg', 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
         public_commit.exploration_id = 'b'
@@ -511,16 +397,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
 
     def test_get_multi(self):
-        commit1 = (
-            exp_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'committer_id', 'username', 'msg',
-                'create', [{}],
-                constants.ACTIVITY_STATUS_PRIVATE, False))
-        commit2 = (
-            exp_models.ExplorationCommitLogEntryModel.create(
-                'a', 2, 'committer_id', 'username', 'msg',
-                'create', [{}],
-                constants.ACTIVITY_STATUS_PUBLIC, False))
+        commit1 = exp_models.ExplorationCommitLogEntryModel.create(
+            'a', 1, 'committer_id', 'msg', 'create', [{}],
+            constants.ACTIVITY_STATUS_PRIVATE, False)
+        commit2 = exp_models.ExplorationCommitLogEntryModel.create(
+            'a', 2, 'committer_id', 'msg', 'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False)
         commit1.exploration_id = 'a'
         commit2.exploration_id = 'a'
         commit1.put()
@@ -598,101 +480,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             exp_models.ExpSummaryModel
             .has_reference_to_user_id('x_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            exp_models.ExpSummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        exp_models.ExpSummaryModel(
-            id=self.EXPLORATION_ID_1,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            editor_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            voice_artist_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            viewer_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-            contributor_ids=[
-                self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
-        ).put()
-        exp_models.ExpSummaryModel(
-            id=self.EXPLORATION_ID_2,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[self.USER_ID_1_OLD],
-            editor_ids=[self.USER_ID_1_OLD],
-            voice_artist_ids=[self.USER_ID_2_OLD],
-            viewer_ids=[self.USER_ID_2_OLD],
-            contributor_ids=[self.USER_ID_3_OLD],
-        ).put()
-        exp_models.ExpSummaryModel(
-            id=self.EXPLORATION_ID_3,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[self.USER_ID_1_OLD, self.USER_ID_2_OLD],
-            editor_ids=[self.USER_ID_2_OLD],
-            voice_artist_ids=[],
-            viewer_ids=[],
-            contributor_ids=[self.USER_ID_3_OLD],
-        ).put()
-
-        exp_models.ExpSummaryModel.migrate_model(
-            self.USER_ID_1_OLD, self.USER_ID_1_NEW)
-        exp_models.ExpSummaryModel.migrate_model(
-            self.USER_ID_2_OLD, self.USER_ID_2_NEW)
-        exp_models.ExpSummaryModel.migrate_model(
-            self.USER_ID_3_OLD, self.USER_ID_3_NEW)
-
-        migrated_model_1 = exp_models.ExpSummaryModel.get_by_id(
-            self.EXPLORATION_ID_1)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.owner_ids)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.voice_artist_ids)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.viewer_ids)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
-            migrated_model_1.contributor_ids)
-
-        migrated_model_2 = exp_models.ExpSummaryModel.get_by_id(
-            self.EXPLORATION_ID_2)
-        self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.owner_ids)
-        self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.editor_ids)
-        self.assertEqual(
-            [self.USER_ID_2_NEW], migrated_model_2.voice_artist_ids)
-        self.assertEqual([self.USER_ID_2_NEW], migrated_model_2.viewer_ids)
-        self.assertEqual([self.USER_ID_3_NEW], migrated_model_2.contributor_ids)
-
-        migrated_model_3 = exp_models.ExpSummaryModel.get_by_id(
-            self.EXPLORATION_ID_3)
-        self.assertEqual(
-            [self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            migrated_model_3.owner_ids)
-        self.assertEqual([self.USER_ID_2_NEW], migrated_model_3.editor_ids)
-        self.assertEqual([], migrated_model_3.voice_artist_ids)
-        self.assertEqual([], migrated_model_3.viewer_ids)
-        self.assertEqual([self.USER_ID_3_NEW], migrated_model_3.contributor_ids)
 
     def test_get_non_private(self):
         public_exploration_summary_model = (
@@ -913,45 +700,3 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExpSummaryModel
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
-
-    def test_verify_model_user_ids_exist(self):
-        model = exp_models.ExpSummaryModel(
-            id=self.EXPLORATION_ID_1,
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            community_owned=False,
-            owner_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            editor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            voice_artist_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            viewer_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-            contributor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
-        )
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.owner_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
-        model.editor_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.editor_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
-        model.voice_artist_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.voice_artist_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
-        model.viewer_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.viewer_ids = [self.USER_ID_1_NEW, self.USER_ID_2_NEW]
-        model.contributor_ids = [self.USER_ID_1_NEW, 'user_non_id']
-        self.assertFalse(model.verify_model_user_ids_exist())

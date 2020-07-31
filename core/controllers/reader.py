@@ -34,7 +34,6 @@ from core.domain import feedback_services
 from core.domain import interaction_registry
 from core.domain import learner_progress_services
 from core.domain import moderator_services
-from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
@@ -54,59 +53,30 @@ import utils
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
 
-def _get_exploration_player_data(
-        exploration_id, version, collection_id, can_edit):
-    """Returns a dict of exploration player data.
+def _does_exploration_exist(exploration_id, version, collection_id):
+    """Returns if an exploration exists.
 
     Args:
         exploration_id: str. The ID of the exploration.
         version: int or None. The version of the exploration.
         collection_id: str. ID of the collection.
-        can_edit: bool. Whether the given user can edit this activity.
 
     Returns:
-        dict. A dict of exploration player data.
-        The keys and values of the dict are as follows:
-        - 'can_edit': bool. Whether the given user can edit this activity.
-        - 'exploration_title': str. Title of exploration.
-        - 'exploration_version': int. The version of the exploration.
-        - 'collection_id': str. ID of the collection.
-        - 'collection_title': str. Title of collection.
-            required by the given exploration ID.
-        - 'is_private': bool. Whether the exploration is private or not.
-        - 'meta_name': str. Title of exploration.
-        - 'meta_description': str. Objective of exploration.
+        bool. True if the exploration exists False otherwise.
     """
-    try:
-        exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=version)
-    except Exception:
-        raise Exception
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False, version=version)
 
-    collection_title = None
+    if exploration is None:
+        return False
+
     if collection_id:
-        try:
-            collection = collection_services.get_collection_by_id(
-                collection_id)
-            collection_title = collection.title
-        except Exception:
-            raise Exception
+        collection = collection_services.get_collection_by_id(
+            collection_id, strict=False)
+        if collection is None:
+            return False
 
-    version = exploration.version
-
-    return {
-        'can_edit': can_edit,
-        'exploration_title': exploration.title,
-        'exploration_version': version,
-        'collection_id': collection_id,
-        'collection_title': collection_title,
-        'is_private': rights_manager.is_exploration_private(
-            exploration_id),
-        # Note that this overwrites the value in base.py.
-        'meta_name': exploration.title,
-        # Note that this overwrites the value in base.py.
-        'meta_description': utils.capitalize_string(exploration.objective),
-    }
+    return True
 
 
 class ExplorationEmbedPage(base.BaseHandler):
@@ -121,14 +91,10 @@ class ExplorationEmbedPage(base.BaseHandler):
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
 
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection.
         collection_id = self.request.get('collection_id')
-        can_edit = rights_manager.check_can_edit_activity(
-            self.user, exploration_rights)
 
         # This check is needed in order to show the correct page when a 404
         # error is raised. The self.request.get('iframed') part of the check is
@@ -136,19 +102,14 @@ class ExplorationEmbedPage(base.BaseHandler):
         # embedding script.
         if (feconf.EXPLORATION_URL_EMBED_PREFIX in self.request.uri or
                 self.request.get('iframed')):
-            self.values['iframed'] = True
-        try:
-            # If the exploration does not exist, a 404 error is raised.
-            exploration_data_values = _get_exploration_player_data(
-                exploration_id, version, collection_id, can_edit)
-        except Exception:
+            self.iframed = True
+
+        if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
 
-        self.values.update(exploration_data_values)
-        self.values['iframed'] = True
+        self.iframed = True
         self.render_template(
-            'exploration-player-page.mainpage.html',
-            iframe_restriction=None)
+            'exploration-player-page.mainpage.html', iframe_restriction=None)
 
 
 class ExplorationPage(base.BaseHandler):
@@ -163,8 +124,6 @@ class ExplorationPage(base.BaseHandler):
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
 
         if self.request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
@@ -180,20 +139,11 @@ class ExplorationPage(base.BaseHandler):
             collection_id = None
         else:
             collection_id = self.request.get('collection_id')
-        can_edit = rights_manager.check_can_edit_activity(
-            self.user, exploration_rights)
 
-        try:
-            # If the exploration does not exist, a 404 error is raised.
-            exploration_data_values = _get_exploration_player_data(
-                exploration_id, version, collection_id, can_edit)
-        except Exception:
+        if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
 
-        self.values.update(exploration_data_values)
-        self.values['iframed'] = False
-        self.render_template(
-            'exploration-player-page.mainpage.html')
+        self.render_template('exploration-player-page.mainpage.html')
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -265,148 +215,28 @@ class PretestHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET request."""
-        start_cursor = self.request.get('cursor')
         story_id = self.request.get('story_id')
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.InvalidInputException
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
-        pretest_questions, _, next_start_cursor = (
-            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+        pretest_questions = (
+            question_services.get_questions_by_skill_ids(
                 feconf.NUM_PRETEST_QUESTIONS,
                 story.get_prerequisite_skill_ids_for_exp_id(exploration_id),
-                start_cursor)
+                True)
         )
         question_dicts = [question.to_dict() for question in pretest_questions]
 
         self.values.update({
             'pretest_question_dicts': question_dicts,
-            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 
 
 class StorePlaythroughHandler(base.BaseHandler):
-    """Handles a useful playthrough coming in from the frontend to store it. If
-    the playthrough already exists, it is updated in the datastore.
-    """
-
-    def __init__(self, *args, **kwargs):
-        """Method that initializes member variables for the handler.
-
-        Attributes:
-            current_exp_issues: ExplorationIssues. The exploration issues domain
-                object.
-            current_issue_schema_version: int. The issue schema version.
-            current_playthrough_id: str|None. The Playthrough ID or None.
-        """
-        super(StorePlaythroughHandler, self).__init__(*args, **kwargs)
-        self.current_exp_issues = None
-        self.current_issue_schema_version = None
-        self.current_playthrough_id = None
-
-    def _find_matching_issue_in_exp_issues(self, playthrough):
-        """Finds an issue with the equivalent issue_type and associated states
-        as the given playthrough in the unresolved issues list of the
-        exploration issues model.
-
-        Args:
-            playthrough: Playthrough. The playthrough domain object.
-
-        Returns:
-            int|None. The index at which the issue was found, None otherwise.
-        """
-        for index, issue in enumerate(
-                self.current_exp_issues.unresolved_issues):
-            if issue.issue_type == playthrough.issue_type:
-                issue_customization_args = issue.issue_customization_args
-                # In case issue_keyname is 'state_names', the ordering of the
-                # list is important i.e. [a,b,c] is different from [b,c,a].
-                issue_keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
-                    issue.issue_type]
-                if (issue_customization_args[issue_keyname] ==
-                        playthrough.issue_customization_args[issue_keyname]):
-                    return index
-        return None
-
-    def _move_playthrough_to_correct_issue(self, playthrough, orig_playthrough):
-        """Moves the updated playthrough to its correct issue in the unresolved
-        issues list.
-
-        Args:
-            playthrough: Playthrough. The updated playthrough domain object.
-            orig_playthrough: Playthrough. The original playthrough domain
-                object which is in the now-incorrect issue list.
-        """
-        did_move_playthrough_to_new_issue = False
-        issue_index = self._find_matching_issue_in_exp_issues(playthrough)
-        # Check whether the playthrough can be added to its new issue,
-        # if not, it stays in its old issue.
-        if issue_index is not None:
-            issue = self.current_exp_issues.unresolved_issues[issue_index]
-            if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
-                issue.playthrough_ids.append(self.current_playthrough_id)
-                did_move_playthrough_to_new_issue = True
-        else:
-            issue = stats_domain.ExplorationIssue(
-                playthrough.issue_type,
-                playthrough.issue_customization_args,
-                [self.current_playthrough_id],
-                self.current_issue_schema_version, is_valid=True)
-            self.current_exp_issues.unresolved_issues.append(issue)
-            did_move_playthrough_to_new_issue = True
-
-        # Now, remove the playthrough from its old issue.
-        if did_move_playthrough_to_new_issue:
-            orig_issue_index = self._find_matching_issue_in_exp_issues(
-                orig_playthrough)
-            if orig_issue_index is not None:
-                self.current_exp_issues.unresolved_issues[
-                    orig_issue_index].playthrough_ids.remove(
-                        self.current_playthrough_id)
-
-    def _assign_playthrough_to_issue(self, playthrough):
-        """Assigns newly created playthrough to its correct issue or makes a new
-        issue.
-
-        Args:
-            playthrough: Playthrough. The playthrough domain object.
-
-        Raises:
-            Exception. Maximum playthroughs per issue reached.
-
-        Returns:
-            playthrough_id: int. The playthrough ID.
-        """
-        # Find whether an issue already exists for the new playthrough.
-        issue_index = self._find_matching_issue_in_exp_issues(playthrough)
-        if issue_index is not None:
-            issue = self.current_exp_issues.unresolved_issues[issue_index]
-            if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
-                actions = [action.to_dict() for action in playthrough.actions]
-                playthrough_id = stats_models.PlaythroughModel.create(
-                    playthrough.exp_id, playthrough.exp_version,
-                    playthrough.issue_type,
-                    playthrough.issue_customization_args, actions)
-                issue.playthrough_ids.append(playthrough_id)
-            else:
-                raise Exception('Maximum playthroughs per issue reached.')
-        else:
-            actions = [action.to_dict() for action in playthrough.actions]
-            playthrough_id = stats_models.PlaythroughModel.create(
-                playthrough.exp_id, playthrough.exp_version,
-                playthrough.issue_type,
-                playthrough.issue_customization_args, actions)
-            issue = stats_domain.ExplorationIssue(
-                playthrough.issue_type,
-                playthrough.issue_customization_args,
-                [playthrough_id], self.current_issue_schema_version,
-                is_valid=True)
-
-            self.current_exp_issues.unresolved_issues.append(issue)
-
-        return playthrough_id
+    """Commits a playthrough recorded on the frontend to storage."""
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -416,60 +246,82 @@ class StorePlaythroughHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
+        issue_schema_version = self.payload.get('issue_schema_version')
+        if issue_schema_version is None:
+            raise self.InvalidInputException('missing issue_schema_version')
+
         playthrough_data = self.payload.get('playthrough_data')
         try:
-            unused_playthrough = stats_domain.Playthrough.from_dict(
-                playthrough_data)
+            playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        try:
-            self.current_issue_schema_version = self.payload[
-                'issue_schema_version']
-        except KeyError as e:
-            raise self.InvalidInputException(e)
+        exp_issues = stats_services.get_exp_issues_from_model(
+            stats_models.ExplorationIssuesModel.get_model(
+                exploration_id, playthrough.exp_version))
 
-        try:
-            self.current_playthrough_id = self.payload['playthrough_id']
-        except KeyError as e:
-            raise self.InvalidInputException(e)
+        if self._assign_playthrough_to_corresponding_issue(
+                playthrough, exp_issues, issue_schema_version):
+            stats_services.save_exp_issues_model_transactional(exp_issues)
+        self.render_json({})
 
-        exp_version = playthrough_data['exp_version']
+    def _get_corresponding_exp_issue(
+            self, playthrough, exp_issues, issue_schema_version):
+        """Returns the unique exploration issue model expected to own the given
+        playthrough. If it does not exist yet, then it will be created.
 
-        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-            exploration_id, exp_version)
-        self.current_exp_issues = stats_services.get_exp_issues_from_model(
-            exp_issues_model)
+        Args:
+            playthrough: Playthrough. The playthrough domain object.
+            exp_issues: ExplorationIssues. The exploration issues domain object
+                which manages each individual exploration issue.
+            issue_schema_version: int. The version of the issue schema.
 
-        playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
+        Returns:
+            ExplorationIssue. The corresponding exploration issue.
+        """
+        for issue in exp_issues.unresolved_issues:
+            if issue.issue_type == playthrough.issue_type:
+                issue_customization_args = issue.issue_customization_args
+                identifying_arg = (
+                    stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+                        issue.issue_type])
+                # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
+                # ordering of the list is important (i.e. [a, b, c] is different
+                # from [b, c, a]).
+                if (issue_customization_args[identifying_arg] ==
+                        playthrough.issue_customization_args[identifying_arg]):
+                    return issue
+        issue = stats_domain.ExplorationIssue(
+            playthrough.issue_type, playthrough.issue_customization_args,
+            [], issue_schema_version, is_valid=True)
+        exp_issues.unresolved_issues.append(issue)
+        return issue
 
-        # If playthrough already exists, update it in the datastore.
-        if self.current_playthrough_id is not None:
-            orig_playthrough = stats_services.get_playthrough_by_id(
-                self.current_playthrough_id)
-            if orig_playthrough.issue_type != playthrough.issue_type:
-                self._move_playthrough_to_correct_issue(
-                    playthrough, orig_playthrough)
+    def _assign_playthrough_to_corresponding_issue(
+            self, playthrough, exp_issues, issue_schema_version):
+        """Stores the given playthrough as a new model into its corresponding
+        exploration issue. When the corresponding exploration issue does not
+        exist, a new one is created.
 
-            stats_services.update_playthroughs_multi(
-                [self.current_playthrough_id], [playthrough])
-            stats_services.save_exp_issues_model_transactional(
-                self.current_exp_issues)
-            self.render_json({})
-            return
+        Args:
+            playthrough: Playthrough. The playthrough domain object.
+            exp_issues: ExplorationIssues. The exploration issues domain object.
+            issue_schema_version: int. The version of the issue schema.
 
-        payload_return = {'playthrough_stored': True}
-
-        playthrough_id = None
-        try:
-            playthrough_id = self._assign_playthrough_to_issue(playthrough)
-        except Exception:
-            payload_return['playthrough_stored'] = False
-
-        stats_services.save_exp_issues_model_transactional(
-            self.current_exp_issues)
-        payload_return['playthrough_id'] = playthrough_id
-        self.render_json(payload_return)
+        Returns:
+            bool. Whether the playthrough was stored successfully.
+        """
+        issue = self._get_corresponding_exp_issue(
+            playthrough, exp_issues, issue_schema_version)
+        if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
+            issue.playthrough_ids.append(
+                stats_models.PlaythroughModel.create(
+                    playthrough.exp_id, playthrough.exp_version,
+                    playthrough.issue_type,
+                    playthrough.issue_customization_args,
+                    [action.to_dict() for action in playthrough.actions]))
+            return True
+        return False
 
 
 class StatsEventsHandler(base.BaseHandler):
@@ -594,7 +446,7 @@ class StateHitEventHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'NONE EXP VERSION: State hit')
         session_id = self.payload.get('session_id')
-        # TODO(sll): why do we not record the value of this anywhere?
+        # TODO(sll): Why do we not record the value of this anywhere?
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
@@ -831,6 +683,7 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
     """Handles operations related to the activities in the incomplete list of
     the user.
     """
+
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, activity_id):
         """Removes exploration or collection from incomplete list.

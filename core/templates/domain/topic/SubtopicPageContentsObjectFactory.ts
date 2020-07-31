@@ -22,36 +22,37 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  RecordedVoiceOverBackendDict,
+  RecordedVoiceovers,
+  RecordedVoiceoversObjectFactory
+} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+
+import {
+  SubtitledHtmlBackendDict,
+  SubtitledHtml,
+  SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+export interface SubtopicPageContentsBackendDict {
+  'subtitled_html': SubtitledHtmlBackendDict;
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
+}
 
 export class SubtopicPageContents {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_subtitledHtml' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing. Same goes for '_recordedVoiceovers'.
-  _subtitledHtml: any;
-  _recordedVoiceovers: any;
-  constructor(subtitledHtml: any, recordedVoiceovers: any) {
+  _subtitledHtml: SubtitledHtml;
+  _recordedVoiceovers: RecordedVoiceovers;
+  constructor(
+      subtitledHtml: SubtitledHtml, recordedVoiceovers: RecordedVoiceovers) {
     this._subtitledHtml = subtitledHtml;
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getSubtitledHtml(): any {
+  getSubtitledHtml(): SubtitledHtml {
     return this._subtitledHtml;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'newSubtitledHtml' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  setSubtitledHtml(newSubtitledHtml: any): void {
+  setSubtitledHtml(newSubtitledHtml: SubtitledHtml): void {
     this._subtitledHtml = cloneDeep(newSubtitledHtml);
   }
 
@@ -63,27 +64,15 @@ export class SubtopicPageContents {
     this._subtitledHtml.setHtml(html);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getRecordedVoiceovers(): any {
+  getRecordedVoiceovers(): RecordedVoiceovers {
     return this._recordedVoiceovers;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'newRecordedVoiceovers' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  setRecordedVoiceovers(newRecordedVoiceovers: any): void {
+  setRecordedVoiceovers(newRecordedVoiceovers: RecordedVoiceovers): void {
     this._recordedVoiceovers = cloneDeep(newRecordedVoiceovers);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): SubtopicPageContentsBackendDict {
     return {
       subtitled_html: this._subtitledHtml.toBackendDict(),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
@@ -107,11 +96,8 @@ export class SubtopicPageContentsObjectFactory {
       recordedVoiceovers);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'backendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(backendDict: any): SubtopicPageContents {
+  createFromBackendDict(
+      backendDict: SubtopicPageContentsBackendDict): SubtopicPageContents {
     return new SubtopicPageContents(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         backendDict.subtitled_html),

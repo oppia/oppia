@@ -120,6 +120,12 @@ describe('Skill editor state service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     fakeSkillBackendApiService = (
       FakeSkillBackendApiService());
     $provide.value(
@@ -146,12 +152,6 @@ describe('Skill editor state service', function() {
     $provide.value(
       'SkillRightsBackendApiService',
       [fakeSkillRightsBackendApiService][0]);
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

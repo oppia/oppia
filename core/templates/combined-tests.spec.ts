@@ -39,7 +39,22 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
-declare const require: any;
+// NOTE - These types are defined by taking
+// https://webpack.js.org/guides/dependency-management/#context-module-api
+// as a reference.
+interface RequireContext {
+  context(
+      directory: string, useSubdirectories: boolean, regExp: RegExp): Context;
+}
+
+interface Context {
+  (request: Object): void;
+  resolve: () => string;
+  keys: () => Object[];
+  id: string;
+}
+
+declare const require: RequireContext;
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
@@ -58,7 +73,7 @@ getTestBed().initTestEnvironment(
 // The 'domhandler/src/index.spec.ts' is excluded from the tests since it is
 // coming from third party library.
 /* eslint-disable max-len */
-const context = require.context('../../', true, /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!domhandler\/src\/index\.spec\.ts)/);
+const context = require.context('../../', true, /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!domhandler\/src\/index\.spec\.ts)(?<!(valid|invalid)(_|\-)[\w\d.\-]*\.ts)/);
 /* eslint-enable max-len */
 
 // And load the modules.

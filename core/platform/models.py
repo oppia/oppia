@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
+from constants import constants
 import feconf
 import python_utils
 import utils
@@ -28,7 +29,7 @@ import utils
 # Valid model names.
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'job', 'opportunity',
+    'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
@@ -47,7 +48,8 @@ class Platform(python_utils.OBJECT):
             NotImplementedError: The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'import_models() method is not overwritten in derived classes')
 
 
 class _Gae(Platform):
@@ -97,6 +99,9 @@ class _Gae(Platform):
             elif name == NAMES.feedback:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
+            elif name == NAMES.improvements:
+                from core.storage.improvements import gae_models as improvements_models # pylint: disable=line-too-long
+                returned_models.append(improvements_models)
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
@@ -143,6 +148,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
+
         model_classes = []
         for module in cls.import_models(model_names):
             for member_name, member_obj in inspect.getmembers(module):
@@ -210,38 +216,30 @@ class _Gae(Platform):
         return gae_app_identity_services
 
     @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        from core.platform.image import gae_image_services
-        return gae_image_services
-
-    @classmethod
     def import_email_services(cls):
         """Imports and returns the email services module specified in feconf.py.
+        If in DEV_MODE, uses the dev mode version of email services.
 
         Returns:
             module. The email_services module to use, based on the feconf.py
-            setting.
+            setting and DEV_MODE setting.
 
         Raises:
             Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
-            to a valid email_services module.
+                to a valid email_services module.
         """
-        if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
-            from core.platform.email import gae_email_services
-            return gae_email_services
-        elif (feconf.EMAIL_SERVICE_PROVIDER ==
-              feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+        if constants.DEV_MODE:
+            from core.platform.email import dev_mode_email_services
+            return dev_mode_email_services
+        elif (
+                feconf.EMAIL_SERVICE_PROVIDER ==
+                feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:
             raise Exception(
-                ('Invalid email service provider: %s'
-                 % feconf.EMAIL_SERVICE_PROVIDER))
+                'Invalid email service provider: %s' % (
+                    feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
     def import_memcache_services(cls):
@@ -367,15 +365,6 @@ class Registry(python_utils.OBJECT):
             module. The app_identity_services module.
         """
         return cls._get().import_app_identity_services()
-
-    @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        return cls._get().import_gae_image_services()
 
     @classmethod
     def import_email_services(cls):

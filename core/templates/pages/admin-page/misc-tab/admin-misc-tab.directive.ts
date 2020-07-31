@@ -17,16 +17,26 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
+require('services/image-upload-helper.service.ts');
+require('services/alerts.service.ts');
+require('services/contextual/logger.service');
+require('mathjaxConfig.ts');
+require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
+  '$http', '$rootScope', '$window', 'AdminDataService',
+  'AdminTaskManagerService', 'AlertsService', 'ImageUploadHelperService',
+  'LoggerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window, AdminTaskManagerService, UrlInterpolationService,
-      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
+      $http, $rootScope, $window, AdminDataService,
+      AdminTaskManagerService, AlertsService, ImageUploadHelperService,
+      LoggerService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,10 +51,13 @@ angular.module('oppia').directive('adminMiscTab', [
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/sendDummyMailToAdminHandler');
-
+          '/senddummymailtoadminhandler');
+        var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
+        var ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler';
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
+
+        ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
 
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -155,6 +168,177 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in explorations have a valid math SVG stored in the
+        // datastore.
+        var convertLatexToSvgFile = function(inputLatexString) {
+          return new Promise((resolve, reject) => {
+            var emptyDiv = document.createElement('div');
+            var outputElement = angular.element(emptyDiv);
+            // We need to append the element with a script tag so that Mathjax
+            // can typeset and convert this element. The typesetting is not
+            // possible if we don't add a script tag. The code below is similar
+            // to how the math equations are rendered in the mathjaxBind
+            // directive (see mathjax-bind.directive.ts).
+            var $script = angular.element(
+              '<script type="math/tex">'
+            ).html(inputLatexString === undefined ? '' : inputLatexString);
+            outputElement.html('');
+            outputElement.append($script);
+            // Naturally MathJax works asynchronously, but we can add processes
+            // which we want to happen synchronously into the MathJax Hub Queue.
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement[0]]);
+            MathJax.Hub.Queue(function() {
+              var svgString = (
+                outputElement[0].getElementsByTagName('svg')[0].outerHTML);
+              var cleanedSvgString = (
+                ImageUploadHelperService.cleanMathExpressionSvgString(
+                  svgString));
+              var dimensions = (
+                ImageUploadHelperService.
+                  extractDimensionsFromMathExpressionSvgString(
+                    cleanedSvgString));
+              // We need use unescape and encodeURIComponent in order to
+              // handle the case when SVGs have non-ascii unicode characters.
+              var dataURI = (
+                'data:image/svg+xml;base64,' +
+                btoa(unescape(encodeURIComponent(cleanedSvgString))));
+
+              var invalidTagsAndAttributes = (
+                ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+              var tags = invalidTagsAndAttributes.tags;
+              var attrs = invalidTagsAndAttributes.attrs;
+              if (tags.length === 0 && attrs.length === 0) {
+                var resampledFile = (
+                  ImageUploadHelperService.convertImageDataToImageFile(
+                    dataURI));
+                var date = new Date();
+                var now = date.getTime();
+                // This temporary Id will be used for adding and retrieving the
+                // raw image for each LaTeX string from the request body. For
+                // more details refer to the docstring in
+                // sendMathSvgsToBackend() in AdminBackendApiService.
+                var latexId = (
+                  now.toString(36).substr(2, 6) +
+                  Math.random().toString(36).substr(4));
+                resolve ({
+                  file: resampledFile,
+                  dimensions: {
+                    encoded_height_string: dimensions.height,
+                    encoded_width_string: dimensions.width,
+                    encoded_vertical_padding_string: dimensions.verticalPadding
+                  },
+                  latexId: latexId
+                });
+              } else {
+                AlertsService.addWarning(
+                  'SVG failed validation for LaTeX ' + inputLatexString);
+                reject();
+              }
+            });
+            // This will catch and log any error that occurs internally in
+            // MathJax.
+            MathJax.Hub.Register.MessageHook(
+              'Math Processing Error', function(message) {
+                LoggerService.error(message[2]);
+                LoggerService.error('Cannot convert Latex:' + inputLatexString);
+                reject();
+              });
+          });
+        };
+
+        var latexMapping;
+        var expIdToLatexMapping = null;
+        var numberOfLatexStrings = 0;
+        ctrl.generateSvgs = async function() {
+          var countOfSvgsGenerated = 0;
+          latexMapping = {};
+          for (var expId in expIdToLatexMapping) {
+            var latexStrings = expIdToLatexMapping[expId];
+            latexMapping[expId] = {};
+            for (var i = 0; i < latexStrings.length; i++) {
+              LoggerService.info(
+                'Trying to generate SVG for Latex: ' +
+                latexStrings[i] + '  Exploration: ' + expId );
+              var svgFile = await convertLatexToSvgFile(latexStrings[i]);
+              countOfSvgsGenerated++;
+              LoggerService.info(
+                'generated ' + countOfSvgsGenerated.toString() + ' SVGs' +
+                ' out of ' + numberOfLatexStrings.toString());
+              latexMapping[expId][latexStrings[i]] = svgFile;
+            }
+            if (numberOfLatexStrings === countOfSvgsGenerated) {
+              ctrl.setStatusMessage(
+                'SVGs generated for ' + countOfSvgsGenerated.toString() +
+                ' LaTeX strings .');
+              $rootScope.$apply();
+            }
+          }
+        };
+
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in explorations have a valid math SVG stored in the
+        // datastore.
+        ctrl.fetchAndGenerateSvgsForExplorations = function() {
+          $http.get(ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER).then(
+            function(response) {
+              var numberOfExplorationsFetched = 0;
+              numberOfLatexStrings = 0;
+              expIdToLatexMapping = (
+                response.data.latex_strings_to_exp_id_mapping);
+              for (var expId in expIdToLatexMapping) {
+                numberOfExplorationsFetched++;
+                numberOfLatexStrings += Object.keys(
+                  expIdToLatexMapping[expId]).length;
+              }
+              ctrl.setStatusMessage(
+                numberOfLatexStrings.toString() +
+                ' LaTeX strings fetched from backend for ' +
+                numberOfExplorationsFetched.toString() + ' explorations.' +
+                ' Generating SVGs.....');
+              ctrl.generateSvgs();
+            });
+        };
+        // TODO(#10045): Remove this function once all the math-rich text
+        // components in explorations have a valid math SVG stored in the
+        // datastore.
+        ctrl.saveSvgsToBackend = function() {
+          AdminDataService.sendMathSvgsToBackendAsync(
+            latexMapping).then(
+            function(response) {
+              var numberOfExplorationsUpdated = (
+                response.number_of_explorations_updated);
+              var numberOfExplorationsLeftToUpdate = (
+                response.number_of_explorations_left_to_update);
+              ctrl.setStatusMessage(
+                'Successfully updated ' + numberOfExplorationsUpdated +
+                ' explorations, ' + numberOfExplorationsLeftToUpdate + ' left');
+              $rootScope.$apply();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error:' + errorResponse.data.error);
+              $rootScope.$apply();
+            });
+        };
+
+        ctrl.updateUsername = function() {
+          ctrl.setStatusMessage('Updating username...');
+          $http.put(
+            UPDATE_USERNAME_HANDLER_URL, {
+              old_username: ctrl.oldUsername,
+              new_username: ctrl.newUsername
+            }).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'Successfully renamed ' + ctrl.oldUsername + ' to ' +
+                  ctrl.newUsername + '!');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
@@ -186,6 +370,8 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.$onInit = function() {
           ctrl.topicIdForRegeneratingOpportunities = null;
           ctrl.regenerationMessage = null;
+          ctrl.oldUsername = null;
+          ctrl.newUsername = null;
         };
       }]
     };

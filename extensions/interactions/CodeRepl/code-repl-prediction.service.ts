@@ -34,21 +34,6 @@ import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 
-// TODO(#7165): Replace 'any' with the exact type
-/* eslint-disable camelcase */
-export interface IKNN {
-  fingerprint_data: any;
-  occurrence: any;
-  top: any;
-  K?: any;
-  T?: any;
-  token_to_id?:any;
-}
-export interface IClassifierData {
-  KNN: IKNN
-  cv_vocabulary: object;
-  SVM: object;
-}
 @Injectable({
   providedIn: 'root'
 })
@@ -203,7 +188,7 @@ export class CodeReplPredictionService {
     return this.calcJaccardIndex(multisetA, multisetB);
   }
 
-  findNearestNeighborsIndexes(knnData: IKNN, program: string): Array<number[]> {
+  findNearestNeighborsIndexes(knnData: KNN, program: string): Array<number[]> {
     // Find index of nearest neighbor programs to given program.
     const K = knnData.K;
     const T = knnData.T;
@@ -256,7 +241,7 @@ export class CodeReplPredictionService {
     return nearestNeighborsIndexes;
   }
 
-  predict(classifierData: IClassifierData, answer: {code: string}): number {
+  predict(classifierData: ClassifierData, answer: {code: string}): number {
     // Get python code from the input answer.
     const program = answer.code;
     const knnData = classifierData.KNN;
@@ -269,7 +254,7 @@ export class CodeReplPredictionService {
 
     const nearestNeighborsIndexes = (
       this.findNearestNeighborsIndexes(knnData, program));
-    const nearesNeighborsClasses = [];
+    const nearesNeighborsClasses: number[][] = [];
 
     // Find classes of nearest neighbor programs.
     nearestNeighborsIndexes.forEach((neighbor: number[]) => {
@@ -282,7 +267,7 @@ export class CodeReplPredictionService {
 
     // Count how many times a class appears in nearest neighbors.
     const classCount = {};
-    nearesNeighborsClasses.forEach((neighbor: any[]) => {
+    nearesNeighborsClasses.forEach(neighbor => {
       const outputClass = neighbor[0];
       if (classCount.hasOwnProperty(outputClass)) {
         classCount[outputClass] += 1;

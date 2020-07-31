@@ -21,8 +21,6 @@
 // thread-data.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
-
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -394,7 +392,7 @@ describe('retrieving threads service', () => {
       let thread = FeedbackThreadObjectFactory.createFromBackendDict(
         mockThread);
 
-      // Fetch feedback stats
+      // Fetch feedback stats.
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
         num_open_threads: 1
       });
@@ -425,7 +423,7 @@ describe('retrieving threads service', () => {
       let thread = FeedbackThreadObjectFactory.createFromBackendDict(
         mockThread);
 
-      // Fetch feedback stats
+      // Fetch feedback stats.
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
         num_open_threads: 1
       });
@@ -454,7 +452,7 @@ describe('retrieving threads service', () => {
       let thread = FeedbackThreadObjectFactory.createFromBackendDict(
         mockThread);
 
-      // Fetch feedback stats
+      // Fetch feedback stats.
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
         num_open_threads: 1
       });

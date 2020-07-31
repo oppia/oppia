@@ -65,6 +65,12 @@ describe('Schema Default Value Service', () => {
       }]
     };
     expect(sdvs.getDefaultValue(schema)).toEqual([false, 0]);
+
+    let schema2 = {
+      type: 'list',
+      items: ''
+    };
+    expect(sdvs.getDefaultValue(schema2)).toEqual([]);
   });
 
   it('should get default value if schema type is dict', () => {
@@ -114,6 +120,6 @@ describe('Schema Default Value Service', () => {
 
     expect(sdvs.getDefaultValue(schema)).toBeUndefined();
     expect(loggerErrorSpy).toHaveBeenCalledWith(
-      'Invalid schema type: invalid');
+      'Invalid schema: ' + JSON.stringify(schema));
   });
 });

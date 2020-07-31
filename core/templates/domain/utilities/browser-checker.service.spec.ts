@@ -41,16 +41,6 @@ describe('Browser Checker Service', function() {
       expect(!!bcs.isMobileDevice()).toBe(true);
     });
 
-  it('should evaluate when device is desktop checking window opera', () => {
-    // ref: https://github.com/jasmine/jasmine/issues/1415
-    Object.defineProperty(wrs.nativeWindow, 'opera', {
-      get: () => undefined
-    });
-    spyOnProperty(navigator, 'userAgent').and.returnValue(undefined);
-    spyOnProperty(wrs.nativeWindow, 'opera').and.returnValue(desktopAgent);
-    expect(!!bcs.isMobileDevice()).toBe(false);
-  });
-
   it('should support speech synthesis when device is desktop', () => {
     spyOnProperty(wrs.nativeWindow, 'speechSynthesis').and.returnValue({
       getVoices: () => [{ lang: 'en-US' }]

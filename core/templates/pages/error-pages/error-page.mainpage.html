@@ -4,14 +4,15 @@
     @load('base-components/header.template.html', {"title": "Error - Oppia"})
   </head>
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <content>
-          <error-page status_code="<%=htmlWebpackPlugin.options.statusCode%>"></error-page>
-        </content>
-      </base-content>
-    </div>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <content>
+            <error-page status_code="<%=htmlWebpackPlugin.options.statusCode%>"></error-page>
+          </content>
+        </base-content>
+      </div>
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

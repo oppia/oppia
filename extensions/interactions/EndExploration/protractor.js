@@ -23,25 +23,27 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
  * @param {Object} elem - The Customize Exploration modal for End Exploration.
  * @param {string[]} recommendedExplorationIdArray - Exploration Id array.
  */
-var customizeInteraction = function(elem, recommendedExplorationIdArray) {
+var customizeInteraction = async function(
+    elem, recommendedExplorationIdArray) {
   if (recommendedExplorationIdArray) {
     if (Array.isArray(recommendedExplorationIdArray) === false) {
       throw new Error ('Please use array to add recommendation Ids');
     }
-    recommendedExplorationIdArray.forEach(function(explorationId) {
+    for (var explorationId of recommendedExplorationIdArray) {
       var addExplorationIdButton = element(
         by.css('.protractor-test-add-list-entry'));
-      addExplorationIdButton.click();
-      objects.UnicodeStringEditor(
+      await addExplorationIdButton.click();
+      await objects.UnicodeStringEditor(
         elem.element(by.tagName('schema-based-unicode-editor'))
       ).setValue(explorationId);
-    });
+    }
   }
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-end-exploration')).isPresent()
+    await elem.element(by.tagName(
+      'oppia-interactive-end-exploration')).isPresent()
   ).toBe(true);
 };
 

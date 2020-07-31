@@ -169,6 +169,16 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 % hyphenated_component_id)
             main_html_file = os.path.join(
                 directives_dir, '%s.directive.html' % hyphenated_component_id)
+            # TODO(#9762): Remove this if condition once all the files in the
+            # rich_text_components directory is migrated from directives
+            # to component files.
+            if hyphenated_component_id == 'svgdiagram':
+                main_ts_file = os.path.join(
+                    directives_dir, 'oppia-noninteractive-%s.component.ts'
+                    % hyphenated_component_id)
+                main_html_file = os.path.join(
+                    directives_dir, '%s.component.html'
+                    % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
@@ -202,9 +212,13 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
+            # When reading for all the .ts files in the directives directory,
+            # the .spec.ts files should not be included.
             rtc_ts_filenames.extend(
                 filename for filename
-                in directive_filenames if filename.endswith('.ts'))
+                in directive_filenames if (
+                    filename.endswith('.ts') and
+                    not filename.endswith('.spec.ts')))
 
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')

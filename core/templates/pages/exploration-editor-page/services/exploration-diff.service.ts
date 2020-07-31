@@ -24,6 +24,56 @@ import isEqual from 'lodash/isEqual';
 
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
 
+import {
+  AddStateNameChangeList,
+  ExplorationChangeList,
+  RenameStateChangeList,
+  EditStatePropertyChangeList
+} from 'domain/exploration/ExplorationDraftObjectFactory';
+import { StateObjectsDict } from 'domain/exploration/StatesObjectFactory';
+
+interface ExplorationGraphChangeList {
+  changeList: ExplorationChangeList[];
+  directionForwards: boolean;
+}
+
+interface StateData {
+  [stateName: string]: {
+    newestStateName: string;
+    originalStateName: string;
+    stateProperty: string;
+  }
+}
+
+interface StateIds {
+  [stateName: string]: number;
+}
+
+interface StateIdsAndData {
+  stateIds: StateIds;
+  stateData: StateData;
+}
+
+interface ProcessedStateIdsAndData {
+  nodes: StateData;
+  links: StateLink[];
+  originalStateIds: StateIds;
+  stateIds: StateIds;
+  finalStateIds: string[];
+}
+
+interface AdjMatrix {
+  [state1: number]: {
+    [state2: number]: boolean;
+  }
+}
+
+interface StateLink {
+  source: number;
+  target: number;
+  linkProperty: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,7 +84,7 @@ export class ExplorationDiffService {
   STATE_PROPERTY_UNCHANGED = 'unchanged';
   _maxId = 0;
 
-  // Functions to assign ids to states
+  // Functions to assign ids to states.
   _resetMaxId(): void {
     this._maxId = 0;
   }
@@ -43,9 +93,8 @@ export class ExplorationDiffService {
     return this._maxId;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type.
-  _generateInitialStateIdsAndData(statesDict: Object):
-      { stateIds: any, stateData: any } {
+  _generateInitialStateIdsAndData(
+      statesDict: StateObjectsDict): StateIdsAndData {
     let result = {
       stateIds: {},
       stateData: {}
@@ -64,17 +113,14 @@ export class ExplorationDiffService {
     }
     return result;
   }
-  // TODO(#7176): Replace 'any' with the exact type.
+
   _postprocessStateIdsAndData(
-      originalStateIds: Array<string>, stateIds: Array<string>,
-      stateData: any, v1States: any, v2States: any): {
-        nodes: any,
-        links: any,
-        originalStateIds: Array<string>
-        stateIds: Array<string>
-        finalStateIds: Array<string>
-      } {
-    // Ignore changes that were canceled out by later changes
+      originalStateIds: StateIds,
+      stateIds: StateIds,
+      stateData: StateData,
+      v1States: StateObjectsDict,
+      v2States: StateObjectsDict): ProcessedStateIdsAndData {
+    // Ignore changes that were canceled out by later changes.
     for (let stateId in stateData) {
       if (stateData[stateId].stateProperty === this.STATE_PROPERTY_CHANGED &&
           v1States.hasOwnProperty(stateData[stateId].originalStateName) &&
@@ -85,7 +131,7 @@ export class ExplorationDiffService {
       }
     }
 
-    // Delete states not present in both v1 and v2
+    // Delete states not present in both v1 and v2.
     for (let stateId in stateData) {
       if (!v1States.hasOwnProperty(
         stateData[stateId].originalStateName) &&
@@ -95,7 +141,7 @@ export class ExplorationDiffService {
     }
 
     // Track whether terminal nodes in v1 or v2
-    // TODO(bhenning): could show changes to terminal nodes in diff
+    // TODO(bhenning): Could show changes to terminal nodes in diff.
     let finalStateIds = [];
     for (let stateId in stateData) {
       let oldState = v1States[stateData[stateId].originalStateName];
@@ -145,66 +191,78 @@ export class ExplorationDiffService {
    * - directionForwards: true if changes are compared in increasing version
    * number, and false if changes are compared in decreasing version number.
    */
-  // TODO(#7176): Replace 'any' with the exact type.
-  _getDiffGraphData(v1States: any, v2States: any, changeListData: any): any {
+  _getDiffGraphData(
+      v1States: StateObjectsDict,
+      v2States: StateObjectsDict,
+      changeListData: ExplorationGraphChangeList[]):
+    ProcessedStateIdsAndData {
     let v1Info = this._generateInitialStateIdsAndData(v1States);
     let stateData = v1Info.stateData;
     let stateIds = v1Info.stateIds;
     let originalStateIds = cloneDeep(stateIds);
 
-    changeListData.forEach((changeListDatum) => {
+    changeListData.forEach(changeListDatum => {
       let changeList = changeListDatum.changeList;
       let directionForwards = changeListDatum.directionForwards;
-      // TODO(#7176): Replace 'any' with the exact type.
-      changeList.forEach((change: any) => {
+      changeList.forEach(change => {
         if ((directionForwards && change.cmd === 'add_state') ||
             (!directionForwards && change.cmd === 'delete_state')) {
-          if (!stateIds.hasOwnProperty(change.state_name)) {
+          if (!stateIds.hasOwnProperty(
+            (<AddStateNameChangeList> change).state_name)) {
             let newId = this._generateNewId();
-            stateIds[change.state_name] = newId;
+            stateIds[(<AddStateNameChangeList> change).state_name] = newId;
           }
-          let currentStateId = stateIds[change.state_name];
+          let currentStateId = (
+            stateIds[(<AddStateNameChangeList> change).state_name]);
           if (stateData.hasOwnProperty(currentStateId) &&
               stateData[currentStateId].stateProperty ===
               this.STATE_PROPERTY_DELETED) {
             stateData[currentStateId].stateProperty =
                 this.STATE_PROPERTY_CHANGED;
-            stateData[currentStateId].newestStateName = change.state_name;
+            stateData[currentStateId].newestStateName = (
+              <AddStateNameChangeList> change).state_name;
           } else {
             stateData[currentStateId] = {
-              newestStateName: change.state_name,
-              originalStateName: change.state_name,
+              newestStateName: (<AddStateNameChangeList> change).state_name,
+              originalStateName: (<AddStateNameChangeList> change).state_name,
               stateProperty: this.STATE_PROPERTY_ADDED
             };
           }
         } else if ((directionForwards && change.cmd === 'delete_state') ||
             (!directionForwards && change.cmd === 'add_state')) {
-          if (stateData[stateIds[change.state_name]].stateProperty ===
+          if (stateData[stateIds[(
+            <AddStateNameChangeList> change).state_name]].stateProperty ===
               this.STATE_PROPERTY_ADDED) {
-            stateData[stateIds[change.state_name]].stateProperty = (
+            stateData[stateIds[(
+              <AddStateNameChangeList> change).state_name]].stateProperty = (
               this.STATE_PROPERTY_CHANGED);
           } else {
-            stateData[stateIds[change.state_name]].stateProperty = (
+            stateData[stateIds[(
+              <AddStateNameChangeList> change).state_name]].stateProperty = (
               this.STATE_PROPERTY_DELETED);
           }
         } else if (change.cmd === 'rename_state') {
           let newStateName = null;
           let oldStateName = null;
           if (directionForwards) {
-            newStateName = change.new_state_name;
-            oldStateName = change.old_state_name;
+            newStateName = (<RenameStateChangeList> change).new_state_name;
+            oldStateName = (<RenameStateChangeList> change).old_state_name;
           } else {
-            newStateName = change.old_state_name;
-            oldStateName = change.new_state_name;
+            newStateName = (<RenameStateChangeList> change).old_state_name;
+            oldStateName = (<RenameStateChangeList> change).new_state_name;
           }
           stateIds[newStateName] = stateIds[oldStateName];
           delete stateIds[oldStateName];
           stateData[stateIds[newStateName]].newestStateName = newStateName;
         } else if (change.cmd === 'edit_state_property') {
-          if (stateData[stateIds[change.state_name]].stateProperty ===
+          if (stateData[stateIds[(
+            <EditStatePropertyChangeList> change).state_name]]
+            .stateProperty ===
               this.STATE_PROPERTY_UNCHANGED) {
-            stateData[stateIds[change.state_name]].stateProperty = (
-              this.STATE_PROPERTY_CHANGED);
+            stateData[stateIds[(
+              <EditStatePropertyChangeList> change).state_name]]
+              .stateProperty = (
+                this.STATE_PROPERTY_CHANGED);
           }
         } else if (
           change.cmd !== 'migrate_states_schema_to_latest_version' &&
@@ -231,8 +289,9 @@ export class ExplorationDiffService {
    *     ids.
    * - maxId: the maximum id in states and stateIds.
    */
-  // TODO(#7176): Replace 'any' with the exact type.
-  _getAdjMatrix(states: any, stateIds: Array<string>, maxId: number): Object {
+  _getAdjMatrix(
+      states: StateObjectsDict,
+      stateIds: StateIds, maxId: number): AdjMatrix {
     let adjMatrix = {};
     for (let stateId = 1; stateId <= maxId; stateId++) {
       adjMatrix[stateId] = {};
@@ -264,10 +323,11 @@ export class ExplorationDiffService {
    *  - 'target': target state of link
    *  - 'linkProperty': 'added', 'deleted' or 'unchanged'
    */
-  // TODO(#7176): Replace 'any' with the exact type.
   _compareLinks(
-      v1States: any, originalStateIds: Array<string>,
-      v2States: any, newestStateIds: Array<string>): Array<any> {
+      v1States: StateObjectsDict,
+      originalStateIds: StateIds,
+      v2States: StateObjectsDict,
+      newestStateIds: StateIds): StateLink[] {
     let links = [];
     let adjMatrixV1 = this._getAdjMatrix(v1States, originalStateIds,
       this._maxId);
@@ -290,8 +350,11 @@ export class ExplorationDiffService {
 
     return links;
   }
-  // TODO(#7176): Replace 'any' with the exact type.
-  getDiffGraphData(oldStates: any, newStates: any, changeListData: any): any {
+
+  getDiffGraphData(
+      oldStates: StateObjectsDict, newStates: StateObjectsDict,
+      changeListData: ExplorationGraphChangeList[]):
+      ProcessedStateIdsAndData {
     return this._getDiffGraphData(
       oldStates,
       newStates,

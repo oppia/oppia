@@ -77,7 +77,7 @@ def _migrate_collection_contents_to_latest_schema(
 
     Raises:
         Exception: The schema version of the collection is outside of what is
-        supported at present.
+            supported at present.
     """
     collection_schema_version = versioned_collection_contents['schema_version']
     if not (1 <= collection_schema_version
@@ -277,8 +277,9 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             collection = get_collection_from_model(model)
             db_results_dict[cid] = collection
         else:
-            logging.info('Tried to fetch collection with id %s, but no such '
-                         'collection exists in the datastore' % cid)
+            logging.info(
+                'Tried to fetch collection with id %s, but no such '
+                'collection exists in the datastore' % cid)
             not_found.append(cid)
 
     if strict and not_found:
@@ -408,7 +409,7 @@ def get_explorations_completed_in_collections(user_id, collection_ids):
 
     Returns:
         list(list(str)). List of the exploration ids completed in each
-            collection.
+        collection.
     """
     progress_models = user_models.CollectionProgressModel.get_multi(
         user_id, collection_ids)
@@ -561,7 +562,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
             collections, to start the search from.
 
     Returns:
-        2-tuple of (returned_collection_ids, search_cursor), where:
+        2-tuple of (returned_collection_ids, search_cursor). Where:
             returned_collection_ids : list(str). A list with all collection ids
                 matching the given search query string, as well as a search
                 cursor for future fetches. The list contains exactly
@@ -604,12 +605,11 @@ def apply_change_list(collection_id, change_list):
     Args:
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
-            collection. Each entry is a dict that represents a
-            CollectionChange.
-    object.
+            collection. Each entry is a dict that represents a CollectionChange
+            object.
 
     Returns:
-      Collection. The resulting collection domain object.
+        Collection. The resulting collection domain object.
     """
     collection = get_collection_by_id(collection_id)
     try:
@@ -639,9 +639,8 @@ def apply_change_list(collection_id, change_list):
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_TAGS):
                     collection.update_tags(change.new_value)
-            elif (
-                    change.cmd ==
-                    collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
@@ -1058,29 +1057,37 @@ def save_collection_summary(collection_summary):
         collection_summary: The collection summary object to be saved in the
             datastore.
     """
-    collection_summary_model = collection_models.CollectionSummaryModel(
-        id=collection_summary.id,
-        title=collection_summary.title,
-        category=collection_summary.category,
-        objective=collection_summary.objective,
-        language_code=collection_summary.language_code,
-        tags=collection_summary.tags,
-        status=collection_summary.status,
-        community_owned=collection_summary.community_owned,
-        owner_ids=collection_summary.owner_ids,
-        editor_ids=collection_summary.editor_ids,
-        viewer_ids=collection_summary.viewer_ids,
-        contributor_ids=collection_summary.contributor_ids,
-        contributors_summary=collection_summary.contributors_summary,
-        version=collection_summary.version,
-        node_count=collection_summary.node_count,
-        collection_model_last_updated=(
+    collection_summary_dict = {
+        'title': collection_summary.title,
+        'category': collection_summary.category,
+        'objective': collection_summary.objective,
+        'language_code': collection_summary.language_code,
+        'tags': collection_summary.tags,
+        'status': collection_summary.status,
+        'community_owned': collection_summary.community_owned,
+        'owner_ids': collection_summary.owner_ids,
+        'editor_ids': collection_summary.editor_ids,
+        'viewer_ids': collection_summary.viewer_ids,
+        'contributor_ids': collection_summary.contributor_ids,
+        'contributors_summary': collection_summary.contributors_summary,
+        'version': collection_summary.version,
+        'node_count': collection_summary.node_count,
+        'collection_model_last_updated': (
             collection_summary.collection_model_last_updated),
-        collection_model_created_on=(
+        'collection_model_created_on': (
             collection_summary.collection_model_created_on)
-    )
+    }
 
-    collection_summary_model.put()
+    collection_summary_model = (
+        collection_models.CollectionSummaryModel.get_by_id(
+            collection_summary.id))
+    if collection_summary_model is not None:
+        collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.put()
+    else:
+        collection_summary_dict['id'] = collection_summary.id
+        collection_models.CollectionSummaryModel(
+            **collection_summary_dict).put()
 
 
 def delete_collection_summaries(collection_ids):
@@ -1092,7 +1099,12 @@ def delete_collection_summaries(collection_ids):
     """
     summary_models = (
         collection_models.CollectionSummaryModel.get_multi(collection_ids))
-    collection_models.CollectionSummaryModel.delete_multi(summary_models)
+    existing_summary_models = [
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
+    collection_models.CollectionSummaryModel.delete_multi(
+        existing_summary_models)
 
 
 def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
@@ -1133,8 +1145,9 @@ def delete_demo(collection_id):
 
     collection = get_collection_by_id(collection_id, strict=False)
     if not collection:
-        logging.info('Collection with id %s was not deleted, because it '
-                     'does not exist.' % collection_id)
+        logging.info(
+            'Collection with id %s was not deleted, because it '
+            'does not exist.' % collection_id)
     else:
         delete_collection(
             feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)

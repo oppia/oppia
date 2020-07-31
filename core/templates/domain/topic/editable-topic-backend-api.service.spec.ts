@@ -54,7 +54,7 @@ describe('Editable topic backend API service', function() {
       return deferred.promise;
     });
 
-    // Sample topic object returnable from the backend
+    // Sample topic object returnable from the backend.
     sampleDataResults = {
       topic_dict: {
         id: '0',
@@ -86,6 +86,7 @@ describe('Editable topic backend API service', function() {
       skill_id_to_rubrics_dict: {
         skill_id_1: []
       },
+      skill_question_count_dict: {},
       subtopic_page: {
         id: 'topicId-1',
         topicId: 'topicId',
@@ -126,7 +127,8 @@ describe('Editable topic backend API service', function() {
         skillIdToDescriptionDict:
           sampleDataResults.skill_id_to_description_dict,
         groupedSkillSummaries: sampleDataResults.grouped_skill_summary_dicts,
-        skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict
+        skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict,
+        skillQuestionCountDict: sampleDataResults.skill_question_count_dict
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -211,7 +213,7 @@ describe('Editable topic backend API service', function() {
       $httpBackend.expect('PUT', '/topic_editor_handler/data/0').respond(
         topicWrapper);
 
-      // Send a request to update topic
+      // Send a request to update topic.
       EditableTopicBackendApiService.updateTopic(
         topic.id, topic.version, 'Name is updated', []
       ).then(successHandler, failHandler);

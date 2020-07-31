@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.ext import ndb
 
@@ -31,11 +30,13 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
+
     pass
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
+
     pass
 
 
@@ -45,6 +46,7 @@ class TopicModel(base_models.VersionedModel):
     This class should only be imported by the topic services file
     and the topic model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
     ALLOW_REVERT = False
@@ -100,11 +102,6 @@ class TopicModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -126,23 +123,15 @@ class TopicModel(base_models.VersionedModel):
         super(TopicModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
             status = constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            status, False
+            self.id, self.version, committer_id, commit_type,
+            commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
@@ -175,9 +164,9 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     TopicModel occurs.
 
-    The id for this model is of the form
-    'topic-{{TOPIC_ID}}-{{TOPIC_VERSION}}'.
+    The id for this model is of the form 'topic-[topic_id]-[version]'.
     """
+
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -264,7 +253,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -276,19 +265,16 @@ class TopicSummaryModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicSummaryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
+
     pass
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
+
     pass
 
 
@@ -297,6 +283,7 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     This stores the HTML data for a subtopic page.
     """
+
     SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
     ALLOW_REVERT = False
@@ -329,11 +316,6 @@ class SubtopicPageModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SubtopicPageModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -354,16 +336,10 @@ class SubtopicPageModel(base_models.VersionedModel):
         """
         super(SubtopicPageModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
 
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
@@ -381,8 +357,9 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     SubtopicPageModel occurs.
 
     The id for this model is of the form
-    'subtopicpage-{{SUBTOPIC_PAGE_ID}}-{{SUBTOPIC_PAGE_VERSION}}'.
+    'subtopicpage-[subtopic_page_id]-[version]'.
     """
+
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -418,11 +395,13 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
+
     pass
 
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
+
     pass
 
 
@@ -438,6 +417,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     # The user_ids of the managers of this topic.
     manager_ids = ndb.StringProperty(indexed=True, repeated=True)
+
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
@@ -457,41 +437,9 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        more_results = True
-        cursor = None
-        while more_results:
-            snapshot_content_models, cursor, more_results = (
-                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
-                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
-            for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(**snapshot_content_model.content)
-                if user_id in reconstituted_model.manager_ids:
-                    return True
-        return (cls.query(cls.manager_ids == user_id).get(
-            keys_only=True) is not None or
-                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicRightsModel has one field that contains multiple user IDs."""
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
-
-    @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the manager_ids.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        migrated_models = []
-        for model in cls.query(cls.manager_ids == old_user_id).fetch():
-            model.manager_ids = [
-                new_user_id if manager_id == old_user_id else manager_id
-                for manager_id in model.manager_ids]
-            migrated_models.append(model)
-        cls.put_multi(
-            migrated_models, update_last_updated_time=False)
+        return (cls.query(
+            cls.manager_ids == user_id).get(keys_only=True) is not None
+                or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @classmethod
     def get_by_user(cls, user_id):
@@ -502,20 +450,12 @@ class TopicRightsModel(base_models.VersionedModel):
 
         Returns:
             list(TopicRightsModel). The list of TopicRightsModel objects in
-                which the given user is a manager.
+            which the given user is a manager.
         """
         topic_rights_models = cls.query(
             cls.manager_ids == user_id
         )
         return topic_rights_models
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for all the ids in manager_ids."""
-        user_ids = [user_id for user_id in self.manager_ids
-                    if user_id not in feconf.SYSTEM_USERS]
-        user_settings_models = user_models.UserSettingsModel.get_multi(
-            user_ids, include_deleted=True)
-        return all(model is not None for model in user_settings_models)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -538,14 +478,7 @@ class TopicRightsModel(base_models.VersionedModel):
         super(TopicRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
@@ -554,7 +487,6 @@ class TopicRightsModel(base_models.VersionedModel):
         TopicCommitLogEntryModel(
             id=('rights-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
-            username=committer_username,
             topic_id=self.id,
             commit_type=commit_type,
             commit_message=commit_message,

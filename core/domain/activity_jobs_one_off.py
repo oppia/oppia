@@ -19,23 +19,30 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core import jobs
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import search_services
-
 from core.platform import models
 import feconf
 
-(collection_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.collection, models.NAMES.exploration])
+(
+    collection_models, exp_models,
+    question_models, skill_models,
+    story_models, topic_models) = models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.exploration,
+        models.NAMES.question, models.NAMES.skill,
+        models.NAMES.story, models.NAMES.topic])
 
 
 class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that computes the number of commits done by contributors for
     each collection and exploration.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionModel, exp_models.ExplorationModel]
@@ -132,37 +139,99 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
         pass
 
 
-class ReplaceAdminIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that replaces the usage of 'Admin' in ExplorationCommitLogEntryModel
-    and ExplorationRightsSnapshotMetadataModel.
+class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the username in *CommitLogEntryModels to None in order to
+    remove it from the datastore.
     """
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveCommitUsernamesOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsSnapshotMetadataModel,
-                exp_models.ExplorationCommitLogEntryModel]
+        return [
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.SubtopicPageCommitLogEntryModel
+        ]
 
     @staticmethod
-    def map(model):
-        if isinstance(model, exp_models.ExplorationRightsSnapshotMetadataModel):
-            if model.committer_id == 'Admin':
-                model.committer_id = feconf.SYSTEM_COMMITTER_ID
-                model.put(update_last_updated_time=False)
-                yield ('SUCCESS-RENAMED-SNAPSHOT', model.id)
-            else:
-                yield ('SUCCESS-KEPT-SNAPSHOT', model.id)
+    def map(commit_model):
+        class_name = commit_model.__class__.__name__
+        # This is an only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'username' in commit_model._properties:  # pylint: disable=protected-access
+            del commit_model._properties['username']  # pylint: disable=protected-access
+            if 'username' in commit_model._values:  # pylint: disable=protected-access
+                del commit_model._values['username']  # pylint: disable=protected-access
+            commit_model.put(update_last_updated_time=False)
+            yield ('SUCCESS_REMOVED - %s' % class_name, commit_model.id)
         else:
-            if model.user_id == 'Admin':
-                model.user_id = feconf.SYSTEM_COMMITTER_ID
-                model.put(update_last_updated_time=False)
-                yield ('SUCCESS-RENAMED-COMMIT', model.id)
-            else:
-                yield ('SUCCESS-KEPT-COMMIT', model.id)
+            yield ('SUCCESS_ALREADY_REMOVED - %s' % class_name, commit_model.id)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        if key.startswith('SUCCESS-KEPT'):
-            yield (key, len(values))
+        yield (key, len(values))
+
+
+class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the last_updated in *CommitLogEntryModels to created_on if
+    the last_updated is in the timespan when user ID migration was done.
+    """
+
+    MIGRATION_START = datetime.datetime.strptime(
+        '2020-06-28T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+    MIGRATION_END = datetime.datetime.strptime(
+        '2020-06-30T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(FixCommitLastUpdatedOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.SubtopicPageCommitLogEntryModel
+        ]
+
+    @staticmethod
+    def map(commit_model):
+        class_name = commit_model.__class__.__name__
+        last_updated = commit_model.last_updated
+        created_on = commit_model.created_on
+        if (FixCommitLastUpdatedOneOffJob.MIGRATION_START < last_updated <
+                FixCommitLastUpdatedOneOffJob.MIGRATION_END):
+            commit_model.last_updated = commit_model.created_on
+            commit_model.put(update_last_updated_time=False)
+            yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
+        elif (datetime.timedelta(0) < last_updated - created_on <
+              datetime.timedelta(hours=1)):
+            yield ('SUCCESS_NEWLY_CREATED - %s' % class_name, commit_model.id)
+        elif commit_model.user_id in feconf.SYSTEM_USERS.keys():
+            yield ('SUCCESS_ADMIN - %s' % class_name, commit_model.id)
         else:
+            yield ('FAILURE_INCORRECT - %s' % class_name, commit_model.id)
+
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith('FAILURE_INCORRECT'):
             yield (key, values)
+        else:
+            yield (key, len(values))

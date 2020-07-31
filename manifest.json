@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "backend": {
-      "backports.functools_lru_cache ": {
+      "backports.functools_lru_cache": {
         "version": "1.6.1",
         "downloadFormat": "tar",
         "url": "https://files.pythonhosted.org/packages/ad/2e/aa84668861c3de458c5bcbfb9813f0e26434e2232d3e294469e96efac884/backports.functools_lru_cache-1.6.1.tar.gz#md5=103000b21a8e683647e2ce41929f2a9d",
@@ -49,16 +49,16 @@
         "targetDirPrefix": "graphy-"
       },
       "html5Lib": {
-        "version": "1.0.1",
+        "version": "1.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/html5lib/html5lib-python/archive/1.0.1.zip",
+        "url": "https://github.com/html5lib/html5lib-python/archive/1.1.zip",
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
       "packaging": {
-        "version": "20.3",
+        "version": "20.4",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/65/37/83e3f492eb52d771e2820e88105f605335553fe10422cba9d256faeb1702/packaging-20.3.tar.gz#md5=19e0d1f82a9007b448650ccfeffd0a26",
+        "url": "https://files.pythonhosted.org/packages/55/fd/fc1aca9cf51ed2f2c11748fa797370027babd82f87829c7a8e6dbe720145/packaging-20.4.tar.gz#md5=3208229da731c5d8e29d4d8941e75005",
         "tarRootDirPrefix": "packaging-",
         "rootDirPrefix": "packaging-",
         "targetDirPrefix": "packaging-"
@@ -72,9 +72,9 @@
         "targetDirPrefix": "simplejson-"
       },
       "six": {
-        "version": "1.12.0",
+        "version": "1.15.0",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/dd/bf/4138e7bfb757de47d1f4b6994648ec67a51efe58fa907c1e11e350cddfca/six-1.12.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/6b/34/415834bfdafca3c5f451532e8a8d9ba89a21c9743a0c59fbd0205c7f9426/six-1.15.0.tar.gz#md5=9f90a0eaa0ea7747fda01ca79d21ebcb",
         "tarRootDirPrefix": "six-",
         "rootDirPrefix": "six-",
         "targetDirPrefix": "six-"
@@ -96,9 +96,9 @@
         "targetDirPrefix": "callbacks-"
       },
       "beautifulSoup": {
-        "version": "4.9.0",
+        "version": "4.9.1",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/3b/e4/7cfc641f11e0eef60123912611a5c9ee7d4638da7325878b695b9ae4bb6f/beautifulsoup4-4.9.0.tar.gz#md5=54e86045e37b578036f34b0e4927c85f",
+        "url": "https://files.pythonhosted.org/packages/c6/62/8a2bef01214eeaa5a4489eca7104e152968729512ee33cb5fbbc37a896b7/beautifulsoup4-4.9.1.tar.gz#md5=57502b5b34ccfd97b180260071f5799a",
         "tarRootDirPrefix": "beautifulsoup4-",
         "rootDirPrefix": "beautifulsoup4-",
         "targetDirPrefix": "beautifulsoup4-"
@@ -110,6 +110,14 @@
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
+      },
+      "pylatexenc": {
+        "version": "2.6",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/be/0b/7a3bc86c8f0b9bb2eb03c1c0e6be15d859ec4f30d642f15d5f38aaee8640/pylatexenc-2.6.tar.gz#md5=98832370ce1aaa96caf493538c1e6aef",
+        "tarRootDirPrefix": "pylatexenc-",
+        "rootDirPrefix": "pylatexenc-",
+        "targetDirPrefix": "pylatexenc-"
       },
       "soupsieve": {
         "version": "1.9.5",
@@ -343,11 +351,11 @@
         "files": ["angular-simple-logger.min.js"]
       },
       "guppy": {
-        "version": "b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba",
+        "version": "1759992a3885cb99d3ead04241f318a074c9f963",
         "downloadFormat": "zip",
-        "url": "https://github.com/daniel3735928559/guppy/archive/b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.zip",
+        "url": "https://github.com/daniel3735928559/guppy/archive/1759992a3885cb99d3ead04241f318a074c9f963.zip",
         "rootDirPrefix": "guppy-",
-        "targetDir": "guppy-b5055b"
+        "targetDir": "guppy-175999"
       },
       "headroomJs": {
         "version": "0.9.4",
@@ -358,9 +366,9 @@
         "files": ["angular.headroom.min.js", "headroom.min.js"]
       },
       "jquery": {
-        "version": "3.4.1",
+        "version": "3.5.1",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"]

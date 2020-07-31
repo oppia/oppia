@@ -44,7 +44,9 @@ describe('Story contents object factory', () => {
           destination_node_ids: ['node_2'],
           outline: 'Outline',
           exploration_id: null,
-          outline_is_finalized: false
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename'
         }, {
           id: 'node_2',
           title: 'Title 2',
@@ -54,7 +56,9 @@ describe('Story contents object factory', () => {
           destination_node_ids: [],
           outline: 'Outline 2',
           exploration_id: 'exp_1',
-          outline_is_finalized: true
+          outline_is_finalized: true,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename'
         }],
       next_node_id: 'node_3'
     };
@@ -118,15 +122,6 @@ describe('Story contents object factory', () => {
     _sampleStoryContents.addDestinationNodeIdToNode('node_3', 'node_1');
     expect(_sampleStoryContents.validate()).toEqual([
       'Loops are not allowed in the node graph'
-    ]);
-  });
-
-  it('should correctly correctly validate the case where the story graph is' +
-    ' disconnected.', () => {
-    _sampleStoryContents.addNode('Title 3');
-    expect(_sampleStoryContents.validate()).toEqual([
-      'There is no way to get to the chapter with title Title 3 from any ' +
-      'other chapter'
     ]);
   });
 

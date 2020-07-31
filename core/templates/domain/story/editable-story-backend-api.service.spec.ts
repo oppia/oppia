@@ -45,7 +45,9 @@ fdescribe('Editable story backend API service', () => {
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });
-    // Sample story object returnable from the backend
+
+    // Sample story object returnable from the backend.
+
     sampleDataResults = {
       story: {
         id: 'storyId',
@@ -162,14 +164,16 @@ fdescribe('Editable story backend API service', () => {
       story.version = '2';
       var storyWrapper = {
         story: story
-      };
+      }
       // var req = httpTestingController.expectOne(
         // '/story_editor_handler/data/storyId');
       // expect(req.request.method).toEqual('PUT');
       // req.flush(storyWrapper);
       // flushMicrotasks();
-      // Send a request to update a story
+
+      // Send a request to update story.
       editableStoryBackendApiService.updateStory(
+
         story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne(
@@ -211,6 +215,7 @@ fdescribe('Editable story backend API service', () => {
   it('should publish a story', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
+
     // send a request to update story
     editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true).then(successHandler, failHandler);

@@ -43,18 +43,27 @@ describe('Story object factory', () => {
         nodes: [{
           id: 'node_1',
           title: 'Title 1',
+          description: 'Description',
           prerequisite_skill_ids: [],
           acquired_skill_ids: [],
           destination_node_ids: [],
           outline: 'Outline',
           exploration_id: null,
-          outline_is_finalized: false
+          outline_is_finalized: false,
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
         }],
         next_node_id: 'node_3'
       },
       language_code: 'en'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
+      // This throws "Argument of type '{ id: string; ... }'
+      // is not assignable to parameter of type 'StoryBackendDict'."
+      // This is because 'sampleStoryBackendDict' should have a property
+      // 'thumbnail' but we didn't add that property in order to test
+      // validations.
+      // @ts-expect-error
       sampleStoryBackendDict);
   });
 
@@ -108,11 +117,16 @@ describe('Story object factory', () => {
           destination_node_ids: [],
           outline: 'Outline',
           exploration_id: null,
-          outline_is_finalized: false
+          outline_is_finalized: false,
+          description: 'Description',
+          thumbnail_filename: 'img.png',
+          thumbnail_bg_color: '#a33f40'
         }],
         next_node_id: 'node_3'
       },
-      language_code: 'en'
+      language_code: 'en',
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40'
     });
 
     expect(_sampleStory).not.toBe(secondStory);

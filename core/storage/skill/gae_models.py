@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
@@ -28,11 +29,13 @@ from google.appengine.ext import ndb
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill snapshot."""
+
     pass
 
 
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
+
     pass
 
 
@@ -42,6 +45,7 @@ class SkillModel(base_models.VersionedModel):
     This class should only be imported by the skill services file
     and the skill model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = SkillSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SkillSnapshotContentModel
     ALLOW_REVERT = False
@@ -96,16 +100,12 @@ class SkillModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
-
     @classmethod
     def get_merged_skills(cls):
         """Returns the skill models which have been merged.
 
-        Returns: list(SkillModel). List of skill models which have been merged.
+        Returns:
+            list(SkillModel). List of skill models which have been merged.
         """
 
         return [skill for skill in cls.query() if (
@@ -133,16 +133,9 @@ class SkillModel(base_models.VersionedModel):
         super(SkillModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()
@@ -159,9 +152,9 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     SkillModel occurs.
 
-    The id for this model is of the form
-    'skill-{{SKILL_ID}}-{{SKILL_VERSION}}'.
+    The id for this model is of the form 'skill-[skill_id]-[version]'.
     """
+
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -236,7 +229,7 @@ class SkillSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -248,7 +241,43 @@ class SkillSummaryModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """SkillSummaryModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+    @classmethod
+    def fetch_page(cls, page_size, urlsafe_start_cursor, sort_by):
+        """Returns the models according to values specified.
+
+        Args:
+            page_size: int. Number of skills to fetch.
+            urlsafe_start_cursor: str. The cursor to the next page.
+            sort_by: str. A string indicating how to sort the result.
+
+        Returns:
+            3-tuple(query_models, urlsafe_start_cursor, more). where:
+                query_models: list(SkillSummary). The list of summaries
+                    of skills starting at the given cursor.
+                urlsafe_start_cursor: str or None. A query cursor pointing to
+                    the next batch of results. If there are no more results,
+                    this might be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results
+                    after this batch.
+        """
+        cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        sort = -cls.skill_model_created_on
+        if sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingCreatedOn']):
+            sort = cls.skill_model_created_on
+        elif sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'IncreasingUpdatedOn']):
+            sort = -cls.skill_model_last_updated
+        elif sort_by == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingUpdatedOn']):
+            sort = cls.skill_model_last_updated
+
+        query_models, next_cursor, more = (
+            cls.query().order(sort).fetch_page(page_size, start_cursor=cursor))
+        new_urlsafe_start_cursor = (
+            next_cursor.urlsafe() if (next_cursor and more) else None)
+        return query_models, new_urlsafe_start_cursor, more

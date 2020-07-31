@@ -11,8 +11,8 @@
         <a ng-click="onPlayButtonClicked()"
            uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
            tooltip-append-to-body="true" tooltip-placement="right">
-          <i class="fas oppia-audio-controls-button-icon"
-             ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+          <i class="fas oppia-audio-controls-button-icon" tabindex="0"
+             ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle protractor-test-play-circle': !isAudioPlaying(), 'fa-pause-circle protractor-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
           </i>
         </a>
         <a ng-click="onForwardButtonClicked()">
@@ -36,17 +36,17 @@
         <span class="audio-controls-message">&zwnj;</span>
       </div>
       <div class="oppia-audio-header-select">
-        <select class="audio-language-select"
+        <select class="audio-language-select protractor-test-audio-lang-select"
                 ng-model="selectedLanguage.value"
                 ng-options="o.value as o.displayed for o in languagesInExploration"
                 ng-change="onNewLanguageSelected()">
         </select>
       </div>
     </div>
-    <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fas fa-sort-up"></i></div>
+    <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()" aria-label="Audio menu collapse"><i class="fas fa-sort-up"></i></div>
   </div>
-  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()">
-    <div class="container">
+  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()" aria-label="Audio menu expand">
+    <div class="container protractor-test-audio-bar">
       <div class="row">
         <div class="col-lg-6 px-0 mt-1 ml-2">
           <span class="audio-expand-button-text" translate="I18N_PLAYER_AUDIO_EXPAND_TEXT"></span>
@@ -84,8 +84,8 @@
   }
 
   audio-bar md-slider.md-default-theme .md-thumb:after {
-    border-color: #009688;
     background-color: #009688;
+    border-color: #009688;
   }
 
   audio-bar md-slider .md-track-container {
@@ -122,8 +122,8 @@
   .audio-collapse-button {
     height: 10px;
     position: absolute;
-    width: 30px;
     top: 44px;
+    width: 30px;
   }
 
   .audio-toggle-button {
@@ -185,8 +185,8 @@
     left: 0;
   }
   .audio-controls-button-image {
-    width: 21px;
     height: 21px;
+    width: 21px;
   }
 
   .audio-controls-audio-not-available {
@@ -207,12 +207,12 @@
 
   .audio-controls.ng-enter,
   .audio-controls.ng-leave {
+    position: absolute;
     -webkit-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
     -moz-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
     -ms-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
     -o-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
     transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    position: absolute;
   }
 
   .audio-controls.ng-enter {
@@ -232,9 +232,9 @@
   }
 
   .audio-controls-message {
+    color: white;
     font-size: 10px;
     font-style: italic;
-    color: white;
   }
 
   .audio-header {

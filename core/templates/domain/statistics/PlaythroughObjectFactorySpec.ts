@@ -24,70 +24,222 @@ import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 
 describe('Playthrough Object Factory', () => {
+  let laof: LearnerActionObjectFactory;
+  let pof: PlaythroughObjectFactory;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [PlaythroughObjectFactory]
     });
 
-    this.pof = TestBed.get(PlaythroughObjectFactory);
-    this.laof = TestBed.get(LearnerActionObjectFactory);
+    pof = TestBed.get(PlaythroughObjectFactory);
+    laof = TestBed.get(LearnerActionObjectFactory);
   });
 
   it('should create a new playthrough', () => {
-    var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
-    var playthroughObject = this.pof.createNew(
-      'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
+    let actions = [laof.createNewExplorationStartAction({
+      state_name: {
+        value: 'state'
+      }
+    })];
+    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+      'expId1', 1, {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 30000},
+      }, actions);
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual({});
+    expect(playthroughObject.issueCustomizationArgs).toEqual({
+      state_name: {value: 'state'},
+      time_spent_in_exp_in_msecs: {value: 30000}
+    });
     expect(playthroughObject.actions).toEqual(actions);
   });
 
+  it('should create same objects from backend dict and direct values.', () => {
+    var playthroughDictObject = pof.createFromBackendDict({
+      exp_id: 'expId1',
+      exp_version: 1,
+      issue_type: 'CyclicStateTransitions',
+      issue_customization_args: {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      },
+      actions: []
+    });
+
+    var playthroughObject = pof.createNewCyclicStateTransitionsPlaythrough(
+      'expId1', 1, {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      }, []);
+
+    expect(playthroughDictObject).toEqual(playthroughObject);
+  });
+
   it('should create a new playthrough from a backend dict', () => {
-    var playthroughObject = this.pof.createFromBackendDict(
+    let playthroughObject = pof.createFromBackendDict(
       {
-        playthrough_id: 'playthroughId1',
         exp_id: 'expId1',
         exp_version: 1,
         issue_type: 'EarlyQuit',
-        issue_customization_args: {},
+        issue_customization_args: {
+          state_name: {
+            value: 'state'
+          },
+          time_spent_in_exp_in_msecs: {
+            value: 1.2
+          }
+        },
         actions: [{
           action_type: 'AnswerSubmit',
-          action_customization_args: {},
+          action_customization_args: {
+            state_name: {
+              value: 'state'
+            },
+            dest_state_name: {
+              value: 'dest_state'
+            },
+            interaction_id: {
+              value: 'interaction_id'
+            },
+            submitted_answer: {
+              value: 'answer'
+            },
+            feedback: {
+              value: 'feedback'
+            },
+            time_spent_state_in_msecs: {
+              value: 2
+            }
+          },
           schema_version: 1
         }]
       }
     );
 
-    expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
-    expect(playthroughObject.issueCustomizationArgs).toEqual({});
-    expect(playthroughObject.actions).toEqual([this.laof.createNew(
-      'AnswerSubmit', {}, 1)]);
+    expect(playthroughObject.issueCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state'
+      },
+      time_spent_in_exp_in_msecs: {
+        value: 1.2
+      }
+    });
+    expect(playthroughObject.actions).toEqual(
+      [laof.createNewAnswerSubmitAction({
+        state_name: {
+          value: 'state'
+        },
+        dest_state_name: {
+          value: 'dest_state'
+        },
+        interaction_id: {
+          value: 'interaction_id'
+        },
+        submitted_answer: {
+          value: 'answer'
+        },
+        feedback: {
+          value: 'feedback'
+        },
+        time_spent_state_in_msecs: {
+          value: 2
+        }
+      })]);
   });
 
   it('should convert a playthrough to a backend dict', () => {
-    var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
-    var playthroughObject = this.pof.createNew(
-      'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
+    let actions = [laof.createNewAnswerSubmitAction({
+      state_name: {
+        value: 'state'
+      },
+      dest_state_name: {
+        value: 'dest_state'
+      },
+      interaction_id: {
+        value: 'interaction_id'
+      },
+      submitted_answer: {
+        value: 'answer'
+      },
+      feedback: {
+        value: 'feedback'
+      },
+      time_spent_state_in_msecs: {
+        value: 2
+      }
+    })];
+    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+      'expId1', 1, {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 30000}
+      }, actions);
 
-    var playthroughDict = playthroughObject.toBackendDict();
+    let playthroughDict = playthroughObject.toBackendDict();
     expect(playthroughDict).toEqual({
-      id: 'playthroughId1',
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',
-      issue_customization_args: {},
+      issue_customization_args: {
+        state_name: {value: 'state'},
+        time_spent_in_exp_in_msecs: {value: 30000}
+      },
       actions: [{
         action_type: 'AnswerSubmit',
-        action_customization_args: {},
+        action_customization_args: {
+          state_name: {
+            value: 'state'
+          },
+          dest_state_name: {
+            value: 'dest_state'
+          },
+          interaction_id: {
+            value: 'interaction_id'
+          },
+          submitted_answer: {
+            value: 'answer'
+          },
+          feedback: {
+            value: 'feedback'
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
+        },
         schema_version: 1
       }]
     });
+  });
+
+  it('should throw error on invalid backend dict', () => {
+    const playthroughDict = {
+      playthrough_id: 'playthroughId1',
+      exp_id: 'expId1',
+      exp_version: 1,
+      issue_type: 'InvalidType',
+      issue_customization_args: {
+        state_names: {
+          value: ['state1', 'state2']
+        }
+      },
+      actions: []
+    };
+
+    // This throws "Type 'string' is not assignable to type
+    // '"CyclicStateTransitions"'." This is because 'playthroughDict' has an
+    // invalid value of 'issue_type' property. We need to do that in order
+    // to test validations.
+    // @ts-expect-error
+    expect(() => pof.createFromBackendDict(playthroughDict)).toThrowError(
+      'Backend dict does not match any known issue type: ' +
+      JSON.stringify(playthroughDict));
   });
 });

@@ -9,6 +9,10 @@ declare namespace JQueryUI {
         containment?: string;
     }
     interface UI {
-        ddmanager?: any;
+        ddmanager?: {
+            current?: {
+                cancelHelperRemoval?: boolean;
+            }
+        };
     }
 }

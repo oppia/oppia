@@ -93,6 +93,7 @@ class MemoizeTest(test_utils.GenericTestBase):
     def test_memoize_with_methods(self):
         class CallCounter(python_utils.OBJECT):
             """Counts calls made to an instance."""
+
             def __init__(self):
                 self.count = 0
 
@@ -116,6 +117,7 @@ class MemoizeTest(test_utils.GenericTestBase):
     def test_memoize_with_classmethods(self):
         class GoodCallCounter(python_utils.OBJECT):
             """Counts calls made to the class."""
+
             count = 0
 
             @classmethod
@@ -137,6 +139,7 @@ class MemoizeTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(TypeError, 'not a Python function'):
             class BadCallCounter(python_utils.OBJECT):  # pylint: disable=unused-variable
                 """Counts calls made to the class."""
+
                 count = 0
 
                 @linter_utils.memoize

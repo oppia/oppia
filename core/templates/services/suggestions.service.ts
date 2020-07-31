@@ -19,10 +19,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { SuggestionBackendDict } from
+  'domain/suggestion/SuggestionObjectFactory';
+
 @Injectable({providedIn: 'root'})
 export class SuggestionsService {
-  // TODO(#7165): Replace 'any' with the exact type.
-  getThreadIdFromSuggestionBackendDict(suggestionBackendDict: any): string {
+  getThreadIdFromSuggestionBackendDict(
+      suggestionBackendDict: SuggestionBackendDict): string {
     return suggestionBackendDict.suggestion_id;
   }
 }
@@ -30,4 +33,3 @@ export class SuggestionsService {
 angular.module('oppia').factory(
   'SuggestionsService',
   downgradeInjectable(SuggestionsService));
-

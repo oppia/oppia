@@ -17,6 +17,7 @@
  * tests.
  */
 
+var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
@@ -34,7 +35,7 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
-  // Viewing roles can be done by two methods: 1. By roles 2. By username
+  // Viewing roles can be done by two methods: 1. By roles 2. By username.
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
   var roleUsernameOption = element(by.css(
@@ -43,8 +44,26 @@ var AdminPage = function() {
   var oneOffJobRows = element.all(by.css('.protractor-test-one-off-jobs-rows'));
   var unfinishedOneOffJobRows = element.all(by.css(
     '.protractor-test-unfinished-one-off-jobs-rows'));
-  var unfinishedOffJobIDs = element.all(by.css(
-    '.protractor-test-unfinished-one-off-jobs-id'));
+  var unfinishedOffJobIDClassName = (
+    '.protractor-test-unfinished-one-off-jobs-id');
+
+  // Adding a new community reviewer.
+  var addReviewerName = element(by.css(
+    '.protractor-test-add-reviewer-username'));
+  var selectReviewerRole = element(by.css(
+    '.protractor-test-select-reviewer-role'));
+  var addReviewerFormSubmitButton = element(by.css(
+    '.protractor-test-add-reviewer-form-submit-button'));
+
+  // Viewing community reviewers by role.
+  var reviewerMethodDropdown = element(by.css(
+    '.protractor-test-reviewer-role-method'));
+  var reviewerRoleValueOption = element(by.css(
+    '.protractor-test-reviewer-role-value'));
+  var viewReviewerRoleButton = element(by.css(
+    '.protractor-test-view-reviewer-role-button'));
+  var reviewerUsernamesResult = element(by.css(
+    '.protractor-test-reviewer-roles-result'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -73,12 +92,14 @@ var AdminPage = function() {
       );
     };
 
-    this.reloadCollection = function(collectionId) {
+    this.reloadCollection = async function(collectionId) {
       this.get();
-      reloadCollectionButtons.get(collectionId).click();
-      general.acceptAlert();
+      await (
+        await reloadCollectionButtons.get(collectionId)
+      ).click();
+      await general.acceptAlert();
       // Time is needed for the reloading to complete.
-      waitFor.textToBePresentInElement(
+      await waitFor.textToBePresentInElement(
         statusMessage, 'Data reloaded successfully.',
         'Collection could not be reloaded');
       return true;
@@ -86,186 +107,221 @@ var AdminPage = function() {
 
     // The name should be as given in the admin page (including '.yaml' if
     // necessary).
-    this.reloadExploration = function(name) {
-      this.get();
-      explorationElements.map(function(explorationElement) {
-        getExplorationTitleElement(explorationElement)
-          .getText().then(function(title) {
-          // We use match here in case there is whitespace around the name
-            if (title.match(name)) {
-              getExplorationElementReloadButton(explorationElement).click();
-              general.acceptAlert();
-              // Time is needed for the reloading to complete.
-              waitFor.textToBePresentInElement(
-                statusMessage, 'Data reloaded successfully.',
-                'Exploration could not be reloaded');
-              return true;
-            }
-          });
+    this.reloadExploration = async function(name) {
+      await this.get();
+      explorationElements.map(async function(explorationElement) {
+        var title = await getExplorationTitleElement(explorationElement)
+          .getText();
+
+        // We use match here in case there is whitespace around the name.
+        if (title.match(name)) {
+          await getExplorationElementReloadButton(explorationElement).click();
+          await general.acceptAlert();
+          // Time is needed for the reloading to complete.
+          await waitFor.textToBePresentInElement(
+            statusMessage, 'Data reloaded successfully.',
+            'Exploration could not be reloaded');
+          return true;
+        }
       });
     };
   }
 
-  var saveConfigProperty = function(
+  var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
-    return configProperty.element(by.css('.protractor-test-config-title'))
-      .getText()
-      .then(function(title) {
-        if (title.match(propertyName)) {
-          editingInstructions(forms.getEditor(objectType)(configProperty));
-          saveAllConfigs.click();
-          general.acceptAlert();
-          // Waiting for success message.
-          waitFor.textToBePresentInElement(
-            statusMessage, 'saved successfully',
-            'New config could not be saved');
-          return true;
-        }
-      });
+    var title = await configProperty.element(
+      by.css('.protractor-test-config-title')).getText();
+    if (title.match(propertyName)) {
+      await editingInstructions(
+        await forms.getEditor(objectType)(configProperty));
+      await saveAllConfigs.click();
+      await general.acceptAlert();
+      // Waiting for success message.
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'saved successfully',
+        'New config could not be saved');
+      return true;
+    }
   };
 
-  this.get = function() {
-    browser.get(ADMIN_URL_SUFFIX);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(ADMIN_URL_SUFFIX);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.getJobsTab = function() {
-    browser.get(ADMIN_URL_SUFFIX + '#/jobs');
-    return waitFor.pageToFullyLoad();
+  this.getJobsTab = async function() {
+    await browser.get(ADMIN_URL_SUFFIX + '#/jobs');
+    await waitFor.pageToFullyLoad();
   };
 
-  this.editConfigProperty = function(
+  this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
-    this.get();
-    configTab.click();
-    waitFor.elementToBeClickable(saveAllConfigs);
-    configProperties.map(function(x) {
-      return saveConfigProperty(
-        x, propertyName, objectType, editingInstructions);
-    }).then(function(results) {
-      var success = null;
-      for (var i = 0; i < results.length; i++) {
-        success = success || results[i];
-      }
-      if (!success) {
-        throw new Error('Could not find config property: ' + propertyName);
-      }
-    });
+    await this.get();
+    await configTab.click();
+    await waitFor.elementToBeClickable(saveAllConfigs);
+
+    const results = [];
+    for (let configProperty of (await configProperties)) {
+      results.push(
+        await saveConfigProperty(
+          configProperty, propertyName, objectType, editingInstructions)
+      );
+    }
+    var success = null;
+    for (var i = 0; i < results.length; i++) {
+      success = success || results[i];
+    }
+    if (!success) {
+      throw new Error('Could not find config property: ' + propertyName);
+    }
   };
 
-  this.startOneOffJob = function(jobName) {
-    this._startOneOffJob(jobName, 0);
+  this.startOneOffJob = async function(jobName) {
+    await this._startOneOffJob(jobName, 0);
   };
 
-  this._startOneOffJob = function(jobName, i) {
-    waitFor.visibilityOf(oneOffJobRows.first(),
+  this._startOneOffJob = async function(jobName, i) {
+    await waitFor.visibilityOf(await oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
-    oneOffJobRows.get(i).getText().then((text) => {
-      if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-        oneOffJobRows.get(i).element(
-          by.css('.protractor-test-one-off-jobs-start-btn')).click();
-      } else {
-        this._startOneOffJob(jobName, ++i);
-      }
-    });
+    var text = await (await oneOffJobRows.get(i)).getText();
+    if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
+      await (await oneOffJobRows.get(i)).element(
+        by.css('.protractor-test-one-off-jobs-start-btn')).click();
+    } else {
+      await this._startOneOffJob(jobName, ++i);
+    }
   };
 
-  this.stopOneOffJob = function(jobName) {
-    this._stopOneOffJob(jobName, 0);
+  this.stopOneOffJob = async function(jobName) {
+    await this._stopOneOffJob(jobName, 0);
   };
 
-  this._stopOneOffJob = function(jobName, i) {
-    unfinishedOneOffJobRows.get(i).getText().then((text) => {
-      if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
-        unfinishedOneOffJobRows.get(i).element(
-          by.css('.protractor-test-one-off-jobs-stop-btn')).click();
-      } else {
-        this._stopOneOffJob(jobName, ++i);
-      }
-    });
+  this._stopOneOffJob = async function(jobName, i) {
+    var text = await (await unfinishedOneOffJobRows.get(i)).getText();
+    if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
+      await (await unfinishedOneOffJobRows.get(i)).element(
+        by.css('.protractor-test-one-off-jobs-stop-btn')).click();
+    } else {
+      await this._stopOneOffJob(jobName, ++i);
+    }
   };
 
-  this.expectNumberOfRunningOneOffJobs = function(count) {
-    element.all(by.css(
-      '.protractor-test-unfinished-one-off-jobs-id')).count().then((len) =>{
-      expect(len).toEqual(count);
-    });
+  this.expectNumberOfRunningOneOffJobs = async function(count) {
+    var len = await element.all(by.css(
+      '.protractor-test-unfinished-one-off-jobs-id')).count();
+    expect(len).toEqual(count);
   };
 
-  this.expectJobToBeRunning = function(jobName) {
-    browser.refresh();
-    waitFor.pageToFullyLoad();
-    waitFor.visibilityOf(element(
+  this.expectJobToBeRunning = async function(jobName) {
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(element(
       by.css('.protractor-test-unfinished-jobs-card')),
     'Unfinished Jobs taking too long to appear');
-    let unfinishedJobs = unfinishedOffJobIDs.filter((element) => {
-      return element.getText().then((job) => {
-        return job.toLowerCase().startsWith(jobName.toLowerCase());
-      });
-    });
-    unfinishedJobs.get(0).getText((job) => {
-      expect(job.toLowerCase().startsWith(jobName.toLowerCase())).toBeTrue();
-    });
+    let regex = new RegExp(`^${jobName.toLowerCase()}.*`, 'i');
+    let unfinishedJob = element(
+      by.cssContainingText(unfinishedOffJobIDClassName, regex));
+    var unfinishedJobName = await unfinishedJob.getText();
+    expect(unfinishedJobName.toLowerCase().startsWith(
+      jobName.toLowerCase())).toEqual(true);
   };
 
-  this.updateRole = function(name, newRole) {
-    waitFor.elementToBeClickable(
+  this.updateRole = async function(name, newRole) {
+    await waitFor.elementToBeClickable(
       adminRolesTab, 'Admin Roles tab is not clickable');
-    adminRolesTab.click();
+    await adminRolesTab.click();
 
     // Change values for "update role" form, and submit it.
-    waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
-    updateFormName.sendKeys(name);
+    await waitFor.visibilityOf(
+      updateFormName, 'Update Form Name is not visible');
+    await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
-    roleOption.click();
-    updateFormSubmit.click();
-    waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
-    waitFor.textToBePresentInElement(
+    await waitFor.visibilityOf(roleOption, 'Admin role option is not visible');
+    await roleOption.click();
+    await updateFormSubmit.click();
+    await waitFor.visibilityOf(
+      statusMessage, 'Confirmation message not visible');
+    await waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
   };
 
-  this.getUsersAsssignedToRole = function(role) {
-    waitFor.visibilityOf(roleDropdown,
+  this.getUsersAsssignedToRole = async function(role) {
+    await waitFor.visibilityOf(roleDropdown,
       'View role dropdown taking too long to be visible');
-    roleDropdown.sendKeys('By Role');
+    await roleDropdown.sendKeys('By Role');
 
-    roleValueOption.click();
-    roleValueOption.sendKeys(role);
+    await roleValueOption.click();
+    await roleValueOption.sendKeys(role);
 
-    viewRoleButton.click();
+    await viewRoleButton.click();
   };
 
-  this.viewRolesbyUsername = function(username) {
-    waitFor.visibilityOf(roleDropdown,
+  this.viewRolesbyUsername = async function(username) {
+    await waitFor.visibilityOf(roleDropdown,
       'View role dropdown taking too long to be visible');
-    roleDropdown.sendKeys('By Username');
+    await roleDropdown.sendKeys('By Username');
 
-    roleUsernameOption.click();
-    roleUsernameOption.sendKeys(username);
+    await roleUsernameOption.click();
+    await roleUsernameOption.sendKeys(username);
 
-    viewRoleButton.click();
+    await viewRoleButton.click();
   };
 
-  this.expectUsernamesToMatch = function(expectedUsernamesArray) {
+  this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
-    element.all(by.css('.protractor-test-roles-result-rows'))
-      .map(function(elm) {
-        return elm.getText();
-      })
-      .then(function(texts) {
-        texts.forEach(function(name) {
-          foundUsersArray.push(name);
-        });
-        expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
-
-        expectedUsernamesArray.sort();
-        foundUsersArray.sort();
-        foundUsersArray.forEach(function(name, ind) {
-          expect(name).toEqual(expectedUsernamesArray[ind]);
-        });
+    var usernames = await element.all(
+      by.css('.protractor-test-roles-result-rows'))
+      .map(async function(elm) {
+        var text = await elm.getText();
+        return text;
       });
+
+    for (i = 0; i < usernames.length; i++) {
+      var name = usernames[i];
+      foundUsersArray.push(name);
+    }
+    expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
+
+    expectedUsernamesArray.sort();
+    foundUsersArray.sort();
+    for (j = 0; j < foundUsersArray.length; j++) {
+      var name = foundUsersArray[j];
+      expect(name).toEqual(expectedUsernamesArray[j]);
+    }
+  };
+
+  this.addReviewer = async function(name, newRole) {
+    await action.click('Admin Roles Tab', adminRolesTab);
+    // Change values for "add reviewer for community" form, and submit it.
+    await action.sendKeys('Add reviewer name', addReviewerName, name);
+    await action.sendKeys('Select reviewer role', selectReviewerRole, newRole);
+    await action.click('Add Reviewer button', addReviewerFormSubmitButton);
+    await waitFor.visibilityOf(
+      statusMessage, 'Confirmation message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, 'Successfully added ',
+      'Could not add reviewer successfully');
+  };
+
+  this.showReviewersAssignedToRole = async function(role) {
+    await action.sendKeys(
+      'Reviewer method dropdown', reviewerMethodDropdown, 'By Role');
+    await action.sendKeys(
+      'Reviewer role dropdown', reviewerRoleValueOption, role);
+    await action.click('View reviewer role button', viewReviewerRoleButton);
+  };
+
+  this.expectReviewerUsernamesStrToMatch = async function(
+      expectedUsernamesArrayStr) {
+    // The reviewer usernames that are shown after a user views reviewers by
+    // role in the 'view community reviewers' section. The result is displayed
+    // as a 'Usernames: ["username1", "username2"]' string.
+    await waitFor.visibilityOf(
+      reviewerUsernamesResult, 'Reviewer usernames result not visible.');
+    var reviewerUsernamesArrayStr = await reviewerUsernamesResult.getText();
+    expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
   };
 };
 

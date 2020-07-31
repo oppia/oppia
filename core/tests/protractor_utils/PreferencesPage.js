@@ -17,6 +17,7 @@
  * tests.
  */
 
+var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 var path = require('path');
@@ -30,7 +31,6 @@ var PreferencesPage = function() {
   var languageOptionsList = element.all(by.css('.select2-results'));
   var navBar = element(by.css('.oppia-navbar-dropdown-toggle'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
-  var preferencesLink = element(by.css('.protractor-test-preferences-link'));
   var preferredAudioLanguageSelector = element(
     by.css('.protractor-test-preferred-audio-language-selector'));
   var selectedAudioLanguageElement = preferredAudioLanguageSelector.element(
@@ -56,133 +56,141 @@ var PreferencesPage = function() {
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
 
-  this.expectUploadError = function() {
-    expect(profilePhotoUploadError.isDisplayed()).toBe(true);
+  var saveNewChanges = async function(fieldName) {
+    await navBar.click();
+    await waitFor.visibilityOfInfoToast(
+      `Info toast for saving ${fieldName} takes too long to appear.`);
+    await waitFor.invisibilityOfInfoToast(
+      'Info toast takes too long to disappear.');
   };
 
-  this.uploadProfilePhoto = function(imgPath) {
-    return workflow.uploadImage(profilePhotoClickable, imgPath);
+  this.get = async function() {
+    await browser.get(USER_PREFERENCES_URL);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.submitProfilePhoto = function(imgPath) {
-    return workflow.submitImage(
-      profilePhotoClickable, profilePhotoCropper, imgPath);
+  this.expectUploadError = async function() {
+    expect(await profilePhotoUploadError.isDisplayed()).toBe(true);
   };
 
-  this.getProfilePhotoSource = function() {
-    return workflow.getImageSource(customProfilePhoto);
+  this.uploadProfilePhoto = async function(imgPath, resetExistingImage) {
+    return await workflow.uploadImage(
+      profilePhotoClickable, imgPath, resetExistingImage);
   };
 
-  this.editUserBio = function(bio) {
-    userBioElement.sendKeys(bio);
-    navBar.click();
-    preferencesLink.click();
+  this.submitProfilePhoto = async function(imgPath, resetExistingImage) {
+    return await workflow.submitImage(
+      profilePhotoClickable, profilePhotoCropper, imgPath, resetExistingImage);
   };
 
-  this.get = function() {
-    browser.get(USER_PREFERENCES_URL);
-    return waitFor.pageToFullyLoad();
+  this.getProfilePhotoSource = async function() {
+    return await workflow.getImageSource(customProfilePhoto);
   };
 
-  this.toggleEditorRoleEmailsCheckbox = function() {
-    editorRoleEmailsCheckbox.click();
+  this.editUserBio = async function(bio) {
+    await action.sendKeys('User bio field', userBioElement, bio);
+    await saveNewChanges('User Bio');
   };
 
-  this.toggleFeedbackEmailsCheckbox = function() {
-    feedbackMessageEmailsCheckbox.click();
+  this.toggleEditorRoleEmailsCheckbox = async function() {
+    await action.click('Editor role emails checkbox', editorRoleEmailsCheckbox);
+    await saveNewChanges('Editor Role Emails');
   };
 
-  this.selectSystemLanguage = function(language) {
-    systemLanguageSelector.click();
-    var options = element.all(by.css('.select2-dropdown li')).filter(
-      function(elem) {
-        return elem.getText().then(function(text) {
-          return text === language;
-        });
-      });
-    options.first().click();
+  this.toggleFeedbackEmailsCheckbox = async function() {
+    await action.click(
+      'Feedback emails checkbox', feedbackMessageEmailsCheckbox);
+    await saveNewChanges('Feedback Emails');
   };
 
-  this.selectPreferredAudioLanguage = function(language) {
-    preferredAudioLanguageSelector.click();
-    var correctOptions = languageOptionsList.all(by.tagName('li')).filter(
-      function(elem) {
-        return elem.getText().then(function(text) {
-          return text === language;
-        });
-      });
-    correctOptions.first().click();
+  this.selectSystemLanguage = async function(language) {
+    await action.select2(
+      'System language selector', systemLanguageSelector, language);
+    await saveNewChanges('System Language');
   };
 
-  this.setUserBio = function(bio) {
-    userBioElement.clear();
-    userBioElement.sendKeys(bio);
-    navBar.click();
-    preferencesLink.click();
+  this.selectPreferredAudioLanguage = async function(language) {
+    await action.select2(
+      'Audio language selector', preferredAudioLanguageSelector, language);
+    await saveNewChanges('Preferred Audio Language');
   };
 
-  this.setUserInterests = function(interests) {
-    userInterestsInput.click();
-    interests.forEach(function(interest) {
-      userInterestsInput.sendKeys(interest);
-      userInterestsInput.sendKeys(protractor.Key.RETURN);
-    });
+  this.setUserBio = async function(bio) {
+    var inputFieldName = 'User bio input field';
+    await action.clear(inputFieldName, userBioElement);
+    await saveNewChanges('User Bio');
+    await action.sendKeys(inputFieldName, userBioElement, bio);
+    await saveNewChanges('User Bio');
   };
 
-  this.isFeedbackEmailsCheckboxSelected = function() {
-    return feedbackMessageEmailsCheckbox.isSelected();
+  this.setUserInterests = async function(interests) {
+    await userInterestsInput.click();
+    for (var i = 0; i < interests.length; i++) {
+      await userInterestsInput.sendKeys(interests[i], protractor.Key.RETURN);
+      await saveNewChanges('User Interests');
+    }
   };
 
-  this.isEditorRoleEmailsCheckboxSelected = function() {
-    return editorRoleEmailsCheckbox.isSelected();
+  this.isFeedbackEmailsCheckboxSelected = async function() {
+    return await feedbackMessageEmailsCheckbox.isSelected();
   };
 
-  // This function only compares the text displayed on the subscription (which
-  // might be abbreviated), rather than the text on the popover that appears
-  // when hovering over the tile.
-  this.expectDisplayedFirstSubscriptionToBe = function(name) {
-    expect(subscriptions.first().getText()).toMatch(name);
+  this.isEditorRoleEmailsCheckboxSelected = async function() {
+    return await editorRoleEmailsCheckbox.isSelected();
   };
 
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
-  this.expectDisplayedLastSubscriptionToBe = function(name) {
-    expect(subscriptions.last().getText()).toMatch(name);
+  this.expectDisplayedFirstSubscriptionToBe = async function(name) {
+    expect(await subscriptions.first().getText()).toMatch(name);
   };
 
-  this.expectPageHeaderToBe = function(text) {
-    expect(pageHeader.getText()).toEqual(text);
+  // This function only compares the text displayed on the subscription (which
+  // might be abbreviated), rather than the text on the popover that appears
+  // when hovering over the tile.
+  this.expectDisplayedLastSubscriptionToBe = async function(name) {
+    expect(await subscriptions.last().getText()).toMatch(name);
   };
 
-  this.expectPreferredSiteLanguageToBe = function(language) {
+  this.expectPageHeaderToBe = async function(text) {
+    expect(await pageHeader.getText()).toEqual(text);
+  };
+
+  this.expectPreferredSiteLanguageToBe = async function(language) {
     var selectedLanguageElement = systemLanguageSelector.element(
       by.css('.select2-selection__rendered'));
-    expect(selectedLanguageElement.getText()).toEqual(language);
+    expect(await selectedLanguageElement.getText()).toEqual(language);
   };
 
-  this.expectPreferredAudioLanguageToBe = function(language) {
-    expect(selectedAudioLanguageElement.getText()).toEqual(language);
+  this.expectPreferredAudioLanguageToBe = async function(language) {
+    expect(await selectedAudioLanguageElement.getText()).toEqual(language);
   };
 
-  this.expectPreferredAudioLanguageNotToBe = function(language) {
-    expect(selectedAudioLanguageElement.getText()).not.toEqual(language);
+  this.expectPreferredAudioLanguageNotToBe = async function(language) {
+    expect(await selectedAudioLanguageElement.getText()).not.toEqual(language);
   };
 
-  this.expectSubscriptionCountToEqual = function(value) {
-    expect(subscriptions.count()).toEqual(value);
+  this.expectSubscriptionCountToEqual = async function(value) {
+    expect(await subscriptions.count()).toEqual(value);
   };
 
-  this.expectUserBioToBe = function(bio) {
-    expect(userBioElement.getAttribute('value')).toMatch(bio);
+  this.expectUserBioToBe = async function(bio) {
+    await waitFor.visibilityOf(
+      userBioElement, 'User bio field takes too long to appear.');
+    expect(await userBioElement.getAttribute('value')).toMatch(bio);
   };
 
-  this.selectCreatorDashboard = function() {
-    createrDashboardRadio.click();
+  this.selectCreatorDashboard = async function() {
+    await action.click(
+      'Creator Dashboard radio', createrDashboardRadio);
+    await saveNewChanges('Creator Dashboard Option');
   };
 
-  this.selectLearnerDashboard = function() {
-    learnerDashboardRadio.click();
+  this.selectLearnerDashboard = async function() {
+    await action.click(
+      'Learner Dashboard radio', learnerDashboardRadio);
+    await saveNewChanges('Learner Dashboard Option');
   };
 };
 

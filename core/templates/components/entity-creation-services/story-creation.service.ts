@@ -16,18 +16,20 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
+require(
+  'pages/topic-editor-page/modal-templates/' +
+  'create-new-story-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', '$uibModal', '$window', 'AlertsService', 'LoaderService',
-  'TopicEditorStateService', 'UrlInterpolationService',
-  'MAX_CHARS_IN_STORY_TITLE',
+  '$http', '$uibModal', '$window', 'AlertsService', 'ImageLocalStorageService',
+  'LoaderService', 'TopicEditorStateService', 'UrlInterpolationService',
   function(
-      $http, $uibModal, $window, AlertsService, LoaderService,
-      TopicEditorStateService, UrlInterpolationService,
-      MAX_CHARS_IN_STORY_TITLE) {
+      $http, $uibModal, $window, AlertsService, ImageLocalStorageService,
+      LoaderService, TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
@@ -37,32 +39,15 @@ angular.module('oppia').factory('StoryCreationService', [
         if (storyCreationInProgress) {
           return;
         }
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
-            'new-story-title-editor.template.html'),
+            'create-new-story-modal.template.html'),
           backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.storyTitle = '';
-              $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
-              $scope.isStoryTitleEmpty = function(storyTitle) {
-                return (storyTitle === '');
-              };
-              $scope.save = function(storyTitle) {
-                $uibModalInstance.close(storyTitle);
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-
-        modalInstance.result.then(function(storyTitle) {
-          if (storyTitle === '') {
-            throw new Error('Story title cannot be empty');
+          controller: 'CreateNewStoryModalController'
+        }).result.then(function(newlyCreatedStory) {
+          if (!newlyCreatedStory.isValid()) {
+            throw new Error('Story fields cannot be empty');
           }
           storyCreationInProgress = true;
           AlertsService.clearWarnings();
@@ -73,7 +58,34 @@ angular.module('oppia').factory('StoryCreationService', [
               topic_id: topic.getId()
             }
           );
-          $http.post(createStoryUrl, {title: storyTitle})
+          var imagesData = ImageLocalStorageService.getStoredImagesData();
+          var bgColor = ImageLocalStorageService.getThumbnailBgColor();
+          let postData = {
+            title: newlyCreatedStory.title,
+            description: newlyCreatedStory.description,
+            thumbnailBgColor: bgColor,
+            filename: imagesData[0].filename
+          };
+
+          let body = new FormData();
+          body.append('payload', JSON.stringify(postData));
+          body.append('image', imagesData[0].imageBlob);
+
+          $http.post(createStoryUrl, (body), {
+            // The actual header to be added for form-data is
+            // 'multipart/form-data', But adding it manually won't work because
+            // we will miss the boundary parameter. When we keep 'Content-Type'
+            // as undefined the browser automatically fills the boundary
+            // parameter according to the form
+            // data. Refer https://stackoverflow.com/questions/37039852/. and
+            // https://stackoverflow.com/questions/34983071/.
+            // Note: This should be removed and a convetion similar to
+            // StoryCreationService should be followed once this service
+            // is migrated to Angular 8.
+            headers: {
+              'Content-Type': undefined
+            }
+          })
             .then(function(response) {
               $window.location = UrlInterpolationService.interpolateUrl(
                 STORY_EDITOR_URL_TEMPLATE, {
@@ -82,6 +94,7 @@ angular.module('oppia').factory('StoryCreationService', [
               );
             }, function() {
               LoaderService.hideLoadingScreen();
+              ImageLocalStorageService.flushStoredImagesData();
             });
         }, function() {
           // Note to developers:

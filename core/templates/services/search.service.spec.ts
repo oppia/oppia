@@ -20,7 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-// The import below is to successfully mock Jquery
+// The import below is to successfully mock Jquery.
 import $ from 'jquery';
 
 require('services/search.service.ts');
@@ -251,9 +251,7 @@ describe('Search service', function() {
       hi: true
     };
     var mockInput = document.createElement('input');
-    // @ts-ignore
     var jquerySpy = spyOn(window, '$');
-    // @ts-ignore
     jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue(
       $(mockInput).val(searchQuery));
     jquerySpy.withArgs(mockInput).and.callThrough();
@@ -288,10 +286,8 @@ describe('Search service', function() {
       hi: true
     };
     var mockInput = document.createElement('input');
-    // @ts-ignore
     var jquerySpy = spyOn(window, '$');
 
-    // @ts-ignore
     jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue(
       $(mockInput).val('mismatch'));
     jquerySpy.withArgs(mockInput).and.callThrough();
@@ -354,7 +350,7 @@ describe('Search service', function() {
       search_cursor: 'newcursor'
     };
 
-    // set _last variables
+    // Set _last variables.
     $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
       '("exploration")&language_code=("en" OR "hi")')
       .respond(200, {
@@ -390,7 +386,7 @@ describe('Search service', function() {
         hi: true
       };
 
-      // set _last variables
+      // Set _last variables.
       $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
         '("exploration")&language_code=("en" OR "hi")')
         .respond(200, {
@@ -423,7 +419,7 @@ describe('Search service', function() {
         hi: true
       };
 
-      // set _last variables
+      // Set _last variables.
       $httpBackend.expect('GET', '/searchhandler/data?q=example&category=' +
         '("exploration")&language_code=("en" OR "hi")')
         .respond(200, {

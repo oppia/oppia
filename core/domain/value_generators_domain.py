@@ -68,7 +68,8 @@ class BaseValueGenerator(python_utils.OBJECT):
 
         The first arg should be context_params.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'generate_value() method has not yet been implemented')
 
 
 class Registry(python_utils.OBJECT):
@@ -78,6 +79,7 @@ class Registry(python_utils.OBJECT):
         value_generators_dict: dict(str : BaseValueGenerator). Dictionary
             mapping value generator class names to their classes.
     """
+
     value_generators_dict = {}
 
     @classmethod
@@ -122,7 +124,7 @@ class Registry(python_utils.OBJECT):
 
         Returns:
             class(BaseValueGenerator). A generator class mapping to the
-                generator id given.
+            generator id given.
 
         Raises:
             KeyError: The given generator_id is invalid.

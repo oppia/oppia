@@ -18,14 +18,16 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.directive.ts');
 require(
+  'pages/exploration-editor-page/translation-tab/modal-templates/' +
+  'welcome-translation-modal.controller.ts');
+require(
   'pages/exploration-editor-page/translation-tab/' +
-  'state-translation-status-graph/state-translation-status-graph.directive.ts'
-);
+  'state-translation-status-graph/state-translation-status-graph.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translator-overview/' +
   'translator-overview.directive.ts');
@@ -51,7 +53,8 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 
-angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
+angular.module('oppia').directive('translationTab', [
+  'UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -62,15 +65,15 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
 
       controller: ['$scope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'LoaderService', 'StateEditorService', 'StateRecordedVoiceoversService',
-        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
-        'TranslationTabActiveModeService',
+        'LoaderService', 'SiteAnalyticsService', 'StateEditorService',
+        'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
+        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
         'UserExplorationPermissionsService',
         function($scope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
-            LoaderService, StateEditorService, StateRecordedVoiceoversService,
-            StateTutorialFirstTimeService, StateWrittenTranslationsService,
-            TranslationTabActiveModeService,
+            LoaderService, SiteAnalyticsService, StateEditorService,
+            StateRecordedVoiceoversService, StateTutorialFirstTimeService,
+            StateWrittenTranslationsService, TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
           var ctrl = this;
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
@@ -120,51 +123,27 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
             if (permissions === null) {
               return;
             }
-            if (permissions.can_voiceover) {
+            if (permissions.canVoiceover) {
               EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }
           };
 
           $scope.showWelcomeTranslationModal = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/welcome-translation-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', 'ContextService',
-                'SiteAnalyticsService',
-                function($scope, $uibModalInstance, ContextService,
-                    SiteAnalyticsService) {
-                  var explorationId = ContextService.getExplorationId();
-
-                  SiteAnalyticsService.registerTutorialModalOpenEvent(
-                    explorationId);
-
-                  $scope.beginTutorial = function() {
-                    SiteAnalyticsService.registerAcceptTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    SiteAnalyticsService.registerDeclineTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                  // translation tutorial image url for modal
-                  $scope.translationWelcomeImgUrl = (
-                    UrlInterpolationService.getStaticImageUrl(
-                      '/general/editor_welcome.svg'));
-                }
-              ],
+              controller: 'WelcomeTranslationModalController',
               windowClass: 'oppia-welcome-modal'
-            });
-
-            modalInstance.result.then(function() {
+            }).result.then(function(explorationId) {
+              SiteAnalyticsService.registerAcceptTutorialModalEvent(
+                explorationId);
               $scope.onStartTutorial();
-            }, function() {
+            }, function(explorationId) {
+              SiteAnalyticsService.registerDeclineTutorialModalEvent(
+                explorationId);
               StateTutorialFirstTimeService.markTranslationTutorialFinished();
             });
           };
@@ -176,7 +155,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
             $scope.$on('refreshTranslationTab', function() {
               initTranslationTab();
             });
-            // Toggles the translation tab tutorial on/off
+            // Toggles the translation tab tutorial on/off.
             $scope.translationTutorial = false;
             $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
               type: 'title',

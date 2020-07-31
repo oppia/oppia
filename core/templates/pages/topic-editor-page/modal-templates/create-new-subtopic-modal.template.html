@@ -1,0 +1,81 @@
+<div class="modal-header">
+  <h3>
+    Create New Subtopic
+  </h3>
+</div>
+<div>
+  <div class="modal-body new-subtopic-editor protractor-test-new-subtopic-editor">
+    <div>
+      <strong>Enter the title for the subtopic</strong>
+    </div>
+    <input class="form-control protractor-test-new-subtopic-title-field" style="font-size: 12px;"
+           placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
+           ng-model="$ctrl.subtopicTitle" ng-change="$ctrl.resetErrorMsg()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
+    <span class="oppia-input-box-subtitle">
+      <i>
+        Subtopic title should be at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+      </i>
+    </span>
+    <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
+      <em><[$ctrl.errorMsg]></em>
+    </span>
+
+
+    <div class="thumbnail-editor">
+      <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
+                          update-filename="$ctrl.updateSubtopicThumbnailFilename"
+                          bg-color="$ctrl.editableThumbnailBgColor"
+                          update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
+                          allowed-bg-colors="$ctrl.allowedBgColors"
+                          aspect-ratio="'4:3'"
+                          preview-title="$ctrl.subtopicTitle"
+                          preview-description=""
+                          preview-description-bg-color="'#BE563C'"
+                          preview-footer="">
+      </thumbnail-uploader>
+    </div>
+    <div>
+      <strong>Enter the subtopic content</strong>
+    </div>
+    <div class="description-editor" ng-if="$ctrl.schemaEditorIsShown">
+      <div class="oppia-editor-card-body" >
+        <schema-based-editor schema="$ctrl.SUBTOPIC_PAGE_SCHEMA"
+                             class="protractor-test-create-subtopic-page-content"
+                             local-value="$ctrl.htmlData">
+        </schema-based-editor>
+      </div>
+    </div>
+
+    <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-show-schema-editor">
+      <span class="oppia-placeholder">
+          Give a description or explanation of the subtopic.
+        <i class="fa fa-pen"></i>
+      </span>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" ng-click="$ctrl.cancel()" type="button">Cancel</button>
+    <button class="btn btn-success protractor-test-confirm-subtopic-creation-button"
+            type="submit" ng-disabled="!$ctrl.isSubtopicValid()" ng-click="$ctrl.save()">
+      Create Subtopic
+    </button>
+  </div>
+</div>
+<style>
+  .new-subtopic-editor .form-text {
+    margin-left: 37.5%;
+    margin-top: -3%;
+  }
+  .new-subtopic-editor .thumbnail-editor {
+    margin: 25px 0;
+  }
+  .new-subtopic-editor .description-editor {
+    margin: 10px 0 0;
+  }
+  .new-subtopic-editor .error-msg {
+    color: #ff0000;
+    font-size: smaller;
+    margin: 10px 0 0;
+  }
+</style>

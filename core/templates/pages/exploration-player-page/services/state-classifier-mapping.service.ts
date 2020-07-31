@@ -22,18 +22,27 @@ import { Injectable } from '@angular/core';
 import { Classifier, ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 
+interface StateClassifierMappingBackendDict {
+  [state: string]: {
+    'algorithm_id': string;
+    'classifier_data': ClassifierData;
+    'data_schema_version': number;
+  }
+}
+
+interface StateClassifierMapping {
+  [state: string]: Classifier;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class StateClassifierMappingService {
   constructor(private classifierObjectFactory: ClassifierObjectFactory) {}
-  stateClassifierMapping = null;
+  stateClassifierMapping: StateClassifierMapping = null;
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'backendStateClassifierMapping' is a dict with
-  // underscore_cased keys which give tslint errors against underscore_casing in
-  // favor of camelCasing.
-  init(backendStateClassifierMapping: any): void {
+  init(
+      backendStateClassifierMapping: StateClassifierMappingBackendDict): void {
     this.stateClassifierMapping = {};
     var algorithmId, classifierData, dataSchemaVersion;
     for (var stateName in backendStateClassifierMapping) {

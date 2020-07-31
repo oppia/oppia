@@ -77,20 +77,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.skill.validate()
 
-    def _assert_valid_skill_id(self, expected_error_substring, skill_id):
-        """Checks that the skill passes strict validation."""
+    def test_skill_id_validation_fails_with_invalid_skill_id_type(self):
         with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            skill_domain.Skill.require_valid_skill_id(skill_id)
+            utils.ValidationError, 'Skill id should be a string'):
+            skill_domain.Skill.require_valid_skill_id(10)
 
-    def test_valid_skill_id(self):
-        self._assert_valid_skill_id('Skill id should be a string', 10)
-        self._assert_valid_skill_id('Invalid skill id', 'abc')
+    def test_skill_id_validation_fails_with_invalid_skill_id_length(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid skill id'):
+            skill_domain.Skill.require_valid_skill_id('abc')
 
     def test_valid_misconception_id(self):
         self.skill.next_misconception_id = 'invalid_id'
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
+
+    def test_get_all_html_content_strings(self):
+        html_strings = self.skill.get_all_html_content_strings()
+        self.assertEqual(len(html_strings), 8)
 
     def test_valid_misconception_name(self):
         misconception_name = 'This string is smaller than 50'
@@ -219,7 +223,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconceptions schema version to be an integer')
 
-        self.skill.misconceptions_schema_version = 2
+        self.skill.misconceptions_schema_version = 3
         self.skill.rubric_schema_version = 100
         self._assert_validation_error(
             'Expected rubric schema version to be %s' %
@@ -769,3 +773,51 @@ class SkillSummaryTests(test_utils.GenericTestBase):
                 'Expected worked_examples_count to be non-negative, '
                 'received \'-1\'')):
             self.skill_summary.validate()
+
+
+class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(AugmentedSkillSummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
+
+        self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
+            'skill_id', 'description', 'en', 1, 1, 1,
+            'topic1', 'math', current_time, current_time)
+
+    def test_augmented_skill_summary_gets_created(self):
+        augmented_skill_summary_dict = {
+            'id': 'skill_id',
+            'description': 'description',
+            'language_code': 'en',
+            'version': 1,
+            'misconception_count': 1,
+            'worked_examples_count': 1,
+            'topic_name': 'topic1',
+            'classroom_name': 'math',
+            'skill_model_created_on': self.time_in_millisecs,
+            'skill_model_last_updated': self.time_in_millisecs
+        }
+        self.assertEqual(
+            self.augmented_skill_summary.to_dict(),
+            augmented_skill_summary_dict)
+
+
+class TopicAssignmentTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicAssignmentTests, self).setUp()
+        self.topic_assignments = skill_domain.TopicAssignment(
+            'topic_id1', 'Topic1', 2, 1)
+
+    def test_topic_assignments_gets_created(self):
+        topic_assignments_dict = {
+            'topic_id': 'topic_id1',
+            'topic_name': 'Topic1',
+            'topic_version': 2,
+            'subtopic_id': 1,
+        }
+        self.assertEqual(
+            self.topic_assignments.to_dict(),
+            topic_assignments_dict)

@@ -40,7 +40,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(enum.first, 'first')
         self.assertEqual(enum.second, 'second')
         self.assertEqual(enum.third, 'third')
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesRegexp(
+            AttributeError,
+            'type object \'Enum\' has no attribute \'fourth\''):
             enum.fourth  # pylint: disable=pointless-statement
 
     def test_get_comma_sep_string_from_list(self):
@@ -77,7 +79,10 @@ class UtilsTests(test_utils.GenericTestBase):
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaises(utils.InvalidInputException):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'while parsing a flow node\n'
+            'expected the node content, but found \'<stream end>\'\n'):
             yaml_str = utils.dict_from_yaml('{')
 
     def test_recursively_remove_key(self):
@@ -363,3 +368,17 @@ class UtilsTests(test_utils.GenericTestBase):
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
         filename = 'filename.svg'
         utils.require_valid_thumbnail_filename(filename)
+
+    def test_get_time_in_millisecs(self):
+        dt = datetime.datetime(2020, 6, 15)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_get_time_in_millisecs_with_complicated_time(self):
+        dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))

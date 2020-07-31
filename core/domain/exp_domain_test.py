@@ -716,15 +716,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(answer_groups_list)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-
-        init_state.update_interaction_solution({
+        solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': 'hello_world is a string'
                 }
-        })
+        }
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
         self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
@@ -1210,7 +1212,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -1218,6 +1220,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
         self.assertEqual(exploration.get_content_count(), 7)
@@ -1634,11 +1638,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='objective', end_state_name='End')
         exploration.validate(strict=True)
 
-        (exploration.init_state.interaction.default_outcome
-         .labelled_as_correct) = True
+        (
+            exploration.init_state.interaction.default_outcome
+            .labelled_as_correct) = True
 
-        (exploration.init_state.interaction.default_outcome
-         .dest) = exploration.init_state_name
+        (
+            exploration.init_state.interaction.default_outcome
+            .dest) = exploration.init_state_name
 
         with self.assertRaisesRegexp(
             Exception,
@@ -1935,14 +1941,24 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         exp_domain.Exploration.from_untitled_yaml(
             'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: mapping '
+            'values are not allowed here'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: while '
+            'scanning a simple key'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'State1:\n(\nInvalid yaml')
 
@@ -2000,7 +2016,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = ("""default_skin: conversation_v1
+    YAML_CONTENT_V1 = (
+        """default_skin: conversation_v1
 param_changes: []
 param_specs: {}
 schema_version: 1
@@ -2050,7 +2067,8 @@ states:
     widget_id: TextInput
 """)
 
-    YAML_CONTENT_V2 = ("""default_skin: conversation_v1
+    YAML_CONTENT_V2 = (
+        """default_skin: conversation_v1
 init_state_name: (untitled state)
 param_changes: []
 param_specs: {}
@@ -2101,7 +2119,8 @@ states:
       widget_id: TextInput
 """)
 
-    YAML_CONTENT_V3 = ("""author_notes: ''
+    YAML_CONTENT_V3 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2165,7 +2184,8 @@ states:
       widget_id: TextInput
 """)
 
-    YAML_CONTENT_V4 = ("""author_notes: ''
+    YAML_CONTENT_V4 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2227,7 +2247,8 @@ states:
     param_changes: []
 """)
 
-    YAML_CONTENT_V5 = ("""author_notes: ''
+    YAML_CONTENT_V5 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2322,7 +2343,8 @@ states:
 tags: []
 """)
 
-    YAML_CONTENT_V6 = ("""author_notes: ''
+    YAML_CONTENT_V6 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2408,7 +2430,8 @@ states_schema_version: 3
 tags: []
 """)
 
-    YAML_CONTENT_V7 = ("""author_notes: ''
+    YAML_CONTENT_V7 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2482,7 +2505,8 @@ states_schema_version: 4
 tags: []
 """)
 
-    YAML_CONTENT_V8 = ("""author_notes: ''
+    YAML_CONTENT_V8 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2556,7 +2580,8 @@ states_schema_version: 5
 tags: []
 """)
 
-    YAML_CONTENT_V9 = ("""author_notes: ''
+    YAML_CONTENT_V9 = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -2635,7 +2660,8 @@ states_schema_version: 6
 tags: []
 """)
 
-    YAML_CONTENT_V10 = ("""author_notes: ''
+    YAML_CONTENT_V10 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2713,7 +2739,8 @@ states_schema_version: 7
 tags: []
 title: Title
 """)
-    YAML_CONTENT_V11 = ("""author_notes: ''
+    YAML_CONTENT_V11 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2794,7 +2821,8 @@ states_schema_version: 8
 tags: []
 title: Title
 """)
-    YAML_CONTENT_V12 = ("""author_notes: ''
+    YAML_CONTENT_V12 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2881,7 +2909,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V13 = ("""author_notes: ''
+    YAML_CONTENT_V13 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -2970,7 +2999,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V14 = ("""author_notes: ''
+    YAML_CONTENT_V14 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3059,7 +3089,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V15 = ("""author_notes: ''
+    YAML_CONTENT_V15 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3148,7 +3179,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V16 = ("""author_notes: ''
+    YAML_CONTENT_V16 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3234,7 +3266,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V17 = ("""author_notes: ''
+    YAML_CONTENT_V17 = (
+        """author_notes: ''
 blurb: ''
 category: Category
 init_state_name: (untitled state)
@@ -3317,7 +3350,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V18 = ("""author_notes: ''
+    YAML_CONTENT_V18 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3405,7 +3439,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V19 = ("""author_notes: ''
+    YAML_CONTENT_V19 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3494,7 +3529,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V20 = ("""author_notes: ''
+    YAML_CONTENT_V20 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3584,7 +3620,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V21 = ("""author_notes: ''
+    YAML_CONTENT_V21 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3677,7 +3714,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V22 = ("""author_notes: ''
+    YAML_CONTENT_V22 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3771,7 +3809,8 @@ states_schema_version: 17
 tags: []
 title: Title
 """)
-    YAML_CONTENT_V23 = ("""author_notes: ''
+    YAML_CONTENT_V23 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3866,7 +3905,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V24 = ("""author_notes: ''
+    YAML_CONTENT_V24 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3962,7 +4002,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V25 = ("""author_notes: ''
+    YAML_CONTENT_V25 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4062,7 +4103,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V26 = ("""author_notes: ''
+    YAML_CONTENT_V26 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4171,7 +4213,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V27 = ("""author_notes: ''
+    YAML_CONTENT_V27 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4280,7 +4323,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V28 = ("""author_notes: ''
+    YAML_CONTENT_V28 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4389,7 +4433,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V29 = ("""author_notes: ''
+    YAML_CONTENT_V29 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4501,7 +4546,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V30 = ("""author_notes: ''
+    YAML_CONTENT_V30 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4610,7 +4656,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V31 = ("""author_notes: ''
+    YAML_CONTENT_V31 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4720,7 +4767,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V32 = ("""author_notes: ''
+    YAML_CONTENT_V32 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4841,7 +4889,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V33 = ("""author_notes: ''
+    YAML_CONTENT_V33 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4965,7 +5014,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V34 = ("""author_notes: ''
+    YAML_CONTENT_V34 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5092,7 +5142,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V35 = ("""author_notes: ''
+    YAML_CONTENT_V35 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5219,7 +5270,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V36 = ("""author_notes: ''
+    YAML_CONTENT_V36 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5346,7 +5398,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V37 = ("""author_notes: ''
+    YAML_CONTENT_V37 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5473,7 +5526,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V38 = ("""author_notes: ''
+    YAML_CONTENT_V38 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5600,7 +5654,263 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V38
+    YAML_CONTENT_V39 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 39
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 34
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V40 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 40
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 35
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V40
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -5639,7 +5949,8 @@ title: Title
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_cannot_load_from_v6_with_invalid_handler_name(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -5732,7 +6043,8 @@ tags: []
                 'eid', 'Title', 'Category', invalid_yaml_content_v6)
 
     def test_cannot_load_from_v6_with_invalid_rule(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -5825,7 +6137,8 @@ tags: []
                 'eid', 'Title', 'Category', invalid_yaml_content_v6)
 
     def test_cannot_load_from_v6_with_invalid_subject(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -5919,7 +6232,8 @@ tags: []
                 'eid', 'Title', 'Category', invalid_yaml_content_v6)
 
     def test_cannot_load_from_v6_with_invalid_interaction_id(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
+        invalid_yaml_content_v6 = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -6025,7 +6339,8 @@ tags: []
 
     def test_load_from_v9(self):
         """Test direct loading from a v9 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6035,7 +6350,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 38
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6153,7 +6468,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 33
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6175,7 +6490,8 @@ title: Title
 
     def test_load_from_v12(self):
         """Test direct loading from a v12 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6185,7 +6501,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 38
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6302,7 +6618,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 33
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6342,7 +6658,8 @@ title: Title
 
     def test_load_from_v18(self):
         """Test direct loading from a v18 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6352,7 +6669,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 38
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6476,7 +6793,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 33
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6498,7 +6815,8 @@ title: Title
 
     def test_load_from_v21(self):
         """Test direct loading from a v21 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6508,7 +6826,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 38
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6628,7 +6946,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 33
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6680,7 +6998,8 @@ title: Title
 
     def test_load_from_v29(self):
         """Test direct loading from a v29 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
+        latest_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -6690,7 +7009,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 38
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
@@ -6807,7 +7126,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 33
+states_schema_version: 35
 tags: []
 title: Title
 """)
@@ -6840,7 +7159,8 @@ title: Title
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_cannot_load_from_yaml_with_no_schema_version(self):
-        sample_yaml_content = ("""author_notes: ''
+        sample_yaml_content = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -6939,7 +7259,8 @@ tags: []
                 'eid', 'Title', 'Category', sample_yaml_content)
 
     def test_cannot_load_from_yaml_with_invalid_schema_version(self):
-        sample_yaml_content = ("""author_notes: ''
+        sample_yaml_content = (
+            """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
@@ -7044,7 +7365,8 @@ tags: []
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
     """Test HTML migration."""
 
-    YAML_CONTENT_V26_TEXTANGULAR = ("""author_notes: ''
+    YAML_CONTENT_V26_TEXTANGULAR = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7060,7 +7382,9 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: ''
+      html: '<p>This is test </p><oppia-noninteractive-math
+      raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">
+        </oppia-noninteractive-math>'
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
@@ -7212,7 +7536,8 @@ states:
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
                 alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></i>Here is the image2
-                <div><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+                <div><oppia-noninteractive-image
+                caption-with-value="&amp;quot;&amp;quot;"
                 filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
                 alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></div>
@@ -7260,8 +7585,8 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
-    YAML_CONTENT_V35_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V35_IMAGE_DIMENSIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7404,12 +7729,16 @@ states:
       hints:
       - hint_content:
           content_id: hint_1
-          html: <p>Hello, this is</p><p> html1<strong> for </strong></p><p>state2</p>
+          html: <p>Hello, this is</p><p> html1<strong> for </strong></p>
+          <p>state2</p>
       - hint_content:
           content_id: hint_2
-          html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
-            forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
-            forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
+          html: <p>Here is link 2 <oppia-noninteractive-link
+            text-with-value="&amp;quot;discussion
+            forum&amp;quot;"
+            url-with-value="&amp;quot;https://groups.google.com/
+            forum/?fromgroups#!forum/oppia&amp;quot;">
+            </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
       solution: null
     param_changes: []
@@ -7441,11 +7770,17 @@ states:
           dest: state1
           feedback:
             content_id: feedback_1
-            html: <p>Here is the image1 </p><oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
-              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
-              alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
+            html: <p>Here is the image1 </p><oppia-noninteractive-image
+              alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;"
+              filepath-with-value=
+              "&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
+              </oppia-noninteractive-image><p>Here is the image2 </p>
+              <oppia-noninteractive-image
+              alt-with-value="&amp;quot;&amp;quot;"
+              caption-with-value="&amp;quot;&amp;quot;"
+              filepath-with-value=
+              "&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
               </oppia-noninteractive-image>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -7502,8 +7837,9 @@ tags: []
 title: title
 """)
 
-# pylint: disable=line-too-long
-    YAML_CONTENT_V38_IMAGE_DIMENSIONS = ("""author_notes: ''
+# pylint: disable=line-too-long, single-line-pragma
+    YAML_CONTENT_V40_IMAGE_DIMENSIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7513,13 +7849,15 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 38
+schema_version: 40
 states:
   Introduction:
     classifier_model_id: null
     content:
       content_id: content
-      html: ''
+      html: '<p>This is test </p><p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_latex&amp;quot;:
+        &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}">
+        </oppia-noninteractive-math></p>'
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7741,12 +8079,13 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 33
+states_schema_version: 35
 tags: []
 title: title
 """)
 
-    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7764,6 +8103,8 @@ states:
       content_id: content
       html: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this
             is test case to check image tag inside p tag</p>
+            <oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot;">
+            </oppia-noninteractive-math>
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
@@ -7856,7 +8197,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V35_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V35_WITH_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7985,7 +8327,8 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V38_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V40_WITH_IMAGE_CAPTION = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7995,15 +8338,17 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 38
+schema_version: 40
 states:
   (untitled state):
     classifier_model_id: null
     content:
       content_id: content
-      html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+      html: '<oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;random_height_490_width_120.png&amp;quot;"></oppia-noninteractive-image><p>Hello
-        this is test case to check image tag inside p tag</p>
+        this is test case to check image tag inside p tag</p><p> </p><oppia-noninteractive-math
+        math_content-with-value="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;,
+        &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"> </oppia-noninteractive-math>'
     interaction:
       answer_groups:
       - outcome:
@@ -8109,12 +8454,11 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 33
+states_schema_version: 35
 tags: []
 title: Title
 """)
-
-# pylint: enable=line-too-long
+# pylint: enable=line-too-long, single-line-pragma
 
 
     def test_load_from_v26_textangular(self):
@@ -8127,7 +8471,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V38_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V40_IMAGE_DIMENSIONS)
 
 
     def test_load_from_v27_without_image_caption(self):
@@ -8140,7 +8484,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V38_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V40_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -8233,6 +8577,67 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
+
+
+class ExplorationMathRichTextInfoTests(test_utils.GenericTestBase):
+
+    def test_create_html_math_rich_text_info(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.to_dict(), {
+                'exp_id': 'exp_id1',
+                'math_images_generation_required': True,
+                'latex_strings_without_svg': ['abc', 'x']
+            })
+
+    def test_validate_when_latex_strings_not_list(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected latex_strings to be a list, received '
+            'invalid_latex_format'):
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, 'invalid_latex_format')
+
+    def test_validate_when_each_latex_expressions_are_not_strings(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected each element in the list of latex strings to be a str, '
+            'received 3'):
+            exp_domain.ExplorationMathRichTextInfo('exp_id1', True, ['x^2', 3])
+
+    def test_validate_exp_id_is_string(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected exp_id to be a str, received 0'):
+            exp_domain.ExplorationMathRichTextInfo(0, True, ['x^2', 3])
+
+    def test_validate_math_images_generation_required_is_bool(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected math_images_generation_required to be an bool, '
+            'received invalid'):
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', 'invalid', ['x^2', 3])
+
+    def test_get_svg_size_in_bytes(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_svg_size_in_bytes(), 10000)
+
+    def test_get_longest_latex_expression(self):
+        exploration_math_rich_text_info = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['x^2 + 2ax', 'x']))
+
+        self.assertEqual(
+            exploration_math_rich_text_info.get_longest_latex_expression(),
+            'x^2 + 2ax')
 
 
 class HtmlCollectionTests(test_utils.GenericTestBase):
@@ -8328,7 +8733,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        solution_dict1 = {
+        solution_dict = {
             'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
@@ -8337,8 +8742,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-
-        state1.update_interaction_solution(solution_dict1)
+        solution = state_domain.Solution.from_dict(
+            state1.interaction.id, solution_dict)
+        state1.update_interaction_solution(solution)
 
         answer_group_list2 = [{
             'rule_specs': [{

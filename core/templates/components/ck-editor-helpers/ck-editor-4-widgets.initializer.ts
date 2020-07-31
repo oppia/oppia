@@ -133,7 +133,14 @@ angular.module('oppia').run([
                 function() {
                   var newWidgetSelector = (
                     '[data-cke-widget-id="' + that.id + '"]');
-                  editor.editable().findOne(newWidgetSelector).remove();
+                  // The below check is required, since without this, even a
+                  // valid RTE component was getting removed from the editor
+                  // when 'Cancel' was clicked in the customization modal.
+                  var widgetElement = editor.editable().findOne(
+                    newWidgetSelector);
+                  if (widgetElement && widgetElement.getText() === '') {
+                    widgetElement.remove();
+                  }
                 });
             },
             /**
