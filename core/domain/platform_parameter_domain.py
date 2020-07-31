@@ -585,7 +585,7 @@ class PlatformParameter(python_utils.OBJECT):
         """Returns the data type of the platform parameter.
 
         Returns:
-            str. The data type of the platform parameter.
+            DATA_TYPES. The data type of the platform parameter.
         """
         return self._data_type
 
