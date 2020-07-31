@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from 'rxjs';
-
 /**
  * @fileoverview Directive for the navbar of the collection editor.
  */
+
+import { Subscription } from 'rxjs';
 
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');

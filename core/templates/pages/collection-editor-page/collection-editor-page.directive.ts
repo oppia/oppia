@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from 'rxjs';
-
 /**
  * @fileoverview Primary directive for the collection editor page.
  */
+
+import { Subscription } from 'rxjs';
 
 require(
   'pages/collection-editor-page/editor-tab/collection-editor-tab.directive.ts');
