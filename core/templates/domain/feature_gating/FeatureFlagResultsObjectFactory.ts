@@ -13,31 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating PlatformParameterResult domain objects.
+ * @fileoverview Factory for creating FeatureFlagResults domain objects.
  */
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { PlatformParameterValue } from './PlatformParameterRuleObjectFactory';
 
-export interface PlatformParameterResultBackendDict {
-  [paramName: string]: PlatformParameterValue;
+export interface FeatureFlagResultsBackendDict {
+  [featureName: string]: boolean;
 }
 
-export class PlatformParameterResult {
-  data: Map<string, PlatformParameterValue>;
+export class FeatureFlagResults {
+  data: Map<string, boolean>;
 
-  constructor(data: PlatformParameterResultBackendDict) {
+  constructor(data: FeatureFlagResultsBackendDict) {
     this.data = new Map(Object.entries(data));
   }
 
   /**
    * Creates a dict representation of the instance.
    *
-   * @returns {PlatformParameterResultBackendDict} - The dict representation
+   * @returns {FeatureFlagResultsBackendDict} - The dict representation
    * of the instance.
    */
-  toBackendDict(): PlatformParameterResultBackendDict {
+  toBackendDict(): FeatureFlagResultsBackendDict {
     const backendDict = {};
     for (const [key, value] of this.data.entries()) {
       backendDict[key] = value;
@@ -49,16 +48,16 @@ export class PlatformParameterResult {
    * Parse an expression. Returns a node tree, which can be evaluated by
    * invoking node.eval().
    *
-   * @param {string} paramName - The name of the parameter.
+   * @param {string} featureName - The name of the feature.
    *
-   * @returns {PlatformParameterValue} - The value of the parameter
-   * @throws {Error} - If the parameter with the specified name doesn't exist.
+   * @returns {boolean} - The value of the feature flag, true if enabled.
+   * @throws {Error} - If the feature with the specified name doesn't exist.
    */
-  getPlatformParameterValue(paramName: string): PlatformParameterValue {
-    if (this.data.has(paramName)) {
-      return this.data.get(paramName);
+  isFeatureEnabled(featureName: string): boolean {
+    if (this.data.has(featureName)) {
+      return this.data.get(featureName);
     } else {
-      throw new Error(`Platform parameter '${paramName}' not exists.`);
+      throw new Error(`Feature '${featureName}' not exists.`);
     }
   }
 }
@@ -66,14 +65,13 @@ export class PlatformParameterResult {
 @Injectable({
   providedIn: 'root'
 })
-export class PlatformParameterResultObjectFactory {
+export class FeatureFlagResultsObjectFactory {
   createFromBackendDict(
-      backendDict: PlatformParameterResultBackendDict):
-      PlatformParameterResult {
-    return new PlatformParameterResult(backendDict);
+      backendDict: FeatureFlagResultsBackendDict): FeatureFlagResults {
+    return new FeatureFlagResults(backendDict);
   }
 }
 
 angular.module('oppia').factory(
-  'PlatformParameterResultObjectFactory',
-  downgradeInjectable(PlatformParameterResultObjectFactory));
+  'FeatureFlagResultsObjectFactory',
+  downgradeInjectable(FeatureFlagResultsObjectFactory));

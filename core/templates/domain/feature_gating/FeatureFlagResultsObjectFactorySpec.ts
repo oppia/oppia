@@ -17,20 +17,20 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { PlatformParameterResultObjectFactory } from
-  './PlatformParameterResultObjectFactory';
+import { FeatureFlagResultsObjectFactory } from
+  './FeatureFlagResultsObjectFactory';
 
-describe('PlatformParameterRuleObjectFactory', () => {
-  let factory: PlatformParameterResultObjectFactory;
+fdescribe('FeatureFlagResultsObjectFactory', () => {
+  let factory: FeatureFlagResultsObjectFactory;
 
   beforeEach(() => {
-    factory = TestBed.get(PlatformParameterResultObjectFactory);
+    factory = TestBed.get(FeatureFlagResultsObjectFactory);
   });
 
   it('should create an instance from a backend dict.', () => {
     const result = factory.createFromBackendDict({
       feature_name_a: true,
-      param_name_b: 'string value'
+      feature_name_b: false
     });
 
     expect(result.data.size).toBe(2);
@@ -39,33 +39,32 @@ describe('PlatformParameterRuleObjectFactory', () => {
   it('should convert an instance back to a dict.', () => {
     const backendDict = {
       feature_name_a: true,
-      param_name_b: 'string value'
+      feature_name_b: false
     };
     const result = factory.createFromBackendDict(backendDict);
     expect(result.toBackendDict()).toEqual(backendDict);
   });
 
-  describe('.getPlatformParameterValue', () => {
+  describe('.isFeatureEnabled', () => {
     it('should return the value of the parameter', () => {
       const result = factory.createFromBackendDict({
         feature_name_a: true,
-        param_name_b: 'string value'
+        feature_name_b: false
       });
 
-      expect(result.getPlatformParameterValue('feature_name_a')).toBeTrue();
-      expect(result.getPlatformParameterValue('param_name_b')).toEqual(
-        'string value');
+      expect(result.isFeatureEnabled('feature_name_a')).toBeTrue();
+      expect(result.isFeatureEnabled('feature_name_b')).toBeFalse();
     });
 
-    it('should throws if the parameter does not exist.', () => {
+    it('should throws if the feature does not exist.', () => {
       const result = factory.createFromBackendDict({
         feature_name_a: true,
-        param_name_b: 'string value'
+        feature_name_b: false
       });
 
       expect(
-        () => result.getPlatformParameterValue('invalid_name')
-      ).toThrowError('Platform parameter \'invalid_name\' not exists.');
+        () => result.isFeatureEnabled('invalid_name')
+      ).toThrowError('Feature \'invalid_name\' not exists.');
     });
   });
 });
