@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { FeatureFlagResultsObjectFactory } from
   './FeatureFlagResultsObjectFactory';
 
-fdescribe('FeatureFlagResultsObjectFactory', () => {
+describe('FeatureFlagResultsObjectFactory', () => {
   let factory: FeatureFlagResultsObjectFactory;
 
   beforeEach(() => {

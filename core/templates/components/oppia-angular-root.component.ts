@@ -130,6 +130,8 @@ import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
+import { ClientContextObjectFactory } from
+  'domain/feature_gating/ClientContextObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -257,6 +259,8 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { FeatureFlagResultsObjectFactory } from
+  'domain/feature_gating/FeatureFlagResultsObjectFactory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -742,6 +746,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static classifierObjectFactory: ClassifierObjectFactory;
   static classroomBackendApiService: ClassroomBackendApiService;
   static classroomDataObjectFactory: ClassroomDataObjectFactory;
+  static clientContextObjectFactory: ClientContextObjectFactory;
   static codeNormalizerService: CodeNormalizerService;
   static codeReplPredictionService: CodeReplPredictionService;
   static codeReplRulesService: CodeReplRulesService;
@@ -809,6 +814,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
   static featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory;
+  static featureFlagResultsObjectFactory: FeatureFlagResultsObjectFactory;
   static feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
   static feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
   static feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;
@@ -1069,6 +1075,7 @@ private ckEditorCopyContentService: CkEditorCopyContentService,
 private classifierObjectFactory: ClassifierObjectFactory,
 private classroomBackendApiService: ClassroomBackendApiService,
 private classroomDataObjectFactory: ClassroomDataObjectFactory,
+private clientContextObjectFactory: ClientContextObjectFactory,
 private codeNormalizerService: CodeNormalizerService,
 private codeReplPredictionService: CodeReplPredictionService,
 private codeReplRulesService: CodeReplRulesService,
@@ -1136,6 +1143,7 @@ private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
 private featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory,
+private featureFlagResultsObjectFactory: FeatureFlagResultsObjectFactory,
 private feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory,
 private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
 private feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory,
@@ -1397,6 +1405,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.classifierObjectFactory = this.classifierObjectFactory;
     OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
     OppiaAngularRootComponent.classroomDataObjectFactory = this.classroomDataObjectFactory;
+    OppiaAngularRootComponent.clientContextObjectFactory = this.clientContextObjectFactory;
     OppiaAngularRootComponent.codeNormalizerService = this.codeNormalizerService;
     OppiaAngularRootComponent.codeReplPredictionService = this.codeReplPredictionService;
     OppiaAngularRootComponent.codeReplRulesService = this.codeReplRulesService;
@@ -1464,6 +1473,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
     OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = this.featuredTranslationLanguageObjectFactory;
+    OppiaAngularRootComponent.featureFlagResultsObjectFactory = this.featureFlagResultsObjectFactory;
     OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = this.feedbackMessageSummaryObjectFactory;
     OppiaAngularRootComponent.feedbackThreadObjectFactory = this.feedbackThreadObjectFactory;
     OppiaAngularRootComponent.feedbackThreadSummaryObjectFactory = this.feedbackThreadSummaryObjectFactory;
