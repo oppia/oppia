@@ -91,6 +91,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
+import { ClientContextObjectFactory } from
+  'domain/feature_gating/ClientContextObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -221,6 +223,8 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+import { FeatureFlagResultsObjectFactory } from
+  'domain/feature_gating/FeatureFlagResultsObjectFactory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -695,6 +699,8 @@ export class UpgradedServices {
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
+    upgradedServices['ClientContextObjectFactory'] =
+      new ClientContextObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['CollectionNodeObjectFactory'] =
       new CollectionNodeObjectFactory();
@@ -745,6 +751,8 @@ export class UpgradedServices {
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['FeaturedTranslationLanguageObjectFactory'] =
       new FeaturedTranslationLanguageObjectFactory();
+    upgradedServices['FeatureFlagResultsObjectFactory'] =
+      new FeatureFlagResultsObjectFactory();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =
       new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FeedbackThreadSummaryObjectFactory'] =
