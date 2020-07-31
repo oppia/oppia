@@ -660,9 +660,10 @@ describe('State Graph Visualization directive', function() {
         'UserExplorationPermissionsService');
       userBackendApiService = $injector.get('UserBackendApiService');
 
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true
