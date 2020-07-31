@@ -57,6 +57,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
+    GENERIC_PROFILE_NAME = 'profile_name'
+    ASSOCIATED_PROFILE_IDS = ['profile_1_user_id', 'profile_2_user_id']
 
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
@@ -94,25 +96,33 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=1,
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
-            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            profile_name=self.GENERIC_PROFILE_NAME,
+            associated_profile_user_ids=self.ASSOCIATED_PROFILE_IDS
         ).put()
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy(self):
+    def test_apply_deletion_policy_registered_users_are_deleted(self):
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
-        # Test that calling apply_deletion_policy with no existing model
-        # doesn't fail.
+        user_models.UserSettingsModel.apply_deletion_policy(self.USER_2_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
+        user_models.UserSettingsModel.apply_deletion_policy(self.USER_3_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_3_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_no_exception_raised(self):
         user_models.UserSettingsModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_registered_user_id_is_true(self):
         self.assertTrue(
             user_models.UserSettingsModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -121,23 +131,33 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel
             .has_reference_to_user_id(self.USER_2_ID)
         )
+        self.assertTrue(
+            user_models.UserSettingsModel
+            .has_reference_to_user_id(self.USER_3_ID)
+        )
+
+    def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
             user_models.UserSettingsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_by_role(self):
-        user = user_models.UserSettingsModel.get_by_role(
-            feconf.ROLE_ID_ADMIN)
-        self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
+    def test_get_by_role_for_admin_returns_user1_and_user3_only(self):
+        actual_users = [
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
+            user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
+        ]
+        for user in user_models.UserSettingsModel.get_by_role(
+                feconf.ROLE_ID_ADMIN):
+            self.assertIn(user, actual_users)
 
-    def test_export_data_nonexistent_user(self):
+    def test_export_data_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user not found'):
             user_models.UserSettingsModel.export_data('fake_user')
 
-    def test_export_data_trivial(self):
+    def test_export_data_trivial_returns_data_correctly(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -158,11 +178,13 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'first_contribution_msec': None,
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
-            'preferred_audio_language_code': None
+            'preferred_audio_language_code': None,
+            'profile_name': None,
+            'associated_profile_user_ids': []
         }
         self.assertEqual(expected_user_data, user_data)
 
-    def test_export_data_nontrivial(self):
+    def test_export_data_nontrivial_returns_data_correctly(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -183,11 +205,13 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'first_contribution_msec': 1,
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'profile_name': self.GENERIC_PROFILE_NAME,
+            'associated_profile_user_ids': self.ASSOCIATED_PROFILE_IDS
         }
         self.assertEqual(expected_user_data, user_data)
 
-    def test_get_new_id_method_returns_unique_ids(self):
+    def test_get_new_id_for_regular_case_returns_unique_ids(self):
         ids = set([])
         for _ in python_utils.RANGE(100):
             new_id = user_models.UserSettingsModel.get_new_id('')
@@ -196,7 +220,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
 
-    def test_create_raises_error_when_many_id_collisions_occur(self):
+    def test_get_new_id_forced_for_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             user_models.UserSettingsModel, 'get_by_id', types.MethodType(
