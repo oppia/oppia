@@ -4286,6 +4286,9 @@ md-card.preview-conversation-skin-supplemental-card {
 
 }
 
+.oppia-mobile-back-to-parent {
+  display: none;
+}
 @media only screen and (max-width: 768px) {
   .oppia-static-content, .oppia-static-extra-content {
     width: 90%;
@@ -4303,6 +4306,17 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-mobile-collapsible-card-content {
     border-top: 1px solid #999999;
     padding: 20px 26px 15px;
+  }
+  .oppia-mobile-back-to-parent {
+    color: #007bff;
+    display: block;
+    font-size: 18px;
+    margin-left: 3%;
+  }
+  .oppia-mobile-back-to-parent i {
+    color: #007bff;
+    font-size: 18px;
+    margin-left: 3%;
   }
 }
 

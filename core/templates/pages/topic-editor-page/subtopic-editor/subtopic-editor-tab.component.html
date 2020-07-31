@@ -1,4 +1,8 @@
 <div class="subtopic-content">
+  <p class="oppia-mobile-back-to-parent" ng-click="$ctrl.navigateToTopicEditor()">
+    <i class="fa fa-angle-left"></i>
+    <span>Back to Topic</span>
+  </p>
   <div class="subtopic-header-text">
     <span class="topic-name" ng-click="$ctrl.navigateToTopicEditor()"><[$ctrl.topic.getName()]> / </span>
     <span class="subtopic-name"><[$ctrl.editableTitle]></span>
@@ -358,6 +362,9 @@
   @media screen and (max-width: 768px) {
     .subtopic-content .entity-count {
       display: none;
+    }
+    .subtopic-content {
+      margin-top: 25px;
     }
     .subtopic-content .subtopic-left-box,
     .subtopic-content .subtopic-right-box {

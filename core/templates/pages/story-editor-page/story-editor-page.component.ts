@@ -40,6 +40,7 @@ require(
 require('domain/story/editable-story-backend-api.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('domain/bottom_navbar/bottom-navbar-status.service.ts');
+require('services/page-title.service.ts');
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
@@ -184,6 +185,7 @@ angular.module('oppia').component('storyEditorPage', {
         ctrl.explorationValidationIssues = [];
         ctrl.forceValidateExplorations = true;
         ctrl.warningsAreShown = false;
+        PageTitleService.setPageTitleForMobileView('Story Editor');
         BottomNavbarStatusService.markBottomNavbarStatus(true);
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {

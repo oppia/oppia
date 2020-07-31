@@ -197,6 +197,9 @@ angular.module('oppia').component('subtopicEditorTab', {
       };
 
       ctrl.togglePreviewSkillCard = function() {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
         ctrl.skillsListIsShown = !ctrl.skillsListIsShown;
       };
 

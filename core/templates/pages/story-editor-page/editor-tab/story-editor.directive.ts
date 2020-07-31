@@ -269,11 +269,22 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.toggleChapterLists = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
             $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
+          };
+
+          $scope.toggleStoryEditorCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
           };
 
           ctrl.$onInit = function() {
             $scope.storyPreviewCardIsShown = false;
+            $scope.mainStoryCardIsShown = true;
             $scope.chaptersListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             $scope.NOTES_SCHEMA = {
