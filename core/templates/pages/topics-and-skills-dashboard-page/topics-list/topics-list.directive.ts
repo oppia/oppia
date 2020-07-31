@@ -30,6 +30,8 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -54,6 +56,7 @@ angular.module('oppia').directive('topicsList', [
             AlertsService, TopicsAndSkillsDashboardBackendApiService,
             UrlInterpolationService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           /**
            * @param {String} topicId - ID of the topic.
            * @returns {String} Url of the topic editor with the
@@ -117,6 +120,7 @@ angular.module('oppia').directive('topicsList', [
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
+                  console.log('Emitted: Topics-list: Delete');
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
                 },

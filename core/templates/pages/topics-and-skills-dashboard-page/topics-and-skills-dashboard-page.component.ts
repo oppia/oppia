@@ -385,7 +385,10 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         ctrl.directiveSubscriptions.add(
           TopicsAndSkillsDashboardBackendApiService.
             onTopicsAndSkillsDashboardReinitialized.subscribe(
-              (stayInSameTab) => ctrl._initDashboard(stayInSameTab)
+              (stayInSameTab) => {
+                console.log('Caught: T&SDashboardComponent');
+                ctrl._initDashboard(stayInSameTab);
+              }
             )
         );
         // The _initDashboard function is written separately since it is

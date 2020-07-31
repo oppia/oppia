@@ -389,7 +389,10 @@ angular.module('oppia').directive('topicEditorTab', [
             ctrl.directiveSubscriptions.add(
               TopicsAndSkillsDashboardBackendApiService.
                 onTopicsAndSkillsDashboardReinitialized.subscribe(
-                  () => $scope.refreshTopic()
+                  () => {
+                    console.log('Caught: TopicEditorTab');
+                    $scope.refreshTopic();
+                  }
                 )
             );
             _initEditor();
