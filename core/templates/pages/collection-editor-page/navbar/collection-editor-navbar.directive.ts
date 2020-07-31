@@ -69,6 +69,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _validateCollection = function() {
+            console.log('Tries to validate collection');
             if (ctrl.collectionRights.isPrivate()) {
               ctrl.validationIssues = (
                 CollectionValidationService
@@ -210,9 +211,12 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             RouterService.navigateToHistoryTab();
           };
           ctrl.$onInit = function() {
-            ctrl.directiveSubscription.add(
+            ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
-                () => _validateCollection()
+                () => {
+                  console.log('Caught: CollectionInitialized in CollectionEditorNavbar');
+                  _validateCollection();
+                }
               )
             );
             ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();

@@ -47,6 +47,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
 
     var _setCollection = function(collection) {
       _collection.copyFromCollection(collection);
+      console.log('Emitted: CollectionInitialized');
       if (_collectionIsInitialized) {
         _collectionInitializedEventEmitter.emit();
       } else {
