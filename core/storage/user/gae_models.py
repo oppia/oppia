@@ -2225,7 +2225,7 @@ class UserAuthModel(base_models.BaseModel):
 
     # Authentication detail for sign-in using google id (GAE).
     gae_id = ndb.StringProperty(indexed=True)
-    # A code associated with profiles on android to provide a PIN based 
+    # A code associated with profiles on android to provide a PIN based
     # authentication within the account.
     pin = ndb.StringProperty(default=None)
 
