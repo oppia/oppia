@@ -125,10 +125,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
-                () => {
-                  console.log('Caught: CollectionInitialized in CollectionDetailsEditor');
-                  refreshSettingsTab();
-                }
+                () => refreshSettingsTab()
               )
             );
             ctrl.collection = CollectionEditorStateService.getCollection();

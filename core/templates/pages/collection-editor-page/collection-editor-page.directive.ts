@@ -63,10 +63,7 @@ angular.module('oppia').directive('collectionEditorPage', [
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
-                () => {
-                  console.log('Caught: CollectionInitialized in Collection Editor Page');
-                  setTitle();
-                }
+                () => setTitle()
               )
             );
             // Load the collection to be edited.

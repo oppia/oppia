@@ -47,7 +47,6 @@ angular.module('oppia').factory('CollectionEditorStateService', [
 
     var _setCollection = function(collection) {
       _collection.copyFromCollection(collection);
-      console.log('Emitted: CollectionInitialized');
       if (_collectionIsInitialized) {
         _collectionInitializedEventEmitter.emit();
       } else {
@@ -142,8 +141,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        * Sets the collection stored within this service, propogating changes to
        * all bindings to the collection returned by getCollection(). The first
        * time this is called it will fire a global event based on the
-       * EVENT_COLLECTION_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_COLLECTION_REINITIALIZED event.
+       * _collectionInitializedEventEmitter. All subsequent
+       * calls will similarly fire a event based on
+       * _collectionInitializedEventEmitter
        */
       setCollection: function(collection) {
         _setCollection(collection);

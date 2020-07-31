@@ -213,10 +213,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
-                () => {
-                  console.log('Caught: CollectionInitialized in CollectionEditorNavbar');
-                  _validateCollection();
-                }
+                () => _validateCollection()
               )
             );
             $scope.$on(
