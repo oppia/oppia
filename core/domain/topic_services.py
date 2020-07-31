@@ -1118,7 +1118,7 @@ def assign_role(committer, assignee, new_role, topic_id):
         assignee: UserActionsInfo. UserActionsInfo object for the user
             whose role is being changed.
         new_role: str. The name of the new role. Possible values are:
-            ROLE_MANAGER
+            ROLE_MANAGER.
         topic_id: str. ID of the topic.
 
     Raises:

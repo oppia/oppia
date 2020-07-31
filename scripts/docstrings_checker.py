@@ -211,7 +211,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_raise_line = re.compile(
         r"""
-        \s* ({type}|\S*)?                    # identifier
+        \s* ({type}|\S*)?[.:]                    # identifier
         \s* (.*)                         # beginning of description
     """.format(
         type=re_multiple_type,

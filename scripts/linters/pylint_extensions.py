@@ -899,7 +899,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
-                    if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
+                    if re.search(br'^[a-zA-Z0-9_\.\*]+[.] ',
                                  stripped_line):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):

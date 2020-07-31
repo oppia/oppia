@@ -667,7 +667,7 @@ def _get_activity_rights(activity_type, activity_id):
     Args:
         activity_type: str. The type of activity. Possible values:
             constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION,
+            constants.ACTIVITY_TYPE_COLLECTION.
         activity_id: str. ID of the activity.
 
     Returns:
