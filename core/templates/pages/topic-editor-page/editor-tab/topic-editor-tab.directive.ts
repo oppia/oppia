@@ -48,7 +48,11 @@ require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('domain/question/question-backend-api.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
+import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -67,23 +71,24 @@ angular.module('oppia').directive('topicEditorTab', [
         'ImageUploadHelperService',
         'SkillCreationService', 'StoryCreationService',
         'EntityCreationService', 'TopicEditorRoutingService',
-        'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
+        'TopicEditorStateService', 'TopicsAndSkillsDashboardBackendApiService',
+        'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, WindowDimensionsService,
             ImageUploadHelperService,
             SkillCreationService, StoryCreationService,
             EntityCreationService, TopicEditorRoutingService,
-            TopicEditorStateService, TopicUpdateService, UndoRedoService,
+            TopicEditorStateService, TopicsAndSkillsDashboardBackendApiService,
+            TopicUpdateService, UndoRedoService,
             UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
             MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
@@ -381,11 +386,17 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
             $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
-            $scope.$on(
-              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-              $scope.refreshTopic);
+            ctrl.directiveSubscriptions.add(
+              TopicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.subscribe(
+                  () => $scope.refreshTopic()
+                )
+            );
             _initEditor();
             _initStorySummaries();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

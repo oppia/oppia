@@ -26,6 +26,9 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('services/alerts.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
 angular.module('oppia').directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -44,12 +47,12 @@ angular.module('oppia').directive('topicsList', [
         'topics-list.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
-        'AlertsService', 'UrlInterpolationService',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'AlertsService', 'TopicsAndSkillsDashboardBackendApiService',
+        'UrlInterpolationService',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
-            AlertsService, UrlInterpolationService,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            AlertsService, TopicsAndSkillsDashboardBackendApiService,
+            UrlInterpolationService) {
           var ctrl = this;
           /**
            * @param {String} topicId - ID of the topic.
@@ -114,8 +117,8 @@ angular.module('oppia').directive('topicsList', [
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  TopicsAndSkillsDashboardBackendApiService.
+                    onTopicsAndSkillsDashboardReinitialized.emit();
                 },
                 function(error) {
                   AlertsService.addWarning(
@@ -139,6 +142,10 @@ angular.module('oppia').directive('topicsList', [
               'index', 'name', 'canonical_story_count', 'subtopic_count',
               'skill_count', 'topic_status'
             ];
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

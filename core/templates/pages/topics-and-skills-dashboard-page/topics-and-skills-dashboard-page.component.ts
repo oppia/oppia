@@ -53,6 +53,8 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
 
+import { Subscription } from 'rxjs';
+
 
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
@@ -64,7 +66,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
     'SkillObjectFactory', 'TopicCreationService',
     'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'UrlInterpolationService',
-    'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
     'EVENT_TYPE_SKILL_CREATION_ENABLED',
     'EVENT_TYPE_TOPIC_CREATION_ENABLED',
     'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
@@ -79,7 +80,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SkillObjectFactory, TopicCreationService,
         TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, UrlInterpolationService,
-        EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
         EVENT_TYPE_SKILL_CREATION_ENABLED,
         EVENT_TYPE_TOPIC_CREATION_ENABLED,
         FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
@@ -87,6 +87,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
         TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
 
       /**
@@ -381,16 +382,20 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
           }
           return arr;
         };
-        $scope.$on(
-          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, function(
-              evt, stayInSameTab) {
-            ctrl._initDashboard(stayInSameTab);
-          }
+        ctrl.directiveSubscriptions.add(
+          TopicsAndSkillsDashboardBackendApiService.
+            onTopicsAndSkillsDashboardReinitialized.subscribe(
+              (stayInSameTab) => ctrl._initDashboard(stayInSameTab)
+            )
         );
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are
         // triggered.
         ctrl._initDashboard(false);
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
