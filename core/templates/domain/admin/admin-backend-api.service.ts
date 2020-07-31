@@ -138,6 +138,31 @@ export class AdminBackendApiService {
       });
     });
   }
+
+  // TODO(#10045): Remove this function once all the math-rich text
+  // components in explorations have a valid math SVG stored in the
+  // datastore.
+  sendMathSvgsToBackend(latexToSvgMapping): Promise<Object> {
+    let body = new FormData();
+    for (var expId in latexToSvgMapping) {
+      for (var latexString in latexToSvgMapping[expId]) {
+        // LaTeX strings cannot be appended in the request body as keys for
+        // files because of encoding issues (multiple backslash in the LaTeX
+        // string is processed improperly, e.g 3 backslashes in an
+        // expressions becomes 2 backslashes). As a workaround, we use a
+        // temporary latexId as keys for adding and retrieving raw images from
+        // the request body. Images can be extracted based on the latexId in the
+        // backend.
+        body.set(
+          latexToSvgMapping[expId][latexString].latexId,
+          latexToSvgMapping[expId][latexString].file);
+        delete latexToSvgMapping[expId][latexString].file;
+      }
+    }
+    body.append(
+      'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
+    return this.http.post('/adminmathsvghandler', body).toPromise();
+  }
 }
 
 angular.module('oppia').factory(
