@@ -114,7 +114,12 @@ class ThreadHandler(base.BaseHandler):
         feedback_services.create_message(
             thread_id, self.user_id, updated_status,
             self.payload.get('updated_subject'), text)
-        self.render_json(self.values)
+        messages = [m.to_dict() for m in feedback_services.get_messages(
+            thread_id)]
+
+        self.render_json({
+            'messages': messages
+        })
 
 
 class RecentFeedbackMessagesHandler(base.BaseHandler):
