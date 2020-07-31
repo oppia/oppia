@@ -125,26 +125,28 @@ describe('Creator dashboard controller', () => {
     });
   }));
 
-  it('should go to exploration url when user clicks in the exploration item' +
-    ' in dashboard page', function() {
+  it('should get the correct exploration editor page URL corresponding to a' +
+    ' given exploration ID', function() {
     var explorationId = '1';
     expect(ctrl.getExplorationUrl(explorationId)).toBe(
       '/create/' + explorationId);
   });
 
-  it('should go collection url when user clicks in the collection item in' +
-    ' dashboard page', function() {
+  it('should get the correct collection editor page URL corresponding to a' +
+    ' given collection ID', function() {
     var collectionId = '1';
     expect(ctrl.getCollectionUrl(collectionId)).toBe(
       '/collection_editor/create/' + collectionId);
   });
 
-  it('should show username popover according to its length', function() {
-    expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
-    expect(ctrl.showUsernamePopover('abc')).toBe('none');
-  });
+  it('should show username popover event type according to its length',
+    function() {
+      expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
+      expect(ctrl.showUsernamePopover('abc')).toBe('none');
+    });
 
-  it('should get complete thumbail icon url', function() {
+  it('should get complete thumbail icon path corresponding to a given short' +
+    ' path', function() {
     expect(ctrl.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(
       '/assets/images/path/to/icon.png');
   });
@@ -355,7 +357,7 @@ describe('Creator dashboard controller', () => {
           expect(ctrl.activeTab).toBe('suggestions');
         });
 
-      it('should set explorations views format to backend when creator' +
+      it('should save in backend the exploration format view when creator' +
         ' changes format view', function() {
         $httpBackend.expect('POST', '/creatordashboardhandler/data')
           .respond(200);
@@ -365,103 +367,117 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.myExplorationsView).toBe('a');
       });
 
-      it('should change order sort of exploration when creator change' +
-        ' exploration order sort to the current one', function() {
+      it('should reverse the sort order of explorations when the creator' +
+        ' re-selects the current sorting type', function() {
         expect(ctrl.isCurrentSortDescending).toBe(true);
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('numOpenThreads');
         expect(ctrl.isCurrentSortDescending).toBe(false);
       });
 
-      it('should sort exploration by new open threads when creator clicks' +
-        ' on sorting options', function() {
+      it('should update the exploration sort order based on the' +
+        ' option chosen by the creator', function() {
         ctrl.setExplorationsSortingOptions('new_open');
         expect(ctrl.currentSortType).toBe('new_open');
       });
 
-      it('should change order sort of subscription when creator change' +
-      ' subscription order sort to the current one', function() {
+      it('should reverse the sort order of subscriptions when the creator' +
+        ' re-selects the current sorting type', function() {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
         expect(ctrl.currentSubscribersSortType).toBe('username');
         ctrl.setSubscriptionSortingOptions('username');
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
       });
 
-      it('should sort exploration by new subscriber when creator clicks' +
-        ' on sorting options', function() {
+      it('should update the subscription sort order based on the' +
+        ' option chosen by the creator', function() {
         ctrl.setSubscriptionSortingOptions('new_subscriber');
         expect(ctrl.currentSubscribersSortType).toBe('new_subscriber');
       });
 
-      it('should get value sorted in subscription function by username or' +
-        ' impact', function() {
+      it('should sort subscription list given entity type', function() {
         var entity = {
           username: 'username'
         };
+        expect(ctrl.currentSubscribersSortType).toBe('username');
         expect(ctrl.sortSubscriptionFunction(entity)).toBe(
           'username');
-
-        ctrl.setSubscriptionSortingOptions('impact');
-        expect(ctrl.sortSubscriptionFunction({})).toBe(0);
       });
 
-      it('should get value sorted by custom comparator orderBy function',
+      it('should not sort subscription list by impact given empty entity type',
         function() {
-          expect(ctrl.currentSortType).toBe('numOpenThreads');
-          ctrl.setExplorationsSortingOptions('title');
-          expect(ctrl.currentSortType).toBe('title');
-
-          expect(ctrl.sortByFunction({
-            title: '',
-            status: 'private'
-          })).toBe('Untitled');
-
-          ctrl.setExplorationsSortingOptions('numViews');
-          expect(ctrl.currentSortType).toBe('numViews');
-
-          expect(ctrl.sortByFunction({
-            numViews: '',
-            status: 'private'
-          })).toBe(0);
-
-          ctrl.setExplorationsSortingOptions('ratings');
-          expect(ctrl.currentSortType).toBe('ratings');
-
-          expect(ctrl.sortByFunction({})).toBe(0);
-
-          ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
-          expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
-
-          expect(ctrl.sortByFunction({
-            lastUpdatedMsec: 1
-          })).toBe(1);
+          ctrl.setSubscriptionSortingOptions('impact');
+          expect(ctrl.currentSubscribersSortType).toBe('impact');
+          expect(ctrl.sortSubscriptionFunction({})).toBe(0);
         });
 
-      it('should update screen width on window resize', function() {
-        var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-        $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
-          200);
-        ctrl.setMyExplorationsView('list');
-        $httpBackend.flush();
+      it('should sort exploration list by untitled explorations when title' +
+        ' is not provided and exploration is private', function() {
+        expect(ctrl.currentSortType).toBe('numOpenThreads');
+        ctrl.setExplorationsSortingOptions('title');
+        expect(ctrl.currentSortType).toBe('title');
 
-        expect(ctrl.myExplorationsView).toBe('list');
-
-        innerWidthSpy.and.callFake(() => 480);
-        $rootScope.$apply();
-        angular.element($window).triggerHandler('resize');
-
-        expect(ctrl.myExplorationsView).toBe('card');
-        expect(ctrl.publishText).toBe(
-          'Publish the exploration to receive statistics.');
-
-        innerWidthSpy.and.callFake(() => 768);
-        $rootScope.$apply();
-        angular.element($window).triggerHandler('resize');
-
-        expect(ctrl.myExplorationsView).toBe('list');
-        expect(ctrl.publishText).toBe(
-          'This exploration is private. Publish it to receive statistics.');
+        expect(ctrl.sortByFunction({
+          title: '',
+          status: 'private'
+        })).toBe('Untitled');
       });
+
+      it('should not sort exploration list by rating when rating is not' +
+        ' provided', function() {
+        ctrl.setExplorationsSortingOptions('ratings');
+        expect(ctrl.currentSortType).toBe('ratings');
+
+        expect(ctrl.sortByFunction({})).toBe(0);
+      });
+
+      it('should sort exploration list by last updated when last updated' +
+        ' value is provided', function() {
+        ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
+        expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
+
+        expect(ctrl.sortByFunction({
+          lastUpdatedMsec: 1
+        })).toBe(1);
+      });
+
+      it('should not sort exploration list by options that is not last update' +
+        ' when trying to sort by number of views', function() {
+        ctrl.setExplorationsSortingOptions('numViews');
+        expect(ctrl.currentSortType).toBe('numViews');
+
+        expect(ctrl.sortByFunction({
+          numViews: '',
+          status: 'private'
+        })).toBe(0);
+      });
+
+      it('should update exploration view and publish text on resizing page',
+        function() {
+          var innerWidthSpy = spyOnProperty($window, 'innerWidth');
+          $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
+            200);
+          ctrl.setMyExplorationsView('list');
+          $httpBackend.flush();
+
+          expect(ctrl.myExplorationsView).toBe('list');
+
+          innerWidthSpy.and.callFake(() => 480);
+          $rootScope.$apply();
+          angular.element($window).triggerHandler('resize');
+
+          expect(ctrl.myExplorationsView).toBe('card');
+          expect(ctrl.publishText).toBe(
+            'Publish the exploration to receive statistics.');
+
+          innerWidthSpy.and.callFake(() => 768);
+          $rootScope.$apply();
+          angular.element($window).triggerHandler('resize');
+
+          expect(ctrl.myExplorationsView).toBe('list');
+          expect(ctrl.publishText).toBe(
+            'This exploration is private. Publish it to receive statistics.');
+        });
 
       it('should set active thread from my suggestions list when changing' +
         ' active thread', function() {
