@@ -58,15 +58,15 @@ angular.module('oppia').directive('contributionsAndReview', [
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$uibModal', 'AlertsService', 'ContextService',
-        'ContributionAndReviewService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'SkillBackendApiService', 'UserService',
-        'ENTITY_TYPE',
+        '$filter', '$rootScope', '$uibModal', 'AlertsService',
+        'ContextService', 'ContributionAndReviewService',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'SkillBackendApiService', 'UserBackendApiService', 'ENTITY_TYPE',
         function(
-            $filter, $uibModal, AlertsService, ContextService,
-            ContributionAndReviewService, MisconceptionObjectFactory,
-            QuestionObjectFactory, SkillBackendApiService, UserService,
-            ENTITY_TYPE) {
+            $filter, $rootScope, $uibModal, AlertsService,
+            ContextService, ContributionAndReviewService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            SkillBackendApiService, UserBackendApiService, ENTITY_TYPE) {
           var ctrl = this;
           var SUGGESTION_LABELS = {
             review: {
@@ -349,11 +349,11 @@ angular.module('oppia').directive('contributionsAndReview', [
                 text: 'Translations'
               }
             ];
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               ctrl.userDetailsLoading = false;
               if (ctrl.userIsLoggedIn) {
-                UserService.getUserCommunityRightsData().then(
+                UserBackendApiService.getUserCommunityRightsData().then(
                   function(UserCommunityRights) {
                     var userCanReviewTranslationSuggestionsInLanguages = (
                       UserCommunityRights
@@ -382,6 +382,9 @@ angular.module('oppia').directive('contributionsAndReview', [
                     }
                   });
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();              
             });
           };
         }

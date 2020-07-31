@@ -50,6 +50,7 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
@@ -77,7 +78,7 @@ describe('State Graph Visualization directive', function() {
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var userExplorationPermissionsService = null;
-  var userService = null;
+  var userBackendApiService = null;
   var voiceoverRecordingService = null;
 
   var stateName = 'State1';
@@ -116,6 +117,8 @@ describe('State Graph Visualization directive', function() {
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value('StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value('UserBackendApiService',
+      TestBed.get(UserBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -649,9 +652,9 @@ describe('State Graph Visualization directive', function() {
       $uibModal = $injector.get('$uibModal');
       userExplorationPermissionsService = $injector.get(
         'UserExplorationPermissionsService');
-      userService = $injector.get('UserService');
+      userBackendApiService = $injector.get('UserBackendApiService');
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and

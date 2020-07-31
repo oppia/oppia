@@ -48,11 +48,11 @@ angular.module('oppia').directive(
       controller: [
         '$rootScope', '$scope', '$uibModal',
         'ContributionOpportunitiesService', 'TranslateTextService',
-        'TranslationLanguageService', 'UserService',
+        'TranslationLanguageService', 'UserBackendApiService',
         function(
             $rootScope, $scope, $uibModal,
             ContributionOpportunitiesService, TranslateTextService,
-            TranslationLanguageService, UserService) {
+            TranslationLanguageService, UserBackendApiService) {
           var ctrl = this;
           var userIsLoggedIn = false;
           var getOpportunitySummary = function(expId) {
@@ -138,8 +138,11 @@ angular.module('oppia').directive(
             ctrl.moreOpportunitiesAvailable = true;
             ctrl.progressBarRequired = true;
 
-            UserService.getUserInfoAsync().then(function(userInfo) {
+            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
               userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
             });
             ContributionOpportunitiesService.getTranslationOpportunities(
               TranslationLanguageService.getActiveLanguageCode(),
