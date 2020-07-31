@@ -29,7 +29,7 @@ import python_utils
     [models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
 
-DATA_TYPES = param_domain.PlatformParameter.DATA_TYPES # pylint: disable=invalid-name
+DATA_TYPES = param_domain.DATA_TYPES # pylint: disable=invalid-name
 
 
 class Registry(python_utils.OBJECT):

@@ -31,6 +31,9 @@ import utils
     [models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
 
+DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
+FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
+
 
 class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     """Tests for the platform parameter Registry."""
@@ -58,13 +61,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         registry.Registry.init_platform_parameter_from_dict({
             'name': name,
             'description': 'for test',
-            'data_type': 'string',
+            'data_type': DATA_TYPES.string,
             'rules': [
                 {
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [('=', FEATURE_STAGES.dev)]
                         }
                     ],
                     'value_when_matched': '222'
@@ -81,7 +84,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_platform_parameter(self):
         parameter = registry.Registry.create_platform_parameter(
-            'parameter_a', 'test', 'bool')
+            'parameter_a', 'test', registry.DATA_TYPES.bool)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
         parameter.validate()
 
@@ -91,48 +94,45 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             registry.Registry.create_platform_parameter(
                 'parameter_a', 'test', 'Invalid')
 
-    def test_create_feature_flag(self):
-        feature = registry.Registry.create_feature_flag(
-            'parameter_a', 'test', 'dev')
-        self.assertEqual(feature.data_type, 'bool')
-        self.assertTrue(feature.metadata.is_feature)
-        self.assertEqual(feature.metadata.feature_stage, 'dev')
-        feature.validate()
-
-    def test_default_value_of_bool_platform_parameter(self):
-        parameter = registry.Registry.create_platform_parameter(
-            'parameter_a', 'test', 'bool')
-        parameter.validate()
-        self.assertEqual(parameter.default_value, False)
-
-    def test_default_value_of_string_platform_parameter(self):
-        parameter = registry.Registry.create_platform_parameter(
-            'parameter_a', 'test', 'string')
-        parameter.validate()
-        self.assertEqual(parameter.default_value, '')
-
-    def test_default_value_of_int_platform_parameter(self):
-        parameter = registry.Registry.create_platform_parameter(
-            'parameter_a', 'test', 'number')
-        parameter.validate()
-        self.assertEqual(parameter.default_value, 0)
-
-    def test_create_and_get_platform_parameter(self):
-        parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
-        parameter = registry.Registry.get_platform_parameter(parameter_name)
-        self.assertIsNotNone(parameter)
-        self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
-        # Get from memcache.
-        self.assertIsNotNone(
-            registry.Registry.get_platform_parameter(parameter_name))
-
     def test_create_platform_parameter_with_the_same_name_failure(self):
         param_name = 'parameter_a'
         self.create_example_parameter_with_name(param_name)
         with self.assertRaisesRegexp(
             Exception, 'Parameter with name %s already exists' % param_name):
             self.create_example_parameter_with_name(param_name)
+
+    def test_create_feature_flag(self):
+        feature = registry.Registry.create_feature_flag(
+            'parameter_a', 'test feature', FEATURE_STAGES.dev)
+        self.assertEqual(feature.data_type, registry.DATA_TYPES.bool)
+        self.assertTrue(feature.metadata.is_feature)
+        self.assertEqual(feature.metadata.feature_stage, FEATURE_STAGES.dev)
+        feature.validate()
+
+    def test_default_value_of_bool_platform_parameter(self):
+        parameter = registry.Registry.create_platform_parameter(
+            'parameter_a', 'test feature', registry.DATA_TYPES.bool)
+        parameter.validate()
+        self.assertEqual(parameter.default_value, False)
+
+    def test_default_value_of_string_platform_parameter(self):
+        parameter = registry.Registry.create_platform_parameter(
+            'parameter_a', 'test', DATA_TYPES.string)
+        parameter.validate()
+        self.assertEqual(parameter.default_value, '')
+
+    def test_default_value_of_number_platform_parameter(self):
+        parameter = registry.Registry.create_platform_parameter(
+            'parameter_a', 'test', DATA_TYPES.number)
+        parameter.validate()
+        self.assertEqual(parameter.default_value, 0)
+
+    def test_get_platform_parameter(self):
+        parameter_name = 'parameter_a'
+        self.create_example_parameter_with_name(parameter_name)
+        parameter = registry.Registry.get_platform_parameter(parameter_name)
+        self.assertIsNotNone(parameter)
+        self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
 
     def test_get_non_existing_parameter_failure(self):
         with self.assertRaisesRegexp(Exception, 'not found'):
@@ -169,16 +169,15 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [('=', 'dev')]}
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', FEATURE_STAGES.dev)]
+                        }
                     ],
                     'value_when_matched': 'updated'
                 }
             ],
         )
-        # Cached value is invalidated after update.
-        self.assertIsNone(
-            registry.Registry.load_platform_parameter_from_memcache(
-                parameter_name))
         parameter_updated = registry.Registry.get_platform_parameter(
             parameter_name)
 
@@ -187,7 +186,27 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         self.assertEqual(
             parameter_updated.rules[0].value_when_matched, 'updated')
 
-        self.assertIsNotNone(
+    def test_cached_value_is_invalidated_after_update(self):
+        parameter_name = 'parameter_a'
+        self.create_example_parameter_with_name(parameter_name)
+
+        registry.Registry.update_platform_parameter(
+            parameter_name,
+            feconf.SYSTEM_COMMITTER_ID,
+            'commit message',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', FEATURE_STAGES.dev)]
+                        }
+                    ],
+                    'value_when_matched': 'updated'
+                }
+            ],
+        )
+        self.assertIsNone(
             registry.Registry.load_platform_parameter_from_memcache(
                 parameter_name))
 
@@ -209,7 +228,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                         'filters': [
                             {
                                 'type': 'server_mode',
-                                'conditions': [('=', 'dev')]
+                                'conditions': [('=', FEATURE_STAGES.dev)]
                             }
                         ],
                         'value_when_matched': True
@@ -231,7 +250,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [('=', 'dev')]}
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', FEATURE_STAGES.dev)]
+                        }
                     ],
                     'value_when_matched': 'updated'
                 }
@@ -253,19 +275,19 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'user_locale': 'en',
             },
             {
-                'server_mode': 'dev',
+                'server_mode': FEATURE_STAGES.dev,
             },
         )
         registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
-            'data_type': 'string',
+            'data_type': DATA_TYPES.string,
             'rules': [
                 {
                     'filters': [
                         {
                             'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
+                            'conditions': [('=', FEATURE_STAGES.dev)]
                         }
                     ],
                     'value_when_matched': '222'
@@ -276,13 +298,13 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'default_value': '333',
             'metadata': {
                 'is_feature': True,
-                'feature_stage': 'in-dev',
+                'feature_stage': FEATURE_STAGES.dev,
             }
         })
         registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_b',
             'description': 'for test',
-            'data_type': 'bool',
+            'data_type': registry.DATA_TYPES.bool,
             'rules': [],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
@@ -300,15 +322,3 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'parameter_b': False,
             }
         )
-
-
-class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
-    """Tests to validate all platform parameter registered in
-    core/domain/platform_parameter_registry.py.
-    """
-
-    def test_all_defined_parameters_are_valid(self):
-        all_names = registry.Registry.get_all_platform_parameter_names()
-        for name in all_names:
-            param = registry.Registry.get_platform_parameter(name)
-            param.validate()

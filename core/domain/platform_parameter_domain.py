@@ -30,6 +30,7 @@ import utils
 
 SERVER_MODES = utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
+DATA_TYPES = utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
 
 ALLOWED_USER_LOCALES = [
     lang_dict['id'] for lang_dict in constants.SUPPORTED_SITE_LANGUAGES]
@@ -542,8 +543,6 @@ class PlatformParameterMetadata(python_utils.OBJECT):
 class PlatformParameter(python_utils.OBJECT):
     """Domain object for platform parameters."""
 
-    DATA_TYPES = utils.create_enum('bool', 'string', 'number')
-
     DATA_TYPE_PREDICATES_DICT = {
         DATA_TYPES.bool: lambda x: isinstance(x, bool),
         DATA_TYPES.string: lambda x: isinstance(x, python_utils.BASESTRING),
@@ -701,7 +700,7 @@ class PlatformParameter(python_utils.OBJECT):
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
-        if self._data_type != self.DATA_TYPES.bool:
+        if self._data_type != DATA_TYPES.bool:
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
