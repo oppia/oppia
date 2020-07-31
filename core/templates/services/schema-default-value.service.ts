@@ -141,10 +141,7 @@ export class SchemaDefaultValueService {
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
     } else {
-      // TS Ignore is used here to log an error in case of a
-      // invalid schema.
-      // @ts-ignore
-      this.logger.error('Invalid schema type: ' + schema.type);
+      this.logger.error('Invalid schema: ' + JSON.stringify(schema));
     }
   }
 }

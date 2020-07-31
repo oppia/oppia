@@ -159,11 +159,8 @@ describe('Router Service', () => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
-    // @ts-ignore
     var jQuerySpy = spyOn(window, '$');
-    // @ts-ignore
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
-      // @ts-ignore
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
@@ -200,11 +197,8 @@ describe('Router Service', () => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
-    // @ts-ignore
     var jQuerySpy = spyOn(window, '$');
-    // @ts-ignore
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
-      // @ts-ignore
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 

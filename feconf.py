@@ -540,6 +540,10 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 # gives the maximum size for a batch of Math SVGs in bytes.
 MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
 
+# We generate images for existing math rich text components in batches. This
+# gives the maximum number of entities in a batch.
+MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH = 10
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
@@ -681,6 +685,7 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -917,6 +922,7 @@ HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_LEARNER = 'LEARNER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'

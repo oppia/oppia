@@ -156,6 +156,6 @@ describe('Schema Default Value Service', () => {
 
     expect(sdvs.getDefaultValue(schema)).toBeUndefined();
     expect(loggerErrorSpy).toHaveBeenCalledWith(
-      'Invalid schema type: invalid');
+      'Invalid schema: ' + JSON.stringify(schema));
   });
 });
