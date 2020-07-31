@@ -96,17 +96,12 @@ export class ClassroomBackendApiService {
       }
     });
   }
-<<<<<<< HEAD
-  /**
-   * 
-   * @param classroomName 
-   * 
-   */
-  fetchClassroomData(classroomName: string): Promise<Object> {
-=======
+
+  
+
 
   fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
->>>>>>> upstream/develop
+
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
     });
@@ -117,7 +112,7 @@ export class ClassroomBackendApiService {
       this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
   }
-}
+
 
 angular.module('oppia').factory(
   'ClassroomBackendApiService',

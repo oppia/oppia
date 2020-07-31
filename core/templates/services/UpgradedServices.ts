@@ -717,21 +717,19 @@ export class UpgradedServices {
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
-<<<<<<< HEAD
+
     upgradedServices['EditableStoryBackendApiService'] =
-      new EditableStoryBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']);
+      new EditableStoryBackendApiService();
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(
         new HttpClient(new HttpXhrBackend(
           new ɵangular_packages_common_http_http_d())));
-=======
+
     upgradedServices['EmailDashboardQueryObjectFactory'] =
       new EmailDashboardQueryObjectFactory();
     upgradedServices['EndExplorationRulesService'] =
       new EndExplorationRulesService();
->>>>>>> upstream/develop
+
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
