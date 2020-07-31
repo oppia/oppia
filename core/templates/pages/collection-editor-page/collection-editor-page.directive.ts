@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Subscription } from 'rxjs';
+
 /**
  * @fileoverview Primary directive for the collection editor page.
  */
@@ -38,13 +40,12 @@ angular.module('oppia').directive('collectionEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'PageTitleService',
-        'RouterService', 'UrlService', 'EVENT_COLLECTION_INITIALIZED',
-        'EVENT_COLLECTION_REINITIALIZED',
+        'RouterService', 'UrlService',
         function(
             $scope, CollectionEditorStateService, PageTitleService,
-            RouterService, UrlService, EVENT_COLLECTION_INITIALIZED,
-            EVENT_COLLECTION_REINITIALIZED) {
+            RouterService, UrlService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var setTitle = function() {
             var title = (
               CollectionEditorStateService.getCollection().getTitle());
@@ -60,8 +61,11 @@ angular.module('oppia').directive('collectionEditorPage', [
             return RouterService.getActiveTabName();
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
-            $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
+            ctrl.directiveSubscription.add(
+              CollectionEditorStateService.onCollectionInitialized.subscribe(
+                () => setTitle()
+              )
+            );
             // Load the collection to be edited.
             CollectionEditorStateService.loadCollection(
               UrlService.getCollectionIdFromEditorUrl());
