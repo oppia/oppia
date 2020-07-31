@@ -2344,8 +2344,8 @@ class State(python_utils.OBJECT):
             # a 'outcome' (from 'default_outcome'). If the content_id_suffix
             # is not a digit, we disregard it here.
             if (
-                content_id_suffix.isdigit() and
-                int(content_id_suffix) > self.next_content_id_index
+                    content_id_suffix.isdigit() and
+                    int(content_id_suffix) > self.next_content_id_index
             ):
                 raise utils.ValidationError(
                     'Expected all content id indexes to be less than next '

@@ -1801,6 +1801,5 @@ class StatisticsCustomizationArgsAuditTests(OneOffJobTestBase):
                     'or extra customization argument key(s)\', [u"(False, \'EXP'
                     '_ID\', \'ExplorationStart\')"]]'
                 )
-              
             ]
         )
