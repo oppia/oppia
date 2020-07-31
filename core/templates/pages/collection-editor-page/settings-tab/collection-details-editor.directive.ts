@@ -142,6 +142,9 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             ctrl.languageListForSelect = SUPPORTED_CONTENT_LANGUAGES;
             ctrl.TAG_REGEX = TAG_REGEX;
           };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
         }
       ]
     };

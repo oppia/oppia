@@ -224,6 +224,9 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
             ctrl.validationIssues = [];
           };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
         }
       ]
     };

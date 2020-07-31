@@ -70,6 +70,9 @@ angular.module('oppia').directive('collectionEditorPage', [
             CollectionEditorStateService.loadCollection(
               UrlService.getCollectionIdFromEditorUrl());
           };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
         }
       ]
     };
