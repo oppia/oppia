@@ -219,6 +219,8 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 }
               )
             );
+            $scope.$on(
+              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
             ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.collectionRights = (
