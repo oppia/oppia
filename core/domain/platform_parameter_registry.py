@@ -23,21 +23,22 @@ import core.domain.platform_parameter_domain as param_domain
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
 memcache_services = models.Registry.import_memcache_services()
 
+DATA_TYPES = param_domain.PlatformParameter.DATA_TYPES # pylint: disable=invalid-name
+
 
 class Registry(python_utils.OBJECT):
     """Registry of all platform parameters."""
 
     DEFAULT_VALUE_BY_TYPE_DICT = {
-        'bool': False,
-        'number': 0,
-        'string': '',
+        DATA_TYPES.bool: False,
+        DATA_TYPES.number: 0,
+        DATA_TYPES.string: '',
     }
 
     # The keys of parameter_registry are the property names, and the values
@@ -54,8 +55,8 @@ class Registry(python_utils.OBJECT):
         Args:
             name: str. The name of the platform parameter.
             description: str. The description of the platform parameter.
-            data_type: str. The data type of the platform parameter, must be
-                one of the following: 'bool', 'number', 'string'.
+            data_type: DATA_TYPES. The data type of the platform parameter,
+                must be one of the following: 'bool', 'number', 'string'.
             is_feature: bool. True if the platform parameter is a feature flag.
             feature_stage: FEATURE_STAGES|None. The stage of the feature,
                 required if 'is_feature' is True.
@@ -83,7 +84,7 @@ class Registry(python_utils.OBJECT):
                 'feature_stage': feature_stage,
             },
         }
-        return cls.create_platform_parameter_from_dict(param_dict)
+        return cls.init_platform_parameter_from_dict(param_dict)
 
     @classmethod
     def create_feature_flag(
@@ -100,7 +101,8 @@ class Registry(python_utils.OBJECT):
             PlatformParameter. The created feature flag.
         """
         return cls.create_platform_parameter(
-            name, description, 'bool', is_feature=True, feature_stage=stage)
+            name, description, DATA_TYPES.bool,
+            is_feature=True, feature_stage=stage)
 
     @classmethod
     def init_platform_parameter(cls, name, instance):
@@ -171,19 +173,10 @@ class Registry(python_utils.OBJECT):
         updated_param = param.from_dict(param_dict)
         updated_param.validate()
 
-        # Set value in datastore.
-        model_instance = config_models.PlatformParameterModel.get(
-            param.name, strict=False)
-        if model_instance is None:
-            model_instance = config_models.PlatformParameterModel.create(
-                param.name,
-                [rule.to_dict() for rule in param.rules],
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-            )
+        model_instance = cls._to_platform_parameter_model(param)
 
         new_rules = [
-            param_domain.PlatformParameterRule.from_dict(
-                rule_dict, param.rule_schema_version)
+            param_domain.PlatformParameterRule.from_dict(rule_dict)
             for rule_dict in new_rule_dicts]
         param.set_rules(new_rules)
 
@@ -227,7 +220,7 @@ class Registry(python_utils.OBJECT):
         return result_dict
 
     @classmethod
-    def create_platform_parameter_from_dict(cls, parameter_dict):
+    def init_platform_parameter_from_dict(cls, parameter_dict):
         """Creates, registers and returns a platform parameter using the given
         dict representation of a platform parameter.
 
@@ -288,13 +281,23 @@ class Registry(python_utils.OBJECT):
             memcache_key)
         return cached_parameter
 
+    @classmethod
+    def _to_platform_parameter_model(cls, param):
+        """Returns the platform parameter model corresponding to the given
+        domain object.
 
-PARAM_NAMES = utils.create_enum('dummy_feature') # pylint: disable=invalid-name
+        Args:
+            param: PlatformParameter. The platform parameter domain object.
 
-# Platform parameters should all be defined below.
-
-Registry.create_feature_flag(
-    PARAM_NAMES.dummy_feature,
-    'This is a dummy feature flag.',
-    param_domain.FEATURE_STAGES.dev,
-)
+        Returns:
+            PlatformParameterModel. The corresponding storage model.
+        """
+        model_instance = config_models.PlatformParameterModel.get(
+            param.name, strict=False)
+        if model_instance is None:
+            model_instance = config_models.PlatformParameterModel.create(
+                param.name,
+                [rule.to_dict() for rule in param.rules],
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            )
+        return model_instance

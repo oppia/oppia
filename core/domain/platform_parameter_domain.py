@@ -182,7 +182,7 @@ class EvaluationContext(python_utils.OBJECT):
 class PlatformParameterFilter(python_utils.OBJECT):
     """Domain object for filters in platform parameters."""
 
-    SUPPORTED_FILTER_TYPE = [
+    SUPPORTED_FILTER_TYPES = [
         'server_mode', 'user_locale', 'client_type', 'browser_type',
         'app_version',
     ]
@@ -274,7 +274,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
     def validate(self):
         """Validates the PlatformParameterFilter domain object."""
-        if self._type not in self.SUPPORTED_FILTER_TYPE:
+        if self._type not in self.SUPPORTED_FILTER_TYPES:
             raise utils.ValidationError(
                 'Unsupported filter type \'%s\'' % self._type)
 
@@ -428,10 +428,9 @@ class PlatformParameterRule(python_utils.OBJECT):
         Returns:
             bool. True if the rule is matched.
         """
-        are_all_filters_matched = all(
+        return all(
             filter_domain.evaluate(context)
             for filter_domain in self._filters)
-        return are_all_filters_matched
 
     def has_server_mode_filter(self):
         """Checks if the rule has a filter with type 'server_mode'.
@@ -463,26 +462,17 @@ class PlatformParameterRule(python_utils.OBJECT):
             filter_domain_object.validate()
 
     @classmethod
-    def from_dict(cls, rule_dict, schema_version):
+    def from_dict(cls, rule_dict):
         """Returns an PlatformParameterRule object from a dict.
 
         Args:
             rule_dict: dict. A dict mapping of all fields of
                 PlatformParameterRule object.
-            schema_version: int. The schema version for the rule dict.
 
         Returns:
             PlatformParameterRule. The corresponding PlatformParameterRule
             domain object.
         """
-        if (schema_version !=
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION):
-            raise Exception(
-                'Expected platform parameter rule schema version to be %s, '
-                'received %s.' % (
-                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
-                    schema_version))
-
         return cls(
             [
                 PlatformParameterFilter.from_dict(filter_dict)
@@ -552,10 +542,12 @@ class PlatformParameterMetadata(python_utils.OBJECT):
 class PlatformParameter(python_utils.OBJECT):
     """Domain object for platform parameters."""
 
+    DATA_TYPES = utils.create_enum('bool', 'string', 'number')
+
     DATA_TYPE_PREDICATES_DICT = {
-        'bool': lambda x: isinstance(x, bool),
-        'string': lambda x: isinstance(x, python_utils.BASESTRING),
-        'number': lambda x: isinstance(x, (float, int)),
+        DATA_TYPES.bool: lambda x: isinstance(x, bool),
+        DATA_TYPES.string: lambda x: isinstance(x, python_utils.BASESTRING),
+        DATA_TYPES.number: lambda x: isinstance(x, (float, int)),
     }
 
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
@@ -709,7 +701,7 @@ class PlatformParameter(python_utils.OBJECT):
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
-        if self._data_type != 'bool':
+        if self._data_type != self.DATA_TYPES.bool:
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
@@ -752,13 +744,27 @@ class PlatformParameter(python_utils.OBJECT):
             PlatformParameter. The corresponding PlatformParameter domain
             object.
         """
+        if (param_dict['rule_schema_version'] !=
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION):
+            # NOTE: When there's a new rule schema version, a new method with
+            # name of the form '_convert_rule_v1_dict_to_v2_dict` should be
+            # added to the class and called here to convert the rule dicts to
+            # the latest schema.
+            raise Exception(
+                'Current platform parameter rule schema version is v%s, '
+                'received v%s, and there\'s no convert method from v%s to '
+                'v%s.' % (
+                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                    param_dict['rule_schema_version'],
+                    feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+                    param_dict['rule_schema_version']))
+
         return cls(
             param_dict['name'],
             param_dict['description'],
             param_dict['data_type'],
             [
-                PlatformParameterRule.from_dict(
-                    rule_dict, param_dict['rule_schema_version'])
+                PlatformParameterRule.from_dict(rule_dict)
                 for rule_dict in param_dict['rules']],
             param_dict['rule_schema_version'],
             param_dict['default_value'],

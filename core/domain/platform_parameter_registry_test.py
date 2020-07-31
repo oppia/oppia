@@ -55,7 +55,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def create_example_parameter_with_name(self, name):
         """Creates and returns an example parameter with the given name."""
-        registry.Registry.create_platform_parameter_from_dict({
+        registry.Registry.init_platform_parameter_from_dict({
             'name': name,
             'description': 'for test',
             'data_type': 'string',
@@ -256,7 +256,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'server_mode': 'dev',
             },
         )
-        registry.Registry.create_platform_parameter_from_dict({
+        registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_a',
             'description': 'for test',
             'data_type': 'string',
@@ -279,7 +279,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'feature_stage': 'in-dev',
             }
         })
-        registry.Registry.create_platform_parameter_from_dict({
+        registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_b',
             'description': 'for test',
             'data_type': 'bool',

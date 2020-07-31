@@ -60,7 +60,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
                 'invalid': 'invalid'
             })
 
-    def test_param_change_object_with_valid_data(self):
+    def test_param_change_object_with_valid_data_success(self):
         param_change_object = (
             parameter_domain.PlatformParameterChange({
                 'cmd': self.CMD_EDIT_RULES,
@@ -87,7 +87,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
 class EvaluationContextTests(test_utils.GenericTestBase):
     """Test for the EvaluationContext."""
 
-    def test_create_feature_context_from_dict(self):
+    def test_create_context_from_dict(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'Android',
@@ -527,7 +527,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'filters': filters,
                 'value_when_matched': False,
             },
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
         self.assertIsInstance(rule, parameter_domain.PlatformParameterRule)
 
@@ -539,20 +538,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         self.assertEqual(filter_domain.conditions, [('=', '1.2.3')])
         self.assertEqual(rule.value_when_matched, False)
 
-    def test_from_dict_with_old_schema_version_failure(self):
-        filters = [{'type': 'app_version', 'conditions': [('=', '1.2.3')]}]
-        with self.swap(
-            feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2):
-            with self.assertRaisesRegexp(
-                Exception, 'rule schema version to be 2'):
-                parameter_domain.PlatformParameterRule.from_dict(
-                    {
-                        'filters': filters,
-                        'value_when_matched': False,
-                    },
-                    1,
-                )
-
     def test_to_dict(self):
         rule_dict = {
             'filters': [
@@ -563,10 +548,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
             ],
             'value_when_matched': False,
         }
-        rule = parameter_domain.PlatformParameterRule.from_dict(
-            rule_dict,
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-        )
+        rule = parameter_domain.PlatformParameterRule.from_dict(rule_dict)
         self.assertEqual(rule.to_dict(), rule_dict)
 
     def test_has_server_mode_filter(self):
@@ -577,7 +559,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 ],
                 'value_when_matched': False,
             },
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
         self.assertFalse(rule.has_server_mode_filter())
 
@@ -588,7 +569,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 ],
                 'value_when_matched': False,
             },
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
         self.assertTrue(rule.has_server_mode_filter())
 
@@ -601,7 +581,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 ],
                 'value_when_matched': 'matched_val',
             },
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
         context = parameter_domain.EvaluationContext.from_dict(
             {
@@ -625,7 +604,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 ],
                 'value_when_matched': 'matched_val',
             },
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
         )
         context = parameter_domain.EvaluationContext.from_dict(
             {
@@ -640,7 +618,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         )
         self.assertFalse(rule.evaluate(context))
 
-    def test_validate_each_filter(self):
+    def test_validate_with_invalid_filter_raises_exception(self):
         filters = [
             {'type': 'app_version', 'conditions': [('=', '1.2.3')]},
             {'type': 'invalid', 'conditions': [('=', '1.2.3')]},
@@ -649,8 +627,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
             {
                 'filters': filters,
                 'value_when_matched': False,
-            },
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            }
         )
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Unsupported filter type \'invalid\''):
@@ -883,6 +860,36 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'Expected bool, received \'111\' in default value'):
             param.validate()
 
+    def test_create_with_old_rule_schema_version_failure(self):
+        with self.swap(
+            feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Current platform parameter rule schema version is v2, '
+                'received v1'):
+                parameter_domain.PlatformParameter.from_dict({
+                    'name': 'parameter_a',
+                    'description': 'for test',
+                    'data_type': 'string',
+                    'rules': [
+                        {
+                            'filters': [
+                                {
+                                    'type': 'server_mode',
+                                    'conditions': [('=', 'dev')]
+                                }
+                            ],
+                            'value_when_matched': '222'
+                        }
+                    ],
+                    'rule_schema_version': 1,
+                    'default_value': '333',
+                    'metadata': {
+                        'is_feature': False,
+                        'feature_stage': None,
+                    },
+                })
+
     def test_to_dict(self):
         param_dict = {
             'name': 'parameter_a',
@@ -924,6 +931,15 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                         }
                     ],
                     'value_when_matched': '222'
+                },
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [('=', 'test')]
+                        }
+                    ],
+                    'value_when_matched': '555'
                 }
             ],
             'rule_schema_version': (
@@ -934,6 +950,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'feature_stage': None
             }
         })
+        self.assertEqual(len(param.rules), 2)
 
         new_rule_dict = {
             'filters': [
@@ -942,9 +959,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             'value_when_matched': 'new rule value',
         }
         new_rule = parameter_domain.PlatformParameterRule.from_dict(
-            new_rule_dict,
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
-        )
+            new_rule_dict)
 
         param.set_rules([new_rule])
         self.assertEqual(len(param.rules), 1)
@@ -1026,7 +1041,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
 
-    def test_validate_feature(self):
+    def test_validate_feature_passes_without_exception(self):
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
