@@ -25,7 +25,7 @@ import utils
 
 Registry = registry.Registry
 FEATURE_STAGES = param_domain.FEATURE_STAGES # pylint: disable=invalid-name
-DATA_TYPES = param_domain.PlatformParameter.DATA_TYPES # pylint: disable=invalid-name
+DATA_TYPES = param_domain.DATA_TYPES # pylint: disable=invalid-name
 
 PARAM_NAMES = utils.create_enum( # pylint: disable=invalid-name
     'dummy_feature', 'dummy_parameter')
