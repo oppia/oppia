@@ -74,8 +74,10 @@ angular.module('oppia').directive('topicEditorPage', [
           };
 
           var setPageTitle = function() {
+            let topicName = TopicEditorStateService.getTopic().getName();
             PageTitleService.setPageTitle(
-              TopicEditorStateService.getTopic().getName() + ' - Oppia');
+              topicName + ' - Oppia');
+            PageTitleService.setPageSubtitleForMobileView(topicName);
             ctrl.topic = TopicEditorStateService.getTopic();
             ctrl._validateTopic();
           };

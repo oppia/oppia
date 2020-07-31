@@ -47,6 +47,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
+require('services/page-title.service.ts');
 require('domain/question/question-backend-api.service.ts');
 
 
@@ -62,24 +63,22 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
-        'ContextService', 'CsrfTokenService', 'WindowDimensionsService',
-        'ImageUploadHelperService',
-        'SkillCreationService', 'StoryCreationService',
-        'EntityCreationService', 'TopicEditorRoutingService',
-        'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
-        'UrlInterpolationService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
+        'PageTitleService', 'SkillCreationService', 'StoryCreationService',
+        'TopicEditorRoutingService', 'TopicEditorStateService',
+        'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
+        'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, AlertsService,
-            ContextService, CsrfTokenService, WindowDimensionsService,
-            ImageUploadHelperService,
-            SkillCreationService, StoryCreationService,
-            EntityCreationService, TopicEditorRoutingService,
-            TopicEditorStateService, TopicUpdateService, UndoRedoService,
-            UrlInterpolationService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+            $scope, $uibModal, AlertsService, ContextService,
+            CsrfTokenService, EntityCreationService, ImageUploadHelperService,
+            PageTitleService, SkillCreationService, StoryCreationService,
+            TopicEditorRoutingService, TopicEditorStateService,
+            TopicUpdateService, UndoRedoService, UrlInterpolationService,
+            WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
             MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
@@ -271,7 +270,9 @@ angular.module('oppia').directive('topicEditorTab', [
             _initEditor();
           };
 
-          $scope.navigateToSubtopic = function(subtopicId) {
+          $scope.navigateToSubtopic = function(subtopicId, subtopicName) {
+            PageTitleService.setPageTitleForMobileView('Subtopic Editor');
+            PageTitleService.setPageSubtitleForMobileView(subtopicName);
             TopicEditorRoutingService.navigateToSubtopicEditorWithId(
               subtopicId);
           };
@@ -382,8 +383,6 @@ angular.module('oppia').directive('topicEditorTab', [
               !WindowDimensionsService.isWindowNarrow());
             $scope.storiesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
-            // $scope.mainTopicCardIsShown = (
-            //   WindowDimensionsService.isWindowNarrow());
             $scope.mainTopicCardIsShown = true;
             $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);

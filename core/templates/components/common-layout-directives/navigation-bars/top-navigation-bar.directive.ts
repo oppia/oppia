@@ -34,7 +34,8 @@ angular.module('oppia').directive('topNavigationBar', [
     return {
       restrict: 'E',
       scope: {
-        headerText: '='
+        headerText: '=',
+        subheaderText: '='
       },
       bindToController: {
         backButtonShown: '<'

@@ -30,9 +30,7 @@ angular.module('oppia').directive('baseContent', [
   function() {
     return {
       restrict: 'E',
-      scope: {
-        getHeaderText: '&getHeaderText'
-      },
+      scope: {},
       bindToController: {
         backButtonShown: '<'
       },
@@ -66,6 +64,10 @@ angular.module('oppia').directive('baseContent', [
 
           $scope.getHeaderText = () => {
             return PageTitleService.getPageTitleForMobileView();
+          };
+
+          $scope.getSubheaderText = () => {
+            return PageTitleService.getPageSubtitleForMobileView();
           };
 
           var ctrl = this;

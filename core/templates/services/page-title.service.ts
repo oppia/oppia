@@ -25,6 +25,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 })
 export class PageTitleService {
   pageTitleForMobile: string = null;
+  pageSubtitleForMobile: string = null;
   constructor(private titleService: Title) {}
 
   setPageTitle(title: string) {
@@ -35,12 +36,20 @@ export class PageTitleService {
     return this.titleService.getTitle();
   }
 
-  setPageTitleForMobileView(title: string) {
-    this.pageTitleForMobile = (title);
+  setPageTitleForMobileView(title: string): void {
+    this.pageTitleForMobile = title;
+  }
+
+  setPageSubtitleForMobileView(subtitle: string): void {
+    this.pageSubtitleForMobile = subtitle;
   }
 
   getPageTitleForMobileView(): string {
     return this.pageTitleForMobile;
+  }
+
+  getPageSubtitleForMobileView(): string {
+    return this.pageSubtitleForMobile;
   }
 }
 

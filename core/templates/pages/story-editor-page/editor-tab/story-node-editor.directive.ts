@@ -136,6 +136,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
+            PageTitleService.setPageSubtitleForMobileView($scope.currentTitle);
             $scope.editableTitle = $scope.currentTitle;
             $scope.currentDescription = $scope.getDescription();
             $scope.editableDescription = $scope.currentDescription;

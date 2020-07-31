@@ -1,8 +1,8 @@
+<p class="oppia-mobile-back-to-parent" ng-click="returnToTopicEditorPage()">
+  <i class="fa fa-angle-left"></i>
+  <span>Back to Topic</span>
+</p>
 <div class="topic-story-name">
-  <p class="oppia-mobile-back-to-parent" ng-click="returnToTopicEditorPage()">
-    <i class="fa fa-angle-left"></i>
-    <span>Back to Topic</span>
-  </p>
   <span class="topic-name protractor-test-return-to-topic-button" ng-click="returnToTopicEditorPage()">
     <[getTopicName()]> /
   </span>
@@ -397,6 +397,10 @@
       width: 100%;
     }
 
+    story-editor .topic-story-name {
+      display: none;
+    }
+
     story-editor .chapter-list-container {
       margin-top: 30px;
     }
@@ -423,10 +427,6 @@
     story-editor .chapter-list-card-header div {
       margin-top: 16px;
       width: 100%;
-    }
-    story-editor .topic-story-name {
-      margin-left: 0;
-      width: 80%;
     }
     story-editor .chapter-list-card-header {
       margin-bottom: 0;

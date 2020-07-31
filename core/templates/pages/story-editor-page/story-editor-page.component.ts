@@ -89,6 +89,8 @@ angular.module('oppia').component('storyEditorPage', {
       var setPageTitle = function() {
         PageTitleService.setPageTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
+        PageTitleService.setPageSubtitleForMobileView(
+          StoryEditorStateService.getStory().getTitle());
       };
 
       ctrl.getActiveTab = function() {
@@ -185,9 +187,12 @@ angular.module('oppia').component('storyEditorPage', {
         ctrl.explorationValidationIssues = [];
         ctrl.forceValidateExplorations = true;
         ctrl.warningsAreShown = false;
-        PageTitleService.setPageTitleForMobileView('Story Editor');
         BottomNavbarStatusService.markBottomNavbarStatus(true);
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
+        ctrl.story = StoryEditorStateService.getStory();
+
+        PageTitleService.setPageTitleForMobileView('Story Editor');
+
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
           StoryEditorNavigationService.navigateToChapterEditor();
         } else if (
