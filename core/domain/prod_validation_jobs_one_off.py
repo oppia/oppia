@@ -6337,8 +6337,7 @@ class UserAuthModelValidator(BaseUserModelValidator):
     def _get_external_id_relationships(cls, item):
         return [
             ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id])
-            ]
+                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
 
 class PlatformParameterModelValidator(BaseModelValidator):

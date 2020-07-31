@@ -2224,7 +2224,7 @@ class UserAuthModel(base_models.BaseModel):
     """
 
     # Authentication detail for sign-in using google id (GAE).
-    gae_id = ndb.StringProperty(indexed=True, repeated=True)
+    gae_id = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
