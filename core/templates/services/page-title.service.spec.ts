@@ -39,4 +39,12 @@ describe('Page title service', () => {
     pts.setPageTitle('Second Title');
     expect(titleService.getTitle()).toEqual('Second Title');
   });
+
+  it('should correctly set the page title for mobile view', () => {
+    pts.setPageTitleForMobileView('First Title');
+    expect(pts.getPageTitleForMobileView()).toEqual('First Title');
+
+    pts.setPageTitleForMobileView('Second Title');
+    expect(pts.getPageTitleForMobileView()).toEqual('Second Title');
+  });
 });

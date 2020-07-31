@@ -51,10 +51,12 @@ angular.module('oppia').directive('baseContent', [
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$scope', '$window', 'BackgroundMaskService',
         'BottomNavbarStatusService', 'KeyboardShortcutService',
-        'LoaderService', 'PageTitleService', 'SidebarStatusService', 'UrlService',
+        'LoaderService', 'PageTitleService', 'SidebarStatusService',
+        'UrlService',
         function($rootScope, $scope, $window, BackgroundMaskService,
             BottomNavbarStatusService, KeyboardShortcutService,
-            LoaderService, PageTitleService, SidebarStatusService, UrlService) {
+            LoaderService, PageTitleService, SidebarStatusService,
+            UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {

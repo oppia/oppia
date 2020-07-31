@@ -46,6 +46,9 @@ describe('Subtopic editor tab', function() {
   var QuestionBackendApiService = null;
   var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
+  var MockWindowDimensionsService = {
+    isWindowNarrow: () => false
+  };
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
@@ -86,9 +89,6 @@ describe('Subtopic editor tab', function() {
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
-    var MockWindowDimensionsService = {
-      isWindowNarrow: () => false
-    };
     ctrl = $componentController('subtopicEditorTab', {
       QuestionBackendApiService: MockQuestionBackendApiService,
       WindowDimensionsService: MockWindowDimensionsService
@@ -246,12 +246,14 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should toggle skills list preview', function() {
+    MockWindowDimensionsService.isWindowNarrow = () => true;
     expect(ctrl.skillsListIsShown).toEqual(true);
     ctrl.togglePreviewSkillCard();
     expect(ctrl.skillsListIsShown).toEqual(false);
     ctrl.togglePreviewSkillCard();
     expect(ctrl.skillsListIsShown).toEqual(true);
     ctrl.togglePreviewSkillCard();
+    MockWindowDimensionsService.isWindowNarrow = () => false;
   });
 
   it('should toggle subtopic preview', function() {

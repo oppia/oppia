@@ -16,7 +16,7 @@
          ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
       <div class="oppia-story-viewer-desktop">
         <div ng-style="($index > 0 && !$ctrl.nodes[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
-          <div class="oppia-story-viewer-card">
+          <a class="oppia-story-viewer-card" ng-href="<[$ctrl.getExplorationUrl(node)]>">
             <span class="oppia-chapter-title" aria-live="assertive">
               <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
             </span>
@@ -43,7 +43,7 @@
                     </image>
                   </pattern>
                 </defs>
-                <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}" target="_blank" rel="noopener">
+                <a ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}" target="_blank" rel="noopener">
                   <rect width="240"
                         height="180"
                         fill="url(#image<[$index]>)"
@@ -56,7 +56,7 @@
                 <p style="font-size: 20px;"><[node.getDescription()]></p>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
       <div class="oppia-story-viewer-mobile-card-content" >
@@ -150,6 +150,7 @@
     font-family: Roboto, Arial, sans-serif;
     margin-bottom: 50px;
     margin-right: 60px;
+    text-decoration: none;
   }
 
   story-preview-tab .oppia-story-viewer-card-content {

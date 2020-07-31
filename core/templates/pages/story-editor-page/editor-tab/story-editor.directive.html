@@ -1,7 +1,7 @@
 <div class="topic-story-name">
   <p class="oppia-mobile-back-to-parent" ng-click="returnToTopicEditorPage()">
-      <i class="fa fa-angle-left"></i>
-      <span>Back to Topic</span>
+    <i class="fa fa-angle-left"></i>
+    <span>Back to Topic</span>
   </p>
   <span class="topic-name protractor-test-return-to-topic-button" ng-click="returnToTopicEditorPage()">
     <[getTopicName()]> /
@@ -143,13 +143,13 @@
                ng-if="chaptersListIsShown"
                aria-hidden="true">
             </i>
-            </div>
           </div>
-          <div ng-if="chaptersListIsShown" class="oppia-mobile-collapsible-card-content">
-            <div>
-              <button ng-click="createNode()" class="btn add-chapter-btn protractor-test-add-chapter-button">
-                + ADD CHAPTER
-              </button>
+        </div>
+        <div ng-if="chaptersListIsShown" class="oppia-mobile-collapsible-card-content">
+          <div>
+            <button ng-click="createNode()" class="btn add-chapter-btn protractor-test-add-chapter-button">
+              + ADD CHAPTER
+            </button>
             <div ng-if="!linearNodesList.length">
               <p class="no-chapters-message" style="padding-top: 6px;">
                 This story has no chapters.
@@ -324,7 +324,7 @@
   story-editor .add-chapter-btn {
     background-color: #008098;
     color: #FFF;
-    margin: 15px 0 10px;
+    margin: 15px 0 15px;
     text-align: left;
   }
   story-editor .chapter-list-card-header {

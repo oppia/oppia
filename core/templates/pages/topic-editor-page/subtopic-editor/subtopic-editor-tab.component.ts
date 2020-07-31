@@ -148,7 +148,6 @@ angular.module('oppia').component('subtopicEditorTab', {
       };
 
       ctrl.updateHtmlData = function() {
-        console.log('Called');
         if (ctrl.htmlData !==
                 ctrl.subtopicPage.getPageContents().getHtml()) {
           var subtitledHtml = angular.copy(
