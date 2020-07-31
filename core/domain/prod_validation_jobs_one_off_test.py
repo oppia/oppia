@@ -13070,12 +13070,11 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
-        user_models.UserAuthModel(id=self.user_id, gae_id=[self.gae_id]).put()
+        user_models.UserAuthModel(id=self.user_id, gae_id=self.gae_id).put()
         self.model_instance = user_models.UserAuthModel.get_by_id(
             self.user_id)
         self.job_class = (
-            prod_validation_jobs_one_off
-            .UserAuthModelAuditOneOffJob)
+            prod_validation_jobs_one_off.UserAuthModelAuditOneOffJob)
 
     def test_audit_standard_operation_passes(self):
         expected_output = [
@@ -13110,7 +13109,7 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output)
 
-    def test_audit_missing_user_settings_model_fails(self):
+    def test_audit_with_missing_user_settings_model_fails(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
