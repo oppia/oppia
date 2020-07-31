@@ -69,7 +69,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _validateCollection = function() {
-            console.log('Tries to validate collection');
             if (ctrl.collectionRights.isPrivate()) {
               ctrl.validationIssues = (
                 CollectionValidationService
