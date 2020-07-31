@@ -148,7 +148,6 @@ angular.module('oppia').component('subtopicEditorTab', {
       };
 
       ctrl.updateHtmlData = function() {
-        console.log('Called');
         if (ctrl.htmlData !==
                 ctrl.subtopicPage.getPageContents().getHtml()) {
           var subtitledHtml = angular.copy(
@@ -169,10 +168,6 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.showSchemaEditor = function() {
         ctrl.schemaEditorIsShown = true;
         ctrl.htmlDataBeforeUpdate = angular.copy(ctrl.htmlData);
-      };
-
-      ctrl.undoChange = function() {
-        UndoRedoService.undoChange();
       };
 
       ctrl.onRearrangeMoveSkillFinish = function(toIndex) {
@@ -203,6 +198,13 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.skillsListIsShown = !ctrl.skillsListIsShown;
       };
 
+      ctrl.toggleSubtopicEditorCard = function() {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
+        ctrl.subtopicEditorCardIsShown = !ctrl.subtopicEditorCardIsShown;
+      };
+
       ctrl.showSkillEditOptions = function(index) {
         ctrl.selectedSkillEditOptionsIndex = (
             (ctrl.selectedSkillEditOptionsIndex === index) ? -1 : index);
@@ -226,13 +228,6 @@ angular.module('oppia').component('subtopicEditorTab', {
 
       ctrl.navigateToTopicEditor = function() {
         TopicEditorRoutingService.navigateToMainTab();
-      };
-
-      ctrl.toggleSubtopicEditorCard = function() {
-        if (!WindowDimensionsService.isWindowNarrow()) {
-          return;
-        }
-        ctrl.subtopicEditorCardIsShown = !ctrl.subtopicEditorCardIsShown;
       };
 
       ctrl.$onInit = function() {

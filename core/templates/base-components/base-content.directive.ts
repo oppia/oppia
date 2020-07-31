@@ -16,10 +16,6 @@
  * @fileoverview Directive for the Base Transclusion Component.
  */
 
-
-
-require('services/page-title.service.ts');
-
 require('base-components/loading-message.component.ts');
 require('base-components/warnings-and-alerts.directive.ts');
 require('pages/OppiaFooterDirective.ts');
@@ -27,6 +23,7 @@ require('pages/OppiaFooterDirective.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/contextual/url.service.ts');
 require('services/keyboard-shortcut.service.ts');
+require('services/page-title.service.ts');
 require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
@@ -51,10 +48,12 @@ angular.module('oppia').directive('baseContent', [
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$scope', '$window', 'BackgroundMaskService',
         'BottomNavbarStatusService', 'KeyboardShortcutService',
-        'LoaderService', 'PageTitleService', 'SidebarStatusService', 'UrlService',
+        'LoaderService', 'PageTitleService', 'SidebarStatusService',
+        'UrlService',
         function($rootScope, $scope, $window, BackgroundMaskService,
             BottomNavbarStatusService, KeyboardShortcutService,
-            LoaderService, PageTitleService, SidebarStatusService, UrlService) {
+            LoaderService, PageTitleService, SidebarStatusService,
+            UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {
@@ -64,6 +63,10 @@ angular.module('oppia').directive('baseContent', [
               $window.location.search +
               $window.location.hash);
           }
+
+          $scope.getHeaderText = () => {
+            return PageTitleService.getPageTitleForMobileView();
+          };
 
           var ctrl = this;
           ctrl.loadingMessage = '';
@@ -75,9 +78,6 @@ angular.module('oppia').directive('baseContent', [
           };
           ctrl.isBackgroundMaskActive = () => (
             BackgroundMaskService.isMaskActive());
-          $scope.getHeaderText = () => {
-            return PageTitleService.getPageTitleForMobileView();
-          };
           ctrl.skipToMainContent = function() {
             var mainContentElement = document.getElementById(
               'oppia-main-content');

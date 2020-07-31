@@ -6,9 +6,9 @@
 <div>
   <div class="modal-body new-subtopic-editor protractor-test-new-subtopic-editor">
     <div class="create-new-subtopic-input-field">
-    <div>
-      <strong>Title</strong>
-    </div>
+      <div>
+        <strong>Title</strong>
+      </div>
       <input class="form-control protractor-test-new-subtopic-title-field" style="font-size: 12px;"
              placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
              ng-model="$ctrl.subtopicTitle" ng-change="$ctrl.resetErrorMsg()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
@@ -18,8 +18,8 @@
         </i>
       </span>
       <span class="form-text error-msg" ng-if="$ctrl.errorMsg">
-      <em><[$ctrl.errorMsg]></em>
-    </span>
+        <em><[$ctrl.errorMsg]></em>
+      </span>
     </div>
 
     <div class="create-new-subtopic-input-field create-new-subtopic-content">
@@ -36,10 +36,10 @@
       </div>
 
       <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-show-schema-editor">
-      <span class="oppia-placeholder">
-          Give a description or explanation of the subtopic.
-        <i class="fa fa-pen"></i>
-      </span>
+        <span class="oppia-placeholder">
+            Give a description or explanation of the subtopic.
+          <i class="fa fa-pen"></i>
+        </span>
       </div>
     </div>
 

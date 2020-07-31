@@ -259,7 +259,6 @@ angular.module('oppia').directive('topNavigationBar', [
               ctrl.isSuperAdmin = userInfo.isSuperAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               ctrl.username = userInfo.getUsername();
-              console.log($scope.headerText());
               if (ctrl.username) {
                 ctrl.profilePageUrl = UrlInterpolationService.interpolateUrl(
                   '/profile/<username>', {
