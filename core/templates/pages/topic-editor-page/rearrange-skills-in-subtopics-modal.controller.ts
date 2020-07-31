@@ -43,9 +43,9 @@ angular.module('oppia').controller(
         $uibModalInstance: $uibModalInstance
       });
       var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
-      var _initEditor = function() {
+      ctrl.directiveSubscriptions = new Subscription();
+      ctrl.initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopics = ctrl.topic.getSubtopics();
         ctrl.uncategorizedSkillSummaries = (
@@ -90,7 +90,7 @@ angular.module('oppia').controller(
             ctrl.topic, ctrl.oldSubtopicId, newSubtopicId,
             ctrl.skillSummaryToMove);
         }
-        _initEditor();
+        ctrl.initEditor();
       };
 
 
@@ -117,13 +117,13 @@ angular.module('oppia').controller(
         ctrl.editableName = '';
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicInitialized.subscribe(
-            () => _initEditor()
+            () => ctrl.initEditor()
           ));
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicReinitialized.subscribe(
-            () => _initEditor()
+            () => ctrl.initEditor()
           ));
-        _initEditor();
+        ctrl.initEditor();
       };
       ctrl.init();
       ctrl.$onDestroy = function() {

@@ -53,10 +53,10 @@ angular.module('oppia').component('subtopicEditorTab', {
         UrlInterpolationService, WindowDimensionsService,
         EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
       var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
-      var _initEditor = function() {
+      ctrl.initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
@@ -197,7 +197,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.selectedSkillEditOptionsIndex = -1;
         TopicUpdateService.removeSkillFromSubtopic(
           ctrl.topic, ctrl.subtopicId, skillSummary);
-        _initEditor();
+        ctrl.initEditor();
       };
 
       ctrl.removeSkillFromTopic = function(skillSummary) {
@@ -206,7 +206,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.topic, ctrl.subtopicId, skillSummary);
         TopicUpdateService.removeUncategorizedSkill(
           ctrl.topic, skillSummary);
-        _initEditor();
+        ctrl.initEditor();
       };
 
       ctrl.navigateToTopicEditor = function() {
@@ -228,11 +228,11 @@ angular.module('oppia').component('subtopicEditorTab', {
 
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicInitialized.subscribe(
-            () => _initEditor()
+            () => ctrl.initEditor()
           ));
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicReinitialized.subscribe(
-            () => _initEditor()
+            () => ctrl.initEditor()
           ));
 
         $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
@@ -242,7 +242,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.htmlData = pageContents.getHtml();
         });
 
-        _initEditor();
+        ctrl.initEditor();
       };
 
 

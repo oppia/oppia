@@ -17,10 +17,11 @@
  * @fileoverview Unit tests for the topic editor tab directive.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-import { EventEmitter } from '@angular/core';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {
@@ -56,6 +57,10 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
+
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -88,6 +93,20 @@ describe('Topic editor tab directive', function() {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
+
+    topicInitializedEventEmitter = new EventEmitter();
+    topicReinitializedEventEmitter = new EventEmitter();
+
+    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+      function() {
+        return topicInitializedEventEmitter;
+      });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+      function() {
+        return topicReinitializedEventEmitter;
+      });
+
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
@@ -423,19 +442,10 @@ describe('Topic editor tab directive', function() {
     expect(moveSubtopicSpy).not.toHaveBeenCalled();
   });
 
-  it('should call functions after subscribing', function() {
-    let sampleEventEmitter1 = new EventEmitter();
-    let sampleEventEmitter2 = new EventEmitter();
-    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
-      function() {
-        sampleEventEmitter1.emit();
-        return sampleEventEmitter1;
-      });
-    spyOnProperty(TopicEditorStateService, 'onTopicReinitialized').and.callFake(
-      function() {
-        sampleEventEmitter2.emit();
-        return sampleEventEmitter2;
-      });
-    expect(ctrl.directiveSubscriptions._subscriptions.length).toEqual(2);
+  it('should call initEditor on initialization of topic', function() {
+    spyOn(ctrl, 'initEditor').and.callThrough();
+    topicInitializedEventEmitter.emit();
+    topicReinitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
   });
 });

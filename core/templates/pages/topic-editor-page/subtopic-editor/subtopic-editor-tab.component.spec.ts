@@ -17,6 +17,8 @@
  * @fileoverview Unit tests for the subtopic editor tab component.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Subtopic editor tab', function() {
@@ -46,6 +48,9 @@ describe('Subtopic editor tab', function() {
   var QuestionBackendApiService = null;
   var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
+
+  var topicInitializedEventEmitter = null;
+  var topicReinitializedEventEmitter = null;
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
@@ -78,6 +83,19 @@ describe('Subtopic editor tab', function() {
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
 
+    topicInitializedEventEmitter = new EventEmitter();
+    topicReinitializedEventEmitter = new EventEmitter();
+
+    spyOnProperty(TopicEditorStateService, 'onTopicInitialized').and.callFake(
+      function() {
+        return topicInitializedEventEmitter;
+      });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.callFake(
+      function() {
+        return topicReinitializedEventEmitter;
+      });
+
     topic.getSubtopicById = function() {
       return subtopic;
     };
@@ -95,6 +113,10 @@ describe('Subtopic editor tab', function() {
     });
     ctrl.$onInit();
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should initialize the variables', function() {
     expect(ctrl.editableTitle).toEqual('Subtopic1');
@@ -269,4 +291,11 @@ describe('Subtopic editor tab', function() {
       ctrl.navigateToTopicEditor();
       expect(navigateSpy).toHaveBeenCalled();
     });
+
+  it('should call initEditor when topic is initialized', function() {
+    spyOn(ctrl, 'initEditor').and.callThrough();
+    topicInitializedEventEmitter.emit();
+    topicReinitializedEventEmitter.emit();
+    expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
+  });
 });
