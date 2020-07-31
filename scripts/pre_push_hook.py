@@ -170,7 +170,7 @@ def git_diff_name_status(left, right, diff_filter=''):
         list. List of FileDiffs (tuple with name/status).
 
     Raises:
-        ValueError: Raise ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
@@ -211,7 +211,7 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
         added but not deleted.
 
     Raises:
-        ValueError: Raise ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
@@ -326,7 +326,7 @@ def install_hook():
     It ensures that oppia/ is the root folder.
 
     Raises:
-        ValueError: Raise ValueError if chmod command fails.
+        ValueError. Raise ValueError if chmod command fails.
     """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')

@@ -36,7 +36,7 @@ def validate_image_and_filename(raw_image, filename):
         str. The file format of the image.
 
     Raises:
-        ValidationError: Image or filename supplied fails one of the
+        ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
     hundred_kb_in_bytes = 100 * 1024

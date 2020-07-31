@@ -193,7 +193,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 suggestion.
 
         Raises:
-            Exception: There is already a suggestion with the given id.
+            Exception. There is already a suggestion with the given id.
         """
         instance_id = thread_id
 

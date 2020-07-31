@@ -73,7 +73,7 @@ def link_multiple_skills_for_question(
             0 and 1 (inclusive).
 
     Raises:
-        Exception: The lengths of the skill_ids and skill_difficulties
+        Exception. The lengths of the skill_ids and skill_difficulties
             lists are different.
     """
     if len(skill_ids) != len(skill_difficulties):
@@ -133,7 +133,7 @@ def update_question_skill_link_difficulty(
         new_difficulty: float. New difficulty value.
 
     Raises:
-        Exception: Given question and skill are not linked.
+        Exception. Given question and skill are not linked.
     """
     question_skill_link_id = (
         question_models.QuestionSkillLinkModel.get_model_id(
@@ -438,7 +438,7 @@ def get_displayable_question_skill_link_details(
             questions are to be returned. This value should be urlsafe.
 
     Raises:
-        Exception: Querying linked question summaries for more than 3 skills at
+        Exception. Querying linked question summaries for more than 3 skills at
             a time is not supported currently.
 
     Returns:
@@ -563,7 +563,7 @@ def _save_question(committer_id, question, change_list, commit_message):
             question.
 
     Raises:
-        Exception: Received an invalid change list.
+        Exception. Received an invalid change list.
     """
     if not change_list:
         raise Exception(
@@ -597,7 +597,7 @@ def update_question(
             question.
 
     Raises:
-        ValueError: No commit message was provided.
+        ValueError. No commit message was provided.
     """
     if not commit_message:
         raise ValueError(
@@ -685,7 +685,7 @@ def get_interaction_id_for_question(question_id):
         str. The ID of the interaction of the question.
 
     Raises:
-        Exception: The question does not exists of the ID question_id.
+        Exception. The question does not exists of the ID question_id.
     """
     question = get_question_by_id(question_id, strict=False)
     if question is None:

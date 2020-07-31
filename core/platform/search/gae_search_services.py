@@ -67,9 +67,9 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
         added.
 
     Raises:
-        SearchFailureError: Raised when the indexing fails. If it fails for any
+        SearchFailureError. Raised when the indexing fails. If it fails for any
             document, none will be inserted.
-        ValueError: Raised when invalid values are given.
+        ValueError. Raised when invalid values are given.
     """
     if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
@@ -113,7 +113,7 @@ def _dict_to_search_document(d):
         Document. The document containing fields.
 
     Raises:
-        ValueError: The given document is not in the dict format.
+        ValueError. The given document is not in the dict format.
     """
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary, got %s' % type(d))
@@ -146,7 +146,7 @@ def _make_fields(key, value):
         list(*). A list of fields.
 
     Raises:
-        ValueError: The type of field value is not list, str, Number or
+        ValueError. The type of field value is not list, str, Number or
             datetime.
     """
     if isinstance(value, list):
@@ -201,7 +201,7 @@ def delete_documents_from_index(
         retries: int. The number of times to retry deleting the documents.
 
     Raises:
-        SearchFailureError: Raised when the deletion fails. If it fails for any
+        SearchFailureError. Raised when the deletion fails. If it fails for any
             document, none will be deleted.
     """
     if not isinstance(index, python_utils.BASESTRING):
@@ -355,7 +355,7 @@ def _string_to_sort_expressions(input_string):
         list(SortExpression). A list of sorted expressions.
 
     Raises:
-        ValueError: Fields in the sort expression do not start with '+' or '-'
+        ValueError. Fields in the sort expression do not start with '+' or '-'
             to indicate sort direction.
     """
     sort_expressions = []

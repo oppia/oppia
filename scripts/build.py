@@ -353,7 +353,7 @@ def _ensure_files_exist(filepaths):
         filepaths: list(str). Paths to files that we want to ensure exist.
 
     Raises:
-        OSError: One or more of the files does not exist.
+        OSError. One or more of the files does not exist.
     """
     for filepath in filepaths:
         if not os.path.isfile(filepath):
@@ -415,7 +415,7 @@ def _compare_file_count(
         second_dir_list: list(str). List of directories to compare.
 
     Raises:
-        ValueError: The source directory list does not have the same file
+        ValueError. The source directory list does not have the same file
             count as the target directory list.
     """
 
@@ -1129,11 +1129,11 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
             hashes of file content as values.
 
     Raises:
-        ValueError: The hash dict is empty.
-        ValueError: Filepath has less than 2 partitions after splitting by '.'
+        ValueError. The hash dict is empty.
+        ValueError. Filepath has less than 2 partitions after splitting by '.'
             delimiter.
-        ValueError: The filename does not contain hash.
-        KeyError: The filename's hash cannot be found in the hash dict.
+        ValueError. The filename does not contain hash.
+        KeyError. The filename's hash cannot be found in the hash dict.
     """
     # Final filepath example:
     # pages/base.240933e7564bd72a4dde42ee23260c5f.html.

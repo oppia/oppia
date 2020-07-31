@@ -44,7 +44,7 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
               subtopics.
 
     Raises:
-        Exception: The schema version of subtopics is outside of what
+        Exception. The schema version of subtopics is outside of what
             is supported at present.
     """
     subtopic_schema_version = versioned_subtopics['schema_version']
@@ -76,7 +76,7 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
                 topic's story references.
 
     Raises:
-        Exception: The schema version of story_references is outside of what
+        Exception. The schema version of story_references is outside of what
             is supported at present.
     """
     story_reference_schema_version = (

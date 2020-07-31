@@ -98,7 +98,7 @@ class QuestionModel(base_models.VersionedModel):
             new_id: int. ID of the new QuestionModel instance.
 
         Raises:
-            Exception: The ID generator for QuestionModel is
+            Exception. The ID generator for QuestionModel is
                 producing too many collisions.
         """
 
@@ -159,7 +159,7 @@ class QuestionModel(base_models.VersionedModel):
             QuestionModel. Instance of the new QuestionModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
         instance_id = cls._get_new_id()
         question_model_instance = cls(
@@ -243,7 +243,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill_difficulty: float. The difficulty between [0, 1] of the skill.
 
         Raises:
-            Exception: The given question is already linked to the given skill.
+            Exception. The given question is already linked to the given skill.
 
         Returns:
             QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel

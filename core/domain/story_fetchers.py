@@ -48,7 +48,7 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
               contents.
 
     Raises:
-        Exception: The schema version of the story_contents is outside of what
+        Exception. The schema version of the story_contents is outside of what
             is supported at present.
     """
     story_contents_schema_version = versioned_story_contents['schema_version']
@@ -334,8 +334,8 @@ def get_node_index_by_story_id_and_node_id(story_id, node_id):
         int. The index of the corresponding node.
 
     Raises:
-        Exception: The given story does not exist.
-        Exception: The given node does not exist in the story.
+        Exception. The given story does not exist.
+        Exception. The given node does not exist in the story.
     """
     try:
         story = get_story_by_id(story_id)

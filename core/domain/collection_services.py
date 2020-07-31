@@ -76,7 +76,7 @@ def _migrate_collection_contents_to_latest_schema(
               contents.
 
     Raises:
-        Exception: The schema version of the collection is outside of what is
+        Exception. The schema version of the collection is outside of what is
             supported at present.
     """
     collection_schema_version = versioned_collection_contents['schema_version']
@@ -253,7 +253,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
         the given ids as keys.
 
     Raises:
-        ValueError: The 'strict' is True, and one or more of the given
+        ValueError. The 'strict' is True, and one or more of the given
             collection ids are invalid.
     """
     collection_ids = set(collection_ids)
@@ -665,7 +665,7 @@ def validate_exps_in_collection_are_public(collection):
         collection: Collection. Collection to be validated.
 
     Raises:
-        ValidationError: The collection contains at least one private
+        ValidationError. The collection contains at least one private
             exploration.
     """
     for exploration_id in collection.exploration_ids:
@@ -688,9 +688,9 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             entry in change_list is a dict that represents a CollectionChange.
 
     Raises:
-        ValidationError: An invalid exploration was referenced in the
+        ValidationError. An invalid exploration was referenced in the
             collection.
-        Exception: The collection model and the incoming collection domain
+        Exception. The collection model and the incoming collection domain
             object have different version numbers.
     """
     if not change_list:

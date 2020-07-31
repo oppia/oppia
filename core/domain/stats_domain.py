@@ -1514,7 +1514,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
                 the learner_answer_info_list.
 
         Raises:
-            Exception: If the learner answer info with the given id is not
+            Exception. If the learner answer info with the given id is not
                 found in the learner answer info list.
         """
         new_learner_answer_info_list = []

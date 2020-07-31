@@ -228,7 +228,7 @@ class TaskEntryModel(base_models.BaseModel):
             str. The ID of the new task.
 
         Raises:
-            Exception: A task corresponding to the provided identifier values
+            Exception. A task corresponding to the provided identifier values
                 (entity_type, entity_id, entity_version, task_type, target_type,
                 target_id) already exists in storage.
         """

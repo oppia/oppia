@@ -446,9 +446,9 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
             stanza: list(str). Contains all the lines from a lcov stanza.
 
         Raises:
-            Exception: The file_path is empty.
-            Exception: Total lines number is not found.
-            Exception: Covered lines number is not found.
+            Exception. The file_path is empty.
+            Exception. Total lines number is not found.
+            Exception. Covered lines number is not found.
         """
 
         match = re.search('SF:(.+)\n', stanza)
@@ -520,7 +520,7 @@ def check_coverage_changes():
     - File deletion
 
     Raises:
-        Exception: LCOV_FILE_PATH doesn't exist.
+        Exception. LCOV_FILE_PATH doesn't exist.
     """
     if not os.path.exists(LCOV_FILE_PATH):
         raise Exception(

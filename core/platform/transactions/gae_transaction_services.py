@@ -38,8 +38,8 @@ def run_in_transaction(fn, *args, **kwargs):
         *. Whatever fn() returns.
 
     Raises:
-        Exception: Whatever fn() raises.
-        datastore_errors.TransactionFailedError: The transaction failed.
+        Exception. Whatever fn() raises.
+        datastore_errors.TransactionFailedError. The transaction failed.
     """
     return ndb.transaction(
         lambda: fn(*args, **kwargs),

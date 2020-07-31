@@ -256,7 +256,7 @@ class AdminHandler(base.BaseHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            Exception: Cannot reload an exploration in production.
+            Exception. Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -353,8 +353,8 @@ class AdminHandler(base.BaseHandler):
         attached to each skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -500,8 +500,8 @@ class AdminHandler(base.BaseHandler):
         linked to the skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -536,7 +536,7 @@ class AdminHandler(base.BaseHandler):
             collection_id: str. The collection id.
 
         Raises:
-            Exception: Cannot reload a collection in production.
+            Exception. Cannot reload a collection in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -561,7 +561,7 @@ class AdminHandler(base.BaseHandler):
                 be published.
 
         Raises:
-            Exception: Environment is not DEVMODE.
+            Exception. Environment is not DEVMODE.
         """
 
         if constants.DEV_MODE:

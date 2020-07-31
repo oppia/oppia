@@ -221,7 +221,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             associated with the map.
 
         Raises:
-            Exception: The item type is wrong.
+            Exception. The item type is wrong.
         """
         class_name_to_event_type = {
             'CompleteExplorationEventLogEntryModel':

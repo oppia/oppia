@@ -310,7 +310,7 @@ class SubtopicPage(python_utils.OBJECT):
         """Validates various properties of the SubtopicPage object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic page are
+            ValidationError. One or more attributes of the subtopic page are
                 invalid.
         """
         if not isinstance(self.topic_id, python_utils.BASESTRING):

@@ -638,6 +638,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 method definition in the AST.
             node_doc: Docstring. Pylint Docstring class instance representing
                 a node's docstring.
+
+        Raises:
+            Exc. Some exception.
         """
         # The regexes are taken from the pylint codebase and are modified
         # according to our needs. Link: https://github.com/PyCQA/pylint/blob/
@@ -668,7 +671,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
         re_raise_line = re.compile(
             r"""
-            \s* ({type}:)+                    # identifier
+            \s* ({type}[.])+                    # identifier
             \s* [A-Z0-9](.*)[.]+                     # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,

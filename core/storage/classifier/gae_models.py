@@ -88,7 +88,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             str. ID of the new ClassifierTrainingJobModel instance.
 
         Raises:
-            Exception: The id generator for ClassifierTrainingJobModel is
+            Exception. The id generator for ClassifierTrainingJobModel is
                 producing too many collisions.
         """
 
@@ -132,7 +132,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             str. ID of the new ClassifierModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id)
@@ -290,7 +290,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
             str. ID of the new ClassifierExplorationMappingModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id, exp_version, state_name)

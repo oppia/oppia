@@ -295,7 +295,7 @@ class StoryReference(python_utils.OBJECT):
         """Validates various properties of the StoryReference object.
 
         Raises:
-            ValidationError: One or more attributes of the StoryReference are
+            ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
         if not isinstance(self.story_id, python_utils.BASESTRING):
@@ -405,7 +405,7 @@ class Subtopic(python_utils.OBJECT):
         """Validates various properties of the Subtopic object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic are
+            ValidationError. One or more attributes of the subtopic are
                 invalid.
         """
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
@@ -621,7 +621,7 @@ class Topic(python_utils.OBJECT):
         """Marks story with the given id as published.
 
         Raises:
-            Exception: Story with given id doesn't exist in the topic.
+            Exception. Story with given id doesn't exist in the topic.
         """
         for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -638,7 +638,7 @@ class Topic(python_utils.OBJECT):
         """Marks story with the given id as unpublished.
 
         Raises:
-            Exception: Story with given id doesn't exist in the topic.
+            Exception. Story with given id doesn't exist in the topic.
         """
         for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
@@ -709,7 +709,7 @@ class Topic(python_utils.OBJECT):
             story_id: str. The story id to remove from the list.
 
         Raises:
-            Exception: The story_id is not present in the canonical stories
+            Exception. The story_id is not present in the canonical stories
                 list of the topic.
         """
         deleted = False
@@ -732,7 +732,7 @@ class Topic(python_utils.OBJECT):
                 story.
 
         Raises:
-            Exception: Invalid input.
+            Exception. Invalid input.
         """
         if not isinstance(from_index, int):
             raise Exception(
@@ -799,7 +799,7 @@ class Topic(python_utils.OBJECT):
             story_id: str. The story id to remove from the list.
 
         Raises:
-            Exception: The story_id is not present in the additional stories
+            Exception. The story_id is not present in the additional stories
                 list of the topic.
         """
         deleted = False
@@ -821,7 +821,7 @@ class Topic(python_utils.OBJECT):
                 published or is going to be published.
 
         Raises:
-            ValidationError: One or more attributes of the Topic are not
+            ValidationError. One or more attributes of the Topic are not
                 valid.
         """
         self.require_valid_name(self.name)
@@ -1045,7 +1045,7 @@ class Topic(python_utils.OBJECT):
             new_name: str. The updated name for the topic.
 
         Raises:
-            ValidationError: Name should be a string.
+            ValidationError. Name should be a string.
         """
         if not isinstance(new_name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
@@ -1103,7 +1103,7 @@ class Topic(python_utils.OBJECT):
                 uncategorized_skill_ids list.
 
         Raises:
-            Exception: The given skill id is already present in a subtopic.
+            Exception. The given skill id is already present in a subtopic.
         """
         for subtopic in self.subtopics:
             if new_uncategorized_skill_id in subtopic.skill_ids:
@@ -1126,7 +1126,7 @@ class Topic(python_utils.OBJECT):
                 uncategorized_skill_ids list.
 
         Raises:
-            Exception: The given skill id is not present in the
+            Exception. The given skill id is not present in the
                 uncategorized_skill_ids list.
         """
         if uncategorized_skill_id not in self.uncategorized_skill_ids:
@@ -1172,7 +1172,7 @@ class Topic(python_utils.OBJECT):
             title: str. The title for the new subtopic.
 
         Raises:
-            Exception: The new_subtopic_id and the expected next subtopic id
+            Exception. The new_subtopic_id and the expected next subtopic id
                 differs.
 
         Returns:
@@ -1195,7 +1195,7 @@ class Topic(python_utils.OBJECT):
             subtopic_id: str. The id of the subtopic to remove.
 
         Raises:
-            Exception: A subtopic with the given id doesn't exist.
+            Exception. A subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
@@ -1213,7 +1213,7 @@ class Topic(python_utils.OBJECT):
             new_title: str. The new title for the subtopic.
 
         Raises:
-            Exception: The subtopic with the given id doesn't exist.
+            Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
@@ -1231,7 +1231,7 @@ class Topic(python_utils.OBJECT):
                 subtopic.
 
         Raises:
-            Exception: The subtopic with the given id doesn't exist.
+            Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
@@ -1250,7 +1250,7 @@ class Topic(python_utils.OBJECT):
                 the subtopic.
 
         Raises:
-            Exception: The subtopic with the given id doesn't exist.
+            Exception. The subtopic with the given id doesn't exist.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
@@ -1268,7 +1268,7 @@ class Topic(python_utils.OBJECT):
             to_index: int. The index at which to insert the moved skill.
 
         Raises:
-            Exception: Invalid input.
+            Exception. Invalid input.
         """
         if not isinstance(from_index, int):
             raise Exception(
@@ -1308,7 +1308,7 @@ class Topic(python_utils.OBJECT):
             to_index: int. The index at which to insert the moved subtopic.
 
         Raises:
-            Exception: Invalid input.
+            Exception. Invalid input.
         """
         if not isinstance(from_index, int):
             raise Exception(
@@ -1348,10 +1348,10 @@ class Topic(python_utils.OBJECT):
             skill_id: str. The skill id which is to be moved.
 
         Raises:
-            Exception: The subtopic with the given id doesn't exist.
-            Exception: The skill id is not present in the old subtopic
+            Exception. The subtopic with the given id doesn't exist.
+            Exception. The skill id is not present in the old subtopic
                 (or uncategorized skill id list) already before moving.
-            Exception: The skill id is already present in the new subtopic.
+            Exception. The skill id is already present in the new subtopic.
         """
         if old_subtopic_id is not None:
             old_subtopic_index = self.get_subtopic_index(old_subtopic_id)
@@ -1393,8 +1393,8 @@ class Topic(python_utils.OBJECT):
             skill_id: str. The skill id which is to be removed.
 
         Raises:
-            Exception: The subtopic with the given id doesn't exist.
-            Exception: The skill id should be present in the old subtopic
+            Exception. The subtopic with the given id doesn't exist.
+            Exception. The skill id should be present in the old subtopic
                 already before moving.
         """
 
@@ -1460,7 +1460,7 @@ class TopicSummary(python_utils.OBJECT):
         """Validates all properties of this topic summary.
 
         Raises:
-            ValidationError: One or more attributes of the Topic summary
+            ValidationError. One or more attributes of the Topic summary
                 are not valid.
         """
         if not isinstance(self.name, python_utils.BASESTRING):

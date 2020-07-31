@@ -198,7 +198,7 @@ class CollectionNode(python_utils.OBJECT):
         """Validates various properties of the collection node.
 
         Raises:
-            ValidationError: One or more attributes of the collection node are
+            ValidationError. One or more attributes of the collection node are
                 invalid.
         """
         if not isinstance(self.exploration_id, python_utils.BASESTRING):
@@ -456,7 +456,7 @@ class Collection(python_utils.OBJECT):
             schema format.
 
         Raises:
-            Exception: The 'yaml_content' or the collection schema version is
+            Exception. The 'yaml_content' or the collection schema version is
                 not valid.
         """
         try:
@@ -638,7 +638,7 @@ class Collection(python_utils.OBJECT):
             current_version: int. The current collection schema version.
 
         Raises:
-            Exception: The value of the key 'schema_version' in
+            Exception. The value of the key 'schema_version' in
                 versioned_collection_contents is not valid.
         """
         if (versioned_collection_contents['schema_version'] + 1 >
@@ -824,7 +824,7 @@ class Collection(python_utils.OBJECT):
             exploration_id: str. The id of the exploration.
 
         Raises:
-            ValueError: The exploration is already part of the colletion.
+            ValueError. The exploration is already part of the colletion.
         """
         if self.get_node(exploration_id) is not None:
             raise ValueError(
@@ -840,7 +840,7 @@ class Collection(python_utils.OBJECT):
             second_index: int. Index of the other node to be swapped.
 
         Raises:
-            ValueError: Both indices are the same number.
+            ValueError. Both indices are the same number.
         """
         if first_index == second_index:
             raise ValueError(
@@ -858,7 +858,7 @@ class Collection(python_utils.OBJECT):
             exploration_id: str. The id of the exploration.
 
         Raises:
-            ValueError: The exploration is not part of the collection.
+            ValueError. The exploration is not part of the collection.
         """
         node_index = self._find_node(exploration_id)
         if node_index is None:
@@ -871,7 +871,7 @@ class Collection(python_utils.OBJECT):
         """Validates all properties of this collection and its constituents.
 
         Raises:
-            ValidationError: One or more attributes of the Collection are not
+            ValidationError. One or more attributes of the Collection are not
                 valid.
         """
 
@@ -1069,7 +1069,7 @@ class CollectionSummary(python_utils.OBJECT):
         """Validates various properties of the CollectionSummary.
 
         Raises:
-            ValidationError: One or more attributes of the CollectionSummary
+            ValidationError. One or more attributes of the CollectionSummary
                 are invalid.
         """
         if not isinstance(self.title, python_utils.BASESTRING):

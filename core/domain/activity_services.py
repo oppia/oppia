@@ -54,7 +54,7 @@ def update_featured_activity_references(featured_activity_references):
             'featured' activities.
 
     Raises:
-        Exception: The input list of ActivityReference domain objects has
+        Exception. The input list of ActivityReference domain objects has
             duplicates.
     """
     for activity_reference in featured_activity_references:
@@ -129,7 +129,7 @@ def split_by_type(activity_references):
         is a list of all collection ids represented in the input list.
 
     Raises:
-        Exception: The activity reference type is invalid.
+        Exception. The activity reference type is invalid.
     """
     exploration_ids, collection_ids = [], []
     for activity_reference in activity_references:

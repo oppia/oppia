@@ -60,9 +60,9 @@ def send_email_to_recipients(
                 latest/user_manual.html#batch-sending
 
     Raises:
-        Exception: The mailgun api key is not stored in
+        Exception. The mailgun api key is not stored in
             feconf.MAILGUN_API_KEY.
-        Exception: The mailgun domain name is not stored in
+        Exception. The mailgun domain name is not stored in
             feconf.MAILGUN_DOMAIN_NAME.
 
     Returns:

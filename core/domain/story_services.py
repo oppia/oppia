@@ -229,15 +229,15 @@ def validate_explorations_for_story(exp_ids, raise_error):
         False).
 
     Raises:
-        ValidationError: Expected story to only reference valid explorations.
-        ValidationError: Exploration with ID is not public. Please publish
+        ValidationError. Expected story to only reference valid explorations.
+        ValidationError. Exploration with ID is not public. Please publish
             explorations before adding them to a story.
-        ValidationError: All explorations in a story should be of the same
+        ValidationError. All explorations in a story should be of the same
             category.
-        ValidationError: Invalid language found for exploration.
-        ValidationError: Expected no exploration to have parameter values in it.
-        ValidationError: Invalid interaction in exploration.
-        ValidationError: RTE content in state of exploration with ID is not
+        ValidationError. Invalid language found for exploration.
+        ValidationError. Expected no exploration to have parameter values in it.
+        ValidationError. Invalid interaction in exploration.
+        ValidationError. RTE content in state of exploration with ID is not
             supported on mobile.
     """
     validation_error_messages = []
@@ -355,9 +355,9 @@ def _save_story(committer_id, story, commit_message, change_list):
         change_list: list(StoryChange). List of changes applied to a story.
 
     Raises:
-        ValidationError: An invalid exploration was referenced in the
+        ValidationError. An invalid exploration was referenced in the
             story.
-        Exception: The story model and the incoming story domain
+        Exception. The story model and the incoming story domain
             object have different version numbers.
     """
     if not change_list:
@@ -444,7 +444,7 @@ def update_story(
             story.
 
     Raises:
-        ValidationError: Exploration is already linked to a different story.
+        ValidationError. Exploration is already linked to a different story.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')

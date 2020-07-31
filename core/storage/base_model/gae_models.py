@@ -87,7 +87,7 @@ class BaseModel(ndb.Model):
         """This method should be implemented by subclasses.
 
         Raises:
-            NotImplementedError: The method is not overwritten in a derived
+            NotImplementedError. The method is not overwritten in a derived
                 class.
         """
         raise NotImplementedError(
@@ -102,7 +102,7 @@ class BaseModel(ndb.Model):
             user_id: str. The ID of the user whose data should be checked.
 
         Raises:
-            NotImplementedError: The method is not overwritten in a derived
+            NotImplementedError. The method is not overwritten in a derived
                 class.
         """
         raise NotImplementedError(
@@ -117,7 +117,7 @@ class BaseModel(ndb.Model):
             user_id: str. The ID of the user whose data should be exported.
 
         Raises:
-            NotImplementedError: The method is not overwritten in a derived
+            NotImplementedError. The method is not overwritten in a derived
                 class.
         """
         raise NotImplementedError(
@@ -129,7 +129,7 @@ class BaseModel(ndb.Model):
         """This method should be implemented by subclasses.
 
         Raises:
-            NotImplementedError: The method is not overwritten in a derived
+            NotImplementedError. The method is not overwritten in a derived
                 class.
         """
         raise NotImplementedError(
@@ -151,8 +151,9 @@ class BaseModel(ndb.Model):
             that corresponds to the given id.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError: If strict == True and
-                no undeleted entity with the given id exists in the datastore.
+            base_models.BaseModel.EntityNotFoundError. The value of strict is
+                True and no undeleted entity with the given id exists in the
+                datastore.
         """
         entity = cls.get_by_id(entity_id)
         if entity and entity.deleted:
@@ -322,7 +323,7 @@ class BaseModel(ndb.Model):
             str. New unique id for this entity class.
 
         Raises:
-            Exception: An ID cannot be generated within a reasonable number
+            Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
         for _ in python_utils.RANGE(MAX_RETRIES):
@@ -463,7 +464,7 @@ class BaseCommitLogEntryModel(BaseModel):
             version: int. The version number of the model after the commit.
 
         Raises:
-            NotImplementedError: The method is not overwritten in derived
+            NotImplementedError. The method is not overwritten in derived
                 classes.
         """
         raise NotImplementedError(
@@ -651,9 +652,9 @@ class VersionedModel(BaseModel):
                  'version_number': 4}
 
         Raises:
-            Exception: No snapshot metadata class has been defined.
-            Exception: No snapshot content class has been defined.
-            Exception: The commit_cmds is not a list of dicts.
+            Exception. No snapshot metadata class has been defined.
+            Exception. No snapshot content class has been defined.
+            Exception. The commit_cmds is not a list of dicts.
         """
         if self.SNAPSHOT_METADATA_CLASS is None:
             raise Exception('No snapshot metadata class defined.')
@@ -689,7 +690,7 @@ class VersionedModel(BaseModel):
                 Default is False.
 
         Raises:
-            Exception: This model instance has been already deleted.
+            Exception. This model instance has been already deleted.
         """
         if force_deletion:
             current_version = self.version
@@ -739,7 +740,7 @@ class VersionedModel(BaseModel):
                 Default is False.
 
         Raises:
-            Exception: This model instance has been already deleted.
+            Exception. This model instance has been already deleted.
         """
         versioned_models = cls.get_multi(
             entity_ids, include_deleted=force_deletion)
@@ -814,8 +815,8 @@ class VersionedModel(BaseModel):
                  'version_number': 4}
 
         Raises:
-            Exception: This model instance has been already deleted.
-            Exception: The commit_cmd is in invalid format.
+            Exception. This model instance has been already deleted.
+            Exception. The commit_cmd is in invalid format.
         """
         self._require_not_marked_deleted()
 
@@ -852,8 +853,8 @@ class VersionedModel(BaseModel):
             version_number: int. Version to revert to.
 
         Raises:
-            Exception: This model instance has been deleted.
-            Exception: Reverting is not allowed on this model.
+            Exception. This model instance has been deleted.
+            Exception. Reverting is not allowed on this model.
         """
         model._require_not_marked_deleted()  # pylint: disable=protected-access
 
@@ -905,7 +906,7 @@ class VersionedModel(BaseModel):
             VersionedModel. Model instance representing given version.
 
         Raises:
-            Exception: This model instance has been deleted.
+            Exception. This model instance has been deleted.
         """
         current_version_model = cls.get(entity_id, strict=strict)
 
@@ -939,10 +940,10 @@ class VersionedModel(BaseModel):
             versions.
 
         Raises:
-            ValueError: The given entity_id is invalid.
-            ValueError: Requested version number cannot be higher than the
+            ValueError. The given entity_id is invalid.
+            ValueError. Requested version number cannot be higher than the
                 current version number.
-            ValueError: At least one version number is invalid.
+            ValueError. At least one version number is invalid.
         """
         instances = []
 
@@ -1031,7 +1032,7 @@ class VersionedModel(BaseModel):
                     since the Epoch.
 
         Raises:
-            Exception: There is no model instance corresponding to at least one
+            Exception. There is no model instance corresponding to at least one
                 of the given version numbers.
         """
         if not allow_deleted:

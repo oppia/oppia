@@ -232,9 +232,9 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
             accepting the suggestion.
 
     Raises:
-        Exception: The suggestion is already handled.
-        Exception: The suggestion is not valid.
-        Exception: The commit message is empty.
+        Exception. The suggestion is already handled.
+        Exception. The suggestion is not valid.
+        Exception. The commit message is empty.
     """
     if suggestion.is_handled:
         raise Exception('The suggestion has already been accepted/rejected.')
@@ -288,7 +288,7 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
             rejecting the suggestion.
 
     Raises:
-        Exception: The suggestion is already handled.
+        Exception. The suggestion is already handled.
     """
     if suggestion.is_handled:
         raise Exception('The suggestion has already been accepted/rejected.')
@@ -335,9 +335,9 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
         author_id: str. The ID of the author creating the suggestion.
 
     Raises:
-        Exception: The summary message is empty.
-        Exception: The suggestion has not been handled yet.
-        Exception: The suggestion has already been accepted.
+        Exception. The summary message is empty.
+        Exception. The suggestion has not been handled yet.
+        Exception. The suggestion has already been accepted.
     """
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
@@ -576,7 +576,7 @@ def _get_voiceover_application_class(target_type):
         class. The voiceover application class for the given target type.
 
     Raises:
-        Exception: The voiceover application target type is invalid.
+        Exception. The voiceover application target type is invalid.
     """
     target_type_to_classes = (
         suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)

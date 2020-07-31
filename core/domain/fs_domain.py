@@ -90,7 +90,7 @@ class GeneralFileSystem(python_utils.OBJECT):
             entity_id: str. The ID of the corresponding entity.
 
         Raises:
-            ValidationError: When parameters passed in are invalid.
+            ValidationError. When parameters passed in are invalid.
         """
         if entity_name not in ALLOWED_ENTITY_NAMES:
             raise utils.ValidationError(
@@ -261,7 +261,7 @@ class AbstractFileSystem(python_utils.OBJECT):
                 assets folder.
 
         Raises:
-            IOError: Invalid filepath.
+            IOError. Invalid filepath.
         """
         base_dir = utils.vfs_construct_path(
             '/', self.impl.assets_path, 'assets')
@@ -309,7 +309,7 @@ class AbstractFileSystem(python_utils.OBJECT):
             FileStream. The file stream domain object.
 
         Raises:
-            IOError: The given file stream does not exist.
+            IOError. The given file stream does not exist.
         """
         file_stream = self.open(filepath)
         if file_stream is None:

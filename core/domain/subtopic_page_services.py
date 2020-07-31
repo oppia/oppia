@@ -43,7 +43,7 @@ def _migrate_page_contents_to_latest_schema(versioned_page_contents):
           - page_contents: dict. The dict comprising the page contents.
 
     Raises:
-        Exception: The schema version of the page_contents is outside of what
+        Exception. The schema version of the page_contents is outside of what
             is supported at present.
     """
     page_contents_schema_version = versioned_page_contents['schema_version']
@@ -176,8 +176,8 @@ def save_subtopic_page(
             subtopic page.
 
     Raises:
-        Exception: Received invalid change list.
-        Exception: The subtopic page model and the incoming subtopic page domain
+        Exception. Received invalid change list.
+        Exception. The subtopic page model and the incoming subtopic page domain
             object have different version numbers.
     """
     if not change_list:

@@ -51,7 +51,7 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
         exp_issue_dict: dict. Dict representing the exploration issue.
 
     Raises:
-        Exception: The issue_schema_version is invalid.
+        Exception. The issue_schema_version is invalid.
     """
     issue_schema_version = exp_issue_dict['schema_version']
     if issue_schema_version is None or issue_schema_version < 1:
@@ -81,7 +81,7 @@ def _migrate_to_latest_action_schema(learner_action_dict):
         learner_action_dict: dict. Dict representing the learner action.
 
     Raises:
-        Exception: The action_schema_version is invalid.
+        Exception. The action_schema_version is invalid.
     """
     action_schema_version = learner_action_dict['schema_version']
     if action_schema_version is None or action_schema_version < 1:
@@ -508,7 +508,7 @@ def get_exploration_stats_by_id(exp_id, exp_version):
         ExplorationStats. The domain object for exploration statistics.
 
     Raises:
-        Exception: Entity for class ExplorationStatsModel with id not found.
+        Exception. Entity for class ExplorationStatsModel with id not found.
     """
     exploration_stats = None
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(

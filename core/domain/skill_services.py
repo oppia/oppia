@@ -670,9 +670,9 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         change_list: list(SkillChange). List of changes applied to a skill.
 
     Raises:
-        Exception: The skill model and the incoming skill domain object have
+        Exception. The skill model and the incoming skill domain object have
             different version numbers.
-        Exception: Received invalid change list.
+        Exception. Received invalid change list.
     """
     if not change_list:
         raise Exception(
@@ -735,7 +735,7 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
             unpublished skills, it may be equal to None.
 
     Raises:
-        ValueError: No commit message was provided.
+        ValueError. No commit message was provided.
     """
     if not commit_message:
         raise ValueError(
