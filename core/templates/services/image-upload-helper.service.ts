@@ -112,11 +112,21 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           if (node.tagName.toLowerCase() === 'svg') {
             node.removeAttribute('xmlns:xlink');
             node.removeAttribute('role');
+            // We are removing this attribute, because currently it is not in
+            // the white list of valid attributes.
+            node.removeAttribute('aria-hidden');
             node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            cleanedSvgString = node.outerHTML;
+          }
+          // Remove the custom data attributes added by MathJax.
+          // These custom attributes don't affect the rendering of the SVGs,
+          // and they are not present in the white list for allowed attributes.
+          for (var i = 0; i < node.attributes.length; i++) {
+            if (node.attributes[i].name.toLowerCase().startsWith('data-')) {
+              node.removeAttribute(node.attributes[i].name.toLowerCase());
+            }
           }
         });
-        return cleanedSvgString;
+        return doc.documentElement.outerHTML;
       },
 
       extractDimensionsFromMathExpressionSvgString: function(svgString) {
@@ -136,16 +146,21 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           // to process and validate the filnames.
           if (node.tagName.toLowerCase() === 'svg') {
             dimensions.height = (
-              (node.getAttribute('height').match(/\d+\.\d+/g)[0]).replace(
+              (node.getAttribute('height').match(/\d+\.*\d*/g)[0]).replace(
                 '.', 'd'));
             dimensions.width = (
-              (node.getAttribute('width').match(/\d+\.\d+/g)[0]).replace(
+              (node.getAttribute('width').match(/\d+\.*\d*/g)[0]).replace(
                 '.', 'd'));
             // This attribute is useful for the vertical allignment of the
             // Math SVG while displaying inline with other text.
-            dimensions.verticalPadding = (
-              (node.getAttribute('style').match(/\d+\.\d+/g)[0]).replace(
-                '.', 'd'));
+            // Math SVGs don't necessarily have a vertical allignment, in that
+            // case we assign it zero.
+            var styleValue = node.getAttribute('style').match(/\d+\.*\d*/g);
+            if (styleValue) {
+              dimensions.verticalPadding = styleValue[0].replace('.', 'd');
+            } else {
+              dimensions.verticalPadding = '0';
+            }
           }
         });
         return dimensions;

@@ -3,11 +3,11 @@
 
 namespace CodeMirror {
     export class MergeView {
-      edit?: {
+      edit: {
         setValue?: (code: string) => void;
       };
-      right?: {
-        orig?: {
+      right: {
+        orig: {
           setValue?: (code: string) => void;
         }
       };
@@ -17,10 +17,11 @@ namespace CodeMirror {
 }
 
 interface Window {
-    CodeMirror?: typeof CodeMirror;
-    HTMLElement?: HTMLElement;
-    __fixtures__?: KarmaFixtures;
-    decodeURIComponent?: (encodedURIComponent: string) => string;
-    encodeURIComponent?: (decodedURIComponent: string) => string;
-    ga?: Function;
+    CodeMirror: typeof CodeMirror;
+    HTMLElement: HTMLElement;
+    __fixtures__: KarmaFixtures;
+    decodeURIComponent: (encodedURIComponent: string) => string;
+    encodeURIComponent: (decodedURIComponent: string) => string;
+    ga: Function;
+    $: JQueryStatic;
 }
