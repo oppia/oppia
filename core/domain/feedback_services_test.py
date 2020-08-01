@@ -81,33 +81,11 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
 
     def test_create_message_fails_if_invalid_thread_id(self):
         with self.assertRaisesRegexp(
-            feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError,
-            'Entity for class GeneralFeedbackThreadModel with id '
-            'invalid_thread_id not found'):
+            Exception,
+            'Thread\(s\) belonging to the GeneralFeedbackThreadModel class '
+            'with id\(s\):\[invalid_thread_id\] were not found.'):
             feedback_services.create_message(
                 'invalid_thread_id', self.user_id, None, None, 'Hello')
-
-    def test_create_message_with_no_message_count(self):
-        exp_id = '0'
-        thread_id = feedback_services.create_thread(
-            'exploration', exp_id, None, 'a subject', 'some text')
-
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
-        thread.message_count = None
-        thread.put()
-
-        recent_message = (
-            feedback_models.GeneralFeedbackMessageModel
-            .get_most_recent_message(thread_id))
-        self.assertEqual(recent_message.text, 'some text')
-
-        feedback_services.create_message(
-            thread_id, self.user_id, None, None, 'Hello')
-        recent_message = (
-            feedback_models.GeneralFeedbackMessageModel
-            .get_most_recent_message(thread_id))
-
-        self.assertEqual(recent_message.text, 'Hello')
 
     def test_status_of_newly_created_thread_is_open(self):
         exp_id = '0'
@@ -385,14 +363,11 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id_1)
-        thread.message_count = 0
-        thread.put()
+
         thread_id_2 = feedback_services.create_thread(
             'exploration', self.EXP_ID_2, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id_2)
-        thread.message_count = 0
-        thread.put()
 
         thread_summaries, _ = feedback_services.get_exp_thread_summaries(
             self.owner_id, [thread_id_1, thread_id_2])
@@ -477,17 +452,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
         self.assertEqual(thread.message_count, 2)
-
-    def test_get_thread_returns_correct_message_count(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, self.user_id,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
-        thread.message_count = 0
-        thread.put()
-
-        thread = feedback_services.get_thread(thread_id)
-        self.assertEqual(thread.message_count, 1)
 
     def test_cache_update_after_create_thread_with_user_text(self):
         thread_id = feedback_services.create_thread(

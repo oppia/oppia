@@ -372,11 +372,11 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
 
     _update_suggestions(suggestions)
 
-    for suggestion in suggestions:
-        thread_id = suggestion.suggestion_id
-        feedback_services.create_message(
-            thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
-            None, review_message)
+    thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
+    feedback_services.create_messages(
+        thread_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
+        None, review_message
+    )
 
 
 def reject_question_suggestions_with_skill_target_id(skill_id):

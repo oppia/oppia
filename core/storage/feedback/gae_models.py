@@ -370,13 +370,12 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             instance_ids.append(instance_id)
 
         # Check if the new ids are valid.
-        current_instances = GeneralFeedbackMessageModel.get_multi(
+        current_instances = cls.get_multi(
             instance_ids)
         conflict_ids = []
-        if len(current_instances) > 0:
-            for current_instance in current_instances:
-                if current_instance is not None:
-                    conflict_ids.append(current_instance.id)
+        for current_instance in current_instances:
+            if current_instance is not None:
+                conflict_ids.append(current_instance.id)
         if len(conflict_ids) > 0:
             raise Exception(
                 'The following feedback message ID(s) conflicted on '
@@ -467,18 +466,21 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return thread.message_count
     
     @classmethod
-    def get_message_counts(cls, thread_id):
-        """Returns the number of messages in the threads. Includes the
-        deleted entries.
+    def get_message_counts(cls, thread_ids):
+        """Returns a list containing the number of messages in the threads.
+        Includes the deleted entries.
 
         Args:
-            thread_id: lits(str). ID of the threads.
+            thread_ids: lits(str). ID of the threads.
 
         Returns:
-            list(int). Number of messages in the threads.
+            list(int). List of the message counts for the threads.
         """
         threads = GeneralFeedbackThreadModel.get_multi(thread_ids)
-        return [thread.message_count for thread in threads]
+        message_counts = []
+        for thread in threads:
+            message_counts.append(thread.message_count)
+        return message_counts
 
 
     @classmethod
