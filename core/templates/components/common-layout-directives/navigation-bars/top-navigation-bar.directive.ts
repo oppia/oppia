@@ -33,7 +33,10 @@ angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        headerText: '=',
+        subheaderText: '='
+      },
       bindToController: {
         backButtonShown: '<'
       },
