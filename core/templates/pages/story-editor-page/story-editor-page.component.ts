@@ -39,18 +39,22 @@ require(
   'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('domain/bottom_navbar/bottom-navbar-status.service.ts');
+require('services/page-title.service.ts');
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
-    '$scope', '$uibModal', '$window', 'EditableStoryBackendApiService',
+    '$scope', '$uibModal', '$window', 'BottomNavbarStatusService',
+    'EditableStoryBackendApiService',
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
     'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
     function(
-        $scope, $uibModal, $window, EditableStoryBackendApiService,
+        $scope, $uibModal, $window, BottomNavbarStatusService,
+        EditableStoryBackendApiService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
         UrlInterpolationService, UrlService,
@@ -85,6 +89,8 @@ angular.module('oppia').component('storyEditorPage', {
       var setPageTitle = function() {
         PageTitleService.setPageTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
+        PageTitleService.setPageSubtitleForMobileView(
+          StoryEditorStateService.getStory().getTitle());
       };
 
       ctrl.getActiveTab = function() {
@@ -180,7 +186,13 @@ angular.module('oppia').component('storyEditorPage', {
         ctrl.prepublishValidationIssues = [];
         ctrl.explorationValidationIssues = [];
         ctrl.forceValidateExplorations = true;
+        ctrl.warningsAreShown = false;
+        BottomNavbarStatusService.markBottomNavbarStatus(true);
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
+        ctrl.story = StoryEditorStateService.getStory();
+
+        PageTitleService.setPageTitleForMobileView('Story Editor');
+
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
           StoryEditorNavigationService.navigateToChapterEditor();
         } else if (

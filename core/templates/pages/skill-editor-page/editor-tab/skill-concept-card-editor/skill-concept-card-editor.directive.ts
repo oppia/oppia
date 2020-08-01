@@ -51,13 +51,13 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('skillConceptCardEditor', [
-  'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
-  'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
+  'GenerateContentIdService', 'PageTitleService', 'SkillEditorStateService',
+  'SkillUpdateService', 'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
   'WindowDimensionsService', 'WorkedExampleObjectFactory',
   'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
-      GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
-      SubtitledHtmlObjectFactory, UrlInterpolationService,
+      GenerateContentIdService, PageTitleService, SkillEditorStateService,
+      SkillUpdateService, SubtitledHtmlObjectFactory, UrlInterpolationService,
       WindowDimensionsService, WorkedExampleObjectFactory,
       COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
@@ -77,6 +77,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
 
           ctrl.directiveSubscriptions = new Subscription();
           var initBindableFieldsDict = function() {
+            PageTitleService.setPageSubtitleForMobileView(
+              SkillEditorStateService.getSkill().getDescription());
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
                 $scope.skill.getConceptCard().getExplanation().getHtml(),

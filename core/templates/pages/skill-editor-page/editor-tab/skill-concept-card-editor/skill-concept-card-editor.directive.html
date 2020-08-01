@@ -14,23 +14,21 @@
   <button class="btn btn-default btn-show-preview" ng-click="showSkillPreview()">Preview Concept Card</button>
 </md-card>
 
-<md-card class="oppia-editor-card-with-avatar">
+<md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
   <div class="oppia-editor-card-body">
-    <div class="oppia-editor-card-section">
-      <div class="oppia-worked-examples-header">
+    <div class="oppia-editor-card-section worked-example-content">
+      <div class="oppia-worked-examples-header oppia-mobile-collapsible-card-header" ng-click="toggleWorkedExampleList()">
         <strong class="heading-text">Worked Examples</strong>
-        <i ng-click="toggleWorkedExampleList()"
-           class="fa fa-angle-down"
+        <i class="fa fa-caret-down"
            ng-if="!workedExamplesListIsShown"
            aria-hidden="true">
         </i>
-        <i ng-click="toggleWorkedExampleList()"
-           class="fa fa-angle-up"
+        <i class="fa fa-caret-up"
            ng-if="workedExamplesListIsShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="workedExamplesListIsShown">
+      <div ng-if="workedExamplesListIsShown" class="oppia-mobile-collapsible-card-content">
         <div class="concept-card-subtitle">
           These will be displayed one-by-one to the learner, in order, if they ask for them.
         </div>
@@ -131,6 +129,9 @@
   @media screen and (max-width: 710px) {
     skill-concept-card-editor .oppia-worked-examples-header i {
       display: block;
+    }
+    skill-concept-card-editor .worked-example-content {
+      padding: 0;
     }
   }
 </style>

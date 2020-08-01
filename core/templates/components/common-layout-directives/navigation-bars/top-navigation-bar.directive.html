@@ -17,7 +17,10 @@
     </picture>
   </a>
 </div>
-
+<div class="nav-mobile-header-text-container">
+  <span class="nav-mobile-header-editor"><[headerText()]></span>
+  <span class="nav-mobile-header-text"><[subheaderText()]></span>
+</div>
 <div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown">
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <li>
@@ -320,6 +323,9 @@
     position: absolute;
     right: 4px;
   }
+  top-navigation-bar .nav-mobile-header-text-container {
+    display: none;
+  }
   top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.uib-dropdown-menu {
     display: block;
   }
@@ -380,4 +386,30 @@
   .oppia-navbar-profile > li:hover {
     background-color: #fff;
    }
+  @media screen and (max-width: 768px) {
+    top-navigation-bar .nav-mobile-header-text-container {
+      display: inline-block;
+      font-size: 1px;
+      margin-top: 2px;
+      max-height: 56px;
+      text-overflow: ellipsis;
+      width: 57%;
+    }
+    top-navigation-bar .nav-mobile-header-editor {
+      color: #FFF;
+      display: inline-block;
+      font-family: Roboto, arial, sans-serif;
+      font-size: 19px;
+    }
+    top-navigation-bar .nav-mobile-header-text {
+      color: #FFF;
+      display: inline-block;
+      font-size: 15px;
+      max-width: 205px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+  }
 </style>

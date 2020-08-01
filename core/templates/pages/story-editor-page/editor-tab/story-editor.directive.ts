@@ -32,6 +32,7 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('pages/topic-editor-page/modal-templates/' +
@@ -51,12 +52,14 @@ angular.module('oppia').directive('storyEditor', [
       controller: [
         '$scope', '$window', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'StoryEditorNavigationService',
+        'WindowDimensionsService',
         'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
         'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, $window, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, StoryEditorNavigationService,
+            WindowDimensionsService,
             EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
             MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_CHAPTER_TITLE) {
@@ -265,8 +268,25 @@ angular.module('oppia').directive('storyEditor', [
               $scope.selectedChapterIndex === chapterIndex) ? -1 : chapterIndex;
           };
 
+          $scope.toggleChapterLists = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
+          };
+
+          $scope.toggleStoryEditorCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.storyPreviewCardIsShown = false;
+            $scope.mainStoryCardIsShown = true;
+            $scope.chaptersListIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.NOTES_SCHEMA = {
               type: 'html',
               ui_config: {

@@ -35,7 +35,7 @@
         </div>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectQuestionsTab()">
+      <li ng-if="$ctrl.isInTopicEditorTabs()" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectQuestionsTab()">
         <a class="nav-link  navbar-tab protractor-test-questions-tab-button" uib-tooltip="Questions Editor" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}">import_contacts</i>
         </a>
@@ -105,6 +105,7 @@
   }
   topic-editor-page .navbar-tab-active {
     background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
   }
   topic-editor-page .navbar-tab-active-icon {
     color: #00609C;

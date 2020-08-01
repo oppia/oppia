@@ -68,6 +68,10 @@ describe('Story editor navigation service', () => {
       location: mockLocation
     }));
     expect(sens.checkIfPresentInChapterEditor()).toEqual(true);
+
+    mockLocation.hash = 'story/';
+    expect(sens.checkIfPresentInChapterEditor()).toEqual(false);
+    mockLocation.hash = '/chapter_editor/node_1';
   });
 
   it('should return false if the active tab is not chapter editor tab',

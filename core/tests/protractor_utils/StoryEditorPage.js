@@ -346,6 +346,7 @@ var StoryEditorPage = function() {
       nodeOutlineEditor);
     await editor.clear();
     await richTextInstructions(editor);
+    await action.click('Chapter node editor', nodeOutlineEditor);
     await nodeOutlineSaveButton.click();
   };
 

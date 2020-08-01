@@ -1,22 +1,20 @@
-<md-card class="oppia-editor-card-with-avatar">
+<md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
   <div class="oppia-editor-card-body">
-    <div class="oppia-editor-card-section">
-      <div class="oppia-prerequisite-skills-header">
+    <div class="oppia-editor-card-section prerequisite-skill-content">
+      <div class="oppia-prerequisite-skills-header oppia-mobile-collapsible-card-header" ng-click="togglePrerequisiteSkills()">
         <strong class="heading-text">
           Prerequisite Skills
         </strong>
-        <i ng-click="togglePrerequisiteSkills()"
-           class="fa fa-angle-down"
+        <i class="fa fa-caret-down"
            ng-if="!prerequisiteSkillsAreShown"
            aria-hidden="true">
         </i>
-        <i ng-click="togglePrerequisiteSkills()"
-           class="fa fa-angle-up"
+        <i class="fa fa-caret-up"
            ng-if="prerequisiteSkillsAreShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="prerequisiteSkillsAreShown">
+      <div ng-if="prerequisiteSkillsAreShown" class="oppia-mobile-collapsible-card-content">
         <md-card class="skill-id" ng-repeat="skillId in skill.getPrerequisiteSkillIds()">
           <div class="skill-description-card">
             <span class="remove-skill-icon" ng-click="removeSkillId(skillId)" aria-hidden="true">
@@ -69,6 +67,9 @@
   @media screen and (max-width: 768px) {
     skill-prerequisite-skills-editor .oppia-prerequisite-skills-header i {
       display: block;
+    }
+    skill-prerequisite-skills-editor .prerequisite-skill-content {
+      padding: 0;
     }
   }
 </style>
