@@ -33,9 +33,7 @@ from scripts.release_scripts import deploy
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
 
-# pylint: disable=wrong-import-position
-import github  # isort:skip
-# pylint: enable=wrong-import-position
+import github  # isort:skip pylint: disable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
@@ -65,12 +63,10 @@ class DeployTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DeployTests, self).setUp()
-        # pylint: disable=unused-argument
         def mock_main():
             pass
-        def mock_copytree(unused_dir1, unused_dir2, ignore):
+        def mock_copytree(unused_dir1, unused_dir2, ignore):  # pylint: disable=unused-argument
             pass
-        # pylint: enable=unused-argument
         def mock_copyfile(unused_file1, unused_file2):
             pass
         def mock_get_branch():
@@ -510,7 +506,8 @@ class DeployTests(test_utils.GenericTestBase):
             'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_DEV_MODE)
         with self.exists_swap, self.copyfile_swap, constants_swap:
-            with self.listdir_swap, self.assertRaises(AssertionError):
+            with self.listdir_swap, self.assertRaisesRegexp(
+                AssertionError, 'Invalid DEV_MODE'):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_invalid_bucket_name(self):
@@ -519,7 +516,10 @@ class DeployTests(test_utils.GenericTestBase):
             'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
         with self.exists_swap, self.copyfile_swap, constants_swap:
-            with self.listdir_swap, self.assertRaises(AssertionError):
+            with self.listdir_swap, self.assertRaisesRegexp(
+                AssertionError,
+                'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+                    common.CONSTANTS_FILE_PATH)):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_constants_are_updated_correctly(self):
@@ -575,11 +575,9 @@ class DeployTests(test_utils.GenericTestBase):
     def test_build(self):
         process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
         cmd_tokens = []
-        # pylint: disable=unused-argument
-        def mock_popen(tokens, stdout):
+        def mock_popen(tokens, stdout):  # pylint: disable=unused-argument
             cmd_tokens.extend(tokens)
             return process
-        # pylint: enable=unused-argument
         with self.swap(subprocess, 'Popen', mock_popen):
             deploy.build_scripts(False)
         self.assertEqual(
@@ -589,11 +587,9 @@ class DeployTests(test_utils.GenericTestBase):
     def test_build_with_maintenance_mode(self):
         process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE)
         cmd_tokens = []
-        # pylint: disable=unused-argument
-        def mock_popen(tokens, stdout):
+        def mock_popen(tokens, stdout):  # pylint: disable=unused-argument
             cmd_tokens.extend(tokens)
             return process
-        # pylint: enable=unused-argument
         with self.swap(subprocess, 'Popen', mock_popen):
             deploy.build_scripts(True)
         self.assertEqual(
@@ -608,11 +604,9 @@ class DeployTests(test_utils.GenericTestBase):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         process.return_code = 1
         cmd_tokens = []
-        # pylint: disable=unused-argument
-        def mock_popen(tokens, stdout):
+        def mock_popen(tokens, stdout):  # pylint: disable=unused-argument
             cmd_tokens.extend(tokens)
             return process
-        # pylint: enable=unused-argument
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         with popen_swap, self.assertRaisesRegexp(Exception, 'Build failed.'):
             deploy.build_scripts(False)
@@ -627,10 +621,8 @@ class DeployTests(test_utils.GenericTestBase):
         expected_check_function_calls = {
             'deploy_application_gets_called': True
         }
-        # pylint: disable=unused-argument
-        def mock_deploy(unused_yaml_path, unused_app_name, version='version'):
+        def mock_deploy(unused_yaml_path, unused_app_name, version='version'):  # pylint: disable=unused-argument
             check_function_calls['deploy_application_gets_called'] = True
-        # pylint: enable=unused-argument
         deploy_swap = self.swap(
             gcloud_adapter, 'deploy_application', mock_deploy)
         temp_log_file = tempfile.NamedTemporaryFile().name

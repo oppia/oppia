@@ -52,8 +52,10 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
-    exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
+    exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
     exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
+    exp_jobs_one_off.ExplorationMathRichTextInfoModelGenerationOneOffJob,
+    exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
@@ -128,6 +130,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationMathRichTextInfoModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
@@ -160,6 +163,13 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.PlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.PseudonymizedUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
@@ -204,6 +214,7 @@ AUDIT_JOB_MANAGERS = [
         .TrainingJobExplorationMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserAuthModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,

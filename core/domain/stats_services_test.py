@@ -262,7 +262,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         # Revert to an older version, exploration issues model also changes.
         exp_services.revert_exploration(
-            'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
+            'committer_id_v4', exp_id, 3, 2)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
@@ -346,7 +346,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         # Revert to an older version.
         exp_services.revert_exploration(
-            'committer_id_v3', exp_id, current_version=2, revert_to_version=1)
+            'committer_id_v3', exp_id, 2, 1)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 3
         )
@@ -381,7 +381,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -411,7 +411,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -431,7 +431,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -460,7 +460,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -490,7 +490,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -535,7 +535,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -567,7 +567,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.version += 1
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=None, revert_to_version=5)
+            None, 5)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -2265,10 +2265,12 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.question_id = 'q_id_1'
         self.interaction_id = 'TextInput'
         self.state_reference_exploration = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_exploration(
                 self.exp_id, self.state_name))
         self.state_reference_question = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_question(
                 self.question_id))
         self.learner_answer_details_model_exploration = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(

@@ -16,27 +16,27 @@
  * @fileoverview Type definiitions for Customization Args.
  */
 
-import { IGraphAnswer } from 'interactions/answer-defs';
+import { GraphAnswer } from 'interactions/answer-defs';
 
-interface ILabeledRegion {
+interface LabeledRegion {
   region: {
     area: number[][];
   };
   label: string;
 }
 
-interface IImageWithRegions {
-  labeledRegions: ILabeledRegion[];
+interface ImageWithRegions {
+  labeledRegions: LabeledRegion[];
   imagePath: string;
 }
 
-interface IReadableMusicNote {
+interface ReadableMusicNote {
   readableNoteName: string;
 }
 
-export interface IAlgebraicExpressionInputCustomizationArgs { }
+export interface AlgebraicExpressionInputCustomizationArgs { }
 
-export interface ICodeReplCustomizationArgs {
+export interface CodeReplCustomizationArgs {
   language?: {
     value: string;
   };
@@ -51,13 +51,13 @@ export interface ICodeReplCustomizationArgs {
   };
 }
 
-export interface IContinueCustomizationArgs {
+export interface ContinueCustomizationArgs {
   buttonText?: {
     value: string;
   };
 }
 
-export interface IDragAndDropSortInputCustomizationArgs {
+export interface DragAndDropSortInputCustomizationArgs {
   choices?: {
     value: string[];
   };
@@ -66,13 +66,13 @@ export interface IDragAndDropSortInputCustomizationArgs {
   }
 }
 
-export interface IEndExplorationCustomizationArgs {
+export interface EndExplorationCustomizationArgs {
   recommendedExplorationIds?: {
     value: string[];
   };
 }
 
-export interface IFractionInputCustomizationArgs {
+export interface FractionInputCustomizationArgs {
   requireSimplestForm?: {
     value: string;
   };
@@ -87,9 +87,9 @@ export interface IFractionInputCustomizationArgs {
   };
 }
 
-export interface IGraphInputCustomizationArgs {
+export interface GraphInputCustomizationArgs {
   graph?: {
-    value: IGraphAnswer;
+    value: GraphAnswer;
   };
   canAddVertex: {
     value: boolean;
@@ -114,16 +114,16 @@ export interface IGraphInputCustomizationArgs {
   };
 }
 
-export interface IImageClickInputCustomizationArgs {
+export interface ImageClickInputCustomizationArgs {
   imageAndRegions?: {
-    value: IImageWithRegions;
+    value: ImageWithRegions;
   };
   highlightRegionsOnHover?: {
     value: string;
   };
 }
 
-export interface IInteractiveMapCustomizationArgs {
+export interface InteractiveMapCustomizationArgs {
   latitude?: {
     value: number;
   };
@@ -135,7 +135,7 @@ export interface IInteractiveMapCustomizationArgs {
   };
 }
 
-export interface IItemSelectionInputCustomizationArgs {
+export interface ItemSelectionInputCustomizationArgs {
   choices?: {
     value: string[];
   };
@@ -147,15 +147,15 @@ export interface IItemSelectionInputCustomizationArgs {
   };
 }
 
-export interface ILogicCustomizationArgs {
+export interface LogicCustomizationArgs {
   question?: {
     value: Object;
   };
 }
 
-export interface IMathEquationInputCustomizationArgs { }
+export interface MathEquationInputCustomizationArgs { }
 
-export interface IMultipleChoiceInputCustomizationArgs {
+export interface MultipleChoiceInputCustomizationArgs {
   showChoicesInShuffledOrder?: {
     value: string;
   };
@@ -164,28 +164,28 @@ export interface IMultipleChoiceInputCustomizationArgs {
   };
 }
 
-export interface IMusicNotesInputCustomizationArgs {
+export interface MusicNotesInputCustomizationArgs {
   sequenceToGuess?: {
-    value: IReadableMusicNote[];
+    value: ReadableMusicNote[];
   };
   initialSequence?: {
-    value: IReadableMusicNote[];
+    value: ReadableMusicNote[];
   };
 }
 
-export interface IPencilCodeCustomizationArgs {
+export interface PencilCodeCustomizationArgs {
   initialCode?: {
     value: string;
   };
 }
 
-export interface ISetInputCustomizationArgs {
+export interface SetInputCustomizationArgs {
   buttonText?: {
     value: string;
   };
 }
 
-export interface ITextInputCustomizationArgs {
+export interface TextInputCustomizationArgs {
   placeholder?: {
     value: string;
   };
@@ -194,37 +194,37 @@ export interface ITextInputCustomizationArgs {
   };
 }
 
-export interface IMathExpressionCustomizationArgs { }
+export interface MathExpressionCustomizationArgs { }
 
-export interface INumericExpressionInputCustomizationArgs { }
+export interface NumericExpressionInputCustomizationArgs { }
 
-export interface INumericInputCustomizationArgs { }
+export interface NumericInputCustomizationArgs { }
 
-export interface INumberWithUnitsCustomizationArgs { }
+export interface NumberWithUnitsCustomizationArgs { }
 
-export interface INumberWithUnitsCustomizationArgs {
+export interface NumberWithUnitsCustomizationArgs {
 
 }
 
-export type IInteractionCustomizationArgs = (
-  IAlgebraicExpressionInputCustomizationArgs |
-  ICodeReplCustomizationArgs |
-  IContinueCustomizationArgs |
-  IDragAndDropSortInputCustomizationArgs |
-  IEndExplorationCustomizationArgs |
-  IFractionInputCustomizationArgs |
-  IGraphInputCustomizationArgs |
-  IImageClickInputCustomizationArgs |
-  IInteractiveMapCustomizationArgs |
-  IItemSelectionInputCustomizationArgs |
-  ILogicCustomizationArgs |
-  IMathEquationInputCustomizationArgs |
-  IMathExpressionCustomizationArgs |
-  IMultipleChoiceInputCustomizationArgs |
-  IMusicNotesInputCustomizationArgs |
-  INumberWithUnitsCustomizationArgs |
-  INumericExpressionInputCustomizationArgs |
-  INumericInputCustomizationArgs |
-  IPencilCodeCustomizationArgs |
-  ISetInputCustomizationArgs |
-  ITextInputCustomizationArgs);
+export type InteractionCustomizationArgs = (
+  AlgebraicExpressionInputCustomizationArgs |
+  CodeReplCustomizationArgs |
+  ContinueCustomizationArgs |
+  DragAndDropSortInputCustomizationArgs |
+  EndExplorationCustomizationArgs |
+  FractionInputCustomizationArgs |
+  GraphInputCustomizationArgs |
+  ImageClickInputCustomizationArgs |
+  InteractiveMapCustomizationArgs |
+  ItemSelectionInputCustomizationArgs |
+  LogicCustomizationArgs |
+  MathEquationInputCustomizationArgs |
+  MathExpressionCustomizationArgs |
+  MultipleChoiceInputCustomizationArgs |
+  MusicNotesInputCustomizationArgs |
+  NumberWithUnitsCustomizationArgs |
+  NumericExpressionInputCustomizationArgs |
+  NumericInputCustomizationArgs |
+  PencilCodeCustomizationArgs |
+  SetInputCustomizationArgs |
+  TextInputCustomizationArgs);

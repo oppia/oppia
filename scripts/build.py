@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# pylint: disable=invalid-name
 import argparse
 import collections
 import fnmatch
@@ -133,7 +132,8 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Creates a third-party directory where all the JS and CSS dependencies are
 built and stored. Depending on the options passed to the script, might also
 minify third-party libraries and/or generate a build directory.
@@ -571,22 +571,22 @@ def minify_third_party_libs(third_party_directory_path):
     """Minify third_party.js and third_party.css and remove un-minified
     files.
     """
-    THIRD_PARTY_JS_FILEPATH = os.path.join(
+    third_party_js_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
-    THIRD_PARTY_CSS_FILEPATH = os.path.join(
+    third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
 
-    MINIFIED_THIRD_PARTY_JS_FILEPATH = os.path.join(
+    minified_third_party_js_filepath = os.path.join(
         third_party_directory_path, MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)
-    MINIFIED_THIRD_PARTY_CSS_FILEPATH = os.path.join(
+    minified_third_party_css_filepath = os.path.join(
         third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)
 
     _minify_and_create_sourcemap(
-        THIRD_PARTY_JS_FILEPATH, MINIFIED_THIRD_PARTY_JS_FILEPATH)
-    _minify(THIRD_PARTY_CSS_FILEPATH, MINIFIED_THIRD_PARTY_CSS_FILEPATH)
+        third_party_js_filepath, minified_third_party_js_filepath)
+    _minify(third_party_css_filepath, minified_third_party_css_filepath)
     # Clean up un-minified third_party.js and third_party.css.
-    safe_delete_file(THIRD_PARTY_JS_FILEPATH)
-    safe_delete_file(THIRD_PARTY_CSS_FILEPATH)
+    safe_delete_file(third_party_js_filepath)
+    safe_delete_file(third_party_css_filepath)
 
 
 def build_third_party_libs(third_party_directory_path):
@@ -597,28 +597,28 @@ def build_third_party_libs(third_party_directory_path):
     python_utils.PRINT(
         'Building third party libs at %s' % third_party_directory_path)
 
-    THIRD_PARTY_JS_FILEPATH = os.path.join(
+    third_party_js_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
-    THIRD_PARTY_CSS_FILEPATH = os.path.join(
+    third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
-    WEBFONTS_DIR = os.path.join(
+    webfonts_dir = os.path.join(
         third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
 
     dependency_filepaths = get_dependencies_filepaths()
-    ensure_directory_exists(THIRD_PARTY_JS_FILEPATH)
+    ensure_directory_exists(third_party_js_filepath)
     with python_utils.open_file(
-        THIRD_PARTY_JS_FILEPATH, 'w+') as third_party_js_file:
+        third_party_js_filepath, 'w+') as third_party_js_file:
         _join_files(dependency_filepaths['js'], third_party_js_file)
 
-    ensure_directory_exists(THIRD_PARTY_CSS_FILEPATH)
+    ensure_directory_exists(third_party_css_filepath)
     with python_utils.open_file(
-        THIRD_PARTY_CSS_FILEPATH, 'w+') as third_party_css_file:
+        third_party_css_filepath, 'w+') as third_party_css_file:
         _join_files(dependency_filepaths['css'], third_party_css_file)
 
-    ensure_directory_exists(WEBFONTS_DIR)
+    ensure_directory_exists(webfonts_dir)
     _execute_tasks(
         _generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], WEBFONTS_DIR))
+            dependency_filepaths['fonts'], webfonts_dir))
 
 
 def build_using_webpack(config_path):
@@ -648,8 +648,9 @@ def hash_should_be_inserted(filepath):
     Returns:
         bool. True if filepath should contain hash else False.
     """
-    return not any(fnmatch.fnmatch(filepath, pattern) for pattern
-                   in FILEPATHS_NOT_TO_RENAME)
+    return not any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_NOT_TO_RENAME)
 
 
 def should_file_be_built(filepath):
@@ -738,8 +739,9 @@ def is_file_hash_provided_to_frontend(filepath):
     Returns:
         bool. True if file hash should be provided to the frontend else False.
     """
-    return any(fnmatch.fnmatch(filepath, pattern) for pattern
-               in FILEPATHS_PROVIDED_TO_FRONTEND)
+    return any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_PROVIDED_TO_FRONTEND)
 
 
 def generate_md5_hash(filepath):
@@ -1032,11 +1034,11 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     # If a file gets edited, a different MD5 hash is generated.
     recently_changed_filenames = []
     # Currently, Python files and HTML files are always re-built.
-    FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
+    file_extensions_not_to_track = ('.html', '.py',)
     for filename, md5_hash in source_dir_hashes.items():
         # Skip files that are already built or should not be built.
         if should_file_be_built(filename) and not any(
-                filename.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
+                filename.endswith(p) for p in file_extensions_not_to_track):
             final_filepath = _insert_hash(
                 os.path.join(out_dir, filename), md5_hash)
             if not os.path.isfile(final_filepath):
@@ -1216,12 +1218,12 @@ def generate_hashes():
     hashes = dict()
 
     # Create hashes for all directories and files.
-    HASH_DIRS = [
+    hash_dirs = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
         THIRD_PARTY_GENERATED_DEV_DIR]
-    for HASH_DIR in HASH_DIRS:
-        hashes.update(get_file_hashes(HASH_DIR))
+    for hash_dir in hash_dirs:
+        hashes.update(get_file_hashes(hash_dir))
 
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
@@ -1254,48 +1256,48 @@ def generate_build_directory(hashes):
     _execute_tasks(build_tasks)
 
     # Copy all files from staging directory to production directory.
-    COPY_INPUT_DIRS = [
+    copy_input_dirs = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['staging_dir'],
         THIRD_PARTY_GENERATED_DEV_DIR,
         WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
-    COPY_OUTPUT_DIRS = [
+    copy_output_dirs = [
         ASSETS_OUT_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
         THIRD_PARTY_GENERATED_OUT_DIR, WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
-    assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
-    for i in python_utils.RANGE(len(COPY_INPUT_DIRS)):
-        safe_delete_directory_tree(COPY_OUTPUT_DIRS[i])
+    assert len(copy_input_dirs) == len(copy_output_dirs)
+    for i in python_utils.RANGE(len(copy_input_dirs)):
+        safe_delete_directory_tree(copy_output_dirs[i])
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
-            COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)
+            copy_input_dirs[i], copy_output_dirs[i], hashes)
     _execute_tasks(copy_tasks)
 
-    _verify_hashes(COPY_OUTPUT_DIRS, hashes)
+    _verify_hashes(copy_output_dirs, hashes)
 
-    SOURCE_DIRS_FOR_ASSETS = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
-    OUTPUT_DIRS_FOR_ASSETS = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
-    _compare_file_count(SOURCE_DIRS_FOR_ASSETS, OUTPUT_DIRS_FOR_ASSETS)
+    source_dirs_for_assets = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
+    output_dirs_for_assets = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
+    _compare_file_count(source_dirs_for_assets, output_dirs_for_assets)
 
-    SOURCE_DIRS_FOR_THIRD_PARTY = [THIRD_PARTY_GENERATED_DEV_DIR]
-    OUTPUT_DIRS_FOR_THIRD_PARTY = [THIRD_PARTY_GENERATED_OUT_DIR]
+    source_dirs_for_third_party = [THIRD_PARTY_GENERATED_DEV_DIR]
+    output_dirs_for_third_party = [THIRD_PARTY_GENERATED_OUT_DIR]
     _compare_file_count(
-        SOURCE_DIRS_FOR_THIRD_PARTY, OUTPUT_DIRS_FOR_THIRD_PARTY)
+        source_dirs_for_third_party, output_dirs_for_third_party)
 
-    SOURCE_DIRS_FOR_WEBPACK = [WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
-    OUTPUT_DIRS_FOR_WEBPACK = [WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
+    source_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
+    output_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(
-        SOURCE_DIRS_FOR_WEBPACK, OUTPUT_DIRS_FOR_WEBPACK)
+        source_dirs_for_webpack, output_dirs_for_webpack)
 
-    SOURCE_DIRS_FOR_EXTENSIONS = [
+    source_dirs_for_extensions = [
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']]
-    OUTPUT_DIRS_FOR_EXTENSIONS = [EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']]
-    _compare_file_count(SOURCE_DIRS_FOR_EXTENSIONS, OUTPUT_DIRS_FOR_EXTENSIONS)
+    output_dirs_for_extensions = [EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']]
+    _compare_file_count(source_dirs_for_extensions, output_dirs_for_extensions)
 
-    SOURCE_DIRS_FOR_TEMPLATES = [
+    source_dirs_for_templates = [
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir']]
-    OUTPUT_DIRS_FOR_TEMPLATES = [
+    output_dirs_for_templates = [
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
-    _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
+    _compare_file_count(source_dirs_for_templates, output_dirs_for_templates)
 
     python_utils.PRINT('Build completed.')
 

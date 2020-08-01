@@ -185,6 +185,8 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
+import { ExplorationImprovementsConfigObjectFactory } from
+  'domain/improvements/exploration-improvements-config-object.factory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationMetadataObjectFactory } from
@@ -283,6 +285,7 @@ import { ItemSelectionInputRulesService } from
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -533,6 +536,8 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from
   'domain/statistics/state-top-answers-stats-object.factory';
+import { StateTopAnswersStatsService } from
+  'services/state-top-answers-stats.service';
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
@@ -545,6 +550,8 @@ import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
+import { StoryEditorNavigationService } from
+  'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -720,6 +727,8 @@ export class UpgradedServices {
       new ExplorationDraftObjectFactory();
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
+    upgradedServices['ExplorationImprovementsConfigObjectFactory'] =
+      new ExplorationImprovementsConfigObjectFactory();
     upgradedServices['ExplorationPermissionsObjectFactory'] =
       new ExplorationPermissionsObjectFactory();
     upgradedServices['ExplorationMetadataObjectFactory'] =
@@ -762,6 +771,7 @@ export class UpgradedServices {
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['JobStatusSummaryObjectFactory'] =
       new JobStatusSummaryObjectFactory();
+    upgradedServices['KeyboardShortcutService'] = new KeyboardShortcutService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -1180,6 +1190,8 @@ export class UpgradedServices {
     upgradedServices['StateWrittenTranslationsService'] =
       new StateWrittenTranslationsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StoryEditorNavigationService'] =
+        new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
       new SubtopicPageContentsObjectFactory(
         upgradedServices['RecordedVoiceoversObjectFactory'],
@@ -1301,8 +1313,8 @@ export class UpgradedServices {
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationFeaturesBackendApiService'] =
       new ExplorationFeaturesBackendApiService(
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
@@ -1311,6 +1323,7 @@ export class UpgradedServices {
     upgradedServices['ExplorationImprovementsBackendApiService'] =
       new ExplorationImprovementsBackendApiService(
         upgradedServices['ExplorationTaskObjectFactory'],
+        upgradedServices['ExplorationImprovementsConfigObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =
@@ -1414,9 +1427,9 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StateTopAnswersStatsBackendApiService'] =
       new StateTopAnswersStatsBackendApiService(
-        upgradedServices['UrlInterpolationService'],
         upgradedServices['HttpClient'],
-        upgradedServices['StateTopAnswersStatsObjectFactory']);
+        upgradedServices['StateTopAnswersStatsObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StatsReportingBackendApiService'] =
       new StatsReportingBackendApiService(
         upgradedServices['ContextService'],
@@ -1554,6 +1567,11 @@ export class UpgradedServices {
         upgradedServices['FractionObjectFactory'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateInteractionStatsBackendApiService']);
+    upgradedServices['StateTopAnswersStatsService'] =
+      new StateTopAnswersStatsService(
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['StateTopAnswersStatsBackendApiService']);
     upgradedServices['StatsReportingService'] = new StatsReportingService(
       upgradedServices['ContextService'],
       upgradedServices['MessengerService'],

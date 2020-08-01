@@ -23,16 +23,16 @@ import { Injectable } from '@angular/core';
 import { ExplorationFeatures } from
   'services/exploration-features-backend-api.service';
 
-export interface IExplorationDataDict {
-  'param_changes': IParamChanges[] | [];
+export interface ExplorationDataDict {
+  'param_changes': ParamChanges[] | [];
   states: {
     [propsName : string]: {
-      'param_changes': IParamChanges[] | []
+      'param_changes': ParamChanges[] | []
     }
   };
 }
 
-export interface IParamChanges {
+export interface ParamChanges {
   name: string;
   'generator_id': string;
   'customization_args': {
@@ -48,18 +48,15 @@ export class ExplorationFeaturesService {
   static serviceIsInitialized = false;
   static settings = {
     areParametersEnabled: false,
-    isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false
   };
 
   init(
-      explorationData: IExplorationDataDict,
+      explorationData: ExplorationDataDict,
       featuresData: ExplorationFeatures): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }
-    ExplorationFeaturesService.settings.isImprovementsTabEnabled =
-      featuresData.isImprovementsTabEnabled;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
       featuresData.isExplorationWhitelisted;
     if (explorationData.param_changes &&
@@ -82,10 +79,6 @@ export class ExplorationFeaturesService {
 
   areParametersEnabled(): boolean {
     return ExplorationFeaturesService.settings.areParametersEnabled;
-  }
-
-  isImprovementsTabEnabled(): boolean {
-    return ExplorationFeaturesService.settings.isImprovementsTabEnabled;
   }
 
   isPlaythroughRecordingEnabled(): boolean {

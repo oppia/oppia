@@ -158,6 +158,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
               .createFromBackendDict(backendDict))),
         categorizedSkillsDict: categorizedSkills
       };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
@@ -171,6 +173,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
       return dict.topic_assignment_dicts.map(
         backendDict => this.assignedSkillObjectFactory
           .createFromBackendDict(backendDict));
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
@@ -193,6 +197,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
         nextCursor: response.next_cursor,
         more: response.more
       };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
@@ -203,7 +209,9 @@ export class TopicsAndSkillsDashboardBackendApiService {
     };
     return this.http.post<void>(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
-      mergeSkillsData).toPromise();
+      mergeSkillsData).toPromise().then(() => {}, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
   }
 }
 angular.module('oppia').factory(

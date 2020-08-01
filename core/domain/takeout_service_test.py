@@ -462,6 +462,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             resolver_id=self.USER_ID_1
         ).put()
 
+        config_models.PlatformParameterSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -475,8 +481,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_user(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaises(
-            user_models.UserSettingsModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            user_models.UserSettingsModel.EntityNotFoundError,
+            'Entity for class UserSettingsModel with id fake_user_id '
+            'not found'):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_trivial(self):
@@ -559,6 +567,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_config_property_sm = {}
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
+        expected_platform_parameter_sm = {}
 
         expected_data = {
             'user_stats': stats_data,
@@ -605,6 +614,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
         }
 
         # Perform export and compare.
@@ -761,8 +772,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
-                'suggestion_type': (suggestion_models.
-                                    SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                 'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
@@ -955,6 +966,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_platform_parameter_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
         expected_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_settings_data,
@@ -1003,6 +1022,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
         }
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)

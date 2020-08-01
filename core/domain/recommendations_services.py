@@ -31,8 +31,9 @@ import python_utils
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
 
-# pylint: disable=line-too-long
-DEFAULT_TOPIC_SIMILARITIES_STRING = ("""Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
+# pylint: disable=line-too-long, single-line-pragma
+DEFAULT_TOPIC_SIMILARITIES_STRING = (
+    """Architecture,Art,Biology,Business,Chemistry,Computing,Economics,Education,Engineering,Environment,Geography,Government,Hobbies,Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,Statistics,Welcome
 1.0,0.9,0.2,0.4,0.1,0.2,0.3,0.3,0.6,0.6,0.4,0.2,0.5,0.5,0.5,0.3,0.5,0.3,0.3,0.5,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.9,1.0,0.1,0.6,0.1,0.1,0.6,0.6,0.2,0.3,0.3,0.2,0.5,0.7,0.6,0.2,0.3,0.2,0.9,0.7,0.3,0.1,0.6,0.1,0.1,0.1,0.1,0.1,0.3
 0.2,0.1,1.0,0.2,0.8,0.3,0.2,0.3,0.3,0.7,0.4,0.2,0.2,0.1,0.1,0.9,0.4,0.8,0.1,0.1,0.4,0.1,0.6,0.1,0.1,0.1,0.1,0.6,0.3
@@ -62,7 +63,7 @@ DEFAULT_TOPIC_SIMILARITIES_STRING = ("""Architecture,Art,Biology,Business,Chemis
 0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.2,0.1,0.1,0.1,0.2,0.6,0.1,0.1,0.3,0.1,0.1,0.1,0.1,0.3,0.1,0.2,0.1,0.1,0.2,1.0,0.3,0.3
 0.1,0.1,0.6,0.5,0.3,0.6,0.7,0.2,0.5,0.3,0.2,0.4,0.2,0.1,0.2,0.4,0.8,0.1,0.1,0.3,0.4,0.6,0.4,0.5,0.1,0.1,0.3,1.0,0.3
 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,1.0""")
-# pylint: enable=line-too-long
+# pylint: enable=line-too-long, single-line-pragma
 
 RECOMMENDATION_CATEGORIES = [
     'Architecture',
@@ -234,12 +235,14 @@ def validate_topic_similarities(data):
             try:
                 similarity = float(similarity)
             except:
-                raise ValueError('Expected similarity to be a float, received '
-                                 '%s' % similarity)
+                raise ValueError(
+                    'Expected similarity to be a float, received %s' % (
+                        similarity))
 
             if similarity < 0.0 or similarity > 1.0:
-                raise ValueError('Expected similarity to be between 0.0 and '
-                                 '1.0, received %s' % similarity)
+                raise ValueError(
+                    'Expected similarity to be between 0.0 and '
+                    '1.0, received %s' % similarity)
 
     for row_ind in python_utils.RANGE(topics_length):
         for col_ind in python_utils.RANGE(topics_length):
