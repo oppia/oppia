@@ -67,6 +67,9 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'STORY_PROPERTY_LANGUAGE_CODE',
   StoryDomainConstants.STORY_PROPERTY_LANGUAGE_CODE);
+angular.module('oppia').constant(
+  'STORY_PROPERTY_URL_FRAGMENT',
+  StoryDomainConstants.STORY_PROPERTY_URL_FRAGMENT);
 
 angular.module('oppia').constant(
   'INITIAL_NODE_ID', StoryDomainConstants.INITIAL_NODE_ID);

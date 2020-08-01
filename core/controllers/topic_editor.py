@@ -97,12 +97,16 @@ class TopicEditorStoryHandler(base.BaseHandler):
         thumbnail_filename = self.payload.get('filename')
         thumbnail_bg_color = self.payload.get('thumbnailBgColor')
         raw_image = self.request.get('image')
+        url_fragment = self.payload.get('url_fragment')
 
         story_domain.Story.require_valid_title(title)
+        if not story_services.check_url_fragment_uniqueness(url_fragment):
+            raise self.InvalidInputException(
+                'Story url fragment is not unique across the topic.')
 
         new_story_id = story_services.get_new_story_id()
         story = story_domain.Story.create_default_story(
-            new_story_id, title, description, topic_id)
+            new_story_id, title, description, topic_id, url_fragment)
         story_services.save_new_story(self.user_id, story)
         topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
 

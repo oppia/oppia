@@ -44,6 +44,7 @@ export class StoryDomainConstants {
   public static STORY_PROPERTY_DESCRIPTION = 'description';
   public static STORY_PROPERTY_NOTES = 'notes';
   public static STORY_PROPERTY_LANGUAGE_CODE = 'language_code';
+  public static STORY_PROPERTY_URL_FRAGMENT = 'url_fragment';
 
   public static INITIAL_NODE_ID = 'initial_node_id';
   public static NODE = 'node';

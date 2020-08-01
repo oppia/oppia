@@ -40,12 +40,21 @@ describe('Newly Created Story Object Factory', () => {
     expect(story.isValid()).toBe(false);
 
     story.title = 'storyName1';
-    expect(story.isValid()).toBe(true);
+    expect(story.isValid()).toBe(false);
 
     story.description = '';
     expect(story.isValid()).toBe(false);
 
     story.description = 'story description';
+    expect(story.isValid()).toBe(false);
+
+    story.urlFragment = '';
+    expect(story.isValid()).toBe(false);
+
+    story.urlFragment = 'story Fragment';
+    expect(story.isValid()).toBe(false);
+
+    story.urlFragment = 'story-fragment';
     expect(story.isValid()).toBe(true);
   });
 });

@@ -29,16 +29,17 @@ const newStoryConstants = require('constants.ts');
 angular.module('oppia').controller('CreateNewStoryModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
-  'MAX_CHARS_IN_STORY_TITLE',
+  'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
   function($controller, $scope, $uibModalInstance,
       ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
-      MAX_CHARS_IN_STORY_TITLE) {
+      MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
     $scope.story = NewlyCreatedStoryObjectFactory.createDefault();
     $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
+    $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = MAX_CHARS_IN_STORY_URL_FRAGMENT;
     $scope.allowedBgColors = (
       newStoryConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
 

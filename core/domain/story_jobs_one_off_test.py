@@ -91,7 +91,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new story that should not be affected by the
         # job.
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-one')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
@@ -122,7 +123,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-two')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
@@ -225,7 +227,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             return 'invalid_story'
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-three')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
@@ -279,7 +282,8 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
     def test_job_skips_deleted_story(self):
         """Tests that the regenerate summary job skips deleted story."""
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-four')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
@@ -386,7 +390,8 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
             return 'invalid_story'
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-five')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)

@@ -32,6 +32,27 @@
               <em>The maximum length of subtopic title is 80 characters.</em>
             </span>
           </div>
+          <div class="subtopic-url-fragment">
+            <p>
+              <strong>Url Fragment*</strong>
+            </p>
+            <form class="form-horizontal" role="form">
+              <input class="form-control protractor-test-subtopic-url-fragment-field"
+                     ng-class="{'is-invalid': !$ctrl.subtopicUrlFragmentIsUnique || !$ctrl.subtopicUrlFragmentIsValid}"
+                     type="text"
+                     ng-blur="$ctrl.updateSubtopicUrlFragment($ctrl.editableUrlFragment)"
+                     ng-model="$ctrl.editableUrlFragment"
+                     maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                </i>
+              </span>
+            </form>
+            <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && !$ctrl.subtopicUrlFragmentIsUnique">
+              <em>The subtopic url fragment is not unique.</em>
+            </span>
+          </div>
           <div class="subtopic-html">
             <div  ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
               <p>
@@ -246,7 +267,8 @@
   .subtopic-content .subtopic-left-box {
     width: 45%;
   }
-  .subtopic-content .subtopic-thumbnail {
+  .subtopic-content .subtopic-thumbnail,
+  .subtopic-content, .subtopic-url-fragment {
     margin: 20px 0;
   }
   .subtopic-content .subtopic-html {

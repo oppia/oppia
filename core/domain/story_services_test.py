@@ -285,6 +285,24 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
 
+    def test_check_url_fragment_uniqueness(self):
+        story_id_1 = story_services.get_new_story_id()
+        story_id_2 = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id_1, self.USER_ID, self.TOPIC_ID, url_fragment='story-one')
+        self.save_new_story(
+            story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two')
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_1)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_2)
+        self.assertFalse(
+            story_services.check_url_fragment_uniqueness('story-one'))
+        self.assertFalse(
+            story_services.check_url_fragment_uniqueness('story-two'))
+        self.assertTrue(
+            story_services.check_url_fragment_uniqueness('story-three'))
+
     def test_update_story_with_invalid_corresponding_topic_id_value(self):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
@@ -1568,7 +1586,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID)
+            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID, 'title')
 
         self.node_1 = {
             'id': self.NODE_ID_1,

@@ -47,8 +47,11 @@ describe('Subtopic validation service', function() {
 
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic1 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
+    subtopic1.setUrlFragment('subtopic-one');
     var subtopic2 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic2');
+    subtopic2.setUrlFragment('subtopic-two');
     var subtopic3 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic3');
+    subtopic3.setUrlFragment('subtopic-three');
     topic.getSubtopics = function() {
       return [subtopic1, subtopic2, subtopic3];
     };
@@ -66,5 +69,18 @@ describe('Subtopic validation service', function() {
       'Subtopic3')).toEqual(false);
     expect(SubtopicValidationService.checkValidSubtopicName(
       'Subtopic4')).toEqual(true);
+  });
+
+  it('should validate subtopic url fragment uniqueness', function() {
+    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
+      'random-name')).toEqual(true);
+    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
+      'subtopic-one')).toEqual(false);
+    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
+      'subtopic-two')).toEqual(false);
+    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
+      'subtopic-three')).toEqual(false);
+    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
+      'subtopic-four')).toEqual(true);
   });
 });

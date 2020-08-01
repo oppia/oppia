@@ -418,7 +418,7 @@ class AdminHandler(base.BaseHandler):
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1)
+                topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
                 'exp_id': '15',

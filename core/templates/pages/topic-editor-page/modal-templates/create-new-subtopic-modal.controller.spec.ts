@@ -107,6 +107,15 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.errorMsg).toEqual(null);
   });
 
+  it('should check url fragment uniqueness correctly', function() {
+    expect(ctrl.subtopicUrlFragmentIsUnique).toEqual(false);
+    spyOn(
+      SubtopicValidationService,
+      'checkUrlFragmentUniqueness').and.returnValue(true);
+    ctrl.checkUrlFragmentUniqueness();
+    expect(ctrl.subtopicUrlFragmentIsUnique).toEqual(true);
+  });
+
   it('should return the validity of the subtopic', function() {
     expect(ctrl.isSubtopicValid()).toEqual(false);
     ctrl.subtopicTitle = 'Subtopic1';
@@ -114,6 +123,12 @@ describe('Create new subtopic modal', function() {
     ctrl.htmlData = 'Subtopic description';
     expect(ctrl.isSubtopicValid()).toEqual(false);
     ctrl.editableThumbnailFilename = 'img_316_512.svg';
+    expect(ctrl.isSubtopicValid()).toEqual(false);
+    ctrl.editableUrlFragment = '';
+    expect(ctrl.isSubtopicValid()).toEqual(false);
+    ctrl.editableUrlFragment = 'ABC 123';
+    expect(ctrl.isSubtopicValid()).toEqual(false);
+    ctrl.editableUrlFragment = 'subtopic-url';
     expect(ctrl.isSubtopicValid()).toEqual(true);
   });
 

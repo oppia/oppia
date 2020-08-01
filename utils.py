@@ -552,6 +552,41 @@ def require_valid_name(name, name_type, allow_empty=False):
                 (character, name_type, name))
 
 
+def require_valid_url_fragment(name, name_type, allowed_length):
+    """Generic URL fragment validation.
+
+    Args:
+        name: str. The name to validate.
+        name_type: str. A human-readable string, like 'topic url fragment'.
+            This will be shown in error messages.
+        allowed_length: int. Allowed length for the name.
+
+    Raises:
+        Exception: Name is not a string.
+        Exception: Name is empty.
+        Exception: The length of the name_type is not correct.
+        Exception: Invalid character is present in the name.
+    """
+    if not isinstance(name, python_utils.BASESTRING):
+        raise ValidationError(
+            '%s field must be a string. Received %s.' % (name_type, name))
+
+    if name == '':
+        raise ValidationError(
+            '%s field should not be empty.' % name_type)
+
+    if len(name) > allowed_length:
+        raise ValidationError(
+            '%s field should not exceed %d characters, '
+            'received %s.' % (name_type, allowed_length, name))
+
+    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
+        raise ValidationError(
+            '%s field contains invalid characters. Only lowercase words'
+            ' separated by hyphens are allowed. Received %s.' % (
+                name_type, name))
+
+
 def require_valid_thumbnail_filename(thumbnail_filename):
     """Generic thumbnail filename validation.
 

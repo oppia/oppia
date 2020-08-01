@@ -64,6 +64,15 @@ describe('Create New Story Modal Controller', function() {
     expect($scope.isValid()).toBe(false);
 
     $scope.story.description = 'description';
+    expect($scope.isValid()).toBe(false);
+
+    $scope.story.urlFragment = '';
+    expect($scope.isValid()).toBe(false);
+
+    $scope.story.urlFragment = 'ABC 123';
+    expect($scope.isValid()).toBe(false);
+
+    $scope.story.urlFragment = 'valid-url';
     expect($scope.isValid()).toBe(true);
 
     $scope.story.title = '';
