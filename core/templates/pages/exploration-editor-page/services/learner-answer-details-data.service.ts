@@ -38,7 +38,7 @@ export class LearnerAnswerDetailsDataService {
     private urlInterpolationService: UrlInterpolationService,
   ) {}
   _expId: string;
-  _data: any;
+  _data;
   learnerAnswerInfoData=null;
   LEARNER_ANSWER_INFO_DATA_URL = (
     '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
