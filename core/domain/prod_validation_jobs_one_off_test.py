@@ -13064,13 +13064,19 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
 
 class UserAuthModelValidatorTests(test_utils.GenericTestBase):
 
+    USER_PIN = '123'
+
     def setUp(self):
         super(UserAuthModelValidatorTests, self).setUp()
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
-        user_models.UserAuthModel(id=self.user_id, gae_id=self.gae_id).put()
+        user_models.UserAuthModel(
+            id=self.user_id,
+            gae_id=self.gae_id,
+            pin=self.USER_PIN
+        ).put()
         self.model_instance = user_models.UserAuthModel.get_by_id(
             self.user_id)
         self.job_class = (

@@ -2231,16 +2231,18 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     NONEXISTENT_AUTH_TYPE_NAME = 'id_x'
     NONEXISTENT_USER_ID = 'id_x'
     NONREGISTERED_GAE_ID = 'gae_id_x'
-    USER_1_ID = 'user_1_id'
-    USER_1_GAE_ID = 'gae_1_id'
+    USER_ID = 'user_id'
+    USER_GAE_ID = 'gae_id'
+    USER_PIN = '123'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserAuthModelTests, self).setUp()
 
         user_models.UserAuthModel(
-            id=self.USER_1_ID,
-            gae_id=self.USER_1_GAE_ID,
+            id=self.USER_ID,
+            gae_id=self.USER_GAE_ID,
+            pin=self.USER_PIN
         ).put()
 
     def test_get_export_policy_is_not_applicable(self):
@@ -2253,12 +2255,12 @@ class UserAuthModelTests(test_utils.GenericTestBase):
             user_models.UserAuthModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy_user1_is_deleted(self):
+    def test_apply_deletion_policy_registered_user_is_deleted(self):
         user_models.UserAuthModel.apply_deletion_policy(
-            self.USER_1_ID)
+            self.USER_ID)
         self.assertIsNone(
             user_models.UserAuthModel.get_by_id(
-                self.USER_1_ID
+                self.USER_ID
             )
         )
 
@@ -2269,7 +2271,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     def test_has_reference_to_existing_user_id_is_true(self):
         self.assertTrue(
             user_models.UserAuthModel.has_reference_to_user_id(
-                self.USER_1_ID)
+                self.USER_ID)
         )
 
     def test_has_reference_to_non_existing_user_id_is_false(self):
@@ -2281,7 +2283,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     def test_get_by_auth_id_with_invalid_auth_type_name_is_none(self):
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
-                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_1_GAE_ID)
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_GAE_ID)
         )
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
@@ -2296,7 +2298,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
 
     def test_get_by_auth_id_for_registered_auth_id_is_correct(self):
         self.assertEqual(
-            user_models.UserAuthModel.get_by_id(self.USER_1_ID),
+            user_models.UserAuthModel.get_by_id(self.USER_ID),
             user_models.UserAuthModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.USER_1_GAE_ID)
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )
