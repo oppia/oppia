@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import nerdamer from 'nerdamer';
+
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
@@ -39,12 +41,29 @@ export class MathEquationInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  getCustomizationArgsWarnings(
+      customizationArgs: MathEquationInputCustomizationArgs): Warning[] {
+    let warningsList = [];
+
+    if (customizationArgs.customOskLetters.value.length > 10) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The number of custom letters cannot be more than 10.'
+      });
+    };
+
+    return warningsList;
+  }
+
   getAllWarnings(
       stateName: string,
       customizationArgs: MathEquationInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
     let meirs = new MathEquationInputRulesService();
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
@@ -57,6 +76,7 @@ export class MathEquationInputValidationService {
     // A MatchesExactlyWith rule will make the following rules of the same rule
     // type and a matching input, invalid.
     let seenRules = [];
+    let seenVariables = [];
 
     for (let i = 0; i < answerGroups.length; i++) {
       let rules = answerGroups[i].rules;
@@ -64,6 +84,20 @@ export class MathEquationInputValidationService {
         let currentInput = <string> rules[j].inputs.x;
         let currentPositionOfTerms = <string> rules[j].inputs.y;
         let currentRuleType = <string> rules[j].type;
+
+        let splitInput = currentInput.split('=');
+
+        for (let variable of nerdamer(splitInput[0]).variables()) {
+          if (seenVariables.indexOf(variable) === -1) {
+            seenVariables.push(variable);
+          }
+        }
+
+        for (let variable of nerdamer(splitInput[1]).variables()) {
+          if (seenVariables.indexOf(variable) === -1) {
+            seenVariables.push(variable);
+          }
+        }
 
         for (let seenRule of seenRules) {
           let seenInput = <string> seenRule.inputs.x;
@@ -96,6 +130,32 @@ export class MathEquationInputValidationService {
         }
         seenRules.push(rules[j]);
       }
+    }
+
+    let greek_letters = AppConstants['GREEK_LETTERS'];
+    let greek_symbols = (
+      AppConstants['GREEK_SYMBOLS_LOWERCASE'] + AppConstants[
+        'GREEK_SYMBOLS_UPPERCASE']);
+    let missingVariables = [];
+
+    for (let variable of seenVariables) {
+      if (variable.length > 1) {
+        variable = greek_symbols[greek_letters.indexOf(variable)];
+      }
+      if (customizationArgs.customOskLetters.value.indexOf(variable) === -1) {
+        if (missingVariables.indexOf(variable) === -1) {
+          missingVariables.push(variable);
+        }
+      }
+    }
+
+    if (missingVariables.length > 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'The following variables are present in some of the answer groups ' +
+          'but are missing from the custom letters list: ' + missingVariables)
+      });
     }
 
     return warningsList;

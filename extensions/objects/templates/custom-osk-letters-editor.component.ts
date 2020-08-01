@@ -20,11 +20,6 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-require('services/contextual/device-info.service.ts');
-require('services/guppy-configuration.service.ts');
-require('services/guppy-initialization.service.ts');
-require('services/math-interactions.service.ts');
-
 angular.module('oppia').component('customOskLettersEditor', {
   bindings: {
     value: '='
@@ -60,11 +55,6 @@ angular.module('oppia').component('customOskLettersEditor', {
         } else {
           ctrl.value.splice(index, 1);
         }
-      };
-
-      ctrl.changeCase = function(letter) {
-        return ctrl.lettersAreLowercase ? (
-          letter.toLowerCase()) : letter.toUpperCase();
       };
 
       ctrl.$onInit = function() {

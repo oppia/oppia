@@ -34,7 +34,11 @@ interface ReadableMusicNote {
   readableNoteName: string;
 }
 
-export interface AlgebraicExpressionInputCustomizationArgs { }
+export interface AlgebraicExpressionInputCustomizationArgs {
+  customOskLetters: {
+    value: string[];
+  };
+}
 
 export interface CodeReplCustomizationArgs {
   language?: {
@@ -153,7 +157,11 @@ export interface LogicCustomizationArgs {
   };
 }
 
-export interface MathEquationInputCustomizationArgs { }
+export interface MathEquationInputCustomizationArgs {
+  customOskLetters: {
+    value: string[];
+  };
+}
 
 export interface MultipleChoiceInputCustomizationArgs {
   showChoicesInShuffledOrder?: {

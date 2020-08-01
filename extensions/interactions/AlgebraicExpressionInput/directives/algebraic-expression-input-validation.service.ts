@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import nerdamer from 'nerdamer';
+
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
@@ -40,9 +42,17 @@ export class AlgebraicExpressionInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: IAlgebraicExpressionInputCustomizationArgs): IWarning[] {
-    // TODO(juansaba): Implement customization args validations.
-    return [];
+      customizationArgs: AlgebraicExpressionInputCustomizationArgs): Warning[] {
+    let warningsList = [];
+
+    if (customizationArgs.customOskLetters.value.length > 10) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The number of custom letters cannot be more than 10.'
+      });
+    };
+
+    return warningsList;
   }
 
   getAllWarnings(
@@ -68,12 +78,19 @@ export class AlgebraicExpressionInputValidationService {
     // A MatchesExactlyWith rule will make the following rules of the same rule
     // type and a matching input, invalid.
     let seenRules = [];
+    let seenVariables = [];
 
     for (let i = 0; i < answerGroups.length; i++) {
       let rules = answerGroups[i].rules;
       for (let j = 0; j < rules.length; j++) {
         let currentInput = <string> rules[j].inputs.x;
         let currentRuleType = <string> rules[j].type;
+
+        for (let variable of nerdamer(currentInput).variables()) {
+          if (seenVariables.indexOf(variable) === -1) {
+            seenVariables.push(variable);
+          }
+        }
 
         for (let seenRule of seenRules) {
           let seenInput = <string> seenRule.inputs.x;
@@ -107,6 +124,32 @@ export class AlgebraicExpressionInputValidationService {
         }
         seenRules.push(rules[j]);
       }
+    }
+
+    let greek_letters = AppConstants['GREEK_LETTERS'];
+    let greek_symbols = (
+      AppConstants['GREEK_SYMBOLS_LOWERCASE'] + AppConstants[
+        'GREEK_SYMBOLS_UPPERCASE']);
+    let missingVariables = [];
+
+    for (let variable of seenVariables) {
+      if (variable.length > 1) {
+        variable = greek_symbols[greek_letters.indexOf(variable)];
+      }
+      if (customizationArgs.customOskLetters.value.indexOf(variable) === -1) {
+        if (missingVariables.indexOf(variable) === -1) {
+          missingVariables.push(variable);
+        }
+      }
+    }
+
+    if (missingVariables.length > 0) {  
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'The following variables are present in some of the answer groups ' +
+          'but are missing from the custom letters list: ' + missingVariables)
+      });
     }
 
     return warningsList;
