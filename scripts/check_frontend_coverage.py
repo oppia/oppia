@@ -124,6 +124,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'expression-type-parser.service.ts',
     'fatigue-detection.service.ts',
     'feedback-popup.directive.ts',
+    'feedback-tab.directive.ts',
     'filepath-editor.directive.ts',
     'focus-on.directive.ts',
     'format-timer.pipe.ts',
