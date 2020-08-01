@@ -25,7 +25,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 export {};
-fdescribe('Editable story backend API service', () => {
+describe('Editable story backend API service', () => {
   let editableStoryBackendApiService: EditableStoryBackendApiService = null;
   let sampleDataResults = null;
   let httpTestingController: HttpTestingController;

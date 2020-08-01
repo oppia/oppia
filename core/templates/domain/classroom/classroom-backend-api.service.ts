@@ -112,6 +112,7 @@ export class ClassroomBackendApiService {
       this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
   }
+}
 
 
 angular.module('oppia').factory(
