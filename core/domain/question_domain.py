@@ -496,7 +496,7 @@ class Question(python_utils.OBJECT):
                             rule_input = rule_input.replace(
                                 greek_letter, '')
                             variables.add(greek_symbols[ind])
-                    
+
                     for character in rule_input:
                         if character.isalpha():
                             variables.add(character)
@@ -510,7 +510,7 @@ class Question(python_utils.OBJECT):
             })
 
         return question_state_dict
-    
+
     @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):

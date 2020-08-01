@@ -5910,7 +5910,7 @@ tags: []
 title: Title
 """)
 
-YAML_CONTENT_V41 = (
+    YAML_CONTENT_V41 = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''

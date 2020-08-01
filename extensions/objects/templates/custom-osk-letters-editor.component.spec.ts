@@ -25,7 +25,7 @@ describe('OnScreenKeyboard', function() {
     ctrl = $componentController('customOskLettersEditor');
     ctrl.$onInit();
     ctrl.value = [];
-  }));  
+  }));
 
   it('should update letters list', function() {
     expect(ctrl.value).toEqual([]);

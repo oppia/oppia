@@ -50,7 +50,7 @@ export class AlgebraicExpressionInputValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'The number of custom letters cannot be more than 10.'
       });
-    };
+    }
 
     return warningsList;
   }
@@ -126,15 +126,18 @@ export class AlgebraicExpressionInputValidationService {
       }
     }
 
-    let greek_letters = AppConstants['GREEK_LETTERS'];
-    let greek_symbols = (
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    // eslint-disable-next-line dot-notation
+    let greekLetters = AppConstants['GREEK_LETTERS'];
+    let greekSymbols = (
       AppConstants['GREEK_SYMBOLS_LOWERCASE'] + AppConstants[
         'GREEK_SYMBOLS_UPPERCASE']);
     let missingVariables = [];
 
     for (let variable of seenVariables) {
       if (variable.length > 1) {
-        variable = greek_symbols[greek_letters.indexOf(variable)];
+        variable = greekSymbols[greekLetters.indexOf(variable)];
       }
       if (customizationArgs.customOskLetters.value.indexOf(variable) === -1) {
         if (missingVariables.indexOf(variable) === -1) {

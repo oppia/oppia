@@ -2744,6 +2744,7 @@ class Exploration(python_utils.OBJECT):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -2770,7 +2771,7 @@ class Exploration(python_utils.OBJECT):
                                 rule_input = rule_input.replace(
                                     greek_letter, '')
                                 variables.add(greek_symbols[ind])
-                        
+
                         for character in rule_input:
                             if character.isalpha():
                                 variables.add(character)
@@ -2784,7 +2785,7 @@ class Exploration(python_utils.OBJECT):
                 })
 
         return states_dict
-    
+
     @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
