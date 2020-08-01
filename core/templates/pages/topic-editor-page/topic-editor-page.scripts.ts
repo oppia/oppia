@@ -16,10 +16,6 @@
  * @fileoverview Directive scripts for the topic editor page.
  */
 
-// These requires are needed before the module is bootstrapped since it
-// contains code for modules that are bootstrapped later as additional modules.
-require('interactions/codemirrorRequires.ts');
-
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.
 require('pages/topic-editor-page/topic-editor-page.module.ts');

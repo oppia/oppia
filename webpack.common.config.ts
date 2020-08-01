@@ -716,6 +716,9 @@ module.exports = {
       use: ['style-loader', 'css-loader']
     }]
   },
+  externals: {
+    jquery: 'jQuery'
+  },
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {

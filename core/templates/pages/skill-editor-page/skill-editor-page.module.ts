@@ -19,7 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-require('third-party-imports/headroom.import');
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
+import 'interactions/codemirrorRequires.ts';
 
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
