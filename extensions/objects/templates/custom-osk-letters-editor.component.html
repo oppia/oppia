@@ -1,3 +1,8 @@
+<div ng-class="($ctrl.value.length === 0) ? 'oppia-custom-selected-letters' : 'oppia-custom-selected-letters-bordered'">
+  <div ng-repeat="letter in $ctrl.value">
+    <[letter]>
+  </div>
+</div>
 <div class="oppia-custom-letters-navbar">
   <button
     ng-class="($ctrl.currentTab === $ctrl.latinTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'"
@@ -138,6 +143,28 @@
 </div>
 
 <style>
+  .oppia-custom-selected-letters,
+  .oppia-custom-selected-letters-bordered {
+    border-radius: 5px;
+    margin-top: 13px;
+    text-align: center;
+    padding: 10px 0px;
+  }
+
+  .oppia-custom-selected-letters-bordered {
+    border: 2px solid #399e80;
+  }
+
+  .oppia-custom-selected-letters-bordered div {
+    background-color: inherit;
+    border-radius: 5px;
+    color: #696969; 
+    display: initial;
+    font-family: 'Noto Serif', serif;
+    font-size: 20px;
+    margin: 0px 10px;
+  }
+
   .oppia-custom-letters-navbar {
     margin-top: 15px;
     text-align: center;
@@ -154,7 +181,6 @@
   }
 
   button.oppia-custom-letters-tab-active {
-    border-bottom: 3px #399e80 solid;
     color: #399e80;
   }
 

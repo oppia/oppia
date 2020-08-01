@@ -60,7 +60,6 @@ angular.module('oppia').component('customOskLettersEditor', {
         } else {
           ctrl.value.splice(index, 1);
         }
-        console.log(ctrl.value);
       };
 
       ctrl.changeCase = function(letter) {
@@ -72,7 +71,6 @@ angular.module('oppia').component('customOskLettersEditor', {
         ctrl.alwaysEditable = true;
         ctrl.lettersAreLowercase = true;
         ctrl.currentTab = ctrl.latinTab;
-        console.log(ctrl.greekLowercase);
       };
     }
   ]
