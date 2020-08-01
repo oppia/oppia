@@ -1155,7 +1155,9 @@ class customOskLetters(BaseObject):
     and greek alphabets.
     """
 
-    description = 'Letters that the learner will see in the on-screen keyboard.'
+    description = (
+        'Shortcut variables that the learner can access in the '
+        'on-screen keyboard.')
     default_value = []
 
     SCHEMA = {

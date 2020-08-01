@@ -37,7 +37,8 @@ class AlgebraicExpressionInput(base.BaseInteraction):
     _customization_arg_specs = [{
         'name': 'customOskLetters',
         'description': (
-            'Letters that the learner will see in the on-screen keyboard.'),
+            'Shortcut variables that the learner can access in the on-screen '
+            'keyboard.'),
         'schema': {
             'type': 'custom',
             'obj_type': 'CustomOskLetters',

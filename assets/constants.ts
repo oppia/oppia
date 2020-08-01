@@ -5296,8 +5296,9 @@ export = {
   "GREEK_LETTERS": [
     "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
     "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
-    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
-    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
+    "upsilon", "phi", "chi", "psi", "omega", "Alpha", "Beta", "Gamma", "Delta",
+    "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "Mu", "Nu",
+    "Xi", "Pi", "Rho", "Sigma", "Tau", "Upsilon", "Phi", "Chi", "Psi", "Omega"
   ],
 
   // Greek symbols allowed in math interactions.
