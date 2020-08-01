@@ -374,7 +374,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'Exploration %s failed migration during GET: %s' %
                 (item.id, e))
             logging.error(error_message)
-            yield ('MIGRATION_ERROR', error_message)
+            yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
             return
         try:
             old_exploration.validate()
@@ -383,7 +383,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
             logging.error(error_message)
-            yield ('VALIDATION_ERROR', error_message)
+            yield ('VALIDATION_ERROR', error_message.encode('utf-8'))
             return
 
         # If the exploration model being stored in the datastore is not the
@@ -416,7 +416,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                     'passing strict validations for a public exploration: %s' %
                     (item.id, e))
                 logging.error(error_message)
-                yield ('UPDATE_ERROR', error_message)
+                yield ('UPDATE_ERROR', error_message.encode('utf-8'))
                 return
             yield ('SUCCESS', item.id)
 
