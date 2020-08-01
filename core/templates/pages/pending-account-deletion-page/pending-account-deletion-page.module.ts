@@ -19,6 +19,8 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+require('third-party-imports/headroom.import');
+
 angular.module('oppia', [
   require('angular-cookies'), 'pascalprecht.translate', 'toastr',
   'ui.bootstrap'

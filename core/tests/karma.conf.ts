@@ -18,8 +18,6 @@ module.exports = function(config) {
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
       'third_party/static/angularjs-1.7.9/angular.js',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
-      'third_party/static/headroom-js-0.9.4/headroom.min.js',
-      'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.12.1/ckeditor.js',
       generatedJs,
