@@ -1404,9 +1404,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator can add a new state called 'State 4'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 4',
@@ -1445,9 +1444,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator2 can add a new state called 'State 5'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 5',
@@ -1596,9 +1594,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         csrf_token = self.get_new_csrf_token()
 
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message':
