@@ -2756,7 +2756,7 @@ class Exploration(python_utils.OBJECT):
                     'AlgebraicExpressionInput', 'MathEquationInput'):
                 variables = set()
                 for group in state_dict['interaction']['answer_groups']:
-                    for rule_spec in new_answer_group['rule_specs']:
+                    for rule_spec in group['rule_specs']:
                         rule_input = rule_spec['inputs']['x']
 
                         # Removing all greek letters after adding the

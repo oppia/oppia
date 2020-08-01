@@ -483,7 +483,7 @@ class Question(python_utils.OBJECT):
                 variables = set()
                 for group in question_state_dict[
                         'interaction']['answer_groups']:
-                    for rule_spec in new_answer_group['rule_specs']:
+                    for rule_spec in group['rule_specs']:
                         rule_input = rule_spec['inputs']['x']
 
                         # Removing all greek letters after adding the
