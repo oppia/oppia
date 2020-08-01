@@ -97,7 +97,6 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomData(classroomName: string): Promise<Object> {
 
   fetchClassroomData(classroomName: string): Promise<TopicSummary[]> {
 
