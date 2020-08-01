@@ -248,11 +248,11 @@ def _delete_improvements_models(user_id):
 
 
 def _delete_activity_models(
-    pending_deletion_request,
-    activity_category,
-    snapshot_model_class,
-    commit_log_model_class,
-    commit_log_model_field_name):
+        pending_deletion_request,
+        activity_category,
+        snapshot_model_class,
+        commit_log_model_class,
+        commit_log_model_field_name):
     """Pseudonymize the activity models for the user with user_id.
 
     Args:
