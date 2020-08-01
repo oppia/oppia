@@ -642,6 +642,41 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_malformed_raises_section)
 
+    def test_malformed_args_argument(self):
+        node_malformed_args_argument = astroid.extract_node(
+            u"""def func(*args): #@
+                \"\"\"Does nothing.
+
+                Args:
+                    *args: int. Argument description.
+                \"\"\"
+                a = True
+        """)
+
+        message = testutils.Message(
+            msg_id='malformed-args-argument',
+            node=node_malformed_args_argument
+        )
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_malformed_args_argument)
+
+    def test_well_formated_args_argument(self):
+        node_with_no_error_message = astroid.extract_node(
+            u"""def func(*args): #@
+                \"\"\"Does nothing.
+
+                Args:
+                    *args: list(*). Description.
+                \"\"\"
+                a = True
+        """)
+
+        with self.checker_test_object.assertAddsMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_no_error_message)
+
     def test_well_formated_args_section(self):
         node_with_no_error_message = astroid.extract_node(
             u"""def func(arg): #@
