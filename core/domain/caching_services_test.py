@@ -24,6 +24,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.tests import test_utils
 
+import python_utils
 
 class CachingServicesUnitTests(test_utils.GenericTestBase):
     """Tests for caching_services."""
@@ -32,64 +33,101 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         super(CachingServicesUnitTests, self).setUp()
         self.keys = ['a', 'b', 'c']
         self.non_existent_keys = ['d', 'e']
-        # Redis can only store strings so integers must be cast to string
-        # values in order for comparison to work.
-        self.key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
-        self.string_caching_response = caching_services.set_multi(
-            self.key_value_mapping)
-        self.key_base_string = 'key'
-        self.default_exploration = (
-            exp_domain.Exploration.create_default_exploration(
-                'exp_id_1', title='A title', category='A category'))
-        self.exploration_caching_response = caching_services.set_multi(
-            {
-                exp_fetchers.get_exploration_memcache_key(
-                    self.key_base_string): self.default_exploration
-            })
+
 
     def test_flush_cache_wipes_cache_clean(self):
         """Tests whether flushing the cache removes the elements in the
         cache.
         """
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        caching_services.set_multi(
+            key_value_mapping, 'default')
+        exploration_key = 'key'
+        default_exploration = (
+            exp_domain.Exploration.create_default_exploration(
+                'exp_id_1', title='A title', category='A category'))
+        caching_services.set_multi(
+            {
+                exploration_key: default_exploration
+            }, 'exploration', python_utils.convert_to_bytes(0))
         caching_services.flush_memory_cache()
         self.assertEqual(
-            caching_services.get_multi(self.keys), {})
-        exploration_key = exp_fetchers.get_exploration_memcache_key(
-            self.key_base_string)
-        self.assertEqual(caching_services.get_multi([exploration_key]), {})
+            caching_services.get_multi(['a', 'b', 'c'], 'default'), {})
+        self.assertEqual(
+            caching_services.get_multi(
+                [exploration_key], 'exploration',
+                python_utils.convert_to_bytes(0)),
+            {})
 
     def test_get_multi_correctly_retrieves_cache_elements(self):
-        result = caching_services.get_multi(self.keys)
-        self.assertEqual(result, self.key_value_mapping)
-        result = caching_services.get_multi(self.non_existent_keys)
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        string_caching_response = caching_services.set_multi(
+            key_value_mapping, 'default')
+        exploration_key = 'key'
+        default_exploration = (
+            exp_domain.Exploration.create_default_exploration(
+                'exp_id_1', title='A title', category='A category'))
+        exploration_caching_response = caching_services.set_multi(
+            {
+                exploration_key: default_exploration
+            }, 'exploration', python_utils.convert_to_bytes(0))
+        result = caching_services.get_multi(['a', 'b', 'c'], 'default')
+        self.assertEqual(result, key_value_mapping)
+        result = caching_services.get_multi(['d', 'e'], 'default')
         self.assertEqual(result, {})
-        result = caching_services.get_multi([])
+        result = caching_services.get_multi([], 'default')
         self.assertEqual(result, {})
-        exploration_key = exp_fetchers.get_exploration_memcache_key(
-            self.key_base_string)
-        result = caching_services.get_multi([exploration_key])
+        result = caching_services.get_multi(
+            [exploration_key], 'exploration',
+            python_utils.convert_to_bytes(0))
         self.assertEqual(
-            self.default_exploration.to_dict(),
+            default_exploration.to_dict(),
             result.get(exploration_key).to_dict())
 
     def test_set_multi_correctly_sets_elements(self):
-        self.assertTrue(self.string_caching_response)
-        self.assertTrue(self.exploration_caching_response)
-        result = caching_services.set_multi({})
-        self.assertTrue(result)
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        cache_string_response = caching_services.set_multi(
+            key_value_mapping, 'default')
+        self.assertTrue(cache_string_response)
+
+        exploration_key = 'key'
+        default_exploration = (
+            exp_domain.Exploration.create_default_exploration(
+                'exp_id_1', title='A title', category='A category'))
+        cache_exploration_response = caching_services.set_multi(
+            {
+                exploration_key: default_exploration
+            }, 'exploration', python_utils.convert_to_bytes(0))
+        self.assertTrue(cache_exploration_response)
+
+        cache_empty_list_response = caching_services.set_multi({}, 'default')
+        self.assertTrue(cache_empty_list_response)
 
     def test_delete_multi_correctly_deletes_cache_elements(self):
-        is_successful = caching_services.delete_multi([])
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        caching_services.set_multi(
+            key_value_mapping, 'default')
+        exploration_key = 'key'
+        default_exploration = (
+            exp_domain.Exploration.create_default_exploration(
+                'exp_id_1', title='A title', category='A category'))
+        caching_services.set_multi(
+            {
+                exploration_key: default_exploration
+            }, 'exploration', python_utils.convert_to_bytes(0))
+        is_successful = caching_services.delete_multi([], 'default')
         self.assertTrue(is_successful)
         is_successful = caching_services.delete_multi(
-            self.keys)
+            ['a', 'b', 'c'], 'default')
         self.assertTrue(is_successful)
         is_successful = caching_services.delete_multi(
-            ['d', 'e', 'f'])
+            ['d', 'e', 'f'], 'default')
         self.assertFalse(is_successful)
-        exploration_key = exp_fetchers.get_exploration_memcache_key(
-            self.key_base_string)
-        is_successful = caching_services.delete_multi([exploration_key])
+        is_successful = caching_services.delete_multi(
+            [exploration_key], 'exploration',
+            python_utils.convert_to_bytes(0))
         self.assertTrue(is_successful)
-        result = caching_services.get_multi([exploration_key])
+        result = caching_services.get_multi(
+            [exploration_key], 'exploration',
+            python_utils.convert_to_bytes(0))
         self.assertEqual(result, {})

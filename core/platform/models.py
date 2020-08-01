@@ -243,10 +243,10 @@ class _Gae(Platform):
 
     @classmethod
     def import_cache_services(cls):
-        """Imports and returns platform.cache services.
+        """Imports and returns a cache_services module from core.platform.cache.
 
         Returns:
-            module. The platform.cache services module.
+            module. The core.platform.cache services module.
         """
         from core.platform.cache import redis_cache_services
         return redis_cache_services
@@ -377,10 +377,10 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def import_cache_services(cls):
-        """Imports and returns caching_services module.
+        """Imports and returns the platform cache_services module.
 
         Returns:
-            module. The caching_services module.
+            module. The platform cache_services module.
         """
         return cls._get().import_cache_services()
 

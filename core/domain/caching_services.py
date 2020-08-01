@@ -29,47 +29,64 @@ import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 
-
 def flush_memory_cache():
     """Flushes the memory cache by wiping all of the data."""
     memory_cache_services.flush_cache()
 
-
-def _get_type_corresponding_to_key(key):
-    """In the memory cache, values are stored as (key, value) pairs where values
-    can be string representations of Oppia objects, e.g Collection,
-    Exploration, etc. These object types can be identified by the key that
-    the memory cache uses to store the dictionaries. This function returns the
-    correct type of the saved memory cache value using the key, so that the
-    encoded string can be decoded into an object.
+def _get_deserialization_function_for_namespace(namespace):
+    """Get the deserialization function associated with the namespace specified.
 
     Args:
-        key: str. The key string used in the memory cache.
+        namespace: str. The namespace that differentiates the objects.
 
     Returns:
-        Collection|Exploration|Skill|Story|Topic|None. The original
-        class of the object that got converted to a dictionary. If this key does
-        not correspond to a class that requires deserialization, return None.
+        Method. The deserialization function associated with that particular
+        namespace.
     """
-    if key.startswith('collection'):
-        return collection_domain.Collection
-    elif key.startswith('exp'):
-        return exp_domain.Exploration
-    elif key.startswith('skill'):
-        return skill_domain.Skill
-    elif key.startswith('story'):
-        return story_domain.Story
-    elif key.startswith('topic'):
-        return topic_domain.Topic
+    if namespace == 'collection':
+        return lambda x: collection_domain.Collection.deserialize(x)
+    elif namespace == 'exploration':
+        return lambda x: exp_domain.Exploration.deserialize(x)
+    elif namespace =='skill':
+        return lambda x: skill_domain.Skill.deserialize(x)
+    elif namespace =='story':
+        return lambda x: story_domain.Story.deserialize(x)
+    elif namespace == 'topic':
+        return lambda x: topic_domain.Topic.deserialize(x)
     else:
-        return None
+        return lambda x: x
 
+def _get_serialized_string_for_namespace(obj, namespace):
+    """Get the serialized string of the object associated with the namespace
+    specified.
 
-def get_multi(keys):
+    Args:
+        obj: Exploration|Skill|Story|Topic|Collection|str. The object to be
+            set to the memory cache.
+        namespace: str. The namespace that differentiates the objects.
+
+    Returns:
+        str. The serialized string of the object associated with that namespace.
+    """
+    if namespace == 'collection' or namespace == 'exploration' or (
+        namespace =='skill') or namespace =='story' or namespace == 'topic':
+        return obj.serialize()
+    else:
+        return obj
+
+def get_multi(keys, namespace, sub_namespace=''):
     """Get a dictionary of the {key, value} pairs from the memory cache.
 
     Args:
         keys: list(str). List of keys to query the caching service for.
+        namespace: str. The namespace under which the values associated with
+            these keys lie. The namespace determines how the keys are decoded
+            from their JSON encoded string. Use default namespace for keys that
+            don't require deserialization.
+        sub_namespace: str. Sub namespace further differentiates the
+            values. For Explorations, Skills, Stories, Topics, Collections, the
+            sub_namespace is the version number of the objects. For
+            ConfigPropertyModel, the sub_namespace is the property name.
 
     Returns:
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
@@ -78,25 +95,58 @@ def get_multi(keys):
     result_dict = {}
     if len(keys) == 0:
         return result_dict
-    values = memory_cache_services.get_multi(keys)
+    memory_cache_keys = []
+    for key in keys:
+        memory_cache_keys.append(
+            _get_memory_cache_key_from_type(key, namespace, sub_namespace))
+    values = memory_cache_services.get_multi(memory_cache_keys)
     for key, value in python_utils.ZIP(keys, values):
         if value:
-            value_type = _get_type_corresponding_to_key(key)
-            if value_type:
-                decoded_object = value_type.deserialize(value)
-                result_dict[key] = decoded_object
-            else:
-                result_dict[key] = value
+            deserialization_function = (
+                _get_deserialization_function_for_namespace(namespace))
+            result_dict[key] = deserialization_function(value)
 
     return result_dict
 
 
-def set_multi(key_value_mapping):
-    """Set multiple keys' values at once to the cache.
+def _get_memory_cache_key_from_type(key, namespace, sub_namespace):
+    """Returns a memcache key for the class under namespace and sub_namespace.
 
     Args:
-        key_value_mapping: list(str, Exploration|Skill|Story|Topic|Collection|
-            str). A dict of {key, value} pairs to set to the cache.
+        key: str. The key of the value to store in the memory cache.
+        namespace: str. The namespace under which the values associated with the
+            key lies.
+        sub_namespace: str. Sub namespace further differentiates the
+            values. For Explorations, Skills, Stories, Topics, Collections, the
+            sub_namespace is the version number of the objects. For
+            ConfigPropertyModel, the sub_namespace is the property name.
+
+    Returns:
+        str. Memory cache key that identifies the type of the value associated
+        with it.
+    """
+    if not sub_namespace:
+        return namespace + '-' + key
+    else:
+        return namespace + '-' + sub_namespace + '-' + key
+
+
+def set_multi(key_value_mapping, namespace, sub_namespace=''):
+    """Set multiple keys' values at once to the cache where the values are all
+    of a specific type or a primitype type.
+
+    Args:
+        key_value_mapping: list(str, *). A dict of {key, value} pairs to set to
+            the cache. The values must be of type value_type.
+        namespace: str. The namespace under which the values associated with the
+            key lies. Use default namespace for keys that don't require
+            serialization.
+        sub_namespace: str. Sub namespace further differentiates the
+            values. For Explorations, Skills, Stories, Topics, Collections, the
+            sub_namespace is the version number of the objects. For
+            ConfigPropertyModel, the sub_namespace is the property name. If
+            sub-namespace is not needed to differentiate, the sub namespace
+            defaults to default.
 
     Returns:
         bool. Whether all operations complete successfully.
@@ -104,22 +154,37 @@ def set_multi(key_value_mapping):
     if len(key_value_mapping) == 0:
         return True
 
+    memory_cache_key_value_mapping = {}
     for key, value in key_value_mapping.items():
-        if _get_type_corresponding_to_key(key):
-            key_value_mapping[key] = value.serialize()
-    return memory_cache_services.set_multi(key_value_mapping)
+        unique_key = _get_memory_cache_key_from_type(
+            key, namespace, sub_namespace)
+        memory_cache_key_value_mapping[unique_key] = (
+            _get_serialized_string_for_namespace(value, namespace))
+    return memory_cache_services.set_multi(memory_cache_key_value_mapping)
 
 
-def delete_multi(keys):
+def delete_multi(keys, namespace, sub_namespace=''):
     """Deletes multiple keys in the cache.
 
     Args:
         keys: list(str). A list of key strings to delete from the cache.
+        namespace: str. The namespace under which the values associated with the
+            key lies. Use default namespace for keys that don't fall under any
+            other namespaces.
+        sub_namespace: str. Sub namespace further differentiates the
+            values. For Explorations, Skills, Stories, Topics, Collections, the
+            sub_namespace is the version number of the objects. For
+            ConfigPropertyModel, the sub_namespace is the property name. If
+            sub-namespace is not needed to differentiate, the sub namespace
+            defaults to default.
 
     Returns:
         bool. Whether all operations complete successfully.
     """
     if len(keys) == 0:
         return True
-
-    return memory_cache_services.delete_multi(keys) == len(keys)
+    memory_cache_keys = []
+    for key in keys:
+        memory_cache_keys.append(
+            _get_memory_cache_key_from_type(key, namespace, sub_namespace))
+    return memory_cache_services.delete_multi(memory_cache_keys) == len(keys)

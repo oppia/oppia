@@ -69,8 +69,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         """
         skill_model = skill_models.SkillModel.get(skill_id)
         skill_model.delete(user_id, 'Delete skill model.')
-        skill_memcache_key = skill_fetchers.get_skill_memcache_key(skill_id) # pylint: disable=protected-access
-        caching_services.delete_multi([skill_memcache_key])
+        caching_services.delete_multi([skill_id], 'skill')
 
     def _mock_update_skill_raise_exception(
             self, unused_committer_id, unused_skill_id, unused_change_list,

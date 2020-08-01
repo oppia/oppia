@@ -571,8 +571,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    caching_services.delete_multi([exp_memcache_key])
+    caching_services.delete_multi([exploration.id], 'exploration')
 
     exploration.version += 1
 
@@ -746,12 +745,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
         feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
 
-    # This must come after the explorations are retrieved. Otherwise the
-    # memcache keys will be reinstated.
-    exploration_memcache_keys = [
-        exp_fetchers.get_exploration_memcache_key(exploration_id)
-        for exploration_id in exploration_ids]
-    caching_services.delete_multi(exploration_memcache_keys)
+    caching_services.delete_multi(exploration_ids, 'exploration')
 
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
@@ -1177,8 +1171,7 @@ def revert_exploration(
         exploration_model, committer_id,
         'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    caching_services.delete_multi([exp_memcache_key])
+    caching_services.delete_multi([exploration.id], 'exploration')
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.

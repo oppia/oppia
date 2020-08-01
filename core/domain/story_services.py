@@ -427,7 +427,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
-        [story_fetchers.get_story_memcache_key(story.id)])
+        [story.id], 'story')
     story.version += 1
 
 
@@ -513,10 +513,7 @@ def delete_story(committer_id, story_id, force_deletion=False):
     exp_models.ExplorationContextModel.delete_multi(
         exploration_context_models_to_be_deleted)
 
-    # This must come after the story is retrieved. Otherwise the memcache
-    # key will be reinstated.
-    story_memcache_key = story_fetchers.get_story_memcache_key(story_id)
-    caching_services.delete_multi([story_memcache_key])
+    caching_services.delete_multi([story_id], 'story')
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).

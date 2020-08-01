@@ -307,9 +307,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def test_regeneration_job_with_no_exp_model_for_some_topics(self):
         exp_models.ExplorationModel.get('0').delete(
             self.owner_id, 'Delete exploration', force_deletion=True)
-        exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
-            '0')
-        caching_services.delete_multi([exploration_memcache_key])
+        caching_services.delete_multi(['0'], 'exploration')
 
         exp_opp_summary_model_regen_job_class = (
             opportunity_jobs_one_off

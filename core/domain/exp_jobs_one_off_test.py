@@ -1071,7 +1071,8 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exploration_model.language_code = 'invalid_language_code'
         exploration_model.commit(
             self.albert_id, 'Changed language_code.', [])
-        caching_services.delete_multi(['exploration:%s' % self.VALID_EXP_ID])
+        caching_services.delete_multi(
+            [self.VALID_EXP_ID], 'exploration')
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
@@ -1751,7 +1752,8 @@ class ExplorationContentValidationJobForCKEditorTests(
         exploration_model.states_schema_version = 100
         exploration_model.commit(
             self.albert_id, 'Changed states_schema_version.', [])
-        caching_services.delete_multi(['exploration:%s' % self.VALID_EXP_ID])
+        caching_services.delete_multi(
+            [self.VALID_EXP_ID], 'exploration')
 
         job_id = (
             exp_jobs_one_off
@@ -1913,7 +1915,7 @@ class InteractionCustomizationArgsValidationJobTests(
         exploration_model.states_schema_version = 100
         exploration_model.commit(
             self.albert_id, 'Changed states_schema_version.', [])
-        caching_services.delete('exploration:%s' % self.VALID_EXP_ID)
+        caching_services.delete_multi(self.VALID_EXP_ID, 'exploration')
 
         job_id = (
             exp_jobs_one_off

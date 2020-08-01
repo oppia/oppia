@@ -19,13 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import feconf
 import os
 import python_utils
 import redis
 
-REDIS_HOST = os.environ.get('REDISHOST', 'localhost')
-REDIS_PORT = int(os.environ.get('REDISPORT', 6379))
-REDIS_CLIENT = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+REDIS_CLIENT = redis.Redis(
+    host=feconf.REDISHOST, port=feconf.REDISPORT)
 
 
 def flush_cache():
