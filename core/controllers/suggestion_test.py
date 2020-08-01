@@ -489,7 +489,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'],
-            'Commit messages must be at most 1000 characters.'
+            'Commit messages must be at most 1000 characters long.'
         )
 
     def test_accept_suggestion(self):

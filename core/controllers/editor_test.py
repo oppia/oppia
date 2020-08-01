@@ -1618,7 +1618,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
         self.assertEqual(
             response_dict['error'],
-            'Commit messages must be at most 1000 characters.')
+            'Commit messages must be at most 1000 characters long.')
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)

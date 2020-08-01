@@ -236,7 +236,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 
         if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
             raise self.InvalidInputException(
-                'Commit messages must be at most %s characters.'
+                'Commit messages must be at most %s characters long.'
                 % feconf.MAX_COMMIT_MESSAGE_LENGTH)
 
         topic_and_subtopic_page_change_dicts = self.payload.get(

@@ -224,7 +224,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
             raise self.InvalidInputException(
-                'Commit messages must be at most %s characters.'
+                'Commit messages must be at most %s characters long.'
                 % feconf.MAX_COMMIT_MESSAGE_LENGTH)
 
         if not self.payload.get('change_list'):

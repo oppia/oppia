@@ -286,7 +286,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             expected_status_int=400)
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters.'
+            'Commit messages must be at most 1000 characters long.'
         )
         self.logout()
 

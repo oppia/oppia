@@ -675,7 +675,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response_json['error'],
-            'Commit messages must be at most 1000 characters.')
+            'Commit messages must be at most 1000 characters long.')
 
     def test_put_with_admin_email_allows_question_editing(self):
         payload = {}

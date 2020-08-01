@@ -128,7 +128,7 @@ class ExplorationHandler(EditorHandler):
 
         if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
             raise self.InvalidInputException(
-                'Commit messages must be at most %s characters.'
+                'Commit messages must be at most %s characters long.'
                 % feconf.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_list_dict = self.payload.get('change_list')

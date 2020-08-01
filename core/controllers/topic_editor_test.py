@@ -387,7 +387,7 @@ class TopicEditorTests(
 
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters.')
+            'Commit messages must be at most 1000 characters long.')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {

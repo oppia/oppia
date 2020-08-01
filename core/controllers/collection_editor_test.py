@@ -240,7 +240,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(
             json_response['error'],
-            'Commit messages must be at most 1000 characters.'
+            'Commit messages must be at most 1000 characters long.'
         )
 
         self.logout()
