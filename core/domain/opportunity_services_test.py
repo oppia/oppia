@@ -77,8 +77,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story',
-            self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -426,8 +425,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         with self.assertRaisesRegexp(
             Exception,
-            ('SkillOpportunity corresponding to skill ID %s already exists.'
-             % self.SKILL_ID)):
+            'SkillOpportunity corresponding to skill ID %s already exists.'
+            % self.SKILL_ID):
             opportunity_services.create_skill_opportunity(
                 self.SKILL_ID, 'description')
 
@@ -579,8 +578,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story',
-            self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)

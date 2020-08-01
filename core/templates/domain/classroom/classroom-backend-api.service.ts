@@ -54,8 +54,8 @@ export class ClassroomBackendApiService {
   ) {}
 
   _fetchClassroomData(classroomName: string,
-      successCallback: (value?: ClassroomData) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: ClassroomData) => void,
+      errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
         classroom_name: classroomName
@@ -70,16 +70,16 @@ export class ClassroomBackendApiService {
       if (successCallback) {
         successCallback(this.classroomData);
       }
-    }, (error: string) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
   _fetchClassroomPageIsShownStatus(
-      successCallback: (value?: boolean) => void,
-      errorCallback: (reason?: string) => void): void {
+      successCallback: (value: boolean) => void,
+      errorCallback: (reason: string) => void): void {
     const classroomStatusHandlerUrl = '/classroom_page_status_handler';
 
     this.http.get<ClassroomStatusBackendDict>(
@@ -87,9 +87,9 @@ export class ClassroomBackendApiService {
       if (successCallback) {
         successCallback(data.classroom_page_is_shown);
       }
-    }, (error: string) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }

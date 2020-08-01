@@ -7,7 +7,6 @@ instance_class: F2
 version: default
 
 builtins:
-- appstats: on
 - deferred: on
 - remote_api: on
 

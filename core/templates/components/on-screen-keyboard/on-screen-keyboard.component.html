@@ -21,7 +21,7 @@
     <button class="oppia-osk-btn-number number-8" ng-click="$ctrl.insertString('8')">8</button>
     <button class="oppia-osk-btn-number number-9" ng-click="$ctrl.insertString('9')">9</button>
     <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('+')">+</button>
-    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('*')">*</button>
+    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('*')">×</button>
     <button class="oppia-osk-btn-number number-4" ng-click="$ctrl.insertString('4')">4</button>
     <button class="oppia-osk-btn-number number-5" ng-click="$ctrl.insertString('5')">5</button>
     <button class="oppia-osk-btn-number number-6" ng-click="$ctrl.insertString('6')">6</button>
@@ -43,9 +43,9 @@
     </button>
   </div>
   <div class="oppia-osk-functions-tab" ng-if="$ctrl.currentTab===$ctrl.functionsTab">
-    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('(')">(</button>
-    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString(')')">)</button>
+    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertSymbol('paren')">()</button>
     <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('abs')">||</button>
+    <button class="oppia-osk-btn-operator" ng-click="$ctrl.insertString('=')">=</button>
     <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-exponent-2.svg')]>" class="oppia-osk-btn-shortcut" alt="^2" ng-click="$ctrl.exponent('2')">
     <img ng-src="<[$ctrl.getStaticImageUrl('/icons/osk-exponent-3.svg')]>" class="oppia-osk-btn-shortcut" alt="^3" ng-click="$ctrl.exponent('3')">
     <button class="oppia-osk-btn-function" ng-click="$ctrl.insertString(function)" ng-repeat="function in $ctrl.functions"><[function]></button>

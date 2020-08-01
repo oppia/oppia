@@ -558,13 +558,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
 
         user_services.update_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_mark_user_for_deletion(self):
         gae_id = 'test_id'
@@ -1333,7 +1335,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
-        self.assertFalse(user_services.has_fully_registered(None))
+        self.assertFalse(user_services.has_fully_registered_account(None))
 
     def test_cannot_create_new_user_with_existing_user_id(self):
         with self.assertRaisesRegexp(
