@@ -450,7 +450,9 @@ def migrate_exploration_training_job(training_job_exploration_mapping):
 
     Args:
         training_job_exploration_mapping: TrainingJobExplorationMapping. Domain
-            object containing details of training job exploration mapping.
+            object containing exploration to training job id mapping. This
+            mapping is used to figure out jobs that needs to be re-submitted /
+            added or removed.
     """
     exp_id = training_job_exploration_mapping.exp_id
     exp_version = training_job_exploration_mapping.exp_version

@@ -28,6 +28,7 @@ import sys
 import time
 import traceback
 
+import backports.functools_lru_cache
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
@@ -36,7 +37,6 @@ import feconf
 import python_utils
 import utils
 
-import backports.functools_lru_cache
 import webapp2
 
 current_user_services = models.Registry.import_current_user_services()
@@ -338,20 +338,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
-
-    def render_blob(self, blob):
-        """Prepares binary object response to be sent to the client.
-
-        Args:
-            blob: bytes(str). Binary content to be sent to the client.
-        """
-        self.response.content_type = b'application/octet-stream'
-        self.response.headers[b'Strict-Transport-Security'] = (
-            b'max-age=31536000; includeSubDomains')
-        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
-        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
-
-        self.response.write(blob)
 
     def render_downloadable_file(self, values, filename, content_type):
         """Prepares downloadable content to be sent to the client.

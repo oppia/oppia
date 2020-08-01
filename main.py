@@ -40,12 +40,12 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
-    protobuf_path = os.path.join(
+    PROTOBUF_PATH = os.path.join(
         OPPIA_TOOLS_PATH, 'protobuf-3.12.0')
-    if not os.path.isdir(protobuf_path):
+    if not os.path.isdir(PROTOBUF_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % (
-            protobuf_path))
-    sys.path.insert(0, protobuf_path)
+            PROTOBUF_PATH))
+    sys.path.insert(0, PROTOBUF_PATH)
 
 THIRD_PARTY_LIBS = [
     os.path.join(
