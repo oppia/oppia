@@ -474,8 +474,6 @@ describe('Exploration editor page component', function() {
         ' function on index 1 of ctrl.EDITOR_TUTORIAL_OPTIONS array',
       () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
 
         var animateSpy = spyOn(element, 'animate').and.callThrough();
@@ -490,8 +488,6 @@ describe('Exploration editor page component', function() {
       it('should not change element scroll top when calling fn property' +
         ' function on index 1 of EDITOR_TUTORIAL_OPTIONS array', () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
 
         var animateSpy = spyOn(element, 'animate').and.callThrough();
@@ -507,16 +503,16 @@ describe('Exploration editor page component', function() {
         ' fn property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
       () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
-        // @ts-ignore Angular element method doesn't expect to receive
-        // 1 argument in the lints.
         spyOn(angular, 'element')
           .withArgs('#tutorialStateContent').and.returnValue({
-            // @ts-ignore Angular element should have more properties than
-            // just offset in the lint settings.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
             offset: () => ({
               top: 5
             })
@@ -533,16 +529,16 @@ describe('Exploration editor page component', function() {
         ' property function on index 3 of EDITOR_TUTORIAL_OPTIONS array',
       () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
-        // @ts-ignore Angular element method doesn't expect to receive
-        // 1 argument in the lints.
         spyOn(angular, 'element')
           .withArgs('#tutorialStateInteraction').and.returnValue({
-            // @ts-ignore Angular element should have more properties than
-            // just offset in the lint settings.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
             offset: () => ({
               top: 20
             })
@@ -559,16 +555,16 @@ describe('Exploration editor page component', function() {
         ' property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
       () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
-        // @ts-ignore Angular element method doesn't expect to receive
-        // 1 argument in the lints.
         spyOn(angular, 'element')
           .withArgs('#tutorialPreviewTab').and.returnValue({
-            // @ts-ignore Angular element should have more properties than
-            // just offset in the lint settings.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
             offset: () => ({
               top: 5
             })
@@ -585,16 +581,16 @@ describe('Exploration editor page component', function() {
         ' fn property function on index 5 of EDITOR_TUTORIAL_OPTIONS array',
       () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
-        // @ts-ignore Angular element method doesn't expect to receive
-        // 1 argument in the lints.
         spyOn(angular, 'element')
           .withArgs('#tutorialStateInteraction').and.returnValue({
-            // @ts-ignore Angular element should have more properties than
-            // just offset in the lint settings.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
             offset: () => ({
               top: 20
             })
@@ -611,16 +607,16 @@ describe('Exploration editor page component', function() {
         ' property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
       () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
-        // @ts-ignore Angular element method doesn't expect to receive
-        // 1 argument in the lints.
         spyOn(angular, 'element')
           .withArgs('#tutorialPreviewTab').and.returnValue({
-            // @ts-ignore Angular element should have more properties than
-            // just offset in the lint settings.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
             offset: () => ({
               top: 5
             })
@@ -637,16 +633,16 @@ describe('Exploration editor page component', function() {
         ' fn property function on index 7 of EDITOR_TUTORIAL_OPTIONS array',
       () => {
         var element = angular.element('div');
-        // @ts-ignore is being used in order to ignore JQuery properties that
-        // should be declared.
         spyOn(window, '$').and.returnValue(element);
         var animateSpy = spyOn(element, 'animate').and.callThrough();
-        // @ts-ignore Angular element method doesn't expect to receive
-        // 1 argument in the lints.
         spyOn(angular, 'element')
           .withArgs('#tutorialStateInteraction').and.returnValue({
-            // @ts-ignore Angular element should have more properties than
-            // just offset in the lint settings.
+            // This throws "Type '{ top: number; }' is not assignable to type
+            // 'JQLite | Coordinates'." This is because the actual 'offset'
+            // functions returns more properties than the function we've
+            // defined. We have only returned the properties we need
+            // in 'offset' function.
+            // @ts-expect-error
             offset: () => ({
               top: 20
             })
