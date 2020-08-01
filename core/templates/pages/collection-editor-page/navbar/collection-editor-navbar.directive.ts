@@ -40,6 +40,8 @@ require('pages/exploration-editor-page/services/router.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -57,16 +59,15 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'CollectionRightsBackendApiService',
         'EditableCollectionBackendApiService', 'UrlService',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService, RouterService,
             UndoRedoService, CollectionEditorStateService,
             CollectionValidationService,
             CollectionRightsBackendApiService,
             EditableCollectionBackendApiService, UrlService,
-            EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _validateCollection = function() {
             if (ctrl.collectionRights.isPrivate()) {
               ctrl.validationIssues = (
@@ -212,14 +213,20 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             $scope.$on(
               EVENT_COLLECTION_INITIALIZED, _validateCollection);
             $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+            ctrl.directiveSubscriptions.add(
+              UndoRedoService.onUndoRedoChangeApplied.subscribe(
+                () => _validateCollection()
+              )
+            );
             ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.collectionRights = (
               CollectionEditorStateService.getCollectionRights());
 
             ctrl.validationIssues = [];
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

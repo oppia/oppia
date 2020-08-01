@@ -19,21 +19,23 @@
 
 require('domain/editor/editor-domain.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 /**
  * Stores a stack of changes to a domain object. Please note that only one
  * instance of this service exists at a time, so multiple undo/redo stacks are
  * not currently supported.
  */
 angular.module('oppia').factory('BaseUndoRedoService', [
-  '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-  function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+  function() {
     var BaseUndoRedoService = {};
+    var _undoRedoChangeAppliedEventEmitter = new EventEmitter();
 
     this._appliedChanges = [];
     this._undoneChanges = [];
 
     var _dispatchMutation = function() {
-      $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
+      _undoRedoChangeAppliedEventEmitter.emit();
     };
     var _applyChange = function(changeObject, domainObject) {
       changeObject.applyChange(domainObject);
@@ -178,6 +180,10 @@ angular.module('oppia').factory('BaseUndoRedoService', [
       _dispatchMutation();
     };
 
-    return BaseUndoRedoService;
+    return {
+      get onUndoRedoChangeApplied() {
+        return _undoRedoChangeAppliedEventEmitter;
+      }
+    };
   }
 ]);
