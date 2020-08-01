@@ -15,7 +15,7 @@
     </div>
   </div>
   <div ng-if="!$ctrl.iframed">
-    <div role="button" tabindex="0" ng-click="$ctrl.skipToMainContent()"
+    <div id="skipToMainContentId" role="button" tabindex="0" ng-click="$ctrl.skipToMainContent()"
          class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content
     </div>
     <promo-bar>
@@ -26,14 +26,16 @@
     <div class="oppia-base-container"
          ng-class="{'oppia-sidebar-menu-open': $ctrl.isSidebarShown(), 'oppia-sidebar-menu-closed': !$ctrl.isSidebarShown()}"
          ng-swipe-left="$ctrl.closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
-      <div class="oppia-content-container">
+      <div class="oppia-content-container protractor-test-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
             <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection" role="navigation" headroom
                  tolerance="0" offset="0">
               <div class="navbar-container">
                 <div ng-transclude="preLogoAction" class="oppia-base-content-pre-logo-container"></div>
-                <top-navigation-bar></top-navigation-bar>
+                <top-navigation-bar header-text="getHeaderText"
+                                    subheader-text="getSubheaderText">
+                </top-navigation-bar>
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
                   <div ng-transclude="breadcrumb" class="mr-auto"></div>
 

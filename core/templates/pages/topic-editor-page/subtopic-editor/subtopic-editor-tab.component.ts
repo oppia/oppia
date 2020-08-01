@@ -44,12 +44,14 @@ angular.module('oppia').component('subtopicEditorTab', {
     '$scope', 'EntityCreationService', 'QuestionBackendApiService',
     'SubtopicValidationService', 'TopicEditorStateService',
     'TopicEditorRoutingService', 'TopicUpdateService',
+    'UndoRedoService',
     'UrlInterpolationService', 'WindowDimensionsService',
     'EVENT_SUBTOPIC_PAGE_LOADED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
     function(
         $scope, EntityCreationService, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
+        UndoRedoService,
         UrlInterpolationService, WindowDimensionsService,
         EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
       var ctrl = this;
@@ -159,8 +161,14 @@ angular.module('oppia').component('subtopicEditorTab', {
         }
       };
 
+      ctrl.cancelHtmlDataChange = function() {
+        ctrl.htmlData = ctrl.htmlDataBeforeUpdate;
+        ctrl.updateHtmlData();
+        ctrl.schemaEditorIsShown = false;
+      };
       ctrl.showSchemaEditor = function() {
         ctrl.schemaEditorIsShown = true;
+        ctrl.htmlDataBeforeUpdate = angular.copy(ctrl.htmlData);
       };
 
       ctrl.onRearrangeMoveSkillFinish = function(toIndex) {
@@ -185,7 +193,17 @@ angular.module('oppia').component('subtopicEditorTab', {
       };
 
       ctrl.togglePreviewSkillCard = function() {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
         ctrl.skillsListIsShown = !ctrl.skillsListIsShown;
+      };
+
+      ctrl.toggleSubtopicEditorCard = function() {
+        if (!WindowDimensionsService.isWindowNarrow()) {
+          return;
+        }
+        ctrl.subtopicEditorCardIsShown = !ctrl.subtopicEditorCardIsShown;
       };
 
       ctrl.showSkillEditOptions = function(index) {
@@ -224,6 +242,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.skillsListIsShown = (
           !WindowDimensionsService.isWindowNarrow());
         ctrl.subtopicPreviewCardIsShown = false;
+        ctrl.subtopicEditorCardIsShown = true;
         ctrl.schemaEditorIsShown = false;
 
         ctrl.directiveSubscriptions.add(
