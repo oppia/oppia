@@ -169,3 +169,24 @@ def temp_dir(suffix='', prefix='', parent=None):
         yield new_dir
     finally:
         shutil.rmtree(new_dir)
+
+    
+class OutputStream(python_utils.OBJECT):
+    """Returns linter output messages."""
+
+    def __init__(self, name, failed, summary_messages, full_messages):
+        self.name = name
+        self.failed = failed
+        self.messages = summary_messages
+        self.full_messages = full_messages
+    
+    @property
+    def all_messages(self):
+        if self.name:
+            failed_message = (
+                '%s %s check %s' % (
+                    (FAILED_MESSAGE_PREFIX, self.name, 'failed')
+                    if self.failed else (
+                        SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
+            self.full_messages.append(failed_message)
+        return self.full_messages

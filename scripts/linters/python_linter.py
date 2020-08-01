@@ -106,8 +106,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
         """This function is used to check that function
            with test_only in their names are in test files.
         """
+        name = 'Function definition'
         summary_messages = []
-        full_messages = []
         files_to_check = self.py_filepaths
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
@@ -129,25 +129,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
                         summary_messages.append(summary_message)
                         failed = True
 
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s Function defintion checks failed,'
-                    'see affect files above.'
-                    % (linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Function definition checks passed'
-                    % (linter_utils.SUCCESS_MESSAGE_PREFIX))
-
-            full_messages.append(summary_message)
-        status = {
-            'name': 'Function definition',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
@@ -178,8 +161,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     class_names.append(name)
             return class_names
 
+        name = 'Job registry'
         summary_messages = []
-        full_messages = []
         failed = False
         jobs_in_cron = [
             'DashboardStatsOneOffJob',
@@ -249,19 +232,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     ',\n'.join(sorted(non_registered_validation_jobs))))
             summary_messages.append(summary_message)
 
-        full_messages += summary_messages
-        summary_message = (
-            '%s Job registry check %s' % (
-                (linter_utils.FAILED_MESSAGE_PREFIX, 'failed') if failed else
-                (linter_utils.SUCCESS_MESSAGE_PREFIX, 'passed')))
-        full_messages.append(summary_message)
-        status = {
-            'name': 'Job registry',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -361,6 +333,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         errors_found = False
         summary_messages = []
         full_messages = []
+        name = 'Pylint'
 
         num_py_files = len(files_to_lint)
 
@@ -409,25 +382,8 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             current_batch_start_index = current_batch_end_index
 
-        if errors_found:
-            summary_message = (
-                '%s Python linting failed' % (
-                    linter_utils.FAILED_MESSAGE_PREFIX))
-        else:
-            summary_message = (
-                '%s %s Python files linted (%.1f secs)' % (
-                    linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files,
-                    time.time() - start_time))
-
-        full_messages.append(summary_message)
-
-        status = {
-            'name': 'Pylint',
-            'failed': errors_found,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, errors_found, summary_messages, full_messages)
 
     def _lint_py_files_for_python3_compatibility(self):
         """Prints a list of Python 3 compatibility errors in the given list of
@@ -441,6 +397,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         any_errors = False
         summary_messages = []
         full_messages = []
+        name = 'Pylint for Python 3 compatibility'
 
         files_to_lint_for_python3_compatibility = [
             file_name for file_name in files_to_lint if not re.match(
@@ -484,33 +441,15 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             current_batch_start_index = current_batch_end_index
 
-        if any_errors:
-            summary_message = (
-                '%s Python linting for Python 3 compatibility failed'
-                % linter_utils.FAILED_MESSAGE_PREFIX)
-        else:
-            summary_message = (
-                '%s %s Python files linted for Python 3 compatibility '
-                '(%.1f secs)'
-                % (linter_utils.SUCCESS_MESSAGE_PREFIX, num_py_files, (
-                    time.time() - start_time)))
-
-        full_messages.append(summary_message)
-
-        status = {
-            'name': 'Pylint for Python 3 compatibility',
-            'failed': any_errors,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, any_errors, summary_messages, full_messages)
 
     def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
         """
+        name = 'Import order'
         summary_messages = []
-        full_messages = []
         files_to_check = self.all_filepaths
         failed = False
         stdout = python_utils.string_io()
@@ -524,26 +463,13 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                         filepath, check=True, show_diff=(
                             True)).incorrectly_sorted):
                     failed = True
-
+            
             if failed:
                 summary_message = stdout.getvalue()
                 summary_messages.append(summary_message)
-                summary_message = (
-                    '%s Import order checks failed, file imports should be '
-                    'alphabetized, see affect files above.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Import order checks passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
-        status = {
-            'name': 'Import order',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

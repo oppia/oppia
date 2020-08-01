@@ -111,6 +111,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         failed = False
         summary_messages = []
         full_messages = []
+        name = 'Stylelint'
 
         num_css_files = len(files_to_lint)
         python_utils.PRINT('Total css files: %s' % num_css_files)
@@ -148,13 +149,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 time.time() - start_time))
         full_messages.append(summary_message)
 
-        status = {
-            'name': 'Stylelint',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, full_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

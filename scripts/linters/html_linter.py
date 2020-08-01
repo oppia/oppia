@@ -263,7 +263,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
         failed = False
         summary_messages = []
-        full_messages = []
+        name = 'HTML tag and attribute'
 
         with linter_utils.redirect_stdout(stdout):
             for filepath in html_files_to_lint:
@@ -276,28 +276,11 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                     raise TagMismatchException('Error in file %s\n' % filepath)
 
                 if parser.failed:
+                    summary_messages.extend(parser.summary_messages)
                     failed = True
 
-            if failed:
-                summary_message = (
-                    '%s HTML tag and attribute check failed, fix the HTML '
-                    'files listed above.' % linter_utils.FAILED_MESSAGE_PREFIX)
-                full_messages.append(summary_message)
-                full_messages.extend(parser.summary_messages)
-                summary_messages.extend(parser.summary_messages)
-            else:
-                summary_message = (
-                    '%s HTML tag and attribute check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-                full_messages.append(summary_message)
-
-        status = {
-            'name': 'HTML tag and attribute',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -382,6 +365,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             'node_modules', 'htmllint-cli', 'bin', 'cli.js')
 
         failed = False
+        name = 'HTMLLint'
         error_summary = []
         total_error_count = 0
         summary_messages = []
@@ -409,31 +393,8 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                     summary_messages.append(
                         self._get_trimmed_error_output(linter_stdout))
 
-        with linter_utils.redirect_stdout(stdout):
-            for error_count in error_summary:
-                total_error_count += error_count
-            total_files_checked = len(html_files_to_lint)
-            if total_error_count:
-                full_messages.append(
-                    '(%s files checked, %s errors found)' % (
-                        total_files_checked, total_error_count))
-                summary_message = (
-                    '%s HTML linting failed, fix the HTML files listed above'
-                    '.' % linter_utils.FAILED_MESSAGE_PREFIX)
-                full_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s HTML linting passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-                full_messages.append(summary_message)
-
-        status = {
-            'name': 'HTMLLint',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, full_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

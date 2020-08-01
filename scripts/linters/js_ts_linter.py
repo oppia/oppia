@@ -236,7 +236,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         ]
 
         summary_messages = []
-        full_messages = []
+        name = 'HTTP request'
 
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
@@ -259,32 +259,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             file_path))
                     summary_messages.append(summary_message)
 
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s HTTP requests check failed' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s HTTP requests check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
-
-        status = {
-            'name': 'HTTP request',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
         build.JS_FILEPATHS_NOT_TO_BUILD.
         """
+        name = 'Extra JS files'
         summary_messages = []
-        full_messages = []
         failed = False
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
@@ -306,24 +290,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     'build.py. Otherwise, rename them to .ts\n')
                 summary_messages.append(err_msg)
 
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s Extra JS files check failed, see '
-                    'message above on resolution steps.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Extra JS files check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
-        status = {
-            'name': 'Extra JS files',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -331,6 +299,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         matches the filename.
         """
         # Select JS files which need to be checked.
+        name = 'JS and TS component name and count'
         files_to_check = [
             filepath for filepath in self.all_filepaths if not
             filepath.endswith('App.ts')]
@@ -359,33 +328,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             failed = True
                             summary_messages.append(summary_message)
                             break
-        
-        full_messages += summary_messages
-        with linter_utils.redirect_stdout(stdout):
-            if failed:
-                summary_message = (
-                    '%s JS and TS Component name and count check failed, '
-                    'see messages above for duplicate names.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s JS and TS Component name and count check passed' %
-                    (linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
 
-        status = {
-            'name': 'JS and TS component name and count',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
         """
         # Select JS and TS files which need to be checked.
+        name = 'Directive scope'
         files_to_check = self.all_filepaths
         failed = False
         summary_messages = []
@@ -494,26 +446,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                 summary_messages.append(
                                                     summary_message)
 
-        full_messages += summary_messages
-        with linter_utils.redirect_stdout(stdout):
-            if failed:
-                summary_message = (
-                    '%s Directive scope check failed, '
-                    'see messages above for suggested fixes.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Directive scope check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
-
-        status = {
-            'name': 'Directive scope',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -521,6 +455,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         files are in following pattern: dollar imports, regular
         imports, and constant imports, all in sorted order.
         """
+        name = 'Sorted dependencies'
         files_to_check = self.all_filepaths
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
@@ -593,32 +528,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     'sorted order.'
                                     % (property_value, filepath))
                                 summary_messages.append(summary_message)
-        full_messages += summary_messages
-        with linter_utils.redirect_stdout(stdout):
-            if failed:
-                summary_message = (
-                    '%s Sorted dependencies check failed, fix files that '
-                    'that don\'t have sorted dependencies mentioned above.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Sorted dependencies check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
 
-        full_messages.append(summary_message)
-        status = {
-            'name': 'Sorted dependencies',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
         listed in the controller of a directive or service exactly match those
         between the arguments of the controller function.
         """
+        name = 'Controller dependency line break'
         files_to_check = self.all_filepaths
         failed = False
         summary_messages = []
@@ -652,25 +571,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             'exactly match.' % (
                                 filepath, stringfied_dependencies,
                                 function_parameters))
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s Controller dependency line break check failed, '
-                    'see messages above for the affected files.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Controller dependency line break check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
 
-        status = {
-            'name': 'Controller dependency line break',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
+        
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -679,6 +583,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         that the constants are declared in both *.constants.ajs.ts (for
         AngularJS) and in *.constants.ts (for Angular 8).
         """
+        name = 'Constants declaration'
         summary_messages = []
         full_messages = []
         failed = False
@@ -835,25 +740,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             % filepath)
                         summary_messages.append(summary_message)
 
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s Constants declaration check failed, '
-                    'see messages above for constants with errors.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Constants declaration check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
-
-        status = {
-            'name': 'Constants',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_comments(self):
         """This function ensures that comments follow correct style. Below are
@@ -864,6 +752,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         '--params', 'eslint-disable', 'eslint-enable', 'http://', 'https://')
         in the comment.
         """
+        name = 'Comments'
         summary_messages = []
         full_messages = []
         files_to_check = self.all_filepaths
@@ -939,23 +828,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     filepath, line_num + 1))
                             summary_messages.append(summary_message)
 
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s Comments check failed, fix files that have bad '
-                    'comment formatting.' % linter_utils.FAILED_MESSAGE_PREFIX)
-            else:
-                summary_message = (
-                    '%s Comments check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
-        status = {
-            'name': 'Comments',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -1086,16 +960,12 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         start_time = time.time()
         num_files_with_errors = 0
         summary_messages = []
+        full_messages = []
+        name = 'ESLint'
 
-        num_js_and_ts_files = len(files_to_lint)
-        python_utils.PRINT(
-            'Total js and ts files: %s' % num_js_and_ts_files)
         eslint_cmd_args = [node_path, eslint_path, '--quiet']
         result_list = []
-        python_utils.PRINT('Linting JS and TS files.')
         for _, filepath in enumerate(files_to_lint):
-            if self.verbose_mode_enabled:
-                python_utils.PRINT('Linting: %s' % filepath)
             proc_args = eslint_cmd_args + [filepath]
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -1113,24 +983,14 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
                 result_list.append(linter_stdout)
 
         if num_files_with_errors:
+            failed = True
             for result in result_list:
-                python_utils.PRINT(result)
+                full_messages.append(result)
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
-            summary_message = (
-                '%s %s JavaScript and Typescript files' % (
-                    linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
-        else:
-            summary_message = (
-                '%s %s JavaScript and Typescript files linted (%.1f secs)' % (
-                    linter_utils.SUCCESS_MESSAGE_PREFIX, num_js_and_ts_files,
-                    time.time() - start_time))
-        python_utils.PRINT(summary_message)
-        summary_messages.append(summary_message)
 
-        python_utils.PRINT('Js and Ts linting finished.')
-
-        return summary_messages
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, full_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -1145,7 +1005,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
-        return self._lint_js_and_ts_files()
+        return [self._lint_js_and_ts_files()]
 
 
 def get_linters(

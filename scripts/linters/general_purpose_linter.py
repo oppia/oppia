@@ -703,8 +703,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         """This function checks that all files contain the mandatory
         patterns.
         """
+        name = 'Mandatory pattern'
         summary_messages = []
-        full_messages = []
         failed = False
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
@@ -716,33 +716,15 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         self._check_for_mandatory_pattern_in_file(
                             pattern_list, filepath, failed))
                     summary_messages.extend(mandatory_summary_messages)
-                    full_messages += summary_messages
-
-            if failed:
-                summary_message = (
-                    '%s Mandatory pattern check failed, see errors above for'
-                    'patterns that should be added.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Mandatory pattern check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-
-        full_messages.append(summary_message)
-        status = {
-            'name': 'Mandatory pattern',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
+        name = 'Bad pattern'
         total_files_checked = 0
         total_error_count = 0
         summary_messages = []
-        full_messages = []
         all_filepaths = [
             filepath for filepath in self.all_filepaths if not (
                 filepath.endswith('general_purpose_linter.py') or (
@@ -794,36 +776,14 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                                 REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
                             summary_messages.append(summary_message)
                             total_error_count += 1
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s Pattern check failed, see errors above '
-                    'for patterns that should be removed.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = '%s Pattern checks passed' % (
-                    linter_utils.SUCCESS_MESSAGE_PREFIX)
-            full_messages.append(summary_message)
 
-            python_utils.PRINT('')
-            if total_files_checked == 0:
-                python_utils.PRINT('There are no files to be checked.')
-            else:
-                full_messages.append(
-                    '(%s files checked, %s errors found)' % (
-                        total_files_checked, total_error_count))
-        status = {
-            'name': 'Bad pattern',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_newline_at_eof(self):
         """This function is used to detect newline at the end of file."""
+        name = 'Newline at EOF'
         summary_messages = []
-        full_messages = []
         files_to_lint = self.all_filepaths
         failed = False
 
@@ -839,24 +799,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         'end of file.' % filepath)
                     summary_messages.append(summary_message)
                     failed = True
-            full_messages += summary_messages
-            if failed:
-                summary_message = (
-                    '%s Newline at the eof check failed.' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s Newline at the eof check passed.' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-            full_messages.append(summary_message)
 
-        status = {
-            'name': 'Newline at EOF',
-            'failed': failed,
-            'full_messages': full_messages,
-            'summary_messages': summary_messages
-        }
-        return status
+        return linter_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

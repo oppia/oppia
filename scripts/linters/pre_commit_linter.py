@@ -61,7 +61,6 @@ import threading
 import python_utils
 
 # Install third party dependencies before proceeding.
-from . import app_dev_linter
 from . import codeowner_linter
 from . import css_linter
 from . import general_purpose_linter
@@ -69,8 +68,7 @@ from . import html_linter
 from . import js_ts_linter
 from . import linter_utils
 from . import python_linter
-from . import third_party_typings_linter
-from . import webpack_config_linter
+from . import other_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -268,6 +266,13 @@ def _get_linters_for_file_extension(
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
+    elif file_extension_to_lint == 'other':
+        custom_linter, _ = codeowner_linter.get_linters(FILE_CACHE)
+        custom_linters.append(custom_linter)
+
+        custom_linter, _ = other_linter.get_linters(FILE_CACHE)
+        custom_linters.append(custom_linter)
+
     return custom_linters, third_party_linters
 
 
@@ -448,8 +453,8 @@ def _get_task_output(lint_messages, failed, task):
     """
     if task.output:
         for output in task.output:
-            lint_messages += output['summary_messages']
-            if output['failed']:
+            lint_messages += output.messages
+            if output.failed:
                 failed = True
     return failed
 
@@ -559,19 +564,6 @@ def main(args=None):
 
     for task in tasks_third_party:
         failed = _get_task_output(lint_messages, failed, task)
-
-    lint_messages += codeowner_linter.check_codeowner_file(
-        FILE_CACHE, verbose_mode_enabled)
-
-    lint_messages += (
-        third_party_typings_linter.check_third_party_libs_type_defs(
-            verbose_mode_enabled))
-
-    lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
-        FILE_CACHE, verbose_mode_enabled)
-
-    lint_messages += webpack_config_linter.check_webpack_config_file(
-        FILE_CACHE, verbose_mode_enabled)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:

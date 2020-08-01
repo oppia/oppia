@@ -61,18 +61,23 @@ class TaskThread(threading.Thread):
             self.output = self.func()
             if self.verbose:
                 for stdout in self.output:
-                    if stdout['name']:
-                        log('Starting %s check' % stdout['name'], show_time=True)
+                    if stdout.name:
+                        log('Starting %s check' % stdout.name, show_time=True)
                         log('----------------------------------------')
-                        for message in stdout['full_messages']:
+                        for message in stdout.all_messages:
                             log(message)
+                        log(
+                            'FINISHED %s: %.1f secs' % (
+                                stdout.name, time.time() - self.start_time),
+                                show_time=True)
                     else:
                         log('LOG %s:' % self.name, show_time=True)
-                        log(stdout['full_messages'])
+                        log(stdout.all_messages)
                         log('----------------------------------------')
-            log(
-                'FINISHED %s: %.1f secs' %
-                (self.name, time.time() - self.start_time), show_time=True)
+                        log(
+                            'FINISHED %s: %.1f secs' % (
+                                self.name, time.time() - self.start_time),
+                                show_time=True)
         except Exception as e:
             self.exception = e
             self.stacktrace = traceback.format_exc()
