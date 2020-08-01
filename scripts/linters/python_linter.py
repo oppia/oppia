@@ -24,7 +24,6 @@ import inspect
 import os
 import re
 import sys
-import time
 
 import python_utils
 
@@ -71,26 +70,18 @@ class StringMessageStream(python_utils.OBJECT):
 
 
 class PythonLintChecksManager(python_utils.OBJECT):
-    """Manages all the Python linting functions.
+    """Manages all the Python linting functions."""
 
-    Attributes:
-        files_to_lint: list(str). A list of filepaths to lint.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-
-    def __init__(
-            self, files_to_lint, file_cache, verbose_mode_enabled):
+    def __init__(self, files_to_lint, file_cache):
         """Constructs a PythonLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
-            verbose_mode_enabled: bool. True if mode is enabled.
         """
         self.files_to_lint = files_to_lint
         self.file_cache = file_cache
-        self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
     def py_filepaths(self):
@@ -103,38 +94,45 @@ class PythonLintChecksManager(python_utils.OBJECT):
         return self.py_filepaths
 
     def _check_non_test_files(self):
-        """This function is used to check that function
-           with test_only in their names are in test files.
+        """This function is used to check that function with test_only in their
+        names are in test files.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         name = 'Function definition'
         summary_messages = []
         files_to_check = self.py_filepaths
-        with linter_utils.redirect_stdout(sys.stdout):
-            failed = False
-            for filepath in files_to_check:
-                if filepath.endswith('_test.py'):
+        failed = False
+        for filepath in files_to_check:
+            if filepath.endswith('_test.py'):
+                continue
+            for line_num, line in enumerate(self.file_cache.readlines(
+                    filepath)):
+                line = line.strip()
+                words = line.split()
+                if len(words) < 2:
                     continue
-                for line_num, line in enumerate(self.file_cache.readlines(
-                        filepath)):
-                    line = line.strip()
-                    words = line.split()
-                    if len(words) < 2:
-                        continue
-                    ind1 = words[0].startswith('def')
-                    ind2 = words[1].startswith('test_only')
-                    if ind1 and ind2:
-                        summary_message = (
-                            '%s --> Line %s: Please do not use \'test_only\' '
-                            'in the non-test file.' % (filepath, line_num + 1))
-                        summary_messages.append(summary_message)
-                        failed = True
+                ind1 = words[0].startswith('def')
+                ind2 = words[1].startswith('test_only')
+                if ind1 and ind2:
+                    summary_message = (
+                        '%s --> Line %s: Please do not use \'test_only\' '
+                        'in the non-test file.' % (filepath, line_num + 1))
+                    summary_messages.append(summary_message)
+                    failed = True
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
         are registered in jobs_registry.py file.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         def _get_jobs_class_names_in_filepath(filepath, base_class_name):
             """Returns a list of job class names in the given filepath which has
@@ -232,7 +230,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     ',\n'.join(sorted(non_registered_validation_jobs))))
             summary_messages.append(summary_message)
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
@@ -240,11 +238,12 @@ class PythonLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT('There are no Python files to lint.')
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log('There are no Python files to lint.')
             return []
 
         linter_stdout = []
@@ -256,23 +255,15 @@ class PythonLintChecksManager(python_utils.OBJECT):
 
 
 class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
-    """Manages all the third party Python linting functions.
+    """Manages all the third party Python linting functions."""
 
-    Attributes:
-        files_to_lint: list(str). A list of filepaths to lint.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-
-    def __init__(
-            self, files_to_lint, verbose_mode_enabled):
+    def __init__(self, files_to_lint):
         """Constructs a ThirdPartyPythonLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         self.files_to_lint = files_to_lint
-        self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
     def all_filepaths(self):
@@ -317,25 +308,19 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
     def _lint_py_files(self):
         """Prints a list of lint errors in the given list of Python files.
 
-        Args:
-            config_pylint: str. Path to the .pylintrc file.
-            config_pycodestyle: str. Path to the tox.ini file.
-
         Returns:
-            summary_messages: list(str). Summary messages of lint check.
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
         config_pylint = '--rcfile=%s' % pylintrc_path
         config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
 
         files_to_lint = self.all_filepaths
-        start_time = time.time()
         errors_found = False
         summary_messages = []
         full_messages = []
         name = 'Pylint'
-
-        num_py_files = len(files_to_lint)
 
         _batch_size = 50
         current_batch_start_index = 0
@@ -382,7 +367,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             current_batch_start_index = current_batch_end_index
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, errors_found, summary_messages, full_messages)
 
     def _lint_py_files_for_python3_compatibility(self):
@@ -390,10 +375,10 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         Python files.
 
         Returns:
-            summary_messages: list(str). Summary of lint check.
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         files_to_lint = self.all_filepaths
-        start_time = time.time()
         any_errors = False
         summary_messages = []
         full_messages = []
@@ -402,7 +387,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         files_to_lint_for_python3_compatibility = [
             file_name for file_name in files_to_lint if not re.match(
                 r'^.*python_utils.*\.py$', file_name)]
-        num_py_files = len(files_to_lint_for_python3_compatibility)
         if not files_to_lint_for_python3_compatibility:
             full_messages.append(
                 'There are no Python files to lint for Python 3 compatibility.')
@@ -441,12 +425,16 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             current_batch_start_index = current_batch_end_index
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, any_errors, summary_messages, full_messages)
 
     def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         name = 'Import order'
         summary_messages = []
@@ -463,12 +451,12 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                         filepath, check=True, show_diff=(
                             True)).incorrectly_sorted):
                     failed = True
-            
+
             if failed:
                 summary_message = stdout.getvalue()
                 summary_messages.append(summary_message)
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
@@ -476,12 +464,13 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
         linter_stdout = []
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT('There are no Python files to lint.')
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log('There are no Python files to lint.')
             return []
 
         linter_stdout.append(self._lint_py_files())
@@ -493,7 +482,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return linter_stdout
 
 
-def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
+def get_linters(files_to_lint, file_cache):
     """Creates PythonLintChecksManager and ThirdPartyPythonLintChecksManager
         objects and return them.
 
@@ -501,16 +490,13 @@ def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
         files_to_lint: list(str). A list of filepaths to lint.
         file_cache: object(FileCache). Provides thread-safe access to cached
             file content.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
         tuple(PythonLintChecksManager, ThirdPartyPythonLintChecksManager). A
         2-tuple of custom and third_party linter objects.
     """
-    custom_linter = PythonLintChecksManager(
-        files_to_lint, file_cache, verbose_mode_enabled)
+    custom_linter = PythonLintChecksManager(files_to_lint, file_cache)
 
-    third_party_linter = ThirdPartyPythonLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
+    third_party_linter = ThirdPartyPythonLintChecksManager(files_to_lint)
 
     return custom_linter, third_party_linter

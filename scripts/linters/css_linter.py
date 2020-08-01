@@ -23,38 +23,26 @@ import os
 import re
 import subprocess
 import sys
-import time
 
 import python_utils
 
-from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
 
 
 class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
-    """Manages all the third party Python linting functions.
+    """Manages all the third party Python linting functions."""
 
-    Attributes:
-        config_path: str. Path to the configuration file.
-        files_to_lint: list(str). A list of filepaths to lint.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-
-    def __init__(
-            self, config_path, files_to_lint,
-            verbose_mode_enabled):
+    def __init__(self, config_path, files_to_lint):
         """Constructs a ThirdPartyCSSLintChecksManager object.
 
         Args:
             config_path: str. Path to the configuration file.
             files_to_lint: list(str). A list of filepaths to lint.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         super(ThirdPartyCSSLintChecksManager, self).__init__()
         self.config_path = config_path
         self.files_to_lint = files_to_lint
-        self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
     def all_filepaths(self):
@@ -93,7 +81,8 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of CSS files.
 
         Returns:
-            summary_messages: list(str). Return summary of lint checks.
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
@@ -106,15 +95,12 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 '         or node-stylelint and its dependencies.')
             sys.exit(1)
         files_to_lint = self.all_filepaths
-        start_time = time.time()
         num_files_with_errors = 0
         failed = False
         summary_messages = []
         full_messages = []
         name = 'Stylelint'
 
-        num_css_files = len(files_to_lint)
-        python_utils.PRINT('Total css files: %s' % num_css_files)
         stylelint_cmd_args = [
             node_path, stylelint_path, '--config=' + self.config_path]
         result_list = []
@@ -140,16 +126,9 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
                 full_messages.append(result)
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
-            summary_message = ('%s %s CSS file' % (
-                linter_utils.FAILED_MESSAGE_PREFIX, num_files_with_errors))
             failed = True
-        else:
-            summary_message = ('%s %s CSS file linted (%.1f secs)' % (
-                linter_utils.SUCCESS_MESSAGE_PREFIX, num_css_files,
-                time.time() - start_time))
-        full_messages.append(summary_message)
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, full_messages)
 
     def perform_all_lint_checks(self):
@@ -157,30 +136,30 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'There are no HTML or CSS files to lint.')
             return []
 
         return [self.lint_css_files()]
 
 
-def get_linters(config_path, files_to_lint, verbose_mode_enabled=False):
+def get_linters(config_path, files_to_lint):
     """Creates ThirdPartyCSSLintChecksManager and returns it.
 
     Args:
         config_path: str. Path to the configuration file.
         files_to_lint: list(str). A list of filepaths to lint.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
         tuple(None, ThirdPartyCSSLintChecksManager). A 2-tuple of custom and
         third_party linter objects.
     """
     third_party_linter = ThirdPartyCSSLintChecksManager(
-        config_path, files_to_lint, verbose_mode_enabled)
+        config_path, files_to_lint)
 
     return None, third_party_linter

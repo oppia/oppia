@@ -57,7 +57,6 @@ import unittest
 
 import python_utils
 
-from scripts.linters import linter_utils
 from . import common
 from . import concurrent_task_utils
 from . import install_third_party_libs
@@ -184,7 +183,7 @@ class TestingTaskSpec(python_utils.OBJECT):
 
         result = run_shell_cmd(exc_list)
 
-        return [linter_utils.OutputStream(None, None, None, result)]
+        return [concurrent_task_utils.OutputStream(None, None, None, result)]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):

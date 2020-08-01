@@ -25,6 +25,8 @@ import time
 import traceback
 import python_utils
 
+from scripts.linters import linter_utils
+
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
 
@@ -40,6 +42,45 @@ def log(message, show_time=False):
                 datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
         else:
             python_utils.PRINT(message)
+
+
+class OutputStream(python_utils.OBJECT):
+    """Output stream for concurrent_task_utils."""
+
+    def __init__(self, name, failed, summary_messages, full_messages):
+        """Constructs a OutputStream object.
+
+        Args:
+            name: str. Name of the check currently running.
+            failed: bool. Status of the check currently running.
+            summary_messages: list(str). List of summary messages returned by
+                the objects.
+            full_messages: list(str). List of full messages returned by the
+                objects.
+        """
+        self.name = name
+        self.failed = failed
+        self.messages = summary_messages
+        self.full_messages = full_messages
+
+    @property
+    def all_messages(self):
+        """Returns the full list with the message if the current check is
+        failing or passing.
+
+        Returns:
+            list(str). List of full messages corresponding to currently running
+            task.
+        """
+        if self.name:
+            failed_message = (
+                '%s %s check %s' % (
+                    (linter_utils.FAILED_MESSAGE_PREFIX, self.name, 'failed')
+                    if self.failed else (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX,
+                        self.name, 'passed')))
+            self.full_messages.append(failed_message)
+        return self.full_messages
 
 
 class TaskThread(threading.Thread):
@@ -69,7 +110,7 @@ class TaskThread(threading.Thread):
                         log(
                             'FINISHED %s: %.1f secs' % (
                                 stdout.name, time.time() - self.start_time),
-                                show_time=True)
+                            show_time=True)
                     else:
                         log('LOG %s:' % self.name, show_time=True)
                         log(stdout.all_messages)
@@ -77,7 +118,7 @@ class TaskThread(threading.Thread):
                         log(
                             'FINISHED %s: %.1f secs' % (
                                 self.name, time.time() - self.start_time),
-                                show_time=True)
+                            show_time=True)
         except Exception as e:
             self.exception = e
             self.stacktrace = traceback.format_exc()

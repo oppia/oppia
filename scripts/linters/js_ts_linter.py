@@ -26,11 +26,9 @@ import re
 import shutil
 import subprocess
 import sys
-import time
 
 import python_utils
 
-from . import linter_utils
 from .. import build
 from .. import common
 from .. import concurrent_task_utils
@@ -115,18 +113,9 @@ def compile_all_ts_files():
 
 
 class JsTsLintChecksManager(python_utils.OBJECT):
-    """Manages all the Js and Ts linting functions.
+    """Manages all the Js and Ts linting functions."""
 
-    Attributes:
-        all_filepaths: list(str). The list of filepaths to be linted.
-        js_filepaths: list(str): The list of js filepaths to be linted.
-        ts_filepaths: list(str): The list of ts filepaths to be linted.
-        parsed_js_and_ts_files: dict. Contains the content of JS files, after
-            validating and parsing the files.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-
-    def __init__(self, js_files, ts_files, file_cache, verbose_mode_enabled):
+    def __init__(self, js_files, ts_files, file_cache):
         """Constructs a JsTsLintChecksManager object.
 
         Args:
@@ -134,14 +123,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             ts_files: list(str). The list of ts filepaths to be linted.
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
 
         self.js_files = js_files
         self.ts_files = ts_files
         self.file_cache = file_cache
-        self.verbose_mode_enabled = verbose_mode_enabled
         self.parsed_js_and_ts_files = []
         self.parsed_expressions_in_files = []
 
@@ -172,7 +159,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         # Select JS files which need to be checked.
         files_to_check = self.all_filepaths
         parsed_js_and_ts_files = dict()
-        python_utils.PRINT('Validating and parsing JS and TS files ...')
+        concurrent_task_utils.log('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
             file_content = self.file_cache.read(filepath)
 
@@ -235,6 +222,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
     def _check_http_requests(self):
         """Checks if the http requests are made only by
         backend-api.service.ts.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         http_client_pattern = r':\n? *HttpClient'
 
@@ -245,225 +236,201 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         summary_messages = []
         name = 'HTTP request'
 
-        with linter_utils.redirect_stdout(sys.stdout):
-            failed = False
+        failed = False
 
-            for file_path in self.all_filepaths:
-                if file_path in excluded_files:
-                    continue
+        for file_path in self.all_filepaths:
+            if file_path in excluded_files:
+                continue
 
-                if file_path.endswith('backend-api.service.ts'):
-                    continue
+            if file_path.endswith('backend-api.service.ts'):
+                continue
 
-                file_content = self.file_cache.read(file_path)
+            file_content = self.file_cache.read(file_path)
 
-                if re.findall(http_client_pattern, file_content):
-                    failed = True
-                    summary_message = (
-                        '%s --> An instance of HttpClient is found in this '
-                        'file. You are not allowed to create http requests '
-                        'from files that are not backend api services.' % (
-                            file_path))
-                    summary_messages.append(summary_message)
+            if re.findall(http_client_pattern, file_content):
+                failed = True
+                summary_message = (
+                    '%s --> An instance of HttpClient is found in this '
+                    'file. You are not allowed to create http requests '
+                    'from files that are not backend api services.' % (
+                        file_path))
+                summary_messages.append(summary_message)
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_ts_ignore(self):
-        """Checks if ts ignore is used."""
+        """Checks if ts ignore is used.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
+        """
+        name = 'Ts ignore'
         summary_messages = []
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting ts ignore check')
-            python_utils.PRINT('----------------------------------------')
 
         ts_ignore_pattern = r'@ts-ignore'
         comment_pattern = r'^ *// '
         comment_with_ts_error_pattern = r'^ *// This throws'
+        failed = False
 
-        with linter_utils.redirect_stdout(sys.stdout):
-            failed = False
+        for file_path in self.all_filepaths:
+            file_content = self.file_cache.read(file_path)
+            previous_line_has_ts_ignore = False
+            previous_line_has_comment = False
+            previous_line_has_comment_with_ts_error = False
 
-            for file_path in self.all_filepaths:
-                file_content = self.file_cache.read(file_path)
-                previous_line_has_ts_ignore = False
-                previous_line_has_comment = False
-                previous_line_has_comment_with_ts_error = False
+            for line_number, line in enumerate(file_content.split('\n')):
+                if previous_line_has_ts_ignore:
+                    if file_path in TS_IGNORE_EXCEPTIONS:
+                        line_contents = TS_IGNORE_EXCEPTIONS[file_path]
+                        this_line_is_exception = False
 
-                for line_number, line in enumerate(file_content.split('\n')):
-                    if previous_line_has_ts_ignore:
-                        if file_path in TS_IGNORE_EXCEPTIONS:
-                            line_contents = TS_IGNORE_EXCEPTIONS[file_path]
-                            this_line_is_exception = False
+                        for line_content in line_contents:
+                            if line.find(line_content) != -1:
+                                this_line_is_exception = True
+                                break
 
-                            for line_content in line_contents:
-                                if line.find(line_content) != -1:
-                                    this_line_is_exception = True
-                                    break
+                        if this_line_is_exception:
+                            previous_line_has_ts_ignore = False
+                            continue
 
-                            if this_line_is_exception:
-                                previous_line_has_ts_ignore = False
-                                continue
+                    failed = True
+                    previous_line_has_ts_ignore = False
+                    summary_message = (
+                        '%s --> @ts-ignore found at line %s. '
+                        'Please add this exception in %s.' % (
+                            file_path, line_number,
+                            TS_IGNORE_EXCEPTIONS_FILEPATH))
+                    summary_messages.append(summary_message)
 
-                        failed = True
-                        previous_line_has_ts_ignore = False
-                        summary_message = (
-                            '%s --> @ts-ignore found at line %s. '
-                            'Please add this exception in %s.' % (
-                                file_path, line_number,
-                                TS_IGNORE_EXCEPTIONS_FILEPATH))
-                        python_utils.PRINT(summary_message)
-                        summary_messages.append(summary_message)
-                        python_utils.PRINT('')
+                previous_line_has_ts_ignore = bool(
+                    re.findall(ts_ignore_pattern, line))
 
-                    previous_line_has_ts_ignore = bool(
-                        re.findall(ts_ignore_pattern, line))
+                if (
+                        previous_line_has_ts_ignore and
+                        not previous_line_has_comment_with_ts_error):
+                    failed = True
+                    summary_message = (
+                        '%s --> Please add a comment above the @ts-ignore '
+                        'explaining the @ts-ignore at line %s. The format '
+                        'of comment should be -> This throws "...". This '
+                        'needs to be suppressed because ...' % (
+                            file_path, line_number + 1))
+                    summary_messages.append(summary_message)
 
-                    if (
-                            previous_line_has_ts_ignore and
-                            not previous_line_has_comment_with_ts_error):
-                        failed = True
-                        summary_message = (
-                            '%s --> Please add a comment above the @ts-ignore '
-                            'explaining the @ts-ignore at line %s. The format '
-                            'of comment should be -> This throws "...". This '
-                            'needs to be suppressed because ...' % (
-                                file_path, line_number + 1))
-                        python_utils.PRINT(summary_message)
-                        summary_messages.append(summary_message)
-                        python_utils.PRINT('')
+                previous_line_has_comment = bool(
+                    re.findall(comment_pattern, line))
 
-                    previous_line_has_comment = bool(
-                        re.findall(comment_pattern, line))
+                previous_line_has_comment_with_ts_error = (
+                    bool(
+                        re.findall(
+                            comment_with_ts_error_pattern, line))
+                    or (
+                        previous_line_has_comment_with_ts_error and
+                        previous_line_has_comment))
 
-                    previous_line_has_comment_with_ts_error = (
-                        bool(
-                            re.findall(
-                                comment_with_ts_error_pattern, line))
-                        or (
-                            previous_line_has_comment_with_ts_error and
-                            previous_line_has_comment))
-
-            if failed:
-                summary_message = (
-                    '%s TS ignore check failed' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s TS ignore check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
-            python_utils.PRINT('')
-
-        return summary_messages
+        return concurrent_task_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_ts_expect_error(self):
-        """Checks if ts expect error is used in non spec file."""
+        """Checks if ts expect error is used in non spec file.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
+        """
+        name = 'Ts expect error'
         summary_messages = []
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting ts expect error check')
-            python_utils.PRINT('----------------------------------------')
 
         ts_expect_error_pattern = r'@ts-expect-error'
         comment_pattern = r'^ *// '
         comment_with_ts_error_pattern = r'^ *// This throws'
 
-        with linter_utils.redirect_stdout(sys.stdout):
-            failed = False
-            previous_line_has_comment = False
-            previous_line_has_comment_with_ts_error = False
+        failed = False
+        previous_line_has_comment = False
+        previous_line_has_comment_with_ts_error = False
 
-            for file_path in self.all_filepaths:
-                file_content = self.file_cache.read(file_path)
-                for line_number, line in enumerate(file_content.split('\n')):
-                    if re.findall(ts_expect_error_pattern, line):
-                        if not (
-                                file_path.endswith('.spec.ts') or
-                                file_path.endswith('Spec.ts')):
-                            failed = True
-                            summary_message = (
-                                '%s --> @ts-expect-error found at line %s. '
-                                'It can be used only in spec files.' % (
-                                    file_path, line_number + 1))
-                            python_utils.PRINT(summary_message)
-                            summary_messages.append(summary_message)
-                            python_utils.PRINT('')
+        for file_path in self.all_filepaths:
+            file_content = self.file_cache.read(file_path)
+            for line_number, line in enumerate(file_content.split('\n')):
+                if re.findall(ts_expect_error_pattern, line):
+                    if not (
+                            file_path.endswith('.spec.ts') or
+                            file_path.endswith('Spec.ts')):
+                        failed = True
+                        summary_message = (
+                            '%s --> @ts-expect-error found at line %s. '
+                            'It can be used only in spec files.' % (
+                                file_path, line_number + 1))
+                        summary_messages.append(summary_message)
 
-                        if not previous_line_has_comment_with_ts_error:
-                            failed = True
-                            summary_message = (
-                                '%s --> Please add a comment above the '
-                                '@ts-expect-error explaining the '
-                                '@ts-expect-error at line %s. The format '
-                                'of comment should be -> This throws "...". '
-                                'This needs to be suppressed because ...' % (
-                                    file_path, line_number + 1))
-                            python_utils.PRINT(summary_message)
-                            summary_messages.append(summary_message)
-                            python_utils.PRINT('')
+                    if not previous_line_has_comment_with_ts_error:
+                        failed = True
+                        summary_message = (
+                            '%s --> Please add a comment above the '
+                            '@ts-expect-error explaining the '
+                            '@ts-expect-error at line %s. The format '
+                            'of comment should be -> This throws "...". '
+                            'This needs to be suppressed because ...' % (
+                                file_path, line_number + 1))
+                        summary_messages.append(summary_message)
 
-                    previous_line_has_comment = bool(
-                        re.findall(comment_pattern, line))
+                previous_line_has_comment = bool(
+                    re.findall(comment_pattern, line))
 
-                    previous_line_has_comment_with_ts_error = (
-                        bool(
-                            re.findall(
-                                comment_with_ts_error_pattern, line))
-                        or (
-                            previous_line_has_comment_with_ts_error and
-                            previous_line_has_comment))
+                previous_line_has_comment_with_ts_error = (
+                    bool(
+                        re.findall(
+                            comment_with_ts_error_pattern, line))
+                    or (
+                        previous_line_has_comment_with_ts_error and
+                        previous_line_has_comment))
 
-            if failed:
-                summary_message = (
-                    '%s TS expect error check failed' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s TS expect error check passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
-            python_utils.PRINT('')
-
-        return summary_messages
+        return concurrent_task_utils.OutputStream(
+            name, failed, summary_messages, summary_messages)
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
         build.JS_FILEPATHS_NOT_TO_BUILD.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         name = 'Extra JS files'
         summary_messages = []
         failed = False
-        stdout = sys.stdout
-        with linter_utils.redirect_stdout(stdout):
-            js_files_to_check = self.js_filepaths
+        js_files_to_check = self.js_filepaths
 
-            for filepath in js_files_to_check:
-                if filepath.startswith(('core/templates', 'extensions')) and (
-                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
-                            not filepath.endswith('protractor.js')):
-                    summary_message = (
-                        '%s  --> Found extra .js file\n' % filepath)
-                    summary_messages.append(summary_message)
-                    failed = True
+        for filepath in js_files_to_check:
+            if filepath.startswith(('core/templates', 'extensions')) and (
+                    filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                        not filepath.endswith('protractor.js')):
+                summary_message = (
+                    '%s  --> Found extra .js file\n' % filepath)
+                summary_messages.append(summary_message)
+                failed = True
 
-            if failed:
-                err_msg = (
-                    'If you want the above files to be present as js files, '
-                    'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
-                    'build.py. Otherwise, rename them to .ts\n')
-                summary_messages.append(err_msg)
+        if failed:
+            err_msg = (
+                'If you want the above files to be present as js files, '
+                'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                'build.py. Otherwise, rename them to .ts\n')
+            summary_messages.append(err_msg)
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
         one component and and that the name of the component
         matches the filename.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         # Select JS files which need to be checked.
         name = 'JS and TS component name and count'
@@ -472,148 +439,146 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             filepath.endswith('App.ts')]
         failed = False
         summary_messages = []
-        full_messages = []
         components_to_check = ['controller', 'directive', 'factory', 'filter']
-        stdout = sys.stdout
         for filepath in files_to_check:
             component_num = 0
             parsed_expressions = self.parsed_expressions_in_files[filepath]
-            with linter_utils.redirect_stdout(stdout):
-                for component in components_to_check:
+            for component in components_to_check:
+                if component_num > 1:
+                    break
+                for expression in parsed_expressions[component]:
+                    if not expression:
+                        continue
+                    component_num += 1
+                    # Check if the number of components in each file exceeds
+                    # one.
                     if component_num > 1:
+                        summary_message = (
+                            '%s -> Please ensure that there is exactly one '
+                            'component in the file.' % (filepath))
+                        failed = True
+                        summary_messages.append(summary_message)
                         break
-                    for expression in parsed_expressions[component]:
-                        if not expression:
-                            continue
-                        component_num += 1
-                        # Check if the number of components in each file exceeds
-                        # one.
-                        if component_num > 1:
-                            summary_message = (
-                                '%s -> Please ensure that there is exactly one '
-                                'component in the file.' % (filepath))
-                            failed = True
-                            summary_messages.append(summary_message)
-                            break
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         # Select JS and TS files which need to be checked.
         name = 'Directive scope'
         files_to_check = self.all_filepaths
         failed = False
         summary_messages = []
-        full_messages = []
         components_to_check = ['directive']
 
-        stdout = sys.stdout
         for filepath in files_to_check:
             parsed_expressions = self.parsed_expressions_in_files[filepath]
-            with linter_utils.redirect_stdout(stdout):
-                # Parse the body of the content as nodes.
-                for component in components_to_check:
-                    for expression in parsed_expressions[component]:
-                        if not expression:
+            # Parse the body of the content as nodes.
+            for component in components_to_check:
+                for expression in parsed_expressions[component]:
+                    if not expression:
+                        continue
+                    # Separate the arguments of the expression.
+                    arguments = expression.arguments
+                    # The first argument of the expression is the
+                    # name of the directive.
+                    if arguments[0].type == 'Literal':
+                        directive_name = python_utils.UNICODE(
+                            arguments[0].value)
+                    arguments = arguments[1:]
+                    for argument in arguments:
+                        # Check the type of an argument.
+                        if argument.type != 'ArrayExpression':
                             continue
-                        # Separate the arguments of the expression.
-                        arguments = expression.arguments
-                        # The first argument of the expression is the
-                        # name of the directive.
-                        if arguments[0].type == 'Literal':
-                            directive_name = python_utils.UNICODE(
-                                arguments[0].value)
-                        arguments = arguments[1:]
-                        for argument in arguments:
-                            # Check the type of an argument.
-                            if argument.type != 'ArrayExpression':
+                        # Separate out the elements for the argument.
+                        elements = argument.elements
+                        for element in elements:
+                            # Check the type of an element.
+                            if element.type != 'FunctionExpression':
                                 continue
-                            # Separate out the elements for the argument.
-                            elements = argument.elements
-                            for element in elements:
-                                # Check the type of an element.
-                                if element.type != 'FunctionExpression':
+                            # Separate out the body of the element.
+                            body = element.body
+                            # Further separate the body elements from the
+                            # body.
+                            body_elements = body.body
+                            for body_element in body_elements:
+                                # Check if the body element is a return
+                                # statement.
+                                body_element_type_is_not_return = (
+                                    body_element.type != 'ReturnStatement')
+                                if body_element_type_is_not_return:
                                     continue
-                                # Separate out the body of the element.
-                                body = element.body
-                                # Further separate the body elements from the
-                                # body.
-                                body_elements = body.body
-                                for body_element in body_elements:
-                                    # Check if the body element is a return
-                                    # statement.
-                                    body_element_type_is_not_return = (
-                                        body_element.type != 'ReturnStatement')
-                                    if body_element_type_is_not_return:
-                                        continue
-                                    arg_type = (
-                                        body_element.argument and
-                                        body_element.argument.type)
-                                    body_element_arg_type_is_not_object = (
-                                        arg_type != 'ObjectExpression')
-                                    if body_element_arg_type_is_not_object:
-                                        continue
-                                    # Separate the properties of the return
-                                    # node.
-                                    return_node_properties = (
-                                        body_element.argument.properties)
-                                    # Loop over all the properties of the return
-                                    # node to find out the scope key.
-                                    for return_node_property in (
-                                            return_node_properties):
-                                        # Check whether the property is scope.
-                                        property_key_is_an_identifier = (
-                                            return_node_property.key.type == (
-                                                'Identifier'))
-                                        property_key_name_is_scope = (
-                                            return_node_property.key.name == (
-                                                'scope'))
+                                arg_type = (
+                                    body_element.argument and
+                                    body_element.argument.type)
+                                body_element_arg_type_is_not_object = (
+                                    arg_type != 'ObjectExpression')
+                                if body_element_arg_type_is_not_object:
+                                    continue
+                                # Separate the properties of the return
+                                # node.
+                                return_node_properties = (
+                                    body_element.argument.properties)
+                                # Loop over all the properties of the return
+                                # node to find out the scope key.
+                                for return_node_property in (
+                                        return_node_properties):
+                                    # Check whether the property is scope.
+                                    property_key_is_an_identifier = (
+                                        return_node_property.key.type == (
+                                            'Identifier'))
+                                    property_key_name_is_scope = (
+                                        return_node_property.key.name == (
+                                            'scope'))
+                                    if (
+                                            property_key_is_an_identifier
+                                            and (
+                                                property_key_name_is_scope
+                                                )):
+                                        # Separate the scope value and
+                                        # check if it is an Object
+                                        # Expression. If it is not, then
+                                        # check for scope: true and report
+                                        # the error message.
+                                        scope_value = (
+                                            return_node_property.value)
                                         if (
-                                                property_key_is_an_identifier
+                                                scope_value.type == (
+                                                    'Literal')
                                                 and (
-                                                    property_key_name_is_scope
-                                                    )):
-                                            # Separate the scope value and
-                                            # check if it is an Object
-                                            # Expression. If it is not, then
-                                            # check for scope: true and report
+                                                    scope_value.value)):
+                                            failed = True
+                                            summary_message = (
+                                                'Please ensure that %s '
+                                                'directive in %s file '
+                                                'does not have scope set '
+                                                'to true.' %
+                                                (directive_name, filepath))
+                                            summary_messages.append(
+                                                summary_message)
+                                        elif scope_value.type != (
+                                                'ObjectExpression'):
+                                            # Check whether the directive
+                                            # has scope: {} else report
                                             # the error message.
-                                            scope_value = (
-                                                return_node_property.value)
-                                            if (
-                                                    scope_value.type == (
-                                                        'Literal')
-                                                    and (
-                                                        scope_value.value)):
-                                                failed = True
-                                                summary_message = (
-                                                    'Please ensure that %s '
-                                                    'directive in %s file '
-                                                    'does not have scope set '
-                                                    'to true.' %
-                                                    (directive_name, filepath))
-                                                summary_messages.append(
-                                                    summary_message)
-                                            elif scope_value.type != (
-                                                    'ObjectExpression'):
-                                                # Check whether the directive
-                                                # has scope: {} else report
-                                                # the error message.
-                                                failed = True
-                                                summary_message = (
-                                                    'Please ensure that %s '
-                                                    'directive in %s file has '
-                                                    'a scope: {}.' % (
-                                                        directive_name, filepath
-                                                        ))
-                                                summary_messages.append(
-                                                    summary_message)
+                                            failed = True
+                                            summary_message = (
+                                                'Please ensure that %s '
+                                                'directive in %s file has '
+                                                'a scope: {}.' % (
+                                                    directive_name, filepath
+                                                    ))
+                                            summary_messages.append(
+                                                summary_message)
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_sorted_dependencies(self):
@@ -621,127 +586,129 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         imported in the controllers/directives/factories in JS
         files are in following pattern: dollar imports, regular
         imports, and constant imports, all in sorted order.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         name = 'Sorted dependencies'
         files_to_check = self.all_filepaths
         components_to_check = ['controller', 'directive', 'factory']
         failed = False
         summary_messages = []
-        full_messages = []
 
-        stdout = sys.stdout
         for filepath in files_to_check:
             parsed_expressions = self.parsed_expressions_in_files[filepath]
-            with linter_utils.redirect_stdout(stdout):
-                for component in components_to_check:
-                    for expression in parsed_expressions[component]:
-                        if not expression:
+            for component in components_to_check:
+                for expression in parsed_expressions[component]:
+                    if not expression:
+                        continue
+                    # Separate the arguments of the expression.
+                    arguments = expression.arguments
+                    if arguments[0].type == 'Literal':
+                        property_value = python_utils.UNICODE(
+                            arguments[0].value)
+                    arguments = arguments[1:]
+                    for argument in arguments:
+                        if argument.type != 'ArrayExpression':
                             continue
-                        # Separate the arguments of the expression.
-                        arguments = expression.arguments
-                        if arguments[0].type == 'Literal':
-                            property_value = python_utils.UNICODE(
-                                arguments[0].value)
-                        arguments = arguments[1:]
-                        for argument in arguments:
-                            if argument.type != 'ArrayExpression':
-                                continue
-                            literal_args = []
-                            function_args = []
-                            dollar_imports = []
-                            regular_imports = []
-                            constant_imports = []
-                            elements = argument.elements
-                            for element in elements:
-                                if element.type == 'Literal':
-                                    literal_args.append(
-                                        python_utils.UNICODE(
-                                            element.value))
-                                elif element.type == 'FunctionExpression':
-                                    func_args = element.params
-                                    for func_arg in func_args:
-                                        function_args.append(
-                                            python_utils.UNICODE(func_arg.name))
-                            for arg in function_args:
-                                if arg.startswith('$'):
-                                    dollar_imports.append(arg)
-                                elif re.search('[a-z]', arg):
-                                    regular_imports.append(arg)
-                                else:
-                                    constant_imports.append(arg)
-                            dollar_imports.sort()
-                            regular_imports.sort()
-                            constant_imports.sort()
-                            sorted_imports = (
-                                dollar_imports + regular_imports + (
-                                    constant_imports))
-                            if sorted_imports != function_args:
-                                failed = True
-                                summary_message = (
-                                    'Please ensure that in %s in file %s, the '
-                                    'injected dependencies should be in the '
-                                    'following manner: dollar imports, regular '
-                                    'imports and constant imports, all in '
-                                    'sorted order.'
-                                    % (property_value, filepath))
-                                summary_messages.append(summary_message)
-                            if sorted_imports != literal_args:
-                                failed = True
-                                summary_message = (
-                                    'Please ensure that in %s in file %s, the '
-                                    'stringfied dependencies should be in the '
-                                    'following manner: dollar imports, regular '
-                                    'imports and constant imports, all in '
-                                    'sorted order.'
-                                    % (property_value, filepath))
-                                summary_messages.append(summary_message)
+                        literal_args = []
+                        function_args = []
+                        dollar_imports = []
+                        regular_imports = []
+                        constant_imports = []
+                        elements = argument.elements
+                        for element in elements:
+                            if element.type == 'Literal':
+                                literal_args.append(
+                                    python_utils.UNICODE(
+                                        element.value))
+                            elif element.type == 'FunctionExpression':
+                                func_args = element.params
+                                for func_arg in func_args:
+                                    function_args.append(
+                                        python_utils.UNICODE(func_arg.name))
+                        for arg in function_args:
+                            if arg.startswith('$'):
+                                dollar_imports.append(arg)
+                            elif re.search('[a-z]', arg):
+                                regular_imports.append(arg)
+                            else:
+                                constant_imports.append(arg)
+                        dollar_imports.sort()
+                        regular_imports.sort()
+                        constant_imports.sort()
+                        sorted_imports = (
+                            dollar_imports + regular_imports + (
+                                constant_imports))
+                        if sorted_imports != function_args:
+                            failed = True
+                            summary_message = (
+                                'Please ensure that in %s in file %s, the '
+                                'injected dependencies should be in the '
+                                'following manner: dollar imports, regular '
+                                'imports and constant imports, all in '
+                                'sorted order.'
+                                % (property_value, filepath))
+                            summary_messages.append(summary_message)
+                        if sorted_imports != literal_args:
+                            failed = True
+                            summary_message = (
+                                'Please ensure that in %s in file %s, the '
+                                'stringfied dependencies should be in the '
+                                'following manner: dollar imports, regular '
+                                'imports and constant imports, all in '
+                                'sorted order.'
+                                % (property_value, filepath))
+                            summary_messages.append(summary_message)
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
         listed in the controller of a directive or service exactly match those
         between the arguments of the controller function.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         name = 'Controller dependency line break'
         files_to_check = self.all_filepaths
         failed = False
         summary_messages = []
-        full_messages = []
 
         # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
         pattern_to_match = (
             r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
             r'function\((?P<function_parameters>[\S\s]*?)\)')
-        stdout = sys.stdout
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in files_to_check:
-                file_content = self.file_cache.read(filepath)
-                matched_patterns = re.findall(pattern_to_match, file_content)
-                for matched_pattern in matched_patterns:
-                    stringfied_dependencies, function_parameters = (
-                        matched_pattern)
-                    stringfied_dependencies = (
-                        stringfied_dependencies.strip().replace(
-                            '\'', '').replace(' ', ''))[:-1]
-                    function_parameters = (
-                        function_parameters.strip().replace(' ', ''))
-                    if stringfied_dependencies != function_parameters:
-                        failed = True
-                        summary_messages.append(
-                            'Please ensure that in file %s the line breaks '
-                            'pattern between the dependencies mentioned as '
-                            'strings:\n[%s]\nand the dependencies mentioned '
-                            'as function parameters: \n(%s)\nfor the '
-                            'corresponding controller should '
-                            'exactly match.' % (
-                                filepath, stringfied_dependencies,
-                                function_parameters))
 
-        return linter_utils.OutputStream(
+        for filepath in files_to_check:
+            file_content = self.file_cache.read(filepath)
+            matched_patterns = re.findall(pattern_to_match, file_content)
+            for matched_pattern in matched_patterns:
+                stringfied_dependencies, function_parameters = (
+                    matched_pattern)
+                stringfied_dependencies = (
+                    stringfied_dependencies.strip().replace(
+                        '\'', '').replace(' ', ''))[:-1]
+                function_parameters = (
+                    function_parameters.strip().replace(' ', ''))
+                if stringfied_dependencies != function_parameters:
+                    failed = True
+                    summary_messages.append(
+                        'Please ensure that in file %s the line breaks '
+                        'pattern between the dependencies mentioned as '
+                        'strings:\n[%s]\nand the dependencies mentioned '
+                        'as function parameters: \n(%s)\nfor the '
+                        'corresponding controller should '
+                        'exactly match.' % (
+                            filepath, stringfied_dependencies,
+                            function_parameters))
+
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
-        
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -749,165 +716,166 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         and that the constants are declared only single time. This also checks
         that the constants are declared in both *.constants.ajs.ts (for
         AngularJS) and in *.constants.ts (for Angular 8).
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         name = 'Constants declaration'
         summary_messages = []
-        full_messages = []
         failed = False
-        stdout = sys.stdout
 
-        with linter_utils.redirect_stdout(stdout):
-            ts_files_to_check = self.ts_filepaths
-            constants_to_source_filepaths_dict = {}
-            angularjs_source_filepaths_to_constants_dict = {}
-            for filepath in ts_files_to_check:
-                # The following block extracts the corresponding Angularjs
-                # constants file for the Angular constants file. This is
-                # required since the check cannot proceed if the AngularJS
-                # constants file is not provided before the Angular constants
-                # file.
-                is_corresponding_angularjs_filepath = False
-                if filepath.endswith('.constants.ts'):
-                    filename_without_extension = filepath[:-3]
-                    corresponding_angularjs_filepath = (
-                        filename_without_extension + '.ajs.ts')
+        ts_files_to_check = self.ts_filepaths
+        constants_to_source_filepaths_dict = {}
+        angularjs_source_filepaths_to_constants_dict = {}
+        for filepath in ts_files_to_check:
+            # The following block extracts the corresponding Angularjs
+            # constants file for the Angular constants file. This is
+            # required since the check cannot proceed if the AngularJS
+            # constants file is not provided before the Angular constants
+            # file.
+            is_corresponding_angularjs_filepath = False
+            if filepath.endswith('.constants.ts'):
+                filename_without_extension = filepath[:-3]
+                corresponding_angularjs_filepath = (
+                    filename_without_extension + '.ajs.ts')
 
-                    is_corresponding_angularjs_filepath = (
-                        os.path.isfile(corresponding_angularjs_filepath))
-                    if is_corresponding_angularjs_filepath:
-                        compiled_js_filepath = self._get_compiled_ts_filepath(
-                            corresponding_angularjs_filepath)
-                        file_content = self.file_cache.read(
-                            compiled_js_filepath).decode('utf-8')
+                is_corresponding_angularjs_filepath = (
+                    os.path.isfile(corresponding_angularjs_filepath))
+                if is_corresponding_angularjs_filepath:
+                    compiled_js_filepath = self._get_compiled_ts_filepath(
+                        corresponding_angularjs_filepath)
+                    file_content = self.file_cache.read(
+                        compiled_js_filepath).decode('utf-8')
 
-                        parsed_script = esprima.parseScript(file_content)
-                        parsed_nodes = parsed_script.body
-                        angularjs_constants_list = []
-                        components_to_check = ['constant']
-                        for parsed_node in parsed_nodes:
-                            expression = (
-                                _get_expression_from_node_if_one_exists(
-                                    parsed_node, components_to_check))
-                            if not expression:
-                                continue
-                            else:
-                                # The following block populates a set to
-                                # store constants for the Angular-AngularJS
-                                # constants file consistency check.
-                                angularjs_constants_name = (
-                                    expression.arguments[0].value)
-                                angularjs_constants_value = (
-                                    expression.arguments[1])
-                                # Check if const is declared outside the
-                                # class.
-                                if angularjs_constants_value.property:
-                                    angularjs_constants_value = (
-                                        angularjs_constants_value.property.name)
-                                else:
-                                    angularjs_constants_value = (
-                                        angularjs_constants_value.name)
-                                if angularjs_constants_value != (
-                                        angularjs_constants_name):
-                                    failed = True
-                                    summary_messages.append(
-                                        '%s --> Please ensure that the '
-                                        'constant %s is initialized '
-                                        'from the value from the '
-                                        'corresponding Angular constants'
-                                        ' file (the *.constants.ts '
-                                        'file). Please create one in the'
-                                        ' Angular constants file if it '
-                                        'does not exist there.' % (
-                                            filepath,
-                                            angularjs_constants_name))
-                                angularjs_constants_list.append(
-                                    angularjs_constants_name)
-                        angularjs_constants_set = set(
-                            angularjs_constants_list)
-                        if len(angularjs_constants_set) != len(
-                                angularjs_constants_list):
-                            failed = True
-                            summary_messages.append(
-                                '%s --> Duplicate constant declaration '
-                                'found.' % (
-                                    corresponding_angularjs_filepath))
-                        angularjs_source_filepaths_to_constants_dict[
-                            corresponding_angularjs_filepath] = (
-                                angularjs_constants_set)
-
-                # Check that the constants are declared only in a
-                # *.constants.ajs.ts file.
-                if not filepath.endswith(
-                        ('.constants.ajs.ts', '.constants.ts')):
-                    for line_num, line in enumerate(self.file_cache.readlines(
-                            filepath)):
-                        if 'angular.module(\'oppia\').constant(' in line:
-                            failed = True
-                            summary_message = (
-                                '%s --> Constant declaration found at line '
-                                '%s. Please declare the constants in a '
-                                'separate constants file.' % (
-                                    filepath, line_num))
-                            summary_messages.append(summary_message)
-
-                # Check if the constant has multiple declarations which is
-                # prohibited.
-                parsed_script = self.parsed_js_and_ts_files[filepath]
-                parsed_nodes = parsed_script.body
-                components_to_check = ['constant']
-                angular_constants_list = []
-                for parsed_node in parsed_nodes:
-                    expression = _get_expression_from_node_if_one_exists(
-                        parsed_node, components_to_check)
-                    if not expression:
-                        continue
-                    else:
-                        constant_name = expression.arguments[0].raw
-                        if constant_name in constants_to_source_filepaths_dict:
-                            failed = True
-                            summary_message = (
-                                '%s --> The constant %s is already declared '
-                                'in %s. Please import the file where the '
-                                'constant is declared or rename the constant'
-                                '.' % (
-                                    filepath, constant_name,
-                                    constants_to_source_filepaths_dict[
-                                        constant_name]))
-                            summary_messages.append(summary_message)
-                        else:
-                            constants_to_source_filepaths_dict[
-                                constant_name] = filepath
-
-                # Checks that the *.constants.ts and the corresponding
-                # *.constants.ajs.ts file are in sync.
-                if filepath.endswith('.constants.ts') and (
-                        is_corresponding_angularjs_filepath):
-                    # Ignore if file contains only type definitions for
-                    # constants.
-                    for node in parsed_nodes:
-                        if 'declarations' in node.keys():
-                            try:
-                                angular_constants_nodes = (
-                                    node.declarations[0].init.callee.body.body)
-                            except Exception:
-                                continue
-                    for angular_constant_node in angular_constants_nodes:
-                        if not angular_constant_node.expression:
+                    parsed_script = esprima.parseScript(file_content)
+                    parsed_nodes = parsed_script.body
+                    angularjs_constants_list = []
+                    components_to_check = ['constant']
+                    for parsed_node in parsed_nodes:
+                        expression = (
+                            _get_expression_from_node_if_one_exists(
+                                parsed_node, components_to_check))
+                        if not expression:
                             continue
-                        angular_constant_name = (
-                            angular_constant_node.expression.left.property.name)
-                        angular_constants_list.append(angular_constant_name)
+                        else:
+                            # The following block populates a set to
+                            # store constants for the Angular-AngularJS
+                            # constants file consistency check.
+                            angularjs_constants_name = (
+                                expression.arguments[0].value)
+                            angularjs_constants_value = (
+                                expression.arguments[1])
+                            # Check if const is declared outside the
+                            # class.
+                            if angularjs_constants_value.property:
+                                angularjs_constants_value = (
+                                    angularjs_constants_value.property.name)
+                            else:
+                                angularjs_constants_value = (
+                                    angularjs_constants_value.name)
+                            if angularjs_constants_value != (
+                                    angularjs_constants_name):
+                                failed = True
+                                summary_messages.append(
+                                    '%s --> Please ensure that the '
+                                    'constant %s is initialized '
+                                    'from the value from the '
+                                    'corresponding Angular constants'
+                                    ' file (the *.constants.ts '
+                                    'file). Please create one in the'
+                                    ' Angular constants file if it '
+                                    'does not exist there.' % (
+                                        filepath,
+                                        angularjs_constants_name))
+                            angularjs_constants_list.append(
+                                angularjs_constants_name)
+                    angularjs_constants_set = set(
+                        angularjs_constants_list)
+                    if len(angularjs_constants_set) != len(
+                            angularjs_constants_list):
+                        failed = True
+                        summary_messages.append(
+                            '%s --> Duplicate constant declaration '
+                            'found.' % (
+                                corresponding_angularjs_filepath))
+                    angularjs_source_filepaths_to_constants_dict[
+                        corresponding_angularjs_filepath] = (
+                            angularjs_constants_set)
 
-                    angular_constants_set = set(angular_constants_list)
-                    if len(angular_constants_set) != len(
-                            angular_constants_list):
+            # Check that the constants are declared only in a
+            # *.constants.ajs.ts file.
+            if not filepath.endswith(
+                    ('.constants.ajs.ts', '.constants.ts')):
+                for line_num, line in enumerate(self.file_cache.readlines(
+                        filepath)):
+                    if 'angular.module(\'oppia\').constant(' in line:
                         failed = True
                         summary_message = (
-                            '%s --> Duplicate constant declaration found.'
-                            % filepath)
+                            '%s --> Constant declaration found at line '
+                            '%s. Please declare the constants in a '
+                            'separate constants file.' % (
+                                filepath, line_num))
                         summary_messages.append(summary_message)
 
-        return linter_utils.OutputStream(
+            # Check if the constant has multiple declarations which is
+            # prohibited.
+            parsed_script = self.parsed_js_and_ts_files[filepath]
+            parsed_nodes = parsed_script.body
+            components_to_check = ['constant']
+            angular_constants_list = []
+            for parsed_node in parsed_nodes:
+                expression = _get_expression_from_node_if_one_exists(
+                    parsed_node, components_to_check)
+                if not expression:
+                    continue
+                else:
+                    constant_name = expression.arguments[0].raw
+                    if constant_name in constants_to_source_filepaths_dict:
+                        failed = True
+                        summary_message = (
+                            '%s --> The constant %s is already declared '
+                            'in %s. Please import the file where the '
+                            'constant is declared or rename the constant'
+                            '.' % (
+                                filepath, constant_name,
+                                constants_to_source_filepaths_dict[
+                                    constant_name]))
+                        summary_messages.append(summary_message)
+                    else:
+                        constants_to_source_filepaths_dict[
+                            constant_name] = filepath
+
+            # Checks that the *.constants.ts and the corresponding
+            # *.constants.ajs.ts file are in sync.
+            if filepath.endswith('.constants.ts') and (
+                    is_corresponding_angularjs_filepath):
+                # Ignore if file contains only type definitions for
+                # constants.
+                for node in parsed_nodes:
+                    if 'declarations' in node.keys():
+                        try:
+                            angular_constants_nodes = (
+                                node.declarations[0].init.callee.body.body)
+                        except Exception:
+                            continue
+                for angular_constant_node in angular_constants_nodes:
+                    if not angular_constant_node.expression:
+                        continue
+                    angular_constant_name = (
+                        angular_constant_node.expression.left.property.name)
+                    angular_constants_list.append(angular_constant_name)
+
+                angular_constants_set = set(angular_constants_list)
+                if len(angular_constants_set) != len(
+                        angular_constants_list):
+                    failed = True
+                    summary_message = (
+                        '%s --> Duplicate constant declaration found.'
+                        % filepath)
+                    summary_messages.append(summary_message)
+
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_comments(self):
@@ -918,10 +886,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         2. If a line contain any of the following words or phrases('@ts-ignore',
         '--params', 'eslint-disable', 'eslint-enable', 'http://', 'https://')
         in the comment.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         name = 'Comments'
         summary_messages = []
-        full_messages = []
         files_to_check = self.all_filepaths
         allowed_terminating_punctuations = [
             '.', '?', ';', ',', '{', '^', ')', '}', '>']
@@ -941,62 +912,61 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         allowed_end_phrases = ['http://', 'https://']
 
         failed = False
-        with linter_utils.redirect_stdout(sys.stdout):
-            for filepath in files_to_check:
-                file_content = self.file_cache.readlines(filepath)
-                file_length = len(file_content)
-                for line_num in python_utils.RANGE(file_length):
-                    line = file_content[line_num].strip()
-                    next_line = ''
-                    previous_line = ''
-                    if line_num + 1 < file_length:
-                        next_line = file_content[line_num + 1].strip()
+        for filepath in files_to_check:
+            file_content = self.file_cache.readlines(filepath)
+            file_length = len(file_content)
+            for line_num in python_utils.RANGE(file_length):
+                line = file_content[line_num].strip()
+                next_line = ''
+                previous_line = ''
+                if line_num + 1 < file_length:
+                    next_line = file_content[line_num + 1].strip()
 
-                    # Exclude comment line containing heading.
-                    # Example: // ---- Heading ----
-                    # These types of comments will be excluded from this check.
-                    if (
-                            line.startswith('//') and line.endswith('-')
-                            and not (
-                                next_line.startswith('//') and
-                                previous_line.startswith('//'))):
+                # Exclude comment line containing heading.
+                # Example: // ---- Heading ----
+                # These types of comments will be excluded from this check.
+                if (
+                        line.startswith('//') and line.endswith('-')
+                        and not (
+                            next_line.startswith('//') and
+                            previous_line.startswith('//'))):
+                    continue
+
+                if line.startswith('//') and not next_line.startswith('//'):
+                    # Check if any of the allowed starting phrase is present
+                    # in comment and exclude that line from check.
+                    allowed_start_phrase_present = any(
+                        line.split()[1].startswith(word) for word in
+                        allowed_start_phrases)
+
+                    if allowed_start_phrase_present:
                         continue
 
-                    if line.startswith('//') and not next_line.startswith('//'):
-                        # Check if any of the allowed starting phrase is present
-                        # in comment and exclude that line from check.
-                        allowed_start_phrase_present = any(
-                            line.split()[1].startswith(word) for word in
-                            allowed_start_phrases)
+                    # Check if any of the allowed ending phrase is present
+                    # in comment and exclude that line from check. Used 'in'
+                    # instead of 'startswith' because we have some comments
+                    # with urls inside the quotes.
+                    # Example: 'https://oppia.org'
+                    allowed_end_phrase_present = any(
+                        word in line.split()[-1] for word in
+                        allowed_end_phrases)
 
-                        if allowed_start_phrase_present:
-                            continue
+                    if allowed_end_phrase_present:
+                        continue
 
-                        # Check if any of the allowed ending phrase is present
-                        # in comment and exclude that line from check. Used 'in'
-                        # instead of 'startswith' because we have some comments
-                        # with urls inside the quotes.
-                        # Example: 'https://oppia.org'
-                        allowed_end_phrase_present = any(
-                            word in line.split()[-1] for word in
-                            allowed_end_phrases)
+                    # Check that the comment ends with the proper
+                    # punctuation.
+                    last_char_is_invalid = line[-1] not in (
+                        allowed_terminating_punctuations)
+                    if last_char_is_invalid:
+                        failed = True
+                        summary_message = (
+                            '%s --> Line %s: Invalid punctuation used at '
+                            'the end of the comment.' % (
+                                filepath, line_num + 1))
+                        summary_messages.append(summary_message)
 
-                        if allowed_end_phrase_present:
-                            continue
-
-                        # Check that the comment ends with the proper
-                        # punctuation.
-                        last_char_is_invalid = line[-1] not in (
-                            allowed_terminating_punctuations)
-                        if last_char_is_invalid:
-                            failed = True
-                            summary_message = (
-                                '%s --> Line %s: Invalid punctuation used at '
-                                'the end of the comment.' % (
-                                    filepath, line_num + 1))
-                            summary_messages.append(summary_message)
-
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
@@ -1004,12 +974,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
 
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
@@ -1043,23 +1014,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
 
 class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
-    """Manages all the third party Python linting functions.
+    """Manages all the third party Python linting functions."""
 
-    Attributes:
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-
-    def __init__(
-            self, files_to_lint, verbose_mode_enabled):
+    def __init__(self, files_to_lint):
         """Constructs a ThirdPartyJsTsLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         super(ThirdPartyJsTsLintChecksManager, self).__init__()
         self.files_to_lint = files_to_lint
-        self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
     def all_filepaths(self):
@@ -1113,7 +1077,8 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Prints a list of lint errors in the given list of JavaScript files.
 
         Returns:
-            summary_messages: list(str). Summary of lint check.
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(
@@ -1127,7 +1092,6 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             sys.exit(1)
 
         files_to_lint = self.all_filepaths
-        start_time = time.time()
         num_files_with_errors = 0
         summary_messages = []
         full_messages = []
@@ -1159,7 +1123,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
                 summary_messages.append(
                     self._get_trimmed_error_output(result))
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, full_messages)
 
     def perform_all_lint_checks(self):
@@ -1167,19 +1131,19 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log(
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
         return [self._lint_js_and_ts_files()]
 
 
-def get_linters(
-        js_filepaths, ts_filepaths, file_cache, verbose_mode_enabled=False):
+def get_linters(js_filepaths, ts_filepaths, file_cache):
     """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
         objects and return them.
 
@@ -1188,7 +1152,6 @@ def get_linters(
         ts_filepaths: list(str). A list of ts filepaths to lint.
         file_cache: object(FileCache). Provides thread-safe access to cached
             file content.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
         tuple(JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager. A 2-tuple
@@ -1197,9 +1160,8 @@ def get_linters(
     js_ts_file_paths = js_filepaths + ts_filepaths
 
     custom_linter = JsTsLintChecksManager(
-        js_filepaths, ts_filepaths, file_cache, verbose_mode_enabled)
+        js_filepaths, ts_filepaths, file_cache)
 
-    third_party_linter = ThirdPartyJsTsLintChecksManager(
-        js_ts_file_paths, verbose_mode_enabled)
+    third_party_linter = ThirdPartyJsTsLintChecksManager(js_ts_file_paths)
 
     return custom_linter, third_party_linter

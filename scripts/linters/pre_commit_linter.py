@@ -66,9 +66,8 @@ from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
-from . import linter_utils
-from . import python_linter
 from . import other_linter
+from . import python_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -199,13 +198,11 @@ class FileCache(python_utils.OBJECT):
         return self._CACHE_DATA_DICT[key]
 
 
-def _get_linters_for_file_extension(
-        file_extension_to_lint, verbose_mode_enabled=False):
+def _get_linters_for_file_extension(file_extension_to_lint):
     """Return linters for the file extension type.
 
     Args:
         file_extension_to_lint: str. The file extension to be linted.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
         custom_linter: list. Custom lint checks.
@@ -226,43 +223,37 @@ def _get_linters_for_file_extension(
         general_files_to_lint = _FILES['.%s' % file_extension_to_lint]
 
     custom_linter, third_party_linter = general_purpose_linter.get_linters(
-        general_files_to_lint, FILE_CACHE,
-        verbose_mode_enabled=verbose_mode_enabled)
+        general_files_to_lint, FILE_CACHE)
     custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
-            _FILES['.js'], _FILES['.ts'], FILE_CACHE,
-            verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.js'], _FILES['.ts'], FILE_CACHE)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'html':
         custom_linter, third_party_linter = html_linter.get_linters(
-            _FILES['.html'], FILE_CACHE,
-            verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.html'], FILE_CACHE)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
         config_path_for_css_in_html = os.path.join(
             parent_dir, 'oppia', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_css_in_html, _FILES['.html'],
-            verbose_mode_enabled=verbose_mode_enabled)
+            config_path_for_css_in_html, _FILES['.html'])
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'css':
         config_path_for_oppia_css = os.path.join(
             parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_oppia_css, _FILES['.css'],
-            verbose_mode_enabled=verbose_mode_enabled)
+            config_path_for_oppia_css, _FILES['.css'])
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
-            _FILES['.py'], FILE_CACHE,
-            verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.py'], FILE_CACHE)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -447,9 +438,11 @@ def _get_task_output(lint_messages, failed, task):
 
     Args:
         lint_messages: list(str). List of summary messages of linter output.
+        failed: bool. The boolean to check if lint checks fail or not.
         task: object(TestingTaskSpec). The task object to get output of linter.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
+
+    Returns:
+        bool. The boolean to check if the lint checks fail or not.
     """
     if task.output:
         for output in task.output:
@@ -457,6 +450,7 @@ def _get_task_output(lint_messages, failed, task):
             if output.failed:
                 failed = True
     return failed
+
 
 def _print_errors_stacktrace(errors_stacktrace):
     """Print errors stacktrace caught during linter execution.
@@ -522,7 +516,7 @@ def main(args=None):
     third_party_linters = []
     for file_extension_type in file_extension_types:
         custom_linter, third_party_linter = _get_linters_for_file_extension(
-            file_extension_type, verbose_mode_enabled=verbose_mode_enabled)
+            file_extension_type)
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 

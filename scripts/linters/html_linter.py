@@ -22,11 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import html.parser
 import os
 import subprocess
-import sys
 
 import python_utils
 
-from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
 
@@ -110,8 +108,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
             self.indentation_level += 1
 
         if self.debug:
-            python_utils.PRINT('DEBUG MODE: Start tag_stack')
-            python_utils.PRINT(self.tag_stack)
+            concurrent_task_utils.log('DEBUG MODE: Start tag_stack')
+            concurrent_task_utils.log(self.tag_stack)
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -201,8 +199,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
         self.indentation_level -= 1
 
         if self.debug:
-            python_utils.PRINT('DEBUG MODE: End tag_stack')
-            python_utils.PRINT(self.tag_stack)
+            concurrent_task_utils.log('DEBUG MODE: End tag_stack')
+            concurrent_task_utils.log(self.tag_stack)
 
     def handle_data(self, data):
         """Handle indentation level.
@@ -223,27 +221,19 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
 
 class HTMLLintChecksManager(python_utils.OBJECT):
-    """Manages all the HTML linting functions.
+    """Manages all the HTML linting functions."""
 
-    Attributes:
-        files_to_lint: list(str). A list of filepaths to lint.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-
-    def __init__(
-            self, files_to_lint, file_cache, verbose_mode_enabled, debug=False):
+    def __init__(self, files_to_lint, file_cache, debug=False):
         """Constructs a HTMLLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
             debug: bool. Print tag_stack if set to True.
         """
         self.files_to_lint = files_to_lint
         self.file_cache = file_cache
-        self.verbose_mode_enabled = verbose_mode_enabled
         self.debug = debug
 
     @property
@@ -257,29 +247,31 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         return self.html_filepaths
 
     def _check_html_tags_and_attributes(self):
-        """This function checks the indentation of lines in HTML files."""
-        html_files_to_lint = self.html_filepaths
-        stdout = sys.stdout
+        """This function checks the indentation of lines in HTML files.
 
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
+        """
+        html_files_to_lint = self.html_filepaths
         failed = False
         summary_messages = []
         name = 'HTML tag and attribute'
 
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in html_files_to_lint:
-                file_content = self.file_cache.read(filepath)
-                file_lines = self.file_cache.readlines(filepath)
-                parser = CustomHTMLParser(filepath, file_lines, self.debug)
-                parser.feed(file_content)
+        for filepath in html_files_to_lint:
+            file_content = self.file_cache.read(filepath)
+            file_lines = self.file_cache.readlines(filepath)
+            parser = CustomHTMLParser(filepath, file_lines, self.debug)
+            parser.feed(file_content)
 
-                if len(parser.tag_stack) != 0:
-                    raise TagMismatchException('Error in file %s\n' % filepath)
+            if len(parser.tag_stack) != 0:
+                raise TagMismatchException('Error in file %s\n' % filepath)
 
-                if parser.failed:
-                    summary_messages.extend(parser.summary_messages)
-                    failed = True
+            if parser.failed:
+                summary_messages.extend(parser.summary_messages)
+                failed = True
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
@@ -287,12 +279,13 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
 
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT('There are no HTML files to lint.')
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log('There are no HTML files to lint.')
             return []
 
         # The html tags and attributes check has an additional
@@ -301,24 +294,16 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
 
 class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
-    """Manages all the HTML linting functions.
+    """Manages all the HTML linting functions."""
 
-    Attributes:
-        files_to_lint: list(str). A list of filepaths to lint.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-
-    def __init__(
-            self, files_to_lint, verbose_mode_enabled):
+    def __init__(self, files_to_lint):
         """Constructs a ThirdPartyHTMLLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         super(ThirdPartyHTMLLintChecksManager, self).__init__()
         self.files_to_lint = files_to_lint
-        self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
     def html_filepaths(self):
@@ -359,7 +344,12 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_html_files(self):
-        """This function is used to check HTML files for linting errors."""
+        """This function is used to check HTML files for linting errors.
+
+        Returns:
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
+        """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         htmllint_path = os.path.join(
             'node_modules', 'htmllint-cli', 'bin', 'cli.js')
@@ -367,33 +357,30 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         failed = False
         name = 'HTMLLint'
         error_summary = []
-        total_error_count = 0
         summary_messages = []
         full_messages = []
-        stdout = sys.stdout
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         html_files_to_lint = self.html_filepaths
         for filepath in html_files_to_lint:
             proc_args = htmllint_cmd_args + [filepath]
-            with linter_utils.redirect_stdout(stdout):
-                proc = subprocess.Popen(
-                    proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc = subprocess.Popen(
+                proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-                encoded_linter_stdout, _ = proc.communicate()
-                linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-                # This line splits the output of the linter and extracts digits
-                # from it. The digits are stored in a list. The second last
-                # digit in the list represents the number of errors in the file.
-                error_count = (
-                    [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
-                if error_count:
-                    failed = True
-                    error_summary.append(error_count)
-                    full_messages.append(linter_stdout)
-                    summary_messages.append(
-                        self._get_trimmed_error_output(linter_stdout))
+            encoded_linter_stdout, _ = proc.communicate()
+            linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+            # This line splits the output of the linter and extracts digits
+            # from it. The digits are stored in a list. The second last
+            # digit in the list represents the number of errors in the file.
+            error_count = (
+                [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
+            if error_count:
+                failed = True
+                error_summary.append(error_count)
+                full_messages.append(linter_stdout)
+                summary_messages.append(
+                    self._get_trimmed_error_output(linter_stdout))
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, full_messages)
 
     def perform_all_lint_checks(self):
@@ -401,18 +388,18 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
         if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                'There are no HTML files to lint.')
+            concurrent_task_utils.log('')
+            concurrent_task_utils.log('There are no HTML files to lint.')
             return []
 
         return [self._lint_html_files()]
 
 
-def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
+def get_linters(files_to_lint, file_cache):
     """Creates HTMLLintChecksManager and ThirdPartyHTMLLintChecksManager
         objects and returns them.
 
@@ -420,16 +407,13 @@ def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
         files_to_lint: list(str). A list of filepaths to lint.
         file_cache: object(FileCache). Provides thread-safe access to cached
             file content.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
         tuple(HTMLLintChecksManager, ThirdPartyHTMLLintChecksManager). A 2-tuple
         of custom and third_party linter objects.
     """
-    custom_linter = HTMLLintChecksManager(
-        files_to_lint, file_cache, verbose_mode_enabled)
+    custom_linter = HTMLLintChecksManager(files_to_lint, file_cache)
 
-    third_party_linter = ThirdPartyHTMLLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
+    third_party_linter = ThirdPartyHTMLLintChecksManager(files_to_lint)
 
     return custom_linter, third_party_linter

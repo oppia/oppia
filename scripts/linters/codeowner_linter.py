@@ -22,10 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import glob
 import os
 import subprocess
-import sys
 
 import python_utils
-from . import linter_utils
 from .. import concurrent_task_utils
 
 CODEOWNER_FILEPATH = '.github/CODEOWNERS'
@@ -64,8 +62,8 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
         self.file_cache = file_cache
 
     def _walk_with_gitignore(self, root, exclude_dirs):
-        """A walk function similar to os.walk but this would ignore the files and
-        directories which is not tracked by git. Also, this will ignore the
+        """A walk function similar to os.walk but this would ignore the files
+        and directories which is not tracked by git. Also, this will ignore the
         directories mentioned in exclude_dirs.
 
         Args:
@@ -82,12 +80,13 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
             else:
                 file_paths.append(os.path.join(root, name))
 
-        yield [file_path for file_path in file_paths if not self._is_path_ignored(
-            file_path)]
+        yield [
+            file_path for file_path in file_paths if not self._is_path_ignored(
+                file_path)]
 
         for dir_path in dirs:
-            # Adding "/" in the end of the dir path according to the git dir path
-            # structure.
+            # Adding "/" in the end of the dir path according to the git dir
+            # path structure.
             if (not self._is_path_ignored(dir_path + '/')) and (
                     dir_path not in exclude_dirs):
                 for x in self._walk_with_gitignore(dir_path, exclude_dirs):
@@ -105,8 +104,9 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
         """
         command = ['git', 'check-ignore', '-q', path_to_check]
 
-        # The "git check-ignore <path>" command returns 0 when the path is ignored
-        # otherwise it returns 1. subprocess.call then returns this returncode.
+        # The "git check-ignore <path>" command returns 0 when the path is
+        # ignored otherwise it returns 1. subprocess.call then returns this
+        # returncode.
 
         return subprocess.call(command) == 0
 
@@ -165,9 +165,9 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
             summary_message = (
                 '%s --> Rule %s is not present in the '
                 'CODEOWNER_IMPORTANT_PATHS list in '
-                'scripts/linters/pre_commit_linter.py. Please add this rule in the '
-                'mentioned list or remove this rule from the \'Critical files'
-                '\' section.' % (CODEOWNER_FILEPATH, rule))
+                'scripts/linters/pre_commit_linter.py. Please add this rule in '
+                'the mentioned list or remove this rule from the \'Critical '
+                'files\' section.' % (CODEOWNER_FILEPATH, rule))
             summary_messages.append(summary_message)
             failed = True
         for rule in list_minus_critical_rule_section_set:
@@ -194,119 +194,119 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
         bottom of the CODEOWNERS file.
 
         Returns:
-            list(str). List of summary messages returned by the lint checks.
+            OutputStream. An OutputStream object to retrieve the status of a
+            lint check.
         """
-        stdout = sys.stdout
-        name = "CODEOWNERS"
-
-        with linter_utils.redirect_stdout(stdout):
-            failed = False
-            summary_messages = []
-            # Checks whether every pattern in the CODEOWNERS file matches at
-            # least one dir/file.
-            critical_file_section_found = False
-            important_rules_in_critical_section = []
-            file_patterns = []
-            dir_patterns = []
-            for line_num, line in enumerate(self.file_cache.readlines(
-                    CODEOWNER_FILEPATH)):
-                stripped_line = line.strip()
-                if '# Critical files' in line:
-                    critical_file_section_found = True
-                if stripped_line and stripped_line[0] != '#':
-                    if '@' not in line:
+        name = 'CODEOWNERS'
+        failed = False
+        summary_messages = []
+        # Checks whether every pattern in the CODEOWNERS file matches at
+        # least one dir/file.
+        critical_file_section_found = False
+        important_rules_in_critical_section = []
+        file_patterns = []
+        dir_patterns = []
+        for line_num, line in enumerate(self.file_cache.readlines(
+                CODEOWNER_FILEPATH)):
+            stripped_line = line.strip()
+            if '# Critical files' in line:
+                critical_file_section_found = True
+            if stripped_line and stripped_line[0] != '#':
+                if '@' not in line:
+                    summary_message = (
+                        '%s --> Pattern on line %s doesn\'t have '
+                        'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
+                    summary_messages.append(summary_message)
+                    failed = True
+                else:
+                    # Extract the file pattern from the line.
+                    line_in_concern = line.split('@')[0].strip()
+                    # This is being populated for the important rules
+                    # check.
+                    if critical_file_section_found:
+                        important_rules_in_critical_section.append(
+                            line_in_concern)
+                    # Checks if the path is the full path relative to the
+                    # root oppia directory.
+                    if not line_in_concern.startswith('/'):
                         summary_message = (
-                            '%s --> Pattern on line %s doesn\'t have '
-                            'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
+                            '%s --> Pattern on line %s is invalid. Use '
+                            'full path relative to the root directory'
+                            % (CODEOWNER_FILEPATH, line_num + 1))
                         summary_messages.append(summary_message)
                         failed = True
-                    else:
-                        # Extract the file pattern from the line.
-                        line_in_concern = line.split('@')[0].strip()
-                        # This is being populated for the important rules
-                        # check.
-                        if critical_file_section_found:
-                            important_rules_in_critical_section.append(
-                                line_in_concern)
-                        # Checks if the path is the full path relative to the
-                        # root oppia directory.
-                        if not line_in_concern.startswith('/'):
+
+                    # The double asterisks should be allowed only when path
+                    # includes all the frontend spec files.
+                    if not self._is_path_contains_frontend_specs(
+                            line_in_concern):
+                        # The double asterisks pattern is supported by the
+                        # CODEOWNERS syntax but not the glob in Python 2.
+                        # The following condition checks this.
+                        if '**' in line_in_concern:
                             summary_message = (
-                                '%s --> Pattern on line %s is invalid. Use '
-                                'full path relative to the root directory'
-                                % (CODEOWNER_FILEPATH, line_num + 1))
+                                '%s --> Pattern on line %s is invalid. '
+                                '\'**\' wildcard not allowed' % (
+                                    CODEOWNER_FILEPATH, line_num + 1))
                             summary_messages.append(summary_message)
                             failed = True
+                    # Adjustments to the dir paths in CODEOWNERS syntax
+                    # for glob-style patterns to match correctly.
+                    if line_in_concern.endswith('/'):
+                        line_in_concern = line_in_concern[:-1]
+                    # The following condition checks whether the specified
+                    # path exists in the codebase or not. The CODEOWNERS
+                    # syntax has paths starting with '/' which refers to
+                    # full path relative to root, but python glob module
+                    # does not conform to this logic and literally matches
+                    # the '/' character. Therefore the leading '/' has to
+                    # be changed to './' for glob patterns to match
+                    # correctly.
+                    line_in_concern = line_in_concern.replace('/', './', 1)
+                    # The checking for path existence won't happen if the path
+                    # is getting all the frontend spec files.
+                    if not self._is_path_contains_frontend_specs(
+                            line_in_concern):
+                        if not glob.glob(line_in_concern):
+                            summary_message = (
+                                '%s --> Pattern on line %s doesn\'t match '
+                                'any file or directory' % (
+                                    CODEOWNER_FILEPATH, line_num + 1))
+                            summary_messages.append(summary_message)
+                            failed = True
+                    # The following list is being populated with the
+                    # paths in the CODEOWNERS file with the removal of the
+                    # leading '/' to aid in the glob pattern matching in
+                    # the next part of the check wherein the valid patterns
+                    # are used to check if they cover the entire codebase.
+                    if os.path.isdir(line_in_concern):
+                        dir_patterns.append(line_in_concern)
+                    else:
+                        file_patterns.append(line_in_concern)
 
-                        # The double asterisks should be allowed only when path
-                        # includes all the frontend spec files.
-                        if not self._is_path_contains_frontend_specs(line_in_concern):
-                            # The double asterisks pattern is supported by the
-                            # CODEOWNERS syntax but not the glob in Python 2.
-                            # The following condition checks this.
-                            if '**' in line_in_concern:
-                                summary_message = (
-                                    '%s --> Pattern on line %s is invalid. '
-                                    '\'**\' wildcard not allowed' % (
-                                        CODEOWNER_FILEPATH, line_num + 1))
-                                summary_messages.append(summary_message)
-                                failed = True
-                        # Adjustments to the dir paths in CODEOWNERS syntax
-                        # for glob-style patterns to match correctly.
-                        if line_in_concern.endswith('/'):
-                            line_in_concern = line_in_concern[:-1]
-                        # The following condition checks whether the specified
-                        # path exists in the codebase or not. The CODEOWNERS
-                        # syntax has paths starting with '/' which refers to
-                        # full path relative to root, but python glob module
-                        # does not conform to this logic and literally matches
-                        # the '/' character. Therefore the leading '/' has to
-                        # be changed to './' for glob patterns to match
-                        # correctly.
-                        line_in_concern = line_in_concern.replace('/', './', 1)
-                        # The checking for path existence won't happen if the path
-                        # is getting all the frontend spec files.
-                        if not self._is_path_contains_frontend_specs(line_in_concern):
-                            if not glob.glob(line_in_concern):
-                                summary_message = (
-                                    '%s --> Pattern on line %s doesn\'t match '
-                                    'any file or directory' % (
-                                        CODEOWNER_FILEPATH, line_num + 1))
-                                summary_messages.append(summary_message)
-                                failed = True
-                        # The following list is being populated with the
-                        # paths in the CODEOWNERS file with the removal of the
-                        # leading '/' to aid in the glob pattern matching in
-                        # the next part of the check wherein the valid patterns
-                        # are used to check if they cover the entire codebase.
-                        if os.path.isdir(line_in_concern):
-                            dir_patterns.append(line_in_concern)
-                        else:
-                            file_patterns.append(line_in_concern)
+        # Checks that every file (except those under the dir represented by
+        # the dir_patterns) is covered under CODEOWNERS.
+        for file_paths in self._walk_with_gitignore('.', dir_patterns):
+            for file_path in file_paths:
+                match = False
+                for file_pattern in file_patterns:
+                    if file_path in glob.glob(file_pattern):
+                        match = True
+                        break
+                if not match:
+                    summary_message = (
+                        '%s is not listed in the .github/CODEOWNERS file.' % (
+                            file_path))
+                    summary_messages.append(summary_message)
+                    failed = True
 
-            # Checks that every file (except those under the dir represented by
-            # the dir_patterns) is covered under CODEOWNERS.
-            for file_paths in self._walk_with_gitignore('.', dir_patterns):
-                for file_path in file_paths:
-                    match = False
-                    for file_pattern in file_patterns:
-                        if file_path in glob.glob(file_pattern):
-                            match = True
-                            break
-                    if not match:
-                        summary_message = (
-                            '%s is not listed in the .github/CODEOWNERS file.' % (
-                                file_path))
-                        summary_messages.append(summary_message)
-                        failed = True
+        codeowner_pattern_check_failed, summary_message = (
+            self._check_for_important_patterns_at_bottom_of_codeowners(
+                important_rules_in_critical_section))
+        summary_messages.extend(summary_message)
+        failed = failed or codeowner_pattern_check_failed
 
-            codeowner_pattern_check_failed, summary_message = (
-                self._check_for_important_patterns_at_bottom_of_codeowners(
-                    important_rules_in_critical_section))
-            summary_messages.extend(summary_message)
-            failed = failed or codeowner_pattern_check_failed
-
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
 
@@ -315,7 +315,8 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
 
         return [self.check_codeowner_file()]
@@ -329,7 +330,7 @@ def get_linters(file_cache):
             file content.
 
     Returns:
-        tuple(None, ThirdPartyCSSLintChecksManager). A 2-tuple of custom and
+        tuple(CodeownerLintChecksManager, None). A 2-tuple of custom and
         third_party linter objects.
     """
     custom_linter = CodeownerLintChecksManager(file_cache)

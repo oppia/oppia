@@ -21,12 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
-import sys
 
 import python_utils
 
 from . import js_ts_linter
-from . import linter_utils
 from .. import common
 from .. import concurrent_task_utils
 
@@ -622,22 +620,15 @@ def check_file_type_specific_bad_pattern(filepath, content):
 class GeneralPurposeLinter(python_utils.OBJECT):
     """Manages all the common linting functions. As an abstract base class, this
     is not intended to be used directly.
-
-    Attributes:
-        all_filepaths: list(str). The list of filepaths to be linted.
-        parsed_js_files: dict. Contains the content of JS files, after
-            validating and parsing the files.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
 
-    def __init__(self, files_to_lint, file_cache, verbose_mode_enabled):
+    def __init__(self, files_to_lint, file_cache):
         """Constructs a GeneralPurposeLinter object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # Set path for node.
         # The path for node is set explicitly, since otherwise the lint
@@ -647,7 +638,6 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
         self.files_to_lint = files_to_lint
         self.file_cache = file_cache
-        self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
     def all_filepaths(self):
@@ -706,17 +696,15 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         name = 'Mandatory pattern'
         summary_messages = []
         failed = False
-        stdout = sys.stdout
-        with linter_utils.redirect_stdout(stdout):
-            sets_of_patterns_to_match = [
-                MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
-            for filepath in self.all_filepaths:
-                for pattern_list in sets_of_patterns_to_match:
-                    failed, mandatory_summary_messages = (
-                        self._check_for_mandatory_pattern_in_file(
-                            pattern_list, filepath, failed))
-                    summary_messages.extend(mandatory_summary_messages)
-        return linter_utils.OutputStream(
+        sets_of_patterns_to_match = [
+            MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
+        for filepath in self.all_filepaths:
+            for pattern_list in sets_of_patterns_to_match:
+                failed, mandatory_summary_messages = (
+                    self._check_for_mandatory_pattern_in_file(
+                        pattern_list, filepath, failed))
+                summary_messages.extend(mandatory_summary_messages)
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_bad_patterns(self):
@@ -730,54 +718,52 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 filepath.endswith('general_purpose_linter.py') or (
                     filepath.endswith('general_purpose_linter_test.py')))]
         failed = False
-        stdout = sys.stdout
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in all_filepaths:
-                file_content = self.file_cache.readlines(filepath)
-                total_files_checked += 1
-                for pattern in BAD_PATTERNS:
-                    if is_filepath_excluded_for_bad_patterns_check(
-                            pattern, filepath):
-                        continue
-                    for line_num, line in enumerate(file_content):
-                        if pattern in line:
-                            failed = True
-                            summary_message = ('%s --> Line %s: %s' % (
-                                filepath, line_num + 1,
-                                BAD_PATTERNS[pattern]['message']))
-                            summary_messages.append(summary_message)
-                            total_error_count += 1
-
-                for regexp in BAD_PATTERNS_REGEXP:
-                    bad_pattern_check_failed, bad_pattern_summary_messages = (
-                        check_bad_pattern_in_file(
-                            filepath, file_content, regexp))
-                    if bad_pattern_check_failed:
-                        summary_messages.extend(bad_pattern_summary_messages)
+        for filepath in all_filepaths:
+            file_content = self.file_cache.readlines(filepath)
+            total_files_checked += 1
+            for pattern in BAD_PATTERNS:
+                if is_filepath_excluded_for_bad_patterns_check(
+                        pattern, filepath):
+                    continue
+                for line_num, line in enumerate(file_content):
+                    if pattern in line:
+                        failed = True
+                        summary_message = ('%s --> Line %s: %s' % (
+                            filepath, line_num + 1,
+                            BAD_PATTERNS[pattern]['message']))
+                        summary_messages.append(summary_message)
                         total_error_count += 1
 
-                (
-                    file_type_specific_bad_pattern_failed,
-                    temp_count, bad_pattern_summary_messages) = (
-                        check_file_type_specific_bad_pattern(
-                            filepath, file_content))
-                failed = (
-                    failed or file_type_specific_bad_pattern_failed or
-                    bad_pattern_check_failed)
-                total_error_count += temp_count
-                summary_messages.extend(bad_pattern_summary_messages)
+            for regexp in BAD_PATTERNS_REGEXP:
+                bad_pattern_check_failed, bad_pattern_summary_messages = (
+                    check_bad_pattern_in_file(
+                        filepath, file_content, regexp))
+                if bad_pattern_check_failed:
+                    summary_messages.extend(bad_pattern_summary_messages)
+                    total_error_count += 1
 
-                if filepath == 'constants.ts':
-                    for pattern in REQUIRED_STRINGS_CONSTANTS:
-                        if pattern not in file_content:
-                            failed = True
-                            summary_message = ('%s --> %s' % (
-                                filepath,
-                                REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
-                            summary_messages.append(summary_message)
-                            total_error_count += 1
+            (
+                file_type_specific_bad_pattern_failed,
+                temp_count, bad_pattern_summary_messages) = (
+                    check_file_type_specific_bad_pattern(
+                        filepath, file_content))
+            failed = (
+                failed or file_type_specific_bad_pattern_failed or
+                bad_pattern_check_failed)
+            total_error_count += temp_count
+            summary_messages.extend(bad_pattern_summary_messages)
 
-        return linter_utils.OutputStream(
+            if filepath == 'constants.ts':
+                for pattern in REQUIRED_STRINGS_CONSTANTS:
+                    if pattern not in file_content:
+                        failed = True
+                        summary_message = ('%s --> %s' % (
+                            filepath,
+                            REQUIRED_STRINGS_CONSTANTS[pattern]['message']))
+                        summary_messages.append(summary_message)
+                        total_error_count += 1
+
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def _check_newline_at_eof(self):
@@ -787,20 +773,19 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         files_to_lint = self.all_filepaths
         failed = False
 
-        with linter_utils.redirect_stdout(sys.stdout):
-            for filepath in files_to_lint:
-                file_content = self.file_cache.readlines(filepath)
-                file_length = len(file_content)
-                if (
-                        file_length >= 1 and
-                        not re.search(r'[^\n]\n', file_content[-1])):
-                    summary_message = (
-                        '%s --> There should be a single newline at the '
-                        'end of file.' % filepath)
-                    summary_messages.append(summary_message)
-                    failed = True
+        for filepath in files_to_lint:
+            file_content = self.file_cache.readlines(filepath)
+            file_length = len(file_content)
+            if (
+                    file_length >= 1 and
+                    not re.search(r'[^\n]\n', file_content[-1])):
+                summary_message = (
+                    '%s --> There should be a single newline at the '
+                    'end of file.' % filepath)
+                summary_messages.append(summary_message)
+                failed = True
 
-        return linter_utils.OutputStream(
+        return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
     def perform_all_lint_checks(self):
@@ -808,7 +793,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            list(OutputStream). A list of OutputStream objects to be used for
+            linter status retrieval.
         """
         linter_stdout = []
         linter_stdout.append(self._check_mandatory_patterns())
@@ -817,21 +803,18 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return linter_stdout
 
 
-def get_linters(
-        files_to_lint, file_cache, verbose_mode_enabled=False):
+def get_linters(files_to_lint, file_cache):
     """Creates GeneralPurposeLinter object and returns it.
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
         file_cache: object(FileCache). Provides thread-safe access to cached
             file content.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
         tuple(GeneralPurposeLinter, None). A 2-tuple of custom and third_party
         linter objects.
     """
-    custom_linter = GeneralPurposeLinter(
-        files_to_lint, file_cache, verbose_mode_enabled)
+    custom_linter = GeneralPurposeLinter(files_to_lint, file_cache)
 
     return custom_linter, None
