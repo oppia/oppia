@@ -2234,18 +2234,18 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
                 job_id))
         expected_output = [(
             '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value='
-            '"&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;'
-            'xy.z.png&amp;quot;"></oppia-noninteractive-image>\', '
-            'u\'Exp ID: exp_id0\']]'
+            '[[u\'Exp ID: exp_id0\', u\'<oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;A circle divided into equal fifths.'
+            '&amp;quot;" caption-with-value="&amp;quot;Hello&amp;quot;" '
+            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+            '</oppia-noninteractive-image>\']]]'
         ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' '
             'or \'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
-            'link.com&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp ID: exp_id0\']]')]
+            '[[u\'Exp ID: exp_id0\', u\'<p><oppia-noninteractive-link '
+            'text-with-value="&amp;quot;What is a link?&amp;quot;" '
+            'url-with-value="&amp;quot;htt://link.com&amp;quot;">'
+            '</oppia-noninteractive-link></p>\']]]')]
 
         self.assertEqual(actual_output, expected_output)
 
@@ -2356,29 +2356,28 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         expected_output = [(
             '[u"Invalid URL: Sanitized URL should start with \'http://\' '
             'or \'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
+            '[[u\'Exp ID: exp_id0\', '
+            'u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
             'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
-            'link.com&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp ID: exp_id0\']]'
+            'link.com&amp;quot;"></oppia-noninteractive-link></p>\']]]'
         ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' '
-            'or \'https://\'; received test.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;'
-            'quot;Test link?&amp;quot;" url-with-value="&amp;quot;test.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp ID: exp_id1\']]'
+            'or \'https://\'; received test.com", [[u\'Exp ID: exp_id1\', '
+            'u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
+            'link?&amp;quot;" url-with-value="&amp;quot;test.com&amp;quot;">'
+            '</oppia-noninteractive-link></p>\']]]'
         ), (
-            '[u\'Invalid filepath\', '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value='
+            '[u\'Invalid filepath\', [[u\'Exp ID: exp_id0\', '
+            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;'
+            'A circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="&amp;quot;Hello&amp;quot;" '
+            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+            '</oppia-noninteractive-image>\'], '
+            '[u\'Exp ID: exp_id1\', '
+            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A circle '
+            'divided into equal fifths.&amp;quot;" caption-with-value='
             '"&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;'
-            'xy.z.png&amp;quot;"></oppia-noninteractive-image>\', '
-            'u\'Exp ID: exp_id0\', '
-            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" '
-            'caption-with-value="&amp;quot;Hello&amp;quot;" filepath-with-value'
-            '="&amp;quot;123png&amp;quot;"></oppia-noninteractive-image>\', '
-            'u\'Exp ID: exp_id1\']]')]
+            '123png&amp;quot;"></oppia-noninteractive-image>\']]]')]
 
         self.assertEqual(actual_output, expected_output)
 

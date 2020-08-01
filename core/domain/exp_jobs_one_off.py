@@ -544,7 +544,25 @@ class RTECustomizationArgsValidationOneOffJob(
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
-        # Combine all values from multiple lists into a single list
-        # for that error type.
-        output_values = [item for sublist in final_values for item in sublist]
+        flattened_values = [
+            item for sublist in final_values for item in sublist]
+
+        # Errors produced while loading exploration only contain exploration id
+        # in error message, so no further formatting is required. For errors
+        # from validation the output is in format [err1, expid1, err2, expid2].
+        # So, we further format it as [(expid1, err1), (expid2, err2)].
+        if 'loading exploration' in key:
+            yield (key, flattened_values)
+            return
+
+        output_values = []
+        index = 0
+        while index < len(flattened_values):
+            # flattened_values[index] = error message.
+            # flattened_values[index + 1] = exp id in which error message
+            # is present.
+            output_values.append((
+                flattened_values[index + 1], flattened_values[index]))
+            index += 2
+        output_values.sort()
         yield (key, output_values)
