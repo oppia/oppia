@@ -36,7 +36,7 @@ require(
   'editor-navbar-breadcrumb.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.directive.ts');
+  'editor-navigation.component.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.component.ts');
@@ -64,8 +64,6 @@ require(
   'improvements-tab.component.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.component.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
