@@ -158,9 +158,24 @@ def delete_user(pending_deletion_request):
     _delete_user_models(pending_deletion_request.user_id)
     _hard_delete_explorations_and_collections(pending_deletion_request)
     _delete_improvements_models(pending_deletion_request.user_id)
-    _delete_question_models(pending_deletion_request)
-    _delete_skill_models(pending_deletion_request)
-    _delete_story_models(pending_deletion_request)
+    _delete_activity_models(
+        pending_deletion_request,
+        models.NAMES.question,
+        question_models.QuestionSnapshotMetadataModel,
+        question_models.QuestionCommitLogEntryModel,
+        'question_id')
+    _delete_activity_models(
+        pending_deletion_request,
+        models.NAMES.skill,
+        skill_models.SkillSnapshotMetadataModel,
+        skill_models.SkillCommitLogEntryModel,
+        'skill_id')
+    _delete_activity_models(
+        pending_deletion_request,
+        models.NAMES.story,
+        story_models.StorySnapshotMetadataModel,
+        story_models.StoryCommitLogEntryModel,
+        'story_id')
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -232,219 +247,93 @@ def _delete_improvements_models(user_id):
             model_class.apply_deletion_policy(user_id)
 
 
-def _delete_question_models(pending_deletion_request):
-    """Pseudonymize the question models for the user with user_id.
+def _delete_activity_models(
+    pending_deletion_request,
+    activity_category,
+    snapshot_model_class,
+    commit_log_model_class,
+    commit_log_model_field_name):
+    """Pseudonymize the activity models for the user with user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
+        activity_category: models.NAMES. The category of the category that is
+            being pseudonymized.
+        snapshot_model_class: class. The metadata model class that is being
+            pseudonymized.
+        commit_log_model_class: class. The commit log model class that is being
+            pseudonymized.
+        commit_log_model_field_name: str. The name of the field holding the
+            activity id in the corresponding commit log model.
     """
     user_id = pending_deletion_request.user_id
-    metadata_models = question_models.QuestionSnapshotMetadataModel.query(
-        question_models.QuestionSnapshotMetadataModel.committer_id == user_id
+    metadata_models = snapshot_model_class.query(
+        snapshot_model_class.committer_id == user_id
     ).fetch()
-    question_ids = set([
+    activity_ids = set([
         model.get_unversioned_instance_id() for model in metadata_models])
 
-    commit_log_models = question_models.QuestionCommitLogEntryModel.query(
-        question_models.QuestionCommitLogEntryModel.user_id == user_id
+    commit_log_models = commit_log_model_class.query(
+        commit_log_model_class.user_id == user_id
     ).fetch()
-    commit_log_ids = set(model.question_id for model in commit_log_models)
-    if question_ids != commit_log_ids:
+    commit_log_ids = set(
+        getattr(model, commit_log_model_field_name)
+        for model in commit_log_models)
+    if activity_ids != commit_log_ids:
         logging.error(
-            'The commit log and snapshot question IDs differ. '
+            'The commit log and snapshot %s IDs differ. '
             'Snapshots without commit logs: %s, '
             'Commit logs without snapshots: %s.',
-            list(question_ids - commit_log_ids),
-            list(commit_log_ids - question_ids))
+            activity_category,
+            list(activity_ids - commit_log_ids),
+            list(commit_log_ids - activity_ids))
 
-    question_ids |= commit_log_ids
-    if models.NAMES.question not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[models.NAMES.question] = (
-            _generate_activity_to_pseudonymized_ids_mapping(question_ids))
+    activity_ids |= commit_log_ids
+    if activity_category not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[activity_category] = (
+            _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
         save_pending_deletion_request(pending_deletion_request)
 
-    def _pseudonymize_models(question_related_models, pseudonymized_user_id):
+    def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
 
         Args:
-            question_related_models: list(ndb.Model). Models whose user IDs
+            activity_related_models: list(BaseModel). Models whose user IDs
                 should be pseudonymized.
             pseudonymized_user_id: str. New pseudonymized user ID to be used for
                 the models.
         """
         metadata_models = [
-            model for model in question_related_models
-            if isinstance(model, question_models.QuestionSnapshotMetadataModel)]
+            model for model in activity_related_models
+            if isinstance(model, snapshot_model_class)]
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_user_id
-        question_models.QuestionSnapshotMetadataModel.put_multi(metadata_models)
+        snapshot_model_class.put_multi(metadata_models)
 
         commit_log_models = [
-            model for model in question_related_models
-            if isinstance(model, question_models.QuestionCommitLogEntryModel)]
+            model for model in activity_related_models
+            if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_user_id
-        question_models.QuestionCommitLogEntryModel.put_multi(commit_log_models)
+        commit_log_model_class.put_multi(commit_log_models)
 
-    question_mappings = (
-        pending_deletion_request.activity_mappings[models.NAMES.question])
-    for question_id, pseudonymized_user_id in question_mappings.items():
-        question_related_models = [
+    activity_mappings = (
+        pending_deletion_request.activity_mappings[activity_category])
+    for activity_id, pseudonymized_user_id in activity_mappings.items():
+        activity_related_models = [
             model for model in metadata_models
-            if model.get_unversioned_instance_id() == question_id]
-        question_related_models += [
+            if model.get_unversioned_instance_id() == activity_id]
+        activity_related_models += [
             model for model in commit_log_models
-            if model.question_id == question_id]
+            if getattr(model, commit_log_model_field_name) == activity_id]
         for i in python_utils.RANGE(
                 0,
-                len(question_related_models),
+                len(activity_related_models),
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                question_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_user_id)
-
-
-def _delete_skill_models(pending_deletion_request):
-    """Pseudonymize the skill models for the user with user_id.
-
-    Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
-    """
-    user_id = pending_deletion_request.user_id
-    metadata_models = skill_models.SkillSnapshotMetadataModel.query(
-        skill_models.SkillSnapshotMetadataModel.committer_id == user_id
-    ).fetch()
-    skill_ids = set([
-        model.get_unversioned_instance_id() for model in metadata_models])
-
-    commit_log_models = skill_models.SkillCommitLogEntryModel.query(
-        skill_models.SkillCommitLogEntryModel.user_id == user_id
-    ).fetch()
-    commit_log_ids = set(model.skill_id for model in commit_log_models)
-    if skill_ids != commit_log_ids:
-        logging.error(
-            'The commit log and snapshot skill IDs differ. '
-            'Snapshots without commit logs: %s, '
-            'Commit logs without snapshots: %s.',
-            list(skill_ids - commit_log_ids),
-            list(commit_log_ids - skill_ids))
-
-    skill_ids |= commit_log_ids
-    if models.NAMES.skill not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[models.NAMES.skill] = (
-            _generate_activity_to_pseudonymized_ids_mapping(skill_ids))
-        save_pending_deletion_request(pending_deletion_request)
-
-    def _pseudonymize_models(skill_related_models, pseudonymized_user_id):
-        """Pseudonymize user ID fields in the models.
-
-        Args:
-            skill_related_models: list(ndb.Model). Models whose user IDs should
-                be pseudonymized.
-            pseudonymized_user_id: str. New pseudonymized user ID to be used for
-                the models.
-        """
-        metadata_models = [
-            model for model in skill_related_models
-            if isinstance(model, skill_models.SkillSnapshotMetadataModel)]
-        for metadata_model in metadata_models:
-            metadata_model.committer_id = pseudonymized_user_id
-        skill_models.SkillSnapshotMetadataModel.put_multi(metadata_models)
-
-        commit_log_models = [
-            model for model in skill_related_models
-            if isinstance(model, skill_models.SkillCommitLogEntryModel)]
-        for commit_log_model in commit_log_models:
-            commit_log_model.user_id = pseudonymized_user_id
-        skill_models.SkillCommitLogEntryModel.put_multi(commit_log_models)
-
-    skill_mappings = (
-        pending_deletion_request.activity_mappings[models.NAMES.skill])
-    for skill_id, pseudonymized_user_id in skill_mappings.items():
-        skill_related_models = [
-            model for model in metadata_models
-            if model.get_unversioned_instance_id() == skill_id]
-        skill_related_models += [
-            model for model in commit_log_models if model.skill_id == skill_id]
-        for i in python_utils.RANGE(
-                0, len(skill_related_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
-                skill_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_user_id)
-
-
-def _delete_story_models(pending_deletion_request):
-    """Pseudonymize the story models for the user with user_id.
-
-    Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
-    """
-    user_id = pending_deletion_request.user_id
-    metadata_models = story_models.StorySnapshotMetadataModel.query(
-        story_models.StorySnapshotMetadataModel.committer_id == user_id
-    ).fetch()
-    story_ids = set([
-        model.get_unversioned_instance_id() for model in metadata_models])
-
-    commit_log_models = story_models.StoryCommitLogEntryModel.query(
-        story_models.StoryCommitLogEntryModel.user_id == user_id
-    ).fetch()
-    commit_log_ids = set(model.story_id for model in commit_log_models)
-    if story_ids != commit_log_ids:
-        logging.error(
-            'The commit log and snapshot story IDs differ. '
-            'Snapshots without commit logs: %s, '
-            'Commit logs without snapshots: %s.',
-            list(story_ids - commit_log_ids),
-            list(commit_log_ids - story_ids))
-
-    story_ids |= commit_log_ids
-    if models.NAMES.story not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[models.NAMES.story] = (
-            _generate_activity_to_pseudonymized_ids_mapping(story_ids))
-        save_pending_deletion_request(pending_deletion_request)
-
-    def _pseudonymize_models(story_related_models, pseudonymized_user_id):
-        """Pseudonymize user ID fields in the models.
-
-        Args:
-            story_related_models: list(ndb.Model). Models whose user IDs should
-                be pseudonymized.
-            pseudonymized_user_id: str. New pseudonymized user ID to be used for
-                the models.
-        """
-        metadata_models = [
-            model for model in story_related_models
-            if isinstance(model, story_models.StorySnapshotMetadataModel)]
-        for metadata_model in metadata_models:
-            metadata_model.committer_id = pseudonymized_user_id
-        story_models.StorySnapshotMetadataModel.put_multi(metadata_models)
-
-        commit_log_models = [
-            model for model in story_related_models
-            if isinstance(model, story_models.StoryCommitLogEntryModel)]
-        for commit_log_model in commit_log_models:
-            commit_log_model.user_id = pseudonymized_user_id
-        story_models.StoryCommitLogEntryModel.put_multi(commit_log_models)
-
-    story_mappings = (
-        pending_deletion_request.activity_mappings[models.NAMES.story])
-    for story_id, pseudonymized_user_id in story_mappings.items():
-        story_related_models = [
-            model for model in metadata_models
-            if model.get_unversioned_instance_id() == story_id]
-        story_related_models += [
-            model for model in commit_log_models if model.story_id == story_id]
-        for i in python_utils.RANGE(
-                0, len(story_related_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
-                story_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                activity_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_user_id)
 
 
