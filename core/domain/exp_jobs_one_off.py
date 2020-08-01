@@ -536,19 +536,15 @@ class RTECustomizationArgsValidationOneOffJob(
         html_list = exploration.get_all_html_content_strings()
         err_dict = html_validation_service.validate_customization_args(
             html_list)
-
         for key in err_dict:
-            yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
+            err_value_with_exp_id = err_dict[key]
+            err_value_with_exp_id.append('Exp ID: %s' % item.id)
+            yield (key, err_value_with_exp_id)
 
     @staticmethod
     def reduce(key, values):
         final_values = [ast.literal_eval(value) for value in values]
         # Combine all values from multiple lists into a single list
         # for that error type.
-        output_values = list(set().union(*final_values))
-        exp_id_index = key.find('Exp Id:')
-        if exp_id_index == -1:
-            yield (key, output_values)
-        else:
-            output_values.append(key[exp_id_index:])
-            yield (key[:exp_id_index - 1], output_values)
+        output_values = [item for sublist in final_values for item in sublist]
+        yield (key, output_values)

@@ -2144,8 +2144,7 @@ class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
         self.assertEqual(actual_output, expected_output)
 
 
-class RTECustomizationArgsValidationJobTests(
-        test_utils.GenericTestBase):
+class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -2156,7 +2155,7 @@ class RTECustomizationArgsValidationJobTests(
 
     def setUp(self):
         super(
-            RTECustomizationArgsValidationJobTests, self).setUp()
+            RTECustomizationArgsValidationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -2233,22 +2232,20 @@ class RTECustomizationArgsValidationJobTests(
             exp_jobs_one_off
             .RTECustomizationArgsValidationOneOffJob.get_output(
                 job_id))
-
         expected_output = [(
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
-            'https://\'; received htt://link.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
-            'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
-            '&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp Id: exp_id0\']]'
-        ), (
             '[u\'Invalid filepath\', '
             '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;xy.z.'
-            'png&amp;quot;"></oppia-noninteractive-image>\', '
-            'u\'Exp Id: exp_id0\']]'
-        )]
+            'circle divided into equal fifths.&amp;quot;" caption-with-value='
+            '"&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;'
+            'xy.z.png&amp;quot;"></oppia-noninteractive-image>\', '
+            'u\'Exp ID: exp_id0\']]'
+        ), (
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
+            'or \'https://\'; received htt://link.com", '
+            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
+            'link.com&amp;quot;"></oppia-noninteractive-link></p>\', '
+            'u\'Exp ID: exp_id0\']]')]
 
         self.assertEqual(actual_output, expected_output)
 
@@ -2303,6 +2300,16 @@ class RTECustomizationArgsValidationJobTests(
             self.NEW_EXP_ID, title='title', category='category')
         exploration2.add_states(['State1', 'State2'])
         exp2_state1 = exploration2.states['State1']
+        exp2_content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;123png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            )
+        }
         exp2_default_outcome1 = state_domain.Outcome(
             'State2',
             state_domain.SubtitledHtml(
@@ -2325,6 +2332,8 @@ class RTECustomizationArgsValidationJobTests(
                 state_domain.SubtitledHtml.from_dict(exp1_content3_dict))
             exp_services.save_new_exploration(self.albert_id, exploration1)
 
+            exp2_state1.update_content(
+                state_domain.SubtitledHtml.from_dict(exp2_content1_dict))
             exp2_state1.update_interaction_default_outcome(
                 exp2_default_outcome1)
             exp_services.save_new_exploration(self.albert_id, exploration2)
@@ -2344,27 +2353,32 @@ class RTECustomizationArgsValidationJobTests(
             exp_jobs_one_off
             .RTECustomizationArgsValidationOneOffJob.get_output(
                 job_id))
-
         expected_output = [(
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' or '
-            '\'https://\'; received htt://link.com", '
+            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
+            'or \'https://\'; received htt://link.com", '
             '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
             'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
             'link.com&amp;quot;"></oppia-noninteractive-link></p>\', '
-            'u\'Exp Id: exp_id0\']]'
+            'u\'Exp ID: exp_id0\']]'
         ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' '
             'or \'https://\'; received test.com", '
-            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
-            'link?&amp;quot;" url-with-value="&amp;quot;test.com&amp;quot;">'
-            '</oppia-noninteractive-link></p>\', '
-            'u\'Exp Id: exp_id1\']]'
+            '[u\'<p><oppia-noninteractive-link text-with-value="&amp;'
+            'quot;Test link?&amp;quot;" url-with-value="&amp;quot;test.com'
+            '&amp;quot;"></oppia-noninteractive-link></p>\', '
+            'u\'Exp ID: exp_id1\']]'
         ), (
-            '[u\'Invalid filepath\', [u\'<oppia-noninteractive-image '
-            'alt-with-value="&amp;quot;A circle divided into equal '
-            'fifths.&amp;quot;" caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-            '</oppia-noninteractive-image>\', u\'Exp Id: exp_id0\']]')]
+            '[u\'Invalid filepath\', '
+            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" caption-with-value='
+            '"&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;'
+            'xy.z.png&amp;quot;"></oppia-noninteractive-image>\', '
+            'u\'Exp ID: exp_id0\', '
+            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="&amp;quot;Hello&amp;quot;" filepath-with-value'
+            '="&amp;quot;123png&amp;quot;"></oppia-noninteractive-image>\', '
+            'u\'Exp ID: exp_id1\']]')]
 
         self.assertEqual(actual_output, expected_output)
 
