@@ -187,9 +187,12 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             topic_services.generate_topic_summary(item.id)
         except Exception as e:
+            error_message = (
+                'Failed to create topic summary %s: %s' % (item.id, e))
+            logging.exception(error_message)
             yield (
                 RegenerateTopicSummaryOneOffJob._ERROR_KEY,
-                'Failed to create topic summary %s: %s' % (item.id, e))
+                error_message.encode('utf-8'))
             return
 
         yield (RegenerateTopicSummaryOneOffJob._PROCESSED_KEY, 1)

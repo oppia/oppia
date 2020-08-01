@@ -1,13 +1,13 @@
 <div class="topic-card" ng-click="$ctrl.openTopicPage()" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
   <div class="topic-thumbnail">
     <picture>
-      <img ng-src="$ctrl.getThumbnailUrl()" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+      <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
     </picture>
   </div>
   <div class="topic-details" ng-style="{background: $ctrl.getDarkerThumbnailBgColor()}">
     <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
     <span class="topic-story-count">
-      <[topicSummary.getCanonicalStoryCount()]>
+      <[$ctrl.getTopicSummary().getCanonicalStoryCount()]>
       <span ng-if="topicSummary.getCanonicalStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
       <span ng-if="topicSummary.getCanonicalStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
     </span>

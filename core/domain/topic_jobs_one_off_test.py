@@ -448,10 +448,15 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_regeneration_job_skips_invalid_topic(self):
+        observed_log_messages = []
 
         def _mock_get_topic_by_id(unused_topic_id):
             """Mocks get_topic_by_id()."""
             return 'invalid_topic'
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'A title', 'Abbrev title', 'description')
@@ -459,8 +464,10 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
 
         get_topic_by_id_swap = self.swap(
             topic_fetchers, 'get_topic_by_id', _mock_get_topic_by_id)
+        logging_exception_swap = self.swap(
+            logging, 'exception', _mock_logging_function)
 
-        with get_topic_by_id_swap:
+        with get_topic_by_id_swap, logging_exception_swap:
             job_id = (
                 topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
             topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
@@ -469,6 +476,11 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
         output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
             job_id)
 
+        self.assertEqual(
+            observed_log_messages,
+            [u'Failed to create topic summary %s: \'unicode\' '
+             'object has no attribute \'canonical_story_references\''
+             % topic.id])
         for message in output:
             self.assertRegexpMatches(
                 message,
