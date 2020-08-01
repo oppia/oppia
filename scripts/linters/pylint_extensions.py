@@ -537,6 +537,12 @@ class DocstringParameterChecker(checkers.BaseChecker):
             'Yields should be in the following form: typeinfo. Description.',
             'malformed-yields-section',
             'The parameter is incorrectly formatted.'
+        ),
+        'W9038': (
+            'Arguments starting with *args should be formatted in the following'
+            ' form: *args: list(*). Description.',
+            'malformed-args-argument',
+            'The parameter is incorrectly formatted.'
         )
     }
 
@@ -651,15 +657,15 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 ({type}|\S*|[\s\S]*)
                 (?:,\s+optional)?
                 [.]+\s )+ \s*
-            \s*  [A-Z0-9](.*)[.]+            # beginning of optional description
+            \s*  [A-Z0-9](.*)[.\]}}\)]+$     # beginning of optional description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
 
         re_returns_line = re.compile(
             r"""
-            \s* (({type}|\S*|[\s\S]*).[.]+\s)+              # identifier
-            \s* [A-Z0-9](.*)[.]+                      # beginning of description
+            \s* (({type}|\S*|[\s\S]*).[.]+\s)+        # identifier
+            \s* [A-Z0-9](.*)[.\]}}\)]+$               # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -669,7 +675,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
         re_raise_line = re.compile(
             r"""
             \s* ({type}[.])+                    # identifier
-            \s* [A-Z0-9](.*)[.]+                     # beginning of description
+            \s* [A-Z0-9](.*)[.\]}}\)]+$         # beginning of description
         """.format(
             type=_check_docs_utils.GoogleDocstring.re_multiple_type,
         ), flags=re.X | re.S | re.M)
@@ -682,6 +688,9 @@ class DocstringParameterChecker(checkers.BaseChecker):
             entries = node_doc._parse_section(  # pylint: disable=protected-access
                 _check_docs_utils.GoogleDocstring.re_param_section)
             for entry in entries:
+                if entry.lstrip().startswith('*args') and not (
+                        entry.lstrip().startswith('*args: list(*)')):
+                    self.add_message('malformed-args-argument', node=node)
                 match = re_param_line.match(entry)
                 if not match:
                     self.add_message('malformed-args-section', node=node)

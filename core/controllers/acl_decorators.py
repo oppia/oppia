@@ -60,7 +60,7 @@ def open_access(handler):
         """Gives access to everyone.
 
         Args:
-            *args: *. Arguments.
+            *args: list(*). A list of arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -942,7 +942,7 @@ def can_edit_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
-            *args: *. Arguments.
+            *args: list(*). A list of arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1232,7 +1232,7 @@ def can_publish_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
-            *args: *. The arguments.
+            *args: list(*). A list of arguments.
             **kwargs: *. Keyword arguments present in kwargs.
 
         Returns:
@@ -1540,7 +1540,7 @@ def can_edit_topic(handler):
 
         Args:
             topic_id: str. The topic id.
-            *args: arguments. The arguments from the calling function.
+            *args: list(*). The arguments from the calling function.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2357,7 +2357,7 @@ def can_access_story_viewer_page(handler):
 
         Args:
             story_id: str. The unique id of the story.
-            *args: *. Arguments.
+            *args: list(*). A list of arguments from the calling function.
             **kwargs: *. Keyword arguments.
 
         Returns:

@@ -39,7 +39,7 @@ def send_email_to_recipients(
         recipient_emails: list(str). The email addresses of the recipients.
             Must be utf-8.
         subject: str. The subject line of the email, Must be utf-8.
-        plaintext_body: str. The plaintext body of the email. Must be utf-8
+        plaintext_body: str. The plaintext body of the email. Must be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Must be utf-8.
         bcc: list(str)|None. Optional argument. List of bcc emails.
@@ -57,7 +57,7 @@ def send_email_to_recipients(
                 subject = 'Hey, %recipient.first%’
             More info about this format at:
             https://documentation.mailgun.com/en/
-                latest/user_manual.html#batch-sending
+                latest/user_manual.html#batch-sending.
 
     Raises:
         Exception. The mailgun api key is not stored in

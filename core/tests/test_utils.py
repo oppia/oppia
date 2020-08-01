@@ -2049,7 +2049,7 @@ tags: []
             invoked.
 
             Args:
-                *args: tuple. The args passed into `attr` function.
+                *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
@@ -2353,8 +2353,8 @@ class LinterTestBase(GenericTestBase):
             linter_stdout list.
 
             Args:
-                *args: str. Variable length argument list of values to print in
-                    the same line of output.
+                *args: list(*). Variable length argument list of values to print
+                    in the same line of output.
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
@@ -2408,7 +2408,7 @@ class EmailMessageMock(python_utils.OBJECT):
             recipient_email: str. The email address of the recipient.
                 Must be utf-8.
             subject: str. The subject line of the email, Must be utf-8.
-            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails.
@@ -2475,7 +2475,7 @@ class GenericEmailTestBase(GenericTestBase):
             recipient_emails: list(str). The email addresses of the recipients.
                 Must be utf-8.
             subject: str. The subject line of the email, Must be utf-8.
-            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails.
