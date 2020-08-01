@@ -136,6 +136,7 @@ export class MathEquationInputValidationService {
     // rid of the TS2339 error on AppConstants.
     // eslint-disable-next-line dot-notation
     let greekLetters = AppConstants['GREEK_LETTERS'];
+    // eslint-disable-next-line dot-notation
     let greekSymbols = (
       AppConstants['GREEK_SYMBOLS_LOWERCASE'] + AppConstants[
         'GREEK_SYMBOLS_UPPERCASE']);
