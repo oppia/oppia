@@ -73,8 +73,7 @@ class UserSettingsModel(base_models.BaseModel):
     subject_interests = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last edited an exploration.
     # Exploration language preferences specified by the user.
-    # TODO(sll): Add another field for the language that the user wants the
-    # site to display in. These language preferences are mainly for the purpose
+    # These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
@@ -119,8 +118,8 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
-    # List of profile user ids associated with a full user profile. This is
-    # None if the user model corresponds to a regular profile.
+    # List of profile user ids associated with a full user (primary profile).
+    # This is None if the user model corresponds to a secondary profile.
     associated_profile_user_ids = ndb.StringProperty(repeated=True)
 
 
