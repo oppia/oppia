@@ -38,7 +38,7 @@ export class LearnerAnswerDetailsDataService {
     private urlInterpolationService: UrlInterpolationService,
   ) {}
   _expId: string;
-  _data: [];
+  _data: any;
   learnerAnswerInfoData=null;
   LEARNER_ANSWER_INFO_DATA_URL = (
     '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
@@ -62,7 +62,7 @@ export class LearnerAnswerDetailsDataService {
           entity_type: 'exploration',
           entity_id: entityId
         });
-    return this.http.delete(learnerAnswerInfoDataUrl, {
+    return this.http['delete'](learnerAnswerInfoDataUrl, {
       params: {
         state_name: stateName,
         learner_answer_info_id: learnerAnswerInfoId
@@ -73,7 +73,7 @@ export class LearnerAnswerDetailsDataService {
     return this._data;
   }
   public fetchLearnerAnswerInfoData() {
-    return this._fetchLearnerAnswerInfoData().toPromise().then(
+    return this._fetchLearnerAnswerInfoData().then(
       (response)=>{
         this.learnerAnswerInfoData = response.learner_answer_info_data;
         for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {

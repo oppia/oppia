@@ -784,10 +784,10 @@ export class UpgradedServices {
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerAnswerDetailsService'] =
       new LearnerAnswerDetailsDataService(
-      upgradedServices['ExplorationDataService'],
-      upgradedServices['HttpClient'],
-      upgradedServices['UrlInterPolationService']
-    );
+        upgradedServices['ExplorationDataService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterPolationService']
+      );
     upgradedServices['LearnerExplorationSummaryObjectFactory'] =
       new LearnerExplorationSummaryObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
