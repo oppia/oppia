@@ -4076,18 +4076,18 @@ class Exploration(python_utils.OBJECT):
         })
 
         if self.created_on:
-            exploration_dict['created_on'] = utils.convert_datetime_to_string(
+            exploration_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            exploration_dict['last_updated'] = utils.convert_datetime_to_string(
+            exploration_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(exploration_dict)
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return an Exploration domain object decoded from a Json string.
+        """Return an Exploration domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be
@@ -4099,11 +4099,11 @@ class Exploration(python_utils.OBJECT):
         """
         exploration_dict = json.loads(json_string)
         created_on = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 exploration_dict['created_on'])
             if 'created_on' in exploration_dict else None)
         last_updated = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 exploration_dict['last_updated'])
             if 'last_updated' in exploration_dict else None)
         exploration = cls.from_dict(

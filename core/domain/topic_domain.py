@@ -583,11 +583,11 @@ class Topic(python_utils.OBJECT):
         }
 
         if self.created_on:
-            topic_dict['created_on'] = utils.convert_datetime_to_string(
+            topic_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            topic_dict['last_updated'] = utils.convert_datetime_to_string(
+            topic_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(topic_dict)
@@ -638,7 +638,7 @@ class Topic(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return a Topic domain object decoded from a Json string.
+        """Return a Topic domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be
@@ -651,11 +651,11 @@ class Topic(python_utils.OBJECT):
         topic_dict = json.loads(json_string)
 
         created_on = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 topic_dict['created_on'])
             if 'created_on' in topic_dict else None)
         last_updated = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 topic_dict['last_updated'])
             if 'last_updated' in topic_dict else None)
         topic = cls.from_dict(

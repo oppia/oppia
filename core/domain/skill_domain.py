@@ -796,18 +796,18 @@ class Skill(python_utils.OBJECT):
         }
 
         if self.created_on:
-            skill_dict['created_on'] = utils.convert_datetime_to_string(
+            skill_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            skill_dict['last_updated'] = utils.convert_datetime_to_string(
+            skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(skill_dict)
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return a Skill domain object decoded from a Json string.
+        """Return a Skill domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be
@@ -819,11 +819,11 @@ class Skill(python_utils.OBJECT):
         """
         skill_dict = json.loads(json_string)
         created_on = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 skill_dict['created_on'])
             if 'created_on' in skill_dict else None)
         last_updated = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 skill_dict['last_updated'])
             if 'last_updated' in skill_dict else None)
         skill = cls.from_dict(

@@ -241,14 +241,14 @@ class UtilsTests(test_utils.GenericTestBase):
                 datetime.datetime(2016, 12, 1, 0, 0, 3),
                 initial_time))
 
-    def test_conversion_between_string_and_datetime_object_is_correct(self):
-        """Tests to make sure converting a datetime object to a string and back
-        doesn't alter the datetime object data.
+    def test_conversion_between_string_and_naive_datetime_object(self):
+        """Tests to make sure converting a naive datetime object to a string and
+        back doesn't alter the naive datetime object data.
         """
         now = datetime.datetime.utcnow()
         self.assertEqual(
-            utils.convert_string_to_datetime_object(
-                utils.convert_datetime_to_string(now)),
+            utils.convert_string_to_naive_datetime_object(
+                utils.convert_naive_datetime_to_string(now)),
             now)
 
     def test_get_hashable_value(self):

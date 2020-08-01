@@ -422,28 +422,30 @@ def get_time_in_millisecs(datetime_obj):
     return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
-def convert_datetime_to_string(datetime_obj):
-    """Returns a human-readable string representing the datetime object.
+def convert_naive_datetime_to_string(datetime_obj):
+    """Returns a human-readable string representing the naive datetime object.
 
     Args:
-        datetime_obj: datetime. An object of type datetime.datetime.
+        datetime_obj: datetime. An object of type datetime.datetime. Must be a
+            naive datetime object.
 
     Returns:
-        str. The string representing the datetime object.
+        str. The string representing the naive datetime object.
     """
     return datetime_obj.strftime('%m/%d/%Y, %H:%M:%S:%f')
 
 
-def convert_string_to_datetime_object(date_time_string):
-    """Returns the datetime object equivalent of the date string.
+def convert_string_to_naive_datetime_object(date_time_string):
+    """Returns the naive datetime object equivalent of the date string.
 
     Args:
-        date_time_string: str. The string format representing the datetime object in
-            the format: Month/Day/Year, Hour:Minute:Second:MicroSecond.
+        date_time_string: str. The string format representing the datetime
+            object in the format: Month/Day/Year,
+            Hour:Minute:Second:MicroSecond.
 
     Returns:
-        datetime. An object of type datetime.datetime corresponding to that
-        string.
+        datetime. An object of type naive datetime.datetime corresponding to
+        that string.
     """
     return datetime.datetime.strptime(date_time_string, '%m/%d/%Y, %H:%M:%S:%f')
 

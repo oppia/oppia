@@ -904,7 +904,7 @@ class Story(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return a Story domain object decoded from a Json string.
+        """Return a Story domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be
@@ -916,11 +916,11 @@ class Story(python_utils.OBJECT):
         """
         story_dict = json.loads(json_string)
         created_on = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 story_dict['created_on'])
             if 'created_on' in story_dict else None)
         last_updated = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 story_dict['last_updated'])
             if 'last_updated' in story_dict else None)
 
@@ -954,11 +954,11 @@ class Story(python_utils.OBJECT):
         }
 
         if self.created_on:
-            story_dict['created_on'] = utils.convert_datetime_to_string(
+            story_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            story_dict['last_updated'] = utils.convert_datetime_to_string(
+            story_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(story_dict)

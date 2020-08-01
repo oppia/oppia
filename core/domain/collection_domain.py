@@ -347,7 +347,7 @@ class Collection(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return a Collection domain object decoded from a Json string.
+        """Return a Collection domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be
@@ -360,11 +360,11 @@ class Collection(python_utils.OBJECT):
         collection_dict = json.loads(json_string)
 
         created_on = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 collection_dict['created_on'])
             if 'created_on' in collection_dict else None)
         last_updated = (
-            utils.convert_string_to_datetime_object(
+            utils.convert_string_to_naive_datetime_object(
                 collection_dict['last_updated'])
             if 'last_updated' in collection_dict else None)
         collection = cls.from_dict(
@@ -394,16 +394,16 @@ class Collection(python_utils.OBJECT):
                 node.to_dict() for node in self.nodes
             ],
             'version': self.version,
-            'created_on': utils.convert_datetime_to_string(self.created_on),
-            'last_updated': utils.convert_datetime_to_string(self.last_updated)
+            'created_on': utils.convert_naive_datetime_to_string(self.created_on),
+            'last_updated': utils.convert_naive_datetime_to_string(self.last_updated)
         }
 
         if self.created_on:
-            collection_dict['created_on'] = utils.convert_datetime_to_string(
+            collection_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            collection_dict['last_updated'] = utils.convert_datetime_to_string(
+            collection_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(collection_dict)
