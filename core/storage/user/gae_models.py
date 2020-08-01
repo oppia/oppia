@@ -1979,10 +1979,11 @@ class UserContributionScoringModel(base_models.BaseModel):
         instance_id = cls._get_instance_id(user_id, score_category)
 
         if cls.get_by_id(instance_id):
-            raise Exception('There is already an entry with the given id: %s' %
-                            instance_id)
+            raise Exception(
+                'There is already an entry with the given id: %s' % instance_id)
 
-        cls(id=instance_id, user_id=user_id, score_category=score_category,
+        cls(
+            id=instance_id, user_id=user_id, score_category=score_category,
             score=score).put()
 
     @classmethod
@@ -2214,3 +2215,71 @@ class PseudonymizedUserModel(base_models.BaseModel):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
+
+
+class UserAuthModel(base_models.BaseModel):
+    """Stores the authentication details for a particular user.
+
+    Instances of this class are keyed by user id.
+    """
+
+    # Authentication detail for sign-in using google id (GAE).
+    gae_id = ndb.StringProperty(indexed=True)
+    # A code associated with profiles on android to provide a PIN based
+    # authentication within the account.
+    pin = ndb.StringProperty(default=None)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information
+        relevant to one user account.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data. It may contain user data in
+        the future.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserAuthModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserAuthModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserAuthModel refers to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def get_by_auth_id(cls, auth_service, auth_id):
+        """Fetch a user entry by auth_id of a particular auth service.
+
+        Args:
+            auth_service: str. Name of the auth service.
+            auth_id: str. Authentication detail corresponding to the
+                authentication service.
+
+        Returns:
+            UserAuthModel. The UserAuthModel instance having a
+            particular user mapped to the given auth_id and the auth service
+            if there exists one, else None.
+        """
+
+        if auth_service == feconf.AUTH_METHOD_GAE:
+            return cls.query(cls.gae_id == auth_id).get()
+        return None
