@@ -23,6 +23,7 @@ import ast
 import logging
 
 from core import jobs
+from core.domain import html_validation_service
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
@@ -116,3 +117,44 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class SkillMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks for existence of math components in the skills."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillModel]
+
+    @staticmethod
+    def map(item):
+        skill = skill_fetchers.get_skill_by_id(item.id)
+        html_string = ''.join(skill.get_all_html_content_strings())
+        list_of_latex_strings_without_svg = (
+            html_validation_service.get_latex_strings_without_svg_from_html(
+                html_string))
+        if len(list_of_latex_strings_without_svg) > 0:
+            yield (
+                'Found skill with Latex having no SVG.',
+                (item.id, list_of_latex_strings_without_svg))
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        total_number_of_latex_strings_without_svg = 0
+        skills_latex_strings_count = []
+        for skill_id, latex_strings in final_values:
+            total_number_of_latex_strings_without_svg += len(latex_strings)
+            skills_latex_strings_count.append({
+                'skill_id': skill_id,
+                'latex_strings_without_svg_in_skill': latex_strings
+            })
+        yield (
+            'Overall result.', {
+                'total_number_skills_requiring_svgs': len(final_values),
+                'total_number_of_latex_strings_without_svg': (
+                    total_number_of_latex_strings_without_svg)
+            })
+        yield (
+            'Number of latex strings in each skill',
+            skills_latex_strings_count)

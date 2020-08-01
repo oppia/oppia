@@ -23,6 +23,7 @@ import ast
 import logging
 
 from core import jobs
+from core.domain import html_validation_service
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -131,3 +132,47 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class StoryMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks for existence of math components in the skills."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        story = story_fetchers.get_story_by_id(item.id)
+        html_string = ''
+        for node in story.story_contents.nodes:
+            html_string += node.outline
+
+        list_of_latex_strings_without_svg = (
+            html_validation_service.get_latex_strings_without_svg_from_html(
+                html_string))
+        if len(list_of_latex_strings_without_svg) > 0:
+            yield (
+                'Found story with Latex having no SVG.',
+                (item.id, list_of_latex_strings_without_svg))
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        total_number_of_latex_strings_without_svg = 0
+        stories_latex_strings = []
+        for story_id, latex_strings in final_values:
+            total_number_of_latex_strings_without_svg += len(latex_strings)
+            stories_latex_strings.append({
+                'story_id': story_id,
+                'latex_strings_without_svg': latex_strings
+            })
+        yield (
+            'Overall result.', {
+                'total_number_stories_requiring_svgs': len(final_values),
+                'total_number_of_latex_strings_without_svg': (
+                    total_number_of_latex_strings_without_svg)
+            })
+        yield ('Latex strings in each story', stories_latex_strings)

@@ -23,6 +23,8 @@ import ast
 import logging
 
 from core import jobs
+from core.domain import html_validation_service
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -165,3 +167,52 @@ class RemoveDeletedSkillsFromTopicOneOffJob(
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks for existence of math components in the SubTopicPage."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.SubtopicPageModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        subtopic = subtopic_page_services.get_subtopic_page_from_model(item)
+        html_string = ''
+        html_string += subtopic.page_contents.subtitled_html.html
+        html_string += ''.join(
+            subtopic.page_contents.written_translations.
+            get_all_html_content_strings())
+
+        list_of_latex_strings_without_svg = (
+            html_validation_service.get_latex_strings_without_svg_from_html(
+                html_string))
+        if len(list_of_latex_strings_without_svg) > 0:
+            yield (
+                'Found subtopic with Latex having no SVG.',
+                (item.id, list_of_latex_strings_without_svg))
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        total_number_of_latex_strings_without_svg = 0
+        subtopics_latex_strings_count = []
+        for subtopic_id, latex_strings in final_values:
+            total_number_of_latex_strings_without_svg += len(latex_strings)
+            subtopics_latex_strings_count.append({
+                'subtopic_id': subtopic_id,
+                'latex_strings_without_svg': latex_strings
+            })
+        yield (
+            'Overall result.', {
+                'total_number_subtopics_requiring_svgs': len(final_values),
+                'total_number_of_latex_strings_without_svg': (
+                    total_number_of_latex_strings_without_svg)
+            })
+        yield (
+            'Number of latex strings in each subtopic',
+            subtopics_latex_strings_count)
