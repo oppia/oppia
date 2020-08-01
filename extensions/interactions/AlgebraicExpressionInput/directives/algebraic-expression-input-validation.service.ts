@@ -128,12 +128,12 @@ export class AlgebraicExpressionInputValidationService {
 
     // TODO(#7434): Use dot notation after we find a way to get
     // rid of the TS2339 error on AppConstants.
-    // eslint-disable-next-line dot-notation
+    /* eslint-disable dot-notation */
     let greekLetters = AppConstants['GREEK_LETTERS'];
-    // eslint-disable-next-line dot-notation
     let greekSymbols = (
       AppConstants['GREEK_SYMBOLS_LOWERCASE'] + AppConstants[
         'GREEK_SYMBOLS_UPPERCASE']);
+    /* eslint-enable dot-notation */
     let missingVariables = [];
 
     for (let variable of seenVariables) {
@@ -147,7 +147,7 @@ export class AlgebraicExpressionInputValidationService {
       }
     }
 
-    if (missingVariables.length > 0) {  
+    if (missingVariables.length > 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
