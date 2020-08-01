@@ -102,9 +102,7 @@ describe('Edit Thumbnail Modal Controller', function() {
 
     // Mocking JQuery element method.
     const element = $(document.createElement('div'));
-    // @ts-ignore
     spyOn(window, '$').withArgs('.oppia-thumbnail-uploader').and.returnValue(
-      // @ts-ignore
       element);
     const fadeInElementSpy = spyOn(element, 'fadeIn').and.callThrough();
 
