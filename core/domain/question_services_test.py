@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2018 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1566,3 +1568,92 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(sorted(
             state_data.written_translations.translations_mapping.keys()), [
                 'content_1', 'feedback_1', 'feedback_3'])
+
+    def test_migrate_question_state_from_v35_to_v36(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': '((x)^(2))/(2.5)-(Alpha)/(beta)'
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': {},
+                'id': 'AlgebraicExpressionInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=35)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 36)
+
+        with current_schema_version_swap:
+            question = question_fetchers.get_question_from_model(question_model)
+
+        self.assertEqual(question.question_state_data_schema_version, 36)
+
+        cust_args = question.question_state_data.interaction.customization_args
+        self.assertEqual(
+            sorted(cust_args['customOskLetters']['value']), ['x', 'Α', 'β'])

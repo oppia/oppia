@@ -477,38 +477,37 @@ class Question(python_utils.OBJECT):
             constants.GREEK_SYMBOLS_UPPERCASE)
         greek_letters = constants.GREEK_LETTERS
 
-        for question_state_dict in states_dict.values():
-            if question_state_dict['interaction']['id'] in (
-                    'AlgebraicExpressionInput', 'MathEquationInput'):
-                variables = set()
-                for group in question_state_dict[
-                        'interaction']['answer_groups']:
-                    for rule_spec in group['rule_specs']:
-                        rule_input = rule_spec['inputs']['x']
+        if question_state_dict['interaction']['id'] in (
+                'AlgebraicExpressionInput', 'MathEquationInput'):
+            variables = set()
+            for group in question_state_dict[
+                    'interaction']['answer_groups']:
+                for rule_spec in group['rule_specs']:
+                    rule_input = rule_spec['inputs']['x']
 
-                        # Removing all greek letters after adding the
-                        # corresponding symbol to the 'variables' set so that
-                        # the letters in them don't get considered individually.
-                        # For eg. if the expression is 'beta + x', we want the
-                        # variables to be ['β', 'x'] instead of
-                        # ['β', 'b', 'e', 't', 'a', 'x'].
-                        for ind, greek_letter in enumerate(greek_letters):
-                            if greek_letter in rule_input:
-                                rule_input = rule_input.replace(
-                                    greek_letter, '')
-                                variables.add(greek_symbols[ind])
-                        
-                        for character in rule_input:
-                            if character.isalpha():
-                                variables.add(character)
+                    # Removing all greek letters after adding the
+                    # corresponding symbol to the 'variables' set so that
+                    # the letters in them don't get considered individually.
+                    # For eg. if the expression is 'beta + x', we want the
+                    # variables to be ['β', 'x'] instead of
+                    # ['β', 'b', 'e', 't', 'a', 'x'].
+                    for ind, greek_letter in enumerate(greek_letters):
+                        if greek_letter in rule_input:
+                            rule_input = rule_input.replace(
+                                greek_letter, '')
+                            variables.add(greek_symbols[ind])
+                    
+                    for character in rule_input:
+                        if character.isalpha():
+                            variables.add(character)
 
-                customization_args = question_state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'customOskLetters': {
-                        'value': list(variables)
-                    }
-                })
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'customOskLetters': {
+                    'value': list(variables)
+                }
+            })
 
         return question_state_dict
     
