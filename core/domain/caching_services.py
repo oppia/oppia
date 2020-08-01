@@ -28,10 +28,20 @@ from core.platform import models
 import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
+DESERIALIZATION_FUNCTIONS = {
+    'collection': collection_domain.Collection.deserialize,
+    'exploration': exp_domain.Exploration.deserialize,
+    'skill': skill_domain.Skill.deserialize,
+    'story': story_domain.Story.deserialize,
+    'topic': topic_domain.Topic.deserialize,
+    'default': lambda x: x
+}
+
 
 def flush_memory_cache():
     """Flushes the memory cache by wiping all of the data."""
     memory_cache_services.flush_cache()
+
 
 def _get_deserialization_function_for_namespace(namespace):
     """Get the deserialization function associated with the namespace specified.
@@ -43,18 +53,11 @@ def _get_deserialization_function_for_namespace(namespace):
         Method. The deserialization function associated with that particular
         namespace.
     """
-    if namespace == 'collection':
-        return lambda x: collection_domain.Collection.deserialize(x)
-    elif namespace == 'exploration':
-        return lambda x: exp_domain.Exploration.deserialize(x)
-    elif namespace =='skill':
-        return lambda x: skill_domain.Skill.deserialize(x)
-    elif namespace =='story':
-        return lambda x: story_domain.Story.deserialize(x)
-    elif namespace == 'topic':
-        return lambda x: topic_domain.Topic.deserialize(x)
+    if namespace not in DESERIALIZATION_FUNCTIONS:
+        return DESERIALIZATION_FUNCTIONS['default']
     else:
-        return lambda x: x
+        return DESERIALIZATION_FUNCTIONS[namespace]
+
 
 def _get_serialized_string_for_namespace(obj, namespace):
     """Get the serialized string of the object associated with the namespace
@@ -69,10 +72,12 @@ def _get_serialized_string_for_namespace(obj, namespace):
         str. The serialized string of the object associated with that namespace.
     """
     if namespace == 'collection' or namespace == 'exploration' or (
-        namespace =='skill') or namespace =='story' or namespace == 'topic':
+            namespace == 'skill') or namespace == 'story' or (
+                namespace == 'topic'):
         return obj.serialize()
     else:
         return obj
+
 
 def get_multi(keys, namespace, sub_namespace=''):
     """Get a dictionary of the {key, value} pairs from the memory cache.
