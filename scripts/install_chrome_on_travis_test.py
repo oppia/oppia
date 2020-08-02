@@ -31,8 +31,8 @@ class InstallChromeOnTravisTests(test_utils.GenericTestBase):
 
     def test_main(self):
         chrome_source_url = (
-            'https://github.com/webnicer/chrome-downloads/blob/master/x64.deb/'
-            'google-chrome-stable_83.0.4103.116-1_amd64.deb')
+            'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb'
+            '/google-chrome-stable_83.0.4103.116-1_amd64.deb')
 
         def mock_isfile(unused_path):
             return False
