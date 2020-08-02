@@ -75,8 +75,8 @@ interface CreatorDashboardDataBackendDict {
   'suggestions_to_review_list': SuggestionBackendDict[];
   'explorations_list': CreatorExplorationSummaryBackendDict[];
   'collections_list': CollectionSummaryBackendDict[];
-  // Here topic summary dicts are optional because they are present in response
-  // only if new structrures are enabled.
+  // Here 'topic_summary_dicts' property is optional because it is present
+  // in response only if new structrures are enabled.
   'topic_summary_dicts'?: TopicSummaryBackendDict[];
 }
 
@@ -93,6 +93,8 @@ interface CreatorDashboardData {
   suggestionThreadsToReviewList: SuggestionThread[];
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
+  // Here 'topicSummaries' property is optional because it is present
+  // only if new structrures are enabled.
   topicSummaries?: TopicSummary[];
 }
 

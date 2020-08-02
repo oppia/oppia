@@ -88,7 +88,8 @@ describe('Factory for Change domain objects', () => {
         backendChangeObject, () => {}, () => {});
 
       const returnedBackendObject = changeDomainObject.getBackendChangeObject();
-      returnedBackendObject.property_name = 'new value';
+      (<typeof backendChangeObject> returnedBackendObject)
+        .property_name = 'new value';
 
       expect(changeDomainObject.getBackendChangeObject()).toEqual({
         property_name: 'value'

@@ -153,8 +153,11 @@ describe('ItemSelectionInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
-        // TS ignore is used here for testing purposes.
-        // @ts-ignore
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'ItemSelectionInputCustomizationArgs'." We did not
+        // assign the correct type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have property: choices');

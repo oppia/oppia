@@ -202,8 +202,6 @@ export interface NumericInputCustomizationArgs { }
 
 export interface NumberWithUnitsCustomizationArgs { }
 
-export interface NumberWithUnitsCustomizationArgs { }
-
 export type InteractionCustomizationArgs = (
   AlgebraicExpressionInputCustomizationArgs |
   CodeReplCustomizationArgs |

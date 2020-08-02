@@ -104,8 +104,11 @@ describe('InteractiveMapValidationService', () => {
     () => {
       expect(() => {
         validatorService.getAllWarnings(
-          // TS ignore is needed here for testing purposes.
-          // @ts-ignore
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'InteractiveMapCustomizationArgs'." We did not
+          // assign the correct type of customization args in order to test
+          // validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have properties: ' +

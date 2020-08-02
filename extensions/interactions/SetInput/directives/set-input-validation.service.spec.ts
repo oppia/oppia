@@ -98,8 +98,11 @@ describe('SetInputValidationService', () => {
 
       let warnings = validatorService.getAllWarnings(
         currentState,
-        // TS ignore is used here for testing purposes.
-        // @ts-ignore
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'SetInputCustomizationArgs'." We did not
+        // assign the correct type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         badCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome

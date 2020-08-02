@@ -311,10 +311,10 @@ describe('Collection editor state service', function() {
 
   it('should initially return an empty collection rights', function() {
     var collectionRights = CollectionEditorStateService.getCollectionRights();
-    expect(collectionRights.getCollectionId()).toBeUndefined();
-    expect(collectionRights.canEdit()).toBeUndefined();
-    expect(collectionRights.canUnpublish()).toBeUndefined();
-    expect(collectionRights.isPrivate()).toBeUndefined();
+    expect(collectionRights.getCollectionId()).toBeNull();
+    expect(collectionRights.canEdit()).toBeNull();
+    expect(collectionRights.canUnpublish()).toBeNull();
+    expect(collectionRights.isPrivate()).toBeNull();
     expect(collectionRights.getOwnerNames()).toEqual([]);
   });
 

@@ -32,12 +32,12 @@ import {
 } from 'domain/email-dashboard/email-dashboard-query-object.factory';
 
 export interface QueryData {
-  hasNotLoggedInForNDays?: string;
-  inactiveInLastNDays?: string;
-  createdAtLeastNExps?: string;
-  createdFewerThanNExps?: string;
-  editedAtLeastNExps?: string;
-  editedFewerThanNExps?: string;
+  hasNotLoggedInForNDays: string;
+  inactiveInLastNDays: string;
+  createdAtLeastNExps: string;
+  createdFewerThanNExps: string;
+  editedAtLeastNExps: string;
+  editedFewerThanNExps: string;
 }
 
 @Injectable({
@@ -55,7 +55,9 @@ export class EmailDashboardBackendApiService {
 
   fetchQueriesPage(
       pageSize: number, cursor: string): Promise<EmailDashboardQueryResults> {
-    let params: {'cursor'?: string; 'num_queries_to_fetch'?: string;} = {
+    // Here 'cursor' property is optional because it is present only if this
+    // function is called with a non-null value to 'cursor' arg.
+    let params: {'cursor'?: string; 'num_queries_to_fetch': string;} = {
       num_queries_to_fetch: String(pageSize)
     };
     if (cursor) {

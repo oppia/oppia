@@ -26,12 +26,15 @@ import {
   LearnerExplorationSummaryObjectFactory
 } from 'domain/summary/learner-exploration-summary-object.factory';
 
+// This is the type used for paramas that are sent to the backend.
+// This type has optional properties because they may not be applicable and
+// we may want to send the backend paramas without those properties.
 type RecommendationsUrlParams = {
-  'stringified_author_recommended_ids'?: string;
+  'stringified_author_recommended_ids': string;
   'collection_id'?: string;
   'story_id'?: string;
   'current_node_id'?: string;
-  'include_system_recommendations'?: string;
+  'include_system_recommendations': string;
 };
 
 export interface RecommendedExplorationSummariesBackendDict {

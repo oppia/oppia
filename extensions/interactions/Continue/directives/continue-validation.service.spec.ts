@@ -85,8 +85,11 @@ describe('ContinueValidationService', () => {
 
       expect(() => {
         validatorService.getAllWarnings(
-          // TS ignore is needed here for testing purposes.
-          // @ts-ignore
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'ContinueCustomizationArgs'." We did not
+          // assign the correct type of customization args in order to test
+          // validations.
+          // @ts-expect-error
           currentState, {}, [], goodDefaultOutcome);
       }).toThrowError(
         'Expected customization arguments to have property: buttonText');
