@@ -434,18 +434,35 @@ def get_chrome_driver_version():
     This method follows the steps mentioned here:
     https://chromedriver.chromium.org/downloads/version-selection
     """
+    popen_args = ['google-chrome', '--version']
+    if common.is_mac_os():
+        # There are spaces between Google and Chrome in the path. Spaces don't
+        # need to be escaped when we're not using the terminal, ie. shell=False
+        # for Popen by default.
+        popen_args = [
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            '--version'
+        ]
     try:
-        proc = subprocess.Popen(
-            ['google-chrome', '--version'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(popen_args, stdout=subprocess.PIPE)
         output = proc.stdout.readline()
     except OSError:
+        # For the error message for the mac command, we need to add the
+        # backslashes in. This is because it is likely that a user will try to
+        # run the command on their terminal and, as mentioned above, the mac
+        # get chrome version command has spaces in the path which need to be
+        # escaped for successful terminal use.
         raise Exception(
-            'Failed to execute "google-chrome --version" command. This is '
-            'used to determine the chromedriver version to use. Please set '
-            'the chromedriver version manually using --chrome_driver_version '
-            'flag. To determine the chromedriver version to be used, please '
-            'follow the instructions mentioned in the following URL:\n'
-            'https://chromedriver.chromium.org/downloads/version-selection')
+            'Failed to execute "%s" command. '
+            'This is used to determine the chromedriver version to use. '
+            'Please set the chromedriver version manually using '
+            '--chrome_driver_version flag. To determine the chromedriver '
+            'version to be used, please follow the instructions mentioned '
+            'in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection' % (
+                ' '.join(arg.replace(' ', r'\ ') for arg in popen_args)
+            )
+        )
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     chrome_version = '.'.join(chrome_version.split('.')[:-1])
     response = python_utils.url_open(
