@@ -332,7 +332,13 @@ describe('State Graph Visualization directive', function() {
       play: () => {},
     };
     spyOn(waveSurferObjSpy, 'play');
-    // @ts-ignore
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
     $scope.stopRecording();
     $scope.$apply();
@@ -354,7 +360,13 @@ describe('State Graph Visualization directive', function() {
     };
     spyOn(waveSurferObjSpy, 'play');
     spyOn(waveSurferObjSpy, 'pause');
-    // @ts-ignore
+    // This throws "Argument of type '{ load: () => void; ... }'
+    // is not assignable to parameter of type 'WaveSurfer'."
+    // This is because the actual 'WaveSurfer.create` function returns a
+    // object with around 50 more properties than `waveSurferObjSpy`.
+    // We are suppressing this error because we have defined the properties
+    // we need for this test in 'waveSurferObjSpy' object.
+    // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
     $scope.stopRecording();
     $scope.$apply();
@@ -678,16 +690,11 @@ describe('State Graph Visualization directive', function() {
       translationTabDivMock = $(document.createElement('div'));
       mainBodyDivMock = $(document.createElement('div'));
 
-      // @ts-ignore window does not have native $ property.
       var jQuerySpy = spyOn(window, '$');
 
-      // @ts-ignore
       jQuerySpy
-        // @ts-ignore
         .withArgs('.oppia-translation-tab').and.returnValue(
-          // @ts-ignore
           translationTabDivMock)
-        // @ts-ignore
         .withArgs('.oppia-main-body').and.returnValue(mainBodyDivMock);
       jQuerySpy.and.callThrough();
 
