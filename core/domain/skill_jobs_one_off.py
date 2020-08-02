@@ -122,6 +122,9 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class SkillMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks for existence of math components in the skills."""
 
+    _LATEX_STRINGS_WITHOUT_SVG = 'latex-strings-without-svg'
+    _LATEX_STRINGS_HAVING_SVG = 'latex-strings-having-svg'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [skill_models.SkillModel]
@@ -133,28 +136,51 @@ class SkillMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         list_of_latex_strings_without_svg = (
             html_validation_service.get_latex_strings_without_svg_from_html(
                 html_string))
+        latex_string_to_filename_mapping = (
+            html_validation_service.
+            extract_svg_filename_latex_mapping_in_math_rte_components(
+                html_string))
+        if len(latex_string_to_filename_mapping) > 0:
+            latex_strings_with_svg = [
+                latex_string_to_filename[1] for latex_string_to_filename in (
+                    latex_string_to_filename_mapping)]
+            yield (
+                SkillMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG,
+                (item.id, latex_strings_with_svg))
         if len(list_of_latex_strings_without_svg) > 0:
             yield (
-                'Found skill with Latex having no SVG.',
+                SkillMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG,
                 (item.id, list_of_latex_strings_without_svg))
 
     @staticmethod
     def reduce(key, values):
-        final_values = [ast.literal_eval(value) for value in values]
-        total_number_of_latex_strings_without_svg = 0
-        skills_latex_strings_count = []
-        for skill_id, latex_strings in final_values:
-            total_number_of_latex_strings_without_svg += len(latex_strings)
-            skills_latex_strings_count.append({
-                'skill_id': skill_id,
-                'latex_strings_without_svg_in_skill': latex_strings
-            })
-        yield (
-            'Overall result.', {
-                'total_number_skills_requiring_svgs': len(final_values),
-                'total_number_of_latex_strings_without_svg': (
-                    total_number_of_latex_strings_without_svg)
-            })
-        yield (
-            'Number of latex strings in each skill',
-            skills_latex_strings_count)
+        if key == SkillMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG:
+            final_values = [ast.literal_eval(value) for value in values]
+            total_number_of_latex_strings_without_svg = 0
+            skills_latex_strings_count = []
+            for skill_id, latex_strings in final_values:
+                total_number_of_latex_strings_without_svg += len(latex_strings)
+                skills_latex_strings_count.append({
+                    'skill_id': skill_id,
+                    'latex_strings_without_svg_in_skill': latex_strings
+                })
+            yield (
+                'Overall result.', {
+                    'total_number_skills_requiring_svgs': len(final_values),
+                    'total_number_of_latex_strings_without_svg': (
+                        total_number_of_latex_strings_without_svg)
+                })
+            yield (
+                'Number of latex strings in each skill',
+                skills_latex_strings_count)
+        elif key == SkillMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG:
+            final_values = [ast.literal_eval(value) for value in values]
+            skills_latex_strings_count = []
+            for skill_id, latex_strings in final_values:
+                skills_latex_strings_count.append({
+                    'skill_id': skill_id,
+                    'latex_strings_with_svg': latex_strings
+                })
+            yield (
+                'Latex strings with svgs in each skill',
+                skills_latex_strings_count)

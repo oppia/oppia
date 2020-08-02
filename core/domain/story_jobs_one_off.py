@@ -137,6 +137,9 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class StoryMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks for existence of math components in the skills."""
 
+    _LATEX_STRINGS_WITHOUT_SVG = 'latex-strings-without-svg'
+    _LATEX_STRINGS_HAVING_SVG = 'latex-strings-having-svg'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [story_models.StoryModel]
@@ -153,26 +156,52 @@ class StoryMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         list_of_latex_strings_without_svg = (
             html_validation_service.get_latex_strings_without_svg_from_html(
                 html_string))
+        latex_string_to_filename_mapping = (
+            html_validation_service.
+            extract_svg_filename_latex_mapping_in_math_rte_components(
+                html_string))
+        if len(latex_string_to_filename_mapping) > 0:
+            latex_strings_with_svg = [
+                latex_string_to_filename[1] for latex_string_to_filename in (
+                    latex_string_to_filename_mapping)]
+            yield (
+                StoryMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG,
+                (item.id, latex_strings_with_svg))
+
         if len(list_of_latex_strings_without_svg) > 0:
             yield (
-                'Found story with Latex having no SVG.',
+                StoryMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG,
                 (item.id, list_of_latex_strings_without_svg))
 
     @staticmethod
     def reduce(key, values):
-        final_values = [ast.literal_eval(value) for value in values]
-        total_number_of_latex_strings_without_svg = 0
-        stories_latex_strings = []
-        for story_id, latex_strings in final_values:
-            total_number_of_latex_strings_without_svg += len(latex_strings)
-            stories_latex_strings.append({
-                'story_id': story_id,
-                'latex_strings_without_svg': latex_strings
-            })
-        yield (
-            'Overall result.', {
-                'total_number_stories_requiring_svgs': len(final_values),
-                'total_number_of_latex_strings_without_svg': (
-                    total_number_of_latex_strings_without_svg)
-            })
-        yield ('Latex strings in each story', stories_latex_strings)
+        if key == StoryMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG:
+            final_values = [ast.literal_eval(value) for value in values]
+            total_number_of_latex_strings_without_svg = 0
+            stories_latex_strings = []
+            for story_id, latex_strings in final_values:
+                total_number_of_latex_strings_without_svg += len(latex_strings)
+                stories_latex_strings.append({
+                    'story_id': story_id,
+                    'latex_strings_without_svg': latex_strings
+                })
+            yield (
+                'Overall result.', {
+                    'total_number_stories_requiring_svgs': len(final_values),
+                    'total_number_of_latex_strings_without_svg': (
+                        total_number_of_latex_strings_without_svg)
+                })
+            yield ('Latex strings in each story', stories_latex_strings)
+
+        elif key == (
+                StoryMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG):
+            final_values = [ast.literal_eval(value) for value in values]
+            stories_latex_strings = []
+            for story_id, latex_strings in final_values:
+                stories_latex_strings.append({
+                    'story_id': story_id,
+                    'latex_strings_with_svg': latex_strings
+                })
+            yield (
+                'Latex strings with svgs in each story',
+                stories_latex_strings)

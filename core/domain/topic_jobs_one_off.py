@@ -172,6 +172,9 @@ class RemoveDeletedSkillsFromTopicOneOffJob(
 class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks for existence of math components in the SubTopicPage."""
 
+    _LATEX_STRINGS_WITHOUT_SVG = 'latex-strings-without-svg'
+    _LATEX_STRINGS_HAVING_SVG = 'latex-strings-having-svg'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [topic_models.SubtopicPageModel]
@@ -191,28 +194,54 @@ class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         list_of_latex_strings_without_svg = (
             html_validation_service.get_latex_strings_without_svg_from_html(
                 html_string))
+        latex_string_to_filename_mapping = (
+            html_validation_service.
+            extract_svg_filename_latex_mapping_in_math_rte_components(
+                html_string))
+        if len(latex_string_to_filename_mapping) > 0:
+            latex_strings_with_svg = [
+                latex_string_to_filename[1] for latex_string_to_filename in (
+                    latex_string_to_filename_mapping)]
+            yield (
+                SubTopicPageMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG,
+                (item.id, latex_strings_with_svg))
+
         if len(list_of_latex_strings_without_svg) > 0:
             yield (
-                'Found subtopic with Latex having no SVG.',
+                SubTopicPageMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG,
                 (item.id, list_of_latex_strings_without_svg))
 
     @staticmethod
     def reduce(key, values):
-        final_values = [ast.literal_eval(value) for value in values]
-        total_number_of_latex_strings_without_svg = 0
-        subtopics_latex_strings_count = []
-        for subtopic_id, latex_strings in final_values:
-            total_number_of_latex_strings_without_svg += len(latex_strings)
-            subtopics_latex_strings_count.append({
-                'subtopic_id': subtopic_id,
-                'latex_strings_without_svg': latex_strings
-            })
-        yield (
-            'Overall result.', {
-                'total_number_subtopics_requiring_svgs': len(final_values),
-                'total_number_of_latex_strings_without_svg': (
-                    total_number_of_latex_strings_without_svg)
-            })
-        yield (
-            'Number of latex strings in each subtopic',
-            subtopics_latex_strings_count)
+        if key == SubTopicPageMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG:
+            final_values = [ast.literal_eval(value) for value in values]
+            total_number_of_latex_strings_without_svg = 0
+            subtopics_latex_strings_count = []
+            for subtopic_id, latex_strings in final_values:
+                total_number_of_latex_strings_without_svg += len(latex_strings)
+                subtopics_latex_strings_count.append({
+                    'subtopic_id': subtopic_id,
+                    'latex_strings_without_svg': latex_strings
+                })
+            yield (
+                'Overall result.', {
+                    'total_number_subtopics_requiring_svgs': len(final_values),
+                    'total_number_of_latex_strings_without_svg': (
+                        total_number_of_latex_strings_without_svg)
+                })
+            yield (
+                'Number of latex strings in each subtopic',
+                subtopics_latex_strings_count)
+
+        elif key == (
+                SubTopicPageMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG):
+            final_values = [ast.literal_eval(value) for value in values]
+            subtopics_latex_strings_count = []
+            for subtopic_id, latex_strings in final_values:
+                subtopics_latex_strings_count.append({
+                    'subtopic_id': subtopic_id,
+                    'latex_strings_with_svg': latex_strings
+                })
+            yield (
+                'Latex strings with svgs in each subtopic',
+                subtopics_latex_strings_count)
