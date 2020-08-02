@@ -570,7 +570,7 @@ angular.module('oppia').directive('questionPlayer', [
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
             // The initResults function is written separately since it is also
             // called in $scope.$on when some external events are triggered.

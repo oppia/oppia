@@ -1243,7 +1243,7 @@ angular.module('oppia').directive('conversationSkin', [
               $scope.isLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
 
             $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl(

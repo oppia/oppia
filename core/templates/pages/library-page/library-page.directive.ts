@@ -344,7 +344,7 @@ angular.module('oppia').directive('libraryPage', [
                     }
                     // TODO(#8521): Remove the use of $rootScope.$apply()
                     // once the controller is migrated to angular.
-                    $rootScope.$apply();
+                    $rootScope.$applyAsync();
                   });
 
                 $rootScope.$broadcast(

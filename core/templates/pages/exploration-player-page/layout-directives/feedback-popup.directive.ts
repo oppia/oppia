@@ -140,7 +140,7 @@ angular.module('oppia').directive('feedbackPopup', [
               $scope.isLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
             $scope.feedbackSubmitted = false;
             // We generate a random id since there may be multiple popover

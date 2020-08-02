@@ -86,7 +86,7 @@ angular.module('oppia').directive('topNavigationBar', [
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
-                $rootScope.$apply();
+                $rootScope.$applyAsync();
               }
             );
           };
@@ -284,14 +284,14 @@ angular.module('oppia').directive('topNavigationBar', [
               }
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
             UserBackendApiService.getProfileImageDataUrlAsync().then(
               function(dataUrl) {
                 ctrl.profilePictureDataUrl = dataUrl;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
-                $rootScope.$apply();
+                $rootScope.$applyAsync();
               });
 
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {

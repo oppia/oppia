@@ -183,7 +183,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
               $scope.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
             $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
             var contributorsSummary = $scope.getContributorsSummary() || {};

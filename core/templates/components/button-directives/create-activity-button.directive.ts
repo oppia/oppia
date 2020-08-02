@@ -92,7 +92,7 @@ angular.module('oppia').directive('createActivityButton', [
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
             // If the user clicked on a 'create' button to get to the dashboard,
             // open the create modal immediately (or redirect to the exploration

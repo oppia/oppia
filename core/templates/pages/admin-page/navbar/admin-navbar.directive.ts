@@ -84,7 +84,7 @@ angular.module('oppia').directive('adminNavbar', [
                 ctrl.profilePictureDataUrl = dataUrl;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
-                $rootScope.$apply();
+                $rootScope.$applyAsync();
               });
 
             ctrl.getStaticImageUrl = function(imagePath) {
@@ -107,7 +107,7 @@ angular.module('oppia').directive('adminNavbar', [
               );
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
 
             ctrl.logoutUrl = LOGOUT_URL;

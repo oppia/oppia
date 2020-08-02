@@ -91,7 +91,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
             ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
