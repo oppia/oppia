@@ -34,7 +34,6 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 import { Subscription } from 'rxjs';
 
-
 angular.module('oppia').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

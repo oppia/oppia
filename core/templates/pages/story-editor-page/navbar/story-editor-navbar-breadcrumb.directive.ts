@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
@@ -30,7 +29,6 @@ require('services/contextual/url.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 import { Subscription } from 'rxjs';
-
 
 angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
