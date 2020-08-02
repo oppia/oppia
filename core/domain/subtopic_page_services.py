@@ -38,12 +38,12 @@ def _migrate_page_contents_to_latest_schema(versioned_page_contents):
     function to account for that new version.
 
     Args:
-        versioned_page_contents: A dict with two keys:
+        versioned_page_contents: dict. A dict with two keys:
           - schema_version: int. The schema version for the page_contents dict.
           - page_contents: dict. The dict comprising the page contents.
 
     Raises:
-        Exception: The schema version of the page_contents is outside of what
+        Exception. The schema version of the page_contents is outside of what
             is supported at present.
     """
     page_contents_schema_version = versioned_page_contents['schema_version']
@@ -64,10 +64,11 @@ def get_subtopic_page_from_model(subtopic_page_model):
     """Returns a domain object for an SubtopicPage given a subtopic page model.
 
     Args:
-        subtopic_page_model: SubtopicPageModel.
+        subtopic_page_model: SubtopicPageModel. The subtopic page model to get
+            the corresponding domain object.
 
     Returns:
-        SubtopicPage.
+        SubtopicPage. The domain object corresponding to the given model object.
     """
     versioned_page_contents = {
         'schema_version': subtopic_page_model.page_contents_schema_version,
@@ -149,7 +150,7 @@ def get_subtopic_page_contents_by_id(topic_id, subtopic_id, strict=True):
             id exists in the datastore.
 
     Returns:
-        SubtopicPageContents or None: The page contents for a subtopic page,
+        SubtopicPageContents or None. The page contents for a subtopic page,
         or None if subtopic page does not exist.
     """
     subtopic_page = get_subtopic_page_by_id(
@@ -175,8 +176,8 @@ def save_subtopic_page(
             subtopic page.
 
     Raises:
-        Exception: Received invalid change list.
-        Exception: The subtopic page model and the incoming subtopic page domain
+        Exception. Received invalid change list.
+        Exception. The subtopic page model and the incoming subtopic page domain
             object have different version numbers.
     """
     if not change_list:
