@@ -2150,8 +2150,13 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # a different pseudonymous user ID. Note that all these pseudonymous
     # user IDs originate from the same about-to-be-deleted user.
     # Example structure: {
-    #   'skill': {'skill_id': 'pseudo_user_id_1'},
-    #   'story': {'story_id': 'pseudo_user_id_2'}
+    #     'skill': {'skill_id': 'pseudo_user_id_1'},
+    #     'story': {
+    #         'story_1_id': 'pseudo_user_id_2',
+    #         'story_2_id': 'pseudo_user_id_3',
+    #         'story_3_id': 'pseudo_user_id_4'
+    #     },
+    #     'question': {}
     # }
     activity_mappings = ndb.JsonProperty(default={})
 

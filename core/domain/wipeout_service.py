@@ -359,8 +359,8 @@ def _verify_basic_models_deleted(user_id):
         user_id: str. The id of the user to be deleted.
 
     Returns:
-        bool. True if all the improvements models were correctly deleted, False
-        otherwise.
+        bool. True if all the improvements and user models were correctly
+        deleted, False otherwise.
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.improvements, models.NAMES.user]):
