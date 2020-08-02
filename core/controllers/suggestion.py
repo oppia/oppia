@@ -196,7 +196,7 @@ class SuggestionsProviderHandler(base.BaseHandler):
             suggestion_type: str. The type of the suggestion.
 
         Raises:
-            InvalidInputException: If the given target_type of suggestion_type
+            InvalidInputException. If the given target_type of suggestion_type
                 are invalid.
         """
         if target_type not in suggestion_models.TARGET_TYPE_CHOICES:

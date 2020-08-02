@@ -60,10 +60,10 @@ def enqueue_email_task(url, params, countdown):
     """Adds a new task for sending email.
 
     Args:
-        url: str. url of the handler function.
-        params: dict(str : *). parameters that will be passed as payload to
+        url: str. Url of the handler function.
+        params: dict(str : *). Parameters that will be passed as payload to
             handler function.
-        countdown: int. amount of time, in seconds, to wait before executing
+        countdown: int. Amount of time, in seconds, to wait before executing
             task.
     """
     # See https://cloud.google.com/appengine/docs/python/taskqueue for

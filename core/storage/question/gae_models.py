@@ -98,7 +98,7 @@ class QuestionModel(base_models.VersionedModel):
             new_id: int. ID of the new QuestionModel instance.
 
         Raises:
-            Exception: The ID generator for QuestionModel is
+            Exception. The ID generator for QuestionModel is
                 producing too many collisions.
         """
 
@@ -159,7 +159,7 @@ class QuestionModel(base_models.VersionedModel):
             QuestionModel. Instance of the new QuestionModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
         instance_id = cls._get_new_id()
         question_model_instance = cls(

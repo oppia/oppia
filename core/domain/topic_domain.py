@@ -255,7 +255,7 @@ class StoryReference(python_utils.OBJECT):
         """Returns a dict representing this StoryReference domain object.
 
         Returns:
-            A dict, mapping all fields of StoryReference instance.
+            dict. A dict, mapping all fields of StoryReference instance.
         """
         return {
             'story_id': self.story_id,
@@ -295,7 +295,7 @@ class StoryReference(python_utils.OBJECT):
         """Validates various properties of the StoryReference object.
 
         Raises:
-            ValidationError: One or more attributes of the StoryReference are
+            ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
         if not isinstance(self.story_id, python_utils.BASESTRING):
@@ -336,7 +336,7 @@ class Subtopic(python_utils.OBJECT):
         """Returns a dict representing this Subtopic domain object.
 
         Returns:
-            A dict, mapping all fields of Subtopic instance.
+            dict. A dict, mapping all fields of Subtopic instance.
         """
         return {
             'id': self.id,
@@ -405,7 +405,7 @@ class Subtopic(python_utils.OBJECT):
         """Validates various properties of the Subtopic object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic are
+            ValidationError. One or more attributes of the subtopic are
                 invalid.
         """
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
@@ -518,7 +518,7 @@ class Topic(python_utils.OBJECT):
         """Returns a dict representing this Topic domain object.
 
         Returns:
-            A dict, mapping all fields of Topic instance.
+            dict. A dict, mapping all fields of Topic instance.
         """
         return {
             'id': self.id,
@@ -821,7 +821,7 @@ class Topic(python_utils.OBJECT):
                 published or is going to be published.
 
         Raises:
-            ValidationError: One or more attributes of the Topic are not
+            ValidationError. One or more attributes of the Topic are not
                 valid.
         """
         self.require_valid_name(self.name)
@@ -1045,7 +1045,7 @@ class Topic(python_utils.OBJECT):
             new_name: str. The updated name for the topic.
 
         Raises:
-            ValidationError: Name should be a string.
+            ValidationError. Name should be a string.
         """
         if not isinstance(new_name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
@@ -1460,7 +1460,7 @@ class TopicSummary(python_utils.OBJECT):
         """Validates all properties of this topic summary.
 
         Raises:
-            ValidationError: One or more attributes of the Topic summary
+            ValidationError. One or more attributes of the Topic summary
                 are not valid.
         """
         if not isinstance(self.name, python_utils.BASESTRING):

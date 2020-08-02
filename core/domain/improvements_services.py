@@ -61,7 +61,8 @@ def get_task_entry_from_model(task_entry_model):
     """Returns a domain object corresponding to the given task entry model.
 
     Args:
-        task_entry_model: improvements_models.TaskEntryModel.
+        task_entry_model: improvements_models.TaskEntryModel. The task entry
+            model to get the corresponding domain object.
 
     Returns:
         improvements_domain.TaskEntry. The corresponding domain object.
@@ -79,7 +80,7 @@ def fetch_exploration_tasks(exploration):
     exploration.
 
     Args:
-        exploration: exp_domain.Exploration.
+        exploration: exp_domain.Exploration. The exploration to fetch tasks for.
 
     Returns:
         tuple. Contains the following 2 items:
@@ -114,7 +115,8 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
     """Fetches a page from the given exploration's history of resolved tasks.
 
     Args:
-        exploration: exp_domain.Exploration.
+        exploration: exp_domain.Exploration. The exploration to fetch the
+            history page for.
         urlsafe_start_cursor: str or None. Starting point for the search. When
             None, the starting point is the very beginning of the history
             results (i.e. starting from the most recently resolved task entry).
@@ -190,8 +192,10 @@ def apply_changes_to_model(task_entry, task_entry_model):
     """Makes changes to the given model when differences are found.
 
     Args:
-        task_entry: improvements_domain.TaskEntry.
-        task_entry_model: improvements_models.TaskEntryModel.
+        task_entry: improvements_domain.TaskEntry. The TaskEntry domain object
+            to be check if changes made to the TaskEntry model.
+        task_entry_model: improvements_models.TaskEntryModel. The TaskEntry
+            model object to be compared with TaskEntry domain object.
 
     Returns:
         bool. Whether any change was made to the model.

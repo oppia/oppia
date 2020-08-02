@@ -38,7 +38,7 @@ def can_perform_cron_tasks(handler):
             *. The return value of the decorated function.
 
         Raises:
-            UnauthorizedUserException: The user does not have
+            UnauthorizedUserException. The user does not have
                 credentials to access the page.
         """
         if (self.request.headers.get('X-AppEngine-Cron') is None and

@@ -209,6 +209,14 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_yields_line = re_returns_line
 
+    re_raise_line = re.compile(
+        r"""
+        \s* ({type}|\S*)?[.:]                    # identifier
+        \s* (.*)                         # beginning of description
+    """.format(
+        type=re_multiple_type,
+    ), flags=re.X | re.S | re.M)
+
 
 class ASTDocStringChecker(python_utils.OBJECT):
     """Checks that docstrings meet the code style."""
@@ -303,7 +311,7 @@ class ASTDocStringChecker(python_utils.OBJECT):
             function_node: ast node object. Represents a function.
 
         Returns:
-            func_result: list(str). List of docstring errors associated with
+            list(str). List of docstring errors associated with
             the function. If the function has no errors, the list is empty.
         """
         func_def_args = cls.get_args_list_from_function_definition(

@@ -182,7 +182,7 @@ def convert_strings_to_float_numbers_in_classifier_data(
 
     Raises:
         Exception. If classifier data contains an object whose type is other
-        than integer, string, dict or list.
+            than integer, string, dict or list.
 
     Returns:
         dict|list|string|int|float. Original classifier data dict with
@@ -256,7 +256,7 @@ def get_classifier_training_job_by_id(job_id):
         classifier training job.
 
     Raises:
-        Exception: Entity for class ClassifierTrainingJobModel with id not
+        Exception. Entity for class ClassifierTrainingJobModel with id not
             found.
     """
     classifier_training_job_model = (
@@ -270,7 +270,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_ids: list(str). list of ID of the ClassifierTrainingJob domain
+        job_ids: list(str). List of ID of the ClassifierTrainingJob domain
             objects.
         status: str. The status to which the job needs to be updated.
 
@@ -312,7 +312,7 @@ def mark_training_jobs_failed(job_ids):
     """Updates the training job's status to failed.
 
     Args:
-        job_ids: list(str). list of ID of the ClassifierTrainingJobs.
+        job_ids: list(str). List of ID of the ClassifierTrainingJobs.
     """
     _update_classifier_training_jobs_status(
         job_ids, feconf.TRAINING_JOB_STATUS_FAILED)

@@ -49,6 +49,7 @@ from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, w
 from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint.checkers import typecheck  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 
 def read_from_node(node):
@@ -463,11 +464,10 @@ class DocstringParameterChecker(checkers.BaseChecker):
             ' relative to section headers.'
         ),
         'W9024': (
-            'malformed parameter',
-            'malformed-parameter',
-            'The parameter is incorrectly formatted: \nFor returns and yields,'
-            ' headers should have this format: "type (elaboration). \n'
-            'For raises, headers should have the format: "exception: '
+            'Raises section should be the following form: Exception_name. '
+            'Description.',
+            'malformed-raises-section',
+            'The parameter is incorrectly formatted.'
         ),
         'W9025': (
             'Period is not used at the end of the docstring.',
@@ -521,6 +521,28 @@ class DocstringParameterChecker(checkers.BaseChecker):
             'Files must have a single newline above yield in doc string.',
             'single-space-above-yield',
             'Please enter a single newline above yield in doc string.'
+        ),
+        'W9035': (
+            'Arguments should be in following form: variable_name: typeinfo. '
+            'Description.',
+            'malformed-args-section',
+            'The parameter is incorrectly formatted.'
+        ),
+        'W9036': (
+            'Returns should be in the following form: typeinfo. Description.',
+            'malformed-returns-section',
+            'The parameter is incorrectly formatted.'
+        ),
+        'W9037': (
+            'Yields should be in the following form: typeinfo. Description.',
+            'malformed-yields-section',
+            'The parameter is incorrectly formatted.'
+        ),
+        'W9038': (
+            'Arguments starting with *args should be formatted in the following'
+            ' form: *args: list(*). Description.',
+            'malformed-args-argument',
+            'The parameter is incorrectly formatted.'
         )
     }
 
@@ -611,6 +633,105 @@ class DocstringParameterChecker(checkers.BaseChecker):
         self.check_functiondef_yields(node, node_doc)
         self.check_docstring_style(node)
         self.check_docstring_section_indentation(node)
+        self.check_typeinfo(node, node_doc)
+
+    def check_typeinfo(self, node, node_doc):
+        """Checks whether all parameters in a function definition are
+        properly formatted.
+
+        Args:
+            node: astroid.node.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Docstring. Pylint Docstring class instance representing
+                a node's docstring.
+        """
+        # The regexes are taken from the pylint codebase and are modified
+        # according to our needs. Link: https://github.com/PyCQA/pylint/blob/
+        # e89c361668aeead9fd192d5289c186611ef779ca/pylint/extensions/
+        # _check_docs_utils.py#L428.
+        re_param_line = re.compile(
+            r"""
+            \s*  \*{{0,2}}(\w+)          # identifier potentially with asterisks
+            \s*  ( [:]
+                \s*
+                ({type}|\S*|[\s\S]*)
+                (?:,\s+optional)?
+                [.]+\s )+ \s*
+            \s*  [A-Z0-9](.*)[.\]}}\)]+$     # beginning of optional description
+        """.format(
+            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+        ), flags=re.X | re.S | re.M)
+
+        re_returns_line = re.compile(
+            r"""
+            \s* (({type}|\S*|[\s\S]*).[.]+\s)+        # identifier
+            \s* [A-Z0-9](.*)[.\]}}\)]+$               # beginning of description
+        """.format(
+            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+        ), flags=re.X | re.S | re.M)
+
+        re_yields_line = re_returns_line
+
+        re_raise_line = re.compile(
+            r"""
+            \s* ({type}[.])+                    # identifier
+            \s* [A-Z0-9](.*)[.\]}}\)]+$         # beginning of description
+        """.format(
+            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+        ), flags=re.X | re.S | re.M)
+
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the arguments
+        # from the Args section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
+        if node_doc.has_params():
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_param_section)
+            for entry in entries:
+                if entry.lstrip().startswith('*args') and not (
+                        entry.lstrip().startswith('*args: list(*)')):
+                    self.add_message('malformed-args-argument', node=node)
+                match = re_param_line.match(entry)
+                if not match:
+                    self.add_message('malformed-args-section', node=node)
+
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the returns
+        # from the Returns section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
+        if node_doc.has_returns():
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_returns_section)
+            entries = [''.join(entries)]
+            for entry in entries:
+                match = re_returns_line.match(entry)
+                if not match:
+                    self.add_message('malformed-returns-section', node=node)
+
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the yields
+        # from the Yields section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
+        if node_doc.has_yields():
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_yields_section)
+            entries = [''.join(entries)]
+            for entry in entries:
+                match = re_yields_line.match(entry)
+                if not match:
+                    self.add_message('malformed-yields-section', node=node)
+
+        # We need to extract the information from the given section for that
+        # we need to use _parse_section as this will extract all the exceptions
+        # from the Raises section, as this is a private method hence we need to
+        # use the pylint pragma to escape the pylint warning.
+        if node_doc.exceptions():
+            entries = node_doc._parse_section(  # pylint: disable=protected-access
+                _check_docs_utils.GoogleDocstring.re_raise_section)
+            for entry in entries:
+                match = re_raise_line.match(entry)
+                if not match:
+                    self.add_message('malformed-raises-section', node=node)
 
     def check_functiondef_params(self, node, node_doc):
         """Checks whether all parameters in a function definition are
@@ -691,7 +812,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 elif line == b'Raises:':
                     self.add_message(
                         'single-space-above-raises', node=node)
-                elif line == b'Yield:':
+                elif line == b'Yields:':
                     self.add_message(
                         'single-space-above-yield', node=node)
             if line != b'':
@@ -800,7 +921,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
-                    if re.search(br'^[a-zA-Z0-9_\.\*]+: ',
+                    if re.search(br'^[a-zA-Z0-9_\.\*]+[.] ',
                                  stripped_line):
                         if current_line_indentation != (
                                 args_indentation_in_spaces + 4):
@@ -808,14 +929,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
                                 '4-space-indentation-in-docstring',
                                 node=node)
                         in_description = True
-                    # If the line starts off with a regex like this but failed
-                    # the last check, then it is a malformed parameter so we
-                    # notify the user.
-                    elif (re.search(br'^[^ ]+: ', stripped_line) and
-                          not in_description):
-                        self.add_message(
-                            'malformed-parameter',
-                            node=node)
                     # In a description line that is wrapped around (doesn't
                     # start off with the parameter name), we need to make sure
                     # the indentation is 8.

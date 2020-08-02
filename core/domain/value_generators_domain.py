@@ -127,7 +127,7 @@ class Registry(python_utils.OBJECT):
             generator id given.
 
         Raises:
-            KeyError: The given generator_id is invalid.
+            KeyError. The given generator_id is invalid.
         """
         if generator_id not in cls.value_generators_dict:
             cls._refresh_registry()

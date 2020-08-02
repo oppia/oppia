@@ -119,7 +119,7 @@ class BaseJobManager(python_utils.OBJECT):
             str. The unique id of this job.
 
         Raises:
-            Exception: This method (instead of a subclass method) was directly
+            Exception. This method (instead of a subclass method) was directly
                 used to create a new job.
         """
         if cls._is_abstract():
@@ -487,7 +487,7 @@ class BaseJobManager(python_utils.OBJECT):
             new_status_code: str. New status code.
 
         Raises:
-            Exception: The given status code change is invalid.
+            Exception. The given status code change is invalid.
         """
         valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
         if new_status_code not in valid_new_status_codes:
@@ -503,7 +503,7 @@ class BaseJobManager(python_utils.OBJECT):
             job_type: str. Name of a job class.
 
         Raises:
-            Exception: The given job type is incorrect.
+            Exception. The given job type is incorrect.
         """
         if job_type != cls.__name__:
             raise Exception(
@@ -614,7 +614,7 @@ class BaseDeferredJobManager(BaseJobManager):
             additional_job_params: dict(str : *). Additional parameters on job.
 
         Raises:
-            PermanentTaskFailure: No further work can be scheduled.
+            PermanentTaskFailure. No further work can be scheduled.
         """
         logging.info(
             'Job %s started at %s' %
@@ -778,7 +778,7 @@ class BaseMapReduceJobManager(BaseJobManager):
             *. The current value of the parameter.
 
         Raises:
-            Exception: The parameter is not associated to this job type.
+            Exception. The parameter is not associated to this job type.
         """
         return context.get().mapreduce_spec.mapper.params[param_name]
 
@@ -849,7 +849,7 @@ class BaseMapReduceJobManager(BaseJobManager):
             shard_count: int. Number of shards used for the job.
 
         Raises:
-            Exception: Passed a value to a parameter in the mapper which has
+            Exception. Passed a value to a parameter in the mapper which has
                 already been given a value.
         """
         entity_class_types = cls.entity_classes_to_map_over()
@@ -1044,7 +1044,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
                 for this InputReader.
 
         Raises:
-            BadReaderParamsError: Required parameters are missing or invalid.
+            BadReaderParamsError. Required parameters are missing or invalid.
 
         Returns:
             bool. Whether mapper spec and all mapper patterns are valid.
@@ -1208,8 +1208,9 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             exists in the datastore.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError: strict == True and no
-                undeleted entity with the given id exists in the datastore.
+            base_models.BaseModel.EntityNotFoundError. The value of strinct is
+                True and no undeleted entity with the given id exists in the
+                datastore.
         """
         if not cls._is_valid_realtime_id(entity_id):
             raise ValueError('Invalid realtime id: %s' % entity_id)
@@ -1222,7 +1223,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         """Stores the current realtime layer entity into the database.
 
         Raises:
-            Exception: The current instance has an invalid realtime layer id.
+            Exception. The current instance has an invalid realtime layer id.
 
         Returns:
             realtime_layer. The realtime layer entity.
@@ -1498,7 +1499,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             computation.
 
         Raises:
-            Exception: The computation wasn't idle before trying to start.
+            Exception. The computation wasn't idle before trying to start.
         """
         def _start_computation_transactional():
             """Transactional implementation for marking a continuous

@@ -221,7 +221,7 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
     function.
 
     Args:
-        user_id: str. The id of the user reading the messages,
+        user_id: str. The id of the user reading the messages.
         thread_id: str. The id of the thread.
         message_ids: list(int). The ids of the messages in the thread read by
             the user.
@@ -240,7 +240,7 @@ def add_message_id_to_read_by_list(thread_id, user_id, message_id):
 
     Args:
         thread_id: str. The id of the thread.
-        user_id: str. The id of the user reading the messages,
+        user_id: str. The id of the user reading the messages.
         message_id: int. The id of the message.
     """
     feedback_thread_user_model = (
@@ -365,7 +365,8 @@ def get_total_open_threads(feedback_analytics_list):
     FeedbackAnalytics domain objects.
 
     Args:
-        feedback_analytics_list: list(FeedbackAnalytics).
+        feedback_analytics_list: list(FeedbackAnalytics). A list of
+            FeedbackAnalytics objects to get the count of all open threads.
 
     Returns:
         int. The count of all open threads for the given the given list of
@@ -394,7 +395,8 @@ def _get_thread_from_model(thread_model):
     """Converts the given FeedbackThreadModel to a FeedbackThread object.
 
     Args:
-        thread_model: FeedbackThreadModel.
+        thread_model: FeedbackThreadModel. The FeedbackThread model object to be
+            converted to FeedbackThread object.
 
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.
@@ -602,7 +604,8 @@ def _enqueue_feedback_thread_status_change_email_task(
 
     Args:
         user_id: str. The user to be notified.
-        reference: FeedbackMessageReference.
+        reference: FeedbackMessageReference. The feedback message reference
+            object to be converted to dict.
         old_status: str. One of STATUS_CHOICES.
         new_status: str. One of STATUS_CHOICES.
     """
@@ -665,7 +668,7 @@ def update_feedback_email_retries(user_id):
     corresponding user's UnsentEmailFeedbackModel.
 
     Args:
-        user_id: str.
+        user_id: str. The id of the given user.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
     time_since_buffered = (
@@ -682,7 +685,7 @@ def pop_feedback_message_references(user_id, num_references_to_pop):
     processed already.
 
     Args:
-        user_id: str.
+        user_id: str. The id of the current user.
         num_references_to_pop: int. Number of feedback message references that
             have been processed already.
     """

@@ -582,7 +582,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
             before validating.
 
     Returns:
-        dict: Dictionary of all the error relations and strings.
+        dict. Dictionary of all the error relations and strings.
     """
     # err_dict is a dictionary to store the invalid tags and the
     # invalid parent-child relations that we find.
@@ -724,7 +724,7 @@ def validate_customization_args(html_list):
         html_list: list(str). List of html strings to be validated.
 
     Returns:
-        dict: Dictionary of all the invalid customisation args where
+        dict. Dictionary of all the invalid customisation args where
         key is a Rich Text Component and value is the invalid html string.
     """
     # Dictionary to hold html strings in which customization arguments
@@ -762,7 +762,7 @@ def validate_customization_args_in_tag(tag):
         tag: bs4.element.Tag. The html tag to be validated.
 
     Yields:
-        Error message if the attributes of tag are invalid.
+        str. Error message if the attributes of tag are invalid.
     """
 
     component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long

@@ -58,7 +58,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                         with the mock names.
 
                 Raises:
-                    AssertionError: The argument doesn't match with the mock
+                    AssertionError. The argument doesn't match with the mock
                         name.
                 """
 
@@ -75,7 +75,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                     result: str. The string to be checked with the mock name.
 
                 Raises:
-                    AssertionError: The argument doesn't match with the mock
+                    AssertionError. The argument doesn't match with the mock
                         name.
                 """
                 order.append('after')

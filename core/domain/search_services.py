@@ -154,7 +154,7 @@ def _should_index_collection(collection):
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: CollectionSummaryModel.
+        collection: CollectionSummaryModel. The collection summary model object.
 
     Returns:
         bool. Whether a particular collection should be indexed.
@@ -214,8 +214,8 @@ def search_collections(query, limit, sort=None, cursor=None):
     """Searches through the available collections.
 
     Args:
-        query: str or None. the query string to search for.
-        limit: int. the maximum number of results to return.
+        query: str or None. The query string to search for.
+        limit: int. The maximum number of results to return.
         sort: str. This indicates how to sort results. This should be a string
             of space separated values. Each value should start with a '+' or a
             '-' character indicating whether to sort in ascending or descending
