@@ -52,7 +52,7 @@ angular.module('oppia').directive('i18nFooter', [
               }
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
           };
           ctrl.$onInit = function() {

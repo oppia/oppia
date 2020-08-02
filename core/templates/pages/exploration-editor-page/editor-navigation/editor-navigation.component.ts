@@ -127,7 +127,7 @@ angular.module('oppia').component('editorNavigation', {
             this.userIsLoggedIn = userInfo.isLoggedIn();
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           });
         $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };

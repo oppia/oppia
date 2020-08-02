@@ -261,7 +261,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           ctrl.canCreateCollections = userInfo.canCreateCollections();
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         });
 
         var dashboardDataPromise = (

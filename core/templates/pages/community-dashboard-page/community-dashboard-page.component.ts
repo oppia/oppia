@@ -106,7 +106,7 @@ angular.module('oppia').component('communityDashboardPage', {
             ctrl.profilePictureDataUrl = dataUrl;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           });
 
         UserBackendApiService.getUserCommunityRightsData().then(
@@ -132,7 +132,7 @@ angular.module('oppia').component('communityDashboardPage', {
               ctrl.userCanReviewQuestions);
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           });
 
         UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
@@ -146,7 +146,7 @@ angular.module('oppia').component('communityDashboardPage', {
           }
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         });
 
         ctrl.languageCode = (

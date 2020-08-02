@@ -164,7 +164,7 @@ angular.module('oppia').component('preferencesPage', {
               $window.location.reload();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
-              $rootScope.$apply();
+              $rootScope.$applyAsync();
             });
         }, function() {
           // Note to developers:
@@ -185,7 +185,7 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.email = userInfo.getEmail();
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.
-          $rootScope.$apply();
+          $rootScope.$applyAsync();
         });
 
         ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
