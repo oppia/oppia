@@ -47,8 +47,6 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { CircularImageComponent } from
-  'components/profile-link-directives/circular-image.component';
 
 
 @NgModule({
@@ -57,12 +55,12 @@ import { CircularImageComponent } from
     SafePipe, SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent, CircularImageComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent,
     ExplorationSummaryTileDirective],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent, CircularImageComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
   ],

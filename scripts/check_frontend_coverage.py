@@ -61,7 +61,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'boolean-editor.directive.ts',
     'change-list.service.ts',
-    'circular-image.component.ts',
+    'circular-image.directive.ts',
     'ck-editor-4-rte.directive.ts',
     'ck-editor-4-widgets.initializer.ts',
     'code-repl-prediction.service.ts',

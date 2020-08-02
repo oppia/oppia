@@ -16,24 +16,25 @@
  * @fileoverview Displays circled images with linking (when available).
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+require('domain/utilities/url-interpolation.service.ts');
 
-@Component({
-  selector: 'circular-image',
-  templateUrl: './circular-image.component.html',
-  styleUrls: []
-})
-export class CircularImageComponent {
-  @Input() src: string;
-  @Input() link?: string;
-  constructor( ) {}
-
-  isLinkAvailable() {
-    return this.link ? true : false;
-  }
-}
-
-angular.module('oppia').directive(
-  'circularImage', downgradeComponent(
-    {component: CircularImageComponent}));
+angular.module('oppia').directive('circularImage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {
+        src: '&',
+        link: '&?'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/profile-link-directives/circular-image.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.isLinkAvailable = function() {
+          return ctrl.link() ? true : false;
+        };
+      }]
+    };
+  }]);

@@ -22,8 +22,8 @@
       <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars">
         <div>
           <circular-image ng-if="avatarsList.length > 0"
-                          [src]="avatarsList[0].image"
-                          [link]="avatarsList[0].link"
+                          src="avatarsList[0].image"
+                          link="avatarsList[0].link"
                           uib-tooltip="<[avatarsList[0].tooltipText | truncate:16]>"
                           tooltip-placement="bottom">
           </circular-image>
