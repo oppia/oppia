@@ -557,7 +557,7 @@ def create_skill_opportunity(skill_id, skill_description):
         skill_description: str. The skill_description of the opportunity.
 
     Raises:
-        Exception: If a SkillOpportunityModel corresponding to the supplied
+        Exception. If a SkillOpportunityModel corresponding to the supplied
             skill_id already exists.
     """
     skill_opportunity_model = (

@@ -53,9 +53,8 @@ def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers.
 
     Args:
-        response_headers: webapp2.ResponseHeaders.
-            Response headers are used to give a more detailed
-            context of the response.
+        response_headers: webapp2.ResponseHeaders. Response headers are used
+            to give a more detailed context of the response.
     """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below. We also unset dev_appserver_login
@@ -230,8 +229,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Overrides dispatch method in webapp2 superclass.
 
         Raises:
-            Exception: The CSRF token is missing.
-            UnauthorizedUserException: The CSRF token is invalid.
+            Exception. The CSRF token is missing.
+            UnauthorizedUserException. The CSRF token is invalid.
         """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
@@ -294,7 +293,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle GET requests.
 
         Raises:
-            PageNotFoundException: Page not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
 
@@ -302,7 +301,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle POST requests.
 
         Raises:
-            PageNotFoundException: Page not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
 
@@ -310,7 +309,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle PUT requests.
 
         Raises:
-            PageNotFoundException: Page not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
 
@@ -318,7 +317,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle DELETE requests.
 
         Raises:
-            PageNotFoundException: Page not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
 
@@ -555,7 +554,7 @@ class CsrfTokenManager(python_utils.OBJECT):
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
-            str: The generated CSRF token.
+            str. The generated CSRF token.
         """
         cls.init_csrf_secret()
 
