@@ -37,7 +37,7 @@ from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 
 
-CHROME_DRIVER_VERSION = '77.0.3865.40'
+CHROME_DRIVER_VERSION = '83.0.4103.116'
 
 
 class MockProcessClass(python_utils.OBJECT):
@@ -371,7 +371,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
                 def read(self):
                     """Return required method."""
-                    return '77.0.3865'
+                    return '83.0.4103'
             return Ret()
 
         popen_swap = self.swap(os, 'popen', mock_popen)

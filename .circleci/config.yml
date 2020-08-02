@@ -45,11 +45,11 @@ commands:
     description: "Install Chrome"
     steps:
       - run:
-          name:  Install chrome version 77.0.3865.75-1
+          name:  Install chrome version 83.0.4103.116-1
           command: |
             sudo apt-get update
             sudo apt-get install lsb-release
-            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb
+            curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_83.0.4103.116-1_amd64.deb
             sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
             sudo dpkg -i google-chrome.deb
             google-chrome --version

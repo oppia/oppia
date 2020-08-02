@@ -31,8 +31,8 @@ class InstallChromeOnTravisTests(test_utils.GenericTestBase):
 
     def test_main(self):
         chrome_source_url = (
-            'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb'
-            '/google-chrome-stable_77.0.3865.75-1_amd64.deb')
+            'https://github.com/webnicer/chrome-downloads/blob/master/x64.deb/'
+            'google-chrome-stable_83.0.4103.116-1_amd64.deb')
 
         def mock_isfile(unused_path):
             return False
@@ -62,7 +62,7 @@ class InstallChromeOnTravisTests(test_utils.GenericTestBase):
             os.path, 'isfile', mock_isfile,
             expected_args=[(os.path.join(
                 'HOME', '.cache/TravisChrome/',
-                'google-chrome-stable_77.0.3865.75-1_amd64.deb'),)])
+                'google-chrome-stable_83.0.4103.116-1_amd64.deb'),)])
         chdir_swap = self.swap_with_checks(
             os, 'chdir', mock_chdir, expected_args=[
                 (os.path.join('HOME', '.cache/TravisChrome/'),),
@@ -71,17 +71,17 @@ class InstallChromeOnTravisTests(test_utils.GenericTestBase):
             python_utils, 'url_retrieve', mock_url_retrieve,
             expected_args=[(chrome_source_url,)],
             expected_kwargs=[{
-                'filename': 'google-chrome-stable_77.0.3865.75-1_amd64.deb'
+                'filename': 'google-chrome-stable_83.0.4103.116-1_amd64.deb'
             }])
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', mock_check_call, expected_args=[(
                 ['sudo', 'dpkg', '-i', os.path.join(
                     'HOME', '.cache/TravisChrome/',
-                    'google-chrome-stable_77.0.3865.75-1_amd64.deb')
+                    'google-chrome-stable_83.0.4103.116-1_amd64.deb')
                 ],)])
         environ_swap = self.swap(
             os, 'environ', {
-                'CHROME_SOURCE_URL': chrome_source_url,
+                'CHROME_SOURCE_URL_83': chrome_source_url,
                 'HOME': 'HOME'
             })
         with isdir_swap, isfile_swap, makedirs_swap, chdir_swap:
