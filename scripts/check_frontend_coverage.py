@@ -262,8 +262,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Polyfills.ts',
     'practice-tab.directive.ts',
     'pretest-question-backend-api.service.ts',
-    'profile-link-image.directive.ts',
-    'profile-link-text.directive.ts',
+    'profile-link-image.component.ts',
+    'profile-link-text.component.ts',
     'profile-page-navbar.component.ts',
     'progress-nav.directive.ts',
     'promo-bar.directive.ts',
@@ -430,9 +430,9 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
             stanza: list(str). Contains all the lines from a lcov stanza.
 
         Raises:
-            Exception: file_path is empty.
-            Exception: Total lines number is not found.
-            Exception: Covered lines number is not found.
+            Exception. The file_path is empty.
+            Exception. Total lines number is not found.
+            Exception. Covered lines number is not found.
         """
 
         match = re.search('SF:(.+)\n', stanza)
@@ -504,7 +504,7 @@ def check_coverage_changes():
     - File deletion
 
     Raises:
-        Exception: LCOV_FILE_PATH doesn't exist.
+        Exception. LCOV_FILE_PATH doesn't exist.
     """
     if not os.path.exists(LCOV_FILE_PATH):
         raise Exception(
