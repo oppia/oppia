@@ -38,7 +38,7 @@ def create_new_question(committer_id, question, commit_message):
 
     Args:
         committer_id: str. ID of the committer.
-        question: Question. question domain object.
+        question: Question. Question domain object.
         commit_message: str. A description of changes made to the question.
     """
     question.validate()
@@ -74,7 +74,7 @@ def link_multiple_skills_for_question(
 
     Raises:
         Exception. The lengths of the skill_ids and skill_difficulties
-        lists are different.
+            lists are different.
     """
     if len(skill_ids) != len(skill_difficulties):
         raise Exception(
@@ -439,7 +439,7 @@ def get_displayable_question_skill_link_details(
 
     Raises:
         Exception. Querying linked question summaries for more than 3 skills at
-        a time is not supported currently.
+            a time is not supported currently.
 
     Returns:
         list(QuestionSummary), list(MergedQuestionSkillLink), str|None.
@@ -563,7 +563,7 @@ def _save_question(committer_id, question, change_list, commit_message):
             question.
 
     Raises:
-        Exception: Received an invalid change list.
+        Exception. Received an invalid change list.
     """
     if not change_list:
         raise Exception(
@@ -597,7 +597,7 @@ def update_question(
             question.
 
     Raises:
-        ValueError: No commit message was provided.
+        ValueError. No commit message was provided.
     """
     if not commit_message:
         raise ValueError(
@@ -642,8 +642,8 @@ def save_question_summary(question_summary):
     entity in the datastore.
 
     Args:
-        question_summary: The question summary object to be saved in the
-            datastore.
+        question_summary: QuestionSummaryModel. The question summary object to
+            be saved in the datastore.
     """
     question_summary_model = question_models.QuestionSummaryModel(
         id=question_summary.id,
@@ -660,10 +660,12 @@ def get_question_summary_from_model(question_summary_model):
     question summary model.
 
     Args:
-        question_summary_model: QuestionSummaryModel.
+        question_summary_model: QuestionSummaryModel. The QuestionSummary model
+            object to fetch corresponding QuestionSummary domain object.
 
     Returns:
-        QuestionSummary.
+        QuestionSummary. The domain object corresponding to the given question
+        summary model.
     """
     return question_domain.QuestionSummary(
         question_summary_model.id,

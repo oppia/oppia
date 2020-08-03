@@ -53,7 +53,7 @@ def try_upgrading_draft_to_exp_version(
         objects after upgrade or None if upgrade fails.
 
     Raises:
-        InvalidInputException. current_draft_version is greater than
+        InvalidInputException. The current_draft_version is greater than
             to_exp_version.
     """
     if current_draft_version > to_exp_version:
@@ -82,7 +82,10 @@ def try_upgrading_draft_to_exp_version(
             logging.warning('%s is not implemented' % conversion_fn_name)
             return
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
-        draft_change_list = conversion_fn(draft_change_list)
+        try:
+            draft_change_list = conversion_fn(draft_change_list)
+        except Exception:
+            return
         upgrade_times += 1
     return draft_change_list
 
@@ -163,6 +166,42 @@ def extract_html_from_draft_change_list(draft_change_list):
 
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
+
+    @classmethod
+    def _convert_states_v34_dict_to_v35_dict(cls, draft_change_list):
+        """Converts draft change list from state version 34 to 35. State
+        version 35 upgrades all explorations that use the MathExpressionInput
+        interaction to use one of AlgebraicExpressionInput,
+        NumericExpressionInput, or MathEquationInput interactions. There should
+        be no changes to the draft for this migration.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            Exception. Conversion cannot be completed.
+        """
+        for change in draft_change_list:
+            # We don't want to migrate any changes that involve the
+            # MathExpressionInput interaction.
+            interaction_id_change_condition = (
+                change.property_name ==
+                exp_domain.STATE_PROPERTY_INTERACTION_ID and (
+                    change.new_value == 'MathExpressionInput'))
+            answer_groups_change_condition = (
+                change.property_name ==
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS and (
+                    change.new_value[0]['rule_specs'][0]['rule_type'] == (
+                        'IsMathematicallyEquivalentTo')))
+            if interaction_id_change_condition or (
+                    answer_groups_change_condition):
+                raise Exception('Conversion cannot be completed.')
+
+        return draft_change_list
 
     @classmethod
     def _convert_states_v33_dict_to_v34_dict(cls, draft_change_list):

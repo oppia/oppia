@@ -46,6 +46,9 @@ describe('Subtopic editor tab', function() {
   var QuestionBackendApiService = null;
   var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
+  var MockWindowDimensionsService = {
+    isWindowNarrow: () => false
+  };
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
@@ -86,9 +89,6 @@ describe('Subtopic editor tab', function() {
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
-    var MockWindowDimensionsService = {
-      isWindowNarrow: () => false
-    };
     ctrl = $componentController('subtopicEditorTab', {
       QuestionBackendApiService: MockQuestionBackendApiService,
       WindowDimensionsService: MockWindowDimensionsService
@@ -245,13 +245,34 @@ describe('Subtopic editor tab', function() {
     expect(ctrl.selectedSkillEditOptionsIndex).toEqual(20);
   });
 
-  it('should toggle skills list preview', function() {
+  it('should toggle skills list preview only in mobile view', function() {
+    MockWindowDimensionsService.isWindowNarrow = () => true;
     expect(ctrl.skillsListIsShown).toEqual(true);
     ctrl.togglePreviewSkillCard();
     expect(ctrl.skillsListIsShown).toEqual(false);
     ctrl.togglePreviewSkillCard();
     expect(ctrl.skillsListIsShown).toEqual(true);
     ctrl.togglePreviewSkillCard();
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
+    ctrl.skillsListIsShown = true;
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(true);
+  });
+
+  it('should toggle subtopic editor card only in mobile view', function() {
+    MockWindowDimensionsService.isWindowNarrow = () => true;
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicEditorCard();
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
+    ctrl.subtopicEditorCardIsShown = true;
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
   });
 
   it('should toggle subtopic preview', function() {
@@ -269,4 +290,10 @@ describe('Subtopic editor tab', function() {
       ctrl.navigateToTopicEditor();
       expect(navigateSpy).toHaveBeenCalled();
     });
+
+  it('should hide the html data input on canceling', function() {
+    ctrl.schemaEditorIsShown = true;
+    ctrl.cancelHtmlDataChange();
+    expect(ctrl.schemaEditorIsShown).toEqual(false);
+  });
 });

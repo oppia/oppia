@@ -57,7 +57,7 @@ class BaseRteComponent(python_utils.OBJECT):
         """Validates customization args for a rich text component.
 
         Raises:
-            TypeError: if any customization arg is invalid.
+            TypeError. If any customization arg is invalid.
         """
         arg_names_to_obj_classes = {}
         customization_arg_specs = cls.rich_text_component_specs[

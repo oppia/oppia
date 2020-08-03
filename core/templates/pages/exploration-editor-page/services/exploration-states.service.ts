@@ -42,6 +42,8 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/validators.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
@@ -60,6 +62,8 @@ angular.module('oppia').factory('ExplorationStatesService', [
     var stateDeletedCallbacks = [];
     var stateRenamedCallbacks = [];
     var stateInteractionSavedCallbacks = [];
+    /** @private */
+    var refreshGraphEventEmitter = new EventEmitter();
 
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -166,7 +170,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
     var _setState = function(stateName, stateData, refreshGraph) {
       _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
       }
     };
 
@@ -406,7 +410,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateAddedCallbacks.forEach(function(callback) {
           callback(newStateName);
         });
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
         if (successCallback) {
           successCallback(newStateName);
         }
@@ -447,7 +451,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
             callback(deleteStateName);
           });
           $location.path('/gui/' + StateEditorService.getActiveStateName());
-          $rootScope.$broadcast('refreshGraph');
+          refreshGraphEventEmitter.emit();
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
           $rootScope.$broadcast('refreshStateEditor');
@@ -486,7 +490,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateRenamedCallbacks.forEach(function(callback) {
           callback(oldStateName, newStateName);
         });
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
       },
       registerOnStateAddedCallback: function(callback) {
         stateAddedCallbacks.push(callback);
@@ -499,6 +503,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       registerOnStateInteractionSavedCallback: function(callback) {
         stateInteractionSavedCallbacks.push(callback);
+      },
+      get onRefreshGraph() {
+        return refreshGraphEventEmitter;
       }
     };
   }

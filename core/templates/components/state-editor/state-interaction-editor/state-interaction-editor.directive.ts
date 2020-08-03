@@ -57,6 +57,8 @@ require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -96,6 +98,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             SubtitledHtmlObjectFactory, StateSolutionService,
             StateHintsService, StateContentService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var DEFAULT_TERMINAL_STATE_CONTENT =
             'Congratulations, you have finished!';
 
@@ -261,26 +264,30 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.StateInteractionIdService = StateInteractionIdService;
             $scope.hasLoaded = false;
             $scope.customizationModalReopened = false;
-            $scope.$on('stateEditorInitialized', function(evt, stateData) {
-              if (stateData === undefined || $.isEmptyObject(stateData)) {
-                throw new Error(
-                  'Expected stateData to be defined but ' +
-                  'received ' + stateData);
-              }
-              $scope.hasLoaded = false;
-              InteractionDetailsCacheService.reset();
-              ResponsesService.onInitializeAnswerGroups.emit({
-                interactionId: stateData.interaction.id,
-                answerGroups: stateData.interaction.answerGroups,
-                defaultOutcome: stateData.interaction.defaultOutcome,
-                confirmedUnclassifiedAnswers: (
-                  stateData.interaction.confirmedUnclassifiedAnswers)
-              });
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onStateEditorInitialized.subscribe(
+                (stateData) => {
+                  if (stateData === undefined || $.isEmptyObject(stateData)) {
+                    throw new Error(
+                      'Expected stateData to be defined but ' +
+                      'received ' + stateData);
+                  }
+                  $scope.hasLoaded = false;
+                  InteractionDetailsCacheService.reset();
+                  ResponsesService.onInitializeAnswerGroups.emit({
+                    interactionId: stateData.interaction.id,
+                    answerGroups: stateData.interaction.answerGroups,
+                    defaultOutcome: stateData.interaction.defaultOutcome,
+                    confirmedUnclassifiedAnswers: (
+                      stateData.interaction.confirmedUnclassifiedAnswers)
+                  });
 
-              _updateInteractionPreview();
-              _updateAnswerChoices();
-              $scope.hasLoaded = true;
-            });
+                  _updateInteractionPreview();
+                  _updateAnswerChoices();
+                  $scope.hasLoaded = true;
+                }
+              )
+            );
 
             $scope.getStaticImageUrl = function(imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -288,6 +295,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
             $rootScope.$broadcast('interactionEditorInitialized');
             StateEditorService.updateStateInteractionEditorInitialised();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

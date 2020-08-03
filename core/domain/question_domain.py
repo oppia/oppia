@@ -19,10 +19,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import datetime
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import exp_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
@@ -30,10 +32,12 @@ from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+from pylatexenc import latex2text
 
+(question_models,) = models.Registry.import_models([models.NAMES.question])
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -329,6 +333,133 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
+        """Converts from version 34 to 35. Version 35 upgrades all explorations
+        that use the MathExpressionInput interaction to use one of
+        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
+        interactions.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        if question_state_dict['interaction']['id'] == 'MathExpressionInput':
+            new_answer_groups = []
+            types_of_inputs = set()
+            for group in question_state_dict['interaction']['answer_groups']:
+                new_answer_group = copy.deepcopy(group)
+                for rule_spec in new_answer_group['rule_specs']:
+                    rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+
+                    rule_input = exp_domain.clean_math_expression(
+                        rule_input)
+
+                    type_of_input = exp_domain.TYPE_INVALID_EXPRESSION
+                    if is_valid_algebraic_expression(rule_input):
+                        type_of_input = (
+                            exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+                    elif is_valid_numeric_expression(rule_input):
+                        type_of_input = exp_domain.TYPE_VALID_NUMERIC_EXPRESSION
+                    elif is_valid_math_equation(rule_input):
+                        type_of_input = exp_domain.TYPE_VALID_MATH_EQUATION
+
+                    types_of_inputs.add(type_of_input)
+
+                    if type_of_input != exp_domain.TYPE_INVALID_EXPRESSION:
+                        rule_spec['inputs']['x'] = rule_input
+                        if type_of_input == exp_domain.TYPE_VALID_MATH_EQUATION:
+                            rule_spec['inputs']['y'] = 'both'
+                        rule_spec['rule_type'] = 'MatchesExactlyWith'
+
+                new_answer_groups.append(new_answer_group)
+
+            if exp_domain.TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                # If at least one rule input is an equation, we remove
+                # all other rule inputs that are expressions.
+                if exp_domain.TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                    new_interaction_id = exp_domain.TYPE_VALID_MATH_EQUATION
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_math_equation(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+                # Otherwise, if at least one rule_input is an algebraic
+                # expression, we remove all other rule inputs that are
+                # numeric expressions.
+                elif exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                        types_of_inputs):
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_algebraic_expression(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+                else:
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
+
+                # Removing answer groups that have no rule specs left after
+                # the filtration done above.
+                new_answer_groups = [
+                    answer_group for answer_group in new_answer_groups if (
+                        len(answer_group['rule_specs']) != 0)]
+
+                # Removing feedback keys, from voiceovers_mapping and
+                # translations_mapping, that correspond to the rules that
+                # got deleted.
+                old_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            question_state_dict[
+                                'interaction']['answer_groups'])]
+                new_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            new_answer_groups)]
+                content_ids_to_delete = set(
+                    old_answer_groups_feedback_keys) - set(
+                        new_answer_groups_feedback_keys)
+                for content_id in content_ids_to_delete:
+                    if content_id in question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping']:
+                        del question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping'][content_id]
+                    if content_id in question_state_dict[
+                            'written_translations']['translations_mapping']:
+                        del question_state_dict['written_translations'][
+                            'translations_mapping'][content_id]
+
+                question_state_dict['interaction']['id'] = new_interaction_id
+                question_state_dict['interaction']['answer_groups'] = (
+                    new_answer_groups)
+                if question_state_dict['interaction']['solution']:
+                    correct_answer = question_state_dict['interaction'][
+                        'solution']['correct_answer']['ascii']
+                    correct_answer = exp_domain.clean_math_expression(
+                        correct_answer)
+                    question_state_dict['interaction'][
+                        'solution']['correct_answer'] = correct_answer
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
@@ -549,7 +680,7 @@ class QuestionSummary(python_utils.OBJECT):
         """Validates the Question summary domain object before it is saved.
 
         Raises:
-            ValidationError: One or more attributes of question summary are
+            ValidationError. One or more attributes of question summary are
                 invalid.
         """
         if not isinstance(self.id, python_utils.BASESTRING):

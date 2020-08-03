@@ -152,7 +152,7 @@ def check_image_png_or_webp(image_string):
     """Checks if the image is in png or webp format only.
 
     Args:
-        image_string: str. image url in base64 format.
+        image_string: str. Image url in base64 format.
 
     Returns:
         boolean. Returns true if image is in WebP format.
@@ -908,7 +908,7 @@ tags: []
             headers: dict(str, *). Extra headers to send.
 
         Returns:
-            webtest.TestResponse: The response of the POST request.
+            webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
         if upload_files is not None:
@@ -1265,6 +1265,66 @@ tags: []
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,
             title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def save_new_exp_with_states_schema_v34(self, exp_id, user_id, states_dict):
+        """Saves a new default exploration with a default version 34 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=34,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
             category='category',
             objective='Old objective',
             language_code='en',
@@ -1861,12 +1921,11 @@ tags: []
             print datetime.datetime.utcnow()  # prints current time.
 
         Args:
-            mocked_datetime: datetime.datetime.
-                The datetime which will be used instead of
-                the current UTC datetime.
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
 
         Yields:
-            nothing.
+            None. Empty yield statement.
         """
         if not isinstance(mocked_datetime, datetime.datetime):
             raise utils.ValidationError(
@@ -1959,7 +2018,7 @@ tags: []
                     function_that_invokes_popen()
 
         Args:
-            obj: *. the Python object whose attribute you want to swap.
+            obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             new_value: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you
@@ -1975,7 +2034,7 @@ tags: []
                 will always be checked.
 
         Yields:
-            context: The context with function replaced.
+            context. The context with function replaced.
         """
         original = getattr(obj, attr)
         # The actual error message will also include detail assert error message
@@ -1990,11 +2049,11 @@ tags: []
             invoked.
 
             Args:
-                *args: tuple. The args passed into `attr` function.
+                *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                Result of `new_value`.
+                *. Result of `new_value`.
             """
             wrapper.called = True
             if expected_args is not None:
@@ -2142,7 +2201,7 @@ class AppEngineTestBase(TestBase):
                 that header.
 
         Yields:
-            None.
+            None. Yields nothing.
         """
         if headers is None:
             response_headers = {}
@@ -2179,8 +2238,8 @@ class AppEngineTestBase(TestBase):
         """Execute queued tasks.
 
         Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
-                The queued tasks.
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
+                queued tasks.
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
@@ -2294,8 +2353,8 @@ class LinterTestBase(GenericTestBase):
             linter_stdout list.
 
             Args:
-                *args: str. Variable length argument list of values to print in
-                    the same line of output.
+                *args: list(*). Variable length argument list of values to print
+                    in the same line of output.
             """
             self.linter_stdout.append(
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
@@ -2349,7 +2408,7 @@ class EmailMessageMock(python_utils.OBJECT):
             recipient_email: str. The email address of the recipient.
                 Must be utf-8.
             subject: str. The subject line of the email, Must be utf-8.
-            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails.
@@ -2416,7 +2475,7 @@ class GenericEmailTestBase(GenericTestBase):
             recipient_emails: list(str). The email addresses of the recipients.
                 Must be utf-8.
             subject: str. The subject line of the email, Must be utf-8.
-            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails.
