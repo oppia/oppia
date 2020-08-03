@@ -56,7 +56,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         registry.Registry.parameter_registry = self.original_param_registry
 
-    def create_example_parameter_with_name(self, name):
+    def _create_example_parameter_with_name(self, name):
         """Creates and returns an example parameter with the given name."""
         registry.Registry.init_platform_parameter_from_dict({
             'name': name,
@@ -96,10 +96,10 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_create_platform_parameter_with_the_same_name_failure(self):
         param_name = 'parameter_a'
-        self.create_example_parameter_with_name(param_name)
+        self._create_example_parameter_with_name(param_name)
         with self.assertRaisesRegexp(
             Exception, 'Parameter with name %s already exists' % param_name):
-            self.create_example_parameter_with_name(param_name)
+            self._create_example_parameter_with_name(param_name)
 
     def test_create_feature_flag(self):
         feature = registry.Registry.create_feature_flag(
@@ -129,7 +129,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_get_platform_parameter(self):
         parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
+        self._create_example_parameter_with_name(parameter_name)
         parameter = registry.Registry.get_platform_parameter(parameter_name)
         self.assertIsNotNone(parameter)
         self.assertIsInstance(parameter, parameter_domain.PlatformParameter)
@@ -141,14 +141,14 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_get_all_parameter_names(self):
         parameter_names = ['parameter_a', 'parameter_b']
         for parameter_name in parameter_names:
-            self.create_example_parameter_with_name(parameter_name)
+            self._create_example_parameter_with_name(parameter_name)
         self.assertEqual(
             sorted(registry.Registry.get_all_platform_parameter_names()),
             sorted(parameter_names))
 
     def test_memcache_is_set_after_getting(self):
         parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
+        self._create_example_parameter_with_name(parameter_name)
 
         self.assertIsNone(
             registry.Registry.load_platform_parameter_from_memcache(
@@ -160,7 +160,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_update_parameter(self):
         parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
+        self._create_example_parameter_with_name(parameter_name)
 
         registry.Registry.update_platform_parameter(
             parameter_name,
@@ -188,7 +188,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_cached_value_is_invalidated_after_update(self):
         parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
+        self._create_example_parameter_with_name(parameter_name)
 
         registry.Registry.update_platform_parameter(
             parameter_name,
@@ -212,7 +212,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_update_parameter_with_invalid_rules_failure(self):
         parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
+        self._create_example_parameter_with_name(parameter_name)
 
         param = registry.Registry.get_platform_parameter(parameter_name)
         param.validate()
@@ -238,7 +238,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
     def test_updated_parameter_is_saved_in_storage(self):
         parameter_name = 'parameter_a'
-        self.create_example_parameter_with_name(parameter_name)
+        self._create_example_parameter_with_name(parameter_name)
         self.assertIsNone(
             registry.Registry.load_platform_parameter_from_storage(
                 parameter_name))
