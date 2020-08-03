@@ -470,6 +470,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state2.update_interaction_id('MultipleChoiceInput')
         state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(4)
         state2.update_interaction_answer_groups(answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1246,6 +1247,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state2.update_interaction_id('ItemSelectionInput')
         state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(2)
         state2.update_interaction_answer_groups(answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -2781,6 +2783,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1}
         })
+        exploration2_state.update_next_content_id_index(4)
         exploration2_state.update_interaction_answer_groups(
             [item_selection_answer_group])
         exploration3_state.update_content(
@@ -2790,6 +2793,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'choices': choices_customization_arg,
             'allowMultipleItemsInSamePosition': {'value': True}
         })
+        exploration3_state.update_next_content_id_index(4)
         exploration3_state.update_interaction_answer_groups(
             [drag_and_drop_answer_group_dict])
 
