@@ -122,7 +122,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             commit_message = self.payload.get('commit_message')
-            if (not commit_message is None and
+            if (commit_message is non None and
             len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
                 raise self.InvalidInputException(
                     'Commit messages must be at most %s characters long.'

@@ -222,7 +222,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
         if not commit_message:
             raise self.PageNotFoundException
 
-        if (not commit_message is None and
+        if (commit_message is non None and
             len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
