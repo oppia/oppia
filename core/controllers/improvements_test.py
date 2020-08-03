@@ -576,7 +576,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_get_returns_exploration_id(self):
         self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=False)
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
 
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
@@ -599,7 +599,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_improvements_tab_disabled(self):
         self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=False)
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, False)
 
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
@@ -608,7 +608,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_improvements_tab_enabled(self):
         self.set_config_property(
-            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, new_config_value=True)
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED, True)
 
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
@@ -616,10 +616,9 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(json_response['is_improvements_tab_enabled'])
 
     def test_custom_high_bounce_rate_creation_threshold(self):
-        self.set_config_property(
-            (config_domain
-             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD),
-            new_config_value=0.35)
+        self.set_config_property((
+            config_domain
+            .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD), 0.35)
 
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
@@ -631,9 +630,10 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
 
     def test_custom_high_bounce_rate_obsoletion_threshold(self):
         self.set_config_property(
-            (config_domain
-             .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
-            new_config_value=0.05)
+            (
+                config_domain
+                .HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD),
+            0.05)
 
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())
@@ -646,7 +646,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
     def test_custom_high_bounce_rate_task_minimum_exploration_starts(self):
         self.set_config_property(
             config_domain.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS,
-            new_config_value=20)
+            20)
 
         with self.login_context(self.OWNER_EMAIL):
             json_response = self.get_json(self.get_url())

@@ -152,7 +152,7 @@ def check_image_png_or_webp(image_string):
     """Checks if the image is in png or webp format only.
 
     Args:
-        image_string: str. image url in base64 format.
+        image_string: str. Image url in base64 format.
 
     Returns:
         boolean. Returns true if image is in WebP format.
@@ -477,7 +477,8 @@ class TestBase(unittest.TestCase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -561,7 +562,8 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_UNTITLED_YAML_CONTENT = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: %s
@@ -666,7 +668,6 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
-    # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
@@ -713,8 +714,8 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(response.status_int, expected_status_int)
         if not expect_errors:
-            self.assertTrue(response.status_int >= 200 and
-                            response.status_int < 400)
+            self.assertTrue(
+                response.status_int >= 200 and response.status_int < 400)
         else:
             self.assertTrue(response.status_int >= 400)
         self.assertEqual(
@@ -833,8 +834,9 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_json(self, url, payload, csrf_token=None,
-                  expected_status_int=200, upload_files=None):
+    def post_json(
+            self, url, payload, csrf_token=None,
+            expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -845,7 +847,7 @@ tags: []
             expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=expect_errors,
+            expect_errors,
             expected_status_int=expected_status_int,
             upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
@@ -906,7 +908,7 @@ tags: []
             headers: dict(str, *). Extra headers to send.
 
         Returns:
-            webtest.TestResponse: The response of the POST request.
+            webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
         if upload_files is not None:
@@ -951,8 +953,8 @@ tags: []
         incoming_email_url = '/_ah/mail/%s' % recipient_email
 
         return self._send_post_request(
-            app, incoming_email_url, data, headers=headers,
-            expect_errors=expect_errors,
+            app, incoming_email_url, data,
+            expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
@@ -1277,6 +1279,66 @@ tags: []
         )
         exp_summary_model.put()
 
+    def save_new_exp_with_states_schema_v34(self, exp_id, user_id, states_dict):
+        """Saves a new default exploration with a default version 34 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=34,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
         """Saves a new default exploration with a default version 21 states
         dictionary. Version 21 is where training data of exploration is stored
@@ -1452,7 +1514,7 @@ tags: []
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes
@@ -1859,12 +1921,11 @@ tags: []
             print datetime.datetime.utcnow()  # prints current time.
 
         Args:
-            mocked_datetime: datetime.datetime.
-                The datetime which will be used instead of
-                the current UTC datetime.
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
 
         Yields:
-            nothing.
+            None. Empty yield statement.
         """
         if not isinstance(mocked_datetime, datetime.datetime):
             raise utils.ValidationError(
@@ -1957,7 +2018,7 @@ tags: []
                     function_that_invokes_popen()
 
         Args:
-            obj: *. the Python object whose attribute you want to swap.
+            obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             new_value: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you
@@ -1973,7 +2034,7 @@ tags: []
                 will always be checked.
 
         Yields:
-            context: The context with function replaced.
+            context. The context with function replaced.
         """
         original = getattr(obj, attr)
         # The actual error message will also include detail assert error message
@@ -1988,11 +2049,11 @@ tags: []
             invoked.
 
             Args:
-                *args: tuple. The args passed into `attr` function.
+                *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                Result of `new_value`.
+                *. Result of `new_value`.
             """
             wrapper.called = True
             if expected_args is not None:
@@ -2046,6 +2107,23 @@ tags: []
         finally:
             self.logout()
             os.environ.update(initial_user_env)
+
+    def assertRaises(self, exc, fun, *args, **kwds):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
+            self, expected_exception, expected_regexp, callable_obj=None,
+            *args, **kwargs):
+        if expected_regexp == '':
+            raise Exception(
+                'Please provide a sufficiently strong regexp string to '
+                'validate that the correct error is being raised.')
+
+        return super(TestBase, self).assertRaisesRegexp(
+            expected_exception, expected_regexp,
+            callable_obj=callable_obj, *args, **kwargs)
 
 
 class AppEngineTestBase(TestBase):
@@ -2123,7 +2201,7 @@ class AppEngineTestBase(TestBase):
                 that header.
 
         Yields:
-            None.
+            None. Yields nothing.
         """
         if headers is None:
             response_headers = {}
@@ -2160,8 +2238,8 @@ class AppEngineTestBase(TestBase):
         """Execute queued tasks.
 
         Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
-                The queued tasks.
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
+                queued tasks.
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
@@ -2259,6 +2337,30 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.dest = None
         return state
 
+
+GenericTestBase = AppEngineTestBase
+
+
+class LinterTestBase(GenericTestBase):
+    """Base class for linter tests."""
+
+    def setUp(self):
+        super(LinterTestBase, self).setUp()
+        self.linter_stdout = []
+
+        def mock_print(*args):
+            """Mock for python_utils.PRINT. Append the values to print to
+            linter_stdout list.
+
+            Args:
+                *args: list(*). Variable length argument list of values to print
+                    in the same line of output.
+            """
+            self.linter_stdout.append(
+                ' '.join(python_utils.UNICODE(arg) for arg in args))
+
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+
     def assert_same_list_elements(self, phrases, stdout):
         """Checks to see if all of the phrases appear in at least one of the
         stdout outputs.
@@ -2274,11 +2376,21 @@ class AppEngineTestBase(TestBase):
                 method's execution.
         """
         self.assertTrue(
-            any(all(phrase in output for phrase in phrases) for
+            any(
+                all(phrase in output for phrase in phrases) for
                 output in stdout))
 
+    def assert_failed_messages_count(self, stdout, expected_failed_count):
+        """Assert number of expected failed checks to actual number of failed
+        checks.
 
-GenericTestBase = AppEngineTestBase
+        Args:
+            stdout: list(str). A list of linter output messages.
+
+            expected_failed_count: int. Expected number of failed messages.
+        """
+        failed_count = sum(msg.startswith('FAILED') for msg in stdout)
+        self.assertEqual(failed_count, expected_failed_count)
 
 
 class EmailMessageMock(python_utils.OBJECT):
@@ -2296,7 +2408,7 @@ class EmailMessageMock(python_utils.OBJECT):
             recipient_email: str. The email address of the recipient.
                 Must be utf-8.
             subject: str. The subject line of the email, Must be utf-8.
-            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails.
@@ -2363,7 +2475,7 @@ class GenericEmailTestBase(GenericTestBase):
             recipient_emails: list(str). The email addresses of the recipients.
                 Must be utf-8.
             subject: str. The subject line of the email, Must be utf-8.
-            plaintext_body: str. The plaintext body of the email. Must be utf-8
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails.

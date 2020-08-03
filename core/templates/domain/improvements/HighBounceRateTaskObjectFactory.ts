@@ -23,13 +23,13 @@ import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
-import { ITaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/TaskEntryObjectFactory';
 import { ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
+import { TaskEntryBackendDict, TaskEntry } from
+  'domain/improvements/TaskEntryObjectFactory';
 
 export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
-  constructor(backendDict: ITaskEntryBackendDict<'high_bounce_rate'>) {
+  constructor(backendDict: TaskEntryBackendDict<'high_bounce_rate'>) {
     if (backendDict.entity_type !==
             ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
       throw new Error(
@@ -115,7 +115,7 @@ export class HighBounceRateTaskObjectFactory {
    * not represent a high bounce rate task.
    */
   createFromBackendDict(
-      backendDict: ITaskEntryBackendDict<'high_bounce_rate'>
+      backendDict: TaskEntryBackendDict<'high_bounce_rate'>
   ): HighBounceRateTask {
     return new HighBounceRateTask(backendDict);
   }

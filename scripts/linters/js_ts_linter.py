@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import json
 import os
 import re
 import shutil
@@ -30,6 +31,7 @@ import time
 import python_utils
 
 from . import linter_utils
+from .. import build
 from .. import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -40,14 +42,15 @@ ESPRIMA_PATH = os.path.join(
 
 sys.path.insert(1, ESPRIMA_PATH)
 
-# pylint: disable=wrong-import-order
-# pylint: disable=wrong-import-position
-import esprima  # isort:skip
-from .. import build  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import esprima  # isort:skip pylint: disable=wrong-import-order, wrong-import-position
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
+
+TS_IGNORE_EXCEPTIONS_FILEPATH = os.path.join(
+    CURR_DIR, 'scripts', 'linters', 'ts_ignore_exceptions.json')
+
+TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
+    TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
 
 def _get_expression_from_node_if_one_exists(
@@ -161,8 +164,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         returns the parsed contents as a Python dictionary.
 
         Returns:
-            dict. contains the contents of js and ts files after
-            validating and parsing the files.
+            dict. A dict which has key as filepath and value as contents of js
+            and ts files after validating and parsing the files.
         """
 
         # Select JS files which need to be checked.
@@ -197,8 +200,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         js and ts files.
 
         Returns:
-            dict. contains the expressions in the script parsed using js
-            and ts files.
+            dict. A dict which has key as filepath and value as the expressions
+            in the script parsed using js and ts files.
         """
 
         parsed_expressions_in_files = collections.defaultdict(dict)
@@ -221,10 +224,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """Returns the path for compiled ts file.
 
         Args:
-            filepath: str. filepath of ts file
+            filepath: str. Filepath of ts file.
 
         Returns:
-            str. filepath of compiled ts file.
+            str. Filepath of compiled ts file.
         """
         compiled_js_filepath = os.path.join(
             os.getcwd(),
@@ -284,6 +287,166 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
+
+    def _check_ts_ignore(self):
+        """Checks if ts ignore is used."""
+        summary_messages = []
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting ts ignore check')
+            python_utils.PRINT('----------------------------------------')
+
+        ts_ignore_pattern = r'@ts-ignore'
+        comment_pattern = r'^ *// '
+        comment_with_ts_error_pattern = r'^ *// This throws'
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            failed = False
+
+            for file_path in self.all_filepaths:
+                file_content = self.file_cache.read(file_path)
+                previous_line_has_ts_ignore = False
+                previous_line_has_comment = False
+                previous_line_has_comment_with_ts_error = False
+
+                for line_number, line in enumerate(file_content.split('\n')):
+                    if previous_line_has_ts_ignore:
+                        if file_path in TS_IGNORE_EXCEPTIONS:
+                            line_contents = TS_IGNORE_EXCEPTIONS[file_path]
+                            this_line_is_exception = False
+
+                            for line_content in line_contents:
+                                if line.find(line_content) != -1:
+                                    this_line_is_exception = True
+                                    break
+
+                            if this_line_is_exception:
+                                previous_line_has_ts_ignore = False
+                                continue
+
+                        failed = True
+                        previous_line_has_ts_ignore = False
+                        summary_message = (
+                            '%s --> @ts-ignore found at line %s. '
+                            'Please add this exception in %s.' % (
+                                file_path, line_number,
+                                TS_IGNORE_EXCEPTIONS_FILEPATH))
+                        python_utils.PRINT(summary_message)
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT('')
+
+                    previous_line_has_ts_ignore = bool(
+                        re.findall(ts_ignore_pattern, line))
+
+                    if (
+                            previous_line_has_ts_ignore and
+                            not previous_line_has_comment_with_ts_error):
+                        failed = True
+                        summary_message = (
+                            '%s --> Please add a comment above the @ts-ignore '
+                            'explaining the @ts-ignore at line %s. The format '
+                            'of comment should be -> This throws "...". This '
+                            'needs to be suppressed because ...' % (
+                                file_path, line_number + 1))
+                        python_utils.PRINT(summary_message)
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT('')
+
+                    previous_line_has_comment = bool(
+                        re.findall(comment_pattern, line))
+
+                    previous_line_has_comment_with_ts_error = (
+                        bool(
+                            re.findall(
+                                comment_with_ts_error_pattern, line))
+                        or (
+                            previous_line_has_comment_with_ts_error and
+                            previous_line_has_comment))
+
+            if failed:
+                summary_message = (
+                    '%s TS ignore check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s TS ignore check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
+
+    def _check_ts_expect_error(self):
+        """Checks if ts expect error is used in non spec file."""
+        summary_messages = []
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting ts expect error check')
+            python_utils.PRINT('----------------------------------------')
+
+        ts_expect_error_pattern = r'@ts-expect-error'
+        comment_pattern = r'^ *// '
+        comment_with_ts_error_pattern = r'^ *// This throws'
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            failed = False
+            previous_line_has_comment = False
+            previous_line_has_comment_with_ts_error = False
+
+            for file_path in self.all_filepaths:
+                file_content = self.file_cache.read(file_path)
+                for line_number, line in enumerate(file_content.split('\n')):
+                    if re.findall(ts_expect_error_pattern, line):
+                        if not (
+                                file_path.endswith('.spec.ts') or
+                                file_path.endswith('Spec.ts')):
+                            failed = True
+                            summary_message = (
+                                '%s --> @ts-expect-error found at line %s. '
+                                'It can be used only in spec files.' % (
+                                    file_path, line_number + 1))
+                            python_utils.PRINT(summary_message)
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT('')
+
+                        if not previous_line_has_comment_with_ts_error:
+                            failed = True
+                            summary_message = (
+                                '%s --> Please add a comment above the '
+                                '@ts-expect-error explaining the '
+                                '@ts-expect-error at line %s. The format '
+                                'of comment should be -> This throws "...". '
+                                'This needs to be suppressed because ...' % (
+                                    file_path, line_number + 1))
+                            python_utils.PRINT(summary_message)
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT('')
+
+                    previous_line_has_comment = bool(
+                        re.findall(comment_pattern, line))
+
+                    previous_line_has_comment_with_ts_error = (
+                        bool(
+                            re.findall(
+                                comment_with_ts_error_pattern, line))
+                        or (
+                            previous_line_has_comment_with_ts_error and
+                            previous_line_has_comment))
+
+            if failed:
+                summary_message = (
+                    '%s TS expect error check failed' % (
+                        linter_utils.FAILED_MESSAGE_PREFIX))
+            else:
+                summary_message = (
+                    '%s TS expect error check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
+
+            python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
             python_utils.PRINT('')
 
         return summary_messages
@@ -897,7 +1060,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         # Example: // eslint-disable max-len
         # This comment will be excluded from this check.
         allowed_start_phrases = [
-            '@ts-ignore', '--params', 'eslint-disable', 'eslint-enable']
+            '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
+            'eslint-enable']
 
         # We allow comments to not have a terminating punctuation if any of the
         # below phrases appears in the last word of a comment.
@@ -998,6 +1162,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
+        ts_ignore_messages = self._check_ts_ignore()
+        ts_expect_error_messages = self._check_ts_expect_error()
         extra_js_files_messages = self._check_extra_js_files()
         http_requests_messages = self._check_http_requests()
         js_and_ts_component_messages = (
@@ -1013,11 +1179,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         all_messages = (
-            extra_js_files_messages +
-            http_requests_messages + js_and_ts_component_messages +
-            directive_scope_messages + sorted_dependencies_messages +
-            controller_dependency_messages + constant_declaration_messages +
-            comments_style_messages)
+            ts_ignore_messages + ts_expect_error_messages +
+            extra_js_files_messages + http_requests_messages +
+            js_and_ts_component_messages + directive_scope_messages +
+            sorted_dependencies_messages + controller_dependency_messages +
+            constant_declaration_messages + comments_style_messages)
         return all_messages
 
 
@@ -1050,7 +1216,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Remove extra bits from eslint messages.
 
         Args:
-            eslint_output: str. output returned by the eslint linter.
+            eslint_output: str. Output returned by the eslint linter.
 
         Returns:
             str. A string with the trimmed messages.

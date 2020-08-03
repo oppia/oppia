@@ -41,8 +41,6 @@ IMPORTANT NOTES:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
@@ -56,15 +54,13 @@ from scripts import common
 from scripts import install_third_party_libs
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
-# pylint: enable=wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github  # isort:skip pylint: disable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -109,9 +105,9 @@ def preprocess_release(app_name, deploy_data_path):
         deploy_data_path: str. Path for deploy data directory.
 
     Raises:
-        Exception: Could not find deploy data directory.
-        Exception: Could not find source path.
-        Exception: Could not find destination path.
+        Exception. Could not find deploy data directory.
+        Exception. Could not find source path.
+        Exception. Could not find destination path.
     """
     if not os.path.exists(deploy_data_path):
         raise Exception(
@@ -151,8 +147,10 @@ def preprocess_release(app_name, deploy_data_path):
         os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
         content = assets_file.read()
 
-    assert '"DEV_MODE": true' in content
-    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
+    assert '"DEV_MODE": true' in content, 'Invalid DEV_MODE'
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content, (
+        'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+            common.CONSTANTS_FILE_PATH))
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
         common.CONSTANTS_FILE_PATH,
@@ -191,7 +189,7 @@ def update_and_check_indexes(app_name):
         app_name: str. The name of the app to deploy.
 
     Raises:
-        Exception: All indexes are not serving on the indexes page.
+        Exception. All indexes are not serving on the indexes page.
     """
     # Update indexes, then prompt for a check that they are all serving
     # before continuing with the deployment.
@@ -217,7 +215,7 @@ def build_scripts(maintenance_mode):
         maintenance_mode: bool. Whether to enable the maintenance mode.
 
     Raises:
-        Exception: The build process fails.
+        Exception. The build process fails.
     """
     # Do a build, while outputting to the terminal.
     python_utils.PRINT('Building and minifying scripts...')
@@ -349,9 +347,9 @@ def check_travis_and_circleci_tests(current_branch_name):
         current_branch_name: str. The name of current branch.
 
     Raises:
-        Exception: The latest commit on release/test branch locally does not
+        Exception. The latest commit on release/test branch locally does not
             match the latest commit on local fork or upstream.
-        Exception: The travis or circleci tests are failing on release/test
+        Exception. The travis or circleci tests are failing on release/test
             branch.
     """
     local_sha = subprocess.check_output([
@@ -438,18 +436,18 @@ def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks.
 
     Raises:
-        Exception: App name is invalid.
-        Exception: Custom version is used with production app.
-        Exception: App name is not specified.
-        Exception: The deployment script is not run from a release or test
+        Exception. App name is invalid.
+        Exception. Custom version is used with production app.
+        Exception. App name is not specified.
+        Exception. The deployment script is not run from a release or test
             branch.
-        Exception: The deployment script is run for prod server from a test
+        Exception. The deployment script is run for prod server from a test
             branch.
-        Exception: Current release version has '.' character.
-        Exception: Last commit message is invalid.
-        Exception: The mailgun API key is not added before deployment.
-        Exception: Could not find third party directory.
-        Exception: Invalid directory accessed during deployment.
+        Exception. Current release version has '.' character.
+        Exception. Last commit message is invalid.
+        Exception. The mailgun API key is not added before deployment.
+        Exception. Could not find third party directory.
+        Exception. Invalid directory accessed during deployment.
     """
     parsed_args = _PARSER.parse_args()
     custom_version = None

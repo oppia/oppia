@@ -24,7 +24,7 @@ import { Injectable } from '@angular/core';
 import {
   ExplorationStats,
   ExplorationStatsObjectFactory,
-  IExplorationStatsBackendDict
+  ExplorationStatsBackendDict
 } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -37,12 +37,12 @@ export class ExplorationStatsBackendApiService {
       private urlInterpolationService: UrlInterpolationService) {}
 
   fetchExplorationStats(expId: string): Promise<ExplorationStats> {
-    return this.http.get<IExplorationStatsBackendDict>(
+    return this.http.get<ExplorationStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/statistics/<exploration_id>', {
           exploration_id: expId
         })).toPromise()
-      .then((dict: IExplorationStatsBackendDict) => {
+      .then((dict: ExplorationStatsBackendDict) => {
         return this.explorationStatsObjectFactory.createFromBackendDict(dict);
       });
   }

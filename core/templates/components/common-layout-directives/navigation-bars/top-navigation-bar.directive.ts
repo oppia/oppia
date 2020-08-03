@@ -27,13 +27,19 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/search.service.ts');
 require('constants.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        headerText: '=',
+        subheaderText: '='
+      },
       bindToController: {
         backButtonShown: '<'
       },
@@ -44,16 +50,17 @@ angular.module('oppia').directive('topNavigationBar', [
       controller: [
         '$http', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
-        'I18nLanguageCodeService', 'NavigationService', 'SidebarStatusService',
-        'SiteAnalyticsService', 'UserService', 'WindowDimensionsService',
-        'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
+        'I18nLanguageCodeService', 'NavigationService', 'SearchService',
+        'SidebarStatusService', 'SiteAnalyticsService', 'UserService',
+        'WindowDimensionsService', 'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
             $http, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
-            I18nLanguageCodeService, NavigationService, SidebarStatusService,
-            SiteAnalyticsService, UserService, WindowDimensionsService,
-            LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
+            I18nLanguageCodeService, NavigationService, SearchService,
+            SidebarStatusService, SiteAnalyticsService, UserService,
+            WindowDimensionsService, LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'collection_editor',
@@ -241,9 +248,13 @@ angular.module('oppia').directive('topNavigationBar', [
               }
             });
 
-            $scope.$on('searchBarLoaded', function() {
-              $timeout(truncateNavbar, 100);
-            });
+            ctrl.directiveSubscriptions.add(
+              SearchService.onSearchBarLoaded.subscribe(
+                () => {
+                  $timeout(truncateNavbar, 100);
+                }
+              )
+            );
 
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
@@ -288,8 +299,8 @@ angular.module('oppia').directive('topNavigationBar', [
               ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
             }
 
-            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-              subscribe(evt => {
+            ctrl.directiveSubscriptions.add(
+              WindowDimensionsService.getResizeEvent().subscribe(evt => {
                 ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
                 // If window is resized larger, try displaying the hidden
                 // elements.
@@ -314,7 +325,8 @@ angular.module('oppia').directive('topNavigationBar', [
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the directive is migrated to angular.
                 $scope.$applyAsync();
-              });
+              })
+            );
             // The function needs to be run after i18n. A timeout of 0 appears
             // to run after i18n in Chrome, but not other browsers. The function
             // will check if i18n is complete and set a new timeout if it is
@@ -324,9 +336,7 @@ angular.module('oppia').directive('topNavigationBar', [
           };
 
           ctrl.$onDestroy = function() {
-            if (ctrl.resizeSubscription) {
-              ctrl.resizeSubscription.unsubscribe();
-            }
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

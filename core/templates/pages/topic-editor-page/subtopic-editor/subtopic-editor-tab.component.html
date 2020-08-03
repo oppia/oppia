@@ -1,13 +1,27 @@
 <div class="subtopic-content">
+  <p class="oppia-mobile-back-to-parent" ng-click="$ctrl.navigateToTopicEditor()">
+    <i class="fa fa-angle-left"></i>
+    <span>Back to Topic</span>
+  </p>
   <div class="subtopic-header-text">
-    <span class="topic-name"><[$ctrl.topic.getName()]> / </span>
+    <span class="topic-name" ng-click="$ctrl.navigateToTopicEditor()"><[$ctrl.topic.getName()]> / </span>
     <span class="subtopic-name"><[$ctrl.editableTitle]></span>
   </div>
   <div class="subtopic-content-box">
     <div class="subtopic-left-box">
-      <md-card class="subtopic-item-container">
-        <h3 class="subtopic-card-heading">Review Material</h3>
-        <div class="oppia-subtopics-list-card">
+      <md-card class="subtopic-item-container oppia-mobile-collapsible-card">
+        <div class="skill-card-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleSubtopicEditorCard()">
+          <h3 class="subtopic-card-heading">Review Material</h3>
+          <i class="fa fa-caret-down"
+             ng-if="!$ctrl.subtopicEditorCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             ng-if="$ctrl.subtopicEditorCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div class="oppia-subtopics-list-card oppia-mobile-collapsible-card-content" ng-if="$ctrl.subtopicEditorCardIsShown">
           <div class="subtopic-title">
             <p>
               <strong>Title*</strong>
@@ -41,7 +55,7 @@
             </div>
             <span class="oppia-input-box-subtitle">
               <i>
-                Gives learner a brief overview of how to perform a skill.
+                Gives learner an overview of how to perform a skill. Go to the preview tab to preview.
               </i>
             </span>
             <div class="text-right" ng-if="$ctrl.schemaEditorIsShown">
@@ -49,10 +63,10 @@
                                    class="protractor-test-edit-subtopic-page-contents"
                                    local-value="$ctrl.htmlData">
               </schema-based-editor>
-              <button class="btn btn-success btn-sm protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()"> Save
-              </button>
+              <button class="btn btn-default" ng-click="$ctrl.cancelHtmlDataChange()">Cancel</button>
+              <button class="btn btn-success protractor-test-save-subtopic-content-button" ng-click="$ctrl.updateHtmlData()">Save</button>
             </div>
-            <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
+            <div ng-if="!$ctrl.schemaEditorIsShown" ng-click="$ctrl.showSchemaEditor()" class="subtopic-html-content protractor-test-edit-html-content">
               <angular-html-bind html-data="$ctrl.htmlData" class="protractor-test-subtopic-html-content">
               </angular-html-bind>
             </div>
@@ -61,9 +75,9 @@
             <p>
               <strong>Thumbnail Image*</strong>
             </p>
-            <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
+            <thumbnail-uploader filename="$ctrl.subtopic.getThumbnailFilename()"
                                 update-filename="$ctrl.updateSubtopicThumbnailFilename"
-                                bg-color="$ctrl.editableThumbnailBgColor"
+                                bg-color="$ctrl.subtopic.getThumbnailBgColor()"
                                 update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
                                 allowed-bg-colors="$ctrl.allowedBgColors"
                                 aspect-ratio="'4:3'"
@@ -72,41 +86,42 @@
             </thumbnail-uploader>
           </div>
         </div>
-        <div ng-if="!$ctrl.subtopicPreviewCardIsShown" >
-          <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.toggleSubtopicPreview()">
-            Preview Topic Card
-            <i class="fa fa-angle-down"></i>
-          </button>
-        </div>
-        <div ng-if="$ctrl.subtopicPreviewCardIsShown">
-          <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.toggleSubtopicPreview()">
-            Collapse Topic Card
-            <i class="fa fa-angle-up"></i>
-          </button>
-        </div>
-        <div ng-if="$ctrl.subtopicPreviewCardIsShown">
-          <preview-thumbnail name="$ctrl.editableTitle"
-                             filename = "$ctrl.editableThumbnailFilename"
-                             thumbnail-bg-color="$ctrl.editableThumbnailBgColor"
-                             bg-color="'#2F6687'">
-          </preview-thumbnail>
+        <div ng-if="$ctrl.editableThumbnailFilename && $ctrl.subtopicEditorCardIsShown">
+          <div ng-if="!$ctrl.subtopicPreviewCardIsShown">
+            <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.toggleSubtopicPreview()">
+              Expand Preview
+              <i class="fa fa-angle-down"></i>
+            </button>
+          </div>
+          <div ng-if="$ctrl.subtopicPreviewCardIsShown">
+            <button class="btn btn-default show-subtopic-preview-button" ng-click="$ctrl.toggleSubtopicPreview()">
+              Collapse Preview
+              <i class="fa fa-angle-up"></i>
+            </button>
+          </div>
+          <div ng-if="$ctrl.subtopicPreviewCardIsShown">
+            <preview-thumbnail name="$ctrl.editableTitle"
+                               aspect-ratio="'4:3'"
+                               filename = "$ctrl.editableThumbnailFilename"
+                               thumbnail-bg-color="$ctrl.editableThumbnailBgColor"
+                               bg-color="'#2F6687'">
+            </preview-thumbnail>
+          </div>
         </div>
       </md-card>
-      <md-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container">
-        <div class="skill-card-header">
+      <md-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card">
+        <div class="skill-card-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.togglePreviewSkillCard()">
           <h3>Skills</h3>
-          <i ng-click="$ctrl.togglePreviewSkillCard()"
-             class="fa fa-angle-down"
+          <i class="fa fa-caret-down"
              ng-if="!$ctrl.skillsListIsShown"
              aria-hidden="true">
           </i>
-          <i ng-click="$ctrl.togglePreviewSkillCard()"
-             class="fa fa-angle-up"
+          <i class="fa fa-caret-up"
              ng-if="$ctrl.skillsListIsShown"
              aria-hidden="true">
           </i>
         </div>
-        <div ng-if="$ctrl.skillsListIsShown">
+        <div ng-if="$ctrl.skillsListIsShown" class="oppia-mobile-collapsible-card-content">
           <div>
             <button class="btn add-skill-btn" ng-click="$ctrl.createSkill()">
               + ADD SKILL
@@ -190,9 +205,6 @@
     color: #ff0000;
     font-size: smaller;
   }
-  .subtopic-content .skill-card-header h3 {
-    margin: 0;
-  }
   .subtopic-content .list-header {
     border-bottom: 2px solid #000;
     display: flex;
@@ -252,7 +264,8 @@
   }
   .subtopic-content .add-skill-btn {
     background-color: #008098;
-    color: #FFFFFF;
+    color: #FFF;
+    font-weight: bold;
     margin: 15px 0;
   }
   .subtopic-content .subtopic-right-box {
@@ -272,6 +285,7 @@
   }
   .subtopic-content .topic-name {
     color: #707070;
+    cursor: pointer;
   }
   .subtopic-content .entity-count {
     align-items: center;
@@ -282,12 +296,13 @@
     flex-wrap: wrap;
     height: 110px;
     justify-content: center;
+    position: fixed;
+    width: 26%;
   }
   .subtopic-content .skill-count,
   .subtopic-content .question-count,
   .subtopic-content .create-skill-container {
     border-right: 2px solid #aaaac1;
-    cursor: pointer;
     display: inline-block;
     text-align: center;
     width: 33%;
@@ -297,6 +312,7 @@
   }
   .subtopic-content .create-skill-container {
     border-right: none;
+    cursor: pointer;
   }
   .subtopic-content .skill-count-value,
   .subtopic-content .question-count-value,
@@ -314,16 +330,26 @@
   .subtopic-content .create-skill-text {
     color: #419889;
   }
-  .subtopic-content .subtopic-card-heading {
-    margin-bottom: 0;
-    margin-left: 30px;
-    margin-top: 35px;
-  }
   .subtopic-content .subtopic-title p {
     margin-bottom: 10px;
   }
   .subtopic-content .subtopic-item-container {
       border-radius: 4px;
+      padding-top: 45px;
+  }
+  .subtopic-content .subtopic-html-content {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 6px 12px;
+  }
+  .subtopic-content .subtopic-skill-card {
+    margin-top: 64px;
+  }
+  .subtopic-content .subtopic-card-heading {
+    margin-bottom: 0;
+    margin-left: 20px;
+    margin-top: 0;
+    padding-bottom: 4px;
   }
   @media screen and (max-width: 1100px) {
     .subtopic-content .subtopic-left-box {
@@ -334,24 +360,30 @@
     }
   }
   @media screen and (max-width: 768px) {
-    .subtopic-content .entity-count {
+    .subtopic-content .entity-count,
+    .subtopic-content .subtopic-header-text {
       display: none;
+    }
+    .subtopic-content {
+      margin-top: 25px;
     }
     .subtopic-content .subtopic-left-box,
     .subtopic-content .subtopic-right-box {
       width: 100%;
     }
-    .subtopic-content .subtopic-card-heading {
-      border-bottom: 2px solid;
-      margin-bottom: 15px;
-      padding-bottom: 4px;
-    }
     .subtopic-content .subtopic-item-container {
-      margin-top: 10px;
-      padding: 10px 15px;
+      padding: 0;
+    }
+    .subtopic-content .oppia-subtopics-list-card {
+      padding: 20px 10px 15px;
+    }
+    .subtopic-content .subtopic-card-heading {
+      margin: 0;
+      padding: 0;
     }
     .subtopic-content .subtopic-skill-card {
       display: block;
+      padding: 0;
     }
     .subtopic-content .skill-card-header i {
       color: #000;
@@ -362,8 +394,8 @@
       display: flex;
       justify-content: space-between;
     }
-    .subtopic-content .oppia-subtopics-list-card {
-      padding: 10px 15px;
+    .subtopic-content .skill-card-header h3 {
+      margin: 0;
     }
     .subtopic-content .skill-option-box {
       right: 30px;

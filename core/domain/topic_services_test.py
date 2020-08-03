@@ -82,7 +82,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -268,16 +268,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_index_values(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index, to_index')):
+            Exception, (
+                'The following required attributes are missing: '
+                'from_index, to_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
             })
 
     def test_cannot_rearrange_story_with_missing_from_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'from_index')):
+            Exception, (
+                'The following required attributes are missing: '
+                'from_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'to_index': 1
@@ -285,8 +287,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_to_index_value(self):
         with self.assertRaisesRegexp(
-            Exception, ('The following required attributes are missing: '
-                        'to_index')):
+            Exception, (
+                'The following required attributes are missing: to_index')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'from_index': 1

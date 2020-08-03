@@ -1,7 +1,7 @@
 <div>
   <div class="modal-header">
     <h3>
-      Drag and drop skills to assign them to subtopic
+      Subtopics & Skills
     </h3>
   </div>
   <div class="modal-body subtopics">
@@ -14,7 +14,8 @@
                  dnd-drop="$ctrl.onMoveSkillEnd(null)">
           <strong>Uncategorized Skills</strong>
           <div class="number-skills-container">
-            <span class="number-skills-text">(<[$ctrl.uncategorizedSkillSummaries.length]> Skills)</span>
+            <span ng-if="$ctrl.uncategorizedSkillSummaries.length === 1" class="number-skills-text"><[$ctrl.uncategorizedSkillSummaries.length]> Skill</span>
+            <span ng-if="!($ctrl.uncategorizedSkillSummaries.length === 1)" class="number-skills-text"><[$ctrl.uncategorizedSkillSummaries.length]> Skills</span>
           </div>
           <div class="uncategorized-skills-container">
             <md-card class="skill-id"
@@ -45,7 +46,8 @@
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length < 25"><[subtopic.getTitle()]></strong>
             <strong uib-tooltip="<[subtopic.getTitle()]>" tooltip-placement="bottom" ng-if="subtopic.getTitle().length >= 25"><[subtopic.getTitle().substring(0,15)]>...</strong>
             <div class="number-skills-container">
-              <span class="number-skills-text">(<[subtopic.getSkillSummaries().length]> Skills)</span>
+              <span ng-if="subtopic.getSkillSummaries().length === 1" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skill</span>
+              <span ng-if="!(subtopic.getSkillSummaries().length === 1)" class="number-skills-text"><[subtopic.getSkillSummaries().length]> Skills</span>
             </div>
           </div>
           <div ng-if="subtopic.getId() === $ctrl.selectedSubtopicId">
@@ -97,7 +99,8 @@
   }
   .rearrange-skills-modal .item-container {
     background-color: #eee;
-    max-height: 200px;
+    border-radius: 4px;
+    max-height: 95%;
     padding: 5px 10px;
     width: 15vw;
   }
@@ -131,6 +134,7 @@
   .rearrange-skills-modal .skill-id {
     background-color: #FFF;
     border: 1px solid #ccc;
+    border-radius: 4px;
     box-shadow: none;
     cursor: move;
     margin: 8px 0;
@@ -138,6 +142,9 @@
   }
   .rearrange-skills-modal .skill-id:hover {
     background-color: #e0e0e0;
+  }
+  .rearrange-skills-modal .skill-card {
+    margin-left: 12px;
   }
   .rearrange-skills-modal .dndPlaceholder {
     display: none;
@@ -165,8 +172,5 @@
   .rearrange-skills-modal .empty-placeholder {
     height: 100%;
     width: 60px;
-  }
-  .rearrange-skills-modal .skill-name {
-    margin-left: 12px;
   }
 </style>
