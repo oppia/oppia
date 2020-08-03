@@ -13,27 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the subtopics list.
+ * @fileoverview Component for the subtopics list.
  */
 
 require('components/summary-tile/subtopic-summary-tile.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('subtopicsList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getSubtopics: '&subtopicsList',
-        getTopicId: '&topicId',
-        getTopicName: '&topicName'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/subtopics-list/' +
-        'subtopics-list.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').component('subtopicsList', {
+  bindings: {
+    getSubtopics: '&subtopicsList',
+    getTopicId: '&topicId',
+    getTopicName: '&topicName'
+  },
+  template: require('./subtopics-list.component.html'),
+});

@@ -25,7 +25,7 @@ require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
   'topic-viewer-stories-list.component.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
 require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');

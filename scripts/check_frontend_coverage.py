@@ -372,7 +372,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtopic-viewer-navbar-breadcrumb.component.ts',
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
-    'subtopics-list.directive.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
     'suggestion-modal-for-exploration-player.service.ts',
     'summary-list-header.directive.ts',
