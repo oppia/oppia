@@ -534,7 +534,7 @@ def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
         filepath: str. Path of the file.
 
     Returns:
-        bool: Whether to exclude the given file from this
+        bool. Whether to exclude the given file from this
         particular pattern check.
     """
     return (any(
@@ -597,7 +597,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
         content: str. Contents of the file.
 
     Returns:
-        failed: bool. True if there is bad pattern else false.
+        bool. True if there is bad pattern else false.
         total_error_count: int. The number of errors.
     """
     summary_messages = []

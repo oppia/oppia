@@ -152,8 +152,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         returns the parsed contents as a Python dictionary.
 
         Returns:
-            dict. contains the contents of js and ts files after
-            validating and parsing the files.
+            dict. A dict which has key as filepath and value as contents of js
+            and ts files after validating and parsing the files.
         """
 
         # Select JS files which need to be checked.
@@ -184,8 +184,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         js and ts files.
 
         Returns:
-            dict. contains the expressions in the script parsed using js
-            and ts files.
+            dict. A dict which has key as filepath and value as the expressions
+            in the script parsed using js and ts files.
         """
 
         parsed_expressions_in_files = collections.defaultdict(dict)
@@ -208,10 +208,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """Returns the path for compiled ts file.
 
         Args:
-            filepath: str. filepath of ts file
+            filepath: str. Filepath of ts file.
 
         Returns:
-            str. filepath of compiled ts file.
+            str. Filepath of compiled ts file.
         """
         compiled_js_filepath = os.path.join(
             os.getcwd(),
@@ -1035,7 +1035,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         """Remove extra bits from eslint messages.
 
         Args:
-            eslint_output: str. output returned by the eslint linter.
+            eslint_output: str. Output returned by the eslint linter.
 
         Returns:
             str. A string with the trimmed messages.
