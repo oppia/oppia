@@ -18,7 +18,7 @@
 
 require(
   'pages/community-dashboard-page/opportunities-list-item/' +
-  'opportunities-list-item.directive.ts');
+  'opportunities-list-item.component.ts');
 
 angular.module('oppia').component('opportunitiesList', {
   bindings: {
