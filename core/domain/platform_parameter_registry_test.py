@@ -76,10 +76,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': '111',
-            'metadata': {
-                'is_feature': False,
-                'feature_stage': None,
-            },
+            'is_feature': False,
+            'feature_stage': None,
         })
 
     def test_create_platform_parameter(self):
@@ -105,8 +103,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
         feature = registry.Registry.create_feature_flag(
             'parameter_a', 'test feature', FEATURE_STAGES.dev)
         self.assertEqual(feature.data_type, registry.DATA_TYPES.bool)
-        self.assertTrue(feature.metadata.is_feature)
-        self.assertEqual(feature.metadata.feature_stage, FEATURE_STAGES.dev)
+        self.assertTrue(feature.is_feature)
+        self.assertEqual(feature.feature_stage, FEATURE_STAGES.dev)
         feature.validate()
 
     def test_default_value_of_bool_platform_parameter(self):
@@ -296,10 +294,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': '333',
-            'metadata': {
-                'is_feature': True,
-                'feature_stage': FEATURE_STAGES.dev,
-            }
+            'is_feature': True,
+            'feature_stage': FEATURE_STAGES.dev,
         })
         registry.Registry.init_platform_parameter_from_dict({
             'name': 'parameter_b',
@@ -309,10 +305,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': False,
-            'metadata': {
-                'is_feature': False,
-                'feature_stage': None,
-            },
+            'is_feature': False,
+            'feature_stage': None,
         })
 
         self.assertDictEqual(

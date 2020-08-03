@@ -37,11 +37,33 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
             param.validate()
 
     def test_number_of_parameters_meets_expectation(self):
+        """Test that the Registry and EXPECTED_PARAM_NAMES have the same number
+        of platform parameters.
+
+        If this test fails, it means either:
+            - There are parameters defined in core/domain/platform_parameters.py
+                but not added to EXPECTED_PARAM_NAMES above.
+            - There are parameters accidentally deleted from
+                core/domain/platform_parameters.py.
+        If you are defining new platform parameters, make sure to add it to the
+        EXPECTED_PARAM_NAMES list as well.
+        """
         self.assertEqual(
             len(params.Registry.get_all_platform_parameter_names()),
             len(self.EXPECTED_PARAM_NAMES))
 
     def test_all_expected_parameters_are_present_in_registry(self):
+        """Test that all parameters in EXPECTED_PARAM_NAMES are present in
+        Registry.
+
+        If this test fails, it means some parameters in EXPECTED_PARAM_NAMES
+        are missing in the registry. It's most likely caused by accidentally
+        deleting some parameters in core/domain/platform_parameters.py.
+
+        To fix this, please make sure no parameter is deleted. If you really
+        need to delete a parameter (this should not happen in most cases),
+        make sure it's also deleted from EXPECTED_PARAM_NAMES.
+        """
         existing_names = params.Registry.get_all_platform_parameter_names()
         missing_names = set(self.EXPECTED_PARAM_NAMES) - set(existing_names)
 
@@ -52,6 +74,15 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
         )
 
     def test_no_unexpected_parameter_in_registry(self):
+        """Test that all parameters registered in Registry are expected.
+
+        If this test fails, it means some parameters in
+        core/domain/platform_parameters.py are not found in
+        EXPECTED_PARAM_NAMES.
+
+        If you are creating new platform parameters, make sure to add it to
+        the EXPECTED_PARAM_NAMES list as well.
+        """
         existing_names = params.Registry.get_all_platform_parameter_names()
         unexpected_names = set(existing_names) - set(self.EXPECTED_PARAM_NAMES)
 

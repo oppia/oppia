@@ -79,10 +79,8 @@ class Registry(python_utils.OBJECT):
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
             'default_value': default,
-            'metadata': {
-                'is_feature': is_feature,
-                'feature_stage': feature_stage,
-            },
+            'is_feature': is_feature,
+            'feature_stage': feature_stage,
         }
         return cls.init_platform_parameter_from_dict(param_dict)
 
@@ -260,7 +258,8 @@ class Registry(python_utils.OBJECT):
                 'rules': parameter_model.rules,
                 'rule_schema_version': parameter_model.rule_schema_version,
                 'default_value': param_with_init_settings.default_value,
-                'metadata': param_with_init_settings.metadata.to_dict(),
+                'is_feature': param_with_init_settings.is_feature,
+                'feature_stage': param_with_init_settings.feature_stage,
             })
         else:
             return None
