@@ -459,6 +459,8 @@ import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { ProfileLinkImageBackendApiService } from
+  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
@@ -890,6 +892,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static predictionResultObjectFactory: PredictionResultObjectFactory;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
+  static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static profileSummaryObjectFactory: ProfileSummaryObjectFactory;
   static pythonProgramTokenizer: PythonProgramTokenizer;
@@ -1208,6 +1211,7 @@ private playthroughService: PlaythroughService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private predictionResultObjectFactory: PredictionResultObjectFactory,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
+private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
 private pythonProgramTokenizer: PythonProgramTokenizer,
@@ -1527,6 +1531,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = this.predictionAlgorithmRegistryService;
     OppiaAngularRootComponent.predictionResultObjectFactory = this.predictionResultObjectFactory;
     OppiaAngularRootComponent.pretestQuestionBackendApiService = this.pretestQuestionBackendApiService;
+    OppiaAngularRootComponent.profileLinkImageBackendApiService = this.profileLinkImageBackendApiService;
     OppiaAngularRootComponent.profilePageBackendApiService = this.profilePageBackendApiService;
     OppiaAngularRootComponent.profileSummaryObjectFactory = this.profileSummaryObjectFactory;
     OppiaAngularRootComponent.pythonProgramTokenizer = this.pythonProgramTokenizer;
