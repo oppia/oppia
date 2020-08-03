@@ -2228,12 +2228,16 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 class UserAuthModelTests(test_utils.GenericTestBase):
     """Tests for UserAuthModel."""
 
-    NONEXISTENT_AUTH_TYPE_NAME = 'id_x'
+    NONEXISTENT_AUTH_METHOD_NAME = 'id_x'
     NONEXISTENT_USER_ID = 'id_x'
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
-    USER_PIN = '123'
+    USER_PIN = '12345'
+    PROFILE_ID = 'profile_id'
+    PROFILE_PIN = '123'
+    USER_2_ID = 'user_2_id'
+    USER_2_GAE_ID = 'gae_2_id'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2243,6 +2247,15 @@ class UserAuthModelTests(test_utils.GenericTestBase):
             id=self.USER_ID,
             gae_id=self.USER_GAE_ID,
             pin=self.USER_PIN
+        ).put()
+        user_models.UserAuthModel(
+            id=self.PROFILE_ID,
+            gae_id=self.USER_GAE_ID,
+            pin=self.PROFILE_PIN
+        ).put()
+        user_models.UserAuthModel(
+            id=self.USER_2_ID,
+            gae_id=self.USER_2_GAE_ID
         ).put()
 
     def test_get_export_policy_is_not_applicable(self):
@@ -2263,6 +2276,20 @@ class UserAuthModelTests(test_utils.GenericTestBase):
                 self.USER_ID
             )
         )
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.USER_2_ID)
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_id(
+                self.USER_2_ID
+            )
+        )
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.PROFILE_ID)
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_id(
+                self.PROFILE_ID
+            )
+        )
 
     def test_apply_deletion_policy_nonexistent_user_no_exception_raised(self):
         user_models.UserAuthModel.apply_deletion_policy(
@@ -2273,6 +2300,14 @@ class UserAuthModelTests(test_utils.GenericTestBase):
             user_models.UserAuthModel.has_reference_to_user_id(
                 self.USER_ID)
         )
+        self.assertTrue(
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.PROFILE_ID)
+        )
+        self.assertTrue(
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.USER_2_ID)
+        )
 
     def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
@@ -2280,25 +2315,56 @@ class UserAuthModelTests(test_utils.GenericTestBase):
                 self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_by_auth_id_with_invalid_auth_type_name_is_none(self):
+    def test_get_by_auth_id_with_invalid_auth_method_name_is_none(self):
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
-                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_GAE_ID)
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID)
         )
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
-                self.NONEXISTENT_AUTH_TYPE_NAME, self.NONREGISTERED_GAE_ID)
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_2_GAE_ID)
         )
-
-    def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID)
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID)
         )
 
-    def test_get_by_auth_id_for_registered_auth_id_is_correct(self):
+    def test_get_by_auth_id_for_unregistered_auth_id_is_empty_list(self):
         self.assertEqual(
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID), []
+        )
+
+    def test_get_by_auth_id_for_correct_user_id_auth_id_mapping(self):
+        self.assertIn(
             user_models.UserAuthModel.get_by_id(self.USER_ID),
             user_models.UserAuthModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+        )
+        self.assertIn(
+            user_models.UserAuthModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+        )
+        self.assertIn(
+            user_models.UserAuthModel.get_by_id(self.USER_2_ID),
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_2_GAE_ID)
+        )
+
+    def test_get_by_auth_id_for_wrong_user_id_auth_id_mapping(self):
+        self.assertNotIn(
+            user_models.UserAuthModel.get_by_id(self.USER_2_ID),
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+        )
+        self.assertNotIn(
+            user_models.UserAuthModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_2_GAE_ID)
+        )
+        self.assertNotIn(
+            user_models.UserAuthModel.get_by_id(self.USER_ID),
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_2_GAE_ID)
         )

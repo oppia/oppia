@@ -199,9 +199,14 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off UserAuthModel migration job."""
 
-    USER_EMAIL = 'a@example.com'
-    USER_USERNAME = 'a'
-    NEW_USERNAME = 'new_username'
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_ID = 'user_a_id'
+    USER_A_GAE_ID = 'user_a_gae_id'
+    PROFILE_A_ID = 'profile_a_id'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_ID = 'user_b_id'
+    USER_B_GAE_ID = 'user_b_gae_id'
+    NEW_GAE_ID = 'new_gae_id'
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -214,43 +219,105 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserAuthModelOneOffJobTests, self).setUp()
-        self.signup(self.USER_EMAIL, self.USER_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.profile_a_model = user_models.UserSettingsModel(
+            id=self.PROFILE_A_ID,
+            gae_id=self.USER_A_GAE_ID,
+            email=self.USER_A_EMAIL,
+            role=feconf.ROLE_ID_LEARNER
+        )
+        self.user_a_model = user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_GAE_ID,
+            email=self.USER_A_EMAIL,
+            associated_profile_user_ids=[self.PROFILE_A_ID]
+        )
+        self.user_b_model = user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL
+        )
 
-    def test_one_off_job_new_gae_id_creates_new_auth_model_entry(self):
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            self.user_a_id)
-        new_gae_id = user_settings_model.gae_id
-        self.assertIsNone(user_models.UserAuthModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, new_gae_id))
 
+    def test_prior_to_one_off_job_user_auth_model_does_not_exist(self):
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_id(self.PROFILE_A_ID))
+
+    def test_one_off_job_for_user_with_no_additional_profile(self):
+        self.user_b_model.put()
         self._run_one_off_job()
-        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, new_gae_id)
-        self.assertEqual(user_auth_model.gae_id[0], new_gae_id)
-        self.assertEqual(user_auth_model.id, user_settings_model.id)
+        user_auth_models = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        self.assertEqual(len(user_auth_models), 1)
+        self.assertEqual(user_auth_models[0].gae_id, self.USER_B_GAE_ID)
+        self.assertEqual(user_auth_models[0].id, self.USER_B_ID)
 
-    def test_existing_gae_id_mapped_to_different_user_id_is_updated(self):
+    def test_one_off_job_for_user_with_additional_profile(self):
+        self.user_a_model.put()
+        self.profile_a_model.put()
         self._run_one_off_job()
-        existing_gae_id = user_models.UserSettingsModel.get_by_id(
-            self.user_a_id).gae_id
+        user_auth_models = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(len(user_auth_models), 2)
+        user_id_auth_id_pairs_list = [
+            [item.id, item.gae_id] for item in user_auth_models
+        ]
+        self.assertIn(
+            [self.user_a_model.id, self.user_a_model.gae_id],
+            user_id_auth_id_pairs_list)
+        self.assertIn(
+            [self.profile_a_model.id, self.profile_a_model.gae_id],
+            user_id_auth_id_pairs_list)
 
-        user_models.UserSettingsModel.delete_by_id(self.user_a_id)
-        new_user_id = user_models.UserSettingsModel.get_new_id('')
-        user_models.UserSettingsModel(
-            id=new_user_id,
-            gae_id=existing_gae_id,
-            username=self.NEW_USERNAME,
-            email=self.USER_EMAIL
-        ).put()
+    def test_one_off_job_run_with_all_kinds_of_users_works_fine(self):
+        self.user_a_model.put()
+        self.user_b_model.put()
+        self.profile_a_model.put()
         self._run_one_off_job()
+        user_auth_models = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        self.assertEqual(len(user_auth_models), 1)
+        self.assertEqual(user_auth_models[0].gae_id, self.USER_B_GAE_ID)
+        self.assertEqual(user_auth_models[0].id, self.USER_B_ID)
 
-        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, existing_gae_id)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            new_user_id)
-        self.assertEqual(user_auth_model.gae_id[0], user_settings_model.gae_id)
-        self.assertEqual(user_auth_model.id, user_settings_model.id)
+        user_auth_models = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(len(user_auth_models), 2)
+        user_auth_id_pairs_list = [
+            [item.id, item.gae_id] for item in user_auth_models
+            ]
+        self.assertIn(
+            [self.user_a_model.id, self.user_a_model.gae_id],
+            user_auth_id_pairs_list)
+        self.assertIn(
+            [self.profile_a_model.id, self.profile_a_model.gae_id],
+            user_auth_id_pairs_list)
+
+    def test_one_off_job_gae_id_registered_for_another_user_raises_error(self):
+        self.user_a_model.put()
+        self._run_one_off_job()
+        self.user_b_model.gae_id = self.user_a_model.gae_id
+        self.user_b_model.put()
+        with self.assertRaisesRegexp(
+            Exception, 'gae_id %s is already registered with user %s, who '
+            'belongs to a different account.'
+            % (self.user_b_model.gae_id, self.user_a_model.id)):
+            self._run_one_off_job()
+
+    def test_one_off_job_profile_registered_with_another_gae_id_raises_error(
+            self):
+        self.user_a_model.put()
+        self.user_b_model.put()
+        self.profile_a_model.put()
+        self._run_one_off_job()
+        self.profile_a_model.gae_id = self.NEW_GAE_ID
+        self.profile_a_model.put()
+        with self.assertRaisesRegexp(
+            Exception,
+            'Profile id %s already registered with a different gae_id.'
+            % self.PROFILE_A_ID):
+            self._run_one_off_job()
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):

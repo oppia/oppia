@@ -94,26 +94,38 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
-        user_id = item.id
-        gae_id = [item.gae_id]
-        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
-            feconf.AUTH_METHOD_GAE, gae_id[0])
 
-        # For current migration, one user_id will strictly have one gae_id
-        # associated with it and vice versa.
-        if user_auth_model is None:
-            user_models.UserAuthModel(
-                id=user_id,
-                gae_id=gae_id
-            ).put()
-        elif user_auth_model.id != user_id:
-            # Because <user_id, gae_id> tuple coming from UserSettingsModel
-            # currently is the source of truth.
-            user_models.UserAuthModel.delete_by_id(user_auth_model.id)
-            user_models.UserAuthModel(
-                id=user_id,
-                gae_id=gae_id
-            ).put()
+        # Assumption: full user_id + all its associated profile user_ids will
+        # strictly have one and the same gae_id.
+
+        if item.role == feconf.ROLE_ID_LEARNER:
+            user_auth_model = user_models.UserAuthModel.get_by_id(item.id)
+            if (user_auth_model is not None) and (
+                    item.gae_id != user_auth_model.gae_id):
+                raise Exception(
+                    'Profile id %s already registered with a different '
+                    'gae_id.' % item.id
+                )
+        else:
+            gae_id = item.gae_id
+            all_user_profile_ids = item.associated_profile_user_ids
+            all_user_profile_ids.append(item.id)
+
+            user_auth_models = user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, item.gae_id)
+            for user_auth_model in user_auth_models:
+                if user_auth_model.id not in all_user_profile_ids:
+                    raise Exception(
+                        'gae_id %s is already registered with user %s, who '
+                        'belongs to a different account.'
+                        % (item.gae_id, user_auth_model.id)
+                    )
+
+            for user_id in all_user_profile_ids:
+                user_models.UserAuthModel(
+                    id=user_id,
+                    gae_id=gae_id
+                ).put()
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
