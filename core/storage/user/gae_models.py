@@ -231,7 +231,7 @@ class UserSettingsModel(base_models.BaseModel):
             str. New unique id for this entity class.
 
         Raises:
-            Exception: An ID cannot be generated within a reasonable number
+            Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
@@ -1988,7 +1988,7 @@ class UserContributionScoringModel(base_models.BaseModel):
             score: float. The score of the user.
 
         Raises:
-            Exception: There is already an entry with the given id.
+            Exception. There is already an entry with the given id.
         """
         instance_id = cls._get_instance_id(user_id, score_category)
 
@@ -2217,7 +2217,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
             str. New unique id for this entity class.
 
         Raises:
-            Exception: An ID cannot be generated within a reasonable number
+            Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
