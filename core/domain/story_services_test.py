@@ -298,8 +298,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, ('Expected story to only belong to a valid topic, but '
-                        'found no topic with ID: %s' % topic_id)):
+            Exception, (
+                'Expected story to only belong to a valid topic, but '
+                'found no topic with ID: %s' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
@@ -322,9 +323,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, ('Expected story to belong to the topic %s, but it is '
-                        'neither a part of the canonical stories or the '
-                        'additional stories of the topic.' % topic_id)):
+            Exception, (
+                'Expected story to belong to the topic %s, but it is '
+                'neither a part of the canonical stories or the '
+                'additional stories of the topic.' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
@@ -1566,8 +1568,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            self.STORY_1_ID, 'Title', self.TOPIC_ID)
-        story.description = ('Description')
+            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID)
+
         self.node_1 = {
             'id': self.NODE_ID_1,
             'thumbnail_filename': 'image.svg',

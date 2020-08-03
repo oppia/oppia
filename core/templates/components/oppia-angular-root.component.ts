@@ -326,6 +326,8 @@ import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
+import { KeyboardShortcutService } from
+  'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -388,6 +390,8 @@ import { MusicPhrasePlayerService } from
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
 import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { NewlyCreatedStoryObjectFactory } from
+  'domain/topic/NewlyCreatedStoryObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NonExistentActivitiesObjectFactory } from
@@ -455,6 +459,8 @@ import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { ProfileLinkImageBackendApiService } from
+  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
@@ -585,6 +591,8 @@ import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
+import { StoryEditorNavigationService } from
+  'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -850,6 +858,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
   static needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory;
+  static newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory;
   static newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory;
   static nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
@@ -883,6 +892,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static predictionResultObjectFactory: PredictionResultObjectFactory;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
+  static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static profileSummaryObjectFactory: ProfileSummaryObjectFactory;
   static pythonProgramTokenizer: PythonProgramTokenizer;
@@ -926,6 +936,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateContentService: StateContentService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
   static stateEditorService: StateEditorService;
+  static keyboardShortcutService: KeyboardShortcutService;
   static stateGraphLayoutService: StateGraphLayoutService;
   static stateHintsService: StateHintsService;
   static stateInteractionIdService: StateInteractionIdService;
@@ -947,6 +958,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static statsReportingService: StatsReportingService;
   static stopwatchObjectFactory: StopwatchObjectFactory;
   static storyContentsObjectFactory: StoryContentsObjectFactory;
+  static storyEditorNavigationService: StoryEditorNavigationService;
   static storyNodeObjectFactory: StoryNodeObjectFactory;
   static storyObjectFactory: StoryObjectFactory;
   static storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory;
@@ -1165,6 +1177,7 @@ private musicNotesInputRulesService: MusicNotesInputRulesService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
 private needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory,
+private newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory,
 private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
@@ -1198,6 +1211,7 @@ private playthroughService: PlaythroughService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private predictionResultObjectFactory: PredictionResultObjectFactory,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
+private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
 private pythonProgramTokenizer: PythonProgramTokenizer,
@@ -1241,6 +1255,7 @@ private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
 private stateEditorService: StateEditorService,
+private keyboardShortcutService: KeyboardShortcutService,
 private stateGraphLayoutService: StateGraphLayoutService,
 private stateHintsService: StateHintsService,
 private stateInteractionIdService: StateInteractionIdService,
@@ -1262,6 +1277,7 @@ private statsReportingBackendApiService: StatsReportingBackendApiService,
 private statsReportingService: StatsReportingService,
 private stopwatchObjectFactory: StopwatchObjectFactory,
 private storyContentsObjectFactory: StoryContentsObjectFactory,
+private storyEditorNavigationService: StoryEditorNavigationService,
 private storyNodeObjectFactory: StoryNodeObjectFactory,
 private storyObjectFactory: StoryObjectFactory,
 private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
@@ -1480,6 +1496,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.musicNotesInputRulesService = this.musicNotesInputRulesService;
     OppiaAngularRootComponent.musicNotesInputValidationService = this.musicNotesInputValidationService;
     OppiaAngularRootComponent.musicPhrasePlayerService = this.musicPhrasePlayerService;
+    OppiaAngularRootComponent.newlyCreatedStoryObjectFactory = this.newlyCreatedStoryObjectFactory;
     OppiaAngularRootComponent.newlyCreatedTopicObjectFactory = this.newlyCreatedTopicObjectFactory;
     OppiaAngularRootComponent.needsGuidingResponsesTaskObjectFactory = this.needsGuidingResponsesTaskObjectFactory;
     OppiaAngularRootComponent.nonExistentActivitiesObjectFactory = this.nonExistentActivitiesObjectFactory;
@@ -1514,6 +1531,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = this.predictionAlgorithmRegistryService;
     OppiaAngularRootComponent.predictionResultObjectFactory = this.predictionResultObjectFactory;
     OppiaAngularRootComponent.pretestQuestionBackendApiService = this.pretestQuestionBackendApiService;
+    OppiaAngularRootComponent.profileLinkImageBackendApiService = this.profileLinkImageBackendApiService;
     OppiaAngularRootComponent.profilePageBackendApiService = this.profilePageBackendApiService;
     OppiaAngularRootComponent.profileSummaryObjectFactory = this.profileSummaryObjectFactory;
     OppiaAngularRootComponent.pythonProgramTokenizer = this.pythonProgramTokenizer;
@@ -1557,6 +1575,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateContentService = this.stateContentService;
     OppiaAngularRootComponent.stateCustomizationArgsService = this.stateCustomizationArgsService;
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
+    OppiaAngularRootComponent.keyboardShortcutService = this.keyboardShortcutService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;
     OppiaAngularRootComponent.stateHintsService = this.stateHintsService;
     OppiaAngularRootComponent.stateInteractionIdService = this.stateInteractionIdService;
@@ -1578,6 +1597,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.statsReportingService = this.statsReportingService;
     OppiaAngularRootComponent.stopwatchObjectFactory = this.stopwatchObjectFactory;
     OppiaAngularRootComponent.storyContentsObjectFactory = this.storyContentsObjectFactory;
+    OppiaAngularRootComponent.storyEditorNavigationService = this.storyEditorNavigationService;
     OppiaAngularRootComponent.storyNodeObjectFactory = this.storyNodeObjectFactory;
     OppiaAngularRootComponent.storyObjectFactory = this.storyObjectFactory;
     OppiaAngularRootComponent.storyPlaythroughObjectFactory = this.storyPlaythroughObjectFactory;

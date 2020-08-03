@@ -2350,8 +2350,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story',
-            self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -5956,6 +5955,7 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(2)]
 
@@ -8238,6 +8238,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8439,6 +8440,7 @@ class StorySnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8605,6 +8607,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8723,6 +8726,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -8948,6 +8952,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d' % i,
+            'description %d' % i,
             '0'
         ) for i in python_utils.RANGE(3)]
 
@@ -9487,6 +9492,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -9783,6 +9789,7 @@ class TopicSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -9976,6 +9983,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10137,6 +10145,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10313,6 +10322,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10518,6 +10528,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10677,6 +10688,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -10961,6 +10973,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11185,6 +11198,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11397,6 +11411,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11604,6 +11619,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -11772,6 +11788,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             'title %d',
+            'description %d' % i,
             '%s' % (python_utils.divide(i, 2))
         ) for i in python_utils.RANGE(6)]
 
@@ -13045,6 +13062,73 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class UserAuthModelValidatorTests(test_utils.GenericTestBase):
+
+    USER_PIN = '123'
+
+    def setUp(self):
+        super(UserAuthModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
+        user_models.UserAuthModel(
+            id=self.user_id,
+            gae_id=self.gae_id,
+            pin=self.USER_PIN
+        ).put()
+        self.model_instance = user_models.UserAuthModel.get_by_id(
+            self.user_id)
+        self.job_class = (
+            prod_validation_jobs_one_off.UserAuthModelAuditOneOffJob)
+
+    def test_audit_standard_operation_passes(self):
+        expected_output = [
+            u'[u\'fully-validated UserAuthModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_audit_with_created_on_greater_than_last_updated_fails(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UserAuthModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.user_id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_audit_with_last_updated_greater_than_current_time_fails(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UserAuthModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.user_id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_audit_with_missing_user_settings_model_fails(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids '
+                'field check of UserAuthModel\', '
+                '[u"Entity id %s: based on '
+                'field user_settings_ids having value '
+                '%s, expect model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.user_id, self.user_id, self.user_id)]
+        run_job_and_check_output(self, expected_output)
+
+
 class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -13991,6 +14075,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             'story',
             'title %d',
+            'description %d',
             '0'
         )
 
@@ -14759,7 +14844,7 @@ class TaskEntryModelValidatorTests(test_utils.GenericTestBase):
         """Helper method to run job and fetch the output.
 
         Returns:
-            list([str, *]).
+            list([str, *]). A list of output messages generated by the job.
         """
         job_id = self.job_class.create_new()
         self.assertEqual(

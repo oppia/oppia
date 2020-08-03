@@ -31,7 +31,7 @@
           </a>
         </li>
         <li class="navbar-tab icon nav-list-item" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview'}">
-          <a ng-click="$ctrl.selectPreviewTab()" class="nav-link" uib-tooltip="Preview" tooltip-placement="bottom">
+          <a ng-click="$ctrl.selectPreviewTab()" class="nav-link" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0">
             <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}">&#xE037;</i>
           </a>
         </li>
@@ -92,6 +92,7 @@
   }
   .skill-editor-main .navbar-tab-active {
     background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
   }
   .skill-editor-main .nav-list-item {
     align-items: center;

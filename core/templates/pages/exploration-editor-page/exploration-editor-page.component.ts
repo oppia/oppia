@@ -30,13 +30,12 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navbar-breadcrumb.directive.ts');
+  'editor-navbar-breadcrumb.component.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.directive.ts');
+  'editor-navigation.component.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.component.ts');
@@ -50,29 +49,27 @@ require(
   'pages/exploration-editor-page/modal-templates/welcome-modal.controller.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
-  'param-changes-editor.directive.ts');
+  'param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'exploration-editor-tab.directive.ts');
-require('pages/exploration-editor-page/feedback-tab/feedback-tab.directive.ts');
+  'exploration-editor-tab.component.ts');
+require('pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.directive.ts');
-require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
+  'thread-table.component.ts');
+require('pages/exploration-editor-page/history-tab/history-tab.component.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.component.ts');
-require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
-require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
+require('pages/exploration-editor-page/preview-tab/preview-tab.component.ts');
+require('pages/exploration-editor-page/settings-tab/settings-tab.component.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/charts/pie-chart.directive.ts');
+  'pages/exploration-editor-page/statistics-tab/charts/pie-chart.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.directive.ts');
+  'playthrough-issues.component.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
+  'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
 require(
@@ -152,6 +149,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
@@ -193,6 +192,7 @@ angular.module('oppia').component('explorationEditorPage', {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
       var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
@@ -347,8 +347,7 @@ angular.module('oppia').component('explorationEditorPage', {
               ChangeListService.getChangeList());
             return;
           }
-
-          $scope.$broadcast('refreshStatisticsTab');
+          RouterService.onRefreshStatisticsTab.emit();
           $scope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
@@ -453,10 +452,11 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.$onInit = function() {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
-        $scope.$on('refreshGraph', function() {
-          GraphDataService.recompute();
-          ExplorationWarningsService.updateWarnings();
-        });
+        ctrl.directiveSubscriptions.add(
+          ExplorationStatesService.onRefreshGraph.subscribe(() => {
+            GraphDataService.recompute();
+            ExplorationWarningsService.updateWarnings();
+          }));
         $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
           ctrl.initExplorationPage().then(successCallback);
         });
@@ -625,6 +625,9 @@ angular.module('oppia').component('explorationEditorPage', {
         $templateCache.put(
           'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
         ctrl.tutorialInProgress = false;
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
