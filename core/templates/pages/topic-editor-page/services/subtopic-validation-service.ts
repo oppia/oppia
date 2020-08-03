@@ -37,9 +37,9 @@ angular.module('oppia').factory('SubtopicValidationService', [
       return subtopicTitles.indexOf(title) === -1;
     };
 
-    var checkUrlFragmentUniqueness = function(urlFragment) {
+    var doesSubtopicWithUrlFragmentExist = function(urlFragment) {
       var topic = TopicEditorStateService.getTopic();
-      return !topic.getSubtopics().some(
+      return topic.getSubtopics().some(
         subtopic => subtopic.getUrlFragment() === urlFragment);
     };
 
@@ -49,7 +49,7 @@ angular.module('oppia').factory('SubtopicValidationService', [
 
     return {
       checkValidSubtopicName: checkValidSubtopicName,
-      checkUrlFragmentUniqueness: checkUrlFragmentUniqueness,
+      doesSubtopicWithUrlFragmentExist: doesSubtopicWithUrlFragmentExist,
       validateUrlFragment: validateUrlFragment
     };
   }

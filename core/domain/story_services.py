@@ -183,12 +183,11 @@ def apply_change_list(story_id, change_list):
                     story.update_language_code(change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_URL_FRAGMENT):
-                    if check_url_fragment_uniqueness(change.new_value):
-                        story.update_url_fragment(change.new_value)
-                    else:
+                    if does_story_exist_with_url_fragment(change.new_value):
                         raise utils.ValidationError(
                             'Story Url Fragment is not unique across the '
-                            'topic.')
+                            'site.')
+                    story.update_url_fragment(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
@@ -221,18 +220,17 @@ def apply_change_list(story_id, change_list):
         raise
 
 
-def check_url_fragment_uniqueness(url_fragment):
-    """Checks if the url fragment for the story is unique across all stories.
+def does_story_exist_with_url_fragment(url_fragment):
+    """Checks if the url fragment for the story exists.
 
     Args:
         url_fragment: str. The url_fragment of the story.
 
     Returns:
-        bool. Whether the the url fragment for the story is unique across all
-        stories or not.
+        bool. Whether the the url fragment for the story exists or not.
     """
     story = story_fetchers.get_story_by_url_fragment(url_fragment)
-    return not story
+    return story is not None
 
 
 def validate_explorations_for_story(exp_ids, raise_error):

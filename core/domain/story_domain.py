@@ -699,7 +699,7 @@ class Story(python_utils.OBJECT):
             thumbnail_filename: str|None. The thumbnail filename of the story.
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story.
-            url_fragment: str|None. The url fragment for the story.
+            url_fragment: str. The url fragment for the story.
         """
         self.id = story_id
         self.title = title
@@ -1413,7 +1413,7 @@ class StorySummary(python_utils.OBJECT):
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 story.
             thumbnail_filename: str|None. The thumbnail filename of the story.
-            url_fragment: str|None. The url fragment for the story.
+            url_fragment: str. The url fragment for the story.
             story_model_created_on: datetime.datetime. Date and time when
                 the story model is created.
             story_model_last_updated: datetime.datetime. Date and time

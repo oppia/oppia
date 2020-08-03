@@ -25,13 +25,13 @@
     <input class="form-control protractor-test-new-subtopic-url-fragment-field" style="font-size: 12px;"
            ng-class="{'is-invalid': $ctrl.editableUrlFragment && !$ctrl.checkUrlFragmentValidity()}"
            placeholder="Enter a url fragment for the subtopic."
-           ng-model="$ctrl.editableUrlFragment" ng-change="$ctrl.checkUrlFragmentUniqueness()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
+           ng-model="$ctrl.editableUrlFragment" ng-change="$ctrl.checkSubtopicExistence()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
     <span class="oppia-input-box-subtitle">
       <i>
         The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
       </i>
     </span>
-    <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && !$ctrl.subtopicUrlFragmentIsUnique">
+    <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicExists">
       <em>The subtopic url fragment is not unique.</em>
     </span>
 
@@ -72,7 +72,7 @@
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="$ctrl.cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-subtopic-creation-button"
-            type="submit" ng-disabled="!$ctrl.isSubtopicValid() || !$ctrl.subtopicUrlFragmentIsUnique" ng-click="$ctrl.save()">
+            type="submit" ng-disabled="!$ctrl.isSubtopicValid() || $ctrl.subtopicExists" ng-click="$ctrl.save()">
       Create Subtopic
     </button>
   </div>

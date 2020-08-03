@@ -64,7 +64,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;
-        ctrl.subtopicUrlFragmentIsUnique = true;
+        ctrl.subtopicExists = false;
         ctrl.subtopicUrlFragmentIsValid = false;
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
@@ -121,15 +121,16 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.subtopicUrlFragmentIsValid = (
           SubtopicValidationService.validateUrlFragment(urlFragment));
         if (urlFragment === ctrl.subtopic.getUrlFragment()) {
-          ctrl.subtopicUrlFragmentIsUnique = true;
+          ctrl.subtopicExists = false;
           return;
         }
 
-        ctrl.subtopicUrlFragmentIsUnique = (
-          SubtopicValidationService.checkUrlFragmentUniqueness(urlFragment));
+        ctrl.subtopicExists = (
+          SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+            urlFragment));
         if (
           !ctrl.subtopicUrlFragmentIsValid ||
-          !ctrl.subtopicUrlFragmentIsUnique) {
+          ctrl.subtopicExists) {
           return;
         }
 

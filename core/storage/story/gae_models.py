@@ -71,6 +71,7 @@ class StoryModel(base_models.VersionedModel):
     # The topic id to which the story belongs.
     corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
     # The url fragment for the story.
+    # TODO(#10140): Change url_fragment to a required field.
     url_fragment = ndb.StringProperty(indexed=True)
 
     @staticmethod

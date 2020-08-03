@@ -38,7 +38,7 @@
             </p>
             <form class="form-horizontal" role="form">
               <input class="form-control protractor-test-subtopic-url-fragment-field"
-                     ng-class="{'is-invalid': !$ctrl.subtopicUrlFragmentIsUnique || !$ctrl.subtopicUrlFragmentIsValid}"
+                     ng-class="{'is-invalid': $ctrl.subtopicExists || !$ctrl.subtopicUrlFragmentIsValid}"
                      type="text"
                      ng-blur="$ctrl.updateSubtopicUrlFragment($ctrl.editableUrlFragment)"
                      ng-model="$ctrl.editableUrlFragment"
@@ -49,7 +49,7 @@
                 </i>
               </span>
             </form>
-            <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && !$ctrl.subtopicUrlFragmentIsUnique">
+            <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicExists">
               <em>The subtopic url fragment is not unique.</em>
             </span>
           </div>

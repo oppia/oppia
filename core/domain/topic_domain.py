@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import re
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -327,7 +328,7 @@ class Subtopic(python_utils.OBJECT):
                 subtopic.
             thumbnail_bg_color: str|None. The thumbnail background color for
                 the subtopic.
-            url_fragment: str|None. The url fragment for the subtopic.
+            url_fragment: str. The url fragment for the subtopic.
         """
         self.id = subtopic_id
         self.title = title
@@ -380,7 +381,7 @@ class Subtopic(python_utils.OBJECT):
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None, None)
+        return cls(subtopic_id, title, [], None, None, '')
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -983,7 +984,9 @@ class Topic(python_utils.OBJECT):
         Returns:
             dict. The converted subtopic_dict.
         """
-        subtopic_dict['url_fragment'] = None
+        subtopic_title = re.sub('[^a-z]+', '', subtopic_dict['title'])
+        subtopic_dict['url_fragment'] = (
+            subtopic_title[:constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT])
         return subtopic_dict
 
     @classmethod
@@ -1446,6 +1449,21 @@ class Topic(python_utils.OBJECT):
 
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
+
+    def does_subtopic_exist_with_url_fragment(self, url_fragment):
+        """Checks if the url fragment for the subtopic is unique across the
+        subtopics in the topic.
+
+        Args:
+            url_fragment: str. The url_fragment of the subtopic.
+
+        Returns:
+            bool. Whether the the url fragment for the subtopic is exists or
+            not.
+        """
+        return any([
+            subtopic.url_fragment == url_fragment
+            for subtopic in self.subtopics])
 
 
 class TopicSummary(python_utils.OBJECT):

@@ -367,8 +367,8 @@ def apply_change_list(topic_id, change_list):
                         change.subtopic_id, change.new_value)
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT):
-                    if not check_subtopic_url_fragment_uniqueness(
-                            change.new_value, topic):
+                    if topic.does_subtopic_exist_with_url_fragment(
+                            change.new_value):
                         raise Exception(
                             'The subtopic url fragment %s is not unique across '
                             'subtopics in the topic' % change.new_value)
@@ -393,24 +393,6 @@ def apply_change_list(topic_id, change_list):
                 e.__class__.__name__, e, topic_id, change_list)
         )
         raise
-
-
-def check_subtopic_url_fragment_uniqueness(url_fragment, topic):
-    """Checks if the url fragment for the subtopic is unique across the
-    subtopics in the topic.
-
-    Args:
-        url_fragment: str. The url_fragment of the subtopic.
-        topic: Topic. The topic domain object to be saved.
-
-    Returns:
-        bool. Whether the the url fragment for the subtopic is unique across
-        the subtopics in the topic or not.
-    """
-    for subtopic in topic.subtopics:
-        if subtopic.url_fragment == url_fragment:
-            return False
-    return True
 
 
 def _save_topic(committer_id, topic, commit_message, change_list):

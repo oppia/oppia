@@ -71,16 +71,16 @@ describe('Subtopic validation service', function() {
       'Subtopic4')).toEqual(true);
   });
 
-  it('should validate subtopic url fragment uniqueness', function() {
-    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
-      'random-name')).toEqual(true);
-    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
-      'subtopic-one')).toEqual(false);
-    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
-      'subtopic-two')).toEqual(false);
-    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
-      'subtopic-three')).toEqual(false);
-    expect(SubtopicValidationService.checkUrlFragmentUniqueness(
-      'subtopic-four')).toEqual(true);
+  it('should validate if subtopic with url fragment exists', function() {
+    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+      'random-name')).toEqual(false);
+    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+      'subtopic-one')).toEqual(true);
+    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+      'subtopic-two')).toEqual(true);
+    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+      'subtopic-three')).toEqual(true);
+    expect(SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+      'subtopic-four')).toEqual(false);
   });
 });

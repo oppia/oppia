@@ -107,13 +107,13 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.errorMsg).toEqual(null);
   });
 
-  it('should check url fragment uniqueness correctly', function() {
-    expect(ctrl.subtopicUrlFragmentIsUnique).toEqual(false);
+  it('should check if subtopic with url fragment exists', function() {
+    expect(ctrl.subtopicExists).toEqual(false);
     spyOn(
       SubtopicValidationService,
-      'checkUrlFragmentUniqueness').and.returnValue(true);
-    ctrl.checkUrlFragmentUniqueness();
-    expect(ctrl.subtopicUrlFragmentIsUnique).toEqual(true);
+      'doesSubtopicWithUrlFragmentExist').and.returnValue(true);
+    ctrl.checkSubtopicExistence();
+    expect(ctrl.subtopicExists).toEqual(true);
   });
 
   it('should return the validity of the subtopic', function() {
