@@ -88,67 +88,67 @@
   </div>
 
   <ul>
-    <li ng-class="{'active': $ctrl.currentUrl === '/community-library'}">
+    <li ngClass="{'active': currentUrl === '/community-library'}">
       <a href="/community-library" class="protractor-mobile-test-library-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
-        <span translate="I18N_SIDEBAR_LIBRARY_LINK"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_LIBRARY_LINK' | translate"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': $ctrl.currentUrl === '/about'}">
+    <li ngClass="{'active': currentUrl === '/about'}">
       <a href="/about" class="protractor-mobile-test-about-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
-        <span translate="I18N_SIDEBAR_ABOUT_LINK"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_ABOUT_LINK' | translate"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': $ctrl.currentUrl === '/get-started'}">
+    <li ngClass="{'active': currentUrl === '/get-started'}">
       <a href="/get-started" class="protractor-mobile-test-get-started-link">
         <i class="oppia-sidebar-menu-icon fa">&#xf135;</i>
-        <span translate="I18N_SIDEBAR_GET_STARTED"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_GET_STARTED' | translate"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': $ctrl.currentUrl === '/teach'}">
+    <li ngClass="{'active': currentUrl === '/teach'}">
       <a href="/teach" class="protractor-mobile-test-teach-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-        <span translate="I18N_SIDEBAR_TEACH_WITH_OPPIA"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_TEACH_WITH_OPPIA' | translate"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': $ctrl.currentUrl === '/donate'}">
+    <li ngClass="{'active': currentUrl === '/donate'}">
       <a href="/donate" class="protractor-mobile-test-donate-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
-        <span translate="I18N_SIDEBAR_DONATE"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_DONATE' | translate"></span>
       </a>
     </li>
 
     <li>
       <a href="https://medium.com/oppia-org" target="_blank" rel="noopener">
         <picture>
-          <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/sidebar/blogger.webp')]>">
-          <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/sidebar/blogger.png')]>">
-          <img ng-src="<[$ctrl.getStaticImageUrl('/sidebar/blogger.png')]>" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
+          <source type="image/webp" [srcset]="{{getStaticImageUrl('/sidebar/blogger.webp')}}">
+          <source type="image/png" [srcset]="{{getStaticImageUrl('/sidebar/blogger.png')}}">
+          <img [src]="{{getStaticImageUrl('/sidebar/blogger.png')}}" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
         </picture>
-        <span translate="I18N_SIDEBAR_BLOG"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_BLOG' | translate"></span>
       </a>
     </li>
 
-    <li ng-class="{'active': $ctrl.currentUrl === '/contact'}">
+    <li ngClass="{'active': currentUrl === '/contact'}">
       <a href="/contact" class="protractor-mobile-test-contact-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE0BE;</i>
-        <span translate="I18N_SIDEBAR_CONTACT_US"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_CONTACT_US' | translate"></span>
       </a>
     </li>
 
     <li>
       <a href="http://oppiafoundation.org/" target="_blank" rel="noopener">
         <picture>
-          <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')]>">
-          <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')]>">
-          <img ng-src="<[$ctrl.getStaticImageUrl('/sidebar/oppia-foundation-logo.png')]>" class="oppia-sidebar-menu-icon" alt="Oppia Foundation">
+          <source type="image/webp" [srcset]="{{getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')}}">
+          <source type="image/png" [srcset]="{{getStaticImageUrl('/sidebar/oppia-foundation-logo.png')}}">
+          <img [src]="{{getStaticImageUrl('/sidebar/oppia-foundation-logo.png')}}" class="oppia-sidebar-menu-icon" alt="Oppia Foundation">
         </picture>
-        <span translate="I18N_SIDEBAR_OPPIA_FOUNDATION"></span>
+        <span [innerHTML]="'I18N_SIDEBAR_OPPIA_FOUNDATION' | translate"></span>
       </a>
     </li>
   </ul>
