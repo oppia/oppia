@@ -16,25 +16,14 @@
  * @fileoverview Tests for translate-text service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// UserService.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
 require(
   'pages/community-dashboard-page/services/translate-text.service.ts');
 
-describe('TranslateTextService', function() {
+fdescribe('TranslateTextService', function() {
   let TranslateTextService;
   let $httpBackend;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   beforeEach(angular.mock.inject(function($injector, $q) {
     TranslateTextService = $injector.get('TranslateTextService');
