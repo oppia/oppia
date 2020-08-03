@@ -296,17 +296,6 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
     feedback_thread_user_model.put()
 
 
-def add_message_id_to_read_by_list(thread_id, user_id, message_id):
-    """Adds the message id to the list of message ids read by the user.
-
-    Args:
-        thread_id: str. The id of the thread.
-        user_id: str. The id of the user reading the messages.
-        message_id: int. The id of the message.
-    """
-    add_message_ids_to_read_by_list([thread_id], user_id, [message_id])
-
-
 def add_message_ids_to_read_by_list(thread_ids, user_id, message_ids):
     """Adds the message ids to the list of message ids read by the user.
 
