@@ -43,7 +43,8 @@ def memoize(func):
     values provided as arguments to func *must be hashable!*
 
     Args:
-        func: callable.
+        func: callable. The callable function that is going to be run in
+            thread-safe, cached-access environment.
 
     Returns:
         callable. The same func, but calls to it using the same arguments are
@@ -102,7 +103,7 @@ def memoize(func):
         made exactly once.
 
         Returns:
-            The value of func(*args, **kwargs).
+            function(*). The value of func(*args, **kwargs).
         """
         func_kwargs = default_func_kwargs.copy()
         func_kwargs.update(kwargs)
