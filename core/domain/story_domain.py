@@ -279,7 +279,7 @@ class StoryNode(python_utils.OBJECT):
         """Returns a dict representing this StoryNode domain object.
 
         Returns:
-            A dict, mapping all fields of StoryNode instance.
+            dict. A dict, mapping all fields of StoryNode instance.
         """
         return {
             'id': self.id,
@@ -336,7 +336,7 @@ class StoryNode(python_utils.OBJECT):
         """Validates various properties of the story node.
 
         Raises:
-            ValidationError: One or more attributes of the story node are
+            ValidationError. One or more attributes of the story node are
                 invalid.
         """
         if self.exploration_id:
@@ -466,7 +466,7 @@ class StoryContents(python_utils.OBJECT):
         """Validates various properties of the story contents object.
 
         Raises:
-            ValidationError: One or more attributes of the story contents are
+            ValidationError. One or more attributes of the story contents are
                 invalid.
         """
         if not isinstance(self.nodes, list):
@@ -633,7 +633,7 @@ class StoryContents(python_utils.OBJECT):
         """Returns a dict representing this StoryContents domain object.
 
         Returns:
-            A dict, mapping all fields of StoryContents instance.
+            dict. A dict, mapping all fields of StoryContents instance.
         """
         return {
             'nodes': [
@@ -745,7 +745,7 @@ class Story(python_utils.OBJECT):
         """Validates various properties of the story object.
 
         Raises:
-            ValidationError: One or more attributes of story are invalid.
+            ValidationError. One or more attributes of story are invalid.
         """
         self.require_valid_title(self.title)
 
@@ -863,7 +863,7 @@ class Story(python_utils.OBJECT):
         exploration id.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story,
+            exp_id: str. The ID of the exploration linked to the story.
 
         Returns:
             list(str)|None. The list of prerequisite skill ids for the
@@ -878,7 +878,7 @@ class Story(python_utils.OBJECT):
         """Checks whether an exploration is present in the story.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story,
+            exp_id: str. The ID of the exploration linked to the story.
 
         Returns:
             bool. Whether the exploration is linked to the story.
@@ -892,7 +892,7 @@ class Story(python_utils.OBJECT):
         """Returns a dict representing this Story domain object.
 
         Returns:
-            A dict, mapping all fields of Story instance.
+            dict. A dict, mapping all fields of Story instance.
         """
         return {
             'id': self.id,
@@ -1084,7 +1084,7 @@ class Story(python_utils.OBJECT):
             node_title: str. The title for the new story node.
 
         Raises:
-            Exception: The desired_node_id differs from
+            Exception. The desired_node_id differs from
                 story_contents.next_node_id.
         """
         if self.story_contents.next_node_id != desired_node_id:
@@ -1121,7 +1121,7 @@ class Story(python_utils.OBJECT):
             node_id: str. The id of the node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1147,7 +1147,7 @@ class Story(python_utils.OBJECT):
             new_outline: str. The new outline of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1163,7 +1163,7 @@ class Story(python_utils.OBJECT):
             new_title: str. The new title of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1179,7 +1179,7 @@ class Story(python_utils.OBJECT):
             new_description: str. The new description of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1197,7 +1197,7 @@ class Story(python_utils.OBJECT):
                 given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1215,7 +1215,7 @@ class Story(python_utils.OBJECT):
                 color of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1232,7 +1232,7 @@ class Story(python_utils.OBJECT):
             node_id: str. The id of the node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1248,7 +1248,7 @@ class Story(python_utils.OBJECT):
             node_id: str. The id of the node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1265,7 +1265,7 @@ class Story(python_utils.OBJECT):
                 list.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1284,7 +1284,7 @@ class Story(python_utils.OBJECT):
                 skill id list.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1303,7 +1303,7 @@ class Story(python_utils.OBJECT):
                 node id list.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1356,7 +1356,7 @@ class Story(python_utils.OBJECT):
             new_exploration_id: str. The updated exploration id for a node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1384,7 +1384,7 @@ class Story(python_utils.OBJECT):
             new_initial_node_id: str. The new starting node id.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(new_initial_node_id)
         if node_index is None:
@@ -1435,7 +1435,7 @@ class StorySummary(python_utils.OBJECT):
         """Validates various properties of the story summary object.
 
         Raises:
-            ValidationError: One or more attributes of story summary are
+            ValidationError. One or more attributes of story summary are
                 invalid.
         """
         if self.url_fragment is not None:

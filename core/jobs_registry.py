@@ -52,7 +52,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
-    exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
+    exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
     exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
     exp_jobs_one_off.ExplorationMathRichTextInfoModelGenerationOneOffJob,
     exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
@@ -214,6 +214,7 @@ AUDIT_JOB_MANAGERS = [
         .TrainingJobExplorationMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserAuthModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
@@ -252,7 +253,7 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
 
         Args:
             event_type: str. The type of the event.
-            *args: *. Positional arguments to pass to on_incoming_event().
+            *args: list(*). Positional arguments to pass to on_incoming_event().
             **kwargs: *. Keyword arguments to pass to on_incoming_event().
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:

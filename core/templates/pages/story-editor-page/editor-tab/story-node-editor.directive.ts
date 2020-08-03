@@ -36,6 +36,10 @@ require(
   'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/page-title.service.ts');
+require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
+
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -61,16 +65,22 @@ angular.module('oppia').directive('storyNodeEditor', [
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
+        'PageTitleService',
         'StoryEditorStateService', 'ExplorationIdValidationService',
         'TopicsAndSkillsDashboardBackendApiService',
-        'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
+        'TopicEditorRoutingService',
+        'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
+        'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
+            PageTitleService,
             StoryEditorStateService, ExplorationIdValidationService,
             TopicsAndSkillsDashboardBackendApiService,
-            StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
+            TopicEditorRoutingService,
+            StoryUpdateService, UndoRedoService, WindowDimensionsService,
+            EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
@@ -126,6 +136,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
+            PageTitleService.setPageSubtitleForMobileView($scope.currentTitle);
             $scope.editableTitle = $scope.currentTitle;
             $scope.currentDescription = $scope.getDescription();
             $scope.editableDescription = $scope.currentDescription;
@@ -213,6 +224,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
+            $scope.toggleExplorationInputButtons();
             if (StoryEditorStateService.isStoryPublished()) {
               if (explorationId === '' || explorationId === null) {
                 AlertsService.addInfoMessage(
@@ -359,12 +371,63 @@ angular.module('oppia').directive('storyNodeEditor', [
               !$scope.chapterPreviewCardIsShown);
           };
 
+          $scope.togglePrerequisiteSkillsList = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.prerequisiteSkillIsShown = !$scope.prerequisiteSkillIsShown;
+          };
+          $scope.toggleChapterOutline = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.chapterOutlineIsShown = !$scope.chapterOutlineIsShown;
+          };
+          $scope.toggleAcquiredSkillsList = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.acquiredSkillIsShown = !$scope.acquiredSkillIsShown;
+          };
+          $scope.toggleChapterCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.mainChapterCardIsShown = !$scope.mainChapterCardIsShown;
+          };
+          $scope.toggleChapterTodoCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.chapterTodoCardIsShown = !$scope.chapterTodoCardIsShown;
+          };
+          $scope.toggleExplorationInputButtons = function() {
+            $scope.explorationInputButtonsAreShown = (
+              !$scope.explorationInputButtonsAreShown);
+          };
+          $scope.toggleChapterOutlineButtons = function() {
+            $scope.chapterOutlineButtonsAreShown = (
+              !$scope.chapterOutlineButtonsAreShown);
+          };
+
           ctrl.$onInit = function() {
             // Regex pattern for exploration id,
             // EXPLORATION_AND_SKILL_ID_PATTERN
             // is not being used here, as the chapter of the story can be saved
             // with empty exploration id.
             $scope.chapterPreviewCardIsShown = false;
+            $scope.mainChapterCardIsShown = true;
+            $scope.explorationInputButtonsAreShown = false;
+            $scope.chapterOutlineButtonsAreShown = false;
+            PageTitleService.setPageTitleForMobileView('Chapter Editor');
+            $scope.chapterOutlineIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
+            $scope.chapterTodoCardIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
+            $scope.prerequisiteSkillIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
+            $scope.acquiredSkillIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.expIdCanBeSaved = true;
             $scope.$on(EVENT_STORY_INITIALIZED, _init);
