@@ -124,7 +124,7 @@ class Registry(python_utils.OBJECT):
             version, in the form of a mapping of interaction id to the
             interaction specs. See interaction_specs.json for an example.
 
-        Raises
+        Raises:
             Exception. No interaction specs json file found for the given state
                 schema version.
         """
