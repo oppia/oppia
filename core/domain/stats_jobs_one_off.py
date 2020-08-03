@@ -223,7 +223,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             associated with the map.
 
         Raises:
-            Exception: The item type is wrong.
+            Exception. The item type is wrong.
         """
         class_name_to_event_type = {
             'CompleteExplorationEventLogEntryModel':
@@ -594,7 +594,8 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationStatsModel.
+            item: ExplorationStatsModel. The Exploration stats model object to
+                fetch its properties.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
@@ -770,7 +771,8 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationStatsModel.
+            item: ExplorationStatsModel. The Exploration stats model object to
+                fetch its properties.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
@@ -970,8 +972,8 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationAnnotationsModel or
-                StateCounterModel.
+            item: ExplorationAnnotationsModel or StateCounterModel. The object
+                to fetch its properties.
 
         Yields:
             tuple. Different for different models:

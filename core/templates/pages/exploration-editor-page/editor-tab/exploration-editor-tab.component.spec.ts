@@ -67,6 +67,7 @@ import { SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
+
 describe('Exploration editor tab component', function() {
   var ctrl;
   var $q = null;
@@ -625,11 +626,18 @@ describe('Exploration editor tab component', function() {
 
     $rootScope.$broadcast('refreshStateEditor');
 
-    spyOn($rootScope, '$broadcast');
+    const stateEditorInitializedSpy = jasmine.createSpy(
+      'stateEditorInitialized');
+    let testsubscription =
+      stateEditorService.onStateEditorInitialized.subscribe(
+        stateEditorInitializedSpy);
+
     $scope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'stateEditorInitialized',
-      explorationStatesService.getState('Second State'));
+    expect(stateEditorInitializedSpy).toHaveBeenCalledWith(
+      explorationStatesService.getState('Second State')
+    );
+
+    testsubscription.unsubscribe();
   });
 });

@@ -860,16 +860,17 @@ class StateAnswers(python_utils.OBJECT):
         """Constructs a StateAnswers domain object.
 
         Args:
-            exploration_id: The ID of the exploration corresponding to submitted
-                answers.
-            exploration_version: The version of the exploration corresponding to
+            exploration_id: str. The ID of the exploration corresponding to
                 submitted answers.
-            state_name: The state to which the answers were submitted.
-            interaction_id: The ID of the interaction which created the answers.
-            submitted_answer_list: The list of SubmittedAnswer domain objects
-                that were submitted to the exploration and version specified in
-                this object.
-            schema_version: The schema version of this answers object.
+            exploration_version: str. The version of the exploration
+                corresponding to submitted answers.
+            state_name: str. The state to which the answers were submitted.
+            interaction_id: str. The ID of the interaction which created the
+                answers.
+            submitted_answer_list: list. The list of SubmittedAnswer domain
+                objects that were submitted to the exploration and version
+                specified in this object.
+            schema_version: str. The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -1504,7 +1505,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
                 the learner_answer_info_list.
 
         Raises:
-            Exception: If the learner answer info with the given id is not
+            Exception. If the learner answer info with the given id is not
                 found in the learner answer info list.
         """
         new_learner_answer_info_list = []

@@ -20,7 +20,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
@@ -48,6 +48,9 @@ interface AnswerChoice {
 })
 export class StateEditorService {
   constructor(private solutionValidityService: SolutionValidityService) {}
+
+  private _stateEditorInitializedEventEmitter = new EventEmitter();
+  private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -243,6 +246,14 @@ export class StateEditorService {
 
   setNextContentIdIndex(newNextContentIdIndex: number): void {
     this.nextContentIdIndex = newNextContentIdIndex;
+  }
+
+  get onStateEditorInitialized() {
+    return this._stateEditorInitializedEventEmitter;
+  }
+
+  get onStateEditorDirectiveInitialized() {
+    return this._stateEditorDirectiveInitializedEventEmitter;
   }
 }
 

@@ -346,7 +346,7 @@ def apply_change_list(exploration_id, change_list):
         the given changelist to the existing version of the exploration.
 
     Raises:
-        Exception: Any entries in the changelist are invalid.
+        Exception. Any entries in the changelist are invalid.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
@@ -536,7 +536,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             this commit.
 
     Raises:
-        Exception: The versions of the given exploration and the currently
+        Exception. The versions of the given exploration and the currently
             stored exploration model do not match.
     """
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
@@ -897,10 +897,10 @@ def update_exploration(
             voice artist.
 
     Raises:
-        ValueError: No commit message is supplied and the exploration is public.
-        ValueError: The update is due to a suggestion and the commit message is
+        ValueError. No commit message is supplied and the exploration is public.
+        ValueError. The update is due to a suggestion and the commit message is
             invalid.
-        ValueError: The update is not due to a suggestion, and the commit
+        ValueError. The update is not due to a suggestion, and the commit
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
@@ -1156,8 +1156,8 @@ def revert_exploration(
             is to be reverted.
 
     Raises:
-        Exception:  does not match the version of the currently-stored
-            exploration model.
+        Exception. Version of exploration does not match the version of the
+            currently-stored exploration model.
     """
     exploration_model = exp_models.ExplorationModel.get(
         exploration_id, strict=False)
@@ -1226,7 +1226,7 @@ def get_demo_exploration_components(demo_path):
         filepath does not include the assets/ prefix.
 
     Raises:
-        Exception: The path of the file is unrecognized or does not exist.
+        Exception. The path of the file is unrecognized or does not exist.
     """
     demo_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, demo_path)
 
@@ -1258,7 +1258,7 @@ def save_new_exploration_from_yaml_and_assets(
             from the imported exploration.
 
     Raises:
-        Exception: The yaml file is invalid due to a missing schema version.
+        Exception. The yaml file is invalid due to a missing schema version.
     """
     if assets_list is None:
         assets_list = []
@@ -1314,7 +1314,7 @@ def delete_demo(exploration_id):
         exploration_id: str. The id of the exploration to be deleted.
 
     Raises:
-        Exception: The exploration id is invalid.
+        Exception. The exploration id is invalid.
     """
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
@@ -1340,7 +1340,7 @@ def load_demo(exploration_id):
         exploration_id: str. The id of the demo exploration.
 
     Raises:
-        Exception: The exploration id provided is invalid.
+        Exception. The exploration id provided is invalid.
     """
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
@@ -1391,7 +1391,7 @@ def get_next_page_of_all_non_private_commits(
               are probably more results.
 
     Raises:
-        ValueError: The argument max_age is not datetime.timedelta or None.
+        ValueError. The argument max_age is not datetime.timedelta or None.
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
         raise ValueError(
@@ -1413,7 +1413,7 @@ def get_image_filenames_from_exploration(exploration):
     """Get the image filenames from the exploration.
 
     Args:
-        exploration: Exploration object. The exploration itself.
+        exploration: Exploration. The exploration to get the image filenames.
 
     Returns:
         list(str). List containing the name of the image files in exploration.
@@ -1752,7 +1752,7 @@ def get_interaction_id_for_state(exp_id, state_name):
         str. The ID of the interaction.
 
     Raises:
-        Exception: If the state with the given state name does not exist in
+        Exception. If the state with the given state name does not exist in
             the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -1769,7 +1769,7 @@ def save_multi_exploration_math_rich_text_info_model(
 
     Args:
         exploration_math_rich_text_info_list:
-        list(ExplorationMathRichTextInfoModel). A list of
+            list(ExplorationMathRichTextInfoModel). A list of
             ExplorationMathRichTextInfoModel domain objects.
     """
 
@@ -1957,7 +1957,7 @@ def update_exploration_with_math_svgs(exp_id, raw_latex_to_image_data_dict):
         exp_id: str. The ID of the exploration to update.
 
     Raises:
-        Exception: If any of the SVG images provided fail validation.
+        Exception. If any of the SVG images provided fail validation.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     html_in_exploration_after_conversion = ''

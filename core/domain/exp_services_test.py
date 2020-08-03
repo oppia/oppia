@@ -3843,7 +3843,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             expected: dict(unicode, int). Expected summary.
 
         Raises:
-            AssertionError: Contributors summary of the given exp is not same
+            AssertionError. Contributors summary of the given exp is not same
                 as expected.
         """
         contributors_summary = exp_fetchers.get_exploration_summary_by_id(

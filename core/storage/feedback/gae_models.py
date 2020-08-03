@@ -156,7 +156,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             the existing threads within the given entity.
 
         Raises:
-            Exception: There were too many collisions with existing thread IDs
+            Exception. There were too many collisions with existing thread IDs
                 when attempting to generate a new thread ID.
         """
         for _ in python_utils.RANGE(_MAX_RETRIES):
@@ -181,7 +181,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             instance.
 
         Raises:
-            Exception: A thread with the given thread ID exists already.
+            Exception. A thread with the given thread ID exists already.
         """
         if cls.get_by_id(thread_id):
             raise Exception('Feedback thread ID conflict on create.')
@@ -331,7 +331,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             GeneralFeedbackMessageModel entry.
 
         Raises:
-            Exception: A message with the same ID already exists
+            Exception. A message with the same ID already exists
                 in the given thread.
         """
         instance_id = cls._generate_id(thread_id, message_id)
@@ -359,7 +359,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             given ID.
 
         Raises:
-            EntityNotFoundError: strict == True and either
+            EntityNotFoundError. The value of strict is True and either
                 (i) message ID is not valid
                 (ii) message is marked as deleted.
                 No error will be raised if strict == False.

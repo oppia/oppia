@@ -145,7 +145,7 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         *. The normalized object.
 
     Raises:
-        AssertionError: The object fails to validate against the schema.
+        AssertionError. The object fails to validate against the schema.
     """
     normalized_obj = None
 
@@ -304,7 +304,7 @@ class Normalizers(python_utils.OBJECT):
             normalizer_id.
 
         Raises:
-            Exception: The normalizer_id is not valid.
+            Exception. The normalizer_id is not valid.
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
@@ -315,16 +315,16 @@ class Normalizers(python_utils.OBJECT):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-            obj: a string representing a URL.
+            obj: str. A string representing a URL.
 
         Returns:
-            An empty string if the URL does not start with http:// or https://
-            except when the string is empty. Otherwise, returns the original
-            URL.
+            str. An empty string if the URL does not start with http:// or
+            https:// except when the string is empty. Otherwise, returns the
+            original URL.
 
         Raises:
-            AssertionError: The string is non-empty and does not start with
-                http:// or https://
+            AssertionError. The string is non-empty and does not start with
+                http:// or https://.
         """
         if obj == '':
             return obj
@@ -344,10 +344,10 @@ class Normalizers(python_utils.OBJECT):
         """Collapses multiple spaces into single spaces.
 
         Args:
-            obj: a string.
+            obj: str. String to be processed for multiple spaces.
 
         Returns:
-            A string that is the same as `obj`, except that each block of
+            str. A string that is the same as `obj`, except that each block of
             whitespace is collapsed into a single space character. If the
             block of whitespace is at the front or end of obj, then it
             is simply removed.

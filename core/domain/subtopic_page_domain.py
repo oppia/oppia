@@ -118,7 +118,7 @@ class SubtopicPageContents(python_utils.OBJECT):
         """Returns a dict representing this SubtopicPageContents domain object.
 
         Returns:
-            A dict, mapping all fields of SubtopicPageContents instance.
+            dict. A dict, mapping all fields of SubtopicPageContents instance.
         """
         return {
             'subtitled_html': self.subtitled_html.to_dict(),
@@ -178,7 +178,7 @@ class SubtopicPage(python_utils.OBJECT):
         """Returns a dict representing this SubtopicPage domain object.
 
         Returns:
-            A dict, mapping all fields of SubtopicPage instance.
+            dict. A dict, mapping all fields of SubtopicPage instance.
         """
         return {
             'id': self.id,
@@ -312,7 +312,7 @@ class SubtopicPage(python_utils.OBJECT):
         """Validates various properties of the SubtopicPage object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic page are
+            ValidationError. One or more attributes of the subtopic page are
                 invalid.
         """
         if not isinstance(self.topic_id, python_utils.BASESTRING):

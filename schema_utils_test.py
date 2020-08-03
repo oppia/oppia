@@ -236,7 +236,7 @@ def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
     keys, are in the given dict.
 
     Raises:
-        AssertionError: The validation fails.
+        AssertionError. The validation fails.
     """
     assert set(required_keys) <= set(dict_to_check.keys()), (
         'Missing keys: %s' % dict_to_check)
@@ -262,7 +262,7 @@ def validate_schema(schema):
     of normalizers.
 
     Raises:
-        AssertionError: The schema is not valid.
+        AssertionError. The schema is not valid.
     """
     assert isinstance(schema, dict), ('Expected dict, got %s' % schema)
     assert SCHEMA_KEY_TYPE in schema, (

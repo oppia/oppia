@@ -113,9 +113,9 @@ class AnswerGroup(python_utils.OBJECT):
                 value objects with an object type property (obj_type).
 
         Raises:
-            ValidationError: One or more attributes of the AnswerGroup are
+            ValidationError. One or more attributes of the AnswerGroup are
                 invalid.
-            ValidationError: The AnswerGroup contains more than one classifier
+            ValidationError. The AnswerGroup contains more than one classifier
                 rule.
         """
         if not isinstance(self.rule_specs, list):
@@ -379,7 +379,7 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
 
         Raises:
-            ValidationError: One or more attributes of the Solution are not
+            ValidationError. One or more attributes of the Solution are not
                 valid.
         """
         if not isinstance(self.answer_is_exclusive, bool):
@@ -647,7 +647,7 @@ class InteractionInstance(python_utils.OBJECT):
                 Is used to validate AnswerGroup objects.
 
         Raises:
-            ValidationError: One or more attributes of the InteractionInstance
+            ValidationError. One or more attributes of the InteractionInstance
                 are invalid.
         """
         if not isinstance(self.id, python_utils.BASESTRING):
@@ -725,7 +725,7 @@ class InteractionInstance(python_utils.OBJECT):
         """Get all html content strings in the interaction.
 
         Returns:
-            list(str): The list of all html content strings in the interaction.
+            list(str). The list of all html content strings in the interaction.
         """
         html_list = []
 
@@ -1208,7 +1208,7 @@ class Outcome(python_utils.OBJECT):
         """Validates various properties of the Outcome.
 
         Raises:
-            ValidationError: One or more attributes of the Outcome are invalid.
+            ValidationError. One or more attributes of the Outcome are invalid.
         """
         self.feedback.validate()
 
@@ -1317,7 +1317,7 @@ class Voiceover(python_utils.OBJECT):
         """Validates properties of the Voiceover.
 
         Raises:
-            ValidationError: One or more attributes of the Voiceover are
+            ValidationError. One or more attributes of the Voiceover are
                 invalid.
         """
         if not isinstance(self.filename, python_utils.BASESTRING):
@@ -1417,7 +1417,7 @@ class WrittenTranslation(python_utils.OBJECT):
         """Validates properties of the WrittenTranslation.
 
         Raises:
-            ValidationError: One or more attributes of the WrittenTranslation
+            ValidationError. One or more attributes of the WrittenTranslation
                 are invalid.
         """
         if not isinstance(self.data_format, python_utils.BASESTRING):
@@ -1534,11 +1534,11 @@ class WrittenTranslations(python_utils.OBJECT):
         """Validates properties of the WrittenTranslations.
 
         Args:
-            expected_content_id_list: A list of content id which are expected to
-                be inside they WrittenTranslations.
+            expected_content_id_list: list(str). A list of content id which are
+                expected to be inside they WrittenTranslations.
 
         Raises:
-            ValidationError: One or more attributes of the WrittenTranslations
+            ValidationError. One or more attributes of the WrittenTranslations
                 are invalid.
         """
         if expected_content_id_list is not None:
@@ -1598,8 +1598,8 @@ class WrittenTranslations(python_utils.OBJECT):
             str. The translated content for a given content id in a language.
 
         Raises:
-            Exception: Translation doesn't exist in the given language.
-            Exception: The given content id doesn't exist.
+            Exception. Translation doesn't exist in the given language.
+            Exception. The given content id doesn't exist.
         """
         if content_id in self.translations_mapping:
             if language_code in self.translations_mapping[content_id]:
@@ -1620,7 +1620,7 @@ class WrittenTranslations(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
+            Exception. The content id isn't a string.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
@@ -1638,7 +1638,7 @@ class WrittenTranslations(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
+            Exception. The content id isn't a string.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
@@ -1773,11 +1773,11 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Validates properties of the RecordedVoiceovers.
 
         Args:
-            expected_content_id_list: A list of content id which are expected to
-                be inside they RecordedVoiceovers.
+            expected_content_id_list: list(str). A list of content id which are
+                expected to be inside the RecordedVoiceovers.
 
         Raises:
-            ValidationError: One or more attributes of the RecordedVoiceovers
+            ValidationError. One or more attributes of the RecordedVoiceovers
                 are invalid.
         """
         if expected_content_id_list is not None:
@@ -1835,8 +1835,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
-            Exception: The content id already exist in the voiceovers_mapping
+            Exception. The content id isn't a string.
+            Exception. The content id already exist in the voiceovers_mapping
                 dict.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
@@ -1855,8 +1855,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
-            Exception: The content id does not exist in the voiceovers_mapping
+            Exception. The content id isn't a string.
+            Exception. The content id does not exist in the voiceovers_mapping
                 dict.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
@@ -1920,21 +1920,21 @@ class RuleSpec(python_utils.OBJECT):
         for all the parameters the rule expects.
 
         Args:
-            rule_params_list: A list of parameters used by the rule represented
-                by this RuleSpec instance, to be used to validate the inputs of
-                this RuleSpec. Each element of the list represents a single
-                parameter and is a tuple with two elements:
+            rule_params_list: list(str, object(*)). A list of parameters used by
+                the rule represented by this RuleSpec instance, to be used to
+                validate the inputs of this RuleSpec. Each element of the list
+                represents a single parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
                     1: The typed object instance for that
                         parameter (e.g. Real).
-            exp_param_specs_dict: A dict of specified parameters used in this
-                exploration. Keys are parameter names and values are ParamSpec
-                value objects with an object type property (obj_type). RuleSpec
-                inputs may have a parameter value which refers to one of these
-                exploration parameters.
+            exp_param_specs_dict: dict. A dict of specified parameters used in
+                this exploration. Keys are parameter names and values are
+                ParamSpec value objects with an object type property (obj_type).
+                RuleSpec inputs may have a parameter value which refers to one
+                of these exploration parameters.
 
         Raises:
-            ValidationError: One or more attributes of the RuleSpec are
+            ValidationError. One or more attributes of the RuleSpec are
                 invalid.
         """
         if not isinstance(self.inputs, dict):
@@ -2119,7 +2119,7 @@ class SubtitledHtml(python_utils.OBJECT):
         """Validates properties of the SubtitledHtml, and cleans the html.
 
         Raises:
-            ValidationError: One or more attributes of the SubtitledHtml are
+            ValidationError. One or more attributes of the SubtitledHtml are
                 invalid.
         """
         if not isinstance(self.content_id, python_utils.BASESTRING):
@@ -2138,7 +2138,7 @@ class SubtitledHtml(python_utils.OBJECT):
         """Create a default SubtitledHtml domain object.
 
         Args:
-            content_id: str. the id of the content.
+            content_id: str. The id of the content.
 
         Returns:
             SubtitledHtml. A default SubtitledHtml domain object, some
@@ -2278,7 +2278,7 @@ class State(python_utils.OBJECT):
                 allowed to be unspecified.
 
         Raises:
-            ValidationError: One or more attributes of the State are invalid.
+            ValidationError. One or more attributes of the State are invalid.
         """
         self.content.validate()
 
@@ -2375,7 +2375,7 @@ class State(python_utils.OBJECT):
             str. The html content corresponding to the given content id.
 
         Raises:
-            ValueError: The given content_id does not exist.
+            ValueError. The given content_id does not exist.
         """
         content_id_to_html = self._get_all_translatable_content()
         if content_id not in content_id_to_html:
@@ -2439,7 +2439,7 @@ class State(python_utils.OBJECT):
         for a ML model to be trained.
 
         Returns:
-            bool: True, if the conditions are satisfied.
+            bool. True, if the conditions are satisfied.
         """
         training_examples_count = 0
         labels_count = 0
@@ -2466,7 +2466,7 @@ class State(python_utils.OBJECT):
             str. The YAML version of the state_dict.
 
         Raises:
-            Exception: The state_dict does not represent a valid state.
+            Exception. The state_dict does not represent a valid state.
         """
         try:
             # Check if the state_dict can be converted to a State.
@@ -2730,7 +2730,7 @@ class State(python_utils.OBJECT):
                 default outcome.
 
         Raises:
-            Exception: 'confirmed_unclassified_answers' is not a list.
+            Exception. The 'confirmed_unclassified_answers' is not a list.
         """
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(
@@ -2746,7 +2746,7 @@ class State(python_utils.OBJECT):
             hints_list: list(Hint). A list of Hint objects.
 
         Raises:
-            Exception: 'hints_list' is not a list.
+            Exception. The 'hints_list' is not a list.
         """
         if not isinstance(hints_list, list):
             raise Exception(
@@ -2768,7 +2768,7 @@ class State(python_utils.OBJECT):
             solution: Solution. Object of class Solution.
 
         Raises:
-            Exception: 'solution' is not a domain object.
+            Exception. The 'solution' is not a domain object.
         """
         old_content_id_list = []
         new_content_id_list = []

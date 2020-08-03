@@ -860,7 +860,7 @@ class QuestionSummary(python_utils.OBJECT):
         """Validates the Question summary domain object before it is saved.
 
         Raises:
-            ValidationError: One or more attributes of question summary are
+            ValidationError. One or more attributes of question summary are
                 invalid.
         """
         if not isinstance(self.id, python_utils.BASESTRING):
