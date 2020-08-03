@@ -86,12 +86,11 @@ def get_multi(keys, namespace, sub_namespace=''):
         keys: list(str). List of keys to query the caching service for.
         namespace: str. The namespace under which the values associated with
             these keys lie. The namespace determines how the keys are decoded
-            from their JSON encoded string. Use default namespace for keys that
-            don't require deserialization.
+            from their JSON encoded string. Use 'default' as namespace for keys
+            that don't require serialization.
         sub_namespace: str. Sub namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects. For
-            ConfigPropertyModel, the sub_namespace is the property name.
+            sub_namespace is the version number of the objects.
 
     Returns:
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
@@ -120,11 +119,11 @@ def _get_memory_cache_key_from_type(key, namespace, sub_namespace):
     Args:
         key: str. The key of the value to store in the memory cache.
         namespace: str. The namespace under which the values associated with the
-            key lies.
+            key lies. Use 'default' as namespace for keys that don't require
+            serialization.
         sub_namespace: str. Sub namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects. For
-            ConfigPropertyModel, the sub_namespace is the property name.
+            sub_namespace is the version number of the objects.
 
     Returns:
         str. Memory cache key that identifies the type of the value associated
@@ -144,14 +143,11 @@ def set_multi(key_value_mapping, namespace, sub_namespace=''):
         key_value_mapping: list(str, *). A dict of {key, value} pairs to set to
             the cache. The values must be of type value_type.
         namespace: str. The namespace under which the values associated with the
-            key lies. Use default namespace for keys that don't require
+            key lies. Use 'default' as namespace for keys that don't require
             serialization.
         sub_namespace: str. Sub namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects. For
-            ConfigPropertyModel, the sub_namespace is the property name. If
-            sub-namespace is not needed to differentiate, the sub namespace
-            defaults to default.
+            sub_namespace is the version number of the objects.
 
     Returns:
         bool. Whether all operations complete successfully.
@@ -178,10 +174,7 @@ def delete_multi(keys, namespace, sub_namespace=''):
             other namespaces.
         sub_namespace: str. Sub namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects. For
-            ConfigPropertyModel, the sub_namespace is the property name. If
-            sub-namespace is not needed to differentiate, the sub namespace
-            defaults to default.
+            sub_namespace is the version number of the objects.
 
     Returns:
         bool. Whether all operations complete successfully.

@@ -26,38 +26,40 @@ from core.tests import test_utils
 class RedisCacheServicesUnitTests(test_utils.GenericTestBase):
     """Tests for redis_cache_services."""
 
-    def setUp(self):
-        super(RedisCacheServicesUnitTests, self).setUp()
-        self.keys = ['a', 'b', 'c']
-        self.non_existent_keys = ['d', 'e']
-        # Redis can only store strings so integers must be casted to correct
-        # values.
-        self.key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
-        self.response = redis_cache_services.set_multi(self.key_value_mapping)
-
     def test_flush_cache_wipes_cache_clean(self):
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        redis_cache_services.set_multi(key_value_mapping)
         redis_cache_services.flush_cache()
         self.assertEqual(
-            redis_cache_services.get_multi(self.keys), [None, None, None])
+            redis_cache_services.get_multi(['1', '2', '3']), [None, None, None])
 
     def test_get_multi_correctly_retrieves_cache_elements(self):
-        result = redis_cache_services.get_multi(self.keys)
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        redis_cache_services.set_multi(key_value_mapping)
+        result = redis_cache_services.get_multi(['a', 'b', 'c'])
         self.assertEqual(result, ['1', '2', '3'])
-        result = redis_cache_services.get_multi(self.non_existent_keys)
+        result = redis_cache_services.get_multi(['d', 'e'])
         self.assertEqual(result, [None, None])
 
     def test_set_multi_correctly_sets_elements(self):
-        self.assertTrue(self.response)
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        response = redis_cache_services.set_multi(key_value_mapping)
+        self.assertTrue(response)
 
     def test_delete_correctly_deletes_single_cache_element(self):
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        redis_cache_services.set_multi(key_value_mapping)
         is_successful = redis_cache_services.delete('a')
         self.assertTrue(is_successful)
         is_successful = redis_cache_services.delete('d')
         self.assertFalse(is_successful)
 
     def test_delete_multi_correctly_deletes_cache_elements(self):
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        redis_cache_services.set_multi(key_value_mapping)
+
         return_number_of_keys_set = redis_cache_services.delete_multi(
-            self.keys)
+            ['a', 'b', 'c'])
         self.assertEqual(return_number_of_keys_set, 3)
         return_number_of_keys_set = redis_cache_services.delete_multi(
             ['d', 'e', 'f'])

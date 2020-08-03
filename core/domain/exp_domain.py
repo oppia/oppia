@@ -4092,7 +4092,7 @@ class Exploration(python_utils.OBJECT):
         Args:
             json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing an Exploration. Only call
-                on strings returned from caching_services.get_multi.
+                on strings returned from the platform.cache cache_services.
 
         Returns:
             Exploration. The corresponding Exploration domain object.

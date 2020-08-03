@@ -386,7 +386,9 @@ def main(args=None):
     """Installs all the third party libraries."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
-    install_redis_cli()
+    if not common.is_windows_os():
+        # Redis cli is not compatible with windows machines.
+        install_redis_cli()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

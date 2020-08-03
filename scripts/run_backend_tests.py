@@ -267,11 +267,13 @@ def main(args=None):
     dev_appserver.fix_sys_path()
 
     # Start the redis local development server.
-    python_utils.PRINT('Starting Redis development server.')
-    subprocess.Popen(
-        './third_party/redis-cli-6.0.6/src/redis-server %s' %
-        (common.REDIS_CONF_PATH), shell=True)
-    atexit.register(cleanup)
+    if not common.is_windows_os():
+        # Redis does not run on Windows machines.
+        python_utils.PRINT('Starting Redis development server.')
+        subprocess.Popen(
+            './third_party/redis-cli-6.0.6/src/redis-server %s' %
+            (common.REDIS_CONF_PATH), shell=True)
+        atexit.register(cleanup)
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

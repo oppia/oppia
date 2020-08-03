@@ -812,7 +812,7 @@ class Skill(python_utils.OBJECT):
         Args:
             json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing a Skill. Only call
-                on strings returned from caching_services.get_multi.
+                on strings returned from the platform.cache cache_services.
 
         Returns:
             Skill. The corresponding Skill domain object.
