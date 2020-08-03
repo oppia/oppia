@@ -263,7 +263,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'pretest-question-backend-api.service.ts',
     'profile-link-image.component.ts',
     'profile-link-text.component.ts',
-    'profile-page-navbar.component.ts',
     'progress-nav.directive.ts',
     'promo-bar.directive.ts',
     'promo-bar.service.ts',
