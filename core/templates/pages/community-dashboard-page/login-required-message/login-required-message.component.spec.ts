@@ -23,13 +23,15 @@ describe('Login required message component', function() {
   var $scope = null;
   var userService = null;
 
-  var mockWindow = {
-    location: {
-      reload: jasmine.createSpy('reload', () => {})
-    }
-  };
+  var mockWindow = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    mockWindow = {
+      location: {
+        reload: jasmine.createSpy('reload', () => {})
+      }
+    };
+
     $provide.value('$window', mockWindow);
   }));
 
