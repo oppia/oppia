@@ -261,9 +261,9 @@ class QuestionsMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'question_id': 'question_id2',
             'latex_strings_without_svg': ['+,+,+,+']
         }
-        stories_latex_info = sorted(detailed_result[1])
-        self.assertEqual(stories_latex_info[0], expected_question1_info)
-        self.assertEqual(stories_latex_info[1], expected_question2_info)
+        questions_latex_info = sorted(detailed_result[1])
+        self.assertEqual(questions_latex_info[0], expected_question1_info)
+        self.assertEqual(questions_latex_info[1], expected_question2_info)
 
     def test_job_when_questions_do_not_have_math_rich_text(self):
 
@@ -332,15 +332,38 @@ class QuestionsMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             question_jobs_one_off.QuestionsMathRteAuditOneOffJob.get_output(
                 job_id))
         overall_result = ast.literal_eval(output[0])
-        expected_subtopic1_info = {
+        expected_question1_info = {
             'question_id': 'question_id1',
             'latex_strings_with_svg': [
                 '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
         }
-        expected_subtopic2_info = {
+        expected_question2_info = {
             'question_id': 'question_id2',
             'latex_strings_with_svg': ['+,+,+,+']
         }
-        subtopic_latex_info = sorted(overall_result[1])
-        self.assertEqual(subtopic_latex_info[0], expected_subtopic1_info)
-        self.assertEqual(subtopic_latex_info[1], expected_subtopic2_info)
+        questions_latex_info = sorted(overall_result[1])
+        self.assertEqual(questions_latex_info[0], expected_question1_info)
+        self.assertEqual(questions_latex_info[1], expected_question2_info)
+
+    def test_job_skips_deleted_questions(self):
+        question_data1 = self._create_valid_question_data('ABC')
+        self.save_new_question(
+            'question_id1', self.albert_id,
+            question_data1, ['skill_id1'])
+        question_services.delete_question(
+            self.albert_id, 'question_id1')
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            question_services.get_question_by_id('question_id1')
+
+        job_id = (
+            question_jobs_one_off.QuestionsMathRteAuditOneOffJob.create_new())
+        question_jobs_one_off.QuestionsMathRteAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        self.process_and_flush_pending_tasks()
+        output = (
+            question_jobs_one_off.QuestionsMathRteAuditOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])

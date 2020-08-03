@@ -448,18 +448,18 @@ class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(overall_result[1], expected_overall_result)
         detailed_result = ast.literal_eval(output[1])
-        expected_question1_info = {
+        expected_subtopic1_info = {
             'subtopic_id': subtopic_page1_id,
             'latex_strings_without_svg': [
                 '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
         }
-        expected_question2_info = {
+        expected_subtopic2_info = {
             'subtopic_id': subtopic_page2_id,
             'latex_strings_without_svg': ['+,+,+,+']
         }
-        stories_latex_info = sorted(detailed_result[1])
-        self.assertEqual(stories_latex_info[0], expected_question2_info)
-        self.assertEqual(stories_latex_info[1], expected_question1_info)
+        subtopics_latex_info = sorted(detailed_result[1])
+        self.assertEqual(subtopics_latex_info[0], expected_subtopic2_info)
+        self.assertEqual(subtopics_latex_info[1], expected_subtopic1_info)
 
     def test_job_when_subtopics_do_not_have_math_rich_text(self):
         topic_id1 = topic_services.get_new_topic_id()
@@ -573,3 +573,32 @@ class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         subtopic_latex_info = sorted(overall_result[1])
         self.assertEqual(subtopic_latex_info[0], expected_subtopic1_info)
         self.assertEqual(subtopic_latex_info[1], expected_subtopic2_info)
+
+    def test_job_skips_deleted_subtopics(self):
+        topic_id1 = topic_services.get_new_topic_id()
+        subtopic_page1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id1))
+        subtopic_page_services.save_subtopic_page(
+            self.albert_id, subtopic_page1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page_services.delete_subtopic_page(
+            self.albert_id, topic_id1, 1)
+
+        job_id = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .create_new())
+        topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .get_output(job_id))
+
+        self.assertEqual(output, [])

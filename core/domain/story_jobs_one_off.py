@@ -191,7 +191,9 @@ class StoryMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'total_number_of_latex_strings_without_svg': (
                         total_number_of_latex_strings_without_svg)
                 })
-            yield ('Latex strings in each story', stories_latex_strings)
+            yield (
+                'Latex strings without SVGs in each story',
+                stories_latex_strings)
 
         elif key == (
                 StoryMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG):

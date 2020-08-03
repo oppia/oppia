@@ -183,7 +183,6 @@ class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if item.deleted:
             return
-
         subtopic = subtopic_page_services.get_subtopic_page_from_model(item)
         html_string = ''
         html_string += subtopic.page_contents.subtitled_html.html
@@ -216,10 +215,10 @@ class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if key == SubTopicPageMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG:
             final_values = [ast.literal_eval(value) for value in values]
             total_number_of_latex_strings_without_svg = 0
-            subtopics_latex_strings_count = []
+            subtopics_latex_strings = []
             for subtopic_id, latex_strings in final_values:
                 total_number_of_latex_strings_without_svg += len(latex_strings)
-                subtopics_latex_strings_count.append({
+                subtopics_latex_strings.append({
                     'subtopic_id': subtopic_id,
                     'latex_strings_without_svg': latex_strings
                 })
@@ -230,18 +229,18 @@ class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         total_number_of_latex_strings_without_svg)
                 })
             yield (
-                'Number of latex strings in each subtopic',
-                subtopics_latex_strings_count)
+                'Latex strings with SVGs in each subtopic',
+                subtopics_latex_strings)
 
         elif key == (
                 SubTopicPageMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG):
             final_values = [ast.literal_eval(value) for value in values]
-            subtopics_latex_strings_count = []
+            subtopics_latex_strings = []
             for subtopic_id, latex_strings in final_values:
-                subtopics_latex_strings_count.append({
+                subtopics_latex_strings.append({
                     'subtopic_id': subtopic_id,
                     'latex_strings_with_svg': latex_strings
                 })
             yield (
                 'Latex strings with svgs in each subtopic',
-                subtopics_latex_strings_count)
+                subtopics_latex_strings)

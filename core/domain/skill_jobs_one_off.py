@@ -131,6 +131,8 @@ class SkillMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        if item.deleted:
+            return
         skill = skill_fetchers.get_skill_by_id(item.id)
         html_string = ''.join(skill.get_all_html_content_strings())
         list_of_latex_strings_without_svg = (
@@ -171,7 +173,7 @@ class SkillMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         total_number_of_latex_strings_without_svg)
                 })
             yield (
-                'Number of latex strings in each skill',
+                'Latex strings without SVGs in each skill',
                 skills_latex_strings_count)
         elif key == SkillMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG:
             final_values = [ast.literal_eval(value) for value in values]
@@ -182,5 +184,5 @@ class SkillMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'latex_strings_with_svg': latex_strings
                 })
             yield (
-                'Latex strings with svgs in each skill',
+                'Latex strings with SVGs in each skill',
                 skills_latex_strings_count)

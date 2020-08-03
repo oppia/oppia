@@ -231,7 +231,6 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             expected, [ast.literal_eval(x) for x in output])
 
 
-
 class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -320,14 +319,14 @@ class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(overall_result[1], expected_overall_result)
         detailed_result = ast.literal_eval(output[1])
-        expected_question1_info = {
+        expected_skill1_info = {
             'skill_id': 'skill_id1',
             'latex_strings_without_svg_in_skill': [
                 '+,+,+,+', '-,-,-,-',
                 '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
         }
-        stories_latex_info = sorted(detailed_result[1])
-        self.assertEqual(stories_latex_info[0], expected_question1_info)
+        skill_latex_info = detailed_result[1]
+        self.assertEqual(skill_latex_info[0], expected_skill1_info)
 
     def test_job_when_skills_do_not_have_math_rich_text_components(self):
         rubrics = [
@@ -416,3 +415,30 @@ class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         }
         skill_latex_info = overall_result[1]
         self.assertEqual(skill_latex_info[0], expected_skill1_info)
+
+    def test_job_skips_deleted_skills(self):
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+
+        skill = skill_domain.Skill.create_default_skill(
+            'valid_skill', 'A description', rubrics)
+        skill_services.save_new_skill(self.albert_id, skill)
+
+        skill_services.delete_skill(
+            self.albert_id, skill.id)
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            skill_fetchers.get_skill_by_id(skill.id)
+
+        job_id = (
+            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
+        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])

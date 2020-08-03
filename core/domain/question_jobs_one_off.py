@@ -137,10 +137,10 @@ class QuestionsMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if key == QuestionsMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG:
             final_values = [ast.literal_eval(value) for value in values]
             total_number_of_latex_strings_without_svg = 0
-            questions_latex_strings_count = []
+            questions_latex_strings = []
             for question_id, latex_strings in final_values:
                 total_number_of_latex_strings_without_svg += len(latex_strings)
-                questions_latex_strings_count.append({
+                questions_latex_strings.append({
                     'question_id': question_id,
                     'latex_strings_without_svg': latex_strings
                 })
@@ -151,16 +151,16 @@ class QuestionsMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         total_number_of_latex_strings_without_svg)
                 })
             yield (
-                'Number of latex strings in each question',
-                questions_latex_strings_count)
+                'Latex strings without SVGs in each question',
+                questions_latex_strings)
         elif key == QuestionsMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG:
             final_values = [ast.literal_eval(value) for value in values]
-            questions_latex_strings_count = []
+            questions_latex_strings = []
             for question_id, latex_strings in final_values:
-                questions_latex_strings_count.append({
+                questions_latex_strings.append({
                     'question_id': question_id,
                     'latex_strings_with_svg': latex_strings
                 })
             yield (
-                'Latex strings with svgs in each question',
-                questions_latex_strings_count)
+                'Latex strings with SVGs in each question',
+                questions_latex_strings)
