@@ -76,7 +76,7 @@ class LatexStringSvgImageDimensions(python_utils.OBJECT):
         """Validates properties of the LatexStringSvgImageDimensions.
 
         Raises:
-            ValidationError: attributes of the LatexStringSvgImageDimensions
+            ValidationError. Attributes of the LatexStringSvgImageDimensions
                 are invalid.
         """
 
@@ -138,7 +138,7 @@ class LatexStringSvgImageData(python_utils.OBJECT):
         """Validates properties of the LatexStringSvgImageData.
 
         Raises:
-            ValidationError: attributes of the LatexStringSvgImageData
+            ValidationError. Attributes of the LatexStringSvgImageData
                 are invalid.
         """
         if not isinstance(self.raw_image, python_utils.BASESTRING):

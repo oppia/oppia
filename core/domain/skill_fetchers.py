@@ -153,13 +153,13 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
     function to account for that new version.
 
     Args:
-        versioned_skill_contents: A dict with two keys:
+        versioned_skill_contents: dict. A dict with two keys:
             - schema_version: int. The schema version for the skill_contents
                 dict.
             - skill_contents: dict. The dict comprising the skill contents.
 
     Raises:
-        Exception: The schema version of the skill_contents is outside of what
+        Exception. The schema version of the skill_contents is outside of what
             is supported at present.
     """
     skill_contents_schema_version = versioned_skill_contents['schema_version']
@@ -191,7 +191,7 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
                 misconceptions.
 
     Raises:
-        Exception: The schema version of misconceptions is outside of what
+        Exception. The schema version of misconceptions is outside of what
             is supported at present.
     """
     misconception_schema_version = versioned_misconceptions['schema_version']
@@ -222,7 +222,7 @@ def _migrate_rubrics_to_latest_schema(versioned_rubrics):
                 rubrics.
 
     Raises:
-        Exception: The schema version of rubrics is outside of what is supported
+        Exception. The schema version of rubrics is outside of what is supported
             at present.
     """
     rubric_schema_version = versioned_rubrics['schema_version']

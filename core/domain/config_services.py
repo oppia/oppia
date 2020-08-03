@@ -34,7 +34,7 @@ def set_property(committer_id, name, value):
         value: str. The value of the property.
 
     Raises:
-        Exception: No config property with the specified name is found.
+        Exception. No config property with the specified name is found.
     """
 
     config_property = config_domain.Registry.get_config_property(name)
@@ -52,7 +52,7 @@ def revert_property(committer_id, name):
         name: str. The name of the property.
 
     Raises:
-        Exception: No config property with the specified name is found.
+        Exception. No config property with the specified name is found.
     """
 
     config_property = config_domain.Registry.get_config_property(name)

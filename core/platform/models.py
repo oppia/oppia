@@ -45,7 +45,7 @@ class Platform(python_utils.OBJECT):
         classes.
 
         Raises:
-            NotImplementedError: The method is not overwritten in derived
+            NotImplementedError. The method is not overwritten in derived
                 classes.
         """
         raise NotImplementedError(
@@ -65,10 +65,10 @@ class _Gae(Platform):
             model_names: list(str). List of storage module names.
 
         Returns:
-            tuple(module): Tuple of storage modules.
+            tuple(module). Tuple of storage modules.
 
         Raises:
-            Exception: Invalid model name.
+            Exception. Invalid model name.
         """
         returned_models = []
         for name in model_names:
@@ -225,8 +225,8 @@ class _Gae(Platform):
             setting and DEV_MODE setting.
 
         Raises:
-            Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
-                to a valid email_services module.
+            Exception. The value of feconf.EMAIL_SERVICE_PROVIDER does not
+                correspond to a valid email_services module.
         """
         if constants.DEV_MODE:
             from core.platform.email import dev_mode_email_services
@@ -290,7 +290,7 @@ class Registry(python_utils.OBJECT):
         imports.
 
         Returns:
-            class: The corresponding platform-specific interface class.
+            class. The corresponding platform-specific interface class.
         """
         return cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
 

@@ -5,7 +5,7 @@
       <div class="col-sm-4 col-md-4 col-lg-4">
         <input type="checkbox" name="compareVer" ng-model="$ctrl.versionCheckboxArray[versionNumber].selected" ng-init="init()" ng-click="$ctrl.changeSelectedVersions($event, versionNumber)" ng-disabled="$ctrl.isCheckboxDisabled(versionNumber)" ng-hide="$ctrl.comparisonsAreDisabled" class="protractor-test-history-checkbox-selector">
         [<[versionNumber]>]
-        <strong><profile-link-text username="$ctrl.explorationVersionMetadata[versionNumber].committerId"></profile-link-text></strong>
+        <strong><profile-link-text [username]="$ctrl.explorationVersionMetadata[versionNumber].committerId"></profile-link-text></strong>
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
         <[$ctrl.explorationVersionMetadata[versionNumber].commitMessage]>
