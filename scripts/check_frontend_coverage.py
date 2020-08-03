@@ -165,7 +165,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'list-of-unicode-string-editor.directive.ts',
     'logic-error-category-editor.directive.ts',
     'logic-question-editor.directive.ts',
-    'login-required-message.directive.ts',
     'math-expression-content-editor.directive.ts',
     'math-expression-input-rules.service.ts',
     'math-expression-input-validation.service.ts',

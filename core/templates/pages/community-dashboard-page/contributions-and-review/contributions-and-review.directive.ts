@@ -31,7 +31,7 @@ require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 require(
   'pages/community-dashboard-page/login-required-message/' +
-  'login-required-message.directive.ts');
+  'login-required-message.component.ts');
 require(
   'pages/community-dashboard-page/modal-templates/' +
   'question-suggestion-review-modal.controller.ts');
