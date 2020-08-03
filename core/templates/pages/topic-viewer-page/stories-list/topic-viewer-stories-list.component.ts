@@ -13,25 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the stories list.
+ * @fileoverview Component for the stories list.
  */
 
 require('components/summary-tile/story-summary-tile.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('storiesList', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getCanonicalStorySummaries: '&canonicalStorySummaries',
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-viewer-page/stories-list/' +
-        'topic-viewer-stories-list.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').component('storiesList', {
+  bindings: {
+    getCanonicalStorySummaries: '&canonicalStorySummaries',
+  },
+  template: require('./topic-viewer-stories-list.component.html')
+});
