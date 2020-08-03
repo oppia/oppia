@@ -142,7 +142,8 @@ def create_message(
 
     create_messages(
         [thread_id], author_id, updated_status, updated_subject, text,
-        received_via_email)
+        received_via_email
+    )
 
 
 def create_messages(
@@ -162,8 +163,8 @@ def create_messages(
             the first message of the threads. Otherwise, this property should
             only exist when the subject changes.
         text: str. The text of the feedback message. This may be ''.
-        received_via_email: bool. Whether new message is received via email or
-            web.
+        received_via_email: bool. Whether new the message(s) are received via
+            email or web.
     """
     from core.domain import event_services
     
@@ -192,15 +193,15 @@ def create_messages(
     messages = feedback_models.GeneralFeedbackMessageModel.create_multi(
             thread_ids, message_ids)
 
+    # Update the message instances.
     for index, message in enumerate(messages):
-        # Get the corresponding thread in storage.
-        thread = thread_models[index]
-        thread.message_count += 1
         message.thread_id = thread_ids[index]
         message.message_id = message_ids[index]
         message.author_id = author_id
         message.text = text
         message.received_via_email = received_via_email
+        # Get the corresponding thread in storage.
+        thread = thread_models[index]
         if updated_status:
             message.updated_status = updated_status
             if message.message_id == 0:
@@ -218,8 +219,9 @@ def create_messages(
     feedback_models.GeneralFeedbackMessageModel.put_multi(messages)
 
     # Update the message data cache of the threads.
-    if text:
-        for thread in thread_models:
+    for thread in thread_models:
+        thread.message_count += 1
+        if text:
             thread.last_nonempty_message_text = text
             thread.last_nonempty_message_author_id = author_id
 
@@ -260,8 +262,6 @@ def create_messages(
     suggestion_models.GeneralSuggestionModel.put_multi(
             suggestions_to_update)
 
-    #raise Exception('old status,{} new status,{} thread_models{}'.format(
-     #   len(old_statuses), len(new_statuses), len(thread_models)))
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
             user_services.is_user_registered(author_id))):
@@ -272,10 +272,8 @@ def create_messages(
 
     if author_id:
         subscription_services.subscribe_to_threads(author_id, thread_ids)
-        for index, thread in enumerate(thread_models):
-             add_message_id_to_read_by_list(thread_ids[index], author_id, message_ids[index])
+        add_message_ids_to_read_by_list(thread_ids, author_id, message_ids)
 
-        #add_message_ids_to_read_by_list(thread_ids, author_id, message_ids)
 
 def update_messages_read_by_the_user(user_id, thread_id, message_ids):
     """Replaces the list of message ids read by the message ids given to the
@@ -304,13 +302,7 @@ def add_message_id_to_read_by_list(thread_id, user_id, message_id):
         user_id: str. The id of the user reading the messages,
         message_id: int. The id of the message.
     """
-    feedback_thread_user_model = (
-        feedback_models.GeneralFeedbackThreadUserModel.get(
-            user_id, thread_id) or
-        feedback_models.GeneralFeedbackThreadUserModel.create(
-            user_id, thread_id))
-    feedback_thread_user_model.message_ids_read_by_user.append(message_id)
-    feedback_thread_user_model.put()
+    add_message_ids_to_read_by_list([thread_id], user_id, [message_id])
 
 def add_message_ids_to_read_by_list(thread_ids, user_id, message_ids):
     """Adds the message ids to the list of message ids read by the user.
@@ -324,36 +316,38 @@ def add_message_ids_to_read_by_list(thread_ids, user_id, message_ids):
     current_feedback_thread_user_models = (
         feedback_models.GeneralFeedbackThreadUserModel.get_multi(
             user_id, thread_ids))
-    feedback_thread_user_models = []
-    # Find all of the GeneralFeedbackThreadUserModels that need to be created
-    # based off of which thread_ids don't have a corresponding model yet.
-    new_feedback_thread_user_models = []
+    
     # Keep track of which thread_ids do not have models yet.
     missing_thread_ids = []
+    # Keep track of the current_feedback_thread_user_models that aren't None.
+    feedback_thread_user_models = []
     for index, feedback_model in enumerate(
         current_feedback_thread_user_models):
         if feedback_model is None:
             missing_thread_ids.append(thread_ids[index])
         else:
             feedback_thread_user_models.append(feedback_model)
+
     # Create the new GeneralFeedbackThreadUserModels for each of the thread_ids
     # that do not have a model yet.
+    new_feedback_thread_user_models = []
     if len(missing_thread_ids) > 0:
         new_feedback_thread_user_models = (
             feedback_models.GeneralFeedbackThreadUserModel.create_multi(
                 user_id, missing_thread_ids)
         )
+
     # The GeneralFeedbackThreadUserModels that need to be updated are the new
     # models that we created as well as the models that already existed.
     feedback_thread_user_models.extend(new_feedback_thread_user_models)
+
     # For each of the models, append the message_id to the
     # message_ids_read_by_user property.
     for index, feedback_model in enumerate(feedback_thread_user_models):
-        if feedback_model is None:
-            raise Exception('feedback model is none, id is {}'.format(thread_ids[index]))
         feedback_model.message_ids_read_by_user.append(
             message_ids[index]
         )
+
     # Update these new models in the datastore.
     feedback_models.GeneralFeedbackThreadUserModel.put_multi(
         feedback_thread_user_models

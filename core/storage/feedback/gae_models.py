@@ -344,11 +344,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         Args:
             thread_ids: list(str). IDs of the threads.
-            message_ids: int. IDs of the messages.
+            message_ids: list(int). IDs of the messages.
 
         Returns:
             list(GeneralFeedbackMessageModel). Instances of the new
-            GeneralFeedbackMessageModel entries.
+                GeneralFeedbackMessageModel entries.
 
         Raises:
             Exception: The number of thread_ids must be equal to the number of
@@ -362,16 +362,15 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 'message_ids when using create_multi. There are %s thread_ids '
                 ' and %s message_ids.' % (len(thread_ids), len(message_ids))
             )
-    
+ 
         # Generate the new ids.
         instance_ids = []
-        for thread_id, message_id in zip(thread_ids, message_ids):
+        for thread_id, message_id in python_utils.ZIP(thread_ids, message_ids):
             instance_id = cls._generate_id(thread_id, message_id)
             instance_ids.append(instance_id)
 
         # Check if the new ids are valid.
-        current_instances = cls.get_multi(
-            instance_ids)
+        current_instances = cls.get_multi(instance_ids)
         conflict_ids = []
         for current_instance in current_instances:
             if current_instance is not None:
@@ -381,7 +380,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 'The following feedback message ID(s) conflicted on '
                 'create: %s' % (' '.join(conflict_ids))
             )
-    
+
         # Create a list of the new instances.
         new_instances = []
         for instance_id in instance_ids:
@@ -462,8 +461,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             int. Number of messages in the thread.
         """
-        thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
-        return thread.message_count
+        return cls.get_message_counts([thread_id])[0]
     
     @classmethod
     def get_message_counts(cls, thread_ids):
