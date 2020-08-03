@@ -78,8 +78,8 @@ def validate_customization_args_and_values(
                     variable.
 
     Raises:
-        ValidationError: The given 'customization_args' is not valid.
-        ValidationError: The given 'customization_args' is missing at least one
+        ValidationError. The given 'customization_args' is not valid.
+        ValidationError. The given 'customization_args' is missing at least one
             key.
     """
     ca_spec_names = [

@@ -153,7 +153,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             ):
                 # Because a SubtitledUnicode and SubtitledHtml schema are
                 # encoded as a 'type: dict' schema, we exclude it here because
-                # they includes camel case names (content_id, unicode_str). 
+                # they includes camel case names (content_id, unicode_str).
                 for schema_property in schema['properties']:
                     ca_names_in_schema.append(schema_property['name'])
                     traverse_schema_to_find_names(schema_property['schema'])

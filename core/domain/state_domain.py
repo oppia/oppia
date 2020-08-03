@@ -2197,7 +2197,7 @@ class SubtitledUnicode(python_utils.OBJECT):
         """Validates properties of the SubtitledUnicode.
 
         Raises:
-            ValidationError: One or more attributes of the SubtitledUnicode are
+            ValidationError. One or more attributes of the SubtitledUnicode are
                 invalid.
         """
         if not isinstance(self.content_id, python_utils.BASESTRING):
@@ -2214,7 +2214,7 @@ class SubtitledUnicode(python_utils.OBJECT):
         """Create a default SubtitledUnicode domain object.
 
         Args:
-            content_id: str. the id of the content.
+            content_id: str. The id of the content.
 
         Returns:
             SubtitledUnicode. A default SubtitledUnicode domain object.
