@@ -230,6 +230,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_id('DragAndDropSortInput')
         state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
@@ -249,6 +250,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(2)
         state2.update_interaction_answer_groups(answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -338,6 +340,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -410,6 +413,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_id('MultipleChoiceInput')
         state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -533,6 +537,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1186,6 +1191,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_id('ItemSelectionInput')
         state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1310,6 +1316,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -2139,6 +2146,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(
             customization_args_dict)
+        state2.update_next_content_id_index(4)
         state2.update_interaction_answer_groups([answer_group_dict])
         state2.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
@@ -2263,6 +2271,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(
             customization_args_dict)
+        state2.update_next_content_id_index(4)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         job_id = (
@@ -2430,6 +2439,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
             state1.update_interaction_id('DragAndDropSortInput')
             state1.update_interaction_customization_args(
                 customization_args_dict)
+            state1.update_next_content_id_index(4)
             state1.update_interaction_answer_groups([answer_group_dict])
             state1.update_written_translations(
                 state_domain.WrittenTranslations.from_dict(
@@ -2760,6 +2770,7 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'choices': choices_customization_arg,
             'allowMultipleItemsInSamePosition': {'value': True}
         })
+        exploration1_state.update_next_content_id_index(4)
         exploration1_state.update_interaction_answer_groups(
             [drag_and_drop_answer_group_dict])
         exploration2_state.update_content(

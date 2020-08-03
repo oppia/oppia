@@ -3018,7 +3018,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected all content_ids to be unique, recieved'
+            'Expected all content_ids to be unique, received'
         ):
             with self.swap(
                 init_state.interaction.customization_args['choices'].value[0],
@@ -3044,8 +3044,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected all content id indexes to be less than next '
-            'content id index'
+            'Expected all content id indexes to be less than the "next '
+            'content id index"'
         ):
             exploration.validate()
 
@@ -3454,7 +3454,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Expected solution to be a Solution object,'
-            'recieved test string'):
+            'received test string'):
             exploration.init_state.update_interaction_solution('test string')
 
     def test_update_interaction_solution_with_no_solution(self):

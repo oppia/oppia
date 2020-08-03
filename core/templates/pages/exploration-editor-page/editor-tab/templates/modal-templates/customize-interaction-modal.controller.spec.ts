@@ -125,6 +125,17 @@ describe('Customize Interaction Modal Controller', function() {
       expect(isSubtitledUnicodeSchema).toBe(true);
     });
 
+    it('should properly detect a non SubtitledUnicode schema', () => {
+      const isSubtitledUnicodeSchema = $scope.isSubtitledUnicodeSchema({
+        type: 'dict',
+        properties: [{
+          name: 'content_id',
+          schema: {type: 'unicode_or_none'}
+        }]
+      });
+      expect(isSubtitledUnicodeSchema).toBe(false);
+    });
+
     it('should properly detect a SubtitledHtml schema', () => {
       const isSubtitledHtmlSchema = $scope.isSubtitledHtmlSchema({
         type: 'dict',
@@ -137,6 +148,17 @@ describe('Customize Interaction Modal Controller', function() {
         }]
       });
       expect(isSubtitledHtmlSchema).toBe(true);
+    });
+
+    it('should properly detect a non SubtitledHtml schema', () => {
+      const isSubtitledHtmlSchema = $scope.isSubtitledHtmlSchema({
+        type: 'dict',
+        properties: [{
+          name: 'html',
+          schema: {type: 'html'}
+        }]
+      });
+      expect(isSubtitledHtmlSchema).toBe(false);
     });
 
     it('should evaluate scope variable values correctly', function() {

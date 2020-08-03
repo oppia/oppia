@@ -227,7 +227,7 @@ class Question(python_utils.OBJECT):
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
-                initalize a State domain object.
+                initialize a State domain object.
 
         Returns:
             dict. The converted question_state_dict.
@@ -247,7 +247,7 @@ class Question(python_utils.OBJECT):
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
-                initalize a State domain object.
+                initialize a State domain object.
 
         Returns:
             dict. The converted question_state_dict.
@@ -616,7 +616,6 @@ class Question(python_utils.OBJECT):
                 ca_dict[ca_name] = {'value': new_value}
             elif ca_name not in ca_dict:
                 ca_dict[ca_name] = {'value': ca_spec.default_value}
-
 
         (
             customization_args_util

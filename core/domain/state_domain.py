@@ -1105,7 +1105,9 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 not schema_utils.is_subtitled_unicode_schema(schema)
         ):
             # Because a SubtitledHtml and SubtitledUnicode schema is encoded
-            # as a 'type: dict' schema, we exclude them here.
+            # as a 'type: dict' schema, but are actually represented by domain
+            # objects, we exclude traversing on them to avoid __getitem__
+            # attribute errors when traversing the value.
             result = list(itertools.chain.from_iterable([
                 InteractionCustomizationArg.traverse_by_schema_and_get(
                     property_spec['schema'],
@@ -2074,9 +2076,11 @@ class SubtitledHtml(python_utils.OBJECT):
     def __init__(self, content_id, html):
         """Initializes a SubtitledHtml domain object. Note that initializing
         the SubtitledHtml object does not clean the html. This is because we
-        sometimes need to initalize SubtitledHtml and migrate the contained
+        sometimes need to initialize SubtitledHtml and migrate the contained
         html from an old schema, but the cleaner would remove invalid tags
-        and attributes before having a chance to migrate it. Before saving the
+        and attributes before having a chance to migrate it. An example where
+        this functionality is required is
+        InteractionInstance.convert_html_in_interaction. Before saving the
         SubtitledHtml object, validate() should be called for validation and
         cleaning of the html.
 
@@ -2085,7 +2089,7 @@ class SubtitledHtml(python_utils.OBJECT):
                 content.
             html: str. A piece of user-submitted HTML. Note that this is NOT
                 cleaned in such a way as to contain a restricted set of HTML
-                tags until the validate() method is called.
+                tags. To clean it, the validate() method must be called.
         """
         self.content_id = content_id
         self.html = html
@@ -2335,7 +2339,7 @@ class State(python_utils.OBJECT):
         if len(set(content_id_list)) != len(content_id_list):
             raise utils.ValidationError(
                 'Expected all content_ids to be unique, '
-                'recieved %s' % content_id_list)
+                'received %s' % content_id_list)
 
         for content_id in content_id_list:
             content_id_suffix = content_id.split('_')[-1]
@@ -2348,8 +2352,9 @@ class State(python_utils.OBJECT):
                     int(content_id_suffix) > self.next_content_id_index
             ):
                 raise utils.ValidationError(
-                    'Expected all content id indexes to be less than next '
-                    'content id index, but received content id %s' % content_id)
+                    'Expected all content id indexes to be less than the "next '
+                    'content id index", but received content id %s' % content_id
+                )
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
@@ -2624,7 +2629,7 @@ class State(python_utils.OBJECT):
         if len(new_content_id_list) != len(set(new_content_id_list)):
             raise Exception(
                 'All customization argument content_ids should be unique. '
-                'Content ids recieved: %s' % new_content_id_list)
+                'Content ids received: %s' % new_content_id_list)
 
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
@@ -2779,7 +2784,7 @@ class State(python_utils.OBJECT):
         if solution is not None:
             if not isinstance(solution, Solution):
                 raise Exception(
-                    'Expected solution to be a Solution object,recieved %s'
+                    'Expected solution to be a Solution object,received %s'
                     % solution)
             self.interaction.solution = solution
             new_content_id_list.append(

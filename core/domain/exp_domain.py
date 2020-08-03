@@ -2788,7 +2788,6 @@ class Exploration(python_utils.OBJECT):
                 elif ca_name not in ca_dict:
                     ca_dict[ca_name] = {'value': ca_spec.default_value}
 
-
             (
                 customization_args_util
                 .validate_customization_args_and_values(

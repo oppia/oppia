@@ -1562,6 +1562,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'content_1', 'feedback_1', 'feedback_3'])
 
     def test_migrate_question_state_from_v35_to_latest(self):
+        # Test restructuring of written_translations.
         question_state_dict = {
             'content': {
                 'content_id': 'content_1',
@@ -1642,6 +1643,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 }
             })
 
+        # Test migration of PencilCodeEditor customization argument from
+        # intial_code to intialCode.
         question_state_dict = {
             'content': {
                 'content_id': 'content_1',
@@ -1713,6 +1716,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 }
             })
 
+        # Test population of default value of SubtitledHtml list.
         question_state_dict = {
             'content': {
                 'content_id': 'content_1',
@@ -1781,6 +1785,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'showChoicesInShuffledOrder': {'value': True}
             })
 
+        # Test migration of html list to SubtitledHtml list.
         question_state_dict = {
             'content': {
                 'content_id': 'content_1',

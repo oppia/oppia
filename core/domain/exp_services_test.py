@@ -247,7 +247,12 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                         }]
                     },
                     'showChoicesInShuffledOrder': {'value': False}
-                }),
+                }) +
+            _get_change_list(
+                'Introduction',
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                2
+            ),
             ''
         )
         self.assertEqual(exp_services.get_interaction_id_for_state(
@@ -4781,6 +4786,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             }
         }
         state.update_interaction_id('ItemSelectionInput')
+        state.update_next_content_id_index(4)
         state.update_interaction_customization_args(
             state_customization_args_dict)
         exp_services.save_new_exploration(self.USER_ID, exploration)

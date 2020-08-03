@@ -750,6 +750,7 @@ title: Old Title
         }]
 
         state3.update_interaction_answer_groups(answer_groups_3)
+        state3.update_next_content_id_index(4)
         exploration.states_schema_version = 34
         exp_services.save_new_exploration('owner_id', exploration)
 
