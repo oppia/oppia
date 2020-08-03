@@ -389,7 +389,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-questions-tab.directive.ts',
     'topic-selector.directive.ts',
     'topic-summary-tile.directive.ts',
-    'topic-viewer-navbar-breadcrumb.directive.ts',
     'TopicObjectFactory.ts',
     'topics-and-skills-dashboard-backend-api.service.ts',
     'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts',
