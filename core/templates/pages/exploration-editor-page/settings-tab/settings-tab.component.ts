@@ -77,9 +77,12 @@ require(
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('settingsTab', {
   bindings: {
@@ -99,7 +102,7 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'UrlInterpolationService', 'UserEmailPreferencesService',
+    'RouterService', 'UrlInterpolationService', 'UserEmailPreferencesService',
     'UserExplorationPermissionsService', 'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
@@ -114,13 +117,14 @@ angular.module('oppia').component('settingsTab', {
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        UrlInterpolationService, UserEmailPreferencesService,
+        RouterService, UrlInterpolationService, UserEmailPreferencesService,
         UserExplorationPermissionsService, WindowRef, ALL_CATEGORIES,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
       var ctrl = this;
-
       var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
       var EXPLORE_PAGE_PREFIX = '/explore/';
+
+      ctrl.directiveSubscriptions = new Subscription();
 
       ctrl.getExplorePageUrl = function() {
         return (
@@ -358,7 +362,13 @@ angular.module('oppia').component('settingsTab', {
       };
 
       ctrl.$onInit = function() {
-        $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
+        ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshSettingsTab.subscribe(
+            () => {
+              ctrl.refreshSettingsTab();
+            }
+          )
+        );
         ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
           EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
         ctrl.EditabilityService = EditabilityService;
@@ -422,6 +432,9 @@ angular.module('oppia').component('settingsTab', {
           width: '16.66666667%',
           'vertical-align': 'top'
         });
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
