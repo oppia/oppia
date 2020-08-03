@@ -1409,59 +1409,66 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
                     playthrough_issue_registry.Registry.get_issue_by_type(
                         issue['issue_type']).customization_arg_specs)
                 all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
-                yield (
-                    'ExplorationIssue',
-                    (
-                        all_ca_names == set(issue['issue_customization_args']),
-                        item.exp_id.encode('utf-8'),
-                        issue['issue_type'].encode('utf-8')
+                if all_ca_names == set(issue['issue_customization_args']):
+                    yield ('ExplorationIssue -- SUCCESS', 1)
+                else:
+                    ca = [
+                        ca_name.encode('utf-8')
+                        for ca_name in issue['issue_customization_args'].keys()
+                    ]
+                    yield (
+                        'ExplorationIssue -- FAILURE',
+                        (
+                            item.exp_id.encode('utf-8'),
+                            issue['issue_type'].encode('utf-8'),
+                            ca
+                        )
                     )
-                )
         elif isinstance(item, stats_models.PlaythroughModel):
             ca_specs = playthrough_issue_registry.Registry.get_issue_by_type(
                 item.issue_type).customization_arg_specs
             all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
-            yield (
-                'Playthrough Issue',
-                (
-                    all_ca_names == set(item.issue_customization_args),
-                    item.exp_id.encode('utf-8'),
-                    item.issue_type.encode('utf-8')
+            if all_ca_names == set(item.issue_customization_args):
+                yield ('Playthrough Issue -- SUCCESS', 1)
+            else:
+                ca = [
+                    ca_name.encode('utf-8')
+                    for ca_name in item.issue_customization_args.keys()
+                ]
+                yield (
+                    'Playthrough Issue -- FAILURE',
+                    (
+                        item.exp_id.encode('utf-8'),
+                        item.issue_type.encode('utf-8'),
+                        ca
+                    )
                 )
-            )
 
             for action in item.actions:
                 ca_specs = (
                     action_registry.Registry.get_action_by_type(
                         action['action_type']).customization_arg_specs)
                 all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
-                yield (
-                    'Playthrough Action',
-                    (
-                        all_ca_names == set(
-                            action['action_customization_args']),
-                        item.exp_id.encode('utf-8'),
-                        action['action_type'].encode('utf-8')
+                if all_ca_names == set(action['action_customization_args']):
+                    yield ('Playthrough Action -- SUCCESS', 1)
+                else:
+                    ca = [
+                        ca_name.encode('utf-8')
+                        for ca_name in action[
+                            'action_customization_args'].keys()
+                    ]
+                    yield (
+                        'Playthrough Action -- FAILURE',
+                        (
+                            item.exp_id.encode('utf-8'),
+                            action['action_type'].encode('utf-8'),
+                            ca
+                        )
                     )
-                )
 
     @staticmethod
     def reduce(key, values):
-        expected = [value for value in values if value[1:5] == 'True']
-        unexpected = [value for value in values if value[1:6] == 'False']
-
-        yield (
-            '%s: %i %s objects have %s' % (
-                StatisticsCustomizationArgsAudit.JOB_RESULT_EXPECTED,
-                len(expected),
-                key,
-                StatisticsCustomizationArgsAudit.STATUS_MATCH_KEYS)
-        )
-        yield (
-            '%s: %i %s objects have %s' % (
-                StatisticsCustomizationArgsAudit.JOB_RESULT_UNEXPECTED,
-                len(unexpected),
-                key,
-                StatisticsCustomizationArgsAudit.STATUS_MISMATCH_KEYS),
-            unexpected
-        )
+        if 'SUCCESS' in key:
+            yield (key, len(values))
+        else:
+            yield (key, values)

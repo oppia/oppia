@@ -1779,27 +1779,17 @@ class StatisticsCustomizationArgsAuditTests(OneOffJobTestBase):
         self.assertItemsEqual(
             self.run_one_off_job(),
             [
+                u'[u\'ExplorationIssue -- SUCCESS\', 1]',
                 (
-                    'EXPECTED: 1 Playthrough Issue objects have the correct '
-                    'customization argument key(s)'),
+                    u'[u\'Playthrough Action -- FAILURE\', [u"(\'EXP_ID\', \'Ex'
+                    'plorationStart\', [])"]]'),
                 (
-                    '[u\'UNEXPECTED: 1 Playthrough Issue objects have missing'
-                    ' or extra customization argument key(s)\', [u"(False, \''
-                    'EXP_ID\', \'EarlyQuit\')"]]'),
+                    u'[u\'Playthrough Issue -- FAILURE\', [u"(\'EXP_ID\', \'Ear'
+                    'lyQuit\', [])"]]'),
+                u'[u\'Playthrough Action -- SUCCESS\', 1]',
                 (
-                    'EXPECTED: 1 ExplorationIssue objects have the correct '
-                    'customization argument key(s)'),
-                (
-                    '[u\'UNEXPECTED: 1 ExplorationIssue objects have missing or'
-                    ' extra customization argument key(s)\', [u"(False, \'EXP_I'
-                    'D\', \'MultipleIncorrectSubmissions\')"]]'),
-                (
-                    'EXPECTED: 1 Playthrough Action objects have the correct '
-                    'customization argument key(s)'),
-                (
-                    '[u\'UNEXPECTED: 1 Playthrough Action objects have missing '
-                    'or extra customization argument key(s)\', [u"(False, \'EXP'
-                    '_ID\', \'ExplorationStart\')"]]'
-                )
+                    u'[u\'ExplorationIssue -- FAILURE\', [u"(\'EXP_ID\', \'Mult'
+                    'ipleIncorrectSubmissions\', [\'state_name\'])"]]'),
+                u'[u\'Playthrough Issue -- SUCCESS\', 1]'
             ]
         )

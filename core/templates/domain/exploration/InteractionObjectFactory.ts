@@ -172,6 +172,15 @@ export class Interaction {
     return customizationArgsBackendDict;
   }
 
+  /**
+   * This function is used to properly set state in Questions. The state in
+   * Questions must handle its own WrittenTranslations and RecordedVoiceovers,
+   * so it must get all content ids in the state. See question-update.service.ts
+   * for more details.
+   * @param {InteractionCustomizationArgs} customizationArgs The customization
+   *  arguments to get content ids for.
+   * @returns {string[]} List of content ids in customization args.
+   */
   static getCustomizationArgContentIds(
       customizationArgs: InteractionCustomizationArgs
   ): string[] {
