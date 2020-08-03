@@ -121,8 +121,9 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                 'You cannot accept/reject your own suggestion.')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
-            if (len(self.payload.get('commit_message'))
-                    > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            commit_message = self.payload.get('commit_message')
+            if (not commit_message is None and
+            len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
                 raise self.InvalidInputException(
                     'Commit messages must be at most %s characters long.'
                     % feconf.MAX_COMMIT_MESSAGE_LENGTH)

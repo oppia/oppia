@@ -269,7 +269,8 @@ class EditableTopicDataHandler(base.BaseHandler):
 
         commit_message = self.payload.get('commit_message')
 
-        if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
+        if (not commit_message is None and
+            len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
                 % feconf.MAX_COMMIT_MESSAGE_LENGTH)
