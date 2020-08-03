@@ -583,13 +583,11 @@ class Topic(python_utils.OBJECT):
         }
 
         if self.created_on:
-            topic_dict['created_on'] = (
-                utils.convert_naive_datetime_to_string(self.created_on))
+            topic_dict['created_on'] = utils.convert_naive_datetime_to_string(
                 self.created_on)
 
         if self.last_updated:
-            topic_dict['last_updated'] = (
-                utils.convert_naive_datetime_to_string(self.created_on))
+            topic_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
         return json.dumps(topic_dict)
