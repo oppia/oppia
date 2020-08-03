@@ -13,8 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the jquery ui plugin.
+ * @fileoverview This file imports the jquery, jquery ui.
  */
+
+window.$ = require('static/jquery-3.5.1/jquery.min.js');
+window.jQuery = window.$;
 
 require('static/jqueryui-1.12.1/jquery-ui.min.js');
 require('static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js');

@@ -24,8 +24,6 @@
  * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
 import 'hammerjs';
-require('third-party-imports/jquery-ui.import');
-
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.directive.ts');
