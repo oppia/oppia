@@ -245,8 +245,6 @@ class PlatformParameterFilter(python_utils.OBJECT):
         Returns:
             bool. True if the filter is matched.
         """
-        if value is None:
-            return False
         if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
@@ -349,11 +347,14 @@ class PlatformParameterFilter(python_utils.OBJECT):
         Args:
             op: str. The operator for comparison, e.g. '=', '>'.
             value: str. The version for comparison, e.g. '1.0.1'.
-            client_version: str. The client version, e.g. '1.0.1-3aebf3h'.
+            client_version: str|None. The client version, e.g. '1.0.1-3aebf3h'.
 
         Returns:
             bool. True if the expression matches the version.
         """
+        if client_version is None:
+            return False
+
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
         client_version_without_hash = match.group(1)
 

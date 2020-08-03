@@ -524,6 +524,17 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         test_context = self._create_example_context(mode='test')
         self.assertFalse(filter_domain.evaluate(test_context))
 
+    def test_evaluate_app_version_filter_without_version_returns_false(self):
+        filter_dict = {
+            'type': 'app_version',
+            'conditions': [('=', '1.2.3'), ('=', '1.2.4')]
+        }
+        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
+            filter_dict)
+
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version=None)))
+
     def test_evaluate_filter_with_unsupported_operation_raises_exception(self):
         filter_domain = (
             parameter_domain
@@ -533,15 +544,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Unsupported comparison operator \'!=\''):
             filter_domain.evaluate(self._create_example_context())
-
-    def test_evaluate_filter_with_none_value_returns_false(self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version', 'conditions': [('=', None)]}
-            ))
-        self.assertFalse(
-            filter_domain.evaluate(self._create_example_context()))
 
     def test_validate_filter_passes_without_exception(self):
         filter_dict = {
