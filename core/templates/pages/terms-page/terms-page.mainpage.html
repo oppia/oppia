@@ -286,21 +286,6 @@
           </content>
         </base-content>
       </div>
-
-      <script>
-        // This scrolls the page to the anchor clicked on in the quick links menu.
-        $('a[href*=\\#]:not([href=\\#])').click(function() {
-          if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
-            var target = $('[name=' + this.hash.slice(1) +']');
-            if (target.length) {
-              $('html,body').animate({
-                scrollTop: target.offset().top
-              }, 1000);
-              return false;
-            }
-          }
-        });
-      </script>
       <style>
         .oppia-terms-right-menu {
           left: 50%;
@@ -321,5 +306,19 @@
       </style>
     </oppia-root>
     @load('pages/footer_js_libs.html')
+    <script>
+      // This scrolls the page to the anchor clicked on in the quick links menu.
+      $('a[href*=\\#]:not([href=\\#])').click(function() {
+        if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')) {
+          var target = $('[name=' + this.hash.slice(1) +']');
+          if (target.length) {
+            $('html,body').animate({
+              scrollTop: target.offset().top
+            }, 1000);
+            return false;
+          }
+        }
+      });
+    </script>
   </body>
 </html>
