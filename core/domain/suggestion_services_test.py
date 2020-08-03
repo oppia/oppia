@@ -411,8 +411,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         expected_exception_regexp = (
             'Invalid math tags found in the suggestion with id %s.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
         with self.swap(
             exp_services, 'update_exploration', self.mock_update_exploration):
@@ -454,8 +453,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
         expected_exception_regexp = (
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
@@ -470,8 +468,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         expected_exception_regexp = (
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
@@ -574,8 +571,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
         expected_exception_regexp = (
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
@@ -591,8 +587,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         expected_exception_regexp = (
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
@@ -647,8 +642,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 suggestion, '', self.author_id)
         expected_exception_regexp = (
             'The suggestion with id %s is not yet handled.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
@@ -679,8 +673,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 expected_exception_regexp = (
                     'The suggestion with id %s was accepted. Only rejected '
                     'suggestions can be resubmitted.' % (
-                        suggestion.suggestion_id
-                    )
+                        suggestion.suggestion_id)
                 )
                 with self.assertRaisesRegexp(
                     Exception, expected_exception_regexp):

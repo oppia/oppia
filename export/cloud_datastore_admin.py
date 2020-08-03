@@ -48,7 +48,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         Export data described in request parameters.
 
         Raises:
-            AssertionError: Bucket url exists and doesn't start with 'gs://'.
+            AssertionError. Bucket url exists and doesn't start with 'gs://'.
         """
         gcs_bucket_url_prefix = 'gs://'
 

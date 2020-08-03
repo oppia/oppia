@@ -106,8 +106,9 @@ DELETED_SKILL_REJECT_MESSAGE = 'The associated skill no longer exists.'
 # associated with an exploration that no longer corresponds to the story.
 # The story could be deleted or the exploration could have been
 # removed from the story.
-INVALID_STORY_REJECT_MESSAGE = (
-    'The associated story relationship is no longer valid.'
+INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG = (
+    'This text snippet has been removed from the story, and no longer needs '
+    'translation. Sorry about that!'
 )
 
 # The amount to increase the score of the author by after successfuly getting an
@@ -201,7 +202,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 suggestion.
 
         Raises:
-            Exception: There is already a suggestion with the given id.
+            Exception. There is already a suggestion with the given id.
         """
         instance_id = thread_id
 
@@ -246,7 +247,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         the given exploration ids.
 
         Args:
-            exp_ids: list(str). list of exploration ids to query for.
+            exp_ids: list(str). List of exploration ids to query for.
 
         Returns:
             list(SuggestionModel). A list of translation suggestions that
@@ -282,7 +283,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         score_categories.
 
         Args:
-            score_categories: list(str). list of score categories to query for.
+            score_categories: list(str). List of score categories to query for.
             user_id: list(str). The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.

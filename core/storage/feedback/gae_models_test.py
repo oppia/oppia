@@ -178,16 +178,32 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id('id_x'))
 
     def test_raise_exception_by_mocking_collision(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Feedback message ID conflict on create.'):
-            # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
-                feedback_models.GeneralFeedbackMessageModel, 'get_by_id',
-                types.MethodType(
-                    lambda x, y: True,
-                    feedback_models.GeneralFeedbackMessageModel)):
-                feedback_models.GeneralFeedbackMessageModel.create(
-                    'thread_id', 'message_id')
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', 'test_author', 'subject 1', 'text 1')
+        # Simulating the _generate_id function in the
+        # GeneralFeedbackMessageModel class.
+        instance_id = '.'.join([thread_id, '0'])
+
+        expected_exception_regexp = (
+            r'The following feedback message ID\(s\) conflicted on '
+            'create: %s' % (instance_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            feedback_models.GeneralFeedbackMessageModel.create(
+                thread_id, '0')
+
+    def test_create_multi_raises_exception_for_invalid_arg_lengths(self):
+        test_thread_ids = ['thread_id_1']
+        test_message_ids = ['message_id_1', 'message_id_2']
+        expected_exception_regexp = (
+            'The number of thread_ids must be equal to the number of '
+            'message_ids when using create_multi. There are %s thread_ids '
+            ' and %s message_ids.' % (
+                len(test_thread_ids), len(test_message_ids))
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            feedback_models.GeneralFeedbackMessageModel.create_multi(
+                test_thread_ids, test_message_ids)
 
     def test_get_all_messages(self):
         thread_id = feedback_services.create_thread(

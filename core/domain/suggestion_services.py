@@ -104,7 +104,8 @@ def get_suggestion_from_model(suggestion_model):
     """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
-        suggestion_model: SuggestionModel.
+        suggestion_model: SuggestionModel. SuggestionModel object to be
+            converted to Suggestion domain object.
 
     Returns:
         Suggestion. The corresponding Suggestion domain object.
@@ -274,15 +275,14 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
             accepting the suggestion.
 
     Raises:
-        Exception: The suggestion is already handled.
-        Exception: The suggestion is not valid.
-        Exception: The commit message is empty.
+        Exception. The suggestion is already handled.
+        Exception. The suggestion is not valid.
+        Exception. The commit message is empty.
     """
     if suggestion.is_handled:
         raise Exception(
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
@@ -295,8 +295,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     if len(error_list) > 0:
         raise Exception(
             'Invalid math tags found in the suggestion with id %s.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
 
     author_name = user_services.get_username(suggestion.author_id)
@@ -338,7 +337,7 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
             rejecting the suggestion.
 
     Raises:
-        Exception: The suggestion is already handled.
+        Exception. The suggestion is already handled.
     """
 
     reject_suggestions([suggestion], reviewer_id, review_message)
@@ -354,7 +353,7 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
             rejecting the suggestions.
 
     Raises:
-        Exception: One or more of the suggestions has already been handled.
+        Exception. One or more of the suggestions has already been handled.
     """
 
     for suggestion in suggestions:
@@ -372,19 +371,19 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
 
     _update_suggestions(suggestions)
 
-    for suggestion in suggestions:
-        thread_id = suggestion.suggestion_id
-        feedback_services.create_message(
-            thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
-            None, review_message)
+    thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
+    feedback_services.create_messages(
+        thread_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
+        None, review_message
+    )
 
 
-def reject_question_suggestions_with_skill_target_id(skill_id):
+def auto_reject_question_suggestions_with_skill_target_id(skill_id):
     """Rejects all SuggestionAddQuestions with target ID matching the supplied
     skill ID. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
     Args:
-        skill_id: The skill ID corresponding to the target ID of the
+        skill_id: str. The skill ID corresponding to the target ID of the
             SuggestionAddQuestion.
     """
     suggestions = query_suggestions(
@@ -400,7 +399,7 @@ def reject_question_suggestions_with_skill_target_id(skill_id):
         suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
-def reject_translation_suggestions_with_exp_target_ids(exp_ids):
+def auto_reject_translation_suggestions_with_exp_target_ids(exp_ids):
     """Rejects all translation suggestions with target IDs matching the
     supplied exploration IDs. These suggestions are being rejected because
     their corresponding exploration was removed from a story or the story was
@@ -414,7 +413,7 @@ def reject_translation_suggestions_with_exp_target_ids(exp_ids):
 
     reject_suggestions(
         suggestions, feconf.SUGGESTION_BOT_USER_ID,
-        suggestion_models.INVALID_STORY_REJECT_MESSAGE)
+        suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
 def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
@@ -427,24 +426,22 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
         author_id: str. The ID of the author creating the suggestion.
 
     Raises:
-        Exception: The summary message is empty.
-        Exception: The suggestion has not been handled yet.
-        Exception: The suggestion has already been accepted.
+        Exception. The summary message is empty.
+        Exception. The suggestion has not been handled yet.
+        Exception. The suggestion has already been accepted.
     """
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
     if not suggestion.is_handled:
         raise Exception(
             'The suggestion with id %s is not yet handled.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception(
             'The suggestion with id %s was accepted. '
             'Only rejected suggestions can be resubmitted.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
 
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
@@ -658,7 +655,7 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
         user_id: str. The ID of the user.
 
     Returns:
-        bool: Whether the user can resubmit the suggestion.
+        bool. Whether the user can resubmit the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
@@ -676,7 +673,7 @@ def _get_voiceover_application_class(target_type):
         class. The voiceover application class for the given target type.
 
     Raises:
-        Exception: The voiceover application target type is invalid.
+        Exception. The voiceover application target type is invalid.
     """
     target_type_to_classes = (
         suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)

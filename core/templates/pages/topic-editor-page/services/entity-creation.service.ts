@@ -56,6 +56,7 @@ angular.module('oppia').factory('EntityCreationService', [
           topic: () => topic
         },
         controllerAs: '$ctrl',
+        windowClass: 'create-new-subtopic',
         controller: 'CreateNewSubtopicModalController'
       }).result.then(function(subtopicId) {
         TopicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);

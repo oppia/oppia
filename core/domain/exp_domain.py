@@ -39,7 +39,10 @@ from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
+
+from pylatexenc import latex2text
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -106,6 +109,85 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # Represents answers which led to the 'default outcome' of an interaction,
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
+
+TYPE_INVALID_EXPRESSION = 'Invalid'
+TYPE_VALID_ALGEBRAIC_EXPRESSION = 'AlgebraicExpressionInput'
+TYPE_VALID_NUMERIC_EXPRESSION = 'NumericExpressionInput'
+TYPE_VALID_MATH_EQUATION = 'MathEquationInput'
+
+
+def clean_math_expression(math_expression):
+    """Cleans a given math expression and formats it so that it is compatible
+    with the new interactions' validators.
+
+    Args:
+        math_expression: str. The string representing the math expression.
+
+    Returns:
+        str. The correctly formatted string representing the math expression.
+    """
+    unicode_to_text = {
+        u'\u221a': 'sqrt',
+        u'\xb7': '*',
+        u'\u03b1': 'alpha',
+        u'\u03b2': 'beta',
+        u'\u03b3': 'gamma',
+        u'\u03b4': 'delta',
+        u'\u03b5': 'epsilon',
+        u'\u03b6': 'zeta',
+        u'\u03b7': 'eta',
+        u'\u03b8': 'theta',
+        u'\u03b9': 'iota',
+        u'\u03ba': 'kappa',
+        u'\u03bb': 'lambda',
+        u'\u03bc': 'mu',
+        u'\u03bd': 'nu',
+        u'\u03be': 'xi',
+        u'\u03c0': 'pi',
+        u'\u03c1': 'rho',
+        u'\u03c3': 'sigma',
+        u'\u03c4': 'tau',
+        u'\u03c5': 'upsilon',
+        u'\u03c6': 'phi',
+        u'\u03c7': 'chi',
+        u'\u03c8': 'psi',
+        u'\u03c9': 'omega',
+    }
+    inverse_trig_fns_mapping = {
+        'asin': 'arcsin',
+        'acos': 'arccos',
+        'atan': 'arctan'
+    }
+    trig_fns = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot']
+
+    # Shifting powers in trig functions to the end.
+    # For eg. 'sin^2(x)' -> '(sin(x))^2'.
+    for trig_fn in trig_fns:
+        math_expression = re.sub(
+            r'%s(\^\d)\((.)\)' % trig_fn,
+            r'(%s(\2))\1' % trig_fn, math_expression)
+
+    # Adding parens to trig functions that don't have
+    # any. For eg. 'cosA' -> 'cos(A)'.
+    for trig_fn in trig_fns:
+        math_expression = re.sub(
+            r'%s(?!\()(.)' % trig_fn, r'%s(\1)' % trig_fn, math_expression)
+
+    # The pylatexenc lib outputs the unicode values of special characters like
+    # sqrt and pi, which is why they need to be replaced with their
+    # corresponding text values before performing validation. Other unicode
+    # characters will be left in the string as-is, and will be rejected by the
+    # expression parser.
+    for unicode_char, text in unicode_to_text.items():
+        math_expression = math_expression.replace(unicode_char, text)
+
+    # Replacing trig functions that have format which is
+    # incompatible with the validations.
+    for invalid_trig_fn, valid_trig_fn in inverse_trig_fns_mapping.items():
+        math_expression = math_expression.replace(
+            invalid_trig_fn, valid_trig_fn)
+
+    return math_expression
 
 
 class ExplorationChange(change_domain.BaseChange):
@@ -304,7 +386,7 @@ class ExpVersionReference(python_utils.OBJECT):
         """Validates properties of the ExpVersionReference.
 
         Raises:
-            ValidationError: One or more attributes of the ExpVersionReference
+            ValidationError. One or more attributes of the ExpVersionReference
                 are invalid.
         """
         if not isinstance(self.exp_id, python_utils.BASESTRING):
@@ -360,7 +442,7 @@ class ExplorationMathRichTextInfo(python_utils.OBJECT):
         """Validates properties of the ExplorationMathRichTextInfo.
 
         Raises:
-            ValidationError: attributes of the ExplorationMathRichTextInfo
+            ValidationError. Attributes of the ExplorationMathRichTextInfo
                 are invalid.
         """
         if not isinstance(self.exp_id, python_utils.BASESTRING):
@@ -707,7 +789,7 @@ class Exploration(python_utils.OBJECT):
                 and the validation checks are stricter.
 
         Raises:
-            ValidationError: One or more attributes of the Exploration are
+            ValidationError. One or more attributes of the Exploration are
                 invalid.
         """
         if not isinstance(self.title, python_utils.BASESTRING):
@@ -994,7 +1076,7 @@ class Exploration(python_utils.OBJECT):
         """Verifies that all states are reachable from the initial state.
 
         Raises:
-            ValidationError: One or more states are not reachable from the
+            ValidationError. One or more states are not reachable from the
                 initial state of the Exploration.
         """
         # This queue stores state names.
@@ -1029,7 +1111,7 @@ class Exploration(python_utils.OBJECT):
         """Verifies that all states can reach a terminal state.
 
         Raises:
-            ValidationError: If is impossible to complete the exploration from
+            ValidationError. If is impossible to complete the exploration from
                 a state.
         """
         # This queue stores state names.
@@ -1076,7 +1158,7 @@ class Exploration(python_utils.OBJECT):
             state.
 
         Raises:
-            ValueError: The given state_name does not exist.
+            ValueError. The given state_name does not exist.
         """
         if state_name not in self.states:
             raise ValueError('State %s does not exist' % state_name)
@@ -1272,7 +1354,7 @@ class Exploration(python_utils.OBJECT):
             state_names: list(str). List of state names to add.
 
         Raises:
-            ValueError: At least one of the new state names already exists in
+            ValueError. At least one of the new state names already exists in
                 the states dict.
         """
         for state_name in state_names:
@@ -1291,7 +1373,7 @@ class Exploration(python_utils.OBJECT):
             new_state_name: str. The new state name.
 
         Raises:
-            ValueError: The old state name does not exist or the new state name
+            ValueError. The old state name does not exist or the new state name
                 is already in states dict.
         """
         if old_state_name not in self.states:
@@ -1328,7 +1410,7 @@ class Exploration(python_utils.OBJECT):
             state_name: str. The state name to be deleted.
 
         Raises:
-            ValueError: The state does not exist or is the initial state of the
+            ValueError. The state does not exist or is the initial state of the
                 exploration.
         """
         if state_name not in self.states:
@@ -2530,6 +2612,129 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
+        """Converts from version 34 to 35. Version 35 upgrades all explorations
+        that use the MathExpressionInput interaction to use one of
+        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
+        interactions.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'MathExpressionInput':
+                new_answer_groups = []
+                types_of_inputs = set()
+                for group in state_dict['interaction']['answer_groups']:
+                    new_answer_group = copy.deepcopy(group)
+                    for rule_spec in new_answer_group['rule_specs']:
+                        rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+
+                        rule_input = clean_math_expression(
+                            rule_input)
+
+                        type_of_input = TYPE_INVALID_EXPRESSION
+                        if is_valid_algebraic_expression(rule_input):
+                            type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
+                        elif is_valid_numeric_expression(rule_input):
+                            type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
+                        elif is_valid_math_equation(rule_input):
+                            type_of_input = TYPE_VALID_MATH_EQUATION
+
+                        types_of_inputs.add(type_of_input)
+
+                        if type_of_input != TYPE_INVALID_EXPRESSION:
+                            rule_spec['inputs']['x'] = rule_input
+                            if type_of_input == TYPE_VALID_MATH_EQUATION:
+                                rule_spec['inputs']['y'] = 'both'
+                            rule_spec['rule_type'] = 'MatchesExactlyWith'
+
+                    new_answer_groups.append(new_answer_group)
+
+                if TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                    # If at least one rule input is an equation, we remove
+                    # all other rule inputs that are expressions.
+                    if TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                        new_interaction_id = TYPE_VALID_MATH_EQUATION
+                        for group in new_answer_groups:
+                            new_rule_specs = []
+                            for rule_spec in group['rule_specs']:
+                                if is_valid_math_equation(
+                                        rule_spec['inputs']['x']):
+                                    new_rule_specs.append(rule_spec)
+                            group['rule_specs'] = new_rule_specs
+                    # Otherwise, if at least one rule_input is an algebraic
+                    # expression, we remove all other rule inputs that are
+                    # numeric expressions.
+                    elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                            types_of_inputs):
+                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
+                        for group in new_answer_groups:
+                            new_rule_specs = []
+                            for rule_spec in group['rule_specs']:
+                                if is_valid_algebraic_expression(
+                                        rule_spec['inputs']['x']):
+                                    new_rule_specs.append(rule_spec)
+                            group['rule_specs'] = new_rule_specs
+                    else:
+                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
+
+                    # Removing answer groups that have no rule specs left after
+                    # the filtration done above.
+                    new_answer_groups = [
+                        answer_group for answer_group in new_answer_groups if (
+                            len(answer_group['rule_specs']) != 0)]
+
+                    # Removing feedback keys, from voiceovers_mapping and
+                    # translations_mapping, that correspond to the rules that
+                    # got deleted.
+                    old_answer_groups_feedback_keys = [
+                        answer_group['outcome'][
+                            'feedback']['content_id'] for answer_group in (
+                                state_dict['interaction']['answer_groups'])]
+                    new_answer_groups_feedback_keys = [
+                        answer_group['outcome'][
+                            'feedback']['content_id'] for answer_group in (
+                                new_answer_groups)]
+                    content_ids_to_delete = set(
+                        old_answer_groups_feedback_keys) - set(
+                            new_answer_groups_feedback_keys)
+                    for content_id in content_ids_to_delete:
+                        if content_id in state_dict['recorded_voiceovers'][
+                                'voiceovers_mapping']:
+                            del state_dict['recorded_voiceovers'][
+                                'voiceovers_mapping'][content_id]
+                        if content_id in state_dict['written_translations'][
+                                'translations_mapping']:
+                            del state_dict['written_translations'][
+                                'translations_mapping'][content_id]
+
+                    state_dict['interaction']['id'] = new_interaction_id
+                    state_dict['interaction']['answer_groups'] = (
+                        new_answer_groups)
+                    if state_dict['interaction']['solution']:
+                        correct_answer = state_dict['interaction'][
+                            'solution']['correct_answer']['ascii']
+                        correct_answer = clean_math_expression(correct_answer)
+                        state_dict['interaction'][
+                            'solution']['correct_answer'] = correct_answer
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2564,7 +2769,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 39
+    CURRENT_EXP_SCHEMA_VERSION = 40
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3482,6 +3687,29 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v39_dict_to_v40_dict(cls, exploration_dict):
+        """Converts a v39 exploration dict into a v40 exploration dict.
+        Upgrades all explorations that use the MathExpressionInput interaction
+        to use one of AlgebraicExpressionInput, NumericExpressionInput, or
+        MathEquationInput interactions.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v39.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v40.
+        """
+        exploration_dict['schema_version'] = 40
+
+        exploration_dict['states'] = cls._convert_states_v34_dict_to_v35_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 35
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3499,8 +3727,8 @@ class Exploration(python_utils.OBJECT):
             schema version provided in 'yaml_content'.
 
         Raises:
-            Exception: 'yaml_content' or the exploration schema version is not
-                valid.
+            Exception. The 'yaml_content' or the exploration schema version is
+                not valid.
         """
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
@@ -3709,6 +3937,11 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 39
 
+        if exploration_schema_version == 39:
+            exploration_dict = cls._convert_v39_dict_to_v40_dict(
+                exploration_dict)
+            exploration_schema_version = 40
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -3724,7 +3957,7 @@ class Exploration(python_utils.OBJECT):
             Exploration. The corresponding exploration domain object.
 
         Raises:
-            Exception: The initial schema version of exploration is less than
+            Exception. The initial schema version of exploration is less than
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
@@ -3756,7 +3989,7 @@ class Exploration(python_utils.OBJECT):
             Exploration. The corresponding exploration domain object.
 
         Raises:
-            Exception: The initial schema version of exploration is less than
+            Exception. The initial schema version of exploration is less than
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
@@ -3940,7 +4173,7 @@ class ExplorationSummary(python_utils.OBJECT):
         """Validates various properties of the ExplorationSummary.
 
         Raises:
-            ValidationError: One or more attributes of the ExplorationSummary
+            ValidationError. One or more attributes of the ExplorationSummary
                 are invalid.
         """
         if not isinstance(self.title, python_utils.BASESTRING):
