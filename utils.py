@@ -562,10 +562,10 @@ def require_valid_url_fragment(name, name_type, allowed_length):
         allowed_length: int. Allowed length for the name.
 
     Raises:
-        Exception: Name is not a string.
-        Exception: Name is empty.
-        Exception: The length of the name_type is not correct.
-        Exception: Invalid character is present in the name.
+        Exception. Name is not a string.
+        Exception. Name is empty.
+        Exception. The length of the name_type is not correct.
+        Exception. Invalid character is present in the name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError(
