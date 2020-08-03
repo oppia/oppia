@@ -34,7 +34,7 @@ import { TranslatePipe } from 'filters/translate.pipe';
 import { SafePipe } from 'filters/safe-pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
-import { SideNavigationBarComponent } from 
+import { SideNavigationBarComponent } from
   './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
