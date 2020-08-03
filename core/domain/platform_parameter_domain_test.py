@@ -456,6 +456,50 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self._create_example_context(app_version='2.0.0')))
 
+    def test_evaluate_version_flavor_filter_with_matched_flavor_returns_true(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('=', 'beta')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+
+    def test_evaluate_version_flavor_filter_with_unmatched_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('=', 'beta')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
+
+    def test_evaluate_na_version_flavor_filter_without_flavor_returns_true(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('=', 'n/a')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+
+    def test_evaluate_beta_version_flavor_filter_without_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('=', 'beta')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+
     def test_evaluate_multi_value_filter_with_one_matched_returns_true(self):
         filter_dict = {
             'type': 'server_mode',
@@ -568,6 +612,17 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid version expression \'1.a.2\''):
+            filter_domain.validate()
+
+    def test_validate_filter_with_invalid_version_flavor_raises_exception(self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('=', 'invalid')]}
+            ))
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid app version flavor \'invalid\''):
             filter_domain.validate()
 
 

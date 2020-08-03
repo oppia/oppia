@@ -40,8 +40,10 @@ ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
 ALLOWED_CLIENT_TYPES = ['Web', 'Android']
 ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Others']
+ALLOWED_APP_VERSION_FLAVOR = ['alpha', 'beta', 'test', 'n/a']
 
-APP_VERSION_WITH_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+)?$')
+APP_VERSION_WITH_HASH_REGEXP = re.compile(
+    r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+(?:-(.+))?)?$')
 APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)$')
 
 
@@ -180,7 +182,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
     SUPPORTED_FILTER_TYPES = [
         'server_mode', 'user_locale', 'client_type', 'browser_type',
-        'app_version',
+        'app_version', 'app_version_flavor',
     ]
 
     SUPPORTED_OP_FOR_FILTERS = {
@@ -188,6 +190,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
         'user_locale': ['='],
         'client_type': ['='],
         'browser_type': ['='],
+        'app_version_flavor': ['='],
         'app_version': ['=', '<', '<=', '>', '>='],
     }
 
@@ -259,6 +262,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
             matched = context.client_type == value
         elif self._type == 'browser_type' and op == '=':
             matched = context.browser_type == value
+        elif self._type == 'app_version_flavor' and op == '=':
+            matched = self._match_version_flavor(value, context.app_version)
         elif self._type == 'app_version':
             matched = self._match_version_expression(
                 op, value, context.app_version)
@@ -297,6 +302,12 @@ class PlatformParameterFilter(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Invalid client type \'%s\', must be one of %s.' % (
                             client_type, ALLOWED_CLIENT_TYPES))
+        elif self._type == 'app_version_flavor':
+            for _, flavor in self._conditions:
+                if flavor not in ALLOWED_APP_VERSION_FLAVOR:
+                    raise utils.ValidationError(
+                        'Invalid app version flavor \'%s\', must be one of'
+                        ' %s.' % (flavor, ALLOWED_APP_VERSION_FLAVOR))
         elif self._type == 'app_version':
             for _, version in self._conditions:
                 if not APP_VERSION_WITHOUT_HASH_REGEXP.match(version):
@@ -384,6 +395,23 @@ class PlatformParameterFilter(python_utils.OBJECT):
             elif int(sub_version_a) > int(sub_version_b):
                 return False
         return False
+
+    def _match_version_flavor(self, flavor, client_version):
+        """Matches the client version flavor.
+
+        Args:
+            flavor: str. The flavor to match, e.g. 'alpha', 'beta', 'test',
+                'n/a'.
+            client_version: str. The version of the client, given in the form
+                of '<version>-<hash>-<flavor>'. The hash and flavor of client
+                version is optional, if absent, the flavor is considered 'n/a'.
+
+        Returns:
+            bool. True is the client_version matches the given flavor.
+        """
+        match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
+        client_flavor = match.group(2) or 'n/a'
+        return client_flavor == flavor
 
 
 class PlatformParameterRule(python_utils.OBJECT):
