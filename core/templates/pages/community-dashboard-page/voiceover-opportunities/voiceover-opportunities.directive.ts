@@ -18,7 +18,7 @@
 
 require(
   'pages/community-dashboard-page/opportunities-list/' +
-  'opportunities-list.directive.ts');
+  'opportunities-list.component.ts');
 
 require(
   'pages/community-dashboard-page/services/' +

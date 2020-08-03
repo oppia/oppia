@@ -249,7 +249,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-visualization-enumerated-frequency-table.directive.ts',
     'OppiaFooterDirective.ts',
     'opportunities-list-item.directive.ts',
-    'opportunities-list.directive.ts',
     'outcome-destination-editor.directive.ts',
     'outcome-editor.directive.ts',
     'outcome-feedback-editor.directive.ts',
