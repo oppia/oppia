@@ -34,6 +34,8 @@ import { TranslatePipe } from 'filters/translate.pipe';
 import { SafePipe } from 'filters/safe-pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
+import { SideNavigationBarComponent } from 
+  './common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -55,12 +57,14 @@ import { ProfileLinkTextComponent } from
     SafePipe, SharingLinksComponent, ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    SideNavigationBarComponent, ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     ExplorationSummaryTileDirective],
   entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    SideNavigationBarComponent, ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
   ],

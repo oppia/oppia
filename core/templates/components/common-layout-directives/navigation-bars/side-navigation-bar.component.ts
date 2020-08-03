@@ -23,49 +23,27 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-require('domain/utilities/url-interpolation.service.ts');
+@Component({
+  selector: 'side-navigation-bar',
+  templateUrl: './side-navigation-bar.directive.html',
+  styleUrls: []
+})
+export class SideNavigationBarComponent implements OnInit {
+  currentUrl: string = '';
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
+  ) {}
 
-angular.module('oppia').directive('sideNavigationBar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./side-navigation-bar.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$window', function($window) {
-        var ctrl = this;
-        ctrl.getStaticImageUrl = function(imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        };
-        ctrl.$onInit = function() {
-          ctrl.currentUrl = $window.location.pathname;
-        };
-      }]
-    };
-  }]);
-
-  @Component({
-    selector: 'side-navigation-bar',
-    templateUrl: './side-navigation-bar.directive.html',
-    styleUrls: []
-  })
-  export class SideNavigationBarComponent implements OnInit {
-    currentUrl: string = '';
-    constructor(
-      private urlInterpolationService: UrlInterpolationService,
-      private windowRef: WindowRef
-    ) {}
-
-    ngOnInit(): void {
-      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
-    }
-
-    getStaticImageUrl(imagePath: string): string {
-      return this.urlInterpolationService.getStaticImageUrl(imagePath);
-    } 
-
+  ngOnInit(): void {
+    this.currentUrl = this.windowRef.nativeWindow.location.pathname;
   }
-  angular.module('oppia').directive(
-    'sideNavigationBar', downgradeComponent(
-      {component: SideNavigationBarComponent}));
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  } 
+
+}
+angular.module('oppia').directive(
+  'sideNavigationBar', downgradeComponent(
+    {component: SideNavigationBarComponent}));
