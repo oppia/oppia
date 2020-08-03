@@ -341,7 +341,7 @@ def download_manifest_files(filepath):
 
 def install_redis_cli():
     """This installs the redis-cli to the local oppia third_party directory so
-    that developmental servers and backend tests can make use of a local redis
+    that development servers and backend tests can make use of a local redis
     cache.
     """
     # We need to install redis-cli separately from using manifest.json since it

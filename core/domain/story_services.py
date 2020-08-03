@@ -426,8 +426,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.version = story.version
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
-    caching_services.delete_multi(
-        [story.id], 'story')
+    caching_services.delete_multi([story.id], 'story')
     story.version += 1
 
 

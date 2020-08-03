@@ -126,8 +126,8 @@ def _get_memory_cache_key_from_type(key, namespace, sub_namespace):
             sub_namespace is the version number of the objects.
 
     Returns:
-        str. Memory cache key that identifies the type of the value associated
-        with it.
+        str. New key to differentiate a passed in key based on namespace and
+        sub-namespace.
     """
     if not sub_namespace:
         return namespace + '-' + key

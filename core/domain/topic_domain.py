@@ -597,7 +597,7 @@ class Topic(python_utils.OBJECT):
     def from_dict(
             cls, topic_dict, topic_version=0, topic_created_on=None,
             topic_last_updated=None):
-        """Returns a Topic domain object from a dict.
+        """Returns a Topic domain object from a dictionary.
 
         Args:
             topic_dict: dict. The dictionary representation of Topic

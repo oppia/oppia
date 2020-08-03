@@ -448,8 +448,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
-    caching_services.delete_multi(
-        [topic.id], 'topic')
+    caching_services.delete_multi([topic.id], 'topic')
     topic.version += 1
 
 

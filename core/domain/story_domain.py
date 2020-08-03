@@ -967,7 +967,7 @@ class Story(python_utils.OBJECT):
     def from_dict(
             cls, story_dict, story_version=0,
             story_created_on=None, story_last_updated=None):
-        """Returns a Story domain object from a dict.
+        """Returns a Story domain object from a dictionary.
 
         Args:
             story_dict: dict. The dictionary representation of Story
