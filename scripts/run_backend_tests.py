@@ -239,12 +239,11 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 
 
 def cleanup():
-    """Cleanup the redis client server when backend tests finish."""
+    """Cleanup the redis server when backend tests finish."""
     python_utils.PRINT('Cleaning up the redis_servers.')
-    # Shutdown the redis server before shutting down.
-    command_text = [
-            './third_party/redis-cli-6.0.6/src/redis-cli', 'shutdown']
-    subprocess.call(command_text)
+    # Shutdown the redis server before exiting.
+    subprocess.call([
+            './third_party/redis-cli-6.0.6/src/redis-cli', 'shutdown'])
 
 
 def main(args=None):
@@ -267,7 +266,7 @@ def main(args=None):
     import dev_appserver
     dev_appserver.fix_sys_path()
 
-    # Start the redis local developmental server.
+    # Start the redis local development server.
     python_utils.PRINT('Starting Redis development server.')
     subprocess.Popen(
         './third_party/redis-cli-6.0.6/src/redis-server %s' %

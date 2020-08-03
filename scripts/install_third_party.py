@@ -338,27 +338,23 @@ def download_manifest_files(filepath):
                     dependency_url, TARGET_DOWNLOAD_DIRS[data],
                     dependency_tar_root_name, dependency_target_root_name)
 
-
-def main(args=None):
-    """Installs all the third party libraries."""
-    unused_parsed_args = _PARSER.parse_args(args=args)
-    download_manifest_files(MANIFEST_FILE_PATH)
+def install_redis_cli():
     # We need to install redis-cli separately from using manifest.json since it
     # is a system program and we need to install it after the library is
     # untarred.
     try:
         # Pipe output to /dev/null for silence in console.
         null = python_utils.open_file('/dev/null', 'w')
-        command_text = [
-            './third_party/redis-cli-6.0.6/src/redis-cli', '--version']
-        subprocess.call(command_text)
+        subprocess.call([
+            './third_party/redis-cli-6.0.6/src/redis-cli', '--version'])
         null.close()
         python_utils.PRINT('Redis-cli is already installed.')
     except OSError:
         # Redis-cli is not installed, run the script to install it.
         # NOTE: These should be constants but not sure where to put them since
-        # if they go in manifest.json they'll be automatically installed in the
-        # incorrect way.
+        # if they go in manifest.json they'll be automatically installed using
+        # the default installation pathway(e.g pip if it is under backend)
+        # but we need to install it using make.
         python_utils.PRINT('Installing redis-cli...')
 
         download_and_untar_files(
@@ -366,20 +362,25 @@ def main(args=None):
             TARGET_DOWNLOAD_DIRS['backend'],
             'redis-6.0.6', 'redis-cli-6.0.6')
 
+        # Temporarily change the working directory to redis-cli-6.0.6 so we can
+        # build the source code.
         with python_utils.change_directory('third_party/redis-cli-6.0.6/'):
-            command_text = ['make']
-            subprocess.call(command_text)
+            # Build the scripts necessary to start the redis server.
+            subprocess.call(['make'])
 
         # Make the scripts executable.
-        command_text = [
-            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-cli']
-        subprocess.call(command_text)
-
-        command_text = [
-            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-server']
-        subprocess.call(command_text)
+        subprocess.call([
+            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-cli'])
+        subprocess.call([
+            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-server'])
 
         python_utils.PRINT('Redis-cli installed successfully.')
+
+def main(args=None):
+    """Installs all the third party libraries."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
+    download_manifest_files(MANIFEST_FILE_PATH)
+    install_redis_cli()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
