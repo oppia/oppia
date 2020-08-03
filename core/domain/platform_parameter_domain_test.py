@@ -72,7 +72,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_change_object.new_rules, [])
 
-    def test_to_dict(self):
+    def test_to_dict_returns_correct_dict(self):
         param_change_dict = {
             'cmd': self.CMD_EDIT_RULES,
             'new_rules': []
@@ -87,7 +87,7 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
 class EvaluationContextTests(test_utils.GenericTestBase):
     """Test for the EvaluationContext."""
 
-    def test_create_context_from_dict(self):
+    def test_create_context_from_dict_returns_correct_instance(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'Android',
@@ -105,7 +105,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         self.assertEqual(context.user_locale, 'en')
         self.assertEqual(context.server_mode, 'dev')
 
-    def test_validate_passes_without_exception(self):
+    def test_validate_with_valid_context_passes_without_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'Android',
@@ -203,7 +203,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
 class PlatformParameterFilterTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterFilter."""
 
-    def create_example_context(
+    def _create_example_context(
             self, client_type='Android', browser_type=None, app_version='1.2.3',
             user_locale='en', mode='dev'):
         """Creates and returns an EvaluationContext using the given
@@ -221,18 +221,16 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             },
         )
 
-    def test_create_filter_from_dict(self):
+    def test_create_from_dict_returns_correct_instance(self):
         filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
-        filter_domain.validate()
-
         self.assertEqual(filter_domain.type, 'app_version')
         self.assertEqual(filter_domain.conditions, [('=', '1.2.3')])
 
-    def test_filter_to_dict(self):
+    def test_to_dict_returns_correct_dict(self):
         filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
         filter_domain = (
             parameter_domain
@@ -240,147 +238,225 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         self.assertEqual(filter_domain.to_dict(), filter_dict)
 
-    def test_evaluate_server_mode_filter(self):
+    def test_evaluate_dev_server_mode_filter_with_dev_env_returns_true(self):
         filter_dict = {'type': 'server_mode', 'conditions': [('=', 'dev')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
-        dev_context = self.create_example_context(mode='dev')
-        prod_context = self.create_example_context(mode='prod')
-
+        dev_context = self._create_example_context(mode='dev')
         self.assertTrue(filter_domain.evaluate(dev_context))
+
+    def test_evaluate_dev_server_mode_filter_with_prod_env_returns_false(self):
+        filter_dict = {'type': 'server_mode', 'conditions': [('=', 'dev')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+
+        prod_context = self._create_example_context(mode='prod')
         self.assertFalse(filter_domain.evaluate(prod_context))
 
-    def test_evaluate_user_locale_filter(self):
+    def test_evaluate_en_user_locale_filter_with_en_locale_returns_true(self):
         filter_dict = {'type': 'user_locale', 'conditions': [('=', 'en')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
-        en_context = self.create_example_context(user_locale='en')
-        zh_context = self.create_example_context(user_locale='zh-hans')
-
+        en_context = self._create_example_context(user_locale='en')
         self.assertTrue(filter_domain.evaluate(en_context))
+
+    def test_evaluate_en_user_locale_filter_with_zh_locale_returns_false(self):
+        filter_dict = {'type': 'user_locale', 'conditions': [('=', 'en')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+
+        zh_context = self._create_example_context(user_locale='zh-hans')
         self.assertFalse(filter_domain.evaluate(zh_context))
 
-    def test_evaluate_client_type_filter(self):
+    def test_evaluate_web_client_filter_with_web_client_returns_true(self):
         filter_dict = {'type': 'client_type', 'conditions': [('=', 'Web')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
-        web_context = self.create_example_context(client_type='Web')
-        native_context = self.create_example_context(client_type='Android')
-
+        web_context = self._create_example_context(client_type='Web')
         self.assertTrue(filter_domain.evaluate(web_context))
+
+    def test_evaluate_web_client_filter_with_native_client_returns_false(self):
+        filter_dict = {'type': 'client_type', 'conditions': [('=', 'Web')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+
+        native_context = self._create_example_context(client_type='Android')
         self.assertFalse(filter_domain.evaluate(native_context))
 
-    def test_evaluate_browser_type_filter(self):
+    def test_evaluate_chrome_browser_filter_with_chrome_returns_true(self):
         filter_dict = {'type': 'browser_type', 'conditions': [('=', 'Chrome')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
 
-        chrome_context = self.create_example_context(browser_type='Chrome')
-        firefox_context = self.create_example_context(browser_type='Firefox')
-
+        chrome_context = self._create_example_context(browser_type='Chrome')
         self.assertTrue(filter_domain.evaluate(chrome_context))
+
+    def test_evaluate_chrome_browser_filter_with_firefox_returns_false(self):
+        filter_dict = {'type': 'browser_type', 'conditions': [('=', 'Chrome')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+
+        firefox_context = self._create_example_context(browser_type='Firefox')
         self.assertFalse(filter_domain.evaluate(firefox_context))
 
-    def test_evaluate_app_version_filter_with_eq_comparison(self):
+    def test_evaluate_eq_version_filter_with_same_version_returns_true(self):
         filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.3')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.4')))
+            self._create_example_context(app_version='1.2.3')))
 
-    def test_evaluate_app_version_filter_with_gt_comparison(self):
+    def test_evaluate_eq_version_filter_with_diff_version_returns_false(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.4')))
+
+    def test_evaluate_gt_version_filter_with_small_version_returns_false(self):
         filter_dict = {'type': 'app_version', 'conditions': [('>', '1.2.3')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='0.2.3')))
+            self._create_example_context(app_version='0.2.3')))
         self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.1.2')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.3')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.4')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.3.0')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='2.0.0')))
+            self._create_example_context(app_version='1.1.2')))
 
-    def test_evaluate_app_version_filter_with_gte_comparison(self):
+    def test_evaluate_gt_version_filter_with_same_version_returns_false(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('>', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.3')))
+
+    def test_evaluate_gt_version_filter_with_large_version_returns_true(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('>', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.4')))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.3.0')))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='2.0.0')))
+
+    def test_evaluate_gte_version_filter_with_small_version_returns_false(self):
         filter_dict = {'type': 'app_version', 'conditions': [('>=', '1.2.3')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='0.2.3')))
+            self._create_example_context(app_version='0.2.3')))
         self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.1.2')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.3')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.4')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.3.0')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='2.0.0')))
+            self._create_example_context(app_version='1.1.2')))
 
-    def test_evaluate_app_version_filter_with_lt_comparison(self):
+    def test_evaluate_gte_version_filter_with_same_version_returns_true(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('>=', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.3')))
+
+    def test_evaluate_gte_version_filter_with_large_version_returns_true(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('>=', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.4')))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.3.0')))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='2.0.0')))
+
+    def test_evaluate_lt_version_filter_with_small_version_returns_true(self):
         filter_dict = {'type': 'app_version', 'conditions': [('<', '1.2.3')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='0.3.4')))
+            self._create_example_context(app_version='0.3.4')))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.1.0')))
+            self._create_example_context(app_version='1.1.0')))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.1.2')))
+            self._create_example_context(app_version='1.1.2')))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.2')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.3')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.4')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.3.0')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.10.0')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='2.0.0')))
+            self._create_example_context(app_version='1.2.2')))
 
-    def test_evaluate_app_version_filter_with_lte_comparison(self):
+    def test_evaluate_lt_version_filter_with_same_version_returns_false(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('<', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.3')))
+
+    def test_evaluate_lt_version_filter_with_large_version_returns_false(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('<', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.4')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.3.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='2.0.0')))
+
+    def test_evaluate_lte_version_filter_with_small_version_returns_true(self):
         filter_dict = {'type': 'app_version', 'conditions': [('<=', '1.2.3')]}
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='0.3.4')))
+            self._create_example_context(app_version='0.3.4')))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.1.0')))
+            self._create_example_context(app_version='1.1.0')))
         self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.2')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.3')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.4')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.3.0')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.10.0')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='2.0.0')))
+            self._create_example_context(app_version='1.2.2')))
 
-    def test_evaluate_filter_with_multiple_values(self):
+    def test_evaluate_lte_version_filter_with_same_version_returns_true(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('<=', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.3')))
+
+    def test_evaluate_lte_version_filter_with_large_version_returns_false(self):
+        filter_dict = {'type': 'app_version', 'conditions': [('<=', '1.2.3')]}
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(filter_dict))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.2.4')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.3.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='2.0.0')))
+
+    def test_evaluate_multi_value_filter_with_one_matched_returns_true(self):
         filter_dict = {
             'type': 'server_mode',
             'conditions': [('=', 'dev'), ('=', 'prod')]
@@ -388,43 +464,21 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
-        filter_domain.validate()
 
-        dev_context = self.create_example_context(mode='dev')
-        test_context = self.create_example_context(mode='test')
-        prod_context = self.create_example_context(mode='prod')
-
+        dev_context = self._create_example_context(mode='dev')
         self.assertTrue(filter_domain.evaluate(dev_context))
-        self.assertTrue(filter_domain.evaluate(prod_context))
-        self.assertFalse(filter_domain.evaluate(test_context))
 
-    def test_evaluate_app_version_filter_with_multiple_values(self):
+    def test_evaluate_multi_value_filter_with_none_matched_returns_true(self):
         filter_dict = {
-            'type': 'app_version',
-            'conditions': [('=', '1.2.3'), ('=', '1.2.4')]
+            'type': 'server_mode',
+            'conditions': [('=', 'dev'), ('=', 'prod')]
         }
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(filter_dict))
-        filter_domain.validate()
 
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.3')))
-        self.assertTrue(filter_domain.evaluate(
-            self.create_example_context(app_version='1.2.4')))
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version='1.5.3')))
-
-    def test_evaluate_app_version_filter_with_no_version_in_context(self):
-        filter_dict = {
-            'type': 'app_version',
-            'conditions': [('=', '1.2.3'), ('=', '1.2.4')]
-        }
-        filter_domain = parameter_domain.PlatformParameterFilter.from_dict(
-            filter_dict)
-
-        self.assertFalse(filter_domain.evaluate(
-            self.create_example_context(app_version=None)))
+        test_context = self._create_example_context(mode='test')
+        self.assertFalse(filter_domain.evaluate(test_context))
 
     def test_evaluate_filter_with_unsupported_operation_raises_exception(self):
         filter_domain = (
@@ -434,7 +488,16 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             ))
         with self.assertRaisesRegexp(
             Exception, 'Unsupported comparison operator \'!=\''):
-            filter_domain.evaluate(self.create_example_context())
+            filter_domain.evaluate(self._create_example_context())
+
+    def test_evaluate_filter_with_none_value_returns_false(self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version', 'conditions': [('=', None)]}
+            ))
+        self.assertFalse(
+            filter_domain.evaluate(self._create_example_context()))
 
     def test_validate_filter_passes_without_exception(self):
         filter_dict = {
@@ -511,7 +574,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 class PlatformParameterRuleTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterRule."""
 
-    def test_from_dict(self):
+    def test_create_from_dict_returns_correct_instance(self):
         filters = [
             {
                 'type': 'app_version',
@@ -538,7 +601,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         self.assertEqual(filter_domain.conditions, [('=', '1.2.3')])
         self.assertEqual(rule.value_when_matched, False)
 
-    def test_to_dict(self):
+    def test_to_dict_returns_correct_dict(self):
         rule_dict = {
             'filters': [
                 {
@@ -551,17 +614,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         rule = parameter_domain.PlatformParameterRule.from_dict(rule_dict)
         self.assertEqual(rule.to_dict(), rule_dict)
 
-    def test_has_server_mode_filter(self):
-        rule = parameter_domain.PlatformParameterRule.from_dict(
-            {
-                'filters': [
-                    {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
-                ],
-                'value_when_matched': False,
-            },
-        )
-        self.assertFalse(rule.has_server_mode_filter())
-
+    def test_has_server_mode_filter_with_mode_filter_returns_true(self):
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
@@ -572,7 +625,18 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         )
         self.assertTrue(rule.has_server_mode_filter())
 
-    def test_evaluation_matched(self):
+    def test_has_server_mode_filter_without_mode_filter_returns_false(self):
+        rule = parameter_domain.PlatformParameterRule.from_dict(
+            {
+                'filters': [
+                    {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
+                ],
+                'value_when_matched': False,
+            },
+        )
+        self.assertFalse(rule.has_server_mode_filter())
+
+    def test_evaluation_with_matching_context_returns_true(self):
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
@@ -595,7 +659,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
         )
         self.assertTrue(rule.evaluate(context))
 
-    def test_evaluation_not_matched(self):
+    def test_evaluation_with_unmatching_context_returns_false(self):
         rule = parameter_domain.PlatformParameterRule.from_dict(
             {
                 'filters': [
@@ -637,14 +701,14 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
 class PlatformParameterMetadataTests(test_utils.GenericTestBase):
     """Test for the PlatformParameterMetadata."""
 
-    def test_from_dict(self):
+    def test_create_from_dict_returns_correct_instance(self):
         metadata = parameter_domain.PlatformParameterMetadata.from_dict(
             {'is_feature': True, 'feature_stage': 'dev'})
 
         self.assertTrue(metadata.is_feature)
         self.assertEqual(metadata.feature_stage, 'dev')
 
-    def test_to_dict(self):
+    def test_to_dict_returns_correct_dict(self):
         metadata_dict = {
             'is_feature': True,
             'feature_stage': 'dev',
@@ -658,7 +722,7 @@ class PlatformParameterMetadataTests(test_utils.GenericTestBase):
 class PlatformParameterTests(test_utils.GenericTestBase):
     """Test for the PlatformParameter."""
 
-    def test_from_dict(self):
+    def test_create_from_dict_returns_correct_instance(self):
         param = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -890,7 +954,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                     },
                 })
 
-    def test_to_dict(self):
+    def test_to_dict_returns_correct_dict(self):
         param_dict = {
             'name': 'parameter_a',
             'description': 'for test',
@@ -917,7 +981,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         parameter = parameter_domain.PlatformParameter.from_dict(param_dict)
         self.assertDictEqual(parameter.to_dict(), param_dict)
 
-    def test_set_rules(self):
+    def test_set_rules_correctly_changes_rules(self):
         param = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -950,8 +1014,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'feature_stage': None
             }
         })
-        self.assertEqual(len(param.rules), 2)
-
         new_rule_dict = {
             'filters': [
                 {'type': 'server_mode', 'conditions': [('=', 'test')]}
@@ -960,12 +1022,12 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         }
         new_rule = parameter_domain.PlatformParameterRule.from_dict(
             new_rule_dict)
-
         param.set_rules([new_rule])
+
         self.assertEqual(len(param.rules), 1)
         self.assertEqual(param.rules[0].to_dict(), new_rule_dict)
 
-    def test_evaluate_in_dev(self):
+    def test_evaluate_with_matched_rule_returns_correct_value(self):
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -1003,7 +1065,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
 
-    def test_evaluate_in_prod(self):
+    def test_evaluate_without_matched_rule_returns_default_value(self):
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
             'description': 'for test',
@@ -1124,10 +1186,10 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             utils.ValidationError, 'must have a server_mode filter'):
             parameter.validate()
 
-    def test_validate_dev_feature_for_inappropriate_env_raises_exception(self):
+    def test_validate_dev_feature_for_test_env_raises_exception(self):
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
-            'description': 'for test',
+            'description': '',
             'data_type': 'bool',
             'rules': [
                 {
@@ -1145,14 +1207,38 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             }
         })
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'cannot be enabled in test'):
+            utils.ValidationError, 'cannot be enabled in test or production'):
             parameter.validate()
 
-    def test_validate_test_feature_for_inappropriate_env_raises_exception(
+    def test_validate_dev_feature_for_prod_env_raises_exception(self):
+        parameter = parameter_domain.PlatformParameter.from_dict({
+            'name': 'parameter_a',
+            'description': '',
+            'data_type': 'bool',
+            'rules': [
+                {
+                    'filters': [
+                        {'type': 'server_mode', 'conditions': [('=', 'prod')]}],
+                    'value_when_matched': True
+                }
+            ],
+            'rule_schema_version': (
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
+            'default_value': False,
+            'metadata': {
+                'is_feature': True,
+                'feature_stage': 'dev',
+            }
+        })
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'cannot be enabled in test or production'):
+            parameter.validate()
+
+    def test_validate_test_feature_for_prod_env_raises_exception(
             self):
         parameter = parameter_domain.PlatformParameter.from_dict({
             'name': 'parameter_a',
-            'description': 'for test',
+            'description': '',
             'data_type': 'bool',
             'rules': [
                 {
@@ -1173,7 +1259,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             utils.ValidationError, 'cannot be enabled in production'):
             parameter.validate()
 
-    def test_get_memcache_key(self):
+    def test_get_memcache_key_returns_correct_key(self):
         self.assertEqual(
             parameter_domain.PlatformParameter.get_memcache_key('param_name'),
             'PLATFORM_PARAMETER:param_name'

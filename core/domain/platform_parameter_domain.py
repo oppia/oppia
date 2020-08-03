@@ -34,19 +34,14 @@ DATA_TYPES = utils.create_enum('bool', 'string', 'number') # pylint: disable=inv
 
 ALLOWED_USER_LOCALES = [
     lang_dict['id'] for lang_dict in constants.SUPPORTED_SITE_LANGUAGES]
-
 ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
-
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
-
 ALLOWED_CLIENT_TYPES = ['Web', 'Android']
-
 ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Others']
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+)?$')
-
 APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)$')
 
 
@@ -230,11 +225,10 @@ class PlatformParameterFilter(python_utils.OBJECT):
         Returns:
             bool. True if the filter is matched.
         """
-        for op, value in self._conditions:
-            is_matched = self._evaluate_single_value(op, value, context)
-            if is_matched:
-                return True
-        return False
+        return any(
+            self._evaluate_single_value(op, value, context)
+            for op, value in self._conditions
+        )
 
     def _evaluate_single_value(self, op, value, context):
         """Tries to match the given context with the filter against the
@@ -248,28 +242,26 @@ class PlatformParameterFilter(python_utils.OBJECT):
         Returns:
             bool. True if the filter is matched.
         """
+        if value is None:
+            return False
         if op not in self.SUPPORTED_OP_FOR_FILTERS[self._type]:
             raise Exception(
                 'Unsupported comparison operator \'%s\' for %s filter, '
                 'expected one of %s.' % (
                     op, self._type, self.SUPPORTED_OP_FOR_FILTERS[self._type]))
+
         matched = False
-        if self._type == 'server_mode':
-            if op == '=':
-                matched = context.server_mode == value
-        elif self._type == 'user_locale':
-            if op == '=':
-                matched = context.user_locale == value
-        elif self._type == 'client_type':
-            if op == '=':
-                matched = context.client_type == value
-        elif self._type == 'browser_type':
-            if op == '=':
-                matched = context.browser_type == value
+        if self._type == 'server_mode' and op == '=':
+            matched = context.server_mode == value
+        elif self._type == 'user_locale' and op == '=':
+            matched = context.user_locale == value
+        elif self._type == 'client_type' and op == '=':
+            matched = context.client_type == value
+        elif self._type == 'browser_type' and op == '=':
+            matched = context.browser_type == value
         elif self._type == 'app_version':
-            if context.app_version is not None:
-                matched = self._match_version_expression(
-                    op, value, context.app_version)
+            matched = self._match_version_expression(
+                op, value, context.app_version)
 
         return matched
 
@@ -674,8 +666,7 @@ class PlatformParameter(python_utils.OBJECT):
             *. The evaluate result of the platform parameter.
         """
         for rule in self._rules:
-            matched = rule.evaluate(context)
-            if matched:
+            if rule.evaluate(context):
                 return rule.value_when_matched
         return self._default_value
 
