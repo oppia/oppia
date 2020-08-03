@@ -246,7 +246,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.html_filepaths
 
-    def _check_html_tags_and_attributes(self):
+    def check_html_tags_and_attributes(self):
         """This function checks the indentation of lines in HTML files.
 
         Returns:
@@ -290,7 +290,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
-        return [self._check_html_tags_and_attributes()]
+        return [self.check_html_tags_and_attributes()]
 
 
 class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
@@ -343,7 +343,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             trimmed_error_messages.append(line)
         return '\n'.join(trimmed_error_messages) + '\n'
 
-    def _lint_html_files(self):
+    def lint_html_files(self):
         """This function is used to check HTML files for linting errors.
 
         Returns:
@@ -396,7 +396,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             concurrent_task_utils.log('There are no HTML files to lint.')
             return []
 
-        return [self._lint_html_files()]
+        return [self.lint_html_files()]
 
 
 def get_linters(files_to_lint, file_cache):

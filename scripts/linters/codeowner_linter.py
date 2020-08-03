@@ -49,7 +49,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/workflows/']
 
 
-class CodeownerLintChecksManager(python_utils.OBJECT):
+class CodeOwnerLintChecksManager(python_utils.OBJECT):
     """Manages codeowner checks."""
 
     def __init__(self, file_cache):
@@ -330,9 +330,9 @@ def get_linters(file_cache):
             file content.
 
     Returns:
-        tuple(CodeownerLintChecksManager, None). A 2-tuple of custom and
+        tuple(CodeOwnerLintChecksManager, None). A 2-tuple of custom and
         third_party linter objects.
     """
-    custom_linter = CodeownerLintChecksManager(file_cache)
+    custom_linter = CodeOwnerLintChecksManager(file_cache)
 
     return custom_linter, None

@@ -1095,6 +1095,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         num_files_with_errors = 0
         summary_messages = []
         full_messages = []
+        failed = False
         name = 'ESLint'
 
         eslint_cmd_args = [node_path, eslint_path, '--quiet']

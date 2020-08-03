@@ -93,7 +93,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.py_filepaths
 
-    def _check_non_test_files(self):
+    def check_non_test_files(self):
         """This function is used to check that function with test_only in their
         names are in test files.
 
@@ -126,7 +126,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
-    def _check_that_all_jobs_are_listed_in_the_job_registry_file(self):
+    def check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
         are registered in jobs_registry.py file.
 
@@ -249,8 +249,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
         linter_stdout = []
 
         linter_stdout.append(
-            self._check_that_all_jobs_are_listed_in_the_job_registry_file())
-        linter_stdout.append(self._check_non_test_files())
+            self.check_that_all_jobs_are_listed_in_the_job_registry_file())
+        linter_stdout.append(self.check_non_test_files())
         return linter_stdout
 
 
@@ -305,7 +305,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 trimmed_error_messages.append(message)
         return '\n'.join(trimmed_error_messages) + '\n'
 
-    def _lint_py_files(self):
+    def lint_py_files(self):
         """Prints a list of lint errors in the given list of Python files.
 
         Returns:
@@ -370,7 +370,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.OutputStream(
             name, errors_found, summary_messages, full_messages)
 
-    def _lint_py_files_for_python3_compatibility(self):
+    def lint_py_files_for_python3_compatibility(self):
         """Prints a list of Python 3 compatibility errors in the given list of
         Python files.
 
@@ -388,7 +388,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             file_name for file_name in files_to_lint if not re.match(
                 r'^.*python_utils.*\.py$', file_name)]
         if not files_to_lint_for_python3_compatibility:
-            full_messages.append(
+            concurrent_task_utils.log(
                 'There are no Python files to lint for Python 3 compatibility.')
             return []
 
@@ -428,7 +428,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.OutputStream(
             name, any_errors, summary_messages, full_messages)
 
-    def _check_import_order(self):
+    def check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
 
@@ -473,11 +473,11 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             concurrent_task_utils.log('There are no Python files to lint.')
             return []
 
-        linter_stdout.append(self._lint_py_files())
+        linter_stdout.append(self.lint_py_files())
 
-        linter_stdout.append(self._lint_py_files_for_python3_compatibility())
+        linter_stdout.append(self.lint_py_files_for_python3_compatibility())
 
-        linter_stdout.append(self._check_import_order())
+        linter_stdout.append(self.check_import_order())
 
         return linter_stdout
 

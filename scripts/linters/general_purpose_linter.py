@@ -689,7 +689,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
         return failed, summary_messages
 
-    def _check_mandatory_patterns(self):
+    def check_mandatory_patterns(self):
         """This function checks that all files contain the mandatory
         patterns.
         """
@@ -707,7 +707,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
-    def _check_bad_patterns(self):
+    def check_bad_patterns(self):
         """This function is used for detecting bad patterns."""
         name = 'Bad pattern'
         total_files_checked = 0
@@ -766,7 +766,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.OutputStream(
             name, failed, summary_messages, summary_messages)
 
-    def _check_newline_at_eof(self):
+    def check_newline_at_eof(self):
         """This function is used to detect newline at the end of file."""
         name = 'Newline at EOF'
         summary_messages = []
@@ -796,10 +796,12 @@ class GeneralPurposeLinter(python_utils.OBJECT):
             list(OutputStream). A list of OutputStream objects to be used for
             linter status retrieval.
         """
+        if not self.all_filepaths:
+            concurrent_task_utils.log('There are no files to be checked.')
         linter_stdout = []
-        linter_stdout.append(self._check_mandatory_patterns())
-        linter_stdout.append(self._check_bad_patterns())
-        linter_stdout.append(self._check_newline_at_eof())
+        linter_stdout.append(self.check_mandatory_patterns())
+        linter_stdout.append(self.check_bad_patterns())
+        linter_stdout.append(self.check_newline_at_eof())
         return linter_stdout
 
 

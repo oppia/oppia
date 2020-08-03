@@ -60,122 +60,105 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
     """Test for python linter."""
 
     def test_unsorted_import_order(self):
-        with self.print_swap:
-            python_linter.ThirdPartyPythonLintChecksManager(
-                [INVALID_IMPORT_FILEPATH], True).perform_all_lint_checks()
+        linter_stdout = python_linter.ThirdPartyPythonLintChecksManager(
+            [INVALID_IMPORT_FILEPATH]).check_import_order()
         self.assert_same_list_elements([
-            'FAILED  Import order checks failed, file imports should be '
-            'alphabetized, see affect files above.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            'FAILED  Import order check failed'], linter_stdout.all_messages)
+        self.assert_failed_messages_count(linter_stdout.messages, 1)
 
     def test_sorted_import_order(self):
-        with self.print_swap:
-            python_linter.ThirdPartyPythonLintChecksManager(
-                [VALID_PY_FILEPATH], True).perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['SUCCESS  Import order checks passed'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+        linter_stdout = python_linter.ThirdPartyPythonLintChecksManager(
+            [VALID_PY_FILEPATH]).check_import_order()
+        self.assertEqual(
+            ['SUCCESS  Import order check passed'], linter_stdout.all_messages)
 
     def test_all_jobs_are_listed_in_the_job_registry_file_with_duplicacy(self):
-        with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                INVALID_JOBS_ONE_OFF_FILEPATHS + VALID_JOBS_ONE_OFF_FILEPATHS,
-                FILE_CACHE, True).perform_all_lint_checks()
+        linter_stdout = python_linter.PythonLintChecksManager(
+            INVALID_JOBS_ONE_OFF_FILEPATHS + VALID_JOBS_ONE_OFF_FILEPATHS,
+            FILE_CACHE
+        ).check_that_all_jobs_are_listed_in_the_job_registry_file()
         self.assert_same_list_elements([
             'Found one-off jobs with duplicate names: '
-            'CollectionMigrationOneOffJob'], self.linter_stdout)
+            'CollectionMigrationOneOffJob'], linter_stdout.messages)
         self.assert_same_list_elements([
             'Found one-off jobs not listed in jobs_registry file: '
-            'CollectionsMigrationOneOffJob'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            'CollectionsMigrationOneOffJob'], linter_stdout.messages)
+        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
 
     def test_all_jobs_are_listed_in_the_job_registry_file_with_success(self):
-        with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                VALID_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE,
-                True).perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['SUCCESS  Job registry check passed'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+        linter_stdout = python_linter.PythonLintChecksManager(
+            VALID_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE
+        ).check_that_all_jobs_are_listed_in_the_job_registry_file()
+        self.assertEqual(
+            ['SUCCESS  Job registry check passed'], linter_stdout.all_messages)
 
     def test_jobs_are_listed_in_job_registry_file_with_duplicate_prod_job(self):
-        with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                INVALID_PROD_VALIDATION_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE,
-                True).perform_all_lint_checks()
+        linter_stdout = python_linter.PythonLintChecksManager(
+            INVALID_PROD_VALIDATION_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE
+        ).check_that_all_jobs_are_listed_in_the_job_registry_file()
         self.assert_same_list_elements([
             'Found validation jobs with duplicate names: '
             'PendingDeletionRequestModelAuditOneOffJob'
-            ], self.linter_stdout)
+            ], linter_stdout.messages)
         self.assert_same_list_elements([
             'Found validation jobs not listed in jobs_registry file: '
             'PendingDeletionRequestModelAuditOneOffJobs'
-            ], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            ], linter_stdout.messages)
+        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
 
     def test_custom_linter_with_test_only_in_non_test_file(self):
-        with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                [INVALID_TEST_ONLY_FILEPATH], FILE_CACHE,
-                True).perform_all_lint_checks()
+        linter_stdout = python_linter.PythonLintChecksManager(
+            [INVALID_TEST_ONLY_FILEPATH], FILE_CACHE).check_non_test_files()
         self.assert_same_list_elements([
             'Line 35: Please do not use \'test_only\' in the non-test '
-            'file.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            'file.'], linter_stdout.messages)
+        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
 
     def test_custom_linter_with_test_function_in_test_file(self):
-        with self.print_swap:
-            python_linter.PythonLintChecksManager(
-                [VALID_TEST_FILEPATH], FILE_CACHE,
-                True).perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['SUCCESS  Function definition checks passed'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+        linter_stdout = python_linter.PythonLintChecksManager(
+            [VALID_TEST_FILEPATH], FILE_CACHE).check_non_test_files()
+        self.assertEqual(
+            ['SUCCESS  Function definition check passed'],
+            linter_stdout.all_messages)
 
     def test_valid_file_with_pylint(self):
-        with self.print_swap:
-            python_linter.ThirdPartyPythonLintChecksManager(
-                [VALID_PY_FILEPATH], True).perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['SUCCESS  1 Python files linted'], self.linter_stdout)
-        self.assert_same_list_elements(
-            ['SUCCESS  1 Python files linted for Python 3 compatibility'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+        linter_stdout = python_linter.ThirdPartyPythonLintChecksManager(
+            [VALID_PY_FILEPATH]).lint_py_files()
+        self.assertEqual(
+            ['SUCCESS  Pylint check passed'], linter_stdout.all_messages)
 
     def test_invalid_file_with_pylint_error(self):
-        with self.print_swap:
-            python_linter.ThirdPartyPythonLintChecksManager(
-                [INVALID_DOCSTRING_FILEPATH], True).perform_all_lint_checks()
+        linter_stdout = python_linter.ThirdPartyPythonLintChecksManager(
+            [INVALID_DOCSTRING_FILEPATH]).lint_py_files()
         self.assert_same_list_elements(
             ['W: 27, 0: Period is not used at the end of the docstring.'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            linter_stdout.messages)
+        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
 
     def test_python_utils_file_with_no_files(self):
         with self.print_swap:
             python_linter.ThirdPartyPythonLintChecksManager(
-                [PYTHON_UTILS_FILEPATH], True).perform_all_lint_checks()
+                [PYTHON_UTILS_FILEPATH]
+            ).lint_py_files_for_python3_compatibility()
         self.assert_same_list_elements([
             'There are no Python files to lint for Python 3 '
             'compatibility.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 0)
 
     def test_for_python_three_incompatibility(self):
-        with self.print_swap:
-            python_linter.ThirdPartyPythonLintChecksManager(
-                [INVALID_PYTHON3_FILEPATH], True).perform_all_lint_checks()
-        self.assert_same_list_elements([
-            'W: 21, 0: import missing `from __future__ import '
-            'absolute_import` (no-absolute-import)'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+        linter_stdout = python_linter.ThirdPartyPythonLintChecksManager(
+            [INVALID_PYTHON3_FILEPATH]
+        ).lint_py_files_for_python3_compatibility()
+        self.assert_same_list_elements(
+            ['W: 21, 0: import missing `from __future__ import '
+             'absolute_import` (no-absolute-import)'],
+            linter_stdout.all_messages)
+        self.assert_failed_messages_count(linter_stdout.all_messages, 2)
 
     def test_custom_linter_with_no_files(self):
         with self.print_swap:
             python_linter.PythonLintChecksManager(
-                [], FILE_CACHE, True).perform_all_lint_checks()
+                [], FILE_CACHE).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['There are no Python files to lint.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 0)
@@ -183,21 +166,33 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
     def test_third_party_linter_with_no_files(self):
         with self.print_swap:
             python_linter.ThirdPartyPythonLintChecksManager(
-                [], True).perform_all_lint_checks()
+                []).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['There are no Python files to lint.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 0)
 
+    def test_third_party_perform_all_lint_checks(self):
+        linter_stdout = python_linter.ThirdPartyPythonLintChecksManager(
+            [INVALID_PYCODESTYLE_FILEPATH]).perform_all_lint_checks()
+        self.assertTrue(isinstance(linter_stdout, list))
+
+    def test_custom_perform_all_lint_checks(self):
+        linter_stdout = python_linter.PythonLintChecksManager(
+            [INVALID_PYCODESTYLE_FILEPATH], FILE_CACHE
+        ).perform_all_lint_checks()
+        self.assertTrue(isinstance(linter_stdout, list))
+
     def test_pycodestyle_with_error_message(self):
-        summary_messages = python_linter.ThirdPartyPythonLintChecksManager(
-            [INVALID_PYCODESTYLE_FILEPATH], True).perform_all_lint_checks()
+        linter_stdout = python_linter.ThirdPartyPythonLintChecksManager(
+            [INVALID_PYCODESTYLE_FILEPATH]).lint_py_files()
         self.assert_same_list_elements(
-            ['27:1: E302 expected 2 blank lines, found 1'], summary_messages)
-        self.assert_failed_messages_count(summary_messages, 1)
+            ['27:1: E302 expected 2 blank lines, found 1'],
+            linter_stdout.messages)
+        self.assert_failed_messages_count(linter_stdout.all_messages, 1)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = python_linter.get_linters(
-            [VALID_PY_FILEPATH], FILE_CACHE, verbose_mode_enabled=True)
+            [VALID_PY_FILEPATH], FILE_CACHE)
         self.assertTrue(
             isinstance(custom_linter, python_linter.PythonLintChecksManager))
         self.assertTrue(
