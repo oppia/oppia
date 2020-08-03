@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the exploration preview in the
+ * @fileoverview Component for the exploration preview in the
  * editor page.
  */
 

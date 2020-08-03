@@ -81,7 +81,11 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
           var fileName = (
             ImageUploadHelperService.generateMathExpressionImageFilename(
               dimensions.height, dimensions.width, dimensions.verticalPadding));
-          var dataURI = 'data:image/svg+xml;base64,' + btoa(cleanedSvgString);
+          // We need use unescape and encodeURIComponent in order to
+          // handle the case when SVGs have non-ascii unicode characters.
+          var dataURI = (
+            'data:image/svg+xml;base64,' +
+            btoa(unescape(encodeURIComponent(cleanedSvgString))));
           var invalidTagsAndAttributes = (
             ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
           var tags = invalidTagsAndAttributes.tags;

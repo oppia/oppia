@@ -289,7 +289,7 @@ def _handle_exp_issues_after_state_rename(
             renamed versions. This mapping contains state names only if it is
             actually renamed.
         playthrough_ids_by_state_name: dict. The dict mapping old state names to
-            their new ones
+            their new ones.
 
     Returns:
         ExplorationIssue. The exploration issue domain object.
@@ -431,7 +431,7 @@ def get_exp_issues(exp_id, exp_version):
         exp_version: int. Version of the exploration.
 
     Returns:
-        ExplorationIssues|None: The domain object for exploration issues or
+        ExplorationIssues|None. The domain object for exploration issues or
         None if the exp_id is invalid.
     """
     exp_issues = None
@@ -449,7 +449,7 @@ def get_playthrough_by_id(playthrough_id):
         playthrough_id: str. ID of the playthrough.
 
     Returns:
-        Playthrough|None: The domain object for the playthrough or None if the
+        Playthrough|None. The domain object for the playthrough or None if the
         playthrough_id is invalid.
     """
     playthrough = None
@@ -508,7 +508,7 @@ def get_exploration_stats_by_id(exp_id, exp_version):
         ExplorationStats. The domain object for exploration statistics.
 
     Raises:
-        Exception: Entity for class ExplorationStatsModel with id not found.
+        Exception. Entity for class ExplorationStatsModel with id not found.
     """
     exploration_stats = None
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
@@ -783,9 +783,11 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         - 'options': dict. The visualization options.
 
         An example of the returned value may be:
-        [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
-        'id': 'BarChart',
-        'data': [{u'frequency': 1, u'answer': 0}]}]
+        [{
+            'options': {'header': 'Pretty Tiles!', 'use_percentages': True},
+            'id': 'SortedTiles',
+            'data': [{'frequency': 1, 'answer': 0}]
+        }]
     """
     if interaction_id is None:
         return []
