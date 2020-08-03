@@ -370,7 +370,7 @@ angular.module('oppia').directive('conversationSkin', [
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
-        'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_AUTOPLAY_AUDIO',
+        'EVENT_AUTOPLAY_AUDIO',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_NEW_CARD_OPENED',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
         'INTERACTION_SPECS', 'STORY_VIEWER_URL_TEMPLATE',
@@ -402,7 +402,7 @@ angular.module('oppia').directive('conversationSkin', [
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
-            EVENT_ACTIVE_CARD_CHANGED, EVENT_AUTOPLAY_AUDIO,
+            EVENT_AUTOPLAY_AUDIO,
             EVENT_NEW_CARD_AVAILABLE, EVENT_NEW_CARD_OPENED,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
             INTERACTION_SPECS, STORY_VIEWER_URL_TEMPLATE,
@@ -619,7 +619,7 @@ angular.module('oppia').directive('conversationSkin', [
             var index = PlayerPositionService.getDisplayedCardIndex();
             $scope.displayedCard = PlayerTranscriptService.getCard(index);
 
-            $rootScope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
+            LearnerAnswerInfoService.onActiveCardChanged.emit();
             $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
             /* A hash value is added to URL for scrolling to Oppia feedback
                when answer is submitted by user in mobile view. This hash value

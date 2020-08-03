@@ -20,6 +20,8 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('domain/statistics/learner-answer-details-backend-api.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('LearnerAnswerInfoService', [
   'AnswerClassificationService', 'LearnerAnswerDetailsBackendApiService',
   'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
@@ -48,6 +50,8 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
       // and it is not marked as correct i.e. it is any general outcome.
       typeC: 0.05
     };
+
+    var _activeCardChangedEventEmitter = new EventEmitter();
 
     var getRandomProbabilityIndex = function() {
       var min = 0;
@@ -134,6 +138,9 @@ angular.module('oppia').factory('LearnerAnswerInfoService', [
         var el = $('<p>');
         el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
         return ($('<span>').append(el)).html();
+      },
+      get onActiveCardChanged() {
+        return _activeCardChangedEventEmitter;
       }
     };
   }
