@@ -23,6 +23,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // The import below is to successfully mock Jquery.
 import $ from 'jquery';
 
+import { EventEmitter } from '@angular/core';
+
 require('services/search.service.ts');
 
 describe('Search service', function() {
@@ -445,4 +447,9 @@ describe('Search service', function() {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(true);
     });
+
+  it('should fetch searchBarLoaded EventEmitter', function() {
+    let searchBarLoadedEmitter = new EventEmitter();
+    expect(SearchService.onSearchBarLoaded).toEqual(searchBarLoadedEmitter);
+  });
 });
