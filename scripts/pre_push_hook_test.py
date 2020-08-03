@@ -517,9 +517,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
         unlink_swap = self.swap(os, 'unlink', mock_unlink)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
-        with islink_swap, exists_swap, subprocess_swap, unlink_swap, (
-            symlink_swap, self.print_swap):
-            pre_push_hook.install_hook()
+        with islink_swap, exists_swap, subprocess_swap, self.print_swap:
+            with unlink_swap, symlink_swap:
+                pre_push_hook.install_hook()
         self.assertTrue(check_function_calls['unlink_is_called'])
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue('Removing broken symlink' in self.print_arr)
