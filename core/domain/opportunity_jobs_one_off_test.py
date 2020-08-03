@@ -23,7 +23,6 @@ import ast
 
 from core.domain import caching_services
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services

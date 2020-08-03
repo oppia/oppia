@@ -248,8 +248,7 @@ class UtilsTests(test_utils.GenericTestBase):
         now = datetime.datetime.utcnow()
         self.assertEqual(
             utils.convert_string_to_naive_datetime_object(
-                (
-                utils.convert_naive_datetime_to_string(self.created_on))now)),
+                utils.convert_naive_datetime_to_string(now)),
             now)
 
     def test_get_hashable_value(self):

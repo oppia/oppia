@@ -338,6 +338,7 @@ def download_manifest_files(filepath):
                     dependency_url, TARGET_DOWNLOAD_DIRS[data],
                     dependency_tar_root_name, dependency_target_root_name)
 
+
 def install_redis_cli():
     """This installs the redis-cli to the local oppia third_party directory so
     that developmental servers and backend tests can make use of a local redis
@@ -379,6 +380,7 @@ def install_redis_cli():
             'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-server'])
 
         python_utils.PRINT('Redis-cli installed successfully.')
+
 
 def main(args=None):
     """Installs all the third party libraries."""
