@@ -1034,7 +1034,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow(), {}, initial_state_name,
             feconf.TRAINING_JOB_STATUS_COMPLETE, 1)
         # Store training job model for the classifier model.
-        classifier_models.TrainingJobExplorationMappingModel.create(
+        classifier_models.StateTrainingJobsMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
             {'TextClassifier': classifier_model_id})
 
@@ -1049,11 +1049,12 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
-        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
-            self.NEW_EXP_ID, new_exploration.version,
-            [initial_state_name])[0]
+        classifier_exp_mapping_model = (
+            classifier_models.StateTrainingJobsMappingModel.get_models(
+                self.NEW_EXP_ID, new_exploration.version,
+                [initial_state_name])[0])
         self.assertEqual(
-            classifier_exp_mapping_model.algorithm_id_to_job_id_map[
+            classifier_exp_mapping_model.algorithm_ids_to_job_ids[
                 'TextClassifier'],
             classifier_model_id)
 

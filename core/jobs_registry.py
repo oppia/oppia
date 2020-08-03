@@ -211,7 +211,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .TrainingJobExplorationMappingModelAuditOneOffJob
+        .StateTrainingJobsMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,

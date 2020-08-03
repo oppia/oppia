@@ -1149,8 +1149,8 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
             cls._validate_state_name]
 
 
-class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
-    """Class for validating TrainingJobExplorationMappingModels."""
+class StateTrainingJobsMappingModelValidator(BaseModelValidator):
+    """Class for validating StateTrainingJobsMappingModels."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1161,9 +1161,9 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return classifier_domain.TrainingJobExplorationMapping(
+        return classifier_domain.StateTrainingJobsMapping(
             item.exp_id, item.exp_version, item.state_name,
-            item.algorithm_id_to_job_id_map)
+            item.algorithm_ids_to_job_ids)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1178,7 +1178,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
         of exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. TrainingJobExplorationMappingModel to validate.
+            item: ndb.Model. StateTrainingJobsMappingModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -1222,7 +1222,7 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
         exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
+            item: ndb.Model. StateTrainingJobsMappingModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -6414,8 +6414,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     audit_models.UsernameChangeAuditModel: UsernameChangeAuditModelValidator,
     classifier_models.ClassifierTrainingJobModel: (
         ClassifierTrainingJobModelValidator),
-    classifier_models.TrainingJobExplorationMappingModel: (
-        TrainingJobExplorationMappingModelValidator),
+    classifier_models.StateTrainingJobsMappingModel: (
+        StateTrainingJobsMappingModelValidator),
     collection_models.CollectionModel: CollectionModelValidator,
     collection_models.CollectionSnapshotMetadataModel: (
         CollectionSnapshotMetadataModelValidator),
@@ -6657,13 +6657,13 @@ class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [classifier_models.ClassifierTrainingJobModel]
 
 
-class TrainingJobExplorationMappingModelAuditOneOffJob(
+class StateTrainingJobsMappingModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
-    """Job that audits and validates TrainingJobExplorationMappingModel."""
+    """Job that audits and validates StateTrainingJobsMappingModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [classifier_models.TrainingJobExplorationMappingModel]
+        return [classifier_models.StateTrainingJobsMappingModel]
 
 
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):

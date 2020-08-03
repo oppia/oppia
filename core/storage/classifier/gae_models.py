@@ -201,7 +201,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return job_ids
 
 
-class TrainingJobExplorationMappingModel(base_models.BaseModel):
+class StateTrainingJobsMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierTrainingJob.
 
     The ID of instances of this class has the form
@@ -218,12 +218,12 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     # The IDs of the training job corresponding to the exploration state. Each
     # algorithm_id corresponding to the interaction of the exploration state is
     # mapped to its unique job_id.
-    algorithm_id_to_job_id_map = ndb.JsonProperty(
+    algorithm_ids_to_job_ids = ndb.JsonProperty(
         required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """TrainingJobExplorationMappingModel is not related to users."""
+        """StateTrainingJobsMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -294,7 +294,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, algorithm_id_to_job_id):
+            cls, exp_id, exp_version, state_name, algorithm_ids_to_job_ids):
         """Creates a new ClassifierExplorationMappingModel entry.
 
         Args:
@@ -303,7 +303,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 this training job was created.
             state_name: unicode. The name of the state to which the classifier
                 belongs.
-            algorithm_id_to_job_id: dict. The ID of the training job
+            algorithm_ids_to_job_ids: dict. The ID of the training job
                 corresponding to each possible algorithm_id for the given
                 <exp_id, exp_version, state_name>.
 
@@ -319,36 +319,37 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
             mapping_instance = cls(
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
                 state_name=state_name,
-                algorithm_id_to_job_id_map=algorithm_id_to_job_id)
+                algorithm_ids_to_job_ids=algorithm_ids_to_job_ids)
 
             mapping_instance.put()
             return instance_id
         raise Exception('A model with the same ID already exists.')
 
     @classmethod
-    def create_multi(cls, job_exploration_mappings):
-        """Creates multiple new TrainingJobExplorationMappingModel entries.
+    def create_multi(cls, state_training_jobs_mappings):
+        """Creates multiple new StateTrainingJobsMappingModel entries.
 
         Args:
-            job_exploration_mappings: list(TrainingJobExplorationMapping). The
-                list of TrainingJobExplorationMapping Domain objects.
+            state_training_jobs_mappings: list(StateTrainingJobsMapping). The
+                list of StateTrainingJobsMapping Domain objects.
 
         Returns:
             list(int). The list of mapping IDs.
         """
         mapping_models = []
         mapping_ids = []
-        for job_exploration_mapping in job_exploration_mappings:
+        for state_training_job_mapping in state_training_jobs_mappings:
             instance_id = cls._generate_id(
-                job_exploration_mapping.exp_id,
-                job_exploration_mapping.exp_version,
-                job_exploration_mapping.state_name)
+                state_training_job_mapping.exp_id,
+                state_training_job_mapping.exp_version,
+                state_training_job_mapping.state_name)
             mapping_instance = cls(
-                id=instance_id, exp_id=job_exploration_mapping.exp_id,
-                exp_version=job_exploration_mapping.exp_version,
-                state_name=job_exploration_mapping.state_name,
-                algorithm_id_to_job_id_map=(
-                    job_exploration_mapping.algorithm_id_to_job_id_map.to_dict()
+                id=instance_id, exp_id=state_training_job_mapping.exp_id,
+                exp_version=state_training_job_mapping.exp_version,
+                state_name=state_training_job_mapping.state_name,
+                algorithm_ids_to_job_ids=(
+                    state_training_job_mapping.algorithm_ids_to_job_ids.
+                    to_dict()
                 ))
 
             mapping_models.append(mapping_instance)

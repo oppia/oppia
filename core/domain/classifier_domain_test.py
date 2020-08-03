@@ -259,28 +259,28 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
 
-class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
-    """Tests for the TrainingJobExplorationMapping domain."""
+class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
+    """Tests for the StateTrainingJobsMapping domain."""
 
     def setUp(self):
-        super(TrainingJobExplorationMappingDomainTests, self).setUp()
+        super(StateTrainingJobsMappingDomainTests, self).setUp()
 
         self.mapping_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
-            'algorithm_id_to_job_id_map': {'TextClassifier': 'job_id1'}
+            'algorithm_ids_to_job_ids': {'TextClassifier': 'job_id1'}
         }
 
     def _get_mapping_from_dict(self, mapping_dict):
-        """Returns the TrainingJobExplorationMapping object after receiving the
+        """Returns the StateTrainingJobsMapping object after receiving the
         content from the mapping_dict.
         """
-        mapping = classifier_domain.TrainingJobExplorationMapping(
+        mapping = classifier_domain.StateTrainingJobsMapping(
             mapping_dict['exp_id'],
             mapping_dict['exp_version'],
             mapping_dict['state_name'],
-            mapping_dict['algorithm_id_to_job_id_map'])
+            mapping_dict['algorithm_ids_to_job_ids'])
 
         return mapping
 
@@ -289,7 +289,7 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
-            'algorithm_id_to_job_id_map': {'TextClassifier': 'job_id1'}
+            'algorithm_ids_to_job_ids': {'TextClassifier': 'job_id1'}
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
@@ -323,14 +323,14 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
             mapping.validate()
 
 
-class AlgorithmIDToJobIDMappingDomainTests(test_utils.GenericTestBase):
-    """Tests for the AlgorithmIDToJobIDMapping domain."""
+class AlgorithmIdToJobIdMappingDomainTests(test_utils.GenericTestBase):
+    """Tests for the AlgorithmIdToJobIdMapping domain object."""
 
     def _get_mapping_from_dict(self, mapping_dict):
-        """Returns the AlgorithmIDToJobIDMapping object after receiving the
+        """Returns the AlgorithmIdToJobIdMapping object after receiving the
         content from the mapping_dict.
         """
-        mapping = classifier_domain.AlgorithmIDToJobIDMapping(
+        mapping = classifier_domain.AlgorithmIdToJobIdMapping(
             mapping_dict)
 
         return mapping
@@ -351,13 +351,13 @@ class AlgorithmIDToJobIDMappingDomainTests(test_utils.GenericTestBase):
         self.assertSetEqual(
             set(mapping.get_all_algorithm_ids()), set(mapping_dict.keys()))
 
-    def test_algorithm_id_exists(self):
+    def test_contains_algorithm_id(self):
         mapping_dict = {
             'TextClassifier': 'job_id1',
             'CodeClassifier': 'job_id2'}
         mapping = self._get_mapping_from_dict(mapping_dict)
-        self.assertTrue(mapping.algorithm_id_exists('TextClassifier'))
-        self.assertFalse(mapping.algorithm_id_exists('FakeClassifier'))
+        self.assertTrue(mapping.contains_algorithm_id('TextClassifier'))
+        self.assertFalse(mapping.contains_algorithm_id('FakeClassifier'))
 
     def test_get_job_id_for_algorithm_id(self):
         mapping_dict = {
@@ -374,7 +374,7 @@ class AlgorithmIDToJobIDMappingDomainTests(test_utils.GenericTestBase):
         mapping = self._get_mapping_from_dict(mapping_dict)
         with self.assertRaisesRegexp(
             Exception,
-            'Job ID correspond to Algorithhm FakeClassifier does not exist'):
+            'Job ID correspond to Algorithm FakeClassifier does not exist'):
             mapping.get_job_id_for_algorithm_id('FakeClassifier')
 
     def test_set_job_id_for_algorithm_id(self):
@@ -383,7 +383,7 @@ class AlgorithmIDToJobIDMappingDomainTests(test_utils.GenericTestBase):
             'CodeClassifier': 'job_id2'}
         mapping = self._get_mapping_from_dict(mapping_dict)
         mapping.set_job_id_for_algorithm_id('NewClassifier', 'job_id3')
-        self.assertTrue(mapping.algorithm_id_exists('NewClassifier'))
+        self.assertTrue(mapping.contains_algorithm_id('NewClassifier'))
         self.assertEqual(
             mapping.get_job_id_for_algorithm_id('NewClassifier'), 'job_id3')
 
@@ -393,7 +393,7 @@ class AlgorithmIDToJobIDMappingDomainTests(test_utils.GenericTestBase):
             'CodeClassifier': 'job_id2'}
         mapping = self._get_mapping_from_dict(mapping_dict)
         mapping.remove_algorithm_id('TextClassifier')
-        self.assertFalse(mapping.algorithm_id_exists('TextClassifier'))
+        self.assertFalse(mapping.contains_algorithm_id('TextClassifier'))
         self.assertListEqual(
             mapping.get_all_algorithm_ids(), ['CodeClassifier'])
 
@@ -411,11 +411,11 @@ class AlgorithmIDToJobIDMappingDomainTests(test_utils.GenericTestBase):
         mapping = self._get_mapping_from_dict({'TextClassifier': 'job_id1'})
         mapping.validate()
 
-    def test_validation_with_invalid_algorithm_id_to_job_id_map(self):
+    def test_validation_with_invalid_algorithm_ids_to_job_ids(self):
         mapping = self._get_mapping_from_dict(0)
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected algorithm_id_to_job_id_map to be a dict'):
+            'Expected algorithm_ids_to_job_ids to be a dict'):
             mapping.validate()
 
     def test_validation_with_invalid_algorithm_id_in_algorithm_to_job_map(self):

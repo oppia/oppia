@@ -120,7 +120,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 1)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 1)
 
         # Modify such that job creation is triggered.
@@ -150,7 +150,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 2)
 
         # Make a change to the exploration without changing the answer groups
@@ -168,7 +168,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 3)
 
         # Check that renaming a state does not create an extra job.
@@ -190,7 +190,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 4)
 
     def test_that_models_are_recreated_if_not_available(self):
@@ -205,7 +205,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 1)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 1)
 
         # Modify such that job creation is triggered.
@@ -235,7 +235,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 2)
 
         # Make a change to the exploration without changing the answer groups
@@ -255,7 +255,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 2)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 2)
 
         # Again make a change to the exploration without changing the answer
@@ -275,7 +275,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
         self.assertEqual(all_jobs.count(), 3)
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 3)
 
     def test_handle_trainable_states(self):
@@ -326,7 +326,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # There will be only one mapping (because of the creation of the
         # exploration).
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 1)
 
         # Create job and mapping for previous version.
@@ -336,12 +336,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             algorithm_id, 'TextInput', self.exp_id, exploration.version - 1,
             next_scheduled_check_time, [], 'Old home',
             feconf.TRAINING_JOB_STATUS_COMPLETE, {}, 1)
-        classifier_models.TrainingJobExplorationMappingModel.create(
+        classifier_models.StateTrainingJobsMappingModel.create(
             self.exp_id, exploration.version - 1, 'Old home',
             {algorithm_id: job_id})
 
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 2)
 
         classifier_services.handle_non_retrainable_states(
@@ -350,17 +350,17 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # There should be three mappings (the first mapping because of the
         # creation of the exploration) in the data store now.
         all_mappings = (
-            classifier_models.TrainingJobExplorationMappingModel.get_all())
+            classifier_models.StateTrainingJobsMappingModel.get_all())
         self.assertEqual(all_mappings.count(), 3)
         for index, mapping in enumerate(all_mappings):
             if index == 2:
                 mapping_id = mapping.id
 
-        job_exploration_mapping = (
-            classifier_models.TrainingJobExplorationMappingModel.get(
+        state_training_jobs_mapping = (
+            classifier_models.StateTrainingJobsMappingModel.get(
                 mapping_id))
-        self.assertEqual(job_exploration_mapping.exp_id, self.exp_id)
-        self.assertEqual(job_exploration_mapping.state_name, 'Home')
+        self.assertEqual(state_training_jobs_mapping.exp_id, self.exp_id)
+        self.assertEqual(state_training_jobs_mapping.state_name, 'Home')
 
     def test_retrieval_of_classifier_training_jobs(self):
         """Test the get_classifier_training_job_by_id method."""
@@ -596,7 +596,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             algorithm_id, 'TextInput', exp_id, 1, next_scheduled_check_time,
             [], state_name, feconf.TRAINING_JOB_STATUS_NEW, {},
             algorithm_version)
-        classifier_models.TrainingJobExplorationMappingModel.create(
+        classifier_models.StateTrainingJobsMappingModel.create(
             exp_id, 1, state_name, {algorithm_id: job_id})
 
         classifier_training_job = (

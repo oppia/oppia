@@ -427,12 +427,12 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 '/ml/trainedclassifierhandler', params=params,
                 expected_status_int=404)
 
-        training_job_exploration_mapping = (
-            classifier_services.get_training_job_exploration_mapping(
+        state_training_jobs_mapping = (
+            classifier_services.get_state_training_jobs_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
         self.assertTrue(
-            training_job_exploration_mapping.algorithm_id_to_job_id_map.
-            algorithm_id_exists('NewTextClassifier'))
+            state_training_jobs_mapping.algorithm_ids_to_job_ids.
+            contains_algorithm_id('NewTextClassifier'))
 
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
@@ -443,7 +443,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
         self.assertEqual(
             (
-                training_job_exploration_mapping.algorithm_id_to_job_id_map.
+                state_training_jobs_mapping.algorithm_ids_to_job_ids.
                 get_job_id_for_algorithm_id('NewTextClassifier')),
             json_response['job_id']
         )
@@ -474,12 +474,12 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 '/ml/trainedclassifierhandler', params=params,
                 expected_status_int=404)
 
-        training_job_exploration_mapping = (
-            classifier_services.get_training_job_exploration_mapping(
+        state_training_jobs_mapping = (
+            classifier_services.get_state_training_jobs_mapping(
                 self.exp_id, self.exploration.version, 'Home'))
         self.assertTrue(
-            training_job_exploration_mapping.algorithm_id_to_job_id_map.
-            algorithm_id_exists('TextClassifier'))
+            state_training_jobs_mapping.algorithm_ids_to_job_ids.
+            contains_algorithm_id('TextClassifier'))
 
         with self.swap(
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
@@ -490,7 +490,7 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
         self.assertEqual(
             (
-                training_job_exploration_mapping.algorithm_id_to_job_id_map.
+                state_training_jobs_mapping.algorithm_ids_to_job_ids.
                 get_job_id_for_algorithm_id('TextClassifier')),
             json_response['job_id']
         )

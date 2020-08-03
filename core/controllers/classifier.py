@@ -46,7 +46,6 @@ def generate_signature(secret, message, vm_id):
     Returns:
         str. The signature of the payload data.
     """
-    # message_json = json.dumps(message, sort_keys=True)
     message = '%s|%s' % (base64.b64encode(message), vm_id)
     return hmac.new(
         secret, msg=message, digestmod=hashlib.sha256).hexdigest()
@@ -144,9 +143,10 @@ class TrainedClassifierHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        """Handles get requests.
+        """Handles GET requests.
 
-        Retrieves trained classifier data from GCS and transfers it to frontend.
+        Retrieves the name of the file storing (stored on GCS) the trained model
+        parameters and transfers it to frontend.
         """
         exploration_id = self.request.get('exploration_id')
         state_name = self.request.get('state_name')
@@ -171,22 +171,21 @@ class TrainedClassifierHandler(base.BaseHandler):
         algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_version']
 
-
-        training_job_exploration_mapping = (
-            classifier_services.get_training_job_exploration_mapping(
+        state_training_jobs_mapping = (
+            classifier_services.get_state_training_jobs_mapping(
                 exploration_id, exp_version, state_name))
-        if not training_job_exploration_mapping:
+        if not state_training_jobs_mapping:
             raise self.InvalidInputException
 
         if not (
-                training_job_exploration_mapping.algorithm_id_to_job_id_map.
-                algorithm_id_exists(algorithm_id)):
-            classifier_services.migrate_exploration_training_job(
-                training_job_exploration_mapping)
+                state_training_jobs_mapping.algorithm_ids_to_job_ids.
+                contains_algorithm_id(algorithm_id)):
+            classifier_services.migrate_exploration_training_jobs(
+                state_training_jobs_mapping)
             raise self.PageNotFoundException
 
         training_job = classifier_services.get_classifier_training_job_by_id(
-            training_job_exploration_mapping.algorithm_id_to_job_id_map.
+            state_training_jobs_mapping.algorithm_ids_to_job_ids.
             get_job_id_for_algorithm_id(
                 algorithm_id))
 
@@ -195,8 +194,8 @@ class TrainedClassifierHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         if training_job.algorithm_version != algorithm_version:
-            classifier_services.migrate_exploration_training_job(
-                training_job_exploration_mapping)
+            classifier_services.migrate_exploration_training_jobs(
+                state_training_jobs_mapping)
             raise self.PageNotFoundException
 
         return self.render_json({

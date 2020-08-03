@@ -719,11 +719,11 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class TrainingJobExplorationMappingModelValidatorTests(
+class StateTrainingJobsMappingModelValidatorTests(
         test_utils.GenericTestBase):
 
     def setUp(self):
-        super(TrainingJobExplorationMappingModelValidatorTests, self).setUp()
+        super(StateTrainingJobsMappingModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -739,22 +739,22 @@ class TrainingJobExplorationMappingModelValidatorTests(
             exp.add_states(['StateTest%s' % exp.id])
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        id0 = classifier_models.TrainingJobExplorationMappingModel.create(
+        id0 = classifier_models.StateTrainingJobsMappingModel.create(
             '0', 1, 'StateTest0', {'TextClassifier': 'job0'})
         self.model_instance_0 = (
-            classifier_models.TrainingJobExplorationMappingModel.get_by_id(id0))
-        id1 = classifier_models.TrainingJobExplorationMappingModel.create(
+            classifier_models.StateTrainingJobsMappingModel.get_by_id(id0))
+        id1 = classifier_models.StateTrainingJobsMappingModel.create(
             '1', 1, 'StateTest1', {'TextClassifier': 'job1'})
         self.model_instance_1 = (
-            classifier_models.TrainingJobExplorationMappingModel.get_by_id(id1))
+            classifier_models.StateTrainingJobsMappingModel.get_by_id(id1))
 
         self.job_class = (
             prod_validation_jobs_one_off
-            .TrainingJobExplorationMappingModelAuditOneOffJob)
+            .StateTrainingJobsMappingModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
+            u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_created_on_greater_than_last_updated(self):
@@ -763,21 +763,21 @@ class TrainingJobExplorationMappingModelValidatorTests(
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of TrainingJobExplorationMappingModel\', '
+            'of StateTrainingJobsMappingModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-            ), u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
+            ), u'[u\'fully-validated StateTrainingJobsMappingModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'TrainingJobExplorationMappingModel\', '
+            'StateTrainingJobsMappingModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
@@ -793,45 +793,45 @@ class TrainingJobExplorationMappingModelValidatorTests(
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids field '
-                'check of TrainingJobExplorationMappingModel\', '
+                'check of StateTrainingJobsMappingModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
+            u'[u\'fully-validated StateTrainingJobsMappingModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_invalid_exp_version(self):
         model_instance_with_invalid_exp_version = (
-            classifier_models.TrainingJobExplorationMappingModel(
+            classifier_models.StateTrainingJobsMappingModel(
                 id='0.5.StateTest0', exp_id='0', exp_version=5,
                 state_name='StateTest0',
-                algorithm_id_to_job_id_map={'TextClassifier': 'job_id'}))
+                algorithm_ids_to_job_ids={'TextClassifier': 'job_id'}))
         model_instance_with_invalid_exp_version.put()
         expected_output = [
             (
                 u'[u\'failed validation check for exp version check '
-                'of TrainingJobExplorationMappingModel\', [u\'Entity id %s: '
+                'of StateTrainingJobsMappingModel\', [u\'Entity id %s: '
                 'Exploration version 5 in entity is greater than the '
                 'version 1 of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_exp_version.id,
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
+            u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_invalid_state_name(self):
         model_instance_with_invalid_state_name = (
-            classifier_models.TrainingJobExplorationMappingModel(
+            classifier_models.StateTrainingJobsMappingModel(
                 id='0.1.invalid', exp_id='0', exp_version=1,
                 state_name='invalid',
-                algorithm_id_to_job_id_map={'TextClassifier': 'job_id'}))
+                algorithm_ids_to_job_ids={'TextClassifier': 'job_id'}))
         model_instance_with_invalid_state_name.put()
         expected_output = [
             (
                 u'[u\'failed validation check for state name check '
-                'of TrainingJobExplorationMappingModel\', [u\'Entity id %s: '
+                'of StateTrainingJobsMappingModel\', [u\'Entity id %s: '
                 'State name invalid in entity is not present in '
                 'states of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_state_name.id,
-            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
+            u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
