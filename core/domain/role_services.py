@@ -242,7 +242,7 @@ def get_all_actions(role):
         list(str). A list of actions accessible to the role.
 
     Raises:
-        Exception: The given role does not exist.
+        Exception. The given role does not exist.
     """
     if role not in PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)

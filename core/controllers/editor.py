@@ -271,7 +271,7 @@ class ExplorationStatusHandler(EditorHandler):
             exploration_id: str. Id of the exploration.
 
         Raises:
-            InvalidInputException: Given exploration is invalid.
+            InvalidInputException. Given exploration is invalid.
         """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         try:
@@ -349,7 +349,7 @@ class UserExplorationEmailsHandler(EditorHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            InvalidInputException: Invalid message type.
+            InvalidInputException. Invalid message type.
         """
 
         mute = self.payload.get('mute')
