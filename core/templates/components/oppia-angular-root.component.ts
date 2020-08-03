@@ -326,6 +326,8 @@ import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
+import { KeyboardShortcutService } from
+  'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -587,6 +589,8 @@ import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
+import { StoryEditorNavigationService } from
+  'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -929,6 +933,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateContentService: StateContentService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
   static stateEditorService: StateEditorService;
+  static keyboardShortcutService: KeyboardShortcutService;
   static stateGraphLayoutService: StateGraphLayoutService;
   static stateHintsService: StateHintsService;
   static stateInteractionIdService: StateInteractionIdService;
@@ -950,6 +955,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static statsReportingService: StatsReportingService;
   static stopwatchObjectFactory: StopwatchObjectFactory;
   static storyContentsObjectFactory: StoryContentsObjectFactory;
+  static storyEditorNavigationService: StoryEditorNavigationService;
   static storyNodeObjectFactory: StoryNodeObjectFactory;
   static storyObjectFactory: StoryObjectFactory;
   static storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory;
@@ -1245,6 +1251,7 @@ private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
 private stateEditorService: StateEditorService,
+private keyboardShortcutService: KeyboardShortcutService,
 private stateGraphLayoutService: StateGraphLayoutService,
 private stateHintsService: StateHintsService,
 private stateInteractionIdService: StateInteractionIdService,
@@ -1266,6 +1273,7 @@ private statsReportingBackendApiService: StatsReportingBackendApiService,
 private statsReportingService: StatsReportingService,
 private stopwatchObjectFactory: StopwatchObjectFactory,
 private storyContentsObjectFactory: StoryContentsObjectFactory,
+private storyEditorNavigationService: StoryEditorNavigationService,
 private storyNodeObjectFactory: StoryNodeObjectFactory,
 private storyObjectFactory: StoryObjectFactory,
 private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
@@ -1562,6 +1570,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateContentService = this.stateContentService;
     OppiaAngularRootComponent.stateCustomizationArgsService = this.stateCustomizationArgsService;
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
+    OppiaAngularRootComponent.keyboardShortcutService = this.keyboardShortcutService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;
     OppiaAngularRootComponent.stateHintsService = this.stateHintsService;
     OppiaAngularRootComponent.stateInteractionIdService = this.stateInteractionIdService;
@@ -1583,6 +1592,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.statsReportingService = this.statsReportingService;
     OppiaAngularRootComponent.stopwatchObjectFactory = this.stopwatchObjectFactory;
     OppiaAngularRootComponent.storyContentsObjectFactory = this.storyContentsObjectFactory;
+    OppiaAngularRootComponent.storyEditorNavigationService = this.storyEditorNavigationService;
     OppiaAngularRootComponent.storyNodeObjectFactory = this.storyNodeObjectFactory;
     OppiaAngularRootComponent.storyObjectFactory = this.storyObjectFactory;
     OppiaAngularRootComponent.storyPlaythroughObjectFactory = this.storyPlaythroughObjectFactory;

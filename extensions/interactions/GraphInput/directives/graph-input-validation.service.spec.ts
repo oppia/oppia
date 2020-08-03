@@ -132,9 +132,11 @@ describe('GraphInputValidationService', () => {
   it('should expect graph and edit customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
-        // TS ignore is used because we are assigning no customization
-        // args here to test errors.
-        // @ts-ignore
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'GraphInputCustomizationArgs'." We did not
+        // assign the correct type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have properties: ' +

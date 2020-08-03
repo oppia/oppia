@@ -45,7 +45,7 @@ angular.module('oppia').component('testInteractionPanel', {
       $scope.isSubmitButtonDisabled = (
         CurrentInteractionService.isSubmitButtonDisabled);
       ctrl.$onInit = function() {
-        var _stateName = $scope.getStateName();
+        var _stateName = ctrl.getStateName();
         var _state = ExplorationStatesService.getState(_stateName);
         $scope.interactionIsInline = (
           INTERACTION_SPECS[_state.interaction.id].display_mode ===
