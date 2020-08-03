@@ -619,6 +619,7 @@ angular.module('oppia').directive('conversationSkin', [
             var index = PlayerPositionService.getDisplayedCardIndex();
             $scope.displayedCard = PlayerTranscriptService.getCard(index);
 
+            console.log('Emitted: activeCardChanged in Conversation Skin Directive');
             LearnerAnswerInfoService.onActiveCardChanged.emit();
             $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
             /* A hash value is added to URL for scrolling to Oppia feedback
