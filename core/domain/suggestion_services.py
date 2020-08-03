@@ -282,8 +282,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     if suggestion.is_handled:
         raise Exception(
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
@@ -296,8 +295,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     if len(error_list) > 0:
         raise Exception(
             'Invalid math tags found in the suggestion with id %s.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
 
     author_name = user_services.get_username(suggestion.author_id)
@@ -437,15 +435,13 @@ def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     if not suggestion.is_handled:
         raise Exception(
             'The suggestion with id %s is not yet handled.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception(
             'The suggestion with id %s was accepted. '
             'Only rejected suggestions can be resubmitted.' % (
-                suggestion.suggestion_id
-            )
+                suggestion.suggestion_id)
         )
 
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
