@@ -180,13 +180,13 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     def test_raise_exception_by_mocking_collision(self):
         thread_id = feedback_services.create_thread(
             'exploration', '0', 'test_author', 'subject 1', 'text 1')
-        instance_id = (
-            feedback_models.GeneralFeedbackMessageModel._generate_id(
-                thread_id, '0')
-        )
+        # Simulating the _generate_id function in the
+        # GeneralFeedbackMessageModel class.
+        instance_id = '.'.join([thread_id, '0'])
+
         expected_exception_regexp = (
-            'The following feedback message ID\(s\) conflicted on create: %s' % (
-                instance_id)
+            r'The following feedback message ID\(s\) conflicted on '
+            'create: %s' % (instance_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             feedback_models.GeneralFeedbackMessageModel.create(

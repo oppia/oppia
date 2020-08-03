@@ -355,7 +355,7 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
             rejecting the suggestions.
 
     Raises:
-        Exception: One or more of the suggestions has already been handled.
+        Exception. One or more of the suggestions has already been handled.
     """
 
     for suggestion in suggestions:

@@ -247,7 +247,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         the given exploration ids.
 
         Args:
-            exp_ids: list(str). list of exploration ids to query for.
+            exp_ids: list(str). List of exploration ids to query for.
 
         Returns:
             list(SuggestionModel). A list of translation suggestions that

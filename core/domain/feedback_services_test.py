@@ -82,8 +82,8 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     def test_create_message_fails_if_invalid_thread_id(self):
         with self.assertRaisesRegexp(
             Exception,
-            'Thread\(s\) belonging to the GeneralFeedbackThreadModel class '
-            'with id\(s\):\[invalid_thread_id\] were not found.'):
+            r'Thread\(s\) belonging to the GeneralFeedbackThreadModel class '
+            r'with id\(s\):\[invalid_thread_id\] were not found.'):
             feedback_services.create_message(
                 'invalid_thread_id', self.user_id, None, None, 'Hello')
 
@@ -362,12 +362,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_id_1 = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id_1)
-
         thread_id_2 = feedback_services.create_thread(
             'exploration', self.EXP_ID_2, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id_2)
 
         thread_summaries, _ = feedback_services.get_exp_thread_summaries(
             self.owner_id, [thread_id_1, thread_id_2])

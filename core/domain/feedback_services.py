@@ -139,11 +139,9 @@ def create_message(
         received_via_email: bool. Whether new message is received via email or
             web.
     """
-
     create_messages(
         [thread_id], author_id, updated_status, updated_subject, text,
-        received_via_email
-    )
+        received_via_email=received_via_email)
 
 
 def create_messages(
@@ -167,10 +165,11 @@ def create_messages(
             email or web.
     """
     from core.domain import event_services
-    
+
     # Get the threads at the outset, in order to check that there are models
     # corresponding to each of the thread_ids.
-    thread_models = feedback_models.GeneralFeedbackThreadModel.get_multi(thread_ids)
+    thread_models = feedback_models.GeneralFeedbackThreadModel.get_multi(
+        thread_ids)
     thread_ids_that_do_not_have_models = []
     for index, thread in enumerate(thread_models):
         if thread is None:
@@ -191,7 +190,7 @@ def create_messages(
 
     # Create the new message instances.
     messages = feedback_models.GeneralFeedbackMessageModel.create_multi(
-            thread_ids, message_ids)
+        thread_ids, message_ids)
 
     # Update the message instances.
     for index, message in enumerate(messages):
@@ -212,8 +211,12 @@ def create_messages(
             else:
                 # Thread status changed.
                 if thread.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                    event_services.FeedbackThreadStatusChangedEventHandler.record(
-                        thread.entity_id, thread.status, updated_status)
+                    (
+                        event_services
+                        .FeedbackThreadStatusChangedEventHandler
+                        .record(
+                            thread.entity_id, thread.status, updated_status)
+                    )
         if updated_subject:
             message.updated_subject = updated_subject
     feedback_models.GeneralFeedbackMessageModel.put_multi(messages)
@@ -226,8 +229,8 @@ def create_messages(
             thread.last_nonempty_message_author_id = author_id
 
     # We do a put() even if the status and subject are not updated, so that the
-    # last_updated time of the threads reflects the last time a message was added
-    # to it.
+    # last_updated time of the threads reflects the last time a message was
+    # added to it.
     old_statuses = [thread.status for thread in thread_models]
     new_statuses = old_statuses
     if updated_status or updated_subject:
@@ -259,8 +262,7 @@ def create_messages(
         # we need not update the suggestion.
         if suggestion:
             suggestions_to_update.append(suggestion)
-    suggestion_models.GeneralSuggestionModel.put_multi(
-            suggestions_to_update)
+    suggestion_models.GeneralSuggestionModel.put_multi(suggestions_to_update)
 
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
@@ -304,25 +306,26 @@ def add_message_id_to_read_by_list(thread_id, user_id, message_id):
     """
     add_message_ids_to_read_by_list([thread_id], user_id, [message_id])
 
+
 def add_message_ids_to_read_by_list(thread_ids, user_id, message_ids):
     """Adds the message ids to the list of message ids read by the user.
 
     Args:
         thread_ids: list(str). The ids of the threads.
-        user_id: str. The id of the user reading the messages,
+        user_id: str. The id of the user reading the messages.
         message_ids: list(str). The ids of the messages.
     """
     # First get all of the GeneralFeedbackThreadUserModels that already exist.
     current_feedback_thread_user_models = (
         feedback_models.GeneralFeedbackThreadUserModel.get_multi(
             user_id, thread_ids))
-    
+
     # Keep track of which thread_ids do not have models yet.
     missing_thread_ids = []
     # Keep track of the current_feedback_thread_user_models that aren't None.
     feedback_thread_user_models = []
     for index, feedback_model in enumerate(
-        current_feedback_thread_user_models):
+            current_feedback_thread_user_models):
         if feedback_model is None:
             missing_thread_ids.append(thread_ids[index])
         else:
