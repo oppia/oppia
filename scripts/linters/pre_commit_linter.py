@@ -427,10 +427,7 @@ def _print_summary_of_error_messages(lint_messages):
         python_utils.PRINT('Please fix the errors below:')
         python_utils.PRINT('----------------------------------------')
         for message in lint_messages:
-            if message.startswith(('SUCCESS', 'FAILED')):
-                continue
-            else:
-                python_utils.PRINT(message)
+            python_utils.PRINT(message)
 
 
 def _get_task_output(lint_messages, failed, task):
