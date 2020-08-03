@@ -25,7 +25,6 @@ import sys
 
 from core.tests import test_utils
 
-from . import codeowner_linter
 from . import pre_commit_linter
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
