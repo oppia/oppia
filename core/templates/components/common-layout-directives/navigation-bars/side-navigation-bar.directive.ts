@@ -16,6 +16,13 @@
  * @fileoverview Directive for the side navigation bar.
  */
 
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('sideNavigationBar', [
@@ -37,3 +44,28 @@ angular.module('oppia').directive('sideNavigationBar', [
       }]
     };
   }]);
+
+  @Component({
+    selector: 'side-navigation-bar',
+    templateUrl: './side-navigation-bar.directive.html',
+    styleUrls: []
+  })
+  export class SideNavigationBarComponent implements OnInit {
+    currentUrl: string = '';
+    constructor(
+      private urlInterpolationService: UrlInterpolationService,
+      private windowRef: WindowRef
+    ) {}
+
+    ngOnInit(): void {
+      this.currentUrl = this.windowRef.nativeWindow.location.pathname;
+    }
+
+    getStaticImageUrl(imagePath: string): string {
+      return this.urlInterpolationService.getStaticImageUrl(imagePath);
+    } 
+
+  }
+  angular.module('oppia').directive(
+    'sideNavigationBar', downgradeComponent(
+      {component: SideNavigationBarComponent}));
