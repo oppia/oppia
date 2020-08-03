@@ -68,7 +68,7 @@ angular.module('oppia').component('classroomPage', {
           classroomName).then(function(topicSummaryObjects) {
           ctrl.topicSummaries = topicSummaryObjects;
           LoaderService.hideLoadingScreen();
-          $rootScope.$broadcast('initializeTranslation');
+          ctrl.classroomBackendApiService.onInitializeTranslation.emit();
         }, function(errorResponse) {
           if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
             AlertsService.addWarning('Failed to get dashboard data');
