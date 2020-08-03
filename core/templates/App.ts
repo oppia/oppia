@@ -36,7 +36,7 @@ require(
   'promo-bar.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'side-navigation-bar.directive.ts');
+  'side-navigation-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');

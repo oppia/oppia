@@ -25,7 +25,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'side-navigation-bar',
-  templateUrl: './side-navigation-bar.directive.html',
+  templateUrl: './side-navigation-bar.component.html',
   styleUrls: []
 })
 export class SideNavigationBarComponent implements OnInit {
