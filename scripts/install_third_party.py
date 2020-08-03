@@ -349,7 +349,8 @@ def main(args=None):
     try:
         # Pipe output to /dev/null for silence in console.
         null = python_utils.open_file('/dev/null', 'w')
-        command_text = ['redis-cli', '--version']
+        command_text = [
+            './third_party/redis-cli-6.0.6/src/redis-cli', '--version']
         subprocess.call(command_text)
         null.close()
         python_utils.PRINT('Redis-cli is already installed.')
@@ -364,13 +365,20 @@ def main(args=None):
             'http://download.redis.io/releases/redis-6.0.6.tar.gz',
             TARGET_DOWNLOAD_DIRS['backend'],
             'redis-6.0.6', 'redis-cli-6.0.6')
-        # Make the script executable.
-        command_text = ['chmod', '+x', 'scripts/install_redis_cli.sh']
+
+        with python_utils.change_directory('third_party/redis-cli-6.0.6/'):
+            command_text = ['make']
+            subprocess.call(command_text)
+
+        # Make the scripts executable.
+        command_text = [
+            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-cli']
         subprocess.call(command_text)
 
-        # Execute the script scripts/intall_redis_cli to install redis_cli.
-        command_text = ['sh', './scripts/install_redis_cli.sh']
+        command_text = [
+            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-server']
         subprocess.call(command_text)
+
         python_utils.PRINT('Redis-cli installed successfully.')
 
 
