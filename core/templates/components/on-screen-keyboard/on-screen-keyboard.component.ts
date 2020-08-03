@@ -22,27 +22,27 @@ require('services/contextual/device-info.service.ts');
 require('services/guppy-initialization.service.ts');
 
 angular.module('oppia').component('onScreenKeyboard', {
-  bindings: {
-    // These will be used after a customization arg has been added to the
-    // math interactions.
-    customizable: '=',
-    customLetters: '='
-  },
   template: require('./on-screen-keyboard.component.html'),
   controller: [
     'DeviceInfoService', 'GuppyInitializationService',
     'UrlInterpolationService',
     'OSK_FUNCTIONS_TAB', 'OSK_LETTERS_TAB', 'OSK_MAIN_TAB',
+    'GREEK_SYMBOLS_LOWERCASE', 'GREEK_SYMBOLS_UPPERCASE', 'GREEK_LETTERS',
     function(
         DeviceInfoService, GuppyInitializationService,
         UrlInterpolationService,
-        OSK_FUNCTIONS_TAB, OSK_LETTERS_TAB, OSK_MAIN_TAB) {
+        OSK_FUNCTIONS_TAB, OSK_LETTERS_TAB, OSK_MAIN_TAB,
+        GREEK_SYMBOLS_LOWERCASE, GREEK_SYMBOLS_UPPERCASE, GREEK_LETTERS) {
       const ctrl = this;
       let engine, guppyInstance;
 
       ctrl.functionsTab = OSK_FUNCTIONS_TAB;
       ctrl.lettersTab = OSK_LETTERS_TAB;
       ctrl.mainTab = OSK_MAIN_TAB;
+
+      let greekSymbols = GREEK_SYMBOLS_LOWERCASE.concat(
+        GREEK_SYMBOLS_UPPERCASE);
+      let greekLetters = GREEK_LETTERS;
 
       ctrl.currentTab = ctrl.mainTab;
       ctrl.lettersInKeyboardLayout = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
@@ -64,6 +64,10 @@ angular.module('oppia').component('onScreenKeyboard', {
       };
 
       ctrl.insertString = function(string) {
+        let index = greekSymbols.indexOf(string);
+        if (index !== -1) {
+          string = greekLetters[index];
+        }
         engine.insert_string(string);
         guppyInstance.activate();
       };
@@ -111,6 +115,8 @@ angular.module('oppia').component('onScreenKeyboard', {
         if (showOSK && activeGuppyObject !== undefined) {
           guppyInstance = activeGuppyObject.guppyInstance;
           engine = guppyInstance.engine;
+          ctrl.interactionType = GuppyInitializationService.interactionType;
+          ctrl.customLetters = GuppyInitializationService.customOskLetters;
           return true;
         }
         return false;
