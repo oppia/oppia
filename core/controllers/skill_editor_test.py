@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import caching_services
 from core.domain import role_services
-from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers

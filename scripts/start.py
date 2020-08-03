@@ -94,7 +94,7 @@ def cleanup():
     python_utils.PRINT('Cleaning up the redis_servers.')
     # Shutdown the redis server before exiting.
     subprocess.call([
-            './third_party/redis-cli-6.0.6/src/redis-cli', 'shutdown'])
+        './third_party/redis-cli-6.0.6/src/redis-cli', 'shutdown'])
 
 
 def main(args=None):

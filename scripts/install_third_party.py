@@ -339,6 +339,10 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 def install_redis_cli():
+    """This installs the redis-cli to the local oppia third_party directory so
+    that developmental servers and backend tests can make use of a local redis
+    cache.
+    """
     # We need to install redis-cli separately from using manifest.json since it
     # is a system program and we need to install it after the library is
     # untarred.
@@ -364,7 +368,7 @@ def install_redis_cli():
 
         # Temporarily change the working directory to redis-cli-6.0.6 so we can
         # build the source code.
-        with python_utils.change_directory('third_party/redis-cli-6.0.6/'):
+        with python_utils.ChangeDirectory('third_party/redis-cli-6.0.6/'):
             # Build the scripts necessary to start the redis server.
             subprocess.call(['make'])
 

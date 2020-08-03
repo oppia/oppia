@@ -4076,12 +4076,14 @@ class Exploration(python_utils.OBJECT):
         })
 
         if self.created_on:
-            exploration_dict['created_on'] = utils.convert_naive_datetime_to_string(
-                self.created_on)
+            exploration_dict['created_on'] = (
+                (
+                utils.convert_naive_datetime_to_string(self.created_on))self.created_on))
 
         if self.last_updated:
-            exploration_dict['last_updated'] = utils.convert_naive_datetime_to_string(
-                self.last_updated)
+            exploration_dict['last_updated'] = (
+                (
+                utils.convert_naive_datetime_to_string(self.created_on))self.last_updated))
 
         return json.dumps(exploration_dict)
 

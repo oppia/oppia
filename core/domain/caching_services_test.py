@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import caching_services
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.tests import test_utils
 
 import python_utils
@@ -43,14 +42,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             {
                 exploration_key: default_exploration
-            }, 'exploration', python_utils.convert_to_bytes(0))
+            }, 'exploration',
+            sub_namespace=python_utils.convert_to_bytes(0))
         caching_services.flush_memory_cache()
         self.assertEqual(
             caching_services.get_multi(['a', 'b', 'c'], 'default'), {})
         self.assertEqual(
             caching_services.get_multi(
                 [exploration_key], 'exploration',
-                python_utils.convert_to_bytes(0)),
+                sub_namespace=python_utils.convert_to_bytes(0)),
             {})
 
     def test_get_multi_correctly_retrieves_cache_elements(self):
@@ -64,7 +64,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             {
                 exploration_key: default_exploration
-            }, 'exploration', python_utils.convert_to_bytes(0))
+            }, 'exploration',
+            sub_namespace=python_utils.convert_to_bytes(0))
         result = caching_services.get_multi(['a', 'b', 'c'], 'default')
         self.assertEqual(result, key_value_mapping)
         result = caching_services.get_multi(['d', 'e'], 'default')
@@ -73,7 +74,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, {})
         result = caching_services.get_multi(
             [exploration_key], 'exploration',
-            python_utils.convert_to_bytes(0))
+            sub_namespace=python_utils.convert_to_bytes(0))
         self.assertEqual(
             default_exploration.to_dict(),
             result.get(exploration_key).to_dict())
@@ -91,7 +92,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         cache_exploration_response = caching_services.set_multi(
             {
                 exploration_key: default_exploration
-            }, 'exploration', python_utils.convert_to_bytes(0))
+            }, 'exploration',
+            sub_namespace=python_utils.convert_to_bytes(0))
         self.assertTrue(cache_exploration_response)
 
         cache_empty_list_response = caching_services.set_multi({}, 'default')
@@ -109,7 +111,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             {
                 exploration_key: default_exploration
-            }, 'exploration', python_utils.convert_to_bytes(0))
+            }, 'exploration',
+            sub_namespace=python_utils.convert_to_bytes(0))
 
         is_successful = caching_services.delete_multi([], 'default')
         self.assertTrue(is_successful)
@@ -124,10 +127,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         is_successful = caching_services.delete_multi(
             [exploration_key], 'exploration',
-            python_utils.convert_to_bytes(0))
+            sub_namespace=python_utils.convert_to_bytes(0))
         self.assertTrue(is_successful)
 
         result = caching_services.get_multi(
             [exploration_key], 'exploration',
-            python_utils.convert_to_bytes(0))
+            sub_namespace=python_utils.convert_to_bytes(0))
         self.assertEqual(result, {})

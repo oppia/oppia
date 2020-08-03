@@ -395,17 +395,19 @@ class Collection(python_utils.OBJECT):
                 node.to_dict() for node in self.nodes
             ],
             'version': self.version,
-            'created_on': utils.convert_naive_datetime_to_string(self.created_on),
-            'last_updated': utils.convert_naive_datetime_to_string(self.last_updated)
+            'created_on': utils.convert_naive_datetime_to_string(
+                self.created_on),
+            'last_updated': utils.convert_naive_datetime_to_string(
+                self.last_updated)
         }
 
         if self.created_on:
-            collection_dict['created_on'] = utils.convert_naive_datetime_to_string(
-                self.created_on)
+            collection_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
 
         if self.last_updated:
-            collection_dict['last_updated'] = utils.convert_naive_datetime_to_string(
-                self.last_updated)
+            collection_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(collection_dict)
 

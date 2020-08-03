@@ -954,11 +954,13 @@ class Story(python_utils.OBJECT):
         }
 
         if self.created_on:
-            story_dict['created_on'] = utils.convert_naive_datetime_to_string(
+            story_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
                 self.created_on)
 
         if self.last_updated:
-            story_dict['last_updated'] = utils.convert_naive_datetime_to_string(
+            story_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
                 self.last_updated)
 
         return json.dumps(story_dict)

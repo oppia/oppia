@@ -796,11 +796,13 @@ class Skill(python_utils.OBJECT):
         }
 
         if self.created_on:
-            skill_dict['created_on'] = utils.convert_naive_datetime_to_string(
+            skill_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
                 self.created_on)
 
         if self.last_updated:
-            skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(
+            skill_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
                 self.last_updated)
 
         return json.dumps(skill_dict)

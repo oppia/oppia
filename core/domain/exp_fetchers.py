@@ -304,8 +304,11 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             exploration_id, strict=strict, version=version)
         if exploration_model:
             exploration = get_exploration_from_model(exploration_model)
-            caching_services.set_multi({
-                exploration_id: exploration}, 'exploration',
+            caching_services.set_multi(
+                {
+                    exploration_id: exploration
+                },
+                'exploration',
                 sub_namespace=sub_namespace)
             return exploration
         else:
