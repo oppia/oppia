@@ -150,6 +150,7 @@ class StoryMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
         story = story_fetchers.get_story_by_id(item.id)
         html_string = ''
+        html_string += story.notes
         for node in story.story_contents.nodes:
             html_string += node.outline
 
