@@ -456,8 +456,10 @@ def update_story(
     _save_story(committer_id, new_story, commit_message, change_list)
     create_story_summary(new_story.id)
     opportunity_services.update_exploration_opportunities(old_story, new_story)
-    suggestion_services.reject_translation_suggestions_with_exp_target_ids(
-        exp_ids_removed_from_story
+    (
+        suggestion_services
+        .auto_reject_translation_suggestions_with_exp_target_ids(
+            exp_ids_removed_from_story)
     )
 
     exploration_context_models_to_be_deleted = (
