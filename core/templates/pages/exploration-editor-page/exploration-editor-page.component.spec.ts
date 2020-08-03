@@ -226,7 +226,7 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(ews, 'updateWarnings').and.callFake(() => {});
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
@@ -291,7 +291,7 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(ews, 'updateWarnings').and.callFake(() => {});
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
@@ -360,7 +360,6 @@ describe('Exploration editor page component', function() {
     });
 
     it('should react when refreshing graph', () => {
-      // $rootScope.$broadcast('refreshGraph');
       refreshGraphEmitter.emit();
 
       expect(gds.recompute).toHaveBeenCalled();
@@ -672,7 +671,7 @@ describe('Exploration editor page component', function() {
       spyOn(efbas, 'fetchExplorationFeatures')
         .and.returnValue(Promise.resolve({}));
       spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(ews, 'updateWarnings').and.callFake(() => {});
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
@@ -726,7 +725,7 @@ describe('Exploration editor page component', function() {
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(ews, 'updateWarnings').and.callFake(() => {});
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
