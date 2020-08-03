@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
-import schema_utils
 
 
 class MultipleChoiceInput(base.BaseInteraction):
@@ -49,10 +48,17 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'id': 'has_length_at_least',
                 'min_value': 1,
             }],
-            'items': schema_utils.generate_subtitled_html_schema({
-                'hide_complex_extensions': True,
-                'placeholder': 'Enter an option for the learner to select',
-            }),
+            'items': {
+                'type': 'custom',
+                'obj_type': 'SubtitledHtml',
+                'replacement_ui_config': {
+                    'html': {
+                        'hide_complex_extensions': True,
+                        'placeholder':
+                            'Enter an option for the learner to select',
+                    }
+                }
+            },
             'ui_config': {
                 'add_element_text': 'Add multiple choice option',
             }

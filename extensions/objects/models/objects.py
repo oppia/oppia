@@ -132,6 +132,48 @@ class Html(BaseObject):
     }
 
 
+class SubtitledUnicode(BaseObject):
+    """SubtitledUnicode class."""
+
+    description = 'An dictionary with properties content id and unicode.'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'unicode_str',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
+
+
+class SubtitledHtml(BaseObject):
+    """SubtitledHtml class."""
+
+    description = 'An dictionary with properties content id and html.'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'html',
+            'schema': {
+                'type': 'html'
+            }
+        }]
+    }
+
+
 class NonnegativeInt(BaseObject):
     """Nonnegative integer class."""
 

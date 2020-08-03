@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
-import schema_utils
 
 
 class TextInput(base.BaseInteraction):
@@ -48,7 +47,10 @@ class TextInput(base.BaseInteraction):
     _customization_arg_specs = [{
         'name': 'placeholder',
         'description': 'Placeholder text (optional)',
-        'schema': schema_utils.SUBTITLED_UNICODE_SCHEMA,
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'SubtitledUnicode'
+        },
         'default_value': {
             'content_id': None,
             'unicode_str': ''

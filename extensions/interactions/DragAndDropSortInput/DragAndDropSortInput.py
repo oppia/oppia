@@ -17,7 +17,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
-import schema_utils
 
 
 class DragAndDropSortInput(base.BaseInteraction):
@@ -52,11 +51,17 @@ class DragAndDropSortInput(base.BaseInteraction):
                 # else schema tests for customization args will fail.
                 'min_value': 1
             }],
-            'items': schema_utils.generate_subtitled_html_schema({
-                'hide_complex_extensions': True,
-                'placeholder': 'Enter an option for the learner to drag' +
-                               ' and drop.',
-            }),
+            'items': {
+                'type': 'custom',
+                'obj_type': 'SubtitledHtml',
+                'replacement_ui_config': {
+                    'html': {
+                        'hide_complex_extensions': True,
+                        'placeholder': 'Enter an option for the learner to ' +
+                                    'drag and drop.',
+                    }
+                }
+            },
             'ui_config': {
                 'add_element_text': 'Add a new item',
             }

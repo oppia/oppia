@@ -788,20 +788,22 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             dict. The converted interaction dict.
         """
-        def wrapped_conversion_fn(value, schema):
+        def wrapped_conversion_fn(value, schema_obj_type):
             """Applies the conversion function to the SubtitledHtml values.
 
             Args:
                 value: SubtitledHtml|SubtitledUnicode. The value in the
                     customization argument value to be converted.
-                schema: dict. The schema for the customization argument.
+                schema_obj_type: str. The schema obj_type for the customization
+                    argument value, which is one 'SubtitledUnicode' or
+                    'SubtitledHtml'.
 
             Returns:
                 SubtitledHtml|SubtitledUnicode. The converted SubtitledHtml
                 object, if schema_type is 'SubititledHtml', otherwise the
                 unmodified SubtitledUnicode object.
             """
-            if schema_utils.is_subtitled_html_schema(schema):
+            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 value.html = conversion_fn(value.html)
             return value
 
@@ -897,7 +899,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         traversing the customization argument schema, and converting
         SubtitledUnicode to unicode and SubtitledHtml to html where appropriate.
         """
-        def convert_content_to_dict(ca_value, unused_schema):
+        def convert_content_to_dict(ca_value, unused_schema_obj_type):
             """Conversion function used to convert SubtitledHtml to
             SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
 
@@ -905,7 +907,9 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 ca_value: SubtitledHtml|SubtitledUnicode. A SubtitledUnicode or
                     SubtitledHtml value found inside the customization
                     argument value.
-                unused_schema: dict. The schema of the customization argument.
+                unused_schema_obj_type: str. The schema obj_type for the
+                    customization argument value, which is one
+                    'SubtitledUnicode' or 'SubtitledHtml'.
 
             Returns:
                 dict. The customization argument value converted to a dict.
@@ -937,22 +941,27 @@ class InteractionCustomizationArg(python_utils.OBJECT):
             InteractionCustomizationArg. The customization argument domain
             object.
         """
-        def convert_content_to_domain_obj(ca_value, schema):
+        def convert_content_to_domain_obj(ca_value, schema_obj_type):
             """Conversion function used to convert SubtitledHtml dicts to
             SubtitledHtml and SubtitledUnicode dicts to SubtitledUnicode.
 
             Args:
                 ca_value: dict. Value of customization argument.
-                schema: dict. The schema of the customization argument.
+                schema_obj_type: str. The schema obj_type for the customization
+                    argument value, which is one 'SubtitledUnicode' or
+                    'SubtitledHtml'.
 
             Returns:
                 dict. The unmodified customization argument value.
             """
-            if schema_utils.is_subtitled_unicode_schema(schema):
+            if (
+                schema_obj_type ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+            ):
                 return SubtitledUnicode(
                     ca_value['content_id'], ca_value['unicode_str'])
 
-            if schema_utils.is_subtitled_html_schema(schema):
+            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 return SubtitledHtml(
                     ca_value['content_id'], ca_value['html'])
 
@@ -974,8 +983,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
             self.value,
-            [schema_utils.is_subtitled_unicode_schema,
-             schema_utils.is_subtitled_html_schema],
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
+             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
             lambda x: x.content_id
         )
 
@@ -989,7 +998,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
             self.value,
-            [schema_utils.is_subtitled_html_schema],
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
             lambda x: x.html
         )
 
@@ -1006,7 +1015,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
             self.value,
-            [schema_utils.is_subtitled_html_schema],
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
             validate_html
         )
 
@@ -1025,18 +1034,23 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 modified.
             conversion_fn: function. The function to be used for converting the
                 content. It is passed the customization argument value and
-                schema.
+                schema obj_type, which is 'SubtitledUnicode' or 'SubtitledHtml'.
 
         Returns:
             dict. The converted customization dict.
         """
-        schema_type = schema['type']
+        is_subtitled_html_spec = (
+            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+            schema['obj_type'] ==
+            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+        is_subtitled_unicode_spec = (
+            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+            schema['obj_type'] ==
+            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
-        if (
-                schema_utils.is_subtitled_html_schema(schema) or
-                schema_utils.is_subtitled_unicode_schema(schema)):
-            value = conversion_fn(value, schema)
-        elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
+        if is_subtitled_html_spec or is_subtitled_unicode_spec:
+            value = conversion_fn(value, schema['obj_type'])
+        elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
             value = [
                 InteractionCustomizationArg.traverse_by_schema_and_convert(
                     schema['items'],
@@ -1044,7 +1058,7 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                     conversion_fn
                 ) for value_element in value
             ]
-        elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
+        elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
             for property_spec in schema['properties']:
                 name = property_spec['name']
                 value[name] = (
@@ -1058,10 +1072,10 @@ class InteractionCustomizationArg(python_utils.OBJECT):
 
     @staticmethod
     def traverse_by_schema_and_get(
-            schema, value, search_schema_checkers, value_extractor):
+            schema, value, search_obj_types, value_extractor):
         """Recursively traverses an interaction customization argument spec to
-        locate values with schema in search_schema_checkers, and extracting the
-        value using a value_extractor function.
+        locate values with schema obj_type in search_obj_types, and extracting
+        the value using a value_extractor function.
 
         Args:
             schema: dict. The customization dict to be modified: dict
@@ -1069,9 +1083,9 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 value of the customization arg.
             value: dict. The current nested customization argument value to be
                 modified.
-            search_schema_checkers: list(function). These functions are passed
-                the schema, and should return True if the corresponding value to
-                should be extracted.
+            search_obj_types: list(str). The obj types to search for. If this
+                list contains the current obj type, the value is passed to
+                value_extractor and the results are collected.
             value_extractor: function. The function that extracts the wanted
                 computed value from each value that matches the obj_types. It
                 accepts one parameter, the value that matches the search object
@@ -1087,32 +1101,25 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         result = []
         schema_type = schema['type']
 
-        for search_schema_checker in search_schema_checkers:
-            if search_schema_checker(schema):
-                result.append(value_extractor(value))
-
-        if schema_type == schema_utils.SCHEMA_TYPE_LIST:
+        if (
+            schema_type == schema_utils.SCHEMA_TYPE_CUSTOM and
+            schema['obj_type'] in search_obj_types
+        ):
+            result.append(value_extractor(value))
+        elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
             result = list(itertools.chain.from_iterable([
                 InteractionCustomizationArg.traverse_by_schema_and_get(
                     schema['items'],
                     value_element,
-                    search_schema_checkers,
+                    search_obj_types,
                     value_extractor
                 ) for value_element in value]))
-        elif (
-                schema_type == schema_utils.SCHEMA_TYPE_DICT and
-                not schema_utils.is_subtitled_html_schema(schema) and
-                not schema_utils.is_subtitled_unicode_schema(schema)
-        ):
-            # Because a SubtitledHtml and SubtitledUnicode schema is encoded
-            # as a 'type: dict' schema, but are actually represented by domain
-            # objects, we exclude traversing on them to avoid __getitem__
-            # attribute errors when traversing the value.
+        elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
             result = list(itertools.chain.from_iterable([
                 InteractionCustomizationArg.traverse_by_schema_and_get(
                     property_spec['schema'],
                     value[property_spec['name']],
-                    search_schema_checkers,
+                    search_obj_types,
                     value_extractor
                 ) for property_spec in schema['properties']]))
 

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Schema, DictSchema } from 'services/schema-default-value.service';
-import { cloneDeep, isEqual } from 'lodash';
 
 /**
  * @fileoverview Constants for schema types.
@@ -28,41 +26,6 @@ export class SchemaConstants {
   static readonly SCHEMA_TYPE_INT = 'int';
   static readonly SCHEMA_TYPE_UNICODE = 'unicode';
 
-  static readonly SUBTITLED_UNICODE_SCHEMA = {
-    type: 'dict',
-    properties: [{
-      name: 'unicode_str',
-      schema: {type: 'unicode'}
-    }, {
-      name: 'content_id',
-      schema: {type: 'unicode_or_none'}
-    }]
-  };
-
-  static readonly SUBTITLED_UNICODE_SCHEMA_BASE = {
-    type: 'dict',
-    properties: [{
-      name: 'html',
-      schema: {type: 'html'}
-    }, {
-      name: 'content_id',
-      schema: {type: 'unicode_or_none'}
-    }]
-  };
-
-  static isSubtitledUnicodeSchema = (schema: Schema) => {
-    return isEqual(schema, SchemaConstants.SUBTITLED_UNICODE_SCHEMA);
-  };
-
-  static isSubtitledHtmlSchema = (schema: Schema) => {
-    try {
-      const schemaCopy = <DictSchema>cloneDeep(schema);
-      schemaCopy.properties[0].schema = {
-        type: 'html'
-      };
-      return isEqual(schemaCopy, SchemaConstants.SUBTITLED_UNICODE_SCHEMA_BASE);
-    } catch {
-      return false;
-    }
-  };
+  static readonly SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml';
+  static readonly SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode';
 }

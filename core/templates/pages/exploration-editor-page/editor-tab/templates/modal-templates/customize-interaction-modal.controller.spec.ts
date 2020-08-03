@@ -111,56 +111,6 @@ describe('Customize Interaction Modal Controller', function() {
       });
     }));
 
-    it('should properly detect a SubtitledUnicode schema', () => {
-      const isSubtitledUnicodeSchema = $scope.isSubtitledUnicodeSchema({
-        type: 'dict',
-        properties: [{
-          name: 'unicode_str',
-          schema: {type: 'unicode'}
-        }, {
-          name: 'content_id',
-          schema: {type: 'unicode_or_none'}
-        }]
-      });
-      expect(isSubtitledUnicodeSchema).toBe(true);
-    });
-
-    it('should properly detect a non SubtitledUnicode schema', () => {
-      const isSubtitledUnicodeSchema = $scope.isSubtitledUnicodeSchema({
-        type: 'dict',
-        properties: [{
-          name: 'content_id',
-          schema: {type: 'unicode_or_none'}
-        }]
-      });
-      expect(isSubtitledUnicodeSchema).toBe(false);
-    });
-
-    it('should properly detect a SubtitledHtml schema', () => {
-      const isSubtitledHtmlSchema = $scope.isSubtitledHtmlSchema({
-        type: 'dict',
-        properties: [{
-          name: 'html',
-          schema: {type: 'html'}
-        }, {
-          name: 'content_id',
-          schema: {type: 'unicode_or_none'}
-        }]
-      });
-      expect(isSubtitledHtmlSchema).toBe(true);
-    });
-
-    it('should properly detect a non SubtitledHtml schema', () => {
-      const isSubtitledHtmlSchema = $scope.isSubtitledHtmlSchema({
-        type: 'dict',
-        properties: [{
-          name: 'html',
-          schema: {type: 'html'}
-        }]
-      });
-      expect(isSubtitledHtmlSchema).toBe(false);
-    });
-
     it('should evaluate scope variable values correctly', function() {
       expect($scope.customizationModalReopened).toBe(true);
       // Image Click Input has 2 arg specs.
@@ -513,14 +463,8 @@ describe('Customize Interaction Modal Controller', function() {
                 properties: [{
                   name: 'content',
                   schema: {
-                    type: 'dict',
-                    properties: [{
-                      name: 'unicode_str',
-                      schema: {type: 'unicode'}
-                    }, {
-                      name: 'content_id',
-                      schema: {type: 'unicode_or_none'}
-                    }]
+                    type: 'custom',
+                    obj_type: 'SubtitledUnicode'
                   }
                 }, {
                   name: 'show',

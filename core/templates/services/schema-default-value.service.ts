@@ -65,7 +65,7 @@ export interface DictSchema {
   }[];
 }
 
-interface CustomSchema {
+export interface CustomSchema {
   'type': 'custom';
   'obj_type': string;
 }
@@ -107,13 +107,21 @@ export class SchemaDefaultValueService {
   // TODO(sll): Rewrite this to take validators into account, so that
   // we always start with a valid value.
   getDefaultValue(schema: Schema): SchemaDefaultValue {
+    const schemaIsSubtitledHtml = (
+      schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+      schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
+    const schemaIsSubtitledUnicode = (
+      schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+      schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+    );
+
     if ('choices' in schema) {
       return schema.choices[0];
-    } else if (SchemaConstants.isSubtitledHtmlSchema(schema)) {
+    } else if (schemaIsSubtitledHtml) {
       return this.subtitledHtmlObjectFactory.createFromBackendDict({
         html: '', content_id: null
       });
-    } else if (SchemaConstants.isSubtitledUnicodeSchema(schema)) {
+    } else if (schemaIsSubtitledUnicode) {
       return this.subtitledUnicodeObjectFactory.createFromBackendDict({
         unicode_str: '', content_id: null
       });

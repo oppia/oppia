@@ -38,6 +38,8 @@ SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
+SCHEMA_KEY_REPLACEMENT_UI_CONFIG = 'replacement_ui_config'
+
 # The following keys are always accepted as optional keys in any schema.
 OPTIONAL_SCHEMA_KEYS = [
     SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG,
@@ -61,7 +63,8 @@ ALLOWED_SCHEMA_TYPES = [
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
-    'ListOfTabs', 'SkillSelector', 'SvgFilename']
+    'ListOfTabs', 'SkillSelector', 'SubtitledHtml', 'SubtitledUnicode',
+    'SvgFilename']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
@@ -273,7 +276,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [])
+            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(

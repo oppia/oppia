@@ -240,14 +240,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       }
     };
 
-    $scope.isSubtitledHtmlSchema = function(schema) {
-      return SchemaConstants.isSubtitledHtmlSchema(schema);
-    };
-
-    $scope.isSubtitledUnicodeSchema = function(schema) {
-      return SchemaConstants.isSubtitledUnicodeSchema(schema);
-    };
-
     /**
      * The default values of SubtitledHtml and SubtitledUnicode objects in the
      * customization arguments have a null content_id. This function populates
@@ -262,10 +254,15 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
           schema: Schema,
           contentIdPrefix: string,
       ): void => {
-        if (
-          SchemaConstants.isSubtitledHtmlSchema(schema) ||
-          SchemaConstants.isSubtitledUnicodeSchema(schema)
-        ) {
+        const schemaIsSubtitledHtml = (
+          schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+          schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
+        const schemaIsSubtitledUnicode = (
+          schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+          schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+        );
+
+        if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
           if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
             (<SubtitledHtml|SubtitledUnicode>value).setContentId(
               `${contentIdPrefix}_${StateNextContentIdIndexService.displayed}`

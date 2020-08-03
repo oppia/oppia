@@ -3670,13 +3670,15 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 
     def test_traverse_by_schema_and_convert(self):
         html = []
-        def extract_html(value, unused_schema):
+        def extract_html(value, unused_schema_obj_type):
             """Extracts html from SubtitledHtml values.
 
             Args:
                 value: SubtitledHtml|SubtitledUnicode. The value in the
                     customization argument value to be converted.
-                unused_schema: dict. The schema for the customization argument.
+                unused_schema_obj_type: str. The schema obj_type for the
+                    customization argument value, which is one
+                    'SubtitledUnicode' or 'SubtitledHtml'.
 
             Returns:
                 SubtitledHtml|SubtitledUnicode. The converted SubtitledHtml
@@ -3690,7 +3692,10 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             'type': 'dict',
             'properties': [{
                 'name': 'content',
-                'schema': schema_utils.generate_subtitled_html_schema({})
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
+                }
             }]
         }
         value = {
@@ -3709,7 +3714,10 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             'type': 'dict',
             'properties': [{
                 'name': 'content',
-                'schema': schema_utils.generate_subtitled_html_schema({})
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
+                }
             }]
         }
         value = {
@@ -3720,7 +3728,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
             state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
                 schema,
                 value,
-                [schema_utils.is_subtitled_html_schema],
+                [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
                 lambda x: x.html)
         )
 

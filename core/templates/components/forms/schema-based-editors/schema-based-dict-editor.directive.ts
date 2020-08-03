@@ -16,9 +16,6 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
-import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
-
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
@@ -46,14 +43,6 @@ angular.module('oppia').directive('schemaBasedDictEditor', [
           var ctrl = this;
           $scope.getHumanReadablePropertyDescription = function(property) {
             return property.description || '[' + property.name + ']';
-          };
-
-          $scope.isSubtitledHtmlSchema = function(schema) {
-            return SchemaConstants.isSubtitledHtmlSchema(schema);
-          };
-
-          $scope.isSubtitledUnicodeSchema = function(schema) {
-            return SchemaConstants.isSubtitledUnicodeSchema(schema);
           };
 
           ctrl.$onInit = function() {

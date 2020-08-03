@@ -2744,10 +2744,15 @@ class Exploration(python_utils.OBJECT):
                 # list of html to list of SubtitledHtml. No interactions
                 # were changed from html to SubtitledHtml.
                 is_subtitled_unicode_spec = (
-                    schema_utils.is_subtitled_unicode_schema(schema))
+                    schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                    schema['obj_type'] ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
                 is_subtitled_html_list_spec = (
                     schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
-                    schema_utils.is_subtitled_html_schema(schema['items']))
+                    schema['items']['type'] ==
+                    schema_utils.SCHEMA_TYPE_CUSTOM and
+                    schema['items']['obj_type'] ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
 
                 if is_subtitled_unicode_spec:
                     # Default is a SubtitledHtml dict or SubtitleUnicode dict.

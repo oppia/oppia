@@ -57,78 +57,8 @@ SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 
-SUBTITLED_UNICODE_SCHEMA = {
-    'type': 'dict',
-    'properties': [{
-        'name': 'unicode_str',
-        'schema': {
-            'type': 'unicode',
-        }
-    }, {
-        'name': 'content_id',
-        'schema': {
-            'type': 'unicode_or_none'
-        }
-    }]
-}
-
-
-def generate_subtitled_html_schema(ui_config):
-    """Generate a SubtitledHtml schema given a ui config.
-
-    Args:
-        ui_config: dict. A dictionary that specifies properties related to
-            the ui configuration.
-
-    Returns:
-        dict. The SubtitledHtml schema with the given ui config.
-    """
-    return {
-        'type': 'dict',
-        'properties': [{
-            'name': 'html',
-            'schema': {
-                'type': 'html',
-                'ui_config': ui_config
-            }
-        }, {
-            'name': 'content_id',
-            'schema': {
-                'type': 'unicode_or_none'
-            }
-        }]
-    }
-
-
-def is_subtitled_html_schema(schema):
-    """Returns if the schema is a SubtitledHtml schema, regardless of the
-    nested ui_config in the html field.
-
-    Args:
-        schema: dict. The schema to check.
-
-    Returns:
-        bool. Returns if the schema to check is a SubtitledHtml schema.
-    """
-    schema_copy = copy.deepcopy(schema)
-    try:
-        schema_copy['properties'][0]['schema']['ui_config'] = {}
-        return (
-            schema_copy == generate_subtitled_html_schema({}))
-    except KeyError:
-        return False
-
-
-def is_subtitled_unicode_schema(schema):
-    """Returns if the schema is a SubtitledUnicode schema.
-
-    Args:
-        schema: dict. The schema to check.
-
-    Returns:
-        bool. Returns if the schema to check is a SubtitledHtml schema.
-    """
-    return schema == SUBTITLED_UNICODE_SCHEMA
+SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
+SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):

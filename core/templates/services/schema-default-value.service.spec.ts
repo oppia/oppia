@@ -118,14 +118,8 @@ describe('Schema Default Value Service', () => {
 
   it('should get default value if schema type SubtitledHtml', () => {
     let schema = {
-      type: 'dict',
-      properties: [{
-        name: 'html',
-        schema: {type: 'html'}
-      }, {
-        name: 'content_id',
-        schema: {type: 'unicode_or_none'}
-      }]
+      type: 'custom',
+      obj_type: 'SubtitledHtml'
     };
     expect(
       sdvs.getDefaultValue(schema)
@@ -134,14 +128,8 @@ describe('Schema Default Value Service', () => {
 
   it('should get default value if schema type is SubtitledUnicode', () => {
     let schema = {
-      type: 'dict',
-      properties: [{
-        name: 'unicode_str',
-        schema: {type: 'unicode'}
-      }, {
-        name: 'content_id',
-        schema: {type: 'unicode_or_none'}
-      }]
+      type: 'custom',
+      obj_type: 'SubtitledUnicode'
     };
     expect(
       sdvs.getDefaultValue(schema)

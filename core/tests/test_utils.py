@@ -1160,22 +1160,24 @@ tags: []
                 schema: dict. The current traversed schema.
                 contentId: str. The content_id generated so far.
             """
-            schema_type = schema['type']
-
             is_subtitled_html_spec = (
-                schema_utils.is_subtitled_html_schema(schema))
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
             is_subtitled_unicode_spec = (
-                schema_utils.is_subtitled_unicode_schema(schema))
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
                 value['content_id'] = '%s_%i' % (
                     contentId, next_content_id_index_dict['value'])
                 next_content_id_index_dict['value'] += 1
-            elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
                     traverse_schema_and_assign_content_ids(
                         x, schema['items'], contentId)
-            elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     traverse_schema_and_assign_content_ids(
                         x[schema_property.name],

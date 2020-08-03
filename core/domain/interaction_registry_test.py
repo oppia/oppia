@@ -146,14 +146,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             schema_type = schema['type']
             if schema_type == schema_utils.SCHEMA_TYPE_LIST:
                 traverse_schema_to_find_names(schema['items'])
-            elif (
-                    schema_type == schema_utils.SCHEMA_TYPE_DICT and
-                    not schema_utils.is_subtitled_unicode_schema(schema) and
-                    not schema_utils.is_subtitled_html_schema(schema)
-            ):
-                # Because a SubtitledUnicode and SubtitledHtml schema are
-                # encoded as a 'type: dict' schema, we exclude it here because
-                # they includes camel case names (content_id, unicode_str).
+            elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     ca_names_in_schema.append(schema_property['name'])
                     traverse_schema_to_find_names(schema_property['schema'])
@@ -181,17 +174,22 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 value: *. The value of the customization argument.
                 schema: dict. The customization argument schema.
             """
-            schema_type = schema['type']
+            is_subtitled_html_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+            is_subtitled_unicode_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
 
-            if schema_utils.is_subtitled_html_schema(schema):
+            if is_subtitled_html_spec or is_subtitled_unicode_spec:
                 self.assertIsNone(value['content_id'])
-            elif schema_utils.is_subtitled_unicode_schema(schema):
-                self.assertIsNone(value['content_id'])
-            elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
                     traverse_schema_to_find_and_validate_subtitled_content(
                         x, schema['items'])
-            elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     traverse_schema_to_find_and_validate_subtitled_content(
                         x[schema_property.name],
