@@ -115,10 +115,9 @@ class TaskThread(threading.Thread):
                         log('LOG %s:' % self.name, show_time=True)
                         log(stdout.all_messages)
                         log('----------------------------------------')
-                        log(
-                            'FINISHED %s: %.1f secs' % (
-                                self.name, time.time() - self.start_time),
-                            show_time=True)
+            log(
+                'FINISHED %s: %.1f secs' % (
+                    self.name, time.time() - self.start_time), show_time=True)
         except Exception as e:
             self.exception = e
             self.stacktrace = traceback.format_exc()

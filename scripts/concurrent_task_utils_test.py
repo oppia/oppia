@@ -53,6 +53,28 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
 
+class OutputStreamTests(ConcurrentTaskUtilsTests):
+    """Tests for OutputStream class."""
+
+    def test_all_messages_with_success_message(self):
+        output_object = concurrent_task_utils.OutputStream(
+            'Test', False, [], [])
+        self.assertEqual(output_object.messages, [])
+        self.assertEqual(
+            output_object.all_messages, ['SUCCESS  Test check passed'])
+        self.assertFalse(output_object.failed)
+        self.assertEqual(output_object.name, 'Test')
+
+    def test_all_messages_with_failed_message(self):
+        output_object = concurrent_task_utils.OutputStream(
+            'Test', True, [], [])
+        self.assertEqual(output_object.messages, [])
+        self.assertEqual(
+            output_object.all_messages, ['FAILED  Test check failed'])
+        self.assertTrue(output_object.failed)
+        self.assertEqual(output_object.name, 'Test')
+
+
 class CreateTaskTests(ConcurrentTaskUtilsTests):
     """Tests for create_task method."""
 
@@ -67,7 +89,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_success(self):
         task = concurrent_task_utils.TaskThread(
-            test_function('unused_arg'), True, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test')
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -79,6 +101,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
     def test_task_thread_with_exception(self):
         task = concurrent_task_utils.TaskThread(
             test_function, True, self.semaphore, name='test')
+        self.semaphore.acquire()
+        task.start_time = time.time()
         with self.print_swap:
             task.start()
             task.join()
@@ -86,13 +110,55 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             'test_function() takes exactly 1 argument '
             '(0 given)' in self.linter_stdout)
 
+    def test_task_thread_with_verbose_mode_enabled(self):
+        class HelperTests(python_utils.OBJECT):
+            def test_show(self):
+                return concurrent_task_utils.OutputStream('name', True, [], [])
+            def test_perform_all_check(self):
+                return [self.test_show()]
+
+        def test_func():
+            return HelperTests()
+
+        task = concurrent_task_utils.TaskThread(
+            test_func().test_perform_all_check, True,
+            self.semaphore, name='test')
+        self.semaphore.acquire()
+        task.start_time = time.time()
+        with self.print_swap:
+            task.start()
+            task.join()
+        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        self.assertTrue(len(expected_output) == 2)
+
+    def test_task_thread_with_no_test_name(self):
+        class HelperTests(python_utils.OBJECT):
+            def test_show(self):
+                return concurrent_task_utils.OutputStream(None, None, None, [])
+            def test_perform_all_check(self):
+                return [self.test_show()]
+
+        def test_func():
+            return HelperTests()
+
+        task = concurrent_task_utils.TaskThread(
+            test_func().test_perform_all_check, True,
+            self.semaphore, name='test')
+        self.semaphore.acquire()
+        task.start_time = time.time()
+        with self.print_swap:
+            task.start()
+            task.join()
+        expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
+        self.assertTrue(len(expected_output) == 1)
+
 
 class ExecuteTasksTests(ConcurrentTaskUtilsTests):
     """Tests for execute_tasks method."""
 
     def test_execute_task_with_single_task(self):
         task = concurrent_task_utils.create_task(
-            test_function('unused_arg'), True, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test')
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.linter_stdout if 'FINISHED' in s]
@@ -102,7 +168,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in python_utils.RANGE(6):
             task = concurrent_task_utils.create_task(
-                test_function('unused_arg'), True, self.semaphore)
+                test_function('unused_arg'), False, self.semaphore)
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
