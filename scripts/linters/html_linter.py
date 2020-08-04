@@ -43,10 +43,10 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Define various variables to parse HTML.
 
         Args:
-            filepath: str. path of the file.
-            file_lines: list(str). list of the lines in the file.
-            debug: bool. if true prints tag_stack for the file.
-            failed: bool. true if the HTML indentation check fails.
+            filepath: str. Path of the file.
+            file_lines: list(str). List of the lines in the file.
+            debug: bool. If true prints tag_stack for the file.
+            failed: bool. True if the HTML indentation check fails.
         """
         html.parser.HTMLParser.__init__(self)
         self.summary_messages = []
@@ -66,8 +66,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Handle start tag of a HTML line.
 
         Args:
-            tag: str. start tag of a HTML line.
-            attrs: list(str). list of attributes in the start tag.
+            tag: str. Start tag of a HTML line.
+            attrs: list(str). List of attributes in the start tag.
         """
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
@@ -177,7 +177,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Handle end tag of a HTML line.
 
         Args:
-            tag: str. end tag of a HTML line.
+            tag: str. End tag of a HTML line.
         """
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
@@ -217,7 +217,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Handle indentation level.
 
         Args:
-            data: str. contents of HTML file to be parsed.
+            data: str. Contents of HTML file to be parsed.
         """
         data_lines = data.split('\n')
         opening_block = tuple(

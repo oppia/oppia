@@ -74,8 +74,10 @@ angular.module('oppia').directive('topicEditorPage', [
           };
 
           var setPageTitle = function() {
+            let topicName = TopicEditorStateService.getTopic().getName();
             PageTitleService.setPageTitle(
-              TopicEditorStateService.getTopic().getName() + ' - Oppia');
+              topicName + ' - Oppia');
+            PageTitleService.setPageSubtitleForMobileView(topicName);
             ctrl.topic = TopicEditorStateService.getTopic();
             ctrl._validateTopic();
           };
@@ -83,9 +85,15 @@ angular.module('oppia').directive('topicEditorPage', [
           ctrl.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
           };
+          ctrl.isInTopicEditorTabs = function() {
+            var activeTab = TopicEditorRoutingService.getActiveTabName();
+            return !activeTab.startsWith('subtopic');
+          };
           ctrl.openTopicViewer = function() {
             var activeTab = TopicEditorRoutingService.getActiveTabName();
-            if (activeTab !== 'subtopic_editor') {
+            var lastSubtopicIdVisited = (
+              TopicEditorRoutingService.getLastSubtopicIdVisited());
+            if (activeTab !== 'subtopic_editor' && !lastSubtopicIdVisited) {
               if (ctrl.getChangeListLength() > 0) {
                 AlertsService.addInfoMessage(
                   'Please save all pending changes to preview the topic ' +
@@ -95,13 +103,12 @@ angular.module('oppia').directive('topicEditorPage', [
               var topicUrlFragment = ctrl.topic.getUrlFragment();
               var classroomUrlFragment = (
                 TopicEditorStateService.getClassroomUrlFragment());
-              $window.open(
-                UrlInterpolationService.interpolateUrl(
-                  TOPIC_VIEWER_URL_TEMPLATE, {
-                    topic_url_fragment: topicUrlFragment,
-                    classroom_url_fragment: classroomUrlFragment
-                  }
-                ), 'blank');
+              var newTab = $window.open();
+              newTab.location.href = UrlInterpolationService.interpolateUrl(
+                TOPIC_VIEWER_URL_TEMPLATE, {
+                  topic_url_fragment: topicUrlFragment,
+                  classroom_url_fragment: classroomUrlFragment
+                });
             } else {
               var subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
               TopicEditorRoutingService.navigateToSubtopicPreviewTab(
@@ -170,6 +177,7 @@ angular.module('oppia').directive('topicEditorPage', [
 
           ctrl.$onInit = function() {
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+            PageTitleService.setPageTitleForMobileView('Topic Editor');
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;

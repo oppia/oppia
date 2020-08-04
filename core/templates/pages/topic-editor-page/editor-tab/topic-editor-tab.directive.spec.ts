@@ -55,6 +55,10 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
+  var MockWindowDimensionsService = {
+    isWindowNarrow: () => false
+  };
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -74,9 +78,6 @@ describe('Topic editor tab directive', function() {
       getTrustedResourceUrlForThumbnailFilename: (filename,
           entityType,
           entityId) => (entityType + '/' + entityId + '/' + filename)
-    };
-    var MockWindowDimensionsService = {
-      isWindowNarrow: () => false
     };
     SkillCreationService = $injector.get('SkillCreationService');
     TopicUpdateService = $injector.get('TopicUpdateService');
@@ -358,7 +359,12 @@ describe('Topic editor tab directive', function() {
     expect($scope.getPreviewFooter()).toEqual('1 Story');
   });
 
-  it('should toggle preview of entity lists', function() {
+  it('should only toggle preview of entity lists in mobile view', function() {
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+    $scope.togglePreviewListCards('topic');
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+
+    MockWindowDimensionsService.isWindowNarrow = () => true;
     expect($scope.subtopicsListIsShown).toEqual(true);
     expect($scope.storiesListIsShown).toEqual(true);
 
@@ -369,6 +375,12 @@ describe('Topic editor tab directive', function() {
     $scope.togglePreviewListCards('story');
     expect($scope.subtopicsListIsShown).toEqual(false);
     expect($scope.storiesListIsShown).toEqual(false);
+
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+    $scope.togglePreviewListCards('topic');
+    expect($scope.mainTopicCardIsShown).toEqual(false);
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
   });
 
   it('should toggle uncategorized skill options', function() {

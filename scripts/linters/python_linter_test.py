@@ -150,7 +150,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             python_linter.ThirdPartyPythonLintChecksManager(
                 [INVALID_DOCSTRING_FILEPATH], True).perform_all_lint_checks()
         self.assert_same_list_elements(
-            ['C: 28, 0: Period is not used at the end of the docstring.'],
+            ['W: 27, 0: Period is not used at the end of the docstring.'],
             self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
