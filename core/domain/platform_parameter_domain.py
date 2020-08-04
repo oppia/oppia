@@ -40,7 +40,7 @@ ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
 ALLOWED_CLIENT_TYPES = ['Web', 'Android']
 ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Others']
-ALLOWED_APP_VERSION_FLAVOR = ['alpha', 'beta', 'test', 'n/a']
+ALLOWED_APP_VERSION_FLAVOR = ['alpha', 'beta', 'test', 'release', 'unknown']
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
     r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+(?:-(.+))?)?$')
@@ -411,7 +411,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
             bool. True is the client_version matches the given flavor.
         """
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
-        client_flavor = match.group(2) or 'n/a'
+        client_flavor = match.group(2) or 'unknown'
         return client_flavor == flavor
 
 
