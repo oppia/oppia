@@ -76,7 +76,8 @@ const setRoleAdmin = async function(context, page) {
     await page.waitForSelector('#update-button-id');
     await page.click('#update-button-id');
     await page.waitForFunction(
-      'document.querySelector("body").innerText.includes("successfully updated to")'
+      'document.querySelector("body").innerText.includes('
+       + '"successfully updated to")'
     );
     // eslint-disable-next-line no-console
     console.log('Role changed to admin');

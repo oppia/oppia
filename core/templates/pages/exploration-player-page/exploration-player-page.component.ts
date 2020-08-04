@@ -38,10 +38,10 @@ angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
     'ContextService', 'KeyboardShortcutService',
-    '$timeout', 'PageTitleService', 
+    '$timeout', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService',
     function(
-        ContextService, KeyboardShortcutService, $timeout, 
+        ContextService, KeyboardShortcutService, $timeout,
         PageTitleService, ReadOnlyExplorationBackendApiService) {
       var ctrl = this;
       ctrl.$onInit = function() {
@@ -60,7 +60,7 @@ angular.module('oppia').component('explorationPlayerPage', {
             angular.element('meta[property="og:description"]').attr(
               'content', response.exploration.objective);
           });
-          KeyboardShortcutService.bindExplorationPlayerShortcuts();
+        KeyboardShortcutService.bindExplorationPlayerShortcuts();
       };
     }
   ]
