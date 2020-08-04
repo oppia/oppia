@@ -57,7 +57,7 @@ class BaseObject(python_utils.OBJECT):
             this class.
 
         Raises:
-            TypeError: The Python object cannot be normalized.
+            TypeError. The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
@@ -506,7 +506,7 @@ class CheckedProof(BaseObject):
                     error has occurred.
 
         Raises:
-            TypeError: Cannot convert to the CheckedProof schema.
+            TypeError. Cannot convert to the CheckedProof schema.
         """
         try:
             assert isinstance(raw, dict)
@@ -564,7 +564,7 @@ class LogicQuestion(BaseObject):
                 default_proof_string: str. The default proof string.
 
         Raises:
-            TypeError: Cannot convert to LogicQuestion schema.
+            TypeError. Cannot convert to LogicQuestion schema.
         """
 
         def _validate_expression(expression):
@@ -575,7 +575,7 @@ class LogicQuestion(BaseObject):
                     dict format.
 
             Raises:
-                AssertionError: The specified expression is not in the correct
+                AssertionError. The specified expression is not in the correct
                     format.
             """
             assert isinstance(expression, dict)
@@ -593,7 +593,7 @@ class LogicQuestion(BaseObject):
                 array: list(dict(str, *)). The expression array to be verified.
 
             Raises:
-                AssertionError: The specified expression array is not in the
+                AssertionError. The specified expression array is not in the
                     list format.
             """
             assert isinstance(array, list)
@@ -794,7 +794,7 @@ class NormalizedRectangle2D(BaseObject):
             float values as coordinates of the rectangle.
 
         Raises:
-            TypeError: Cannot convert to the NormalizedRectangle2D schema.
+            TypeError. Cannot convert to the NormalizedRectangle2D schema.
         """
         def clamp(value):
             """Clamps a number to range [0, 1].

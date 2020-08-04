@@ -417,6 +417,8 @@ import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { ProfileLinkImageBackendApiService } from
+  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
@@ -1506,6 +1508,9 @@ export class UpgradedServices {
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
         upgradedServices['TextInputPredictionService']);
+    upgradedServices['ProfileLinkImageBackendApiService'] =
+      new ProfileLinkImageBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
         upgradedServices['SubtopicPageContentsObjectFactory'],
