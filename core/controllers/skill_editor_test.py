@@ -69,7 +69,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         skill_model = skill_models.SkillModel.get(skill_id)
         skill_model.delete(user_id, 'Delete skill model.')
         caching_services.delete_multi(
-            [skill_id], caching_services.CACHE_NAMESPACE_SKILL, None)
+            caching_services.CACHE_NAMESPACE_SKILL, None, [skill_id])
 
     def _mock_update_skill_raise_exception(
             self, unused_committer_id, unused_skill_id, unused_change_list,

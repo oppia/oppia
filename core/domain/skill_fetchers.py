@@ -80,8 +80,9 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         if skill_model:
             skill = get_skill_from_model(skill_model)
             caching_services.set_multi(
-                {skill_id: skill}, caching_services.CACHE_NAMESPACE_SKILL,
-                sub_namespace)
+                caching_services.CACHE_NAMESPACE_SKILL,
+                sub_namespace,
+                {skill_id: skill})
             return skill
         else:
             return None

@@ -215,7 +215,7 @@ class ConfigProperty(python_utils.OBJECT):
         """Get the latest value from memcache, datastore, or use default."""
 
         memcached_items = caching_services.get_multi(
-            [self.name], caching_services.CACHE_NAMESPACE_CONFIG, None)
+            caching_services.CACHE_NAMESPACE_CONFIG, None, [self.name])
         if self.name in memcached_items:
             return memcached_items[self.name]
 
@@ -223,10 +223,10 @@ class ConfigProperty(python_utils.OBJECT):
             self.name, strict=False)
         if datastore_item is not None:
             caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_CONFIG, None,
                 {
                     datastore_item.id: datastore_item.value
-                },
-                caching_services.CACHE_NAMESPACE_CONFIG, None)
+                })
             return datastore_item.value
 
         return self.default_value
@@ -252,10 +252,10 @@ class ConfigProperty(python_utils.OBJECT):
 
         # Set value in memcache.
         caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_CONFIG, None,
             {
                 model_instance.id: model_instance.value
-            },
-            caching_services.CACHE_NAMESPACE_CONFIG, None)
+            })
 
     def normalize(self, value):
         """Validates the given object using the schema and normalizes if

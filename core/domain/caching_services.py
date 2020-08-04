@@ -107,12 +107,10 @@ def flush_memory_cache():
     memory_cache_services.flush_cache()
 
 
-def get_multi(obj_ids, namespace, sub_namespace):
+def get_multi(namespace, sub_namespace, obj_ids):
     """Get a dictionary of the {key, value} pairs from the memory cache.
 
     Args:
-        obj_ids: list(str). List of object ids corresponding to values to
-            retrieve from the cache.
         namespace: str. The namespace under which the values associated with
             these object ids lie. The namespace determines how the keys are
             decoded from their JSON encoded string. Use CACHE_NAMESPACE_DEFAULT
@@ -121,6 +119,8 @@ def get_multi(obj_ids, namespace, sub_namespace):
             values. For Explorations, Skills, Stories, Topics, Collections, the
             sub_namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
+        obj_ids: list(str). List of object ids corresponding to values to
+            retrieve from the cache.
 
     Raises:
         ValueError: The namespace does not exist or is not recognized.
@@ -151,13 +151,11 @@ def get_multi(obj_ids, namespace, sub_namespace):
     return result_dict
 
 
-def set_multi(id_value_mapping, namespace, sub_namespace):
+def set_multi(namespace, sub_namespace, id_value_mapping):
     """Set multiple id' values at once to the cache where the values are all
     of a specific type or a primitype type.
 
     Args:
-        id_value_mapping: dict(str, *). A dict of {id, value} pairs to set to
-            the cache. The values must be of type value_type.
         namespace: str. The namespace under which the values associated with the
             id lies. Use CACHE_NAMESPACE_DEFAULT as namespace for objects that
             don't require serialization.
@@ -165,6 +163,8 @@ def set_multi(id_value_mapping, namespace, sub_namespace):
             values. For Explorations, Skills, Stories, Topics, Collections, the
             sub_namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
+        id_value_mapping: dict(str, *). A dict of {id, value} pairs to set to
+            the cache. The values must be of type value_type.
 
     Raises:
         ValueError: The namespace does not exist or is not recognized.
@@ -188,11 +188,10 @@ def set_multi(id_value_mapping, namespace, sub_namespace):
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 
-def delete_multi(obj_ids, namespace, sub_namespace):
+def delete_multi(namespace, sub_namespace, obj_ids):
     """Deletes multiple keys in the cache.
 
     Args:
-        obj_ids: list(str). A list of id strings to delete from the cache.
         namespace: str. The namespace under which the values associated with the
             id lies. Use CACHE_NAMESPACE_DEFAULT namespace for object ids that
             don't fall under any other namespaces.
@@ -200,6 +199,7 @@ def delete_multi(obj_ids, namespace, sub_namespace):
             values. For Explorations, Skills, Stories, Topics, Collections, the
             sub_namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
+        obj_ids: list(str). A list of id strings to delete from the cache.
 
     Raises:
         ValueError: The namespace does not exist or is not recognized.
