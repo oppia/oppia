@@ -260,7 +260,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'player-position.service.ts',
     'player-transcript.service.ts',
     'Polyfills.ts',
-    'practice-tab.directive.ts',
     'pretest-question-backend-api.service.ts',
     'profile-link-image.component.ts',
     'profile-link-text.component.ts',
