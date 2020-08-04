@@ -22,7 +22,7 @@ require(
   'loading-dots.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('pages/library-page/search-results/search-results.directive.ts');
+require('pages/library-page/search-results/search-results.component.ts');
 
 require('domain/classroom/classroom-backend-api.service');
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
