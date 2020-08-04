@@ -1,10 +1,10 @@
 <div class="protractor-test-custom-letters-div">
-  <div ng-class="($ctrl.value.length === 0) ? 'oppia-custom-selected-letters' : 'oppia-custom-selected-letters-bordered'">
+  <div class="oppia-custom-selected-letters">
     <div ng-repeat="letter in $ctrl.value">
       <[letter]>
     </div>
   </div>
-  <p class="letter-counter">You can still add <[$ctrl.getRemainingLettersCount()]> more letter(s) .</p>
+  <p class="letter-counter">You can still add <[$ctrl.getRemainingLettersCount()]> more letter(s).</p>
   <div class="oppia-custom-letters-navbar">
     <button ng-class="($ctrl.currentTab === $ctrl.latinTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'" ng-click="$ctrl.currentTab = $ctrl.latinTab">
       abc
@@ -93,19 +93,16 @@
 </div>
 
 <style>
-  .oppia-custom-selected-letters,
-  .oppia-custom-selected-letters-bordered {
+  .oppia-custom-selected-letters {
+    border: 2px solid #b8b8b8;
     border-radius: 5px;
     margin-top: 13px;
+    min-height: 55px;
     padding: 10px 0px;
     text-align: center;
   }
 
-  .oppia-custom-selected-letters-bordered {
-    border: 2px solid #399e80;
-  }
-
-  .oppia-custom-selected-letters-bordered div {
+  .oppia-custom-selected-letters div {
     background-color: inherit;
     border-radius: 5px;
     color: #696969;
@@ -116,8 +113,9 @@
   }
 
   .letter-counter {
-    font-weight: bold;
-    margin: 15px;
+    font-size: 15px;
+    margin: 15px 0px;
+    text-align: end;
   }
 
   .oppia-custom-letters-navbar {

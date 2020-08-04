@@ -1149,10 +1149,10 @@ class PositionOfTerms(BaseObject):
 
 
 class CustomOskLetters(BaseObject):
-    """Class fot custom OSK letters. These are the letters that will be
+    """Class for custom OSK letters. These are the letters that will be
     displayed to the learner for AlgebraicExpressionInput and MathEquationInput
-    interactions when the on-screen keyboard is being used. This includes roman
-    and greek alphabets.
+    interactions when the on-screen keyboard is being used. This includes Latin
+    and Greek alphabets.
     """
 
     description = (

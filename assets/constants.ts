@@ -5292,6 +5292,8 @@ export = {
     "floor", "if", "log", "or", "pow", "round", "then"
   ],
 
+  // NOTE: The GREEK_LETTERS array's values should correspond to the symbols
+  // array (lowercase + uppercase).
   // Greek letters allowed in math interactions.
   "GREEK_LETTERS": [
     "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
