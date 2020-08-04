@@ -74,7 +74,7 @@ def _get_serialized_string_for_namespace(obj, namespace):
         str. The serialized string of the object associated with that namespace.
     """
     if namespace == CACHE_NAMESPACE_DEFAULT or (
-        namespace == CACHE_NAMESPACE_CONFIG):
+            namespace == CACHE_NAMESPACE_CONFIG):
         return obj
     else:
         return obj.serialize()
@@ -123,7 +123,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
             retrieve from the cache.
 
     Raises:
-        ValueError: The namespace does not exist or is not recognized.
+        ValueError. The namespace does not exist or is not recognized.
 
     Returns:
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
@@ -167,7 +167,7 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
             the cache. The values must be of type value_type.
 
     Raises:
-        ValueError: The namespace does not exist or is not recognized.
+        ValueError. The namespace does not exist or is not recognized.
 
     Returns:
         bool. Whether all operations complete successfully.
@@ -202,7 +202,7 @@ def delete_multi(namespace, sub_namespace, obj_ids):
         obj_ids: list(str). A list of id strings to delete from the cache.
 
     Raises:
-        ValueError: The namespace does not exist or is not recognized.
+        ValueError. The namespace does not exist or is not recognized.
 
     Returns:
         bool. Whether all operations complete successfully.

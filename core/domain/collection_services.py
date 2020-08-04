@@ -847,7 +847,7 @@ def delete_collections(committer_id, collection_ids, force_deletion=False):
     # This must come after the collection is retrieved. Otherwise the memcache
     # key will be reinstated.
     caching_services.delete_multi(
-       caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
 
     # Delete the collection from search.
     search_services.delete_collections_from_search_index(collection_ids)
