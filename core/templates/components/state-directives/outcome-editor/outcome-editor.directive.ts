@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { Subscription } from 'rxjs';
+
 /**
  * @fileoverview Directives for the outcome editor.
  */
@@ -58,6 +60,7 @@ angular.module('oppia').directive('outcomeEditor', [
             $scope, StateEditorService, StateInteractionIdService,
             ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
           };
@@ -212,10 +215,9 @@ angular.module('oppia').directive('outcomeEditor', [
             $scope.$on('externalSave', function() {
               onExternalSave();
             });
-
-            $scope.$on('onInteractionIdChanged', function() {
-              onExternalSave();
-            });
+            ctrl.directiveSubscriptions.add(
+              () => onExternalSave()
+            );
             ctrl.editOutcomeForm = {};
             ctrl.canAddPrerequisiteSkill = (
               ENABLE_PREREQUISITE_SKILLS &&

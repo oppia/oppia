@@ -41,6 +41,8 @@ require('pages/interaction-specs.constants.ajs.ts');
 
 import { Subscription } from 'rxjs';
 
+
+
 angular.module('oppia').directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -63,13 +65,15 @@ angular.module('oppia').directive('questionEditor', [
         'AlertsService', 'EditabilityService',
         'EditableQuestionBackendApiService', 'LoaderService',
         'QuestionObjectFactory', 'QuestionUpdateService', 'ResponsesService',
-        'SolutionValidityService', 'StateEditorService', 'INTERACTION_SPECS',
+        'SolutionValidityService', 'StateInteractionIdService',
+        'StateEditorService', 'INTERACTION_SPECS',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, EditabilityService,
             EditableQuestionBackendApiService, LoaderService,
             QuestionObjectFactory, QuestionUpdateService, ResponsesService,
-            SolutionValidityService, StateEditorService, INTERACTION_SPECS) {
+            SolutionValidityService, StateInteractionIdService,
+            StateEditorService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getStateContentPlaceholder = function() {
@@ -212,10 +216,12 @@ angular.module('oppia').directive('questionEditor', [
                 () => _init()
               )
             );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => _init()
+              )
+            );
 
-            $scope.$on('onInteractionIdChanged', function(evt) {
-              _init();
-            });
             if (ctrl.canEditQuestion()) {
               EditabilityService.markEditable();
             } else {
