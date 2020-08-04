@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('third-party-imports/leaflet.import');
 
 angular.module('oppia').directive('coordTwoDimEditor', [
   'UrlInterpolationService',
