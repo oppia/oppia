@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import platform_parameters as params
 
 # Names of feature objects defined in domain/platform_parameter_domain.py
 # should be added to one of the following lists, features flags not added
@@ -26,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Features in dev stage.
 DEV_FEATURES_LIST = [
+    params.PARAM_NAMES.dummy_feature
 ]
 
 # Features in test stage.
@@ -40,8 +42,3 @@ PROD_FEATURES_LIST = [
 # completed and no longer gated.
 DEPRECATED_FEATURE_NAMES = [
 ]
-
-
-ALL_FEATURES_LIST = DEV_FEATURES_LIST + TEST_FEATURES_LIST + PROD_FEATURES_LIST
-
-ALL_FEATURES_NAMES_SET = set(ALL_FEATURES_LIST)
