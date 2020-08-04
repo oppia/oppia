@@ -38,6 +38,7 @@ export interface TopicSummaryBackendDict {
   'can_edit_topic'?: boolean;
   'is_published'?: boolean;
   'classroom'?: string;
+  'url_fragment': string;
 }
 
 export class TopicSummary {
