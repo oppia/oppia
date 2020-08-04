@@ -37,6 +37,7 @@ const { browser } = require('protractor');
 var backButton = element(by.css('#backButtonId'));
 var categoryBar = element(by.css(
   '.protractor-test-search-bar-dropdown-toggle'));
+
 var continueButton = element(by.css('.protractor-test-continue-button'));
 var mainContent = element(by.css('.protractor-test-main-content'));
 var nextButton = element(by.css('.protractor-test-next-button'));
@@ -110,6 +111,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
       // Should move the focus away from the elementToFocus.
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
+      await browser.actions().sendKeys(protractor.Key.TAB).perform();
       expect(await browser.driver.switchTo().activeElement()
         .getAttribute('class')).not.toEqual(
         await (await elementToFocus.getAttribute('class')));
@@ -127,6 +129,7 @@ describe('screenreader and keyboard user accessibility features', function() {
           .getAttribute('id'));
 
       // Should move the focus away from the elementToFocus.
+      await browser.actions().sendKeys(protractor.Key.TAB).perform();
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
       expect(await elementToFocus.getAttribute('id')).not.toEqual(
         await (await browser.driver.switchTo().activeElement())

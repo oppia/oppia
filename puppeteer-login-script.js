@@ -42,20 +42,17 @@ const login = async function(context, page) {
     console.log('Logging into Oppia...');
     // eslint-disable-next-line dot-notation
     await page.goto(context.url);
+    await page.waitForSelector('#admin');
     await page.click('#admin');
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click('#submit-login'),
-    ]);
-
+    await page.click('#submit-login');
+    await page.waitForSelector('#username');
     await page.type('#username', 'username1');
     await page.click('#terms-checkbox');
-    await page.waitFor(5000);
-
-    await Promise.all([
-      page.waitForNavigation(),
-      await page.click('#signup-submit')
-    ]);
+    await page.waitForSelector('#signup-submit');
+    await page.click('#signup-submit');
+    await page.waitForFunction(
+      'document.querySelector("body").innerText.includes("Admin")'
+    );
     // eslint-disable-next-line no-console
     console.log('Successfully Logged in');
   } catch (e) {
@@ -73,12 +70,14 @@ const setRoleAdmin = async function(context, page) {
     console.log('Changing role to admin...');
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
-    await page.waitFor(2000);
+    await page.waitForSelector('#update-role-username-input');
     await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', 'string:ADMIN');
-    await page.waitFor(5000);
+    await page.waitForSelector('#update-button-id');
     await page.click('#update-button-id');
-    await page.waitFor(2000);
+    await page.waitForFunction(
+      'document.querySelector("body").innerText.includes("successfully updated to")'
+    );
     // eslint-disable-next-line no-console
     console.log('Role changed to admin');
   } catch (e) {

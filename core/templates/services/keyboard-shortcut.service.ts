@@ -67,13 +67,13 @@ export class KeyboardShortcutService {
     });
 
     Mousetrap.bind('c', function() {
-      document.getElementById('categoryBar').focus();
-      return false;
+      var categoryBar = <HTMLElement>document.querySelector(
+        '.protractor-test-search-bar-dropdown-toggle');
+      categoryBar.focus();
     });
 
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
-      return false;
     });
   }
 

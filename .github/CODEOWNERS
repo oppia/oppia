@@ -243,8 +243,7 @@
 /core/templates/services/page-title.service*.ts @ankita240796
 /core/templates/services/extension-tag-assembler.service*.ts @ankita240796
 /core/templates/services/nested-directives*.ts @ankita240796
-/core/templates/services/keyboard-shortcut.service.ts @jimbyo
-/core/templates/services/keyboard-shortcut.service.spec.ts @jimbyo
+/core/templates/services/keyboard-shortcut.service*.ts @jimbyo
 /core/templates/services/stateful/background-mask.service*.ts @ankita240796
 /core/templates/services/stateful/focus-manager.service*.ts @ankita240796
 /core/templates/services/contextual/url.service*.ts @ankita240796

@@ -51,7 +51,7 @@ angular.module('oppia').directive('libraryPage', [
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
         '$window', 'AlertsService', 'ClassroomBackendApiService',
-        'LearnerDashboardActivityIdsObjectFactory',
+        'KeyboardShortcutService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
@@ -61,7 +61,7 @@ angular.module('oppia').directive('libraryPage', [
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
             $window, AlertsService, ClassroomBackendApiService,
-            LearnerDashboardActivityIdsObjectFactory,
+            KeyboardShortcutService, LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,
@@ -192,25 +192,6 @@ angular.module('oppia').directive('libraryPage', [
                 }, 50);
               });
             }
-          };
-
-          var bindLibraryPageShortcuts = function() {
-            Mousetrap.bind('/', function() {
-              var searchBar = <HTMLElement>document.querySelector(
-                '.protractor-test-search-input');
-              searchBar.focus();
-              return false;
-            });
-
-            Mousetrap.bind('c', function() {
-              document.getElementById('categoryBar').focus();
-              return false;
-            });
-
-            Mousetrap.bind('s', function() {
-              document.getElementById('skipToMainContentId').focus();
-              return false;
-            });
           };
 
           // The following loads explorations belonging to a particular group.
@@ -350,7 +331,7 @@ angular.module('oppia').directive('libraryPage', [
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
                 $timeout(initCarousels, 390);
-                bindLibraryPageShortcuts();
+                KeyboardShortcutService.bindLibraryPageShortcuts();
 
 
                 // Check if actual and expected widths are the same.
