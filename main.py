@@ -91,6 +91,7 @@ from core.controllers import custom_landing_pages # isort:skip   pylint: disable
 from core.controllers import editor # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import email_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import features # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from core.controllers import feature_gating # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import feedback # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import improvements # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from core.controllers import learner_dashboard # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
@@ -850,6 +851,9 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
+
+    get_redirect_route(
+        r'/featuregatinghandler', feature_gating.FeatureGatingHandler)
 ]
 
 # Adding redirects for classroom pages.
