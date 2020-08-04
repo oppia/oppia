@@ -38,7 +38,7 @@ angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
     'ContextService', 'KeyboardShortcutService',
-    'PageTitleService','ReadOnlyExplorationBackendApiService',
+    'PageTitleService', 'ReadOnlyExplorationBackendApiService',
     function(
         ContextService, KeyboardShortcutService,
         PageTitleService, ReadOnlyExplorationBackendApiService) {
