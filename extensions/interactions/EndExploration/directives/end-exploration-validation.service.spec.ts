@@ -114,8 +114,8 @@ describe('EndExplorationValidationService', () => {
   it('should throw for missing recommendations argument', () => {
     expect(() => {
       // This throws "Argument of type '{}' is not assignable to
-      // parameter of type 'EndExplorationCustomizationArgs'." We did not
-      // assign the correct type of customization args in order to test
+      // parameter of type 'EndExplorationCustomizationArgs'." We are purposely
+      // assigning the wrong type of customization args in order to test
       // validations.
       // @ts-expect-error
       validatorService.getAllWarnings(currentState, {}, [], null);

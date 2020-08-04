@@ -154,9 +154,9 @@ describe('ItemSelectionInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         // This throws "Argument of type '{}' is not assignable to
-        // parameter of type 'ItemSelectionInputCustomizationArgs'." We did not
-        // assign the correct type of customization args in order to test
-        // validations.
+        // parameter of type 'ItemSelectionInputCustomizationArgs'." We are
+        // purposely assigning the wrong type of customization args in order
+        // to test validations.
         // @ts-expect-error
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     }).toThrowError(

@@ -324,6 +324,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             self.values.update({
                 'topic_summary_dicts': topic_summary_dicts
             })
+        else:
+            self.values.update({
+                'topic_summary_dicts': None
+            })
+
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard
