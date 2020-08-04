@@ -107,16 +107,21 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy_registered_users_are_deleted(self):
+    def test_apply_deletion_policy_deletes_registered_users(self):
+        # trivial case where non-required attributes are not set.
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
-        user_models.UserSettingsModel.apply_deletion_policy(self.USER_2_ID)
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
+
+        # non-trivial case where non-required attributes are also set.
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_3_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID))
+
+    def test_apply_deletion_policy_deletes_user_with_deleted_equals_true(self):
+        user_models.UserSettingsModel.apply_deletion_policy(self.USER_2_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
 
     def test_apply_deletion_policy_nonexistent_user_no_exception_raised(self):
         user_models.UserSettingsModel.apply_deletion_policy(
@@ -142,7 +147,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_by_role_for_admin_returns_user1_and_user3_only(self):
+    def test_get_by_role_for_admin_returns_admin_users_only(self):
         actual_users = [
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
