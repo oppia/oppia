@@ -45,27 +45,26 @@ angular.module('oppia').component('practiceSessionPage', {
         TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
       var ctrl = this;
       var _fetchSkillDetails = function() {
+        var topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
         var practiceSessionsDataUrl = UrlInterpolationService
           .interpolateUrl(
             PRACTICE_SESSIONS_DATA_URL, {
-              abbreviated_topic_name: (
-                UrlService.getAbbrevTopicNameFromLearnerUrl()),
+              topic_url_fragment: topicUrlFragment,
               classroom_url_fragment: (
                 UrlService.getClassroomUrlFragmentFromLearnerUrl()),
               comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
             });
         var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
           PRACTICE_SESSIONS_URL, {
-            abbreviated_topic_name: (
-              UrlService.getAbbrevTopicNameFromLearnerUrl()),
+            topic_url_fragment: topicUrlFragment,
             classroom_url_fragment: (
               UrlService.getClassroomUrlFragmentFromLearnerUrl()),
             comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
           });
         var topicViewerUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_PAGE, {
-            abbreviated_topic_name: (
-              UrlService.getAbbrevTopicNameFromLearnerUrl()),
+            topic_url_fragment: topicUrlFragment,
             classroom_url_fragment: (
               UrlService.getClassroomUrlFragmentFromLearnerUrl()),
           });
@@ -106,7 +105,7 @@ angular.module('oppia').component('practiceSessionPage', {
         });
       };
       ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getAbbrevTopicNameFromLearnerUrl();
+        ctrl.topicName = UrlService.getTopicUrlFragmentFromLearnerUrl();
         ctrl.commaSeparatedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();

@@ -44,7 +44,8 @@ angular.module('oppia').factory('TopicUpdateService', [
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
   'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
-  'TOPIC_PROPERTY_THUMBNAIL_FILENAME', function(
+  'TOPIC_PROPERTY_THUMBNAIL_FILENAME',
+  'TOPIC_PROPERTY_URL_FRAGMENT', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
       CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
@@ -61,7 +62,8 @@ angular.module('oppia').factory('TopicUpdateService', [
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
       TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-      TOPIC_PROPERTY_THUMBNAIL_FILENAME) {
+      TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+      TOPIC_PROPERTY_URL_FRAGMENT) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
@@ -154,6 +156,26 @@ angular.module('oppia').factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // ---- Undo ----
             topic.setAbbreviatedName(oldAbbreviatedName);
+          });
+      },
+
+      /**
+       * Changes the url fragment of a topic and records the change in the
+       * undo/redo service.
+       */
+      setTopicUrlFragment: function(topic, urlFragment) {
+        var oldUrlFragment = angular.copy(topic.getUrlFragment());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_URL_FRAGMENT,
+          urlFragment, oldUrlFragment,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var newUrlFragment = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            topic.setUrlFragment(newUrlFragment);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            topic.setUrlFragment(oldUrlFragment);
           });
       },
 

@@ -50,6 +50,7 @@ TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
+TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -109,7 +110,8 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE,
         TOPIC_PROPERTY_THUMBNAIL_FILENAME,
-        TOPIC_PROPERTY_THUMBNAIL_BG_COLOR)
+        TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+        TOPIC_PROPERTY_URL_FRAGMENT)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -455,10 +457,10 @@ class Topic(python_utils.OBJECT):
     """Domain object for an Oppia Topic."""
 
     def __init__(
-            self, topic_id, name, abbreviated_name, thumbnail_filename,
-            thumbnail_bg_color, description, canonical_story_references,
-            additional_story_references, uncategorized_skill_ids,
-            subtopics, subtopic_schema_version,
+            self, topic_id, name, abbreviated_name, url_fragment,
+            thumbnail_filename, thumbnail_bg_color, description,
+            canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
             story_reference_schema_version, created_on=None,
             last_updated=None):
@@ -468,6 +470,7 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique ID of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated topic name.
+            url_fragment: str. The url fragment of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
@@ -498,6 +501,7 @@ class Topic(python_utils.OBJECT):
         self.id = topic_id
         self.name = name
         self.abbreviated_name = abbreviated_name
+        self.url_fragment = url_fragment
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
         self.canonical_name = name.lower()
@@ -524,6 +528,7 @@ class Topic(python_utils.OBJECT):
             'id': self.id,
             'name': self.name,
             'abbreviated_name': self.abbreviated_name,
+            'url_fragment': self.url_fragment,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'description': self.description,
@@ -581,15 +586,15 @@ class Topic(python_utils.OBJECT):
                 % (name_limit, name))
 
     @classmethod
-    def require_valid_abbreviated_name(cls, name):
-        """Checks whether the abbreviated name of the topic is a valid one.
+    def require_valid_url_fragment(cls, url_fragment):
+        """Checks whether the url fragment of the topic is a valid one.
 
         Args:
-            name: str. The abbreviated name to validate.
+            url_fragment: str. The url fragment to validate.
         """
         utils.require_valid_url_fragment(
-            name, 'Topic URL Fragment',
-            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
+            url_fragment, 'Topic URL Fragment',
+            android_validation_constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -836,7 +841,7 @@ class Topic(python_utils.OBJECT):
                 valid.
         """
         self.require_valid_name(self.name)
-        self.require_valid_abbreviated_name(self.abbreviated_name)
+        self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
@@ -956,7 +961,7 @@ class Topic(python_utils.OBJECT):
 
     @classmethod
     def create_default_topic(
-            cls, topic_id, name, abbreviated_name, description):
+            cls, topic_id, name, url_fragment, description):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -964,14 +969,14 @@ class Topic(python_utils.OBJECT):
         Args:
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
-            abbreviated_name: str. The abbreviated name for the topic.
+            url_fragment: str. The url fragment for the topic.
             description: str. The description for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, abbreviated_name, None, None,
+            topic_id, name, name, url_fragment, None, None,
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
@@ -1070,6 +1075,14 @@ class Topic(python_utils.OBJECT):
                 for the topic.
         """
         self.abbreviated_name = new_abbreviated_name
+
+    def update_url_fragment(self, new_url_fragment):
+        """Updates the url_fragment of a topic object.
+
+        Args:
+            new_url_fragment: str. The updated url_fragment for the topic.
+        """
+        self.url_fragment = new_url_fragment
 
     def update_thumbnail_filename(self, new_thumbnail_filename):
         """Updates the thumbnail filename of a topic object.
@@ -1429,7 +1442,7 @@ class TopicSummary(python_utils.OBJECT):
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
             topic_model_created_on, topic_model_last_updated,
-            abbreviated_name):
+            url_fragment):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -1452,7 +1465,7 @@ class TopicSummary(python_utils.OBJECT):
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
                 when the topic model was last updated.
-            abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
         """
         self.id = topic_id
         self.name = name
@@ -1467,18 +1480,18 @@ class TopicSummary(python_utils.OBJECT):
         self.total_skill_count = total_skill_count
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
-        self.abbreviated_name = abbreviated_name
+        self.url_fragment = url_fragment
 
     @classmethod
-    def require_valid_abbreviated_name(cls, name):
-        """Checks whether the abbreviated name of the topic is a valid one.
+    def require_valid_url_fragment(cls, url_fragment):
+        """Checks whether the url fragment of the topic is a valid one.
 
         Args:
-            name: str. The abbreviated name to validate.
+            url_fragment: str. The url fragment to validate.
         """
         utils.require_valid_url_fragment(
-            name, 'Topic URL Fragment',
-            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
+            url_fragment, 'Topic URL Fragment',
+            android_validation_constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
     def validate(self):
         """Validates all properties of this topic summary.
@@ -1487,7 +1500,7 @@ class TopicSummary(python_utils.OBJECT):
             ValidationError: One or more attributes of the Topic summary
                 are not valid.
         """
-        self.require_valid_abbreviated_name(self.abbreviated_name)
+        self.require_valid_url_fragment(self.url_fragment)
         if not isinstance(self.name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
@@ -1577,7 +1590,7 @@ class TopicSummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'name': self.name,
-            'abbreviated_name': self.abbreviated_name,
+            'url_fragment': self.url_fragment,
             'language_code': self.language_code,
             'description': self.description,
             'version': self.version,

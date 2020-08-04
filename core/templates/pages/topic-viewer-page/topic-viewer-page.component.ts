@@ -66,15 +66,15 @@ angular.module('oppia').component('topicViewerPage', {
         } else {
           ctrl.setActiveTab('info');
         }
-        ctrl.abbreviatedTopicName = (
-          UrlService.getAbbrevTopicNameFromLearnerUrl());
+        ctrl.topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
         ctrl.classroomUrlFragment = (
           UrlService.getClassroomUrlFragmentFromLearnerUrl());
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.topicIsLoading = true;
         TopicViewerBackendApiService.fetchTopicData(
-          ctrl.abbreviatedTopicName, ctrl.classroomUrlFragment).then(
+          ctrl.topicUrlFragment, ctrl.classroomUrlFragment).then(
           function(readOnlyTopic) {
             ctrl.topicId = readOnlyTopic.getTopicId();
             ctrl.topicName = readOnlyTopic.getTopicName();

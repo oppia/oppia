@@ -108,8 +108,8 @@ angular.module('oppia').directive('storyViewerPage', [
           ctrl.getExplorationUrl = function(node) {
             var result = '/explore/' + node.getExplorationId();
             result = UrlService.addField(
-              result, 'abbreviated_topic_name',
-              UrlService.getAbbrevTopicNameFromLearnerUrl());
+              result, 'topic_url_fragment',
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
             result = UrlService.addField(
               result, 'classroom_url_fragment',
               UrlService.getClassroomUrlFragmentFromLearnerUrl());
@@ -125,7 +125,7 @@ angular.module('oppia').directive('storyViewerPage', [
             LoaderService.showLoadingScreen('Loading');
             ctrl.storyId = UrlService.getStoryIdFromViewerUrl();
             var abbreviatedTopicName = (
-              UrlService.getAbbrevTopicNameFromLearnerUrl());
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
             var classroomUrlFragment = (
               UrlService.getClassroomUrlFragmentFromLearnerUrl());
             StoryViewerBackendApiService.fetchStoryData(

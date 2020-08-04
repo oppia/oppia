@@ -61,7 +61,7 @@ describe('Topic viewer page', function() {
   }));
 
   it('should successfully get topic data', function() {
-    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
@@ -112,7 +112,7 @@ describe('Topic viewer page', function() {
   });
 
   it('should set story tab correctly', function() {
-    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
@@ -123,7 +123,7 @@ describe('Topic viewer page', function() {
   });
 
   it('should set revision tab correctly', function() {
-    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
@@ -134,7 +134,7 @@ describe('Topic viewer page', function() {
   });
 
   it('should set practice tab correctly', function() {
-    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
@@ -145,7 +145,7 @@ describe('Topic viewer page', function() {
   });
 
   it('should switch to info tab if practice tab is hidden', function() {
-    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
@@ -188,7 +188,7 @@ describe('Topic viewer page', function() {
 
   it('should use reject handler when fetching subtopic data fails',
     function() {
-      spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         topicName);
       spyOn(
         UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(

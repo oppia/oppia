@@ -15,7 +15,7 @@
   <div ng-if="$ctrl.nextSubtopicSummaryIsShown" class="oppia-subtopic-viewer-next-subtopic-summary">
     <div class="margin-right: 50px; margin-top: 80px;">
       <p class="oppia-subtopic-next-subtopic-label" translate="I18N_SUBTOPIC_VIEWER_NEXT_SKILL">Next Skill:</p>
-      <subtopic-summary-tile abbreviated-topic-name="$ctrl.abbreviatedTopicName"
+      <subtopic-summary-tile topic-url-fragment="$ctrl.topicUrlFragment"
                              classroom-url-fragment="$ctrl.classroomUrlFragment"
                              subtopic="$ctrl.nextSubtopic"
                              topic-id="$ctrl.parentTopicId">

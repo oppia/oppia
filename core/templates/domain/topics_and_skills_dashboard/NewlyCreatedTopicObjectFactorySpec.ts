@@ -43,7 +43,7 @@ describe('Newly Created Topic Object Factory', () => {
     topic.name = 'TopicName1';
     expect(topic.isValid()).toBe(false);
 
-    topic.abbreviatedName = 'abbrev';
+    topic.urlFragment = 'url-fragment';
     expect(topic.isValid()).toBe(true);
 
     topic.description = '';

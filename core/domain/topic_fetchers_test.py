@@ -52,7 +52,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         })]
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
-            abbreviated_name='name',
+            abbreviated_name='name', url_fragment='name-one',
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -107,6 +107,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-two',
             canonical_name='canonical_name',
             description='description',
             next_subtopic_id=1,
@@ -131,6 +132,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             name='name 2',
             description='description 2',
             abbreviated_name='abbrev',
+            url_fragment='name-three',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -157,7 +159,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, name='topic name',
-            abbreviated_name='topic-name',
+            abbreviated_name='topic-name', url_fragment='topic-name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

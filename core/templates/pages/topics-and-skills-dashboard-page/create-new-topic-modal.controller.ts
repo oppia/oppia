@@ -27,13 +27,13 @@ const topicPropertiesConstants = require('constants.ts');
 angular.module('oppia').controller('CreateNewTopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'ContextService', 'ImageLocalStorageService',
-  'NewlyCreatedTopicObjectFactory', 'MAX_CHARS_IN_ABBREV_TOPIC_NAME',
-  'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+  'NewlyCreatedTopicObjectFactory', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+  'MAX_CHARS_IN_TOPIC_NAME', 'MAX_CHARS_IN_TOPIC_URL_FRAGMENT',
   function(
       $controller, $scope, $uibModalInstance,
       ContextService, ImageLocalStorageService,
-      NewlyCreatedTopicObjectFactory, MAX_CHARS_IN_ABBREV_TOPIC_NAME,
-      MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
+      NewlyCreatedTopicObjectFactory, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+      MAX_CHARS_IN_TOPIC_NAME, MAX_CHARS_IN_TOPIC_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -52,7 +52,7 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
     $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
     $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
       MAX_CHARS_IN_TOPIC_DESCRIPTION);
-    $scope.MAX_CHARS_IN_ABBREV_TOPIC_NAME = MAX_CHARS_IN_ABBREV_TOPIC_NAME;
+    $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
 
     $scope.save = function() {
       $uibModalInstance.close($scope.newlyCreatedTopic);

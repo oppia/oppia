@@ -126,19 +126,19 @@ describe('Url Service', () => {
   it('should correctly retrieve abbreviated topic name from url', () => {
     mockLocation.pathname = '/learn/math/abcdefgijklm';
     expect(
-      urlService.getAbbrevTopicNameFromLearnerUrl()
+      urlService.getTopicUrlFragmentFromLearnerUrl()
     ).toBe('abcdefgijklm');
     mockLocation.pathname = '/learn/math/topic-name';
     expect(
-      urlService.getAbbrevTopicNameFromLearnerUrl()
+      urlService.getTopicUrlFragmentFromLearnerUrl()
     ).toBe('topic-name');
     mockLocation.pathname = '/learn/math/topic-name/practice';
     expect(
-      urlService.getAbbrevTopicNameFromLearnerUrl()
+      urlService.getTopicUrlFragmentFromLearnerUrl()
     ).toBe('topic-name');
     mockLocation.pathname = '/topc/abcdefgijklm';
     expect(function() {
-      urlService.getAbbrevTopicNameFromLearnerUrl();
+      urlService.getTopicUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for topic');
   });
 
@@ -170,18 +170,18 @@ describe('Url Service', () => {
     }).toThrowError('Invalid URL for practice session');
   });
 
-  it('should correctly retrieve classroom name from url', () => {
-    mockLocation.pathname = '/abcdefgijklm';
+  it('should correctly retrieve classroom url fragment from url', () => {
+    mockLocation.pathname = '/learn/abcdefgijklm';
     expect(
-      urlService.getClassroomNameFromUrl()
+      urlService.getClassroomUrlFragmentFromUrl()
     ).toBe('abcdefgijklm');
-    mockLocation.pathname = '/class%20name';
+    mockLocation.pathname = '/learn/class%20name';
     expect(
-      urlService.getClassroomNameFromUrl()
+      urlService.getClassroomUrlFragmentFromUrl()
     ).toBe('class name');
     mockLocation.pathname = '/invalid/abcdefgijklm';
     expect(function() {
-      urlService.getClassroomNameFromUrl();
+      urlService.getClassroomUrlFragmentFromUrl();
     }).toThrowError('Invalid URL for classroom');
   });
 

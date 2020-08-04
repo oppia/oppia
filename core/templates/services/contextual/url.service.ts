@@ -77,7 +77,7 @@ export class UrlService {
     throw new Error('Invalid topic id url');
   }
 
-  getAbbrevTopicNameFromLearnerUrl(): string {
+  getTopicUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[3]);
@@ -102,11 +102,12 @@ export class UrlService {
     throw new Error('Invalid URL for practice session');
   }
 
-  getClassroomNameFromUrl(): string {
+
+  getClassroomUrlFragmentFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
-    if (argumentsArray.length === 2) {
-      return decodeURIComponent(pathname.split('/')[1]);
+    if (pathname.startsWith('/learn') && argumentsArray.length === 3) {
+      return decodeURIComponent(pathname.split('/')[2]);
     }
     throw new Error('Invalid URL for classroom');
   }

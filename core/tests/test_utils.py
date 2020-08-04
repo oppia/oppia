@@ -1516,6 +1516,7 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',
+            url_fragment='topic',
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
@@ -1530,6 +1531,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
@@ -1560,7 +1562,7 @@ tags: []
         uncategorized_skill_ids = (uncategorized_skill_ids or [])
         subtopics = (subtopics or [])
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name,
+            topic_id, name, abbreviated_name, url_fragment,
             thumbnail_filename, thumbnail_bg_color,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
@@ -1571,7 +1573,7 @@ tags: []
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, abbreviated_name,
+            self, topic_id, owner_id, name, abbreviated_name, url_fragment,
             canonical_name, description, thumbnail_filename,
             thumbnail_bg_color, canonical_story_references,
             additional_story_references,
@@ -1594,6 +1596,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The description of the topic.
             thumbnail_filename: str. The thumbnail file name of the topic.
@@ -1620,6 +1623,7 @@ tags: []
             id=topic_id,
             name=name,
             abbreviated_name=abbreviated_name,
+            url_fragment=url_fragment,
             thumbnail_filename=thumbnail_filename,
             thumbnail_bg_color=thumbnail_bg_color,
             canonical_name=canonical_name,

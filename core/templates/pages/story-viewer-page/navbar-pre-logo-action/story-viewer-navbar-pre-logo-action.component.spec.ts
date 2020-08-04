@@ -29,7 +29,7 @@ describe('story viewer pre logo action', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getAbbrevTopicNameFromLearnerUrl')
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
       .and.returnValue('abbrev');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('math');

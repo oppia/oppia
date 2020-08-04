@@ -21,6 +21,8 @@ export = {
   // in the URL for topics that are not yet attached to a classroom.
   "DUMMY_CLASSROOM_URL_FRAGMENT": "staging",
 
+  "DEFAULT_CLASSROOM": "math",
+
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
     "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -5234,6 +5236,7 @@ export = {
   "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 20,
+  "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,

@@ -195,7 +195,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         new_story_id = 'new_story_id'
         self.save_new_topic(
             'topic_id_1', 'user', name='Topic 2',
-            abbreviated_name='topics',
+            abbreviated_name='topics', url_fragment='topics',
             description='A new topic', canonical_story_ids=[new_story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

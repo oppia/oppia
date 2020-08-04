@@ -790,7 +790,7 @@ SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
-    '/learn/<classroom_url_fragment>/<abbreviated_topic_name>')
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'

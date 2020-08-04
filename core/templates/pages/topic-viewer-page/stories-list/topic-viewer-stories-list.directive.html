@@ -2,7 +2,7 @@
   <md-card class="oppia-page-card oppia-long-text">
     <h2 class="tab-title" translate="I18N_TOPIC_VIEWER_LESSONS"></h2>
     <div ng-repeat="storySummary in $ctrl.getCanonicalStorySummaries()" class="story-info-container">
-      <story-summary-tile abbreviated-topic-name="$ctrl.getAbbreviatedTopicName()"
+      <story-summary-tile topic-url-fragment="$ctrl.getTopicUrlFragment()"
                           classroom-url-fragment="$ctrl.getClassroomUrlFragment()"
                           story-summary="storySummary">
       </story-summary-tile>

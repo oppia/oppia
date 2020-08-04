@@ -55,6 +55,7 @@ export class TopicDomainConstants {
   public static TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static TOPIC_PROPERTY_DESCRIPTION = 'description';
   public static TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code';
+  public static TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment';
 
   public static SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';

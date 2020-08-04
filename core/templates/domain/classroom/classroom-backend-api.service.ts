@@ -31,12 +31,12 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 interface ClassroomBackendDict {
-  'classroom_url_fragment': string;
+  'classroom_name': string;
   'topic_summary_dicts': TopicSummaryBackendDict[];
 }
 
 interface ClassroomBackendResponse {
-  classroomUrlFragment: string;
+  classroomName: string;
   topicSummaries: TopicSummary[];
 }
 
@@ -56,12 +56,12 @@ export class ClassroomBackendApiService {
     private topicSummaryObjectFactory: TopicSummaryObjectFactory
   ) {}
 
-  _fetchClassroomData(classroomName: string,
+  _fetchClassroomData(classroomUrlFragment: string,
       successCallback: (value: ClassroomBackendResponse) => void,
       errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
-        classroom_name: classroomName
+        classroom_url_fragment: classroomUrlFragment
       });
 
     this.http.get<ClassroomBackendDict>(
@@ -74,7 +74,7 @@ export class ClassroomBackendApiService {
       );
       if (successCallback) {
         successCallback({
-          classroomUrlFragment: data.classroom_url_fragment,
+          classroomName: data.classroom_name,
           topicSummaries: this.topicSummaryObjects
         });
       }
@@ -103,10 +103,10 @@ export class ClassroomBackendApiService {
   }
 
   fetchClassroomData(
-      classroomName: string
+      classroomUrlFragment: string
   ): Promise<ClassroomBackendResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchClassroomData(classroomName, resolve, reject);
+      this._fetchClassroomData(classroomUrlFragment, resolve, reject);
     });
   }
 

@@ -170,6 +170,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-one',
             description='description1',
             canonical_name='canonical_name',
             next_subtopic_id=1,
@@ -193,6 +194,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             id='topic_id_2',
             name='name 2',
             abbreviated_name='abbrev',
+            url_fragment='name-two',
             description='description',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
@@ -249,7 +251,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, name='Name 2', description='Description',
-            abbreviated_name='random',
+            abbreviated_name='random', url_fragment='name-three',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
             subtopics=[], next_subtopic_id=1)
@@ -673,6 +675,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'short-name'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_URL_FRAGMENT,
+            'old_value': '',
+            'new_value': 'url-name'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
             'old_value': '',
             'new_value': 'thumbnail.svg'
@@ -689,6 +696,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short-name')
+        self.assertEqual(topic.url_fragment, 'url-name')
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
@@ -1298,23 +1306,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 canonical_story_ids=[], additional_story_ids=[],
                 uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
-    def test_cannot_save_new_topic_with_existing_abbreviated_name(self):
-        self.save_new_topic(
-            'topic_2', self.user_id, name='newtopic',
-            abbreviated_name='abbrev',
-            description='Description 2',
-            canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
-        with self.assertRaisesRegexp(
-            Exception,
-            'Topic with URL Fragment \'abbrev\' already exists'):
-            self.save_new_topic(
-                'topic_2', self.user_id, name='original',
-                abbreviated_name='abbrev',
-                description='Description 2',
-                canonical_story_ids=[], additional_story_ids=[],
-                uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
-
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'en')
@@ -1427,13 +1418,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
             'topic_2', self.user_id, name='Name 2',
-            abbreviated_name='name-two',
+            abbreviated_name='name-two', url_fragment='name-six',
             description='Description 2',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             'topic_3', self.user_id, name='Name 3',
-            abbreviated_name='name-three',
+            abbreviated_name='name-three', url_fragment='name-seven',
             description='Description 3',
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
@@ -1535,6 +1526,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-eight',
             canonical_name='Name',
             description='description1',
             next_subtopic_id=1,
@@ -1579,6 +1571,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-nine',
             canonical_name='Name',
             description='description1',
             next_subtopic_id=1,

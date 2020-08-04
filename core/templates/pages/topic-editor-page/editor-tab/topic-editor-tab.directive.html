@@ -34,14 +34,14 @@
           </span>
         </div>
         <div class="topic-name">
-          <label for="abbreviatedTopicName" class="form-heading protractor-test-abbrev-topic-name-heading">Topic URL Name</label>
-          <input id="abbreviatedTopicName" type="text" class="form-control protractor-test-abbrev-topic-name-field"
+          <label for="topicUrlFragment" class="form-heading protractor-test-topic-url-fragment-heading">Topic URL Fragment</label>
+          <input id="topicUrlFragment" type="text" class="form-control protractor-test-topic-url-fragment-field"
                  ng-disabled="!topicRights.canEditTopic()"
-                 ng-model="editableAbbreviatedName" ng-blur="updateAbbreviatedTopicName(editableAbbreviatedName)"
-                 maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>" ng-trim="true">
+                 ng-model="editableTopicUrlFragment" ng-blur="updateTopicUrlFragment(editableTopicUrlFragment)"
+                 maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>" ng-trim="true">
           <span class="oppia-input-box-subtitle">
             <i>
-              Topic URL fragment should be a short word or set of words in lowercase and separated by hyphens (-). Please use meaningful keywords and avoid using words like "and", "of", or "the". This will be used to uniquely access the topic viewer page. It should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
+              The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]> characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
             </i>
           </span>
         </div>

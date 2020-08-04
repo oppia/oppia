@@ -59,7 +59,7 @@ describe('Classroom backend API service', function() {
       topic_model_created_on: 231241343,
       topic_model_last_updated: 3454354354
     }],
-    classroom_url_fragment: 'math'
+    classroom_name: 'math'
   };
 
   let sampleDataResultsObjects = null;
@@ -80,7 +80,7 @@ describe('Classroom backend API service', function() {
         topicSummaryObjectFactory.createFromBackendDict(
           responseDictionaries.topic_summary_dicts[1])
       ],
-      classroom_url_fragment: responseDictionaries.classroom_url_fragment
+      classroom_name: responseDictionaries.classroom_name
     };
   });
 
@@ -104,7 +104,7 @@ describe('Classroom backend API service', function() {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
-        classroomUrlFragment: sampleDataResultsObjects.classroom_url_fragment,
+        classroomName: sampleDataResultsObjects.classroom_name,
         topicSummaries: sampleDataResultsObjects.topic_summary_objects
       });
       expect(failHandler).not.toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe('Classroom backend API service', function() {
       req.flush(responseDictionaries);
       flushMicrotasks();
       expect(successHandler).toHaveBeenCalledWith({
-        classroomUrlFragment: sampleDataResultsObjects.classroom_url_fragment,
+        classroomName: sampleDataResultsObjects.classroom_name,
         topicSummaries: sampleDataResultsObjects.topic_summary_objects
       });
       expect(failHandler).not.toHaveBeenCalled();

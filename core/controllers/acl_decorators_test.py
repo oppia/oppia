@@ -2134,10 +2134,12 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
-        story_data_url = '/mock_story_data/<abbreviated_topic_name>/<story_id>'
+        story_data_url = (
+            '/mock_story_data/<classroom_url_fragment>/'
+            '<topic_url_fragment>/<story_id>')
         story_page_url = (
-            '/mock_story_page/<classroom_name>/'
-            '<abbreviated_topic_name>/story/<story_id>')
+            '/mock_story_page/<classroom_url_fragment>/'
+            '<topic_url_fragment>/story/<story_id>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(story_data_url, self.MockDataHandler),
@@ -2158,19 +2160,20 @@ class StoryViewerTests(test_utils.GenericTestBase):
     def test_cannot_access_non_existent_story(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/topic/story_id', expected_status_int=404)
+                '/mock_story_data/staging/topic/story_id',
+                expected_status_int=404)
 
     def test_cannot_access_story_when_topic_is_not_published(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/topic/%s' % self.story_id,
+                '/mock_story_data/staging/topic/%s' % self.story_id,
                 expected_status_int=404)
 
     def test_cannot_access_story_when_story_is_not_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/topic/%s' % self.story_id,
+                '/mock_story_data/staging/topic/%s' % self.story_id,
                 expected_status_int=404)
 
     def test_can_access_story_when_story_and_topic_are_published(self):
@@ -2179,7 +2182,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.topic_id, self.story_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/topic/%s' % self.story_id,
+                '/mock_story_data/staging/topic/%s' % self.story_id,
                 expected_status_int=200)
 
     def test_can_access_story_when_all_url_fragments_are_valid(self):
@@ -2198,7 +2201,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/topic/story/000',
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic/story',
                 response.headers['location'])
@@ -2211,7 +2214,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             response = self.get_html_response(
                 '/mock_story_page/staging/invalid-topic/story/%s'
                 % self.story_id,
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic/story/%s'
                 % self.story_id,
@@ -2225,7 +2228,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             response = self.get_html_response(
                 '/mock_story_page/math/topic/story/%s'
                 % self.story_id,
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic/story/%s'
                 % self.story_id,
@@ -2260,10 +2263,11 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
         subtopic_data_url = (
-            '/mock_subtopic_data/<abbreviated_topic_name>/<subtopic_id>')
+            '/mock_subtopic_data/<classroom_url_fragment>/'
+            '<topic_url_fragment>/<subtopic_id>')
         subtopic_page_url = (
-            '/mock_subtopic_page/<classroom_name>/'
-            '<abbreviated_topic_name>/revision/<subtopic_id>')
+            '/mock_subtopic_page/<classroom_url_fragment>/'
+            '<topic_url_fragment>/revision/<subtopic_id>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(subtopic_data_url, self.MockDataHandler),
@@ -2299,19 +2303,20 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_cannot_access_non_existent_subtopic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/topic/50', expected_status_int=404)
+                '/mock_subtopic_data/staging/topic/50',
+                expected_status_int=404)
 
     def test_cannot_access_subtopic_when_topic_is_not_published(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/topic/1',
+                '/mock_subtopic_data/staging/topic/1',
                 expected_status_int=404)
 
     def test_can_access_subtopic_when_topic_is_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/topic/1',
+                '/mock_subtopic_data/staging/topic/1',
                 expected_status_int=200)
 
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self):
@@ -2326,7 +2331,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/staging/topic/revision/000',
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic/revision',
                 response.headers['location'])
@@ -2336,7 +2341,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/math/invalid-topic/revision/1',
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/math',
                 response.headers['location'])
@@ -2346,7 +2351,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/math/topic/revision/1',
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic/revision/1',
                 response.headers['location'])
@@ -2379,9 +2384,10 @@ class TopicViewerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
-        topic_data_url = '/mock_topic_data/<abbreviated_topic_name>'
+        topic_data_url = (
+            '/mock_topic_data/<classroom_url_fragment>/<topic_url_fragment>')
         topic_page_url = (
-            '/mock_topic_page/<classroom_name>/<abbreviated_topic_name>')
+            '/mock_topic_page/<classroom_url_fragment>/<topic_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(topic_data_url, self.MockDataHandler),
@@ -2400,19 +2406,20 @@ class TopicViewerTests(test_utils.GenericTestBase):
     def test_cannot_access_non_existent_topic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_topic_data/invalid-topic', expected_status_int=404)
+                '/mock_topic_data/staging/invalid-topic',
+                expected_status_int=404)
 
     def test_cannot_access_unpublished_topic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_topic_data/topic',
+                '/mock_topic_data/staging/topic',
                 expected_status_int=404)
 
     def test_can_access_published_topic(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_topic_data/topic',
+                '/mock_topic_data/staging/topic',
                 expected_status_int=200)
 
     def test_can_access_topic_when_all_url_fragments_are_valid(self):
@@ -2427,7 +2434,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_topic_page/math/invalid-topic',
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/math',
                 response.headers['location'])
@@ -2437,7 +2444,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_topic_page/math/topic',
-                expected_status_int=301)
+                expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic',
                 response.headers['location'])

@@ -292,29 +292,29 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/practice/session' % feconf.TOPIC_VIEWER_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<abbreviated_topic_name>' %
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>' %
         feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<abbreviated_topic_name>/<story_id>' %
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<story_id>' %
         feconf.REVIEW_TEST_DATA_URL_PREFIX,
         review_tests.ReviewTestsPageDataHandler),
     get_redirect_route(
         r'%s/review-test/<story_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         review_tests.ReviewTestsPage),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<abbreviated_topic_name>/<story_id>'
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<story_id>'
         % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
         r'%s/story/<story_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<abbreviated_topic_name>/<story_id>'
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<story_id>'
         r'/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
         story_viewer.StoryProgressHandler),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<abbreviated_topic_name>/<subtopic_id>' %
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
@@ -331,11 +331,11 @@ URLS = MAPREDUCE_HANDLERS + [
         % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<abbreviated_topic_name>'
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
     get_redirect_route(
-        r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
+        r'%s/<classroom_url_fragment>' % feconf.CLASSROOM_DATA_HANDLER,
         classroom.ClassroomDataHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
@@ -799,13 +799,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
-]
 
-# Adding redirects for classroom pages.
-for classroom_url_fragment in feconf.CLASSROOM_PAGES:
-    URLS.append(
-        get_redirect_route(
-            r'/learn/%s' % classroom_url_fragment, classroom.ClassroomPage))
+    get_redirect_route(
+        r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+]
 
 # Adding redirects for topic landing pages.
 for subject in feconf.AVAILABLE_LANDING_PAGES:

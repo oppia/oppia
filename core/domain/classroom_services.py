@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import classroom_domain
 from core.domain import config_domain
 
 
@@ -40,18 +41,23 @@ def get_classroom_url_fragment_for_topic_id(topic_id):
     return constants.DUMMY_CLASSROOM_URL_FRAGMENT
 
 
-def get_classroom_dict_by_name(classroom_name):
-    """Returns the classroom dict for the provided classroom name.
+def get_classroom_by_url_fragment(classroom_url_fragment):
+    """Returns the classroom domain object for the provided classroom url
+    fragment.
 
     Args:
-        classroom_name: str. The classroom name.
+        classroom_url_fragment: str. The classroom url fragment.
 
     Returns:
-        dict|None. Returns the classroom dict if found or else returns None.
+        Classroom|None. Returns the classroom domain object if found or
+        else returns None.
     """
     topic_ids_for_classroom_pages = (
         config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value)
     for classroom_dict in topic_ids_for_classroom_pages:
-        if classroom_name in classroom_dict['name']:
-            return classroom_dict
+        if classroom_url_fragment == classroom_dict['url_fragment']:
+            return classroom_domain.Classroom(
+                classroom_dict['name'],
+                classroom_dict['url_fragment'],
+                classroom_dict['topic_ids'])
     return None

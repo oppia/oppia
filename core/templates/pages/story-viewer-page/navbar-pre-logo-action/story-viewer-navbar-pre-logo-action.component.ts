@@ -32,8 +32,8 @@ angular.module('oppia').component('storyViewerNavbarPreLogoAction', {
       ctrl.getTopicUrl = function() {
         return UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_STORY_URL_TEMPLATE, {
-            abbreviated_topic_name: (
-              UrlService.getAbbrevTopicNameFromLearnerUrl()),
+            topic_url_fragment: (
+              UrlService.getTopicUrlFragmentFromLearnerUrl()),
             classroom_url_fragment: (
               UrlService.getClassroomUrlFragmentFromLearnerUrl())
           });

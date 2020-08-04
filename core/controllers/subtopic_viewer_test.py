@@ -81,14 +81,14 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic, subtopic2], next_subtopic_id=3)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_topic(
             'topic_id_2', self.admin_id, name='Private_Name',
-            abbreviated_name='pvttopic',
+            abbreviated_name='pvttopic', url_fragment='pvttopic',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],

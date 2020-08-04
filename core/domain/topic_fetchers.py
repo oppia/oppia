@@ -146,6 +146,7 @@ def get_topic_from_model(topic_model):
     return topic_domain.Topic(
         topic_model.id, topic_model.name,
         topic_model.abbreviated_name,
+        topic_model.url_fragment,
         topic_model.thumbnail_filename,
         topic_model.thumbnail_bg_color,
         topic_model.description, [
@@ -234,19 +235,18 @@ def get_topic_by_name(topic_name):
     return topic
 
 
-def get_topic_by_abbreviated_name(abbreviated_topic_name):
+def get_topic_by_url_fragment(url_fragment):
     """Returns a domain object representing a topic.
 
     Args:
-        abbreviated_topic_name: str. The abbreviated name of the topic.
+        url_fragment: str. The url fragment of the topic.
 
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
     topic_model = (
-        topic_models.TopicModel.get_by_abbreviated_name(
-            abbreviated_topic_name))
+        topic_models.TopicModel.get_by_url_fragment(url_fragment))
     if topic_model is None:
         return None
 

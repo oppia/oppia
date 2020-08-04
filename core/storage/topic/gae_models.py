@@ -84,6 +84,9 @@ class TopicModel(base_models.VersionedModel):
     next_subtopic_id = ndb.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The url fragment of the topic.
+    # TODO(#10140): Topic url_fragment should be a required field.
+    url_fragment = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -150,23 +153,23 @@ class TopicModel(base_models.VersionedModel):
         """
         return TopicModel.query().filter(
             cls.canonical_name == topic_name.lower()).filter(
-                cls.deleted == False).get() #pylint: disable=singleton-comparison
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
     @classmethod
-    def get_by_abbreviated_name(cls, abbreviated_name):
-        """Gets TopicModel by topic_name. Returns None if the topic with
-        name topic_name doesn't exist.
+    def get_by_url_fragment(cls, url_fragment):
+        """Gets TopicModel by url_fragment. Returns None if the topic with
+        name url_fragment doesn't exist.
 
         Args:
-            abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
 
         Returns:
             TopicModel|None. The topic model of the topic or None if not
             found.
         """
         return TopicModel.query().filter(
-            cls.abbreviated_name == abbreviated_name.lower()).filter(
-                cls.deleted == False).get() #pylint: disable=singleton-comparison
+            cls.url_fragment == url_fragment.lower()).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
     @staticmethod
     def get_export_policy():
@@ -224,7 +227,7 @@ class TopicSummaryModel(base_models.BaseModel):
     A TopicSummaryModel instance stores the following information:
 
         id, description, language_code, last_updated, created_on, version,
-        abbreviated_name.
+        url_fragment.
 
     The key of each instance is the topic id.
     """
@@ -237,8 +240,8 @@ class TopicSummaryModel(base_models.BaseModel):
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
-    # The abbreviated name of the topic.
-    abbreviated_name = ndb.StringProperty(indexed=True, default='')
+    # The url fragment of the topic.
+    url_fragment = ndb.StringProperty(indexed=True)
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the

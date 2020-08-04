@@ -57,7 +57,7 @@ describe('Practice session page', function() {
 
   it('should load topic based on its id on url when component is initialized' +
     ' and set page title', function() {
-    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'abbrev-topic');
     spyOn(UrlService, 'getSelectedSubtopicsFromUrl').and.returnValue(
       '1,2,3,4,5');

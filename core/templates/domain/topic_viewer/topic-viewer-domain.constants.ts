@@ -18,14 +18,14 @@
 
 export class TopicViewerDomainConstants {
   public static TOPIC_DATA_URL_TEMPLATE = (
-    '/topic_data_handler/<classroom_url_fragment>/<abbreviated_topic_name>');
+    '/topic_data_handler/<classroom_url_fragment>/<topic_url_fragment>');
   public static STORY_VIEWER_URL_TEMPLATE = (
-    '/learn/<classroom_url_fragment>/<abbreviated_topic_name>/story/' +
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/story/' +
     '<story_id>');
   public static SUBTOPIC_VIEWER_URL_TEMPLATE = (
-    '/learn/<classroom_url_fragment>/<abbreviated_topic_name>/revision/' +
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/' +
     '<subtopic_id>');
   public static REVIEW_TESTS_URL_TEMPLATE = (
-    '/learn/<classroom_url_fragment>/<abbreviated_topic_name>/review-test/' +
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/review-test/' +
     '<story_id>');
 }

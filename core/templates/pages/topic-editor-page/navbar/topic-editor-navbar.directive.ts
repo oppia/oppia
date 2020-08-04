@@ -75,13 +75,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 'with the changes', 2000);
               return;
             }
-            var abbreviatedName = $scope.topic.getAbbreviatedName();
+            var topicUrlFragment = $scope.topic.getUrlFragment();
             var classroomUrlFragment = (
               TopicEditorStateService.getClassroomUrlFragment());
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 TOPIC_VIEWER_URL_TEMPLATE, {
-                  abbreviated_topic_name: abbreviatedName,
+                  topic_url_fragment: topicUrlFragment,
                   classroom_url_fragment: classroomUrlFragment
                 }
               ), 'blank');

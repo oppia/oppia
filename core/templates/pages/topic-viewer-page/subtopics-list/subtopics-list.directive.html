@@ -8,7 +8,7 @@
     </span>
     <div class="subtopics-container">
       <subtopic-summary-tile ng-repeat="subtopic in $ctrl.getSubtopics()"
-                             abbreviated-topic-name="$ctrl.getAbbreviatedTopicName()"
+                             topic-url-fragment="$ctrl.getTopicUrlFragment()"
                              classroom-url-fragment="$ctrl.getClassroomUrlFragment()"
                              subtopic="subtopic"
                              topic-id="$ctrl.getTopicId()">

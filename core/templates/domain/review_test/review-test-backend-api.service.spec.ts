@@ -47,7 +47,7 @@ describe('Review test backend API service', () => {
       ReviewTestBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getAbbrevTopicNameFromLearnerUrl').and.callFake(
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.callFake(
       () => 'abbrev-topic');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.callFake(
       () => 'math');

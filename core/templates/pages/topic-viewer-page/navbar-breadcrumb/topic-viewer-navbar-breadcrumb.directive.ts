@@ -36,7 +36,7 @@ angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [
           var ctrl = this;
           ctrl.$onInit = function() {
             TopicViewerBackendApiService.fetchTopicData(
-              UrlService.getAbbrevTopicNameFromLearnerUrl(),
+              UrlService.getTopicUrlFragmentFromLearnerUrl(),
               UrlService.getClassroomUrlFragmentFromLearnerUrl()).then(
               function(readOnlyTopic) {
                 $scope.topicName = readOnlyTopic.getTopicName();

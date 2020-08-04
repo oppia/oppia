@@ -29,8 +29,8 @@ import feconf
 class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
 
-    @acl_decorators.open_access
-    def get(self):
+    @acl_decorators.does_classroom_exist
+    def get(self, _):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS or not (
@@ -47,20 +47,17 @@ class ClassroomDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
-    def get(self, classroom_name):
+    @acl_decorators.does_classroom_exist
+    def get(self, classroom_url_fragment):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        classroom_dict = classroom_services.get_classroom_dict_by_name(
-            classroom_name)
+        classroom = classroom_services.get_classroom_by_url_fragment(
+            classroom_url_fragment)
 
-        if not classroom_dict:
-            raise self.PageNotFoundException
-
-        topic_ids = classroom_dict['topic_ids']
+        topic_ids = classroom.topic_ids
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_services.get_multi_topic_rights(topic_ids)
         topic_summary_dicts = [
@@ -70,7 +67,7 @@ class ClassroomDataHandler(base.BaseHandler):
 
         self.values.update({
             'topic_summary_dicts': topic_summary_dicts,
-            'classroom_url_fragment': classroom_dict['url_fragment']
+            'classroom_name': classroom.name
         })
         self.render_json(self.values)
 

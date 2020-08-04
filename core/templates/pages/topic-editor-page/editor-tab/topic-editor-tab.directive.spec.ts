@@ -222,21 +222,21 @@ describe('Topic editor tab directive', function() {
     expect(topicNameSpy).not.toHaveBeenCalled();
   });
 
-  it('should not call the TopicUpdateService if abbreviated name is same',
+  it('should not call the TopicUpdateService if url fragment is same',
     function() {
-      $scope.updateAbbreviatedTopicName('topic');
-      var abbrevTopicNameSpy = spyOn(
-        TopicUpdateService, 'setAbbreviatedTopicName');
-      $scope.updateAbbreviatedTopicName('topic');
-      expect(abbrevTopicNameSpy).not.toHaveBeenCalled();
+      $scope.updateTopicUrlFragment('topic');
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      $scope.updateTopicUrlFragment('topic');
+      expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
     });
 
-  it('should call the TopicUpdateService if abbreviated name is updated',
+  it('should call the TopicUpdateService if url fragment is updated',
     function() {
-      var abbrevTopicNameSpy = spyOn(
-        TopicUpdateService, 'setAbbreviatedTopicName');
-      $scope.updateAbbreviatedTopicName('topic');
-      expect(abbrevTopicNameSpy).toHaveBeenCalled();
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
+      $scope.updateTopicUrlFragment('topic');
+      expect(topicUrlFragmentSpy).toHaveBeenCalled();
     });
 
   it('should call the TopicUpdateService if thumbnail is updated', function() {

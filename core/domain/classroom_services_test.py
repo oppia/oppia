@@ -33,7 +33,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME, self.ADMIN_USERNAME])
 
-    def test_can_get_classroom_dict_by_name(self):
+    def test_can_get_classroom_by_url_fragment(self):
         topic_id = topic_services.get_new_topic_id()
         config_services.set_property(
             self.user_id_admin, 'topic_ids_for_classroom_pages', [{
@@ -41,14 +41,14 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'url_fragment': 'math',
                 'topic_ids': [topic_id]
             }])
-        classroom_dict = classroom_services.get_classroom_dict_by_name('math')
-        self.assertEqual(classroom_dict['name'], 'math')
-        self.assertEqual(classroom_dict['url_fragment'], 'math')
-        self.assertEqual(classroom_dict['topic_ids'], [topic_id])
+        classroom = classroom_services.get_classroom_by_url_fragment('math')
+        self.assertEqual(classroom.name, 'math')
+        self.assertEqual(classroom.url_fragment, 'math')
+        self.assertEqual(classroom.topic_ids, [topic_id])
 
     def test_return_none_when_classroom_cannot_be_found(self):
-        classroom_dict = classroom_services.get_classroom_dict_by_name('bio')
-        self.assertIsNone(classroom_dict)
+        classroom = classroom_services.get_classroom_by_url_fragment('bio')
+        self.assertIsNone(classroom)
 
     def test_get_classroom_url_fragment_for_topic_id(self):
         topic_id = topic_services.get_new_topic_id()

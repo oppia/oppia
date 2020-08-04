@@ -17,10 +17,10 @@
     </div>
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Topic URL Fragment</span></div>
-      <input class="protractor-test-new-topic-url-fragment-field" ng-model="newlyCreatedTopic.abbreviatedName" maxlength="<[MAX_CHARS_IN_ABBREV_TOPIC_NAME]>">
+      <input class="protractor-test-new-topic-url-fragment-field" ng-model="newlyCreatedTopic.urlFragment" maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>">
       <div class="oppia-input-box-subtitle">
         <i>
-          Topic URL fragment should be a short word or set of words in lowercase and separated by hyphens (-). Please use meaningful keywords and avoid using words like "and", "of", or "the". This will be used to uniquely access the topic viewer page. It should be at most <[MAX_CHARS_IN_ABBREV_TOPIC_NAME]> characters.
+          The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]> characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
         </i>
       </div>
     </div>

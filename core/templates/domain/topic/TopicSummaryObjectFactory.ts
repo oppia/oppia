@@ -56,7 +56,8 @@ export class TopicSummary {
       public topicModelLastUpdated: number,
       public canEditTopic: boolean,
       public isPublished: boolean,
-      public classroom: string) { }
+      public classroom: string,
+      public urlFragment: string) { }
 
   getId(): string {
     return this.id;
@@ -109,6 +110,10 @@ export class TopicSummary {
   getClassroom(): string {
     return this.classroom;
   }
+
+  getUrlFragment(): string {
+    return this.urlFragment;
+  }
 }
 
 @Injectable({
@@ -132,7 +137,8 @@ export class TopicSummaryObjectFactory {
       topicSummaryBackendDict.topic_model_last_updated,
       topicSummaryBackendDict.can_edit_topic,
       topicSummaryBackendDict.is_published,
-      topicSummaryBackendDict.classroom);
+      topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.url_fragment);
   }
 }
 

@@ -94,11 +94,11 @@ describe('Classroom page', () => {
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
         $q.resolve({
           topicSummaries: topicSummaryObjects,
-          classroomUrlFragment: 'math'
+          classroomName: 'Mock'
         }));
       spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-      spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(
+      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');
     });
 
@@ -131,7 +131,7 @@ describe('Classroom page', () => {
           status: 404
         }));
       spyOn(AlertsService, 'addWarning').and.callThrough();
-      spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(
+      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
         'mock');
     });
 

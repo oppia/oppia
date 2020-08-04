@@ -87,7 +87,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
-        self.topic.abbreviated_name = 'private'
+        self.topic.url_fragment = 'private'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)

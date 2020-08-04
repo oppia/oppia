@@ -62,7 +62,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         subtopic.skill_ids = [self.subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.linked_skill_id],
@@ -187,7 +187,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
         topic_id_2 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Topic1',
-            abbreviated_name='topic-one',
+            abbreviated_name='topic-one', url_fragment='topic-one',
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[skill_id],
@@ -201,7 +201,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
         })
         self.save_new_topic(
             topic_id_2, self.admin_id, name='Topic2',
-            abbreviated_name='topic-two',
+            abbreviated_name='topic-two', url_fragment='topic-two',
             description='Description2', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],

@@ -66,6 +66,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
             abbreviated_name='abbrev',
+            url_fragment='url-fragment',
             description='description',
             canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,

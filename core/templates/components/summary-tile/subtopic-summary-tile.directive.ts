@@ -26,7 +26,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getAbbreviatedTopicName: '&abbreviatedTopicName',
+        getTopicUrlFragment: '&topicUrlFragment',
         getClassroomUrlFragment: '&classroomUrlFragment',
         getSubtopic: '&subtopic',
         getTopicId: '&topicId'
@@ -45,7 +45,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 SUBTOPIC_VIEWER_URL_TEMPLATE, {
-                  abbreviated_topic_name: ctrl.getAbbreviatedTopicName(),
+                  topic_url_fragment: ctrl.getTopicUrlFragment(),
                   classroom_url_fragment: ctrl.getClassroomUrlFragment(),
                   subtopic_id: ctrl.getSubtopic().getId().toString()
                 }

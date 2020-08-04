@@ -98,7 +98,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
-            $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
+            $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
@@ -221,12 +221,12 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicNameEditorIsShown = false;
           };
 
-          $scope.updateAbbreviatedTopicName = function(newAbbrevName) {
-            if (newAbbrevName === $scope.topic.getAbbreviatedName()) {
+          $scope.updateTopicUrlFragment = function(newTopicUrlFragment) {
+            if (newTopicUrlFragment === $scope.topic.getUrlFragment()) {
               return;
             }
-            TopicUpdateService.setAbbreviatedTopicName(
-              $scope.topic, newAbbrevName);
+            TopicUpdateService.setTopicUrlFragment(
+              $scope.topic, newTopicUrlFragment);
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {

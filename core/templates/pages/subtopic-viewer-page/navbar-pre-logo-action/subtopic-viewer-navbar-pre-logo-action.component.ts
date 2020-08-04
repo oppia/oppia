@@ -32,12 +32,12 @@ angular.module('oppia').component('subtopicViewerNavbarPreLogoAction', {
       var ctrl = this;
 
       ctrl.$onInit = function() {
-        ctrl.abbreviatedTopicName = (
-          UrlService.getAbbrevTopicNameFromLearnerUrl());
+        ctrl.topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
 
         ctrl.topicUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_REVISION_URL_TEMPLATE, {
-            abbreviated_topic_name: ctrl.abbreviatedTopicName,
+            topic_url_fragment: ctrl.topicUrlFragment,
             classroom_url_fragment: (
               UrlService.getClassroomUrlFragmentFromLearnerUrl())
           });

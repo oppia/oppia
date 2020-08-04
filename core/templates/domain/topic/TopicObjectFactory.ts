@@ -50,6 +50,7 @@ interface TopicBackendDict {
   'subtopics': SubtopicBackendDict[];
   'canonical_story_references': StoryReferenceBackendDict[];
   'additional_story_references': StoryReferenceBackendDict[];
+  'url_fragment': string;
 }
 
 export class Topic {
@@ -66,11 +67,12 @@ export class Topic {
   _subtopics: Array<Subtopic>;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
+  _urlFragment: string;
   skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string, name: string, abbreviatedName: string,
+      id: string, name: string, abbreviatedName: string, urlFragment: string,
       description: string, languageCode: string,
       canonicalStoryReferences: Array<StoryReference>,
       additionalStoryReferences: Array<StoryReference>,
@@ -85,6 +87,7 @@ export class Topic {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
+    this._urlFragment = urlFragment;
     this._description = description;
     this._languageCode = languageCode;
     this._canonicalStoryReferences = canonicalStoryReferences;
@@ -123,6 +126,14 @@ export class Topic {
 
   setAbbreviatedName(abbreviatedName: string): void {
     this._abbreviatedName = abbreviatedName;
+  }
+
+  getUrlFragment(): string {
+    return this._urlFragment;
+  }
+
+  setUrlFragment(urlFragment: string): void {
+    this._urlFragment = urlFragment;
   }
 
   setThumbnailFilename(thumbnailFilename: string): void {
@@ -461,6 +472,7 @@ export class Topic {
     this._id = otherTopic.getId();
     this.setName(otherTopic.getName());
     this.setAbbreviatedName(otherTopic.getAbbreviatedName());
+    this.setUrlFragment(otherTopic.getUrlFragment());
     this.setThumbnailFilename(otherTopic.getThumbnailFilename());
     this.setThumbnailBgColor(otherTopic.getThumbnailBgColor());
     this.setDescription(otherTopic.getDescription());
@@ -519,6 +531,7 @@ export class TopicObjectFactory {
     return new Topic(
       topicBackendDict.id, topicBackendDict.name,
       topicBackendDict.abbreviated_name,
+      topicBackendDict.url_fragment,
       topicBackendDict.description, topicBackendDict.language_code,
       canonicalStoryReferences, additionalStoryReferences,
       topicBackendDict.uncategorized_skill_ids,
@@ -535,7 +548,8 @@ export class TopicObjectFactory {
   createInterstitialTopic(): Topic {
     return new Topic(
       null, 'Topic name loading', 'Abbrev. name loading',
-      'Topic description loading', 'en', [], [], [], 1, 1, [], '', '', {},
+      'Url Fragment loading', 'Topic description loading', 'en',
+      [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
       this.storyReferenceObjectFactory
     );

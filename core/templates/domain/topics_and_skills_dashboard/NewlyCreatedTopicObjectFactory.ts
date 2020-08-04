@@ -25,16 +25,16 @@ import { AppConstants } from 'app.constants';
 export class NewlyCreatedTopic {
   name: string;
   description: string;
-  abbreviatedName: string;
+  urlFragment: string;
   /**
    * @param {String} name - name of the topic.
    * @param {String} description - description of the topic.
-   * @param {String} abbreviatedName - abbreviated name of the topic.
+   * @param {String} urlFragment - url fragment of the topic.
    */
-  constructor(name, description, abbreviatedName) {
+  constructor(name, description, urlFragment) {
     this.name = name;
     this.description = description;
-    this.abbreviatedName = abbreviatedName;
+    this.urlFragment = urlFragment;
   }
   /**
    * @returns {Boolean} - A boolean indicating if the topic is valid.
@@ -45,8 +45,8 @@ export class NewlyCreatedTopic {
       // a way to get rid of the TS2339 error on AppConstants.
       AppConstants.VALID_URL_FRAGMENT_REGEX);
     return Boolean(
-      this.name && this.description && this.abbreviatedName &&
-      validUrlFragmentRegex.test(this.abbreviatedName));
+      this.name && this.description && this.urlFragment &&
+      validUrlFragmentRegex.test(this.urlFragment));
   }
 }
 

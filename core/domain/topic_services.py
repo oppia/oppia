@@ -113,7 +113,7 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.total_skill_count,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated,
-        topic_summary_model.abbreviated_name
+        topic_summary_model.url_fragment
     )
 
 
@@ -159,13 +159,14 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
             represent change commands made to the given topic.
     """
     topic.validate()
-    _check_topic_name_uniqueness(topic.name)
-    _check_abbrev_topic_name_uniqueness(topic.abbreviated_name)
+    does_topic_with_name_exist(topic.name)
+    does_topic_with_url_fragment_exist(topic.url_fragment)
     create_new_topic_rights(topic.id, committer_id)
     model = topic_models.TopicModel(
         id=topic.id,
         name=topic.name,
         abbreviated_name=topic.abbreviated_name,
+        url_fragment=topic.url_fragment,
         thumbnail_bg_color=topic.thumbnail_bg_color,
         thumbnail_filename=topic.thumbnail_filename,
         canonical_name=topic.canonical_name,
@@ -189,8 +190,8 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
     generate_topic_summary(topic.id)
 
 
-def _check_topic_name_uniqueness(topic_name):
-    """Checks if the topic name provided is unique.
+def does_topic_with_name_exist(topic_name):
+    """Checks if the topic with provided name exists.
 
     Args:
         topic_name: str. The topic name.
@@ -206,23 +207,23 @@ def _check_topic_name_uniqueness(topic_name):
             'Topic with name \'%s\' already exists' % topic_name)
 
 
-def _check_abbrev_topic_name_uniqueness(abbreviated_topic_name):
-    """Checks if the abbreviated topic name provided is unique.
+def does_topic_with_url_fragment_exist(url_fragment):
+    """Checks if topic with provided url fragment exists.
 
     Args:
-        abbreviated_topic_name: str. The abbreviated topic name.
+        url_fragment: str. The url fragment for the topic.
 
     Raises:
-        Exception. Topic with same abbreviated name already exists.
+        Exception. Topic with the same url fragment already exists.
     """
-    if not isinstance(abbreviated_topic_name, python_utils.BASESTRING):
+    if not isinstance(url_fragment, python_utils.BASESTRING):
         raise utils.ValidationError('Topic URL Fragment should be a string.')
     existing_topic = (
-        topic_fetchers.get_topic_by_abbreviated_name(abbreviated_topic_name))
+        topic_fetchers.get_topic_by_url_fragment(url_fragment))
     if existing_topic is not None:
         raise utils.ValidationError(
             'Topic with URL Fragment \'%s\' already exists'
-            % abbreviated_topic_name)
+            % url_fragment)
 
 
 def save_new_topic(committer_id, topic):
@@ -344,12 +345,15 @@ def apply_change_list(topic_id, change_list):
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
-                    _check_topic_name_uniqueness(change.new_value)
+                    does_topic_with_name_exist(change.new_value)
                     topic.update_name(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
-                    _check_abbrev_topic_name_uniqueness(change.new_value)
                     topic.update_abbreviated_name(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_URL_FRAGMENT):
+                    does_topic_with_url_fragment_exist(change.new_value)
+                    topic.update_url_fragment(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     topic.update_description(change.new_value)
@@ -466,6 +470,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.name = topic.name
     topic_model.canonical_name = topic.canonical_name
     topic_model.abbreviated_name = topic.abbreviated_name
+    topic_model.url_fragment = topic.url_fragment
     topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
     topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [
@@ -848,7 +853,7 @@ def compute_summary_of_topic(topic):
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
         total_skill_count, topic.created_on, topic.last_updated,
-        topic.abbreviated_name
+        topic.url_fragment
     )
 
     return topic_summary
@@ -875,7 +880,7 @@ def save_topic_summary(topic_summary):
         'total_skill_count': topic_summary.total_skill_count,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on,
-        'abbreviated_name': topic_summary.abbreviated_name
+        'url_fragment': topic_summary.url_fragment
     }
 
     topic_summary_model = (

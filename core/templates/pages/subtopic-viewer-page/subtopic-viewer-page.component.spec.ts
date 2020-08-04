@@ -68,7 +68,7 @@ describe('Subtopic viewer page', function() {
   }));
 
   it('should succesfully get subtopic data and set context', function() {
-    spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       abbreviatedTopicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
@@ -123,7 +123,7 @@ describe('Subtopic viewer page', function() {
 
   it('should use reject handler when fetching subtopic data fails',
     function() {
-      spyOn(UrlService, 'getAbbrevTopicNameFromLearnerUrl').and.returnValue(
+      spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         abbreviatedTopicName);
       spyOn(
         UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
