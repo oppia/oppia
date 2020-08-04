@@ -43,6 +43,5 @@ export class SideNavigationBarComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
-angular.module('oppia').directive(
-  'sideNavigationBar', downgradeComponent(
+angular.module('oppia').directive('sideNavigationBar', downgradeComponent(
     {component: SideNavigationBarComponent}));
