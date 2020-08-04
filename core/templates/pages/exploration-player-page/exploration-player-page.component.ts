@@ -38,10 +38,9 @@ angular.module('oppia').component('explorationPlayerPage', {
   template: require('./exploration-player-page.component.html'),
   controller: [
     'ContextService', 'KeyboardShortcutService',
-    '$timeout', 'PageTitleService',
-    'ReadOnlyExplorationBackendApiService',
+    'PageTitleService','ReadOnlyExplorationBackendApiService',
     function(
-        ContextService, KeyboardShortcutService, $timeout,
+        ContextService, KeyboardShortcutService,
         PageTitleService, ReadOnlyExplorationBackendApiService) {
       var ctrl = this;
       ctrl.$onInit = function() {
