@@ -175,8 +175,9 @@ export class Interaction {
   /**
    * This function is used to properly set state in Questions. The state in
    * Questions must handle its own WrittenTranslations and RecordedVoiceovers,
-   * so it must get all content ids in the state. See question-update.service.ts
-   * for more details.
+   * so it must get all content ids in the state. See
+   * question-update.service.ts _updateContentIdsInAssets method for more
+   * details.
    * @param {InteractionCustomizationArgs} customizationArgs The customization
    *  arguments to get content ids for.
    * @returns {string[]} List of content ids in customization args.
