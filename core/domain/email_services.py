@@ -157,11 +157,11 @@ def send_mail(
             utf-8.
 
     Raises:
-        Exception: The configuration in feconf.py forbids emails from being
+        Exception. The configuration in feconf.py forbids emails from being
             sent.
-        Exception: Any recipient email address is malformed.
-        Exception: Any sender email address is malformed.
-        Exception: The email was not sent correctly. In other words, the
+        Exception. Any recipient email address is malformed.
+        Exception. Any sender email address is malformed.
+        Exception. The email was not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
@@ -184,10 +184,10 @@ def send_mail(
         plaintext_body.encode(encoding='utf-8'),
         html_body.encode(encoding='utf-8'), bcc, reply_to, None)
     if not response:
-        raise Exception(
-            ('Email to %s failed to send. Please try again later or ' +
-             'contact us to report a bug at ' +
-             'https://www.oppia.org/contact.') % recipient_email)
+        raise Exception((
+            'Email to %s failed to send. Please try again later or ' +
+            'contact us to report a bug at ' +
+            'https://www.oppia.org/contact.') % recipient_email)
 
 
 def send_bulk_mail(
@@ -210,11 +210,11 @@ def send_bulk_mail(
             entity. Format must be utf-8.
 
     Raises:
-        Exception: The configuration in feconf.py forbids emails from being
+        Exception. The configuration in feconf.py forbids emails from being
             sent.
-        Exception: Any recipient email addresses are malformed.
-        Exception: Any sender email address is malformed.
-        Exception: The emails were not sent correctly. In other words, the
+        Exception. Any recipient email addresses are malformed.
+        Exception. Any sender email address is malformed.
+        Exception. The emails were not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """

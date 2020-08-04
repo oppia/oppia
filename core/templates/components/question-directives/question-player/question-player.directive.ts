@@ -117,6 +117,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
+require(
+  'pages/exploration-player-page/services/exploration-player-state.service.ts');
+
+import { Subscription } from 'rxjs';
 
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -138,7 +142,7 @@ angular.module('oppia').directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$uibModal', '$window',
-        'AlertsService', 'HtmlEscaperService',
+        'AlertsService', 'ExplorationPlayerStateService', 'HtmlEscaperService',
         'QuestionBackendApiService', 'SkillMasteryBackendApiService',
         'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
@@ -149,7 +153,7 @@ angular.module('oppia').directive('questionPlayer', [
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $uibModal, $window,
-            AlertsService, HtmlEscaperService,
+            AlertsService, ExplorationPlayerStateService, HtmlEscaperService,
             QuestionBackendApiService, SkillMasteryBackendApiService,
             UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
@@ -157,6 +161,7 @@ angular.module('oppia').directive('questionPlayer', [
             VIEW_HINT_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var initResults = function() {
             $scope.resultsLoaded = false;
             ctrl.currentQuestion = 0;
@@ -537,9 +542,13 @@ angular.module('oppia').directive('questionPlayer', [
               updateCurrentQuestion(result + 1);
             });
 
-            $rootScope.$on('totalQuestionsReceived', function(event, result) {
-              updateTotalQuestions(result);
-            });
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+                (result) => {
+                  updateTotalQuestions(result);
+                }
+              )
+            );
 
             $rootScope.$on('questionSessionCompleted', function(event, result) {
               $location.hash(HASH_PARAM +
@@ -573,6 +582,10 @@ angular.module('oppia').directive('questionPlayer', [
             // called in $scope.$on when some external events are triggered.
             initResults();
             ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

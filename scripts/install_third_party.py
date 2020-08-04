@@ -71,7 +71,8 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Installation script for Oppia third-party libraries.
 """)
 
@@ -208,7 +209,7 @@ def return_json(filepath):
     Returns:
         *. A parsed json object. Actual conversion is different based on input
         to json.loads. More details can be found here:
-            https://docs.python.org/3/library/json.html#encoders-and-decoders
+            https://docs.python.org/3/library/json.html#encoders-and-decoders.
     """
     response = get_file_contents(filepath)
     return json.loads(response)

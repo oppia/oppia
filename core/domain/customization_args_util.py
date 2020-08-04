@@ -81,7 +81,7 @@ def validate_customization_args_and_values(
                     variable.
 
     Raises:
-        ValidationError: The given 'customization_args' is not valid.
+        ValidationError. The given 'customization_args' is not valid.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]

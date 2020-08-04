@@ -22,14 +22,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import sys
 
-import github
 import python_utils
 import release_constants
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 
 def remove_release_labels(repo):
@@ -39,7 +41,7 @@ def remove_release_labels(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: If any PR is not released.
+        Exception. If any PR is not released.
     """
     current_release_label = repo.get_label(
         release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
@@ -79,7 +81,7 @@ def remove_blocking_bugs_milestone_from_issues(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: If there is an open issue with blocking bug milestone.
+        Exception. If there is an open issue with blocking bug milestone.
     """
     blocking_bugs_milestone = repo.get_milestone(
         number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)

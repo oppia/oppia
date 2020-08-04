@@ -41,8 +41,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """
 
     # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.StringProperty(required=True, choices=ALGORITHM_CHOICES,
-                                      indexed=True)
+    algorithm_id = ndb.StringProperty(
+        required=True, choices=ALGORITHM_CHOICES, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
     interaction_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
@@ -52,18 +52,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING.
-    status = ndb.StringProperty(required=True,
-                                choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                                default=feconf.TRAINING_JOB_STATUS_PENDING,
-                                indexed=True)
+    status = ndb.StringProperty(
+        required=True, choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
+        default=feconf.TRAINING_JOB_STATUS_PENDING, indexed=True)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
     # data group.
     training_data = ndb.JsonProperty(default=None)
     # The time when the job's status should next be checked.
     # It is incremented by TTL when a job with status NEW is picked up by VM.
-    next_scheduled_check_time = ndb.DateTimeProperty(required=True,
-                                                     indexed=True)
+    next_scheduled_check_time = ndb.DateTimeProperty(
+        required=True, indexed=True)
     # The schema version for the data that is being classified.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
@@ -86,10 +85,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new ClassifierTrainingJobModel instance.
+            str. ID of the new ClassifierTrainingJobModel instance.
 
         Raises:
-            Exception: The id generator for ClassifierTrainingJobModel is
+            Exception. The id generator for ClassifierTrainingJobModel is
                 producing too many collisions.
         """
 
@@ -130,10 +129,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             data_schema_version: int. The schema version for the data.
 
         Returns:
-            ID of the new ClassifierModel entry.
+            str. ID of the new ClassifierModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id)
@@ -161,7 +160,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            List of the ClassifierTrainingJobModels with status new or pending.
+            list(ClassifierTrainingJobModel). List of the
+            ClassifierTrainingJobModels with status new or pending.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
@@ -287,10 +287,10 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 combination of <exp_id, exp_version, state_name>.
 
         Returns:
-            ID of the new ClassifierExplorationMappingModel entry.
+            str. ID of the new ClassifierExplorationMappingModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id, exp_version, state_name)
