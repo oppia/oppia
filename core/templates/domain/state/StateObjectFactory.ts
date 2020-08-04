@@ -132,7 +132,7 @@ export class StateObjectFactory {
       recorded_voiceovers: newStateTemplate.recorded_voiceovers,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
       written_translations: newStateTemplate.written_translations,
-      next_content_id_index: newStateTemplate.next_interaction_id_index
+      next_content_id_index: newStateTemplate.next_content_id_index
     });
     newState.interaction.defaultOutcome.dest = newStateName;
     return newState;

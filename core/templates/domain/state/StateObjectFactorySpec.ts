@@ -143,6 +143,7 @@ describe('State Object Factory', () => {
         solution: null,
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {

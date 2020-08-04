@@ -382,15 +382,6 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
 
-  it('should save state next content id index successfully', function() {
-    stateEditorService.setActiveStateName('First State');
-    stateEditorService.setNextContentIdIndex(0);
-    expect(stateEditorService.nextContentIdIndex).toBe(0);
-
-    ctrl.saveNextContentIdIndex(2);
-    expect(stateEditorService.nextContentIdIndex).toBe(2);
-  });
-
   it('should save interaction answer groups successfully', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
