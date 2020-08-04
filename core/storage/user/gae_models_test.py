@@ -108,12 +108,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy_deletes_registered_users(self):
-        # trivial case where non-required attributes are not set.
+        # Trivial case where non-required attributes are not set.
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
 
-        # non-trivial case where non-required attributes are also set.
+        # Non-trivial case where non-required attributes are also set.
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_3_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID))
@@ -156,7 +156,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 feconf.ROLE_ID_ADMIN):
             self.assertIn(user, actual_users)
 
-    def test_export_data_nonexistent_user_raises_exception(self):
+    def test_export_data_for_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user not found'):
