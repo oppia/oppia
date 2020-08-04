@@ -69,7 +69,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
     GENERIC_DISPLAY_ALIAS = 'display_alias'
-    ASSOCIATED_PROFILE_IDS = ['profile_1_user_id', 'profile_2_user_id']
     USER_1_IMPACT_SCORE = 0.87
     USER_1_TOTAL_PLAYS = 33
     USER_1_AVERAGE_RATINGS = 4.37
@@ -328,8 +327,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
             preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
-            display_alias=self.GENERIC_DISPLAY_ALIAS,
-            associated_profile_user_ids=self.ASSOCIATED_PROFILE_IDS
+            display_alias=self.GENERIC_DISPLAY_ALIAS
         ).put()
 
         # Setup for GeneralFeedbackReplyToId.
@@ -539,8 +537,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'display_alias': None,
-            'associated_profile_user_ids': []
+            'display_alias': None
         }
         skill_data = {}
         stats_data = {}
@@ -815,8 +812,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS,
-            'associated_profile_user_ids': self.ASSOCIATED_PROFILE_IDS
+            'display_alias': self.GENERIC_DISPLAY_ALIAS
         }
 
         expected_reply_to_data = {

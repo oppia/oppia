@@ -118,10 +118,6 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
-    # List of profile user ids associated with a full user.
-    # This is None if the user model corresponds to a profile user.
-    associated_profile_user_ids = ndb.StringProperty(repeated=True)
-
 
     # DEPRECATED in 2.8.7. Do not use.
     gae_user_id = ndb.StringProperty(required=False, indexed=False)
@@ -212,8 +208,7 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
-            'display_alias': user.display_alias,
-            'associated_profile_user_ids': user.associated_profile_user_ids,
+            'display_alias': user.display_alias
         }
 
     @classmethod
