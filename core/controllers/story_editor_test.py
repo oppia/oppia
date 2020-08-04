@@ -325,7 +325,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             'Expected a commit message but received none.')
 
         self.logout()
-    
+
     def test_put_fails_with_long_commit_message(self):
         self.login(self.ADMIN_EMAIL)
 
@@ -346,12 +346,12 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
-        
+
         self.assertEqual(
             json_response['error'],
             'Commit messages must be at most 1000 characters long.')
 
-        self.logout() 
+        self.logout()
 
     def test_delete_can_not_access_story_handler_with_invalid_story_id(self):
         self.login(self.ADMIN_EMAIL)
