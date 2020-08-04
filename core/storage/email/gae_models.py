@@ -119,7 +119,7 @@ class SentEmailModel(base_models.BaseModel):
             str. The newly-generated ID for the SentEmailModel instance.
 
         Raises:
-            Exception: The id generator for SentEmailModel is producing
+            Exception. The id generator for SentEmailModel is producing
                 too many collisions.
         """
         id_prefix = '%s.' % intent
@@ -190,7 +190,7 @@ class SentEmailModel(base_models.BaseModel):
             value and sent more recently than sent_datetime_lower_bound.
 
         Raises:
-            Exception: sent_datetime_lower_bound is not a valid
+            Exception. The sent_datetime_lower_bound is not a valid
                 datetime.datetime.
         """
 
@@ -434,7 +434,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             with the unique reply_to_id generated.
 
         Raises:
-            Exception: Model instance for given user_id and
+            Exception. Model instance for given user_id and
                 thread_id already exists.
         """
 
