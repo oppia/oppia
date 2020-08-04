@@ -111,12 +111,12 @@ def get_multi(obj_ids, namespace, sub_namespace):
     """Get a dictionary of the {key, value} pairs from the memory cache.
 
     Args:
-        obj_ids: list(str). List of object ids to corresponding to values to get
-            from the cache.
+        obj_ids: list(str). List of object ids corresponding to values to
+            retrieve from the cache.
         namespace: str. The namespace under which the values associated with
-            these keys lie. The namespace determines how the keys are decoded
-            from their JSON encoded string. Use CACHE_NAMESPACE_DEFAULT as
-            namespace for keys that don't require serialization.
+            these object ids lie. The namespace determines how the keys are
+            decoded from their JSON encoded string. Use CACHE_NAMESPACE_DEFAULT
+            as namespace for objects that don't require deserialization.
         sub_namespace: str|None. Sub namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
             sub_namespace is the version number of the objects. If sub-namespace
@@ -156,10 +156,10 @@ def set_multi(id_value_mapping, namespace, sub_namespace):
     of a specific type or a primitype type.
 
     Args:
-        id_value_mapping: dict(str, *). A dict of {key, value} pairs to set to
+        id_value_mapping: dict(str, *). A dict of {id, value} pairs to set to
             the cache. The values must be of type value_type.
         namespace: str. The namespace under which the values associated with the
-            key lies. Use CACHE_NAMESPACE_DEFAULT as namespace for keys that
+            id lies. Use CACHE_NAMESPACE_DEFAULT as namespace for objects that
             don't require serialization.
         sub_namespace: str|None. Sub namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
@@ -194,8 +194,8 @@ def delete_multi(obj_ids, namespace, sub_namespace):
     Args:
         obj_ids: list(str). A list of id strings to delete from the cache.
         namespace: str. The namespace under which the values associated with the
-            key lies. Use CACHE_NAMESPACE_DEFAULT namespace for keys that don't
-            fall under any other namespaces.
+            id lies. Use CACHE_NAMESPACE_DEFAULT namespace for object ids that
+            don't fall under any other namespaces.
         sub_namespace: str|None. Sub namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
             sub_namespace is the version number of the objects. If sub-namespace
