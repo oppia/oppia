@@ -364,7 +364,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         with python_utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
-        actual_interaction_ids_ca_backend_interfaces = set()
+        actual_interaction_ca_backend_interfaces = set()
         actual_interaction_ca_frontend_interfaces = set()
 
         for line in lines:
@@ -403,7 +403,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             expected_interaction_ca_interfaces,
             actual_interaction_ca_frontend_interfaces)
 
-    def test_frontend_customization_args_defs_coverage(self):
+    def test_frontend_customization_args_constructor_coverage(self):
         """Test to ensure that InteractionObjectFactory.ts covers constructing
         customization arguments for each interaction. Uses regex to confirm
         that the CustomizationArgs interface is imported for each interaction

@@ -955,8 +955,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 dict. The unmodified customization argument value.
             """
             if (
-                schema_obj_type ==
-                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+                    schema_obj_type ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
             ):
                 return SubtitledUnicode(
                     ca_value['content_id'], ca_value['unicode_str'])
@@ -1102,8 +1102,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         schema_type = schema['type']
 
         if (
-            schema_type == schema_utils.SCHEMA_TYPE_CUSTOM and
-            schema['obj_type'] in search_obj_types
+                schema_type == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] in search_obj_types
         ):
             result.append(value_extractor(value))
         elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
