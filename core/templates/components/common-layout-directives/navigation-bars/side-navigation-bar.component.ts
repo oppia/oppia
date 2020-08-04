@@ -44,4 +44,4 @@ export class SideNavigationBarComponent implements OnInit {
   }
 }
 angular.module('oppia').directive('sideNavigationBar', downgradeComponent(
-    {component: SideNavigationBarComponent}));
+  {component: SideNavigationBarComponent}));
