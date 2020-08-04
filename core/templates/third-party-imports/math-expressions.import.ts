@@ -16,5 +16,7 @@
  * @fileoverview This file imports the Math Expressions library.
  */
 
+// TODO(#10154): Remove this file when MathExpressionInput
+// interaction is deprecated.
 window.MathExpression = require(
   'static/math-expressions-1.7.0/math-expressions.js');
