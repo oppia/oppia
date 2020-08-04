@@ -138,15 +138,15 @@ def get_multi(obj_ids, namespace, sub_namespace):
             'Invalid namespace: %s.' % namespace)
 
     namespaced_keys = []
-    for key in obj_ids:
+    for obj_id in obj_ids:
         namespaced_keys.append(
-            _get_namespaced_key_from_type(key, namespace, sub_namespace))
+            _get_namespaced_key_from_type(obj_id, namespace, sub_namespace))
     values = memory_cache_services.get_multi(namespaced_keys)
-    for key, value in python_utils.ZIP(obj_ids, values):
+    for obj_id, value in python_utils.ZIP(obj_ids, values):
         if value:
             deserialization_function = (
                 _get_deserialization_function_for_namespace(namespace))
-            result_dict[key] = deserialization_function(value)
+            result_dict[obj_id] = deserialization_function(value)
 
     return result_dict
 
@@ -180,9 +180,9 @@ def set_multi(id_value_mapping, namespace, sub_namespace):
             'Invalid namespace: %s.' % namespace)
 
     memory_cache_id_value_mapping = {}
-    for key, value in id_value_mapping.items():
+    for obj_id, value in id_value_mapping.items():
         unique_key = _get_namespaced_key_from_type(
-            key, namespace, sub_namespace)
+            obj_id, namespace, sub_namespace)
         memory_cache_id_value_mapping[unique_key] = (
             _get_serialized_string_for_namespace(value, namespace))
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
@@ -215,7 +215,7 @@ def delete_multi(obj_ids, namespace, sub_namespace):
             'Invalid namespace: %s.' % namespace)
 
     namespaced_keys = []
-    for key in obj_ids:
+    for obj_id in obj_ids:
         namespaced_keys.append(
-            _get_namespaced_key_from_type(key, namespace, sub_namespace))
+            _get_namespaced_key_from_type(obj_id, namespace, sub_namespace))
     return memory_cache_services.delete_multi(namespaced_keys) == len(obj_ids)
