@@ -66,7 +66,7 @@ import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 
 
-describe('Exploration editor tab component', function() {
+fdescribe('Exploration editor tab component', function() {
   var ctrl;
   var $q = null;
   var $scope = null;
