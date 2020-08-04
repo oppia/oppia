@@ -237,6 +237,35 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             },
         )
 
+    def _test_flavor_relation_holds(self, version, op, flavor_b):
+        """Helper method to test relation 'flavor_a <op> flavor_b' hold,
+        where flavor_a is the flavor of the argument 'version'.
+        """
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [(op, flavor_b)]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(
+                app_version=version)))
+
+    def _test_flavor_relation_does_not_hold(self, version, op, flavor_b):
+        """Helper method to test relation 'flavor_a <op> flavor_b' doesn't
+        holds, where flavor_a is the flavor of the argument 'version'.
+        """
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [(op, flavor_b)]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(
+                app_version=version)))
+
+
     def test_create_from_dict_returns_correct_instance(self):
         filter_dict = {'type': 'app_version', 'conditions': [('=', '1.2.3')]}
         filter_domain = (
@@ -472,235 +501,505 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self._create_example_context(app_version='2.0.0')))
 
-    def test_evaluate_eq_version_flavor_filter_with_small_flavor_returns_false(
+    def test_evaluate_alpha_version_with_eq_alpha_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '=', 'alpha')
 
-    def test_evaluate_eq_version_flavor_filter_with_same_flavor_returns_true(
+    def test_evaluate_alpha_version_with_eq_beta_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-test')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '=', 'beta')
 
-    def test_evaluate_eq_version_flavor_filter_with_large_flavor_returns_false(
+    def test_evaluate_alpha_version_with_eq_test_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-release')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '=', 'test')
 
-    def test_evaluate_eq_version_flavor_filter_with_none_flavor_returns_false(
+    def test_evaluate_alpha_version_with_eq_release_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '=', 'release')
 
-    def test_evaluate_gt_version_flavor_filter_with_small_flavor_returns_false(
+    def test_evaluate_alpha_version_with_lt_alpha_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '<', 'alpha')
 
-    def test_evaluate_gt_version_flavor_filter_with_same_flavor_returns_false(
+    def test_evaluate_alpha_version_with_lt_beta_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-test')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<', 'beta')
 
-    def test_evaluate_gt_version_flavor_filter_with_large_flavor_returns_true(
+    def test_evaluate_alpha_version_with_lt_test_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-release')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<', 'test')
 
-    def test_evaluate_gt_version_flavor_filter_with_none_flavor_returns_false(
+    def test_evaluate_alpha_version_with_lt_release_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<', 'release')
 
-    def test_evaluate_gte_version_flavor_filter_with_small_flavor_returns_false(
+    def test_evaluate_alpha_version_with_lte_alpha_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<=', 'alpha')
 
-    def test_evaluate_gte_version_flavor_filter_with_same_flavor_returns_false(
+    def test_evaluate_alpha_version_with_lte_beta_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-test')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<=', 'beta')
 
-    def test_evaluate_gte_version_flavor_filter_with_large_flavor_returns_true(
+    def test_evaluate_alpha_version_with_lte_test_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-release')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<=', 'test')
 
-    def test_evaluate_gte_version_flavor_filter_with_none_flavor_returns_false(
+    def test_evaluate_alpha_version_with_lte_release_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<=', 'release')
 
-    def test_evaluate_lte_version_flavor_filter_with_small_flavor_returns_true(
+    def test_evaluate_alpha_version_with_gt_alpha_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>', 'alpha')
 
-    def test_evaluate_lte_version_flavor_filter_with_same_flavor_returns_true(
+    def test_evaluate_alpha_version_with_gt_beta_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-test')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>', 'beta')
 
-    def test_evaluate_lte_version_flavor_filter_with_large_flavor_returns_false(
+    def test_evaluate_alpha_version_with_gt_test_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-release')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>', 'test')
 
-    def test_evaluate_lte_version_flavor_filter_with_none_flavor_returns_false(
+    def test_evaluate_alpha_version_with_gt_release_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>', 'release')
 
-    def test_evaluate_lt_version_flavor_filter_with_small_flavor_returns_true(
+    def test_evaluate_alpha_version_with_gte_alpha_cond_returns_true(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '>=', 'alpha')
 
-    def test_evaluate_lt_version_flavor_filter_with_same_flavor_returns_false(
+    def test_evaluate_alpha_version_with_gte_beta_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-test')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>=', 'beta')
 
-    def test_evaluate_lt_version_flavor_filter_with_large_flavor_returns_false(
+    def test_evaluate_alpha_version_with_gte_test_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-release')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>=', 'test')
 
-    def test_evaluate_lt_version_flavor_filter_with_none_flavor_returns_false(
+    def test_evaluate_alpha_version_with_gte_release_cond_returns_false(
             self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
-            )
-        )
-        self.assertFalse(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0')))
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>=', 'release')
+
+    def test_evaluate_beta_version_with_eq_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '=', 'alpha')
+
+    def test_evaluate_beta_version_with_eq_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '=', 'beta')
+
+    def test_evaluate_beta_version_with_eq_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '=', 'test')
+
+    def test_evaluate_beta_version_with_eq_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '=', 'release')
+
+    def test_evaluate_beta_version_with_lt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<', 'alpha')
+
+    def test_evaluate_beta_version_with_lt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<', 'beta')
+
+    def test_evaluate_beta_version_with_lt_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<', 'test')
+
+    def test_evaluate_beta_version_with_lt_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<', 'release')
+
+    def test_evaluate_beta_version_with_lte_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<=', 'alpha')
+
+    def test_evaluate_beta_version_with_lte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<=', 'beta')
+
+    def test_evaluate_beta_version_with_lte_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<=', 'test')
+
+    def test_evaluate_beta_version_with_lte_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<=', 'release')
+
+    def test_evaluate_beta_version_with_gt_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>', 'alpha')
+
+    def test_evaluate_beta_version_with_gt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>', 'beta')
+
+    def test_evaluate_beta_version_with_gt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>', 'test')
+
+    def test_evaluate_beta_version_with_gt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>', 'release')
+
+    def test_evaluate_beta_version_with_gte_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>=', 'alpha')
+
+    def test_evaluate_beta_version_with_gte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>=', 'beta')
+
+    def test_evaluate_beta_version_with_gte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>=', 'test')
+
+    def test_evaluate_beta_version_with_gte_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>=', 'release')
+
+    def test_evaluate_test_version_with_eq_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '=', 'alpha')
+
+    def test_evaluate_test_version_with_eq_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '=', 'beta')
+
+    def test_evaluate_test_version_with_eq_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '=', 'test')
+
+    def test_evaluate_test_version_with_eq_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '=', 'release')
+
+    def test_evaluate_test_version_with_lt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '<', 'alpha')
+
+    def test_evaluate_test_version_with_lt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '<', 'beta')
+
+    def test_evaluate_test_version_with_lt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '<', 'test')
+
+    def test_evaluate_test_version_with_lt_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '<', 'release')
+
+    def test_evaluate_test_version_with_lte_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '<=', 'alpha')
+
+    def test_evaluate_test_version_with_lte_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '<=', 'beta')
+
+    def test_evaluate_test_version_with_lte_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '<=', 'test')
+
+    def test_evaluate_test_version_with_lte_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '<=', 'release')
+
+    def test_evaluate_test_version_with_gt_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '>', 'alpha')
+
+    def test_evaluate_test_version_with_gt_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '>', 'beta')
+
+    def test_evaluate_test_version_with_gt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '>', 'test')
+
+    def test_evaluate_test_version_with_gt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '>', 'release')
+
+    def test_evaluate_test_version_with_gte_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '>=', 'alpha')
+
+    def test_evaluate_test_version_with_gte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '>=', 'beta')
+
+    def test_evaluate_test_version_with_gte_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '>=', 'test')
+
+    def test_evaluate_test_version_with_gte_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '>=', 'release')
+
+    def test_evaluate_release_version_with_eq_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '=', 'alpha')
+
+    def test_evaluate_release_version_with_eq_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '=', 'beta')
+
+    def test_evaluate_release_version_with_eq_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '=', 'test')
+
+    def test_evaluate_release_version_with_eq_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '=', 'release')
+
+    def test_evaluate_release_version_with_lt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<', 'alpha')
+
+    def test_evaluate_release_version_with_lt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<', 'beta')
+
+    def test_evaluate_release_version_with_lt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<', 'test')
+
+    def test_evaluate_release_version_with_lt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<', 'release')
+
+    def test_evaluate_release_version_with_lte_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<=', 'alpha')
+
+    def test_evaluate_release_version_with_lte_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<=', 'beta')
+
+    def test_evaluate_release_version_with_lte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<=', 'test')
+
+    def test_evaluate_release_version_with_lte_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '<=', 'release')
+
+    def test_evaluate_release_version_with_gt_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>', 'alpha')
+
+    def test_evaluate_release_version_with_gt_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>', 'beta')
+
+    def test_evaluate_release_version_with_gt_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>', 'test')
+
+    def test_evaluate_release_version_with_gt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '>', 'release')
+
+    def test_evaluate_release_version_with_gte_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>=', 'alpha')
+
+    def test_evaluate_release_version_with_gte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>=', 'beta')
+
+    def test_evaluate_release_version_with_gte_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>=', 'test')
+
+    def test_evaluate_release_version_with_gte_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>=', 'release')
+
+    def test_evaluate_unspecified_version_with_eq_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '=', 'alpha')
+
+    def test_evaluate_unspecified_version_with_eq_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '=', 'beta')
+
+    def test_evaluate_unspecified_version_with_eq_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '=', 'test')
+
+    def test_evaluate_unspecified_version_with_eq_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '=', 'release')
+
+    def test_evaluate_unspecified_version_with_lt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<', 'alpha')
+
+    def test_evaluate_unspecified_version_with_lt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<', 'beta')
+
+    def test_evaluate_unspecified_version_with_lt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<', 'test')
+
+    def test_evaluate_unspecified_version_with_lt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<', 'release')
+
+    def test_evaluate_unspecified_version_with_lte_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<=', 'alpha')
+
+    def test_evaluate_unspecified_version_with_lte_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<=', 'beta')
+
+    def test_evaluate_unspecified_version_with_lte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<=', 'test')
+
+    def test_evaluate_unspecified_version_with_lte_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<=', 'release')
+
+    def test_evaluate_unspecified_version_with_gt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>', 'alpha')
+
+    def test_evaluate_unspecified_version_with_gt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>', 'beta')
+
+    def test_evaluate_unspecified_version_with_gt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>', 'test')
+
+    def test_evaluate_unspecified_version_with_gt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>', 'release')
+
+    def test_evaluate_unspecified_version_with_gte_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>=', 'alpha')
+
+    def test_evaluate_unspecified_version_with_gte_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>=', 'beta')
+
+    def test_evaluate_unspecified_version_with_gte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>=', 'test')
+
+    def test_evaluate_unspecified_version_with_gte_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>=', 'release')
 
     def test_evaluate_multi_value_filter_with_one_matched_returns_true(self):
         filter_dict = {
