@@ -167,6 +167,22 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid version \'a.a.a\''):
             context.validate()
 
+    def test_validate_with_invalid_app_version_flavor_raises_exception(self):
+        context = parameter_domain.EvaluationContext.from_dict(
+            {
+                'client_type': 'Android',
+                'browser_type': None,
+                'app_version': '1.0.0-abcedef-invalid',
+                'user_locale': 'en',
+            },
+            {
+                'server_mode': 'dev',
+            },
+        )
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid version flavor \'invalid\''):
+            context.validate()
+
     def test_validate_with_invalid_user_locale_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
@@ -456,45 +472,231 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self._create_example_context(app_version='2.0.0')))
 
-    def test_evaluate_version_flavor_filter_with_matched_flavor_returns_true(
+    def test_evaluate_eq_version_flavor_filter_with_small_flavor_returns_false(
             self):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'beta')]}
-            )
-        )
-        self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0-abcdef-beta')))
-
-    def test_evaluate_version_flavor_filter_with_unmatched_flavor_returns_false(
-            self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'beta')]}
+                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
             )
         )
         self.assertFalse(filter_domain.evaluate(
             self._create_example_context(app_version='1.10.0-abcdef-alpha')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-beta')))
 
-    def test_evaluate_na_version_flavor_filter_without_flavor_returns_true(
+    def test_evaluate_eq_version_flavor_filter_with_same_flavor_returns_true(
             self):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'n/a')]}
+                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
             )
         )
         self.assertTrue(filter_domain.evaluate(
-            self._create_example_context(app_version='1.10.0')))
+            self._create_example_context(app_version='1.10.0-abcdef-test')))
 
-    def test_evaluate_beta_version_flavor_filter_without_flavor_returns_false(
+    def test_evaluate_eq_version_flavor_filter_with_large_flavor_returns_false(
             self):
         filter_domain = (
             parameter_domain
             .PlatformParameterFilter.from_dict(
-                {'type': 'app_version_flavor', 'conditions': [('=', 'beta')]}
+                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-release')))
+
+    def test_evaluate_eq_version_flavor_filter_with_none_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('=', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+
+    def test_evaluate_gt_version_flavor_filter_with_small_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+
+    def test_evaluate_gt_version_flavor_filter_with_same_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-test')))
+
+    def test_evaluate_gt_version_flavor_filter_with_large_flavor_returns_true(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-release')))
+
+    def test_evaluate_gt_version_flavor_filter_with_none_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+
+    def test_evaluate_gte_version_flavor_filter_with_small_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+
+    def test_evaluate_gte_version_flavor_filter_with_same_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-test')))
+
+    def test_evaluate_gte_version_flavor_filter_with_large_flavor_returns_true(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-release')))
+
+    def test_evaluate_gte_version_flavor_filter_with_none_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('>=', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+
+    def test_evaluate_lte_version_flavor_filter_with_small_flavor_returns_true(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+
+    def test_evaluate_lte_version_flavor_filter_with_same_flavor_returns_true(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-test')))
+
+    def test_evaluate_lte_version_flavor_filter_with_large_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-release')))
+
+    def test_evaluate_lte_version_flavor_filter_with_none_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<=', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0')))
+
+    def test_evaluate_lt_version_flavor_filter_with_small_flavor_returns_true(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
+            )
+        )
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-alpha')))
+        self.assertTrue(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-beta')))
+
+    def test_evaluate_lt_version_flavor_filter_with_same_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-test')))
+
+    def test_evaluate_lt_version_flavor_filter_with_large_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
+            )
+        )
+        self.assertFalse(filter_domain.evaluate(
+            self._create_example_context(app_version='1.10.0-abcdef-release')))
+
+    def test_evaluate_lt_version_flavor_filter_with_none_flavor_returns_false(
+            self):
+        filter_domain = (
+            parameter_domain
+            .PlatformParameterFilter.from_dict(
+                {'type': 'app_version_flavor', 'conditions': [('<', 'test')]}
             )
         )
         self.assertFalse(filter_domain.evaluate(

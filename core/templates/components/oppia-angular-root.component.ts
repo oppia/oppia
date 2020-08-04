@@ -330,6 +330,8 @@ import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from
   'domain/admin/job-status-summary-object.factory';
+import { KeyboardShortcutService } from
+  'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -467,6 +469,8 @@ import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
+import { ProfileLinkImageBackendApiService } from
+  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
@@ -903,6 +907,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static predictionResultObjectFactory: PredictionResultObjectFactory;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
+  static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static profileSummaryObjectFactory: ProfileSummaryObjectFactory;
   static pythonProgramTokenizer: PythonProgramTokenizer;
@@ -946,6 +951,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateContentService: StateContentService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
   static stateEditorService: StateEditorService;
+  static keyboardShortcutService: KeyboardShortcutService;
   static stateGraphLayoutService: StateGraphLayoutService;
   static stateHintsService: StateHintsService;
   static stateInteractionIdService: StateInteractionIdService;
@@ -1225,6 +1231,7 @@ private playthroughService: PlaythroughService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private predictionResultObjectFactory: PredictionResultObjectFactory,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
+private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
 private pythonProgramTokenizer: PythonProgramTokenizer,
@@ -1268,6 +1275,7 @@ private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
 private stateEditorService: StateEditorService,
+private keyboardShortcutService: KeyboardShortcutService,
 private stateGraphLayoutService: StateGraphLayoutService,
 private stateHintsService: StateHintsService,
 private stateInteractionIdService: StateInteractionIdService,
@@ -1548,6 +1556,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = this.predictionAlgorithmRegistryService;
     OppiaAngularRootComponent.predictionResultObjectFactory = this.predictionResultObjectFactory;
     OppiaAngularRootComponent.pretestQuestionBackendApiService = this.pretestQuestionBackendApiService;
+    OppiaAngularRootComponent.profileLinkImageBackendApiService = this.profileLinkImageBackendApiService;
     OppiaAngularRootComponent.profilePageBackendApiService = this.profilePageBackendApiService;
     OppiaAngularRootComponent.profileSummaryObjectFactory = this.profileSummaryObjectFactory;
     OppiaAngularRootComponent.pythonProgramTokenizer = this.pythonProgramTokenizer;
@@ -1591,6 +1600,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateContentService = this.stateContentService;
     OppiaAngularRootComponent.stateCustomizationArgsService = this.stateCustomizationArgsService;
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
+    OppiaAngularRootComponent.keyboardShortcutService = this.keyboardShortcutService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;
     OppiaAngularRootComponent.stateHintsService = this.stateHintsService;
     OppiaAngularRootComponent.stateInteractionIdService = this.stateInteractionIdService;

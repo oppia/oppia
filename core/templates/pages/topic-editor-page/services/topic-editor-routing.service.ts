@@ -16,12 +16,15 @@
  * @fileoverview Service that handles routing for the topic editor page.
  */
 require('domain/utilities/url-interpolation.service.ts');
+require('services/page-title.service.ts');
 
 
 angular.module('oppia').factory('TopicEditorRoutingService', [
-  '$location', '$rootScope', '$window', 'UrlInterpolationService',
+  '$location', '$rootScope', '$window', 'PageTitleService',
+  'UrlInterpolationService',
   function(
-      $location, $rootScope, $window, UrlInterpolationService) {
+      $location, $rootScope, $window, PageTitleService,
+      UrlInterpolationService) {
     var MAIN_TAB = 'main';
     var SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
     var SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
@@ -68,18 +71,22 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
       },
       navigateToMainTab: function() {
         lastTabVisited = 'topic';
+        PageTitleService.setPageTitleForMobileView('Topic Editor');
         $location.path('');
       },
       navigateToSubtopicPreviewTab: function(subtopicId) {
         lastTabVisited = 'subtopic';
+        PageTitleService.setPageTitleForMobileView('Subtopic Preview');
         $location.path('/subtopic_preview/' + subtopicId);
       },
       navigateToSubtopicEditorWithId: function(subtopicId) {
         lastTabVisited = 'subtopic';
+        PageTitleService.setPageTitleForMobileView('Subtopic Editor');
         $location.path('/subtopic_editor/' + subtopicId);
       },
       navigateToQuestionsTab: function() {
         lastSubtopicId = this.getSubtopicIdFromUrl();
+        PageTitleService.setPageTitleForMobileView('Question Editor');
         $location.path('/questions');
       },
       getSubtopicIdFromUrl: function() {
