@@ -19,8 +19,17 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeInteraction = function() {
-  // There are no customizations.
+var customizeInteraction = async function(elem, customLetters) {
+  expect(await elem.element(
+    by.css('.protractor-test-custom-letters-div')).isPresent()).toBe(true);
+  for (let letter of customLetters) {
+    await elem.element(by.buttonText('abc')).click();
+    let letterIsPresent = await elem.element(by.buttonText(letter)).isPresent();
+    if (!letterIsPresent) {
+      await elem.element(by.buttonText('αβγ')).click();
+    }
+    await elem.element(by.buttonText(letter)).click();
+  }
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {
@@ -44,13 +53,13 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'MathEquation';
 
 var testSuite = [{
-  interactionArguments: [],
+  interactionArguments: [['y', 'm', 'x', 'c']],
   ruleArguments: ['IsEquivalentTo', 'y=m*x+c'],
   expectedInteractionDetails: [],
   wrongAnswers: ['x=m*y+c', 'y+m*x+c=0', 'y=m*x+b', 'y=m*x'],
   correctAnswers: ['y=m*x+c', 'y=c+m*x', 'm*x+c=y', 'y-m*x=c', 'y-m*x-c=0']
 }, {
-  interactionArguments: [],
+  interactionArguments: [['x']],
   ruleArguments: ['IsEquivalentTo', '(2*x+1)*(x-3)=0'],
   expectedInteractionDetails: [],
   wrongAnswers: ['x-y=x-y', 'x=3', '2*x+1=0', 'x=-1/2'],
@@ -58,13 +67,13 @@ var testSuite = [{
     '(2*x+1)*(x-3)=0', '0=(2*x+1)*(x-3)', '2*x*x-6*x=3-x', '-2*x*x+5*x+3=0',
     '(2*x+1)*(-x+3)=0']
 }, {
-  interactionArguments: [],
+  interactionArguments: [['y', 'm', 'x', 'c']],
   ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on Left Hand Side'],
   expectedInteractionDetails: [],
   wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
   correctAnswers: ['y=m*x+c', 'y=m*x^2+c', '2*y-y=m*x+c', 'y=0', 'y=m*x-c']
 }, {
-  interactionArguments: [],
+  interactionArguments: [['y', 'm', 'x', 'c']],
   ruleArguments: ['MatchesExactlyWith', 'y=m*x+c', 'on both sides'],
   expectedInteractionDetails: [],
   wrongAnswers: ['y-m*x=c', 'm*x+c=y', 'x=m*y+c'],
