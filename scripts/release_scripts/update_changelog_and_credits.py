@@ -27,15 +27,17 @@ import os
 import subprocess
 import sys
 
-import github
 import python_utils
 import release_constants
 from scripts import common
 from scripts.release_scripts import generate_release_info
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
+
+import github  # isort:skip pylint: disable=wrong-import-position
 
 ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
     'core', 'templates', 'pages', 'about-page',
@@ -147,8 +149,8 @@ def get_previous_release_version(branch_type, current_release_version_number):
         str. The previous version.
 
     Raises:
-        Exception: Branch type is invalid.
-        Exception: Previous release version is same as current release version.
+        Exception. Branch type is invalid.
+        Exception. Previous release version is same as current release version.
     """
     all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
