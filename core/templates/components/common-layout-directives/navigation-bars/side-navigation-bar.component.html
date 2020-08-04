@@ -126,9 +126,9 @@
     <li>
       <a href="https://medium.com/oppia-org" target="_blank" rel="noopener">
         <picture>
-          <source type="image/webp" [srcset]="{{getStaticImageUrl('/sidebar/blogger.webp')}}">
-          <source type="image/png" [srcset]="{{getStaticImageUrl('/sidebar/blogger.png')}}">
-          <img [src]="{{getStaticImageUrl('/sidebar/blogger.png')}}" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
+          <source type="image/webp" [srcset]="getStaticImageUrl('/sidebar/blogger.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/sidebar/blogger.png')">
+          <img [src]="getStaticImageUrl('/sidebar/blogger.png')" class="oppia-sidebar-menu-icon" alt="Oppia Blog">
         </picture>
         <span [innerHTML]="'I18N_SIDEBAR_BLOG' | translate"></span>
       </a>
@@ -144,9 +144,9 @@
     <li>
       <a href="http://oppiafoundation.org/" target="_blank" rel="noopener">
         <picture>
-          <source type="image/webp" [srcset]="{{getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')}}">
-          <source type="image/png" [srcset]="{{getStaticImageUrl('/sidebar/oppia-foundation-logo.png')}}">
-          <img [src]="{{getStaticImageUrl('/sidebar/oppia-foundation-logo.png')}}" class="oppia-sidebar-menu-icon" alt="Oppia Foundation">
+          <source type="image/webp" [srcset]="getStaticImageUrl('/sidebar/oppia-foundation-logo.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/sidebar/oppia-foundation-logo.png')">
+          <img [src]="getStaticImageUrl('/sidebar/oppia-foundation-logo.png')" class="oppia-sidebar-menu-icon" alt="Oppia Foundation">
         </picture>
         <span [innerHTML]="'I18N_SIDEBAR_OPPIA_FOUNDATION' | translate"></span>
       </a>
