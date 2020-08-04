@@ -152,7 +152,7 @@ require('pages/interaction-specs.constants.ajs.ts');
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
+    '$q', '$scope', '$rootScope', '$templateCache', '$timeout', '$uibModal',
     'AutosaveInfoModalsService', 'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
@@ -171,7 +171,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
-        $q, $scope, $templateCache, $timeout, $uibModal,
+        $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
@@ -445,6 +445,50 @@ angular.module('oppia').component('explorationEditorPage', {
           SiteAnalyticsService.registerDeclineTutorialModalEvent(
             explorationId);
           StateTutorialFirstTimeService.markEditorTutorialFinished();
+        });
+      };
+      ctrl.getNavbarText = function() {
+        return 'Exploration Editor';
+      };
+
+      ctrl.countWarnings = () => ExplorationWarningsService.countWarnings();
+      ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
+      ctrl.hasCriticalWarnings = (
+        () => ExplorationWarningsService.hasCriticalWarnings);
+      ctrl.selectMainTab = () => RouterService.navigateToMainTab();
+      ctrl.selectTranslationTab = (
+        () => RouterService.navigateToTranslationTab());
+      ctrl.selectPreviewTab = () => RouterService.navigateToPreviewTab();
+      ctrl.selectSettingsTab = () => RouterService.navigateToSettingsTab();
+      ctrl.selectStatsTab = () => RouterService.navigateToStatsTab();
+      ctrl.selectImprovementsTab = (
+        () => RouterService.navigateToImprovementsTab());
+      ctrl.selectHistoryTab = () => RouterService.navigateToHistoryTab();
+      ctrl.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
+      ctrl.getOpenThreadsCount = (
+        () => ThreadDataService.getOpenThreadsCount());
+      ctrl.showUserHelpModal = () => {
+        var explorationId = ContextService.getExplorationId();
+        SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+        var EDITOR_TUTORIAL_MODE = 'editor';
+        var TRANSLATION_TUTORIAL_MODE = 'translation';
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/modal-templates/' +
+              'help-modal.template.html'),
+          backdrop: true,
+          controller: 'HelpModalController',
+          windowClass: 'oppia-help-modal'
+        }).result.then(mode => {
+          if (mode === EDITOR_TUTORIAL_MODE) {
+            $rootScope.$broadcast('openEditorTutorial');
+          } else if (mode === TRANSLATION_TUTORIAL_MODE) {
+            $rootScope.$broadcast('openTranslationTutorial');
+          }
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       };
 
