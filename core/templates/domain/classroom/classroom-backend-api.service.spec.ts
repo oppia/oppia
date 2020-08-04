@@ -44,7 +44,8 @@ describe('Classroom backend API service', function() {
       version: 1,
       additional_story_count: 0,
       topic_model_created_on: 231241343,
-      topic_model_last_updated: 3454354354
+      topic_model_last_updated: 3454354354,
+      url_fragment: 'topic-name-one'
     }, {
       id: 'topic2',
       name: 'Topic name 2',
@@ -57,7 +58,8 @@ describe('Classroom backend API service', function() {
       version: 1,
       additional_story_count: 0,
       topic_model_created_on: 231241343,
-      topic_model_last_updated: 3454354354
+      topic_model_last_updated: 3454354354,
+      url_fragment: 'topic-name-two'
     }],
     classroom_name: 'math'
   };
