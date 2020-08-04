@@ -39,7 +39,8 @@ describe('Keyboard Shortcuts', () => {
       'class', 'protractor-test-continue-to-next-card-button');
     searchBar.setAttribute(
       'class', 'protractor-test-search-input');
-    categoryBar.setAttribute('class', 'protractor-test-search-bar-dropdown-toggle');
+    categoryBar.setAttribute(
+      'class', 'protractor-test-search-bar-dropdown-toggle');
     document.body.append(skipButton);
     document.body.append(continueButton);
     document.body.append(backButton);
