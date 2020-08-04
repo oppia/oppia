@@ -35,10 +35,10 @@ describe('Command executor service', () => {
     setupWindowRef(wrf);
     wrf.nativeWindow.parent.postMessage = function(message) {
       mockWindow.state = message;
-    }
+    };
     spy = spyOn(ces.windowWrapperMessageService, 'addEventListener');
     ces.getOuterFrameEvents(wrf);
-    done()
+    done();
   });
 
   var continueBoolean = false;
@@ -185,7 +185,7 @@ describe('Command executor service', () => {
     var textbox = wrf.nativeWindow.document.getElementsByClassName(
       'form-control')[0] as HTMLInputElement;
     expect(textbox.value).toEqual('1');
-  })
+  });
 
   it('should add two elements to set', () => {
     expect(spy).toHaveBeenCalled();
@@ -233,7 +233,7 @@ describe('Command executor service', () => {
     listener(messageEvent);
     var textbox = wrf.nativeWindow.document.getElementsByClassName(
       'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r'
-      )[0] as HTMLInputElement;
+    )[0] as HTMLInputElement;
     expect(textbox.value).toEqual('2/3');
   });
 
@@ -313,11 +313,11 @@ describe('Command executor service', () => {
   });
 
   it('should attempt to send parent ready state', () => {
-    ces.windowWrapperMessageService.postMessageToParent = 
+    ces.windowWrapperMessageService.postMessageToParent =
     jasmine.createSpy('parentMessage spy');
     ces.sendParentReadyState(wrf);
     expect(ces.windowWrapperMessageService.postMessageToParent)
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
   });
 
   it('should mimic send state to outer frame', () => {
@@ -328,30 +328,30 @@ describe('Command executor service', () => {
       data: 'HOSTNAME mockWindow'
     });
     listener(messageEvent);
-    ces.windowWrapperMessageService.postMessageToParent = 
+    ces.windowWrapperMessageService.postMessageToParent =
     jasmine.createSpy('parentMessage spy');
     ces.sendStateToOuterFrame('Continue');
     expect(ces.windowWrapperMessageService.postMessageToParent)
-    .toHaveBeenCalledWith('CONTINUE', 'mockWindow');
+      .toHaveBeenCalledWith('CONTINUE', 'mockWindow');
   });
 
-  it('should send the cached message after hostname load', 
-  () => {
-    ces.sendStateToOuterFrame('SetInput');
-    expect(ces.cachedOuterFrameMessage).toEqual('SET_OPERATION');
-    expect(spy).toHaveBeenCalled();
-    expect(spy.calls.mostRecent().args[0]).toEqual('message');
-    var listener = spy.calls.mostRecent().args[1];
-    ces.windowWrapperMessageService.postMessageToParent = 
-    jasmine.createSpy('parentMessage spy');
-    var messageEvent = new MessageEvent('message', {
-      data: 'HOSTNAME mockWindow'
+  it('should send the cached message after hostname load',
+    () => {
+      ces.sendStateToOuterFrame('SetInput');
+      expect(ces.cachedOuterFrameMessage).toEqual('SET_OPERATION');
+      expect(spy).toHaveBeenCalled();
+      expect(spy.calls.mostRecent().args[0]).toEqual('message');
+      var listener = spy.calls.mostRecent().args[1];
+      ces.windowWrapperMessageService.postMessageToParent =
+      jasmine.createSpy('parentMessage spy');
+      var messageEvent = new MessageEvent('message', {
+        data: 'HOSTNAME mockWindow'
+      });
+      listener(messageEvent);
+      expect(ces.hostname).toEqual('mockWindow');
+      expect(ces.windowWrapperMessageService.postMessageToParent)
+      .toHaveBeenCalledWith('SET_OPERATION', 'mockWindow');
     });
-    listener(messageEvent);
-    expect(ces.hostname).toEqual('mockWindow');
-    expect(ces.windowWrapperMessageService.postMessageToParent)
-    .toHaveBeenCalledWith('SET_OPERATION', 'mockWindow');
-  });
 
   it('should not send any message', () => {
     var emptyVal = ces.sendStateToOuterFrame('START_STATE');

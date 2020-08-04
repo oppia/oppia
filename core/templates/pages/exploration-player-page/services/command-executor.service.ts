@@ -69,7 +69,8 @@ export class CommandExecutorService {
         } else if (command === 'CONTINUE' || command === 'SUBMIT') {
           this.commandToFunctionMap[command](windowRef);
         } else if (command === 'HOSTNAME') {
-          if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message) >= 0) {
+          if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message)
+          >= 0) {
             this.hostname = message;
           }
           if (this.cachedOuterFrameMessage !== '' &&
