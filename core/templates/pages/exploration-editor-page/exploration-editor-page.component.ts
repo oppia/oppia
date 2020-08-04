@@ -30,7 +30,6 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.component.ts');
