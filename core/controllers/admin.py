@@ -251,11 +251,7 @@ class AdminHandler(base.BaseHandler):
                 new_rule_dicts = self.payload.get('new_rules')
                 commit_message = self.payload.get('message')
                 feature_gating_services.update_feature_flag_rules(
-                    feature_name=feature_name,
-                    new_rule_dicts=new_rule_dicts,
-                    committer_id=self.user_id,
-                    commit_message=commit_message,
-                )
+                    feature_name, self.user_id, commit_message, new_rule_dicts)
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))

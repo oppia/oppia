@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feature_gating_services
+import utils
 
 
 class FeatureGatingHandler(base.BaseHandler):
@@ -31,14 +32,19 @@ class FeatureGatingHandler(base.BaseHandler):
         the given client information.
         """
         context_dict = {
-            'client_platform': self.payload.get('platform'),
-            'client_type': self.payload.get('client_type'),
+            'client_type': self.payload.get('client'),
             'browser_type': self.payload.get('browser'),
             'app_version': self.payload.get('app_version'),
             'user_locale': self.payload.get('locale'),
         }
-        context = feature_gating_services.create_evaluation_context_for_client(
-            context_dict)
+        context = (
+            feature_gating_services.create_evaluation_context_for_client(
+                context_dict))
+        try:
+            context.validate()
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
         result_dict = (
             feature_gating_services
             .get_all_feature_flag_values_for_context(context))
