@@ -292,10 +292,9 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     Returns:
         Exploration. The domain object corresponding to the given exploration.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else ''
     cached_exploration = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION,
-        sub_namespace,
+        version,
         [exploration_id]).get(
             exploration_id)
 
@@ -308,7 +307,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             exploration = get_exploration_from_model(exploration_model)
             caching_services.set_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
-                sub_namespace,
+                version,
                 {
                     exploration_id: exploration
                 })

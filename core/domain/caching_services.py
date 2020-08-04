@@ -29,12 +29,34 @@ import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 
+# NOTE: Namespaces cannot contain ':'.
+# Sub-namespace is defined as the version number of the Exploration. The
+# namespace handles Exploration objects and returns an Exploration objects in
+# the format of a dictionary with string to Exploration id-value pairs.
 CACHE_NAMESPACE_EXPLORATION = 'exploration'
+# Sub-namespace is defined as the version number of the Collection. The
+# namespace handles Collection objects and returns a Collection objects in
+# the format of a dictionary with string to Collection id-value pairs.
 CACHE_NAMESPACE_COLLECTION = 'collection'
+# Sub-namespace is defined as the version number of the Skill. The namespace
+# handles Skill objects and returns Skill objects in
+# the format of a dictionary with string to Skill id-value pairs.
 CACHE_NAMESPACE_SKILL = 'skill'
+# Sub-namespace is defined as the version number of the Story. The namespace
+# handles Story object and returns Story objects in
+# the format of a dictionary with string to Story id-value pairs.
 CACHE_NAMESPACE_STORY = 'story'
+# Sub-namespace is defined as the version number of the Topic. The namespace
+# handles Topic objects and returns Topic objects in
+# the format of a dictionary with string to Topic id-value pairs.
 CACHE_NAMESPACE_TOPIC = 'topic'
+# Sub-namespace is not defined. The namespace handles a ConfigPropertyModel
+# value and returns a ConfigPropertyModel value(returned from the value
+# attribute of a ConfigPropertyModel object).
 CACHE_NAMESPACE_CONFIG = 'config'
+# Sub-namespace is not defined. The namespace handles default datatypes allowed
+# by Redis including Strings, Lists, Sets, and Hashes. More details found here
+# https://redis.io/topics/data-types. Returns the same type.
 CACHE_NAMESPACE_DEFAULT = 'default'
 
 DESERIALIZATION_FUNCTIONS = {
@@ -47,59 +69,42 @@ DESERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_DEFAULT: lambda x: x
 }
 
-
-def _get_deserialization_function_for_namespace(namespace):
-    """Get the deserialization function associated with the namespace specified.
-
-    Args:
-        namespace: str. The namespace that differentiates the objects.
-
-    Returns:
-        function. The deserialization function associated with that particular
-        namespace.
-    """
-    return DESERIALIZATION_FUNCTIONS[namespace]
+SERIALIZATION_FUNCTIONS = {
+    CACHE_NAMESPACE_COLLECTION: lambda x: x.serialize(),
+    CACHE_NAMESPACE_EXPLORATION: lambda x: x.serialize(),
+    CACHE_NAMESPACE_SKILL: lambda x: x.serialize(),
+    CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
+    CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
+    CACHE_NAMESPACE_CONFIG: lambda x: x,
+    CACHE_NAMESPACE_DEFAULT: lambda x: x
+}
 
 
-def _get_serialized_string_for_namespace(obj, namespace):
-    """Get the serialized string of the object associated with the namespace
-    specified.
-
-    Args:
-        obj: Exploration|Skill|Story|Topic|Collection|str. The object to be
-            set to the memory cache.
-        namespace: str. The namespace that differentiates the objects.
-
-    Returns:
-        str. The serialized string of the object associated with that namespace.
-    """
-    if namespace == CACHE_NAMESPACE_DEFAULT or (
-            namespace == CACHE_NAMESPACE_CONFIG):
-        return obj
-    else:
-        return obj.serialize()
-
-
-def _get_namespaced_key_from_type(obj_id, namespace, sub_namespace):
+def _get_memcache_key(namespace, sub_namespace, obj_id):
     """Returns a memcache key for the class under namespace and sub_namespace.
 
     Args:
-        obj_id: str. The id of the value to store in the memory cache.
         namespace: str. The namespace under which the values associated with the
-            key lies. Use CACHE_NAMESPACE_DEFAULT as namespace for keys that
-            don't require serialization.
-        sub_namespace: str|None. Sub namespace further differentiates the
+            id lie. Use CACHE_NAMESPACE_DEFAULT as namespace for ids that
+            are not associated with a conceptual domain-layer entity and
+            therefore don't require serialization.
+        sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects.
+            sub-namespace is the version number of the objects.
+        obj_id: str. The id of the value to store in the memory cache.
+
+    Raises:
+        Exception. The sub-namespace contains a ':'.
 
     Returns:
-        str. New key to differentiate a passed-in key based on namespace and
-        sub-namespace.
+        str. The generated key for use in the memory cache in order to
+        differentiate a passed-in key based on namespace and sub-namespace.
     """
-    if not sub_namespace:
-        return '%s-%s' % (namespace, obj_id)
-    else:
-        return '%s-%s-%s' % (namespace, sub_namespace, obj_id)
+    sub_namespace_key_string = sub_namespace if sub_namespace else ''
+    if ':' in sub_namespace_key_string:
+        raise ValueError(
+            'Sub-namespace %s cannot contain \':\'.' % sub_namespace_key_string)
+    return '%s:%s:%s' % (namespace, sub_namespace_key_string, obj_id)
 
 
 def flush_memory_cache():
@@ -108,16 +113,17 @@ def flush_memory_cache():
 
 
 def get_multi(namespace, sub_namespace, obj_ids):
-    """Get a dictionary of the {key, value} pairs from the memory cache.
+    """Get a dictionary of the {id, value} pairs from the memory cache.
 
     Args:
         namespace: str. The namespace under which the values associated with
-            these object ids lie. The namespace determines how the keys are
-            decoded from their JSON encoded string. Use CACHE_NAMESPACE_DEFAULT
-            as namespace for objects that don't require deserialization.
-        sub_namespace: str|None. Sub namespace further differentiates the
+            these object ids lie. The namespace determines how the objects are
+            decoded from their JSON-encoded string. Use CACHE_NAMESPACE_DEFAULT
+            as namespace for objects that are not associated with a conceptual
+            domain-layer entity and therefore don't require serialization.
+        sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects. If sub-namespace
+            sub-namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
         obj_ids: list(str). List of object ids corresponding to values to
             retrieve from the cache.
@@ -127,7 +133,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
 
     Returns:
         dict(str, Exploration|Skill|Story|Topic|Collection|str). Dictionary of
-        decoded (key, value) pairs retrieved from the platform caching service.
+        decoded (id, value) pairs retrieved from the platform caching service.
     """
     result_dict = {}
     if len(obj_ids) == 0:
@@ -137,34 +143,35 @@ def get_multi(namespace, sub_namespace, obj_ids):
         raise ValueError(
             'Invalid namespace: %s.' % namespace)
 
-    namespaced_keys = []
-    for obj_id in obj_ids:
-        namespaced_keys.append(
-            _get_namespaced_key_from_type(obj_id, namespace, sub_namespace))
-    values = memory_cache_services.get_multi(namespaced_keys)
+    memcache_keys = [
+        _get_memcache_key(namespace, sub_namespace, obj_id)
+        for obj_id in obj_ids]
+    values = memory_cache_services.get_multi(memcache_keys)
     for obj_id, value in python_utils.ZIP(obj_ids, values):
         if value:
-            deserialization_function = (
-                _get_deserialization_function_for_namespace(namespace))
+            deserialization_function = DESERIALIZATION_FUNCTIONS[namespace]
             result_dict[obj_id] = deserialization_function(value)
 
     return result_dict
 
 
 def set_multi(namespace, sub_namespace, id_value_mapping):
-    """Set multiple id' values at once to the cache where the values are all
-    of a specific type or a primitype type.
+    """Set multiple id values at once to the cache, where the values are all
+    of a specific namespace type or a Redis compatible type (more details here:
+    https://redis.io/topics/data-types).
 
     Args:
         namespace: str. The namespace under which the values associated with the
-            id lies. Use CACHE_NAMESPACE_DEFAULT as namespace for objects that
-            don't require serialization.
-        sub_namespace: str|None. Sub namespace further differentiates the
+            id lie. Use CACHE_NAMESPACE_DEFAULT as namespace for objects that
+            are not associated with a conceptual domain-layer entity and
+            therefore don't require serialization.
+        sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects. If sub-namespace
+            sub-namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
-        id_value_mapping: dict(str, *). A dict of {id, value} pairs to set to
-            the cache. The values must be of type value_type.
+        id_value_mapping:
+            dict(str, Exploration|Skill|Story|Topic|Collection|str). A dict of
+            {id, value} pairs to set to the cache.
 
     Raises:
         ValueError. The namespace does not exist or is not recognized.
@@ -175,29 +182,30 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
     if len(id_value_mapping) == 0:
         return True
 
-    if namespace not in DESERIALIZATION_FUNCTIONS:
+    if namespace not in SERIALIZATION_FUNCTIONS:
         raise ValueError(
             'Invalid namespace: %s.' % namespace)
 
-    memory_cache_id_value_mapping = {}
-    for obj_id, value in id_value_mapping.items():
-        unique_key = _get_namespaced_key_from_type(
-            obj_id, namespace, sub_namespace)
-        memory_cache_id_value_mapping[unique_key] = (
-            _get_serialized_string_for_namespace(value, namespace))
+    memory_cache_id_value_mapping = (
+        {
+            _get_memcache_key(namespace, sub_namespace, obj_id):
+            SERIALIZATION_FUNCTIONS[namespace](value)
+            for obj_id, value in id_value_mapping.items()
+        })
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 
 def delete_multi(namespace, sub_namespace, obj_ids):
-    """Deletes multiple keys in the cache.
+    """Deletes multiple ids in the cache.
 
     Args:
         namespace: str. The namespace under which the values associated with the
-            id lies. Use CACHE_NAMESPACE_DEFAULT namespace for object ids that
-            don't fall under any other namespaces.
-        sub_namespace: str|None. Sub namespace further differentiates the
+            id lie. Use CACHE_NAMESPACE_DEFAULT namespace for object ids that
+            are not associated with a conceptual domain-layer entity and
+            therefore don't require serialization.
+        sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, Collections, the
-            sub_namespace is the version number of the objects. If sub-namespace
+            sub-namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
         obj_ids: list(str). A list of id strings to delete from the cache.
 
@@ -214,8 +222,7 @@ def delete_multi(namespace, sub_namespace, obj_ids):
         raise ValueError(
             'Invalid namespace: %s.' % namespace)
 
-    namespaced_keys = []
-    for obj_id in obj_ids:
-        namespaced_keys.append(
-            _get_namespaced_key_from_type(obj_id, namespace, sub_namespace))
-    return memory_cache_services.delete_multi(namespaced_keys) == len(obj_ids)
+    memcache_keys = [
+        _get_memcache_key(namespace, sub_namespace, obj_id)
+        for obj_id in obj_ids]
+    return memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)

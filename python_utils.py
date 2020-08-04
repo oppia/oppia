@@ -430,17 +430,3 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-
-class ChangeDirectory(OBJECT):
-    """Context manager for changing the current working directory."""
-
-    def __init__(self, newPath):
-        self.new_path = os.path.expanduser(newPath)
-        self.saved_path = os.getcwd()
-
-    def __enter__(self):
-        os.chdir(self.new_path)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.saved_path)

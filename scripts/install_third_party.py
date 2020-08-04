@@ -356,20 +356,18 @@ def install_redis_cli():
         python_utils.PRINT('Redis-cli is already installed.')
     except OSError:
         # Redis-cli is not installed, run the script to install it.
-        # NOTE: These should be constants but not sure where to put them since
-        # if they go in manifest.json they'll be automatically installed using
-        # the default installation pathway(e.g pip if it is under backend)
-        # but we need to install it using make.
+        # NOTE: We do the installation here (rather than in manifest.json)
+        # since we need to use make.
         python_utils.PRINT('Installing redis-cli...')
 
         download_and_untar_files(
-            'http://download.redis.io/releases/redis-6.0.6.tar.gz',
+            'https://download.redis.io/releases/redis-6.0.6.tar.gz',
             TARGET_DOWNLOAD_DIRS['backend'],
             'redis-6.0.6', 'redis-cli-6.0.6')
 
         # Temporarily change the working directory to redis-cli-6.0.6 so we can
         # build the source code.
-        with python_utils.ChangeDirectory('third_party/redis-cli-6.0.6/'):
+        with common.CD('third_party/redis-cli-6.0.6/'):
             # Build the scripts necessary to start the redis server.
             subprocess.call(['make'])
 
@@ -389,6 +387,10 @@ def main(args=None):
     if not common.is_windows_os():
         # Redis cli is not compatible with windows machines.
         install_redis_cli()
+    else:
+        raise Exception(
+            'Redis command line interface is not installed because your ' +
+            'machine is on the Windows operating system.')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

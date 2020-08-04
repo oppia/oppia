@@ -717,6 +717,9 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
+
+    # This must come after the skill is retrieved. Otherwise the memcache
+    # key will be reinstated.
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_SKILL, None, [skill.id])
     skill.version += 1

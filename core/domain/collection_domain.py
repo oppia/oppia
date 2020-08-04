@@ -323,12 +323,12 @@ class Collection(python_utils.OBJECT):
 
         Args:
             collection_dict: dict. The dictionary representation of the
-                Collection.
-            collection_version: int. The version of the Collection.
+                collection.
+            collection_version: int. The version of the collection.
             collection_created_on: datetime.datetime. Date and time when the
-                Collection is created.
+                collection is created.
             collection_last_updated: datetime.datetime. Date and time when
-                the Collection is updated last time.
+                the collection is updated last time.
 
         Returns:
             Collection. The corresponding Collection domain object.
@@ -353,7 +353,7 @@ class Collection(python_utils.OBJECT):
         Args:
             json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing a Collection. Only call
-                on strings returned from the platform.cache cache_services.
+                on strings that were created using serialize().
 
         Returns:
             Collection. The corresponding Collection domain object.
@@ -410,7 +410,6 @@ class Collection(python_utils.OBJECT):
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
         return json.dumps(collection_dict)
-
 
     def to_yaml(self):
         """Convert the Collection domain object into YAML.

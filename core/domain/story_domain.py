@@ -909,7 +909,7 @@ class Story(python_utils.OBJECT):
         Args:
             json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing a Story. Only call
-                on strings returned from the platform.cache cache_services.
+                on strings that were created using serialize().
 
         Returns:
             Story. The corresponding Story domain object.
@@ -970,13 +970,13 @@ class Story(python_utils.OBJECT):
         """Returns a Story domain object from a dictionary.
 
         Args:
-            story_dict: dict. The dictionary representation of Story
+            story_dict: dict. The dictionary representation of story
                 object.
-            story_version: int. The version of the Story.
+            story_version: int. The version of the story.
             story_created_on: datetime.datetime. Date and time when the
-                Story is created.
+                story is created.
             story_last_updated: datetime.datetime. Date and time when the
-                Story was last updated.
+                story was last updated.
 
         Returns:
             Story. The corresponding Story domain object.

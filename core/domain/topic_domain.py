@@ -600,13 +600,13 @@ class Topic(python_utils.OBJECT):
         """Returns a Topic domain object from a dictionary.
 
         Args:
-            topic_dict: dict. The dictionary representation of Topic
+            topic_dict: dict. The dictionary representation of topic
                 object.
-            topic_version: int. The version of the Topic.
+            topic_version: int. The version of the topic.
             topic_created_on: datetime.datetime. Date and time when the
-                Topic is created.
+                topic is created.
             topic_last_updated: datetime.datetime. Date and time when the
-                Topic was last updated.
+                topic was last updated.
 
         Returns:
             Topic. The corresponding Topic domain object.
@@ -642,8 +642,8 @@ class Topic(python_utils.OBJECT):
 
         Args:
             json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Topic.  Only call
-                on strings returned from the platform.cache cache_services.
+                decoded into a dictionary representing a Topic. Only call
+                on strings that were created using serialize().
 
         Returns:
             Topic. The corresponding Topic domain object.

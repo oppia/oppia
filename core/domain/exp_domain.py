@@ -676,7 +676,7 @@ class Exploration(python_utils.OBJECT):
         """Return a Exploration domain object from a dict.
 
         Args:
-            exploration_dict: dict. The dict representation of Exploration
+            exploration_dict: dict. The dict representation of exploration
                 object.
             exploration_version: int. The version of the exploration.
             exploration_created_on: datetime.datetime. Date and time when the
@@ -4092,7 +4092,7 @@ class Exploration(python_utils.OBJECT):
         Args:
             json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing an Exploration. Only call
-                on strings returned from the platform.cache cache_services.
+                on strings that were created using serialize().
 
         Returns:
             Exploration. The corresponding Exploration domain object.

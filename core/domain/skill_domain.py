@@ -812,7 +812,7 @@ class Skill(python_utils.OBJECT):
         Args:
             json_string: str. A JSON-encoded string that can be
                 decoded into a dictionary representing a Skill. Only call
-                on strings returned from the platform.cache cache_services.
+                on strings that were created using serialize().
 
         Returns:
             Skill. The corresponding Skill domain object.
@@ -841,9 +841,9 @@ class Skill(python_utils.OBJECT):
         """Returns a Skill domain object from a dict.
 
         Args:
-            skill_dict: dict. The dictionary representation of Skill
+            skill_dict: dict. The dictionary representation of skill
                 object.
-            skill_version: int. The version of the Skill.
+            skill_version: int. The version of the skill.
             skill_created_on: datetime.datetime. Date and time when the
                 skill is created.
             skill_last_updated: datetime.datetime. Date and time when the

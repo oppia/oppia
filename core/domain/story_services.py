@@ -426,6 +426,9 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.version = story.version
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
+
+    # This must come after the story is retrieved. Otherwise the memcache
+    # key will be reinstated.
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
     story.version += 1

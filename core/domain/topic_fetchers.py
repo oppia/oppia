@@ -167,10 +167,9 @@ def get_topic_by_id(topic_id, strict=True, version=None):
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else ''
     cached_topic = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_TOPIC,
-        sub_namespace, [topic_id]).get(topic_id)
+        version, [topic_id]).get(topic_id)
 
     if cached_topic is not None:
         return cached_topic
@@ -181,7 +180,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             topic = get_topic_from_model(topic_model)
             caching_services.set_multi(
                 caching_services.CACHE_NAMESPACE_TOPIC,
-                sub_namespace,
+                version,
                 {topic_id: topic})
             return topic
         else:
