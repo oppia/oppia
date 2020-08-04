@@ -14,31 +14,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Feature flags registry."""
+"""Definition of platform parameters."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import platform_parameters as params
+import core.domain.platform_parameter_domain as param_domain
+import core.domain.platform_parameter_registry as registry
+import utils
 
-# Names of feature objects defined in domain/platform_parameter_domain.py
-# should be added to one of the following lists, features flags not added
-# here won't be available.
+Registry = registry.Registry
+FEATURE_STAGES = param_domain.FEATURE_STAGES # pylint: disable=invalid-name
+DATA_TYPES = param_domain.DATA_TYPES # pylint: disable=invalid-name
 
-# Features in dev stage.
-DEV_FEATURES_LIST = [
-    params.PARAM_NAMES.dummy_feature
-]
+PARAM_NAMES = utils.create_enum( # pylint: disable=invalid-name
+    'dummy_feature', 'dummy_parameter')
 
-# Features in test stage.
-TEST_FEATURES_LIST = [
-]
+# Platform parameters should all be defined below.
 
-# Features in prod stage.
-PROD_FEATURES_LIST = [
-]
+Registry.create_feature_flag(
+    PARAM_NAMES.dummy_feature,
+    'This is a dummy feature flag.',
+    FEATURE_STAGES.dev,
+)
 
-# Names of features that should not be used anyway, e.g. features that are
-# completed and no longer gated.
-DEPRECATED_FEATURE_NAMES = [
-]
+Registry.create_platform_parameter(
+    PARAM_NAMES.dummy_parameter,
+    'This is a dummy platform parameter.',
+    DATA_TYPES.string
+)

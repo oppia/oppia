@@ -22,16 +22,26 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import features_registry
 from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
 
 
 class FeatureFlagRegistryTest(test_utils.GenericTestBase):
     """Tests for feature flags listed in features_registry."""
 
+    def setUp(self):
+        super(FeatureFlagRegistryTest, self).setUp()
+
+        self.all_features_list = (
+            features_registry.DEV_FEATURES_LIST +
+            features_registry.TEST_FEATURES_LIST +
+            features_registry.PROD_FEATURES_LIST)
+        self.all_feature_names_set = set(self.all_features_list)
+
     def test_all_names_in_features_lists_exist(self):
         missing_names = []
-        for name in features_registry.ALL_FEATURES_NAMES_SET:
-            if name not in param_domain.Registry.parameter_registry:
+        for name in self.all_feature_names_set:
+            if name not in registry.Registry.parameter_registry:
                 missing_names.append(name)
         self.assertFalse(
             missing_names,
@@ -41,8 +51,8 @@ class FeatureFlagRegistryTest(test_utils.GenericTestBase):
 
     def test_no_duplicated_names_in_features_lists(self):
         duplicate_names = []
-        for name in features_registry.ALL_FEATURES_NAMES_SET:
-            if features_registry.ALL_FEATURES_LIST.count(name) > 1:
+        for name in self.all_feature_names_set:
+            if self.all_features_list.count(name) > 1:
                 duplicate_names.append(name)
         self.assertFalse(
             duplicate_names,
@@ -64,7 +74,7 @@ class FeatureFlagRegistryTest(test_utils.GenericTestBase):
     def test_no_deprecated_names_in_features_lists(self):
         deprecated_names_set = set(features_registry.DEPRECATED_FEATURE_NAMES)
         found_deprecated_names = []
-        for name in features_registry.ALL_FEATURES_NAMES_SET:
+        for name in self.all_feature_names_set:
             if name in deprecated_names_set:
                 found_deprecated_names.append(name)
         self.assertFalse(
@@ -75,9 +85,9 @@ class FeatureFlagRegistryTest(test_utils.GenericTestBase):
 
     def test_all_entries_in_features_lists_are_featrues(self):
         non_feature_names = []
-        for name in features_registry.ALL_FEATURES_LIST:
-            feature_flag = param_domain.Registry.get_platform_parameter(name)
-            if not feature_flag.metadata.is_feature:
+        for name in self.all_feature_names_set:
+            feature_flag = registry.Registry.get_platform_parameter(name)
+            if not feature_flag.is_feature:
                 non_feature_names.append(name)
         self.assertFalse(
             non_feature_names,
@@ -85,16 +95,11 @@ class FeatureFlagRegistryTest(test_utils.GenericTestBase):
                 non_feature_names)
         )
 
-    def test_all_entries_in_features_lists_are_valid(self):
-        for name in features_registry.ALL_FEATURES_LIST:
-            feature_flag = param_domain.Registry.get_platform_parameter(name)
-            feature_flag.validate()
-
     def test_all_entries_in_dev_features_list_are_in_dev_stage(self):
         invalid_feature_names = []
         for name in features_registry.DEV_FEATURES_LIST:
-            feature_flag = param_domain.Registry.get_platform_parameter(name)
-            if feature_flag.metadata.stage != 'dev':
+            feature_flag = registry.Registry.get_platform_parameter(name)
+            if feature_flag.feature_stage != param_domain.FEATURE_STAGES.dev:
                 invalid_feature_names.append(name)
         self.assertFalse(
             invalid_feature_names,
@@ -105,8 +110,8 @@ class FeatureFlagRegistryTest(test_utils.GenericTestBase):
     def test_all_entries_in_test_features_list_are_in_test_stage(self):
         invalid_feature_names = []
         for name in features_registry.TEST_FEATURES_LIST:
-            feature_flag = param_domain.Registry.get_platform_parameter(name)
-            if feature_flag.metadata.stage != 'test':
+            feature_flag = registry.Registry.get_platform_parameter(name)
+            if feature_flag.feature_stage != param_domain.FEATURE_STAGES.test:
                 invalid_feature_names.append(name)
         self.assertFalse(
             invalid_feature_names,
@@ -117,8 +122,8 @@ class FeatureFlagRegistryTest(test_utils.GenericTestBase):
     def test_all_entries_in_prod_features_list_are_in_prod_stage(self):
         invalid_feature_names = []
         for name in features_registry.PROD_FEATURES_LIST:
-            feature_flag = param_domain.Registry.get_platform_parameter(name)
-            if feature_flag.metadata.stage != 'prod':
+            feature_flag = registry.Registry.get_platform_parameter(name)
+            if feature_flag.feature_stage != param_domain.FEATURE_STAGES.prod:
                 invalid_feature_names.append(name)
         self.assertFalse(
             invalid_feature_names,

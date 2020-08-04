@@ -22,23 +22,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core import features_registry
 from core.domain import platform_parameter_domain as param_domain
+from core.domain import platform_parameter_registry as registry
 
 
-# TODO(MegrezZhu): Currently Oppia runs in either of the two modes:
-# dev or prod. There should be another mode 'test' added for QA testing,
-# once it is added, this function needs to be updated to take that into
-# consideration.
-def get_running_mode():
-    """Returns the running mode of Oppia.
+ALL_FEATURES_LIST = (
+    features_registry.DEV_FEATURES_LIST +
+    features_registry.TEST_FEATURES_LIST +
+    features_registry.PROD_FEATURES_LIST
+)
 
-    Returns:
-        str. 'dev' if Oppia is running in development mode, 'prod' if in
-        production mode.
-    """
-    if constants.DEV_MODE:
-        return 'dev'
-    else:
-        return 'prod'
+ALL_FEATURES_NAMES_SET = set(ALL_FEATURES_LIST)
 
 
 def create_evaluation_context_for_client(client_context_dict):
@@ -51,31 +44,10 @@ def create_evaluation_context_for_client(client_context_dict):
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    return param_domain.EvaluationContext.create_from_dict(
-        client_context_dict=client_context_dict,
-        server_context_dict={
-            'mode': get_running_mode()
-        }
-    )
-
-
-def create_evaluation_context_for_server():
-    """Returns context instance for evaluation without client-side
-    informations.
-
-    Returns:
-        EvaluationContext. The context for evaluation.
-    """
-    return param_domain.EvaluationContext.create_from_dict(
-        client_context_dict={
-            'client_platform': None,
-            'client_type': None,
-            'browser_type': None,
-            'app_version': None,
-            'user_locale': None,
-        },
-        server_context_dict={
-            'mode': get_running_mode()
+    return param_domain.EvaluationContext.from_dict(
+        client_context_dict,
+        {
+            'server_mode': _get_running_mode()
         }
     )
 
@@ -87,11 +59,10 @@ def get_all_feature_flag_setting_dicts():
         dict. The keys are the feature names and the values are the dict
         mappings of all fields of the feature flags.
     """
-    result_dict = {}
-    for name in features_registry.ALL_FEATURES_LIST:
-        flag_domain = param_domain.Registry.get_platform_parameter(name)
-        result_dict[name] = flag_domain.to_dict()
-    return result_dict
+    return dict(
+        (name, registry.Registry.get_platform_parameter(name).to_dict())
+        for name in ALL_FEATURES_LIST
+    )
 
 
 def get_all_feature_flag_values_for_context(context):
@@ -104,36 +75,7 @@ def get_all_feature_flag_values_for_context(context):
         dict. The keys are the feature names and the values are boolean
         results of corresponding flags.
     """
-    return get_feature_flag_values_for_context(
-        features_registry.ALL_FEATURES_LIST, context)
-
-
-def get_feature_flag_values_for_context(feature_names, context):
-    """Evaluates and returns the values for specified feature flags.
-
-    Args:
-        feature_names: list(str). The names of feature flags that need to
-            be evaluated.
-        context: EvaluationContext. The context used for evaluation.
-
-    Returns:
-        dict. The keys are the feature names and the values are boolean
-        results of corresponding flags.
-    """
-    unknown_feature_names = []
-    for feature_name in feature_names:
-        if feature_name not in features_registry.ALL_FEATURES_NAMES_SET:
-            unknown_feature_names.append(feature_name)
-    if len(unknown_feature_names) > 0:
-        raise Exception(
-            'Feature flag(s) not exist: %s.' % unknown_feature_names)
-
-    result_dict = {}
-    for feature_name in feature_names:
-        flag_domain = param_domain.Registry.get_platform_parameter(
-            feature_name)
-        result_dict[feature_name] = flag_domain.evaluate(context)
-    return result_dict
+    return _get_feature_flag_values_for_context(ALL_FEATURES_LIST, context)
 
 
 def get_feature_flag_value(feature_name):
@@ -147,8 +89,8 @@ def get_feature_flag_value(feature_name):
     Returns:
         bool. The value of the feature flag, True if it's enabled.
     """
-    context = create_evaluation_context_for_server()
-    values_dict = get_feature_flag_values_for_context([feature_name], context)
+    context = _create_evaluation_context_for_server()
+    values_dict = _get_feature_flag_values_for_context([feature_name], context)
     return values_dict[feature_name]
 
 
@@ -163,12 +105,74 @@ def update_feature_flag_rules(
         new_rule_dicts: list(dist). A list of dict mappings of all fields
             of PlatformParameterRule object.
     """
-    if feature_name not in features_registry.ALL_FEATURES_NAMES_SET:
+    if feature_name not in ALL_FEATURES_NAMES_SET:
         raise Exception('Feature flag not exist: %s.' % feature_name)
 
-    param_domain.Registry.update_platform_parameter(
-        name=feature_name,
-        committer_id=committer_id,
-        commit_message=commit_message,
-        new_rule_dicts=new_rule_dicts,
+    registry.Registry.update_platform_parameter(
+        feature_name, committer_id, commit_message, new_rule_dicts)
+
+
+# TODO(MegrezZhu): Currently Oppia runs in either of the two modes:
+# dev or prod. There should be another mode 'test' added for QA testing,
+# once it is added, this function needs to be updated to take that into
+# consideration.
+def _get_running_mode():
+    """Returns the running mode of Oppia.
+
+    Returns:
+        str. 'dev' if Oppia is running in development mode, 'prod' if in
+        production mode.
+    """
+    if constants.DEV_MODE:
+        return param_domain.SERVER_MODES.dev
+    else:
+        return param_domain.SERVER_MODES.prod
+
+
+def _create_evaluation_context_for_server():
+    """Returns context instance for evaluation without client-side
+    informations.
+
+    Returns:
+        EvaluationContext. The context for evaluation.
+    """
+    return param_domain.EvaluationContext.from_dict(
+        {
+            'client_platform': None,
+            'client_type': None,
+            'browser_type': None,
+            'app_version': None,
+            'user_locale': None,
+        },
+        {
+            'server_mode': _get_running_mode()
+        }
     )
+
+
+def _get_feature_flag_values_for_context(feature_names, context):
+    """Evaluates and returns the values for specified feature flags.
+
+    Args:
+        feature_names: list(str). The names of feature flags that need to
+            be evaluated.
+        context: EvaluationContext. The context used for evaluation.
+
+    Returns:
+        dict. The keys are the feature names and the values are boolean
+        results of corresponding flags.
+    """
+    unknown_feature_names = []
+    for feature_name in feature_names:
+        if feature_name not in ALL_FEATURES_NAMES_SET:
+            unknown_feature_names.append(feature_name)
+    if len(unknown_feature_names) > 0:
+        raise Exception(
+            'Feature flag(s) not exist: %s.' % unknown_feature_names)
+
+    result_dict = {}
+    for feature_name in feature_names:
+        flag_domain = registry.Registry.get_platform_parameter(
+            feature_name)
+        result_dict[feature_name] = flag_domain.evaluate(context)
+    return result_dict
