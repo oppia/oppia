@@ -225,6 +225,11 @@ import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { FeatureFlagResultsObjectFactory } from
   'domain/feature_gating/FeatureFlagResultsObjectFactory';
+import { FeatureGatingAdminBackendApiService } from
+  'domain/feature_gating/feature-gating-admin-backend-api.service';
+import { FeatureGatingBackendApiService } from
+  'domain/feature_gating/feature-gating-backend-api.service';
+import { FeatureGatingService } from 'services/feature-gating.service';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -1355,6 +1360,14 @@ export class UpgradedServices {
         upgradedServices['ExplorationStatsObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['FeatureGatingBackendApiService'] =
+      new FeatureGatingBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['FeatureFlagResultsObjectFactory']
+      );
+    upgradedServices['FeatureGatingAdminBackendApiService'] =
+      new FeatureGatingAdminBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],
@@ -1526,6 +1539,12 @@ export class UpgradedServices {
         upgradedServices['ExplorationRecommendationsBackendApiService']);
     upgradedServices['ExplorationStatsService'] = new ExplorationStatsService(
       upgradedServices['ExplorationStatsBackendApiService']);
+    upgradedServices['FeatureGatingService'] = new FeatureGatingService(
+      upgradedServices['ClientContextObjectFactory'],
+      upgradedServices['FeatureGatingBackendApiService'],
+      upgradedServices['FeatureFlagResultsObjectFactory'],
+      upgradedServices['I18nLanguageCodeService'],
+      upgradedServices['WindowRef']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],

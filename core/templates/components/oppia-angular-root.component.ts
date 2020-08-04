@@ -259,6 +259,11 @@ import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { FeatureFlagResultsObjectFactory } from
   'domain/feature_gating/FeatureFlagResultsObjectFactory';
+import { FeatureGatingAdminBackendApiService } from
+  'domain/feature_gating/feature-gating-admin-backend-api.service';
+import { FeatureGatingBackendApiService } from
+  'domain/feature_gating/feature-gating-backend-api.service';
+import { FeatureGatingService } from 'services/feature-gating.service';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -803,6 +808,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
   static featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory;
   static featureFlagResultsObjectFactory: FeatureFlagResultsObjectFactory;
+  static featureGatingAdminBackendApiService: FeatureGatingAdminBackendApiService;
+  static featureGatingBackendApiService: FeatureGatingBackendApiService;
+  static featureGatingService: FeatureGatingService;
   static feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
   static feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
   static feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;
@@ -1127,6 +1135,9 @@ private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
 private featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory,
 private featureFlagResultsObjectFactory: FeatureFlagResultsObjectFactory,
+private featureGatingAdminBackendApiService: FeatureGatingAdminBackendApiService,
+private featureGatingBackendApiService: FeatureGatingBackendApiService,
+private featureGatingService: FeatureGatingService,
 private feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory,
 private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
 private feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory,
@@ -1452,6 +1463,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
     OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = this.featuredTranslationLanguageObjectFactory;
     OppiaAngularRootComponent.featureFlagResultsObjectFactory = this.featureFlagResultsObjectFactory;
+    OppiaAngularRootComponent.featureGatingAdminBackendApiService = this.featureGatingAdminBackendApiService;
+    OppiaAngularRootComponent.featureGatingBackendApiService = this.featureGatingBackendApiService;
+    OppiaAngularRootComponent.featureGatingService = this.featureGatingService;
     OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = this.feedbackMessageSummaryObjectFactory;
     OppiaAngularRootComponent.feedbackThreadObjectFactory = this.feedbackThreadObjectFactory;
     OppiaAngularRootComponent.feedbackThreadSummaryObjectFactory = this.feedbackThreadSummaryObjectFactory;
@@ -1673,6 +1687,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.writtenTranslationObjectFactory = this.writtenTranslationObjectFactory;
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = this.writtenTranslationsObjectFactory;
     // This emit triggers ajs to start its app.
-    this.initialized.emit();
+
+    this.featureGatingService.initialize().then(
+      () => this.initialized.emit()
+    );
   }
 }
