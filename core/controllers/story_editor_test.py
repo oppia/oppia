@@ -331,7 +331,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         change_cmd = {
             'version': 1,
-            'commit_message': 'a' * 1001
+            'commit_message': 'a' * 1001,
             'change_dicts': [{
                 'cmd': 'update_story_property',
                 'property_name': 'description',
