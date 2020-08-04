@@ -131,7 +131,7 @@ describe('Question Player Concept Card Modal Controller', function() {
     expect($scope.modalHeader).toBe(undefined);
   });
 
-  it('should refresh page when retrying a test', function() {
+  it('should refresh page when retrying a practice test', function() {
     $scope.retryTest();
     expect(mockWindow.location.replace).toHaveBeenCalledWith('pathname');
   });
