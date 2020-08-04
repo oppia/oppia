@@ -20,8 +20,8 @@ require('components/summary-tile/story-summary-tile.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('storiesList', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('topicViewerStoriesList',
+  ['UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

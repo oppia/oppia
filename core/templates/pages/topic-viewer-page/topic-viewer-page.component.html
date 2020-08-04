@@ -48,7 +48,7 @@
       </topic-info-tab>
     </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></stories-list>
+      <topic-viewer-stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></topic-viewer-stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
       <practice-tab subtopics-list="$ctrl.subtopics"

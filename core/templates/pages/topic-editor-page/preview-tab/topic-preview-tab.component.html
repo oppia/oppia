@@ -1,0 +1,130 @@
+<div class="topic-preview-parent">
+	<div>
+		<background-banner></background-banner>
+	</div>
+	<div class="topic-preview-container">
+		<div class="topic-preview-nav">
+			<div class="topic-preview-navbar-tabs">
+				<div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'info'}" ng-click="$ctrl.changePreviewTab('info')">
+					<div class="topic-preview-icon">
+						<img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
+					</div>
+					<div class="topic-preview-text">
+						Info
+					</div>
+				</div>
+				<div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'story'}" ng-click="$ctrl.changePreviewTab('story')">
+					<div class="topic-preview-icon">
+						<img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
+					</div>
+					<div class="topic-preview-text">
+						Lessons
+					</div>
+				</div>
+				<div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'practice'}" ng-click="$ctrl.changePreviewTab('practice')">
+					<div class="topic-preview-icon">
+						<img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
+					</div>
+					<div class="topic-preview-text">
+						Practice
+					</div>
+				</div>
+				<div class="topic-preview-navbar-tab" ng-class="{'topic-preview-nav-active': $ctrl.activeTab === 'subtopic'}" ng-click="$ctrl.changePreviewTab('subtopic')">
+					<div class="topic-preview-icon">
+						<img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>">
+					</div>
+					<div class="topic-preview-text">
+						Revision
+					</div>
+				</div>
+			</div>
+		</div>
+		<div ng-if="$ctrl.activeTab === 'info'">
+			<topic-info-tab topic-name="$ctrl.topic.getName()"
+			                topic-description="$ctrl.topic.getDescription()"
+			                story-count="$ctrl.canonicalStorySummaries.length"
+			                subtopic-count="$ctrl.subtopics.length"
+			                chapter-count="$ctrl.chapterCount">
+			</topic-info-tab>
+		</div>
+		<div ng-if="$ctrl.activeTab === 'story'">
+			<topic-viewer-stories-list canonical-story-summaries="$ctrl.canonicalStorySummaries"></topic-viewer-stories-list>
+		</div>
+		<div ng-if="$ctrl.activeTab === 'subtopic'">
+			<subtopics-list subtopics-list="$ctrl.subtopics"
+			                topic-name="$ctrl.topic.getName()"
+			                topic-id="$ctrl.topic.getId()">
+			</subtopics-list>
+		</div>
+		<div ng-if="$ctrl.activeTab === 'practice'">
+			<practice-tab subtopics-list="$ctrl.subtopics"
+			              topic-name="$ctrl.topic.getName()">
+			</practice-tab>
+		</div>
+	</div>
+</div>
+<style>
+	topic-preview-tab .topic-preview-container {
+      background-color: #FFF;
+			margin: 0 auto;
+      position: relative;
+			width: 50%;
+	}
+  topic-preview-tab .topic-preview-nav {
+      background-color: #00645c;
+			box-shadow: 0 2px 8px #000000cf;
+      margin-bottom: 12px;
+	}
+  topic-preview-tab .topic-preview-navbar-tabs {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+	}
+  topic-preview-tab .topic-preview-nav-active {
+			border-bottom: 4px solid #FFF;
+	}
+  topic-preview-tab .topic-preview-navbar-tab {
+      cursor: pointer;
+		  display: inline-block;
+      height: 100%;
+		  padding: 20px 0;
+      text-align: center;
+		  width: 25%;
+	}
+  topic-preview-tab .topic-preview-icon img {
+		  height: 40px;
+  }
+  topic-preview-tab .topic-preview-text {
+      color: #FFF;
+		  font-size: 20px;
+  }
+  topic-preview-tab .topic-preview-container md-card {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
+		  margin-top: 0;
+  }
+  topic-preview-tab .topic-preview-parent .background-banner-position {
+		  top: 121px;
+  }
+  topic-preview-tab .topic-preview-parent .topic-preview-container md-card {
+			box-shadow: none;
+  }
+  @media screen and (max-width: 1000px) {
+      topic-preview-tab .topic-preview-container {
+		      width: 70%;
+      }
+  }
+	@media screen and (max-width: 800px) {
+      topic-preview-tab .topic-preview-container {
+		      width: 80%;
+      }
+      topic-preview-tab .topic-preview-parent .background-banner-position {
+          top: 30px;
+      }
+  }
+	@media screen and (max-width: 650px) {
+      topic-preview-tab .topic-preview-container {
+          margin-top: 80px;
+          width: 100%;
+      }
+  }
+</style>

@@ -126,7 +126,7 @@ class TopicPageDataHandler(base.BaseHandler):
         if all_skill_ids:
             questions = question_services.get_questions_by_skill_ids(
                 5, all_skill_ids, False)
-            if len(questions) == 5:
+            if len(questions) >= 5:
                 train_tab_should_be_displayed = True
 
         self.values.update({

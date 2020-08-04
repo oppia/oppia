@@ -41,9 +41,9 @@
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'subtopic_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.openTopicViewer()">
-        <a class="nav-link navbar-tab" uib-tooltip="Preview (new tab)" tooltip-placement="bottom" tabindex="0">
-          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'subtopic_preview'}">&#xE037;</i>
+      <li ng-class="{'navbar-tab-active': $ctrl.isInPreviewTab()}" class="nav-item icon nav-list-item" ng-click="$ctrl.openTopicViewer()">
+        <a class="nav-link navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0">
+          <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon':  $ctrl.isInPreviewTab()}">&#xE037;</i>
         </a>
       </li>
     </div>
@@ -60,6 +60,10 @@
 
   <div ng-if="$ctrl.getActiveTabName() === 'subtopic_editor'">
     <subtopic-editor-tab></subtopic-editor-tab>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'topic_preview'">
+    <topic-preview-tab></topic-preview-tab>
   </div>
 
   <div ng-if="$ctrl.getActiveTabName() === 'subtopic_preview'">
