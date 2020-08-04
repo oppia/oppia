@@ -291,8 +291,8 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(ews, 'updateWarnings');
+      spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
@@ -360,7 +360,6 @@ describe('Exploration editor page component', function() {
     });
 
     it('should react when refreshing graph', () => {
-      // $rootScope.$broadcast('refreshGraph');
       refreshGraphEmitter.emit();
 
       expect(gds.recompute).toHaveBeenCalled();
