@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateEditorService } from
@@ -73,7 +72,6 @@ describe('Exploration editor page component', function() {
   var stass = null;
   var tds = null;
   var ueps = null;
-  var refreshGraphEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -298,15 +296,10 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
-      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
 
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
-    });
-
-    afterEach(() => {
-      ctrl.$onDestroy();
     });
 
     it('should link exploration to story when initing exploration page', () => {
@@ -360,8 +353,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should react when refreshing graph', () => {
-      // $rootScope.$broadcast('refreshGraph');
-      refreshGraphEmitter.emit();
+      $rootScope.$broadcast('refreshGraph');
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
@@ -684,10 +676,6 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
     });
 
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
       spyOn(eibas, 'getConfigAsync')
         .and.returnValue(Promise.resolve({improvementsTabIsEnabled: true}));
@@ -738,9 +726,6 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
-    });
-    afterEach(() => {
-      ctrl.$onDestroy();
     });
 
     it('should callback state-added method for stats', fakeAsync(() => {
