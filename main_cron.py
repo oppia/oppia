@@ -17,9 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# main.py has important system path configurations that need to be imported for
-# all of the correct python libraries to be discoverable.
-import main # isort:skip
+import main
 from core.controllers import cron
 from core.platform import models
 import feconf
