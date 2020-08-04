@@ -25,14 +25,14 @@ import {
   PlatformParameterRuleObjectFactory,
   PlatformParameterValue
 } from 'domain/feature_gating/PlatformParameterRuleObjectFactory';
-import {
-  PlatformParameterMetadata,
-  PlatformParameterMetadataObjectFactory,
-  PlatformParameterMetadataBackendDict,
-  FeatureFlagStage
-} from 'domain/feature_gating/PlatformParameterMetadataObjectFactory';
 import { PlatformParameterFilterType, ServerMode }
   from './PlatformParameterFilterObjectFactory';
+
+export enum FeatureFlagStage {
+  DEV = 'dev',
+  TEST = 'test',
+  PROD = 'prod',
+}
 
 export interface PlatformParameterBackendDict {
   'name': string;
@@ -41,7 +41,8 @@ export interface PlatformParameterBackendDict {
   'rules': PlatformParameterRuleBackendDict[];
   'rule_schema_version': number;
   'default_value': PlatformParameterValue;
-  'metadata': PlatformParameterMetadataBackendDict;
+  'is_feature': boolean;
+  'feature_stage': FeatureFlagStage | null;
 }
 
 export class PlatformParameter {
@@ -50,21 +51,23 @@ export class PlatformParameter {
   readonly dataType: string;
   readonly ruleSchemaVersion: number;
   readonly defaultValue: PlatformParameterValue;
-  readonly metadata: PlatformParameterMetadata;
+  readonly isFeature: boolean;
+  readonly featureStage: FeatureFlagStage | null;
   rules: PlatformParameterRule[];
 
   constructor(
       name: string, description: string, dataType: string,
       rules: PlatformParameterRule[], ruleSchemaVersion: number,
-      defaultValue: PlatformParameterValue,
-      metadata: PlatformParameterMetadata) {
+      defaultValue: PlatformParameterValue, isFeature: boolean,
+      featureStage: FeatureFlagStage | null) {
     this.name = name;
     this.description = description;
     this.dataType = dataType;
     this.rules = rules;
     this.ruleSchemaVersion = ruleSchemaVersion;
     this.defaultValue = defaultValue;
-    this.metadata = metadata;
+    this.isFeature = isFeature;
+    this.featureStage = featureStage;
   }
 
   /**
@@ -83,7 +86,7 @@ export class PlatformParameter {
       }
     }
 
-    if (this.metadata.isFeature) {
+    if (this.isFeature) {
       issues = issues.concat(this.validateFeatureFlag());
     }
 
@@ -115,7 +118,7 @@ export class PlatformParameter {
       for (const [filterIndex, filter] of rule.filters.entries()) {
         if (filter.type === PlatformParameterFilterType.ServerMode) {
           const matchingModes = filter.conditions.map(([_, mode]) => mode);
-          switch (this.metadata.featureStage) {
+          switch (this.featureStage) {
             case FeatureFlagStage.DEV:
               if (
                 matchingModes.includes(ServerMode.Test.toString()) ||
@@ -153,9 +156,7 @@ export class PlatformParameter {
 export class PlatformParameterObjectFactory {
   constructor(
     private platformParameterRuleObjectFactory:
-      PlatformParameterRuleObjectFactory,
-    private platformParameterMetadataObjectFactory:
-      PlatformParameterMetadataObjectFactory) {}
+      PlatformParameterRuleObjectFactory) {}
 
   createFromBackendDict(
       backendDict: PlatformParameterBackendDict): PlatformParameter {
@@ -170,8 +171,8 @@ export class PlatformParameterObjectFactory {
         )),
       backendDict.rule_schema_version,
       backendDict.default_value,
-      this.platformParameterMetadataObjectFactory.createFromBackendDict(
-        backendDict.metadata)
+      backendDict.is_feature,
+      backendDict.feature_stage
     );
   }
 }
