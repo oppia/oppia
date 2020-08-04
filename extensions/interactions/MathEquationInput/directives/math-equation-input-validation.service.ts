@@ -47,7 +47,7 @@ export class MathEquationInputValidationService {
 
     // TODO(#7434): Use dot notation after we find a way to get
     // rid of the TS2339 error on AppConstants.
-    // eslint-disable-nex-line dot-notation
+    // eslint-disable-next-line dot-notation
     let allowedLettersLimit = AppConstants['ALLOWED_CUSTOM_LETTERS_LIMIT'];
     if (customizationArgs.customOskLetters.value.length > allowedLettersLimit) {
       warningsList.push({

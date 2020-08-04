@@ -30,7 +30,7 @@ angular.module('oppia').component('customOskLettersEditor', {
     'CUSTOM_LETTERS_LATIN_TAB', 'GREEK_SYMBOLS_LOWERCASE',
     'GREEK_SYMBOLS_UPPERCASE',
     function(
-        ALLOWED_CUSTOM_LETTERS_LIMIT,  CUSTOM_LETTERS_GREEK_TAB,
+        ALLOWED_CUSTOM_LETTERS_LIMIT, CUSTOM_LETTERS_GREEK_TAB,
         CUSTOM_LETTERS_LATIN_TAB, GREEK_SYMBOLS_LOWERCASE,
         GREEK_SYMBOLS_UPPERCASE) {
       const ctrl = this;
@@ -60,7 +60,7 @@ angular.module('oppia').component('customOskLettersEditor', {
 
       ctrl.getRemainingLettersCount = function() {
         return Math.max(ALLOWED_CUSTOM_LETTERS_LIMIT - ctrl.value.length, 0);
-      }
+      };
 
       ctrl.$onInit = function() {
         ctrl.alwaysEditable = true;
