@@ -19,6 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import {
+  FeatureFlagStage,
   PlatformParameterBackendDict,
   PlatformParameterObjectFactory
 } from './PlatformParameterObjectFactory';
@@ -26,7 +27,6 @@ import {
   PlatformParameterFilterType,
   ServerMode
 } from './PlatformParameterFilterObjectFactory';
-import { FeatureFlagStage } from './PlatformParameterMetadataObjectFactory';
 
 describe('PlatformParameterObjectFactory', () => {
   let factory: PlatformParameterObjectFactory;
@@ -51,10 +51,8 @@ describe('PlatformParameterObjectFactory', () => {
           value_when_matched: 'matched'
         }
       ],
-      metadata: {
-        is_feature: false,
-        feature_stage: null
-      },
+      is_feature: false,
+      feature_stage: null,
       rule_schema_version: 1,
       default_value: 'default value'
     });
@@ -83,10 +81,8 @@ describe('PlatformParameterObjectFactory', () => {
           value_when_matched: 'matched'
         }
       ],
-      metadata: {
-        is_feature: false,
-        feature_stage: null
-      },
+      is_feature: false,
+      feature_stage: null,
       rule_schema_version: 1,
       default_value: 'default value'
     };
@@ -113,10 +109,8 @@ describe('PlatformParameterObjectFactory', () => {
             value_when_matched: true
           },
         ],
-        metadata: {
-          is_feature: false,
-          feature_stage: null
-        },
+        is_feature: false,
+        feature_stage: null,
         rule_schema_version: 1,
         default_value: false
       });
@@ -153,10 +147,8 @@ describe('PlatformParameterObjectFactory', () => {
             value_when_matched: true
           }
         ],
-        metadata: {
-          is_feature: true,
-          feature_stage: FeatureFlagStage.PROD
-        },
+        is_feature: true,
+        feature_stage: FeatureFlagStage.PROD,
         rule_schema_version: 1,
         default_value: false
       });
@@ -202,10 +194,8 @@ describe('PlatformParameterObjectFactory', () => {
             value_when_matched: false
           }
         ],
-        metadata: {
-          is_feature: true,
-          feature_stage: FeatureFlagStage.DEV
-        },
+        is_feature: true,
+        feature_stage: FeatureFlagStage.DEV,
         rule_schema_version: 1,
         default_value: false
       });
@@ -239,10 +229,8 @@ describe('PlatformParameterObjectFactory', () => {
             value_when_matched: true
           }
         ],
-        metadata: {
-          is_feature: true,
-          feature_stage: FeatureFlagStage.DEV
-        },
+        is_feature: true,
+        feature_stage: FeatureFlagStage.DEV,
         rule_schema_version: 1,
         default_value: false
       });
@@ -276,10 +264,8 @@ describe('PlatformParameterObjectFactory', () => {
             value_when_matched: true
           }
         ],
-        metadata: {
-          is_feature: true,
-          feature_stage: FeatureFlagStage.TEST
-        },
+        is_feature: true,
+        feature_stage: FeatureFlagStage.TEST,
         rule_schema_version: 1,
         default_value: false
       });

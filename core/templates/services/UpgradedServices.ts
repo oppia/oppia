@@ -399,8 +399,6 @@ import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/feature_gating/PlatformParameterFilterObjectFactory';
-import { PlatformParameterMetadataObjectFactory } from
-  'domain/feature_gating/PlatformParameterMetadataObjectFactory';
 import { PlatformParameterObjectFactory } from
   'domain/feature_gating/PlatformParameterObjectFactory';
 import { PlatformParameterRuleObjectFactory } from
@@ -832,8 +830,6 @@ export class UpgradedServices {
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['PlatformParameterFilterObjectFactory'] =
       new PlatformParameterFilterObjectFactory();
-    upgradedServices['PlatformParameterMetadataObjectFactory'] =
-      new PlatformParameterMetadataObjectFactory();
     upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
@@ -1188,8 +1184,7 @@ export class UpgradedServices {
         upgradedServices['CodeNormalizerService']);
     upgradedServices['PlatformParameterObjectFactory'] =
       new PlatformParameterObjectFactory(
-        upgradedServices['PlatformParameterRuleObjectFactory'],
-        upgradedServices['PlatformParameterMetadataObjectFactory']);
+        upgradedServices['PlatformParameterRuleObjectFactory']);
     upgradedServices['SidebarStatusService'] = new SidebarStatusService(
       upgradedServices['WindowDimensionsService']);
     upgradedServices['StateContentService'] = new StateContentService(
