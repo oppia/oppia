@@ -2228,6 +2228,9 @@ class UserAuthModel(base_models.BaseModel):
     # A code associated with profiles on android to provide a PIN based
     # authentication within the account.
     pin = ndb.StringProperty(default=None)
+    # User id of the full user which the profile user is associated with.
+    # None for full users.
+    parent_user_id = ndb.StringProperty(indexed=True, default=None)
 
     @staticmethod
     def get_deletion_policy():

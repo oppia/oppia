@@ -25,6 +25,7 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -79,6 +80,39 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
+
+
+class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for creating and populating UserAuthModel for
+    all registered users.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+
+        # Assumption: We do not have any profile user in the UserSettingsModel,
+        # because we have no method of associating profile users with a full
+        # user.
+
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, item.gae_id)
+        if (user_auth_model is not None) and (user_auth_model.id != item.id):
+            yield ('GAE_ID %s already registered with user_id %s.' % (
+                item.gae_id, user_auth_model.id)
+            )
+        else:
+            user_models.UserAuthModel(
+                id=item.id,
+                gae_id=item.gae_id,
+                pin=None,
+                parent_user_id=None
+            ).put()
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):

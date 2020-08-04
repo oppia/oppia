@@ -196,6 +196,11 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             ['exp_id'])
 
 
+class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off UserAuthModel migration job."""
+    pass
+
+
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
 
