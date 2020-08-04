@@ -138,6 +138,10 @@ def create_message(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether new message is received via email or
             web.
+
+    Returns:
+        FeedbackMessage. The domain object representing the new message added in
+        the datastore.
     """
 
     from core.domain import event_services
@@ -214,6 +218,8 @@ def create_message(
     if author_id:
         subscription_services.subscribe_to_thread(author_id, thread_id)
         add_message_id_to_read_by_list(thread_id, author_id, message_id)
+
+    return _get_message_from_model(message)
 
 
 def update_messages_read_by_the_user(user_id, thread_id, message_ids):

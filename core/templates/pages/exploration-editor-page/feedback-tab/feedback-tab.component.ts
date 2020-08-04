@@ -170,8 +170,9 @@ angular.module('oppia').component('feedbackTab', {
             'Trying to add message to a non-existent thread.');
         }
         ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
-          .then(() => {
+          .then((messages) => {
             _resetTmpMessageFields();
+            ctrl.activeThread.messages = messages;
             ctrl.messageSendingInProgress = false;
           },
           () => {
