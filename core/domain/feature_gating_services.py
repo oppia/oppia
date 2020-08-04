@@ -120,8 +120,8 @@ def _get_running_mode():
     """Returns the running mode of Oppia.
 
     Returns:
-        str. 'dev' if Oppia is running in development mode, 'prod' if in
-        production mode.
+        str. The server mode of Oppia, 'dev' if Oppia is running in development
+        mode, 'prod' if in production mode.
     """
     if constants.DEV_MODE:
         return param_domain.SERVER_MODES.dev
