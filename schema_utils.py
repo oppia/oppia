@@ -353,21 +353,17 @@ class _Validators(python_utils.OBJECT):
         return sorted(list(set(obj))) == sorted(obj)
 
     @staticmethod
-    def is_url_fragment(obj, char_limit):
+    def is_url_fragment(obj):
         """Returns True iff the given object (a string) is a valid
         URL fragment.
 
         Args:
             obj: str. A string.
-            char_limit: int. An integer representing the maximum
-                allowed characters for the url fragment.
 
         Returns:
             bool. Whether the given object is a valid URL fragment.
         """
-        return (
-            re.match(constants.VALID_URL_FRAGMENT_REGEX, obj) and
-            len(obj) <= char_limit)
+        return re.match(constants.VALID_URL_FRAGMENT_REGEX, obj)
 
     @staticmethod
     def is_at_least(obj, min_value):

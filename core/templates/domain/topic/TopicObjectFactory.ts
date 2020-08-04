@@ -53,6 +53,8 @@ interface TopicBackendDict {
   'url_fragment': string;
 }
 
+const constants = require('constants.ts');
+
 export class Topic {
   _id: string;
   _name: string;
@@ -177,9 +179,19 @@ export class Topic {
   }
 
   validate(): Array<string> {
+    let validUrlFragmentRegex = new RegExp(constants.VALID_URL_FRAGMENT_REGEX);
+    let topicUrlFragmentCharLimit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
     let issues = [];
     if (this._name === '') {
       issues.push('Topic name should not be empty.');
+    }
+    if (!validUrlFragmentRegex.test(this._urlFragment)) {
+      issues.push('Topic url fragment is not valid.');
+    }
+    if (this._urlFragment.length > topicUrlFragmentCharLimit) {
+      issues.push(
+        'Topic url fragment should not be longer than ' +
+        `${topicUrlFragmentCharLimit} characters.`);
     }
 
     let subtopics = this._subtopics;

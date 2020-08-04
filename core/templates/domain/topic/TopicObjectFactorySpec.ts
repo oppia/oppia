@@ -142,8 +142,7 @@ describe('Topic object factory', () => {
         title: 'Title',
         skill_ids: ['skill_1'],
         thumbnail_filename: 'img.png',
-        thumbnail_bg_color: '#a33f40',
-        url_fragment: 'title'
+        thumbnail_bg_color: '#a33f40'
       }]
     }, {
       skill_1: 'Description 1',

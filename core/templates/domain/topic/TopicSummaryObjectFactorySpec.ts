@@ -39,7 +39,8 @@ describe('Topic summary object factory', () => {
       additional_story_count: 0,
       topic_model_created_on: 231241343,
       topic_model_last_updated: 3454354354,
-      classroom: 'math'
+      classroom: 'math',
+      url_fragment: 'topic-name'
     };
     _sampleTopicSummary = topicSummaryObjectFactory.createFromBackendDict(
       sampleTopicSummaryBackendDict);
@@ -48,6 +49,7 @@ describe('Topic summary object factory', () => {
   it('should be able to get all the values', () => {
     expect(_sampleTopicSummary.getId()).toEqual('sample_topic_id');
     expect(_sampleTopicSummary.getName()).toEqual('Topic Name');
+    expect(_sampleTopicSummary.getUrlFragment()).toEqual('topic-name');
     expect(_sampleTopicSummary.getSubtopicCount()).toEqual(5);
     expect(_sampleTopicSummary.getCanonicalStoryCount()).toEqual(4);
     expect(_sampleTopicSummary.getTotalSkillCount()).toEqual(10);

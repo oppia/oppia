@@ -46,7 +46,7 @@
                 </i>
               </span>
             </div>
-            <div>
+            <div class="topic-url-fragment">
               <label for="topicUrlFragment" class="form-heading protractor-test-topic-url-fragment-heading">Topic URL Fragment</label>
               <input id="topicUrlFragment" type="text" class="form-control protractor-test-topic-url-fragment-field"
                      ng-disabled="!topicRights.canEditTopic()"
@@ -379,7 +379,8 @@
     font-size: 15px;
   }
 
-  .topic-editor .topic-name {
+  .topic-editor .topic-name,
+  .topic-editor .topic-url-fragment {
     margin-bottom: 25px;
     margin-top: 32px;
   }

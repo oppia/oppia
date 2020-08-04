@@ -77,7 +77,9 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
                 'type': 'unicode',
                 'validators': [{
                     'id': 'is_url_fragment',
-                    'char_limit': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
                 }]
             }
         }, {

@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
+from constants import constants
 from core.domain import email_manager
 from core.tests import test_utils
 import python_utils
@@ -174,9 +175,11 @@ VALIDATOR_SPECS = {
         'is_valid_math_equation': {},
         'is_supported_audio_language_code': {},
         'is_url_fragment': {
-            'char_limit': {
-                'type': SCHEMA_TYPE_INT,
-            }
+            'type': SCHEMA_TYPE_UNICODE,
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+            }]
         }
     },
 }
@@ -624,14 +627,13 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         validate_url_fragment = schema_utils.get_validator(
             'is_url_fragment')
 
-        self.assertTrue(validate_url_fragment('math', 20))
-        self.assertTrue(validate_url_fragment('computer-science', 20))
-        self.assertTrue(validate_url_fragment('bio-tech', 20))
+        self.assertTrue(validate_url_fragment('math'))
+        self.assertTrue(validate_url_fragment('computer-science'))
+        self.assertTrue(validate_url_fragment('bio-tech'))
 
-        self.assertFalse(validate_url_fragment('', 20))
-        self.assertFalse(validate_url_fragment('Abc', 20))
-        self.assertFalse(validate_url_fragment('abcdefghi', 5))
-        self.assertFalse(validate_url_fragment('!@#$%^&*()_+=', 20))
+        self.assertFalse(validate_url_fragment(''))
+        self.assertFalse(validate_url_fragment('Abc'))
+        self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

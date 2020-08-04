@@ -57,7 +57,7 @@ def redirect_based_on_return_type(
             in case of errors eg. html, json.
 
     Raises:
-        PageNotFoundException: The page is not found.
+        PageNotFoundException. The page is not found.
     """
     if expected_return_type == feconf.HANDLER_TYPE_JSON:
         raise handler.PageNotFoundException
@@ -2507,7 +2507,7 @@ def can_access_subtopic_viewer_page(handler):
 
     Returns:
         function. The newly decorated function that now checks
-        if the user can access the give subtopic viewer page.
+        if the user can access the given subtopic viewer page.
     """
 
     def test_can_access(

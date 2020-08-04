@@ -49,8 +49,8 @@ def get_classroom_by_url_fragment(classroom_url_fragment):
         classroom_url_fragment: str. The classroom url fragment.
 
     Returns:
-        Classroom|None. Returns the classroom domain object if found or
-        else returns None.
+        Classroom|None. Returns the classroom domain object if found, else
+        returns None.
     """
     topic_ids_for_classroom_pages = (
         config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value)

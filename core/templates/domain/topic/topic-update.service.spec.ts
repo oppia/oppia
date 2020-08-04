@@ -341,6 +341,27 @@ describe('Topic update service', function() {
     }]);
   });
 
+  it('should set/unset changes to a topic\'s url fragment', function() {
+    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+
+    TopicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
+    expect(_sampleTopic.getUrlFragment()).toEqual('new-unique-value');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s url fragment', function() {
+    TopicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'url_fragment',
+      new_value: 'new-unique-value',
+      old_value: null
+    }]);
+  });
+
   it('should set/unset changes to a topic\'s thumbnail filename', function() {
     expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
 

@@ -168,7 +168,7 @@ class TopicModel(base_models.VersionedModel):
             found.
         """
         return TopicModel.query().filter(
-            cls.url_fragment == url_fragment.lower()).filter(
+            cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
     @staticmethod

@@ -44,9 +44,13 @@ export class NewlyCreatedTopic {
       // @ts-ignore: TODO(#7434): Remove this ignore after we find
       // a way to get rid of the TS2339 error on AppConstants.
       AppConstants.VALID_URL_FRAGMENT_REGEX);
+    // @ts-ignore: TODO(#7434): Remove this ignore after we find
+    // a way to get rid of the TS2339 error on AppConstants.
+    let urlFragmentCharLimit = AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
     return Boolean(
       this.name && this.description && this.urlFragment &&
-      validUrlFragmentRegex.test(this.urlFragment));
+      validUrlFragmentRegex.test(this.urlFragment) &&
+      this.urlFragment.length <= urlFragmentCharLimit);
   }
 }
 
