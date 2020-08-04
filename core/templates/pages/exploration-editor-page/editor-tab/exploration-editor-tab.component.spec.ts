@@ -210,6 +210,7 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
+        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         recorded_voiceovers: {
@@ -285,6 +286,7 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
+        next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
@@ -380,6 +382,18 @@ describe('Exploration editor tab component', function() {
     ctrl.saveInteractionId(newInteractionId);
 
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
+  });
+
+  it('should save state next content id index successfully', function() {
+    stateEditorService.setActiveStateName('First State');
+    expect(
+      explorationStatesService.getState('First State').nextContentIdIndex
+    ).toEqual(0);
+
+    ctrl.saveNextContentIdIndex(2);
+    expect(
+      explorationStatesService.getState('First State').nextContentIdIndex
+    ).toBe(2);
   });
 
   it('should save interaction answer groups successfully', function() {
