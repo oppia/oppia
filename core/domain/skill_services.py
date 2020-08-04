@@ -718,7 +718,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     change_dicts = [change.to_dict() for change in change_list]
     skill_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(
-        [skill.id], caching_services.CACHE_NAMESPACE_SKILL)
+        [skill.id], caching_services.CACHE_NAMESPACE_SKILL, None)
     skill.version += 1
 
 
@@ -765,7 +765,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
         force_deletion=force_deletion)
 
     caching_services.delete_multi(
-        [skill_id], caching_services.CACHE_NAMESPACE_SKILL)
+        [skill_id], caching_services.CACHE_NAMESPACE_SKILL, None)
 
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).

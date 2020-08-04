@@ -307,7 +307,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_models.ExplorationModel.get('0').delete(
             self.owner_id, 'Delete exploration', force_deletion=True)
         caching_services.delete_multi(
-            ['0'], caching_services.CACHE_NAMESPACE_EXPLORATION)
+            ['0'], caching_services.CACHE_NAMESPACE_EXPLORATION, None)
 
         exp_opp_summary_model_regen_job_class = (
             opportunity_jobs_one_off

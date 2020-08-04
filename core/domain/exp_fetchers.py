@@ -338,7 +338,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     result = {}
     uncached = []
     cache_result = caching_services.get_multi(
-        exp_ids, caching_services.CACHE_NAMESPACE_EXPLORATION)
+        exp_ids, caching_services.CACHE_NAMESPACE_EXPLORATION, None)
 
     for exp_obj in cache_result.values():
         result[exp_obj.id] = exp_obj
@@ -373,7 +373,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
     if cache_update:
         caching_services.set_multi(
-            cache_update, caching_services.CACHE_NAMESPACE_EXPLORATION)
+            cache_update, caching_services.CACHE_NAMESPACE_EXPLORATION, None)
 
     result.update(db_results_dict)
     return result
