@@ -225,7 +225,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
 
-    def test_get_new_id_forced_for_many_collisions_raises_error(self):
+    def test_get_new_id_raises_error_if_too_many_collisions(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             user_models.UserSettingsModel, 'get_by_id', types.MethodType(
