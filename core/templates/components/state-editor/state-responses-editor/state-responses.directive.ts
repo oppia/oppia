@@ -82,6 +82,8 @@ require('services/exploration-html-formatter.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/html-escaper.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -120,6 +122,7 @@ angular.module('oppia').directive('stateResponses', [
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
             SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _initializeTrainingData = function() {
             if (StateEditorService.isInQuestionMode()) {
               return;
@@ -545,34 +548,38 @@ angular.module('oppia').directive('stateResponses', [
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
 
-            $scope.$on('onInteractionIdChanged', function(
-                evt, newInteractionId) {
-              $rootScope.$broadcast('externalSave');
-              ResponsesService.onInteractionIdChanged(
-                newInteractionId, function(newAnswerGroups, newDefaultOutcome) {
-                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  $scope.refreshWarnings()();
-                  $scope.answerGroups = ResponsesService.getAnswerGroups();
-                  $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                (newInteractionId) => {
+                  $rootScope.$broadcast('externalSave');
+                  ResponsesService.onInteractionIdChanged(newInteractionId,
+                    function(newAnswerGroups, newDefaultOutcome) {
+                      $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                      $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                      $scope.refreshWarnings()();
+                      $scope.answerGroups = ResponsesService.getAnswerGroups();
+                      $scope.defaultOutcome =
+                        ResponsesService.getDefaultOutcome();
 
-                  // Reinitialize training data if the interaction ID is
-                  // changed.
-                  _initializeTrainingData();
+                      // Reinitialize training data if the interaction ID is
+                      // changed.
+                      _initializeTrainingData();
 
-                  $scope.activeAnswerGroupIndex = (
-                    ResponsesService.getActiveAnswerGroupIndex());
-                });
+                      $scope.activeAnswerGroupIndex = (
+                        ResponsesService.getActiveAnswerGroupIndex());
+                    });
 
-              // Prompt the user to create a new response if it is not a linear
-              // or non-terminal interaction and if an actual interaction is
-              // specified (versus one being deleted).
-              if (newInteractionId &&
-                  !INTERACTION_SPECS[newInteractionId].is_linear &&
-                  !INTERACTION_SPECS[newInteractionId].is_terminal) {
-                $scope.openAddAnswerGroupModal();
-              }
-            });
+                  // Prompt the user to create a new response if it is not a
+                  // linear or non-terminal interaction and if an actual
+                  // interaction is specified (versus one being deleted).
+                  if (newInteractionId &&
+                      !INTERACTION_SPECS[newInteractionId].is_linear &&
+                      !INTERACTION_SPECS[newInteractionId].is_terminal) {
+                    $scope.openAddAnswerGroupModal();
+                  }
+                }
+              )
+            );
 
             $scope.$on('answerGroupChanged', function() {
               $scope.answerGroups = ResponsesService.getAnswerGroups();
@@ -623,6 +630,9 @@ angular.module('oppia').directive('stateResponses', [
               $scope.onResponsesInitialized();
             }
             StateEditorService.updateStateResponsesInitialised();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

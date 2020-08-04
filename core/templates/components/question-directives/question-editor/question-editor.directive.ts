@@ -207,10 +207,11 @@ angular.module('oppia').directive('questionEditor', [
                 () => _init()
               )
             );
-
-            $scope.$on('interactionEditorInitialized', function(evt) {
-              _init();
-            });
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onInteractionEditorInitialized.subscribe(
+                () => _init()
+              )
+            );
 
             $scope.$on('onInteractionIdChanged', function(evt) {
               _init();

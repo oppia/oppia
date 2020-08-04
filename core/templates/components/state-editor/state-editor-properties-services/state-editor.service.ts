@@ -53,6 +53,7 @@ export class StateEditorService {
 
   private _stateEditorInitializedEventEmitter = new EventEmitter();
   private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
+  private _interactionEditorInitializedEventEmitter = new EventEmitter();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -247,6 +248,10 @@ export class StateEditorService {
 
   get onStateEditorDirectiveInitialized() {
     return this._stateEditorDirectiveInitializedEventEmitter;
+  }
+
+  get onInteractionEditorInitialized() {
+    return this._interactionEditorInitializedEventEmitter;
   }
 }
 
