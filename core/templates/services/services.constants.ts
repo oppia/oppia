@@ -70,5 +70,5 @@ export class ServicesConstants {
   public static RTE_COMPONENT_SPECS = (
       require('rich_text_components_definitions.ts'));
 
-  public static WHITELISTED_IFRAME_HOSTS = ['http://localhost:9876', 'mockWindow', 'https://oppiaassistant.web.app'];
+  public static WHITELISTED_IFRAME_HOSTS = [];
 }
