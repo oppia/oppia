@@ -33,6 +33,8 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
 describe('Interaction object factory', () => {
   let iof = null;
   let oof = null;
@@ -299,14 +301,14 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set customization arguments for ' +
-     'MathExpression', () => {
+     'MathExpressionInput', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {},
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
-      id: 'MathExpression',
+      id: 'MathExpressionInput',
       solution: solutionDict
     });
 
@@ -770,5 +772,29 @@ describe('Interaction object factory', () => {
 
     expect(Interaction.getCustomizationArgContentIds(ca)).toEqual(
       ['ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1']);
+  });
+
+  it('should fully cover constructing customization arguments for all' +
+     'interactions', () => {
+    Object.keys(INTERACTION_SPECS).forEach(interactionId => {
+      expect(() => {
+        const defaultCa = {};
+        const caSpecs = INTERACTION_SPECS[
+          interactionId].customization_arg_specs;
+        caSpecs.forEach(caSpec => {
+          defaultCa[caSpec.name] = caSpec.default_value;
+        });
+
+        iof.createFromBackendDict({
+          answer_groups: answerGroupsDict,
+          confirmed_unclassified_answers: [],
+          customization_args: defaultCa,
+          default_outcome: defaultOutcomeDict,
+          hints: hintsDict,
+          id: interactionId,
+          solution: solutionDict
+        });
+      }).not.toThrowError(`Unrecognized interaction id ${interactionId}`);
+    });
   });
 });

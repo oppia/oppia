@@ -266,12 +266,12 @@ export interface ItemSelectionInputCustomizationArgs {
 }
 
 
-interface LogicCustomizationArgsBackendDict {
+interface LogicProofCustomizationArgsBackendDict {
   question?: {
     value: Object;
   };
 }
-export interface LogicCustomizationArgs {
+export interface LogicProofCustomizationArgs {
   question?: {
     value: Object;
   };
@@ -318,12 +318,12 @@ export interface MusicNotesInputCustomizationArgs {
 }
 
 
-interface PencilCodeCustomizationArgsBackendDict {
+interface PencilCodeEditorCustomizationArgsBackendDict {
   initialCode?: {
     value: string;
   };
 }
-export interface PencilCodeCustomizationArgs {
+export interface PencilCodeEditorCustomizationArgs {
   initialCode?: {
     value: string;
   };
@@ -360,8 +360,8 @@ export interface TextInputCustomizationArgs {
 }
 
 
-interface MathExpressionCustomizationArgsBackendDict { }
-export interface MathExpressionCustomizationArgs { }
+interface MathExpressionInputCustomizationArgsBackendDict { }
+export interface MathExpressionInputCustomizationArgs { }
 
 
 interface NumericExpressionInputCustomizationArgsBackendDict { }
@@ -387,15 +387,15 @@ export type InteractionCustomizationArgsBackendDict = (
   ImageClickInputCustomizationArgsBackendDict |
   InteractiveMapCustomizationArgsBackendDict |
   ItemSelectionInputCustomizationArgsBackendDict |
-  LogicCustomizationArgsBackendDict |
+  LogicProofCustomizationArgsBackendDict |
   MathEquationInputCustomizationArgsBackendDict |
-  MathExpressionCustomizationArgsBackendDict |
+  MathExpressionInputCustomizationArgsBackendDict |
   MultipleChoiceInputCustomizationArgsBackendDict |
   MusicNotesInputCustomizationArgsBackendDict |
   NumberWithUnitsCustomizationArgsBackendDict |
   NumericExpressionInputCustomizationArgsBackendDict |
   NumericInputCustomizationArgsBackendDict |
-  PencilCodeCustomizationArgsBackendDict |
+  PencilCodeEditorCustomizationArgsBackendDict |
   SetInputCustomizationArgsBackendDict |
   TextInputCustomizationArgsBackendDict);
 
@@ -410,14 +410,14 @@ export type InteractionCustomizationArgs = (
   ImageClickInputCustomizationArgs |
   InteractiveMapCustomizationArgs |
   ItemSelectionInputCustomizationArgs |
-  LogicCustomizationArgs |
+  LogicProofCustomizationArgs |
   MathEquationInputCustomizationArgs |
-  MathExpressionCustomizationArgs |
+  MathExpressionInputCustomizationArgs |
   MultipleChoiceInputCustomizationArgs |
   MusicNotesInputCustomizationArgs |
   NumberWithUnitsCustomizationArgs |
   NumericExpressionInputCustomizationArgs |
   NumericInputCustomizationArgs |
-  PencilCodeCustomizationArgs |
+  PencilCodeEditorCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);

@@ -47,16 +47,16 @@ import {
   InteractiveMapCustomizationArgs,
   ItemSelectionInputCustomizationArgs,
   ItemSelectionInputCustomizationArgsBackendDict,
-  LogicCustomizationArgs,
+  LogicProofCustomizationArgs,
   MathEquationInputCustomizationArgs,
-  MathExpressionCustomizationArgs,
+  MathExpressionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgsBackendDict,
   MusicNotesInputCustomizationArgs,
   NumberWithUnitsCustomizationArgs,
   NumericExpressionInputCustomizationArgs,
   NumericInputCustomizationArgs,
-  PencilCodeCustomizationArgs,
+  PencilCodeEditorCustomizationArgs,
   SetInputCustomizationArgs,
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
@@ -373,11 +373,11 @@ export class InteractionObjectFactory {
         return this._createFromItemSelectionInputCustomizationArgsBackendDict(
           <ItemSelectionInputCustomizationArgsBackendDict> caBackendDict);
       case 'LogicProof':
-        return <LogicCustomizationArgs> cloneDeep(caBackendDict);
+        return <LogicProofCustomizationArgs> cloneDeep(caBackendDict);
       case 'MathEquationInput':
         return <MathEquationInputCustomizationArgs> cloneDeep(caBackendDict);
-      case 'MathExpression':
-        return <MathExpressionCustomizationArgs> cloneDeep(caBackendDict);
+      case 'MathExpressionInput':
+        return <MathExpressionInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'MultipleChoiceInput':
         return this._createFromIMultipleChoiceInputCustomizationArgsBackendDict(
           <MultipleChoiceInputCustomizationArgsBackendDict> caBackendDict);
@@ -391,7 +391,7 @@ export class InteractionObjectFactory {
       case 'NumericInput':
         return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'PencilCodeEditor':
-        return <PencilCodeCustomizationArgs> cloneDeep(caBackendDict);
+        return <PencilCodeEditorCustomizationArgs> cloneDeep(caBackendDict);
       case 'SetInput':
         return this._createFromSetInputCustomizationArgsBackendDict(
           <SetInputCustomizationArgsBackendDict> caBackendDict);

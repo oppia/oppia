@@ -19,9 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+import re
+
 from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
+import feconf
+import python_utils
 import utils
 
 
@@ -349,3 +354,110 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 customization_args_with_invalid_type,
                 ca_fraction_input_specs
             )
+
+    def test_frontend_customization_args_defs_coverage(self):
+        """Test to ensure that customization-args-defs.ts has frontend and
+        backend interfaces for customization arguments for each interaction.
+        """
+        filepath = os.path.join(
+            feconf.INTERACTIONS_DIR, 'customization-args-defs.ts')
+        with python_utils.open_file(filepath, 'r', newline='') as f:
+            lines = f.readlines()
+
+        actual_interaction_ids_ca_backend_interfaces = set()
+        actual_interaction_ca_frontend_interfaces = set()
+
+        for line in lines:
+            # Group 1: The characters 'interface'.
+            # Group 2: The interaction id.
+            # Group 3: The characters 'CustomizationArgsBackendDict'.
+            ca_backend_interface_match = (
+                re.search(
+                    r'(interface )([a-zA-Z]+)(CustomizationArgsBackendDict)',
+                    line
+                ))
+            if ca_backend_interface_match:
+                actual_interaction_ca_backend_interfaces.add(
+                    ca_backend_interface_match.group(2))
+
+            # Group 1: The characters 'interface'.
+            # Group 2: The interaction id.
+            # Group 3: The characters 'CustomizationArgs'.
+            # Group 4: A space or an open bracket.
+            ca_frontend_interface_match = (
+                re.search(
+                    r'(interface )([a-zA-Z]+)(CustomizationArgs)( |{)',
+                    line
+                ))
+            if ca_frontend_interface_match:
+                actual_interaction_ca_frontend_interfaces.add(
+                    ca_frontend_interface_match.group(2))
+
+        expected_interaction_ca_interfaces = (
+            set(interaction_registry.Registry.get_all_interaction_ids()))
+
+        self.assertEqual(
+            expected_interaction_ca_interfaces,
+            actual_interaction_ca_backend_interfaces)
+        self.assertEqual(
+            expected_interaction_ca_interfaces,
+            actual_interaction_ca_frontend_interfaces)
+
+    def test_frontend_customization_args_defs_coverage(self):
+        """Test to ensure that InteractionObjectFactory.ts covers constructing
+        customization arguments for each interaction. Uses regex to confirm
+        that the CustomizationArgs interface is imported for each interaction
+        id, and that the CustomizationArgs or CustomizationArgsBackendDict
+        interface is used in the file to typecast.
+        """
+        filepath = os.path.join(
+            'core', 'templates', 'domain', 'exploration',
+            'InteractionObjectFactory.ts')
+        with python_utils.open_file(filepath, 'r', newline='') as f:
+            lines = f.readlines()
+
+        imported_interaction_ca_frontend_interfaces = set()
+        used_interaction_ca_frontend_interfaces = set()
+
+        for line in lines:
+            # Group 1: The interaction id.
+            # Group 2: The characters 'CustomizationArgs'.
+            # Group 3: A comma or a new line character.
+            imported_match = (
+                re.search(
+                    r'([a-zA-Z]+)(CustomizationArgs)(,|\n)',
+                    line
+                ))
+            if imported_match:
+                imported_interaction_ca_frontend_interfaces.add(
+                    imported_match.group(1))
+
+            # Group 1: The character '<'.
+            # Group 2: The interaction id.
+            # Group 3: The characters 'CustomizationArgs'.
+            # Group 4: The characters 'BackendDict' (optional).
+            # Group 5: The character '>'.
+            used_match = (
+                re.search(
+                    r'(<)([a-zA-Z]+)(CustomizationArgs)(BackendDict)?(>)',
+                    line
+                ))
+            if used_match:
+                used_interaction_ca_frontend_interfaces.add(
+                    used_match.group(2))
+
+        all_interaction_ids = (
+            set(interaction_registry.Registry.get_all_interaction_ids()))
+
+        # We use issubset here because there may be extra elements in
+        # imported_interaction_ca_frontend_interfaces. For example,
+        # InteractionCustomizationArgs gets captured by the regex but
+        # Interaction is not an interaction id.
+        self.assertTrue(
+            set.issubset(
+                all_interaction_ids,
+                imported_interaction_ca_frontend_interfaces)
+        )
+        self.assertEqual(
+            all_interaction_ids,
+            used_interaction_ca_frontend_interfaces)
