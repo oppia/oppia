@@ -264,7 +264,7 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         """Constructs a dict representation of training job domain object.
 
         Returns:
-            A dict representation of training job domain object.
+            dict. A dict representation of training job domain object.
         """
 
         return {

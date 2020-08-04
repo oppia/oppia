@@ -82,10 +82,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             exp_id: str. ID of the exploration.
 
         Returns:
-            ID of the new ClassifierTrainingJobModel instance.
+            str. ID of the new ClassifierTrainingJobModel instance.
 
         Raises:
-            Exception: The id generator for ClassifierTrainingJobModel is
+            Exception. The id generator for ClassifierTrainingJobModel is
                 producing too many collisions.
         """
 
@@ -127,10 +127,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 trained.
 
         Returns:
-            ID of the new ClassifierModel entry.
+            str. ID of the new ClassifierModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id)
@@ -158,7 +158,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            List of the ClassifierTrainingJobModels with status new or pending.
+            list(ClassifierTrainingJobModel). List of the
+            ClassifierTrainingJobModels with status new or pending.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
@@ -308,10 +309,10 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
                 <exp_id, exp_version, state_name>.
 
         Returns:
-            ID of the new ClassifierExplorationMappingModel entry.
+            str. ID of the new ClassifierExplorationMappingModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
 
         instance_id = cls._generate_id(exp_id, exp_version, state_name)

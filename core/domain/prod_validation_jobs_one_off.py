@@ -907,11 +907,10 @@ class BaseUserModelValidator(BaseModelValidator):
             unused_item: ndb.Model. BaseUserModel to validate.
 
         Returns:
-            list(tuple(str, str, list, str, list).
-            A list of tuple which consists of External model name,
-            property name in model, list of property value in model,
-            property name in external model, list of property value
-            in external model.
+            list(tuple(str, str, list, str, list)). A list of tuple which
+            consists of External model name, property name in model, list of
+            property value in model, property name in external model, list of
+            property value in external model.
         """
         return []
 
@@ -6059,7 +6058,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         """Validates the composite_entity_id field of the given item.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The TaskEntry model
+                object to get the composite entity id.
         """
         expected_composite_entity_id = (
             improvements_models.TaskEntryModel.generate_composite_entity_id(
@@ -6077,7 +6077,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         """Validates the fields of the item relating to the status field.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The item to check the
+                status for.
         """
         if item.status == improvements_models.TASK_STATUS_OPEN:
             if item.resolver_id:
@@ -6108,7 +6109,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         name.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The item to fetch and
+                check the target id.
         """
         try:
             exp_model = exp_models.ExplorationModel.get(
@@ -6329,6 +6331,16 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_user_settings_with_same_id_not_exist]
+
+
+class UserAuthModelValidator(BaseUserModelValidator):
+    """Class for validating UserAuthModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            ExternalModelFetcherDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
 
 
 class PlatformParameterModelValidator(BaseModelValidator):
@@ -6552,7 +6564,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator),
     stats_models.PlaythroughModel: PlaythroughModelValidator,
-    user_models.PseudonymizedUserModel: PseudonymizedUserModelValidator
+    user_models.PseudonymizedUserModel: PseudonymizedUserModelValidator,
+    user_models.UserAuthModel: UserAuthModelValidator
 }
 
 
@@ -7425,6 +7438,14 @@ class PseudonymizedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PseudonymizedUserModel]
+
+
+class UserAuthModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserAuthModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserAuthModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
