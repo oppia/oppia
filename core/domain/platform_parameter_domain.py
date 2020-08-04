@@ -138,8 +138,8 @@ class EvaluationContext(python_utils.OBJECT):
                 'Invalid browser type \'%s\', must be one of %s.' % (
                     self._browser_type, ALLOWED_BROWSER_TYPES))
 
-        match = APP_VERSION_WITH_HASH_REGEXP.match(self._app_version)
         if self._app_version is not None:
+            match = APP_VERSION_WITH_HASH_REGEXP.match(self._app_version)
             if match is None:
                 raise utils.ValidationError(
                     'Invalid version \'%s\', expected to match regexp %s.' % (
