@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the jquery, jquery ui.
+ * @fileoverview This file imports the jQuery, jQuery UI.
  */
 
 window.$ = require('static/jquery-3.5.1/jquery.min.js');
