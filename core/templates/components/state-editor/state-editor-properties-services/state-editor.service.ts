@@ -56,7 +56,6 @@ export class StateEditorService {
   stateNames: string[] = [];
   correctnessFeedbackEnabled: boolean = null;
   inQuestionMode: boolean = null;
-  nextContentIdIndex: number = null;
   // Currently, the only place where this is used in the state editor
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
@@ -242,10 +241,6 @@ export class StateEditorService {
 
   deleteCurrentSolutionValidity(): void {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
-  }
-
-  setNextContentIdIndex(newNextContentIdIndex: number): void {
-    this.nextContentIdIndex = newNextContentIdIndex;
   }
 
   get onStateEditorInitialized() {

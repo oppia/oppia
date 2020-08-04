@@ -134,6 +134,7 @@ angular.module('oppia').factory('QuestionUpdateService', [
         // for creating the change to send to the backend.
         updateFunction();
         var newStateData = question.getStateData();
+        console.log(newStateData)
         _updateContentIdsInAssets(newStateData, oldStateData);
         _applyPropertyChange(
           question, QUESTION_PROPERTY_QUESTION_STATE_DATA,

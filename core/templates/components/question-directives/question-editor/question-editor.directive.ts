@@ -162,8 +162,8 @@ angular.module('oppia').directive('questionEditor', [
 
           ctrl.saveNextContentIdIndex = function(displayedValue) {
             _updateQuestion(function() {
-              StateEditorService.setNextContentIdIndex(
-                angular.copy(displayedValue));
+              var stateData = ctrl.question.getStateData();
+              stateData.nextContentIdIndex = angular.copy(displayedValue);
             });
           };
 

@@ -186,9 +186,6 @@ angular.module('oppia').component('explorationEditorTab', {
         ExplorationStatesService.saveNextContentIdIndex(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
-
-        StateEditorService.setNextContentIdIndex(
-          angular.copy(displayedValue));
       };
 
       ctrl.saveSolution = function(displayedValue) {

@@ -29,7 +29,7 @@ var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
 
-describe('Topics and skills dashboard functionality', function() {
+fdescribe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
@@ -140,7 +140,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
-  it('should merge an outside skill with one in a topic', async function() {
+  fit('should merge an outside skill with one in a topic', async function() {
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
