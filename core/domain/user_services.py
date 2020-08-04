@@ -295,6 +295,59 @@ class UserSettings(python_utils.OBJECT):
                         'This username is not available.')
 
 
+class UserAuth(python_utils.OBJECT):
+    """Value object representing a user's authentication information.
+
+    Attributes:
+        user_id: str. The unique ID of the user.
+        gae_id: str. The ID of the user retrieved from GAE.
+        pin: str or None. The PIN of the user's profile for android.
+    """
+
+    def __init__(self, user_id, gae_id, pin=None, deleted=False):
+        """Constructs a UserAuth domain object.
+
+        Args:
+            user_id: str. The unique ID of the user.
+            gae_id: str. The ID of the user retrieved from GAE.
+            pin: str or None. The PIN of the user's profile for android.
+        """
+        self.user_id = user_id
+        self.gae_id = gae_id
+        self.pin = pin
+
+    def validate(self):
+        """Checks that user_id, gae_id and email fields of this UserAuth domain
+        object are valid.
+
+        Raises:
+            ValidationError. The user_id is not str.
+            ValidationError. The gae_id is not str.
+            ValidationError. The pin is not str.
+        """
+        if not isinstance(self.user_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
+
+        if (self.gae_id is not None and
+                not isinstance(self.gae_id, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected gae_id to be a string, received %s' %
+                self.gae_id
+            )
+
+        if (self.pin is not None and
+                not isinstance(self.gae_id, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected PIN to be a string, received %s' %
+                self.pin
+            )
+
+
 def is_user_id_correct(user_id):
     """Verify that the user ID is in a correct format or that it belongs to
     a system user.

@@ -1046,3 +1046,6 @@ CLASSROOM_PAGES = ['math']
 
 # Authentication method using GAE ID (google sign in)
 AUTH_METHOD_GAE = 'gae'
+
+# Used to disable usage of UserAuthModel until it is fully implemented
+ENABLE_USER_AUTH_MODEL = False
