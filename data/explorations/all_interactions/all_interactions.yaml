@@ -39,7 +39,9 @@ states:
         tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        customOskLetters:
+          value: ['π', 'r']
       default_outcome:
         dest: Algebraic Expression Input
         feedback:
@@ -887,7 +889,9 @@ states:
         tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        customOskLetters:
+          value: ['y', 'm', 'x', 'c']
       default_outcome:
         dest: Math Equation Input
         feedback:
