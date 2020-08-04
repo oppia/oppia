@@ -58,7 +58,7 @@ class DragAndDropSortInput(base.BaseInteraction):
                     'html': {
                         'hide_complex_extensions': True,
                         'placeholder': 'Enter an option for the learner to ' +
-                                    'drag and drop.',
+                                       'drag and drop.',
                     }
                 }
             },
