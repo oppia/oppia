@@ -31,6 +31,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/debouncer.service.ts');
 require('services/guppy-configuration.service.ts');
 require('services/html-escaper.service.ts');
+require('third-party-imports/math-expressions.import.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
   '$timeout', 'MathExpressionInputRulesService',

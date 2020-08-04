@@ -21,6 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { MathExpressionAnswer } from 'interactions/answer-defs';
 import { MathExpressionRuleInputs } from 'interactions/rule-input-defs';
+import 'third-party-imports/math-expressions.import';
 
 @Injectable({
   providedIn: 'root'

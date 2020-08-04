@@ -27,6 +27,7 @@ import { MathExpressionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import 'third-party-imports/math-expressions.import';
 
 import { AppConstants } from 'app.constants';
 
