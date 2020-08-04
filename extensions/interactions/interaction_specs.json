@@ -590,7 +590,7 @@
     "id": "MathEquationInput",
     "customization_arg_specs": [
       {
-        "description": "Shortcut variables that the learner can access in the on-screen keyboard.",
+        "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
         "name": "customOskLetters",
         "schema": {
           "obj_type": "CustomOskLetters",
@@ -894,7 +894,7 @@
     "id": "AlgebraicExpressionInput",
     "customization_arg_specs": [
       {
-        "description": "Shortcut variables that the learner can access in the on-screen keyboard.",
+        "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
         "name": "customOskLetters",
         "schema": {
           "obj_type": "CustomOskLetters",

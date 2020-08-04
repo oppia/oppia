@@ -26,11 +26,13 @@ angular.module('oppia').component('customOskLettersEditor', {
   },
   template: require('./custom-osk-letters-editor.component.html'),
   controller: [
-    'GREEK_SYMBOLS_LOWERCASE', 'GREEK_SYMBOLS_UPPERCASE',
-    'CUSTOM_LETTERS_LATIN_TAB', 'CUSTOM_LETTERS_GREEK_TAB',
+    'ALLOWED_CUSTOM_LETTERS_LIMIT', 'CUSTOM_LETTERS_GREEK_TAB',
+    'CUSTOM_LETTERS_LATIN_TAB', 'GREEK_SYMBOLS_LOWERCASE',
+    'GREEK_SYMBOLS_UPPERCASE',
     function(
-        GREEK_SYMBOLS_LOWERCASE, GREEK_SYMBOLS_UPPERCASE,
-        CUSTOM_LETTERS_LATIN_TAB, CUSTOM_LETTERS_GREEK_TAB) {
+        ALLOWED_CUSTOM_LETTERS_LIMIT,  CUSTOM_LETTERS_GREEK_TAB,
+        CUSTOM_LETTERS_LATIN_TAB, GREEK_SYMBOLS_LOWERCASE,
+        GREEK_SYMBOLS_UPPERCASE) {
       const ctrl = this;
       ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
@@ -40,9 +42,8 @@ angular.module('oppia').component('customOskLettersEditor', {
         GREEK_SYMBOLS_LOWERCASE.slice(16, 23).join(''),
       ];
       ctrl.greekUpperCase = [
-        GREEK_SYMBOLS_UPPERCASE.slice(0, 8).join(''),
-        GREEK_SYMBOLS_UPPERCASE.slice(8, 16).join(''),
-        GREEK_SYMBOLS_UPPERCASE.slice(16, 23).join(''),
+        GREEK_SYMBOLS_UPPERCASE.slice(0, 5).join(''),
+        GREEK_SYMBOLS_UPPERCASE.slice(5, 10).join('')
       ];
 
       ctrl.latinTab = CUSTOM_LETTERS_LATIN_TAB;
@@ -56,6 +57,10 @@ angular.module('oppia').component('customOskLettersEditor', {
           ctrl.value.splice(index, 1);
         }
       };
+
+      ctrl.getRemainingLettersCount = function() {
+        return Math.max(ALLOWED_CUSTOM_LETTERS_LIMIT - ctrl.value.length, 0);
+      }
 
       ctrl.$onInit = function() {
         ctrl.alwaysEditable = true;

@@ -1157,7 +1157,8 @@ class CustomOskLetters(BaseObject):
 
     description = (
         'Shortcut variables that the learner can access in the '
-        'on-screen keyboard.')
+        'on-screen keyboard. (The order of these variables will be reflected '
+        'in the learner\'s keyboard)')
     default_value = []
 
     SCHEMA = {

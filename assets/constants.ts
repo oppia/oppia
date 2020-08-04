@@ -5296,9 +5296,8 @@ export = {
   "GREEK_LETTERS": [
     "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
     "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
-    "upsilon", "phi", "chi", "psi", "omega", "Alpha", "Beta", "Gamma", "Delta",
-    "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa", "Lambda", "Mu", "Nu",
-    "Xi", "Pi", "Rho", "Sigma", "Tau", "Upsilon", "Phi", "Chi", "Psi", "Omega"
+    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
+    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
   ],
 
   // Greek symbols allowed in math interactions.
@@ -5306,11 +5305,11 @@ export = {
     "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
     "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω"
   ],
+  "GREEK_SYMBOLS_UPPERCASE": ["Γ", "Δ", "Θ", "Λ", "Ξ", "Π", "Σ", "Φ", "Ψ", "Ω"],
 
-  "GREEK_SYMBOLS_UPPERCASE": [
-    "Α", "Β", "Γ", "Δ", "Ε", "Ζ", "Η", "Θ", "Ι", "Κ", "Λ", "Μ", "Ν", "Ξ", "Π",
-    "Ρ", "Σ", "Τ", "Υ", "Φ", "Χ", "Ψ", "Ω"
-  ],
+  // Number of custom letters allowed in the on-screen keyboard for math
+  // interactions.
+  "ALLOWED_CUSTOM_LETTERS_LIMIT": 10,
 
   // Functions allowed in math interactions.
   "MATH_FUNCTION_NAMES": [

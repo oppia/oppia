@@ -38,7 +38,8 @@ class AlgebraicExpressionInput(base.BaseInteraction):
         'name': 'customOskLetters',
         'description': (
             'Shortcut variables that the learner can access in the on-screen '
-            'keyboard.'),
+            'keyboard. (The order of these variables will be reflected in the '
+            'learner\'s keyboard)'),
         'schema': {
             'type': 'custom',
             'obj_type': 'CustomOskLetters',

@@ -45,10 +45,16 @@ export class MathEquationInputValidationService {
       customizationArgs: MathEquationInputCustomizationArgs): Warning[] {
     let warningsList = [];
 
-    if (customizationArgs.customOskLetters.value.length > 10) {
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    // eslint-disable-nex-line dot-notation
+    let allowedLettersLimit = AppConstants['ALLOWED_CUSTOM_LETTERS_LIMIT'];
+    if (customizationArgs.customOskLetters.value.length > allowedLettersLimit) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The number of custom letters cannot be more than 10.'
+        message: (
+          'The number of custom letters cannot be more than ' +
+          allowedLettersLimit + '.')
       });
     }
 

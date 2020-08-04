@@ -29,13 +29,18 @@ describe('OnScreenKeyboard', function() {
 
   it('should update letters list', function() {
     expect(ctrl.value).toEqual([]);
+    expect(ctrl.getRemainingLettersCount()).toBe(10);
     ctrl.updateLettersList('z');
     expect(ctrl.value).toEqual(['z']);
+    expect(ctrl.getRemainingLettersCount()).toBe(9);
     ctrl.updateLettersList('alpha');
     expect(ctrl.value).toEqual(['z', 'alpha']);
+    expect(ctrl.getRemainingLettersCount()).toBe(8);
     ctrl.updateLettersList('z');
     expect(ctrl.value).toEqual(['alpha']);
+    expect(ctrl.getRemainingLettersCount()).toBe(9);
     ctrl.updateLettersList('alpha');
     expect(ctrl.value).toEqual([]);
+    expect(ctrl.getRemainingLettersCount()).toBe(10);
   });
 });
