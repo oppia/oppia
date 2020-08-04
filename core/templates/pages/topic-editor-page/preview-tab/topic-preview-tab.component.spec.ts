@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for topic-preview-tab.
+ * @fileoverview Unit tests for topic preview tab.
  */
 
 import { TestBed } from '@angular/core/testing';

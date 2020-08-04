@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the topic editor preview tab.
+ * @fileoverview Controller for the topic preview tab.
  */
 
 require('components/summary-tile/subtopic-summary-tile.directive.ts');
