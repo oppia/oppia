@@ -50,9 +50,7 @@ const login = async function(context, page) {
     await page.click('#terms-checkbox');
     await page.waitForSelector('#signup-submit');
     await page.click('#signup-submit');
-    await page.waitForFunction(
-      'document.querySelector("body").innerText.includes("Admin")'
-    );
+    await page.waitForSelector('.oppia-navbar-dropdown-toggle');
     // eslint-disable-next-line no-console
     console.log('Successfully Logged in');
   } catch (e) {
@@ -71,13 +69,17 @@ const setRoleAdmin = async function(context, page) {
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin#/roles');
     await page.waitForSelector('#update-role-username-input');
+    await page.waitFor(2000);
     await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', 'string:ADMIN');
+    await page.waitFor(2000);
     await page.waitForSelector('#update-button-id');
+    await page.waitFor(2000);
     await page.click('#update-button-id');
+    await page.waitFor(2000);
+    await page.waitForSelector('.protractor-test-status-message');
     await page.waitForFunction(
-      'document.querySelector("body").innerText.includes('
-       + '"successfully updated to")'
+      'document.querySelector("body").innerText.includes("successfully updated to")'
     );
     // eslint-disable-next-line no-console
     console.log('Role changed to admin');
