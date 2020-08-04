@@ -17,14 +17,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# File main.py has important system path configurations that need to be imported
-# for all of the correct python libraries to be discoverable.
+# main.py has important system path configurations that need to be imported for
+# all of the correct python libraries to be discoverable.
 import main # isort:skip
-from core.controllers import cron # isort:skip
-from core.platform import models # isort:skip
-import feconf # isort:skip
+from core.controllers import cron
+from core.platform import models
+import feconf
 
-import webapp2 # isort:skip
+import webapp2
 
 
 transaction_services = models.Registry.import_transaction_services()
