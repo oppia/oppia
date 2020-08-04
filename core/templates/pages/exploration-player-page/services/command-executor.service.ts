@@ -20,6 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, HostListener } from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service.ts';
+import {WindowWrapperMessageService} from 
+'pages/exploration-player-page/services/window-wrapper-message.service';
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 import {ServicesConstants} from 'services/services.constants';
 
@@ -37,21 +39,21 @@ export class CommandExecutorService {
   setElementsOnPage = 0;
   hostname = '';
   cachedOuterFrameMessage = '';
+  windowWrapperMessageService = null;
   constructor(private windowRef: WindowRef) {
-    this.getOuterFrameEvents(windowRef);
     this.setElementsOnPage = 0;
     this.hostname = '';
     this.cachedOuterFrameMessage = '';
-    this.sendParentReadyState();
+    this.windowWrapperMessageService = new WindowWrapperMessageService(windowRef);
   }
 
-  sendParentReadyState() {
-    this.windowRef.nativeWindow.parent.postMessage(
-      'Ready to receive hostname', '*');
+  sendParentReadyState(windowRef) {
+    this.windowWrapperMessageService.postMessageToParent('Ready to receive hostname', '*');
   }
 
   getOuterFrameEvents(windowRef) {
-    windowRef.nativeWindow.addEventListener('message', (event) => {
+    this.windowWrapperMessageService.addEventListener(
+    'message', (event) => {
       var messageArray = event.data.split(' ');
       var command = messageArray[0];
       var message = '';
@@ -59,12 +61,19 @@ export class CommandExecutorService {
         message = message + messageArray[i] + ' ';
       }
       message = message.substr(0, message.length - 1);
-      if (command !== 'HOSTNAME' && this.hostname === '') {
-        return;
+      if ((command !== 'HOSTNAME' && this.hostname === '') ||
+      command == 'finishedProcessing') {
       } else if (command === 'CONTINUE' || command === 'SUBMIT') {
         this.commandToFunctionMap[command](windowRef);
-      } else if (command === 'HOSTNAME') {
-        this.setHostname(windowRef, message);
+      } else if (command == 'HOSTNAME'){
+        if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message) >= 0) {
+          this.hostname = message;
+        }
+        if (this.cachedOuterFrameMessage !== '' &&
+        this.cachedOuterFrameMessage !== undefined) {
+          this.windowWrapperMessageService.postMessageToParent(
+            this.cachedOuterFrameMessage,this.hostname);
+        }
       } else {
         this.commandToFunctionMap[command](windowRef, message);
       }
@@ -90,18 +99,7 @@ export class CommandExecutorService {
     if (this.hostname === '') {
       this.cachedOuterFrameMessage = stateToCommand[id];
     } else {
-      this.windowRef.nativeWindow.parent.postMessage(stateToCommand[id],
-        this.hostname);
-    }
-  }
-
-  setHostname(windowRef, message) {
-    if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message) >= 0) {
-      this.hostname = message;
-    }
-    if (this.cachedOuterFrameMessage !== '' &&
-    this.cachedOuterFrameMessage !== undefined) {
-      windowRef.nativeWindow.parent.postMessage(this.cachedOuterFrameMessage,
+      this.windowWrapperMessageService.postMessageToParent(stateToCommand[id],
         this.hostname);
     }
   }

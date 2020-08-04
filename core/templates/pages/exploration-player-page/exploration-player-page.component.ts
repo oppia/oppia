@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CommandExecutorService } from './services/command-executor.service';
 
 /**
  * @fileoverview Component for the explaration player page.
@@ -39,17 +38,19 @@ angular.module('oppia').component('explorationPlayerPage', {
   controller: [
     'ContextService', 'PageTitleService',
     'ReadOnlyExplorationBackendApiService',
-    'CommandExecutorService', '$rootScope',
+    'CommandExecutorService', 'WindowRef', '$rootScope',
     function(
         ContextService, PageTitleService,
         ReadOnlyExplorationBackendApiService,
-        CommandExecutorService, $rootScope) {
+        CommandExecutorService, WindowRef, $rootScope) {
       var ctrl = this;
       ctrl.$onInit = function() {
         $rootScope.$on('livePlayerStateChange', function(state, args) {
-          var id = args._interaction.id;
+          var id = args;
           CommandExecutorService.sendStateToOuterFrame(id);
         });
+        CommandExecutorService.getOuterFrameEvents(WindowRef);
+        CommandExecutorService.sendParentReadyState(WindowRef);
 
         var explorationId = ContextService.getExplorationId();
         ReadOnlyExplorationBackendApiService.fetchExploration(

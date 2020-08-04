@@ -669,8 +669,9 @@ angular.module('oppia').directive('conversationSkin', [
               PlayerPositionService.getDisplayedCardIndex());
           };
           var _addNewCard = function(newCard) {
+            console.log(newCard)
             PlayerTranscriptService.addNewCard(newCard);
-            $rootScope.$broadcast('livePlayerStateChange', newCard);
+            $rootScope.$broadcast('livePlayerStateChange', newCard._interaction.id);
 
             var totalNumCards = PlayerTranscriptService.getNumCards();
 

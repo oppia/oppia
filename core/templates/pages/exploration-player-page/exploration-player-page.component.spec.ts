@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { rootCertificates } from 'tls';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-player-page/exploration-player-page.component.ts');
@@ -26,10 +27,12 @@ require('pages/exploration-player-page/exploration-player-page.component.ts');
 describe('Exploration player page', function() {
   var ctrl = null;
   var $q = null;
+  var $rootScope = null;
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
   var ReadOnlyExplorationBackendApiService = null;
+  var CommandExecutorService = null;
 
   var explorationId = 'exp1';
   var exploration = {
@@ -46,9 +49,10 @@ describe('Exploration player page', function() {
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     PageTitleService = $injector.get('PageTitleService');
+    CommandExecutorService = $injector.get('CommandExecutorService');
     ReadOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
 
@@ -68,6 +72,12 @@ describe('Exploration player page', function() {
       }));
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
+    CommandExecutorService.getOuterFrameEvents = 
+    jasmine.createSpy("outerFrameEvents spy");
+    CommandExecutorService.sendParentReadyState = 
+    jasmine.createSpy("sendParentReadyState spy");
+    CommandExecutorService.sendStateToOuterFrame = 
+    jasmine.createSpy('sendStateToOuterFrame spy');
     var angularElementSpy = spyOn(angular, 'element');
 
     var elementNameItemProp = $('<div>');
@@ -107,5 +117,13 @@ describe('Exploration player page', function() {
     expect(elementTitleProperty.attr('content')).toBe(exploration.title);
     expect(elementDescriptionProperty.attr('content')).toBe(
       exploration.objective);
+    expect(CommandExecutorService.getOuterFrameEvents)
+    .toHaveBeenCalled();
+    expect(CommandExecutorService.sendParentReadyState)
+    .toHaveBeenCalled();
+    $rootScope.$broadcast('livePlayerStateChange', 'CONTINUE');
+    $rootScope.$apply();
+    $scope.$apply();
+    expect(CommandExecutorService.sendStateToOuterFrame).toHaveBeenCalled();
   });
 });

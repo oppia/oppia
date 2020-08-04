@@ -95,7 +95,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-update.service.ts',
     'CollectionObjectFactory.ts',
     'CollectionPlaythroughObjectFactory.ts',
-    'command-executor.service.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
     'confirm-delete-state-modal.controller.ts',
@@ -139,7 +138,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-graph.directive.ts',
     'exploration-metadata-modal.controller.ts',
     'exploration-objective-editor.directive.ts',
-    'exploration-player-page.component.ts',
     'exploration-player-state.service.ts',
     'exploration-player-suggestion-modal.controller.ts',
     'exploration-recommendations.service.ts',
@@ -482,6 +480,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'voiceover-recording.service.ts',
     'warnings-and-alerts.directive.ts',
     'welcome-modal.controller.ts',
+    'window-wrapper-message.service.ts',
     'worked-example-editor.directive.ts',
 ]
 

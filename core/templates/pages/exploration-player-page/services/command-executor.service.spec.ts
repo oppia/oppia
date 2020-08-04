@@ -20,16 +20,27 @@ import { TestBed } from '@angular/core/testing';
 import { CommandExecutorService } from
   'pages/exploration-player-page/services/command-executor.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
-
+import { WindowWrapperMessageService } from
+'pages/exploration-player-page/services/window-wrapper-message.service';
+import { isObject } from 'lodash';
 describe('Command executor service', () => {
   let ces: CommandExecutorService, wrf: WindowRef;
-  beforeEach(() => {
+  var mockWindow; var spy;
+  beforeEach((done) => {
     TestBed.configureTestingModule({
       providers: [CommandExecutorService, WindowRef]
     });
     ces = TestBed.get(CommandExecutorService);
     wrf = TestBed.get(WindowRef);
+    setupWindowRef(wrf);
+    wrf.nativeWindow.parent.postMessage = function(message) {
+      mockWindow.state = message;
+    }
+    spy = spyOn(ces.windowWrapperMessageService, 'addEventListener');
+    ces.getOuterFrameEvents(wrf);
+    done()
   });
+
   var continueBoolean = false;
   var addBoolean = false;
   var deleteBoolean = false;
@@ -112,87 +123,238 @@ describe('Command executor service', () => {
     testPage.appendChild(secondaryContinueButton);
     wrf.nativeWindow.document.body.appendChild(testPage);
   };
-  it('should properly click the continue button', () => {
-    setupWindowRef(wrf);
-    ces.continueClick(wrf);
+
+  it('should register the host', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+  });
+
+  it('should click continue', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'CONTINUE'
+    });
+    listener(messageEvent);
     expect(continueBoolean).toEqual(true);
   });
 
-  it('should properly enter text', () => {
-    setupWindowRef(wrf);
-    ces.fillTextBox(wrf, 'testText');
+  it('should enter text', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'ENTER_TEXT_NUMBER_UNITS testText'
+    });
+    listener(messageEvent);
     var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control'
-    )[0] as HTMLInputElement;
+      'form-control')[0] as HTMLInputElement;
     expect(textbox.value).toEqual('testText');
   });
 
-  it('should only enter text for adding to set',
-    () => {
-      setupWindowRef(wrf);
-      ces.addSet(wrf, '1');
-      expect(addBoolean).toEqual(false);
-      var textbox = wrf.nativeWindow.document.getElementsByClassName(
-        'form-control'
-      )[0] as HTMLInputElement;
-      expect(textbox.value).toEqual('1');
+  it('should add to set by filling box', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
     });
-
-  it('should enter text, click button, then add text to add to set',
-    () => {
-      setupWindowRef(wrf);
-      ces.addSet(wrf, '1');
-      expect(addBoolean).toEqual(false);
-      ces.addSet(wrf, '2');
-      expect(addBoolean).toEqual(true);
-      var textbox = wrf.nativeWindow.document.getElementsByClassName(
-        'form-control'
-      )[0] as HTMLInputElement;
-      expect(textbox.value).toEqual('1');
-      var textbox = wrf.nativeWindow.document.getElementsByClassName(
-        'form-control'
-      )[1] as HTMLInputElement;
-      expect(textbox.value).toEqual('2');
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'ADD_SET 1'
     });
+    listener(messageEvent);
+    var textbox = wrf.nativeWindow.document.getElementsByClassName(
+      'form-control')[0] as HTMLInputElement;
+    expect(textbox.value).toEqual('1');
+  })
 
-  it('should delete the set element correctly by clicking the button',
-    () => {
-      setupWindowRef(wrf);
-      ces.addSet(wrf, '1');
-      ces.removeSet(wrf, '1');
-      expect(deleteBoolean).toEqual(true);
+  it('should add two elements to set', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
     });
-
-  it('should add the fraction into the correct box', () => {
-    setupWindowRef(wrf);
-    ces.enterFraction(wrf, '2/3');
-    var fractionbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control \n' +
-      'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r'
-    )[0] as HTMLInputElement;
-    expect(fractionbox.value).toEqual('2/3');
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'ADD_SET 1'
+    });
+    listener(messageEvent);
+    var textbox = wrf.nativeWindow.document.getElementsByClassName(
+      'form-control')[0] as HTMLInputElement;
+    expect(textbox.value).toEqual('1');
+    expect(addBoolean).toEqual(false);
+    var messageEvent = new MessageEvent('message', {
+      data: 'ADD_SET 2'
+    });
+    listener(messageEvent);
+    var textboxes = wrf.nativeWindow.document.getElementsByClassName(
+      'form-control');
+    var first = textboxes[0] as HTMLInputElement;
+    var second = textboxes[1] as HTMLInputElement;
+    expect(first.value).toEqual('1');
+    expect(second.value).toEqual('2');
+    expect(addBoolean).toEqual(true);
   });
 
-  it('should correctly click the 2nd multiple choice answer', () => {
-    setupWindowRef(wrf);
-    ces.selectItemBullet(wrf, '2');
+  it('should enter a fraction', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'ENTER_FRACTION 2/3'
+    });
+    listener(messageEvent);
+    var textbox = wrf.nativeWindow.document.getElementsByClassName(
+      'ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r'
+      )[0] as HTMLInputElement;
+    expect(textbox.value).toEqual('2/3');
+  });
+
+  it('should click 2nd multiple choice answer', () {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'SELECT_ITEM_BULLET 2'
+    });
+    listener(messageEvent);
     expect(mcBoolean).toEqual(true);
   });
 
-  it('should click the submit button', () => {
-    setupWindowRef(wrf);
-    ces.submit(wrf);
+  it('should click submit', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'SUBMIT'
+    });
+    listener(messageEvent);
     expect(continueBoolean).toEqual(true);
   });
 
-  it('should click continue in the second type of continue button',
-    () => {
-      setupWindowRef(wrf);
-      var suite =
-        wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
-      suite.querySelector(
-        '.oppia-learner-confirm-button').remove();
-      ces.continueClick(wrf);
-      expect(secondaryContinueBoolean).toEqual(true);
+  it('should delete the added element', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
     });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'ADD_SET 1'
+    });
+    listener(messageEvent);
+    var textbox = wrf.nativeWindow.document.getElementsByClassName(
+      'form-control')[0] as HTMLInputElement;
+    expect(textbox.value).toEqual('1');
+    var messageEvent = new MessageEvent('message', {
+      data: 'REMOVE_SET 1'
+    });
+    listener(messageEvent);
+    expect(deleteBoolean).toEqual(true);
+  });
+
+  it('should click the second type of continue button', () => {
+    var suite =
+    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
+    suite.querySelector(
+      '.oppia-learner-confirm-button').remove();
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    var messageEvent = new MessageEvent('message', {
+      data: 'CONTINUE'
+    });
+    listener(messageEvent);
+    expect(secondaryContinueBoolean).toEqual(true);
+  });
+
+  it('should attempt to send parent ready state', () => {
+    ces.windowWrapperMessageService.postMessageToParent = 
+    jasmine.createSpy('parentMessage spy');
+    ces.sendParentReadyState(wrf);
+    expect(ces.windowWrapperMessageService.postMessageToParent)
+    .toHaveBeenCalled();
+  });
+
+  it('should mimic send state to outer frame', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    ces.windowWrapperMessageService.postMessageToParent = 
+    jasmine.createSpy('parentMessage spy');
+    ces.sendStateToOuterFrame('Continue');
+    expect(ces.windowWrapperMessageService.postMessageToParent)
+    .toHaveBeenCalledWith('CONTINUE', 'mockWindow');
+  });
+
+  it('should send the cached message after hostname load', 
+  () => {
+    ces.sendStateToOuterFrame('SetInput');
+    expect(ces.cachedOuterFrameMessage).toEqual('SET_OPERATION');
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    ces.windowWrapperMessageService.postMessageToParent = 
+    jasmine.createSpy('parentMessage spy');
+    var messageEvent = new MessageEvent('message', {
+      data: 'HOSTNAME mockWindow'
+    });
+    listener(messageEvent);
+    expect(ces.hostname).toEqual('mockWindow');
+    expect(ces.windowWrapperMessageService.postMessageToParent)
+    .toHaveBeenCalledWith('SET_OPERATION', 'mockWindow');
+  });
+
+  it('should not send any message', () => {
+    var emptyVal = ces.sendStateToOuterFrame('START_STATE');
+    expect(emptyVal).toEqual(undefined);
+  })
 });
