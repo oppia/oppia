@@ -94,10 +94,9 @@ export class CommandExecutorService {
       NumericExpressionInput: 'ENTER_TEXT_NUMBER_UNITS',
       SetInput: 'SET_OPERATION',
       TextInput: 'ENTER_TEXT_NUMBER_UNITS',
-      'default': ''
     };
     this.setElementsOnPage = 0;
-    if (stateToCommand[id] === '') {
+    if (!(id in stateToCommand)) {
       return;
     }
     if (this.hostname === '') {
