@@ -143,7 +143,9 @@ def get_story_by_id(story_id, strict=True, version=None):
     """
     sub_namespace = python_utils.convert_to_bytes(version) if version else ''
     cached_story = caching_services.get_multi(
-        [story_id], 'story', sub_namespace=sub_namespace).get(story_id)
+        [story_id],
+        caching_services.CACHE_NAMESPACE_STORY,
+        sub_namespace).get(story_id)
 
     if cached_story is not None:
         return cached_story
@@ -153,7 +155,8 @@ def get_story_by_id(story_id, strict=True, version=None):
         if story_model:
             story = get_story_from_model(story_model)
             caching_services.set_multi(
-                {story_id: story}, 'story', sub_namespace=sub_namespace)
+                {story_id: story}, caching_services.CACHE_NAMESPACE_STORY,
+                sub_namespace)
             return story
         else:
             return None

@@ -294,7 +294,9 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     """
     sub_namespace = python_utils.convert_to_bytes(version) if version else ''
     cached_exploration = caching_services.get_multi(
-        [exploration_id], 'exploration', sub_namespace=sub_namespace).get(
+        [exploration_id],
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        sub_namespace).get(
             exploration_id)
 
     if cached_exploration is not None:
@@ -308,8 +310,8 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
                 {
                     exploration_id: exploration
                 },
-                'exploration',
-                sub_namespace=sub_namespace)
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                sub_namespace)
             return exploration
         else:
             return None
@@ -335,7 +337,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     """
     result = {}
     uncached = []
-    cache_result = caching_services.get_multi(exp_ids, 'exploration')
+    cache_result = caching_services.get_multi(
+        exp_ids, caching_services.CACHE_NAMESPACE_EXPLORATION)
 
     for exp_obj in cache_result.values():
         result[exp_obj.id] = exp_obj
@@ -369,7 +372,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     }
 
     if cache_update:
-        caching_services.set_multi(cache_update, 'exploration')
+        caching_services.set_multi(
+            cache_update, caching_services.CACHE_NAMESPACE_EXPLORATION)
 
     result.update(db_results_dict)
     return result

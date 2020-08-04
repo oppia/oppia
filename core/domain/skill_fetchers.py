@@ -68,7 +68,9 @@ def get_skill_by_id(skill_id, strict=True, version=None):
     """
     sub_namespace = python_utils.convert_to_bytes(version) if version else ''
     cached_skill = caching_services.get_multi(
-        [skill_id], 'skill', sub_namespace=sub_namespace).get(skill_id)
+        [skill_id],
+        caching_services.CACHE_NAMESPACE_SKILL,
+        sub_namespace).get(skill_id)
 
     if cached_skill is not None:
         return cached_skill
@@ -78,8 +80,8 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         if skill_model:
             skill = get_skill_from_model(skill_model)
             caching_services.set_multi(
-                {skill_id: skill}, 'skill',
-                sub_namespace=sub_namespace)
+                {skill_id: skill}, caching_services.CACHE_NAMESPACE_SKILL,
+                sub_namespace)
             return skill
         else:
             return None

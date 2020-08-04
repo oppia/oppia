@@ -169,7 +169,8 @@ def get_topic_by_id(topic_id, strict=True, version=None):
     """
     sub_namespace = python_utils.convert_to_bytes(version) if version else ''
     cached_topic = caching_services.get_multi(
-        [topic_id], 'topic', sub_namespace=sub_namespace).get(topic_id)
+        [topic_id], caching_services.CACHE_NAMESPACE_TOPIC,
+        sub_namespace).get(topic_id)
 
     if cached_topic is not None:
         return cached_topic
@@ -178,12 +179,10 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             topic_id, strict=strict, version=version)
         if topic_model:
             topic = get_topic_from_model(topic_model)
-            if version:
-                caching_services.set_multi(
-                    {topic_id: topic}, 'topic',
-                    sub_namespace=sub_namespace)
-            else:
-                caching_services.set_multi({topic_id: topic}, 'topic')
+            caching_services.set_multi(
+                {topic_id: topic},
+                caching_services.CACHE_NAMESPACE_TOPIC,
+                sub_namespace)
             return topic
         else:
             return None

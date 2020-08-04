@@ -184,7 +184,9 @@ def get_collection_by_id(collection_id, strict=True, version=None):
     """
     sub_namespace = python_utils.convert_to_bytes(version) if version else ''
     cached_collection = caching_services.get_multi(
-        [collection_id], 'collection', sub_namespace=sub_namespace).get(
+        [collection_id],
+        caching_services.CACHE_NAMESPACE_COLLECTION,
+        sub_namespace).get(
             collection_id)
 
     if cached_collection is not None:
@@ -195,8 +197,9 @@ def get_collection_by_id(collection_id, strict=True, version=None):
         if collection_model:
             collection = get_collection_from_model(collection_model)
             caching_services.set_multi(
-                {collection_id: collection}, 'collection',
-                sub_namespace=sub_namespace)
+                {collection_id: collection},
+                caching_services.CACHE_NAMESPACE_COLLECTION,
+                sub_namespace)
             return collection
         else:
             return None
@@ -244,7 +247,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     result = {}
     uncached = []
     cache_result = caching_services.get_multi(
-        collection_ids, 'collection')
+        collection_ids, caching_services.CACHE_NAMESPACE_COLLECTION)
 
     for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
@@ -280,7 +283,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
 
     if cache_update:
         caching_services.set_multi(
-            cache_update, 'collection')
+            cache_update, caching_services.CACHE_NAMESPACE_COLLECTION)
 
     result.update(db_results_dict)
     return result
@@ -742,7 +745,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
     caching_services.delete_multi(
-        [collection.id], 'collection')
+        [collection.id], caching_services.CACHE_NAMESPACE_COLLECTION)
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -844,7 +847,7 @@ def delete_collections(committer_id, collection_ids, force_deletion=False):
     # This must come after the collection is retrieved. Otherwise the memcache
     # key will be reinstated.
     caching_services.delete_multi(
-        collection_ids, 'collection')
+        collection_ids, caching_services.CACHE_NAMESPACE_COLLECTION)
 
     # Delete the collection from search.
     search_services.delete_collections_from_search_index(collection_ids)

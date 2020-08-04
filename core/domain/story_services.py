@@ -426,7 +426,8 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.version = story.version
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
-    caching_services.delete_multi([story.id], 'story')
+    caching_services.delete_multi(
+        [story.id], caching_services.CACHE_NAMESPACE_STORY)
     story.version += 1
 
 
@@ -512,7 +513,8 @@ def delete_story(committer_id, story_id, force_deletion=False):
     exp_models.ExplorationContextModel.delete_multi(
         exploration_context_models_to_be_deleted)
 
-    caching_services.delete_multi([story_id], 'story')
+    caching_services.delete_multi(
+        [story_id], caching_services.CACHE_NAMESPACE_STORY)
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).

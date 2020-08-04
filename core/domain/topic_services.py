@@ -448,7 +448,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
-    caching_services.delete_multi([topic.id], 'topic')
+    caching_services.delete_multi(
+        [topic.id], caching_services.CACHE_NAMESPACE_TOPIC)
     topic.version += 1
 
 
@@ -749,7 +750,8 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
 
-    caching_services.delete_multi([topic_id], 'topic')
+    caching_services.delete_multi(
+        [topic_id], caching_services.CACHE_NAMESPACE_TOPIC)
     (
         opportunity_services
         .delete_exploration_opportunities_corresponding_to_topic(topic_id))

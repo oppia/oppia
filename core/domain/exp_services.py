@@ -576,7 +576,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
-    caching_services.delete_multi([exploration.id], 'exploration')
+    caching_services.delete_multi(
+        [exploration.id], caching_services.CACHE_NAMESPACE_EXPLORATION)
 
     exploration.version += 1
 
@@ -750,7 +751,8 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
         feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
 
-    caching_services.delete_multi(exploration_ids, 'exploration')
+    caching_services.delete_multi(
+        exploration_ids, caching_services.CACHE_NAMESPACE_EXPLORATION)
 
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
@@ -1176,7 +1178,8 @@ def revert_exploration(
         exploration_model, committer_id,
         'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
-    caching_services.delete_multi([exploration.id], 'exploration')
+    caching_services.delete_multi(
+        [exploration.id], caching_services.CACHE_NAMESPACE_EXPLORATION)
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
