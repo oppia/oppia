@@ -32,10 +32,10 @@ class FeatureGatingHandler(base.BaseHandler):
         the given client information.
         """
         context_dict = {
-            'client_type': self.payload.get('client'),
-            'browser_type': self.payload.get('browser'),
+            'client_type': self.payload.get('client_type'),
+            'browser_type': self.payload.get('browser_type'),
             'app_version': self.payload.get('app_version'),
-            'user_locale': self.payload.get('locale'),
+            'user_locale': self.payload.get('user_locale'),
         }
         context = (
             feature_gating_services.create_evaluation_context_for_client(

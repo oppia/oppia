@@ -84,10 +84,10 @@ class FeatureGatingHandlerTest(test_utils.GenericTestBase):
             result = self.post_json(
                 '/featuregatinghandler',
                 {
-                    'client': 'Android',
-                    'browser': None,
-                    'version': '1.0.0',
-                    'locale': 'en',
+                    'client_type': 'Android',
+                    'browser_type': None,
+                    'app_version': '1.0.0',
+                    'user_locale': 'en',
                 },
                 csrf_token=csrf_token)
             self.assertEqual(
@@ -99,10 +99,10 @@ class FeatureGatingHandlerTest(test_utils.GenericTestBase):
         resp_dict = self.post_json(
             '/featuregatinghandler',
             {
-                'client': 'Invalid',
-                'browser': None,
-                'version': '1.0.0',
-                'locale': 'en',
+                'client_type': 'Invalid',
+                'browser_type': None,
+                'app_version': '1.0.0',
+                'user_locale': 'en',
             },
             csrf_token=csrf_token,
             expected_status_int=400)
