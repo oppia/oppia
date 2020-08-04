@@ -20,9 +20,6 @@ import { TestBed } from '@angular/core/testing';
 import { CommandExecutorService } from
   'pages/exploration-player-page/services/command-executor.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
-import { WindowWrapperMessageService } from
-'pages/exploration-player-page/services/window-wrapper-message.service';
-import { isObject } from 'lodash';
 describe('Command executor service', () => {
   let ces: CommandExecutorService, wrf: WindowRef;
   var mockWindow; var spy;
@@ -350,7 +347,7 @@ describe('Command executor service', () => {
       listener(messageEvent);
       expect(ces.hostname).toEqual('mockWindow');
       expect(ces.windowWrapperMessageService.postMessageToParent)
-      .toHaveBeenCalledWith('SET_OPERATION', 'mockWindow');
+        .toHaveBeenCalledWith('SET_OPERATION', 'mockWindow');
     });
 
   it('should not send any message', () => {
