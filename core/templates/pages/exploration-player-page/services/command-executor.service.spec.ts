@@ -237,7 +237,7 @@ describe('Command executor service', () => {
     expect(textbox.value).toEqual('2/3');
   });
 
-  it('should click 2nd multiple choice answer', () {
+  it('should click 2nd multiple choice answer', () => {
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var listener = spy.calls.mostRecent().args[1];
@@ -356,5 +356,16 @@ describe('Command executor service', () => {
   it('should not send any message', () => {
     var emptyVal = ces.sendStateToOuterFrame('START_STATE');
     expect(emptyVal).toEqual(undefined);
-  })
+  });
+
+  it('should do nothing because hostname not set', () => {
+    expect(spy).toHaveBeenCalled();
+    expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var listener = spy.calls.mostRecent().args[1];
+    var messageEvent = new MessageEvent('message', {
+      data: 'CONTINUE'
+    });
+    var emptyVal = listener(messageEvent);
+    expect(emptyVal).toEqual(undefined);
+  });
 });

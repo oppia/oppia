@@ -72,11 +72,11 @@ describe('Exploration player page', function() {
       }));
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
-    CommandExecutorService.getOuterFrameEvents = 
-    jasmine.createSpy("outerFrameEvents spy");
-    CommandExecutorService.sendParentReadyState = 
-    jasmine.createSpy("sendParentReadyState spy");
-    CommandExecutorService.sendStateToOuterFrame = 
+    CommandExecutorService.getOuterFrameEvents =
+    jasmine.createSpy('outerFrameEvents spy');
+    CommandExecutorService.sendParentReadyState =
+    jasmine.createSpy('sendParentReadyState spy');
+    CommandExecutorService.sendStateToOuterFrame =
     jasmine.createSpy('sendStateToOuterFrame spy');
     var angularElementSpy = spyOn(angular, 'element');
 
@@ -118,9 +118,9 @@ describe('Exploration player page', function() {
     expect(elementDescriptionProperty.attr('content')).toBe(
       exploration.objective);
     expect(CommandExecutorService.getOuterFrameEvents)
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
     expect(CommandExecutorService.sendParentReadyState)
-    .toHaveBeenCalled();
+      .toHaveBeenCalled();
     $rootScope.$broadcast('livePlayerStateChange', 'CONTINUE');
     $rootScope.$apply();
     $scope.$apply();

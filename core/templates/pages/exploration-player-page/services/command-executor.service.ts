@@ -20,8 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, HostListener } from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service.ts';
-import {WindowWrapperMessageService} from 
-'pages/exploration-player-page/services/window-wrapper-message.service';
+import {WindowWrapperMessageService} from
+  'pages/exploration-player-page/services/window-wrapper-message.service';
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 import {ServicesConstants} from 'services/services.constants';
 
@@ -44,40 +44,43 @@ export class CommandExecutorService {
     this.setElementsOnPage = 0;
     this.hostname = '';
     this.cachedOuterFrameMessage = '';
-    this.windowWrapperMessageService = new WindowWrapperMessageService(windowRef);
+    this.windowWrapperMessageService =
+      new WindowWrapperMessageService(windowRef);
   }
 
   sendParentReadyState(windowRef) {
-    this.windowWrapperMessageService.postMessageToParent('Ready to receive hostname', '*');
+    this.windowWrapperMessageService.postMessageToParent(
+      'Ready to receive hostname', '*');
   }
 
   getOuterFrameEvents(windowRef) {
     this.windowWrapperMessageService.addEventListener(
-    'message', (event) => {
-      var messageArray = event.data.split(' ');
-      var command = messageArray[0];
-      var message = '';
-      for (var i = 1; i < messageArray.length; i++) {
-        message = message + messageArray[i] + ' ';
-      }
-      message = message.substr(0, message.length - 1);
-      if ((command !== 'HOSTNAME' && this.hostname === '') ||
-      command == 'finishedProcessing') {
-      } else if (command === 'CONTINUE' || command === 'SUBMIT') {
-        this.commandToFunctionMap[command](windowRef);
-      } else if (command == 'HOSTNAME'){
-        if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message) >= 0) {
-          this.hostname = message;
+      'message', (event) => {
+        var messageArray = event.data.split(' ');
+        var command = messageArray[0];
+        var message = '';
+        for (var i = 1; i < messageArray.length; i++) {
+          message = message + messageArray[i] + ' ';
         }
-        if (this.cachedOuterFrameMessage !== '' &&
-        this.cachedOuterFrameMessage !== undefined) {
-          this.windowWrapperMessageService.postMessageToParent(
-            this.cachedOuterFrameMessage,this.hostname);
+        message = message.substr(0, message.length - 1);
+        if ((command !== 'HOSTNAME' && this.hostname === '') ||
+        command === 'finishedProcessing') {
+          return;
+        } else if (command === 'CONTINUE' || command === 'SUBMIT') {
+          this.commandToFunctionMap[command](windowRef);
+        } else if (command === 'HOSTNAME') {
+          if (ServicesConstants.WHITELISTED_IFRAME_HOSTS.indexOf(message) >= 0) {
+            this.hostname = message;
+          }
+          if (this.cachedOuterFrameMessage !== '' &&
+          this.cachedOuterFrameMessage !== undefined) {
+            this.windowWrapperMessageService.postMessageToParent(
+              this.cachedOuterFrameMessage, this.hostname);
+          }
+        } else {
+          this.commandToFunctionMap[command](windowRef, message);
         }
-      } else {
-        this.commandToFunctionMap[command](windowRef, message);
-      }
-    });
+      });
   }
 
   sendStateToOuterFrame(id) {

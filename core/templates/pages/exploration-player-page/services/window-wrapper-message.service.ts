@@ -29,11 +29,11 @@ export class WindowWrapperMessageService {
   }
 
   addEventListener(type, func) {
-      this.windowRef.nativeWindow.addEventListener(type, func);
+    this.windowRef.nativeWindow.addEventListener(type, func);
   }
 
   postMessageToParent(message, hostname) {
-      this.windowRef.nativeWindow.parent.postMessage(message, hostname)
+    this.windowRef.nativeWindow.parent.postMessage(message, hostname);
   }
 }
 
