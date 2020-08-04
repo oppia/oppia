@@ -128,7 +128,6 @@ angular.module('oppia').directive('supplementalCard', [
             ctrl.directiveSubscriptions.add(
               LearnerAnswerInfoService.onActiveCardChanged.subscribe(
                 () => {
-                  console.log('Caught: activeCardChanged in supplemental-card');
                   updateDisplayedCard();
                 }
               )

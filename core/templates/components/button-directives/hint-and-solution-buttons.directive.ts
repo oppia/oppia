@@ -153,7 +153,6 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.directiveSubscriptions.add(
               LearnerAnswerInfoService.onActiveCardChanged.subscribe(
                 () => {
-                  console.log('Caught: activeCardChanged in hints-and-solutions-button-directive');
                   var displayedCardIndex =
                   PlayerPositionService.getDisplayedCardIndex();
                   ctrl.currentlyOnLatestCard =
