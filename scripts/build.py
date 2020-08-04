@@ -132,7 +132,8 @@ HASH_BLOCK_SIZE = 2**20
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Creates a third-party directory where all the JS and CSS dependencies are
 built and stored. Depending on the options passed to the script, might also
 minify third-party libraries and/or generate a build directory.
@@ -352,7 +353,7 @@ def _ensure_files_exist(filepaths):
         filepaths: list(str). Paths to files that we want to ensure exist.
 
     Raises:
-        OSError: One or more of the files does not exist.
+        OSError. One or more of the files does not exist.
     """
     for filepath in filepaths:
         if not os.path.isfile(filepath):
@@ -414,7 +415,7 @@ def _compare_file_count(
         second_dir_list: list(str). List of directories to compare.
 
     Raises:
-        ValueError: The source directory list does not have the same file
+        ValueError. The source directory list does not have the same file
             count as the target directory list.
     """
 
@@ -647,8 +648,9 @@ def hash_should_be_inserted(filepath):
     Returns:
         bool. True if filepath should contain hash else False.
     """
-    return not any(fnmatch.fnmatch(filepath, pattern) for pattern
-                   in FILEPATHS_NOT_TO_RENAME)
+    return not any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_NOT_TO_RENAME)
 
 
 def should_file_be_built(filepath):
@@ -737,8 +739,9 @@ def is_file_hash_provided_to_frontend(filepath):
     Returns:
         bool. True if file hash should be provided to the frontend else False.
     """
-    return any(fnmatch.fnmatch(filepath, pattern) for pattern
-               in FILEPATHS_PROVIDED_TO_FRONTEND)
+    return any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_PROVIDED_TO_FRONTEND)
 
 
 def generate_md5_hash(filepath):
@@ -909,7 +912,7 @@ def generate_build_tasks_to_build_all_files_in_directory(source, target):
     excluding files that should not be built.
 
     Args:
-        source: str.  Path relative to /oppia of directory containing source
+        source: str. Path relative to /oppia of directory containing source
             files and directories to be built.
         target: str. Path relative to /oppia of directory where the built files
             and directories will be saved to.
@@ -1126,11 +1129,11 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
             hashes of file content as values.
 
     Raises:
-        ValueError: The hash dict is empty.
-        ValueError: Filepath has less than 2 partitions after splitting by '.'
+        ValueError. The hash dict is empty.
+        ValueError. Filepath has less than 2 partitions after splitting by '.'
             delimiter.
-        ValueError: The filename does not contain hash.
-        KeyError: The filename's hash cannot be found in the hash dict.
+        ValueError. The filename does not contain hash.
+        KeyError. The filename's hash cannot be found in the hash dict.
     """
     # Final filepath example:
     # pages/base.240933e7564bd72a4dde42ee23260c5f.html.
