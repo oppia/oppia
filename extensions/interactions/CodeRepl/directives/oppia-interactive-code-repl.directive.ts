@@ -27,6 +27,7 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('third-party-imports/skulpt.import');
 
 angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
   '$timeout', 'CodeReplRulesService', 'HtmlEscaperService',
