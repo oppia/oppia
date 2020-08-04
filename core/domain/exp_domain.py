@@ -2821,7 +2821,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 40
+    CURRENT_EXP_SCHEMA_VERSION = 41
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
