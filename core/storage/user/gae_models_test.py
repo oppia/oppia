@@ -57,7 +57,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
-    GENERIC_PROFILE_NAME = 'profile_name'
+    GENERIC_DISPLAY_ALIAS = 'display_alias'
     ASSOCIATED_PROFILE_IDS = ['profile_1_user_id', 'profile_2_user_id']
 
     def setUp(self):
@@ -98,7 +98,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
             preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
-            profile_name=self.GENERIC_PROFILE_NAME,
+            display_alias=self.GENERIC_DISPLAY_ALIAS,
             associated_profile_user_ids=self.ASSOCIATED_PROFILE_IDS
         ).put()
 
@@ -179,7 +179,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'profile_name': None,
+            'display_alias': None,
             'associated_profile_user_ids': []
         }
         self.assertEqual(expected_user_data, user_data)
@@ -206,7 +206,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'profile_name': self.GENERIC_PROFILE_NAME,
+            'display_alias': self.GENERIC_DISPLAY_ALIAS,
             'associated_profile_user_ids': self.ASSOCIATED_PROFILE_IDS
         }
         self.assertEqual(expected_user_data, user_data)

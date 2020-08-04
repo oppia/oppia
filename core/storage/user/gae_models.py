@@ -62,9 +62,10 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
-    # Name of a user displayed in android UI. Unlike username, it can be
-    # edited and is unique only among the profiles of the account.
-    profile_name = ndb.StringProperty(default=None)
+    # Name of a user displayed in Android UI. Unlike username, it can be
+    # edited and is unique only among the profiles of the corresponding
+    # regular user account.
+    display_alias = ndb.StringProperty(default=None)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
     # User uploaded profile picture as a dataURI string. May be None.
@@ -87,7 +88,6 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
-
 
     # Attributes used for full users only.
 
@@ -118,8 +118,8 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
-    # List of profile user ids associated with a full user (primary profile).
-    # This is None if the user model corresponds to a secondary profile.
+    # List of profile user ids associated with a full user.
+    # This is None if the user model corresponds to a profile user.
     associated_profile_user_ids = ndb.StringProperty(repeated=True)
 
 
@@ -212,7 +212,7 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code,
-            'profile_name': user.profile_name,
+            'display_alias': user.display_alias,
             'associated_profile_user_ids': user.associated_profile_user_ids,
         }
 
@@ -2239,8 +2239,8 @@ class UserAuthModel(base_models.BaseModel):
 
     # Authentication detail for sign-in using google id (GAE).
     gae_id = ndb.StringProperty(indexed=True)
-    # A code associated with profiles on android to provide a PIN based
-    # authentication within the account.
+    # A code associated with profile and full user on Android to provide a PIN
+    # based authentication within the account.
     pin = ndb.StringProperty(default=None)
 
     @staticmethod
