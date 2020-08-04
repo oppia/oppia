@@ -22,7 +22,7 @@ import { CommandExecutorService } from
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 describe('Command executor service', () => {
   let ces: CommandExecutorService, wrf: WindowRef;
-  var mockWindow; var spy;
+  var spy;
   beforeEach((done) => {
     TestBed.configureTestingModule({
       providers: [CommandExecutorService, WindowRef]
@@ -30,9 +30,6 @@ describe('Command executor service', () => {
     ces = TestBed.get(CommandExecutorService);
     wrf = TestBed.get(WindowRef);
     setupWindowRef(wrf);
-    wrf.nativeWindow.parent.postMessage = function(message) {
-      mockWindow.state = message;
-    };
     spy = spyOn(ces.windowWrapperMessageService, 'addEventListener');
     ces.getOuterFrameEvents(wrf);
     done();
