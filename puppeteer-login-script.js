@@ -79,7 +79,8 @@ const setRoleAdmin = async function(context, page) {
     await page.waitFor(2000);
     await page.waitForSelector('.protractor-test-status-message');
     await page.waitForFunction(
-      'document.querySelector("body").innerText.includes("successfully updated to")'
+      'document.querySelector("body").innerText.includes(' +
+        '"successfully updated to")'
     );
     // eslint-disable-next-line no-console
     console.log('Role changed to admin');
