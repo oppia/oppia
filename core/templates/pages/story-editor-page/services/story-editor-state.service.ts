@@ -25,14 +25,14 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('StoryEditorStateService', [
-  '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
+  'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',
-  'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
   function(
-      $rootScope, AlertsService, EditableStoryBackendApiService,
-      StoryObjectFactory, UndoRedoService,
-      EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+      AlertsService, EditableStoryBackendApiService,
+      StoryObjectFactory, UndoRedoService) {
     var _story = StoryObjectFactory.createInterstitialStory();
     var _storyIsInitialized = false;
     var _storyIsLoading = false;
@@ -43,12 +43,15 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _expIdsChanged = false;
     var _storyWithUrlFragmentExists = false;
 
+    var _storyInitializedEventEmitter = new EventEmitter();
+    var _storyReinitializedEventEmitter = new EventEmitter();
+
     var _setStory = function(story) {
       _story.copyFromStory(story);
       if (_storyIsInitialized) {
-        $rootScope.$broadcast(EVENT_STORY_REINITIALIZED);
+        _storyReinitializedEventEmitter.emit();
       } else {
-        $rootScope.$broadcast(EVENT_STORY_INITIALIZED);
+        _storyInitializedEventEmitter.emit();
         _storyIsInitialized = true;
       }
     };
@@ -146,8 +149,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
        * Sets the story stored within this service, propogating changes to
        * all bindings to the story returned by getStory(). The first
        * time this is called it will fire a global event based on the
-       * EVENT_STORY_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_STORY_REINITIALIZED event.
+       * next() function of the _storyInitializedEventEmitter. All subsequent
+       * calls will similarly fire a next() function of the
+       * _storyReinitializedEventEmitter.
        */
       setStory: function(story) {
         _setStory(story);
@@ -226,6 +230,14 @@ angular.module('oppia').factory('StoryEditorStateService', [
        */
       isSavingStory: function() {
         return _storyIsBeingSaved;
+      },
+
+      get onStoryInitialized() {
+        return _storyInitializedEventEmitter;
+      },
+
+      get onStoryReinitialized() {
+        return _storyReinitializedEventEmitter;
       },
 
       getStoryWithUrlFragmentExists: function() {

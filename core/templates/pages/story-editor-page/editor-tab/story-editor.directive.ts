@@ -38,6 +38,8 @@ require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('pages/topic-editor-page/modal-templates/' +
     'preview-thumbnail.component.ts');
 
+import { Subscription } from 'rxjs';
+
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
 const storyConstants = require('constants.ts');
@@ -54,16 +56,17 @@ angular.module('oppia').directive('storyEditor', [
         'UndoRedoService', 'StoryEditorNavigationService',
         'WindowDimensionsService',
         'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
-        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
+        'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
+        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $scope, $window, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, StoryEditorNavigationService,
             WindowDimensionsService,
             EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
-            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+            AlertsService, MAX_CHARS_IN_STORY_TITLE,
+            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
             MAX_CHARS_IN_STORY_URL_FRAGMENT);
@@ -319,11 +322,21 @@ angular.module('oppia').directive('storyEditor', [
               _initEditor();
             });
 
-            $scope.$on(EVENT_STORY_INITIALIZED, _init);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryInitialized.subscribe(
+                () => _init()
+              ));
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
+                () => _initEditor()
+              ));
 
             _init();
             _initEditor();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

@@ -410,3 +410,308 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
         for x in output:
             self.assertRegexpMatches(
                 x, 'object has no attribute \'story_contents\'')
+
+
+class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+
+    def setUp(self):
+        super(StoryMathRteAuditOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test stories.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_job_finds_stories_with_math_rich_text_components(self):
+        valid_html_1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        valid_html_2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        story_contents1 = {
+            'nodes': [{
+                'outline': valid_html_1,
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2'
+        }
+        story_model1 = story_models.StoryModel(
+            id='story_id_1',
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            description='Story description',
+            title='Story title1',
+            language_code='en',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            notes='Story notes',
+            corresponding_topic_id='topic_id1',
+            story_contents=story_contents1
+        )
+        commit_message = (
+            'New story created with title \'Story title1\'.')
+        story_model1.commit(
+            self.albert_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': 'Story title'
+            }])
+        story_contents2 = {
+            'nodes': [{
+                'outline': valid_html_2,
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 2',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2'
+        }
+        story_model2 = story_models.StoryModel(
+            id='story_id_2',
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            description='Story description',
+            title='Story title2',
+            language_code='en',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            notes='Story notes',
+            corresponding_topic_id='topic_id1',
+            story_contents=story_contents2
+        )
+        commit_message = (
+            'New story created with title \'Story title2\'.')
+        story_model2.commit(
+            self.albert_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': 'Story title'
+            }])
+
+        job_id = (
+            story_jobs_one_off.StoryMathRteAuditOneOffJob.create_new())
+        story_jobs_one_off.StoryMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = story_jobs_one_off.StoryMathRteAuditOneOffJob.get_output(
+            job_id)
+
+        expected_overall_result = (
+            u'[u\'Overall result.\', {u\'total_number_stories_requiring_sv'
+            'gs\': 2, u\'total_number_of_latex_strings_without_svg\': 2}]')
+        self.assertEqual(output[0], expected_overall_result)
+        detailed_result = ast.literal_eval(output[1])
+        expected_story1_info = {
+            'story_id': 'story_id_1',
+            'latex_strings_without_svg': [
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+        }
+        expected_story2_info = {
+            'story_id': 'story_id_2',
+            'latex_strings_without_svg': ['+,+,+,+']
+        }
+        stories_latex_info = sorted(detailed_result[1])
+        self.assertEqual(stories_latex_info[0], expected_story1_info)
+        self.assertEqual(stories_latex_info[1], expected_story2_info)
+
+    def test_job_when_stories_do_not_have_math_rich_text(self):
+        story_contents1 = {
+            'nodes': [{
+                'outline': u'',
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2'
+        }
+        story_model1 = story_models.StoryModel(
+            id='story_id_1',
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            description='Story description',
+            title='Story title1',
+            language_code='en',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            notes='Story notes',
+            corresponding_topic_id='topic_id1',
+            story_contents=story_contents1
+        )
+        commit_message = (
+            'New story created with title \'Story title1\'.')
+        story_model1.commit(
+            self.albert_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': 'Story title'
+            }])
+        job_id = (
+            story_jobs_one_off.StoryMathRteAuditOneOffJob.create_new())
+        story_jobs_one_off.StoryMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = story_jobs_one_off.StoryMathRteAuditOneOffJob.get_output(
+            job_id)
+
+        self.assertEqual(output, [])
+
+    def test_job_skips_deleted_stories(self):
+        story = story_domain.Story.create_default_story(
+            'story_id', 'A title', 'Description', 'topic_id')
+        story_services.save_new_story(self.albert_id, story)
+        story_services.delete_story(self.albert_id, 'story_id')
+        job_id = (
+            story_jobs_one_off.StoryMathRteAuditOneOffJob.create_new())
+        story_jobs_one_off.StoryMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+        output = story_jobs_one_off.StoryMathRteAuditOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])
+
+    def test_job_when_subtopics_have_math_rich_text_with_svgs(self):
+
+        valid_html_1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file1.svg&amp;quot;}"></oppia-nonint'
+            'eractive-math>'
+        )
+        valid_html_2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;file2.svg&amp;quot;}"></'
+            'oppia-noninteractive-math>'
+        )
+        story_contents1 = {
+            'nodes': [{
+                'outline': valid_html_1,
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2'
+        }
+        story_model1 = story_models.StoryModel(
+            id='story_id_1',
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            description='Story description',
+            title='Story title1',
+            language_code='en',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            notes='Story notes',
+            corresponding_topic_id='topic_id1',
+            story_contents=story_contents1
+        )
+        commit_message = (
+            'New story created with title \'Story title1\'.')
+        story_model1.commit(
+            self.albert_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': 'Story title'
+            }])
+        story_contents2 = {
+            'nodes': [{
+                'outline': valid_html_2,
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 2',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': None,
+                'thumbnail_bg_color': None
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2'
+        }
+        story_model2 = story_models.StoryModel(
+            id='story_id_2',
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            description='Story description',
+            title='Story title2',
+            language_code='en',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            notes='Story notes',
+            corresponding_topic_id='topic_id1',
+            story_contents=story_contents2
+        )
+        commit_message = (
+            'New story created with title \'Story title2\'.')
+        story_model2.commit(
+            self.albert_id, commit_message, [{
+                'cmd': story_domain.CMD_CREATE_NEW,
+                'title': 'Story title'
+            }])
+
+        job_id = (
+            story_jobs_one_off.StoryMathRteAuditOneOffJob
+            .create_new())
+        story_jobs_one_off.StoryMathRteAuditOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            story_jobs_one_off.StoryMathRteAuditOneOffJob
+            .get_output(job_id))
+
+        overall_result = ast.literal_eval(output[0])
+        expected_story1_info = {
+            'story_id': 'story_id_1',
+            'latex_strings_with_svg': [
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+        }
+        expected_story2_info = {
+            'story_id': 'story_id_2',
+            'latex_strings_with_svg': ['+,+,+,+']
+        }
+        story_latex_info = sorted(overall_result[1])
+        self.assertEqual(story_latex_info[0], expected_story1_info)
+        self.assertEqual(story_latex_info[1], expected_story2_info)
