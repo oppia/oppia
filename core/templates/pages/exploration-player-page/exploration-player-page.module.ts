@@ -22,7 +22,7 @@ import 'zone.js';
 import 'third-party-imports/ng-audio.import';
 
 angular.module('oppia', [
-  'headroom', 'infinite-scroll', 'ngAnimate',
+  'headroom', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',

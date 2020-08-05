@@ -23,7 +23,7 @@ import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
 
 angular.module('oppia', [
-  'headroom', 'infinite-scroll', 'ngAnimate',
+  'headroom', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',

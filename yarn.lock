@@ -7092,6 +7092,11 @@ nerdamer@^1.1.4:
   resolved "https://registry.yarnpkg.com/nerdamer/-/nerdamer-1.1.5.tgz#0dab69914308015b38a7885c985d9493050635d1"
   integrity sha512-6ubr5CCUbOEPA6aFQ8ZkvetnHy9mxolu/SaRJmgVuk+9YZpaC0PMpz8AmTrlS0qgNBQUBCjQsdwqsW06nKKJ0g==
 
+ng-infinite-scroll@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/ng-infinite-scroll/-/ng-infinite-scroll-1.3.0.tgz#c2e98d8fd134b0525a4d2cf58c95d9b583755112"
+  integrity sha1-wumNj9E0sFJaTSz1jJXZtYN1URI=
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"

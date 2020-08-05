@@ -413,17 +413,6 @@
           "css": ["ng-joyride.css"]
         }
       },
-      "ngInfiniteScroll": {
-        "version": "1.0.0",
-        "downloadFormat": "files",
-        "url": "https://raw.github.com/BinaryMuse/ngInfiniteScroll/1.0.0/build",
-        "rootDirPrefix": "nginfinitescroll-",
-        "targetDirPrefix": "nginfinitescroll-",
-        "files": ["ng-infinite-scroll.min.js"],
-        "bundle": {
-          "js": ["ng-infinite-scroll.min.js"]
-        }
-      },
       "select2": {
         "version": "4.0.3",
         "downloadFormat": "zip",

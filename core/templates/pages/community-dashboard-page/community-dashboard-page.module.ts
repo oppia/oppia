@@ -19,8 +19,10 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import ngInfiniteScroll from 'ng-infinite-scroll';
+
 angular.module('oppia', [
-  'headroom', 'infinite-scroll', 'ngAnimate',
+  'headroom', ngInfiniteScroll, 'ngAnimate',
   require('angular-cookies'), 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
