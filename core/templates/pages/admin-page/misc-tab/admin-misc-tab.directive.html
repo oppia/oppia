@@ -73,6 +73,40 @@
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Flush the Memory Cache</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.flushMemoryCache()">
+      <div class="form-group row">
+        <input type="submit" value="Flush Cache">
+      </div>
+    </form>
+    <form class="form" ng-submit="$ctrl.getMemoryCacheProfile()">
+      <div class="form-group row">
+        <input type="submit" value="Get Memory Cache Profile">
+      </div>
+    </form>
+  </div>
+  <div ng-show="$ctrl.memoryCacheDataFetched">
+    <table class="table text-center view-results-table">
+      <thead>
+        <tr>
+          <td><strong>Total Memory Allocated in Bytes</strong></td>
+          <td><strong>Peak Memory Allocation in Bytes</strong></td>
+          <td><strong>Number of Keys Allocated</strong></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><[$ctrl.result.totalAllocatedInBytes]></td>
+          <td><[$ctrl.result.peakAllocatedInBytes]></td>
+          <td><[$ctrl.result.totalKeysStored]></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Generate SVGs for exploration</h3>
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForExplorations()">

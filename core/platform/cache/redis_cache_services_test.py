@@ -26,6 +26,15 @@ from core.tests import test_utils
 class RedisCacheServicesUnitTests(test_utils.GenericTestBase):
     """Tests for redis_cache_services."""
 
+    def test_memory_stats_returns_dict(self):
+        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
+        redis_cache_services.set_multi(key_value_mapping)
+        redis_cache_services.set_multi({'2121':'adfasfd'})
+        memory_stats = redis_cache_services.get_memory_stats()
+        print(memory_stats)
+        self.assertTrue(False)
+        self.assertIsInstance(memory_stats, dict)
+
     def test_flush_cache_wipes_cache_clean(self):
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
         redis_cache_services.set_multi(key_value_mapping)

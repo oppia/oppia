@@ -52,6 +52,7 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
+        var FLUSH_MEMORY_CACHE_URL = '/refreshmemorycache'
         var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
         var ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler';
         var irreversibleActionMessage = (
@@ -167,6 +168,32 @@ angular.module('oppia').directive('adminMiscTab', [
                 'Server error: ' + errorResponse.data.error);
             });
         };
+
+        ctrl.flushMemoryCache = function() {
+          $http.post(FLUSH_MEMORY_CACHE_URL)
+            .then(function(response) {
+              ctrl.setStatusMessage('Success! Memory Cache Flushed.');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        }
+
+        ctrl.getMemoryCacheProfile = function() {
+          $http.get(FLUSH_MEMORY_CACHE_URL)
+            .then(function(response) {
+              ctrl.result = {
+                totalAllocatedInBytes: response.data.total_allocation,
+                peakAllocatedInBytes: response.data.peak_allocation,
+                totalKeysStored: response.data.total_keys_stored
+              };
+              ctrl.memoryCacheDataFetched = true;
+              ctrl.setStatusMessage('Success!');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        }
 
         // TODO(#10045): Remove this function once all the math-rich text
         // components in explorations have a valid math SVG stored in the

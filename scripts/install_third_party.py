@@ -342,7 +342,17 @@ def download_manifest_files(filepath):
 def install_redis_cli():
     """This installs the redis-cli to the local oppia third_party directory so
     that development servers and backend tests can make use of a local redis
-    cache.
+    cache. Redis-cli installed here is different from the redis package
+    installed in manifest.json. The redis package detailed in manifest.json is
+    the Python library that allows users to communicate with any Redis cache
+    using Python. The redis-cli package installed in this function contains
+    scripts for the redis-cli and redis-server programs detailed below.
+
+    Redis-server starts a local Redis database on the machine that can be
+    queried using either the Python redis library or the Redis-cli program.
+
+    Redis-cli is the command line interface that serves up an interpreter that
+    connects to a redis database cache and queries it to retrieve/set data.
     """
     # We need to install redis-cli separately from using manifest.json since it
     # is a system program and we need to install it after the library is
@@ -369,6 +379,11 @@ def install_redis_cli():
         # build the source code.
         with common.CD('third_party/redis-cli-6.0.6/'):
             # Build the scripts necessary to start the redis server.
+            # The make command only builds the C++ files in the Redis-cli in the
+            # src/ folder and does anything outside of the oppia root directory.
+            # It will build the redis-cli and redis-server files so that we can
+            # run the server from inside the oppia folder by executing the
+            # script src/redis-cli and src/redis-server.
             subprocess.call(['make'])
 
         # Make the scripts executable.

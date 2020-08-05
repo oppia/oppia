@@ -149,8 +149,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
     values = memory_cache_services.get_multi(memcache_keys)
     for obj_id, value in python_utils.ZIP(obj_ids, values):
         if value:
-            deserialization_function = DESERIALIZATION_FUNCTIONS[namespace]
-            result_dict[obj_id] = deserialization_function(value)
+            result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value)
 
     return result_dict
 
@@ -226,3 +225,14 @@ def delete_multi(namespace, sub_namespace, obj_ids):
         _get_memcache_key(namespace, sub_namespace, obj_id)
         for obj_id in obj_ids]
     return memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)
+
+
+def get_memory_stats():
+    """Get a memory profile of the cache in a dictionary dependent on how the
+    caching service profiles its own cache.
+
+    Returns:
+        dict(str, str). String value denoting the profile metric and the
+        corresponding metric value.
+    """
+    return memory_cache_services.get_memory_stats()

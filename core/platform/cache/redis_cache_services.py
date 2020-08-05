@@ -26,6 +26,22 @@ import redis
 REDIS_CLIENT = redis.Redis(
     host=feconf.REDISHOST, port=feconf.REDISPORT)
 
+def get_memory_stats():
+    """Returns a memory profile of the redis cache. Visit
+    https://redis.io/commands/memory-stats for more details on what exactly is
+    returned.
+
+    Returns:
+        dict(str, str). Dictionary with the total allocated memory in bytes,
+        peak memory usage in bytes, total number of keys stored.
+    """
+    redis_full_profile = REDIS_CLIENT.memory_stats()
+    memory_stats = {
+        'total_allocated_in_bytes': redis_full_profile['total.allocated'],
+        'peak_memory_usage_in_bytes': redis_full_profile['peak.allocated'],
+        'total_number_of_keys_stored': redis_full_profile['keys.count']
+    }
+    return memory_stats
 
 def flush_cache():
     """Wipes the Redis cache clean."""

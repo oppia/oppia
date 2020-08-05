@@ -90,6 +90,7 @@ def cleanup():
     while common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
         time.sleep(1)
     build.set_constants_to_default()
+
     if not common.is_windows_os():
         # Redis does not run on Windows machines.
         python_utils.PRINT('Cleaning up the redis_servers.')
@@ -151,11 +152,13 @@ def main(args=None):
         # backend process. It does not hang the terminal but returns
         # automatically and runs the service in the system background.
         # Start the redis local development server. Redis doesn't run on
-        # Windows machine.
+        # Windows machine. Use daemonize argument to prevent redis-server from
+        # exiting on its own.
         if not common.is_windows_os():
-            subprocess.Popen(
-                './third_party/redis-cli-6.0.6/src/redis-server %s' %
-                (common.REDIS_CONF_PATH), shell=True)
+            background_processes.append(
+                subprocess.call([
+                    './third_party/redis-cli-6.0.6/src/redis-server',
+                    (common.REDIS_CONF_PATH), '--daemonize', 'yes']))
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(

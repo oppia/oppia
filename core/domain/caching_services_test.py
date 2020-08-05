@@ -29,6 +29,13 @@ import python_utils
 class CachingServicesUnitTests(test_utils.GenericTestBase):
     """Tests for caching_services."""
 
+    def test_retrieved_memory_profile_contains_correct_elements(self):
+        memory_profile = caching_services.get_memory_stats()
+        self.assertIsInstance(memory_profile, dict)
+        self.assertTrue('total_allocated_in_bytes' in memory_profile)
+        self.assertTrue('peak_memory_usage_in_bytes' in memory_profile)
+        self.assertTrue('total_number_of_keys_stored' in memory_profile)
+
     def test_flush_cache_wipes_cache_clean(self):
         """Tests whether flushing the cache removes the elements in the
         cache.
