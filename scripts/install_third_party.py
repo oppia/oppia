@@ -380,11 +380,11 @@ def install_redis_cli():
         # build the source code.
         with common.CD('third_party/redis-cli-6.0.6/'):
             # Build the scripts necessary to start the redis server.
-            # The make command only builds the C++ files in the
-            # src/ folder and does nothing outside of the oppia root directory.
+            # The make command only builds the C++ files in the src/ folder
+            # without modifying anything outside of the oppia root directory.
             # It will build the redis-cli and redis-server files so that we can
             # run the server from inside the oppia folder by executing the
-            # script src/redis-cli and src/redis-server.
+            # script src/redis-cli and src/redis-server,
             subprocess.call(['make'])
 
         # Make the scripts executable.

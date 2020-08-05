@@ -807,7 +807,7 @@ class Skill(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return a Skill domain object decoded from a JSON string.
+        """Returns a Skill domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be

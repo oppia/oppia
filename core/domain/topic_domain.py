@@ -638,7 +638,7 @@ class Topic(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return a Topic domain object decoded from a JSON string.
+        """Returns a Topic domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be

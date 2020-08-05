@@ -964,7 +964,7 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             raise self.InvalidInputException('This app cannot send emails.')
 
 
-class MemoryCacheHandler(base.BaseHandler):
+class MemoryCacheAdminHandler(base.BaseHandler):
     """Handler for memory cache functions used in the Misc Page."""
 
     @acl_decorators.can_access_admin_page
@@ -976,9 +976,9 @@ class MemoryCacheHandler(base.BaseHandler):
     def get(self):
         memory_stats = caching_services.get_memory_stats()
         self.render_json({
-            'total_allocation': memory_stats['total_allocated_in_bytes'],
-            'peak_allocation': memory_stats['peak_memory_usage_in_bytes'],
-            'total_keys_stored': memory_stats['total_number_of_keys_stored']
+            'total_allocation': memory_stats.total_allocated_in_bytes,
+            'peak_allocation': memory_stats.peak_memory_usage_in_bytes,
+            'total_keys_stored': memory_stats.total_number_of_keys_stored
         })
 
 

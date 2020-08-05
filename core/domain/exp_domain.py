@@ -4087,7 +4087,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def deserialize(cls, json_string):
-        """Return an Exploration domain object decoded from a JSON string.
+        """Returns an Exploration domain object decoded from a JSON string.
 
         Args:
             json_string: str. A JSON-encoded string that can be

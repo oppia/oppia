@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import caching_domain
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.tests import test_utils
@@ -31,10 +32,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
     def test_retrieved_memory_profile_contains_correct_elements(self):
         memory_profile = caching_services.get_memory_stats()
-        self.assertIsInstance(memory_profile, dict)
-        self.assertTrue('total_allocated_in_bytes' in memory_profile)
-        self.assertTrue('peak_memory_usage_in_bytes' in memory_profile)
-        self.assertTrue('total_number_of_keys_stored' in memory_profile)
+        self.assertIsInstance(memory_profile, caching_domain.MemoryStats)
+        self.assertIsNotNone(memory_profile.total_allocated_in_bytes)
+        self.assertIsNotNone(memory_profile.peak_memory_usage_in_bytes)
+        self.assertIsNotNone(memory_profile.total_number_of_keys_stored)
 
     def test_flush_cache_wipes_cache_clean(self):
         """Tests whether flushing the cache removes the elements in the

@@ -157,10 +157,10 @@ def main(args=None):
                     './third_party/redis-cli-6.0.6/src/redis-server',
                     (common.REDIS_CONF_PATH), '--daemonize', 'yes']))
         else:
-        raise Exception(
-            'Redis command line interface is not installed because your ' +
-            'machine is on the Windows operating system. Caching will not ' +
-            'work on a non-Windows machine,')
+            raise Exception(
+                'Redis command line interface is not installed because your ' +
+                'machine is on the Windows operating system. Caching will ' +
+                'not work on a non-Windows machine.')
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(

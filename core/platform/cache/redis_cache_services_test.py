@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,11 +27,10 @@ class RedisCacheServicesUnitTests(test_utils.GenericTestBase):
     """Tests for redis_cache_services."""
 
     def test_memory_stats_returns_dict(self):
-        key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
-        redis_cache_services.set_multi(key_value_mapping)
-        redis_cache_services.set_multi({'key': 'value'})
         memory_stats = redis_cache_services.get_memory_stats()
-        self.assertIsInstance(memory_stats, dict)
+        self.assertIsNotNone(memory_stats.total_allocated_in_bytes)
+        self.assertIsNotNone(memory_stats.peak_memory_usage_in_bytes)
+        self.assertIsNotNone(memory_stats.total_number_of_keys_stored)
 
     def test_flush_cache_wipes_cache_clean(self):
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}

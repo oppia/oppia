@@ -239,7 +239,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 
 
 def cleanup():
-    """Cleanup the redis server when backend tests finish."""
+    """Cleanup the redis server when the backend tests finish."""
     python_utils.PRINT('Cleaning up the redis_servers.')
     # Shutdown the redis server before exiting.
     subprocess.call([
@@ -270,8 +270,8 @@ def main(args=None):
     if not common.is_windows_os():
         # Redis does not run on Windows machines.
         python_utils.PRINT('Starting Redis development server.')
-        # Use daemonize argument to prevent redis-server from exiting
-        # on its own.
+        # We use the --daemonize argument to prevent the redis-server from
+        # exiting on its own.
         subprocess.call([
             './third_party/redis-cli-6.0.6/src/redis-server',
             (common.REDIS_CONF_PATH), '--daemonize', 'yes'])
@@ -280,7 +280,7 @@ def main(args=None):
         raise Exception(
             'Redis command line interface is not installed because your ' +
             'machine is on the Windows operating system. Many backend tests ' +
-            'will not work on a non-Windows machine,')
+            'will not work on a non-Windows machine.')
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

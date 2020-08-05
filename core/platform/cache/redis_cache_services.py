@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import caching_domain
 import feconf
 import python_utils
 import redis
@@ -33,15 +34,16 @@ def get_memory_stats():
     returned.
 
     Returns:
-        dict(str, str). Dictionary with the total allocated memory in bytes,
-        peak memory usage in bytes, and the total number of keys stored.
+        MemoryStats. MemoryStats object containing the total allocated memory in
+        bytes, peak memory usage in bytes, and the total number of keys stored
+        as values.
     """
     redis_full_profile = REDIS_CLIENT.memory_stats()
-    memory_stats = {
-        'total_allocated_in_bytes': redis_full_profile.get('total.allocated'),
-        'peak_memory_usage_in_bytes': redis_full_profile.get('peak.allocated'),
-        'total_number_of_keys_stored': redis_full_profile.get('keys.count')
-    }
+    memory_stats = caching_domain.MemoryStats(
+        redis_full_profile.get('total.allocated'),
+        redis_full_profile.get('peak.allocated'),
+        redis_full_profile.get('keys.count'))
+
     return memory_stats
 
 
