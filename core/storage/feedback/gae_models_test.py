@@ -192,7 +192,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             feedback_models.GeneralFeedbackMessageModel.create(
                 feedback_domain.FullyQualifiedMessageIdentifier(
-                thread_id, '0')
+                    thread_id, '0')
             )
 
     def test_get_all_messages(self):

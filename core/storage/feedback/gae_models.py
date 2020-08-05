@@ -362,7 +362,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         message_ids = [
             message_identifier.message_id for message_identifier
             in message_identifiers]
-    
+
         # Generate the new ids.
         instance_ids = []
         for thread_id, message_id in python_utils.ZIP(thread_ids, message_ids):

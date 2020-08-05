@@ -27,7 +27,6 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 import feconf
-import python_utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(

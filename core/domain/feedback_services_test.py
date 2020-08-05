@@ -90,7 +90,8 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             feedback_services.create_message(
                 thread_id, self.user_id, None, None, 'Hello')
 
-    def test_create_messages_raises_pluralized_exception_for_bad_thread_ids(self):
+    def test_create_messages_raises_pluralized_exception_for_bad_thread_ids(
+            self):
         thread_ids = ['invalid_thread_id_1', 'invalid_thread_id_2']
 
         expected_exception_regexp = (
@@ -104,7 +105,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     def test_create_messages_raises_an_exception_if_thread_ids_are_not_unique(
             self):
         repeated_thread_ids = ['thread_id', 'thread_id']
-   
+
         with self.assertRaisesRegexp(
             Exception,
             'Thread ids must be distinct when calling create_messsages.'):
@@ -456,7 +457,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Assert that no messages are read for any of the threads yet.
         for sample_thread_id in sample_thread_ids:
             self.assertEqual(
-                self._get_all_messages_read(self.user_id, sample_thread_id),[])
+                self._get_all_messages_read(self.user_id, sample_thread_id),
+                [])
         # Create a list of FullyQualifiedMessageIdentifier objects for the
         # sample_message_ids and sample_thread_ids.
         message_identifiers = []
@@ -464,11 +466,11 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 sample_thread_ids, sample_message_ids):
             message_identifiers.append(
                 feedback_domain.FullyQualifiedMessageIdentifier(
-                sample_thread_id, sample_message_id))
+                    sample_thread_id, sample_message_id))
 
         # In the add_message_ids_to_read_by_list method, the
         # GeneralFeedbackUserModel is created for thread id
-        # sample_thread_id_2. 
+        # sample_thread_id_2.
         feedback_services.add_message_ids_to_read_by_list(
             self.user_id, message_identifiers)
 
