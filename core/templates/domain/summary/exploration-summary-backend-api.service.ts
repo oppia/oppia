@@ -37,7 +37,7 @@ export class ExplorationSummaryBackendApiService {
   _fetchExpSummaries(explorationIds: Array<string>,
       includePrivateExplorations: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: Array<string>) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
@@ -62,6 +62,7 @@ export class ExplorationSummaryBackendApiService {
           includePrivateExplorations)
       }
     }).toPromise().then((response: any) => {
+      console.log(response);
       var summaries = angular.copy(response.data.summaries);
       if (successCallback) {
         if (summaries === null) {

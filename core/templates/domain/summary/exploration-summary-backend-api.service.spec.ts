@@ -34,8 +34,7 @@ fdescribe('Exploration Summary Backend Api Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ExplorationSummaryBackendApiService]
+      imports: [HttpClientTestingModule]
     });
 
     explorationSummaryBackendApiService = TestBed.get(
