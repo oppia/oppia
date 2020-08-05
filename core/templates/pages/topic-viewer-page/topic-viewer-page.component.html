@@ -4,7 +4,7 @@
       <ul class="topic-viewer-tabs">
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
-            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
+            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
             <a class="tab-title"
                translate="I18N_TOPIC_VIEWER_INFO">
             </a>
@@ -12,7 +12,7 @@
         </li>
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
-            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
+            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
             <a class="tab-title"
                translate="I18N_TOPIC_VIEWER_LESSONS">
             </a>
@@ -20,7 +20,7 @@
         </li>
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
-            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
+            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
             <a class="tab-title"
                translate="I18N_TOPIC_VIEWER_PRACTICE">
             </a>
@@ -28,7 +28,7 @@
         </li>
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
-            <img class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>">
+            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>">
             <a class="tab-title"
                translate="I18N_TOPIC_VIEWER_REVISION">
             </a>
@@ -142,6 +142,7 @@
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 2em;
+    word-break: break-word;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {

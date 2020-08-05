@@ -1,0 +1,41 @@
+<p class="oppia-mobile-back-to-parent" ng-click="$ctrl.navigateToStoryEditor()">
+  <i class="fa fa-angle-left"></i>
+  <span>Back to Story</span>
+</p>
+<div class="story-chapter-name">
+  <span class="story-name protractor-test-back-to-story-editor-button" ng-click="$ctrl.navigateToStoryEditor()">
+    <[$ctrl.story.getTitle()]> /
+  </span>
+  <span class="chapter-name">
+    <[$ctrl.node.getTitle()]>
+  </span>
+</div>
+<div ng-if="$ctrl.node">
+  <story-node-editor node-id="$ctrl.node.getId()"
+                     thumbnail-filename="$ctrl.node.getThumbnailFilename()"
+                     thumbnail-bg-color="$ctrl.node.getThumbnailBgColor()"
+                     outline="$ctrl.node.getOutline()"
+                     description="$ctrl.node.getDescription()"
+                     exploration-id="$ctrl.node.getExplorationId()"
+                     outline-finalized="$ctrl.node.getOutlineStatus()"
+                     destination-node-ids="$ctrl.node.getDestinationNodeIds()"
+                     prerequisite-skill-ids="$ctrl.node.getPrerequisiteSkillIds()"
+                     acquired-skill-ids="$ctrl.node.getAcquiredSkillIds()">
+  </story-node-editor>
+</div>
+<style>
+  chapter-editor-tab .story-chapter-name {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
+  }
+  chapter-editor-tab .story-name {
+    color: #666;
+    cursor: pointer;
+  }
+  @media screen and (max-width: 768px) {
+    chapter-editor-tab .story-chapter-name {
+      display: none;
+    }
+  }
+</style>

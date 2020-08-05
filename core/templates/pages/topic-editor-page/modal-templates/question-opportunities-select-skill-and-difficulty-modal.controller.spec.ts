@@ -151,7 +151,7 @@ describe(
         var addWarningSpy = spyOn(alertsService, 'addWarning');
         $scope.$apply();
 
-        expect(<any>addWarningSpy.calls.allArgs()[0]).toEqual(
+        expect(addWarningSpy.calls.allArgs()[0]).toEqual(
           ['Error populating skill: It was not possible to fetch the skill.']);
       });
     });

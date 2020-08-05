@@ -68,6 +68,7 @@ CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
 CMD_REARRANGE_SKILL_IN_SUBTOPIC = 'rearrange_skill_in_subtopic'
+CMD_REARRANGE_SUBTOPIC = 'rearrange_subtopic'
 CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -175,6 +176,10 @@ class TopicChange(change_domain.BaseChange):
         'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
         'optional_attribute_names': [],
     }, {
+        'name': CMD_REARRANGE_SUBTOPIC,
+        'required_attribute_names': ['from_index', 'to_index'],
+        'optional_attribute_names': [],
+    }, {
         'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'skill_id'],
         'optional_attribute_names': [],
@@ -250,7 +255,7 @@ class StoryReference(python_utils.OBJECT):
         """Returns a dict representing this StoryReference domain object.
 
         Returns:
-            A dict, mapping all fields of StoryReference instance.
+            dict. A dict, mapping all fields of StoryReference instance.
         """
         return {
             'story_id': self.story_id,
@@ -290,7 +295,7 @@ class StoryReference(python_utils.OBJECT):
         """Validates various properties of the StoryReference object.
 
         Raises:
-            ValidationError: One or more attributes of the StoryReference are
+            ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
         if not isinstance(self.story_id, python_utils.BASESTRING):
@@ -331,7 +336,7 @@ class Subtopic(python_utils.OBJECT):
         """Returns a dict representing this Subtopic domain object.
 
         Returns:
-            A dict, mapping all fields of Subtopic instance.
+            dict. A dict, mapping all fields of Subtopic instance.
         """
         return {
             'id': self.id,
@@ -400,7 +405,7 @@ class Subtopic(python_utils.OBJECT):
         """Validates various properties of the Subtopic object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic are
+            ValidationError. One or more attributes of the subtopic are
                 invalid.
         """
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
@@ -513,7 +518,7 @@ class Topic(python_utils.OBJECT):
         """Returns a dict representing this Topic domain object.
 
         Returns:
-            A dict, mapping all fields of Topic instance.
+            dict. A dict, mapping all fields of Topic instance.
         """
         return {
             'id': self.id,
@@ -730,16 +735,18 @@ class Topic(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         if (from_index >= len(self.canonical_story_references) or
                 from_index < 0):
@@ -814,7 +821,7 @@ class Topic(python_utils.OBJECT):
                 published or is going to be published.
 
         Raises:
-            ValidationError: One or more attributes of the Topic are not
+            ValidationError. One or more attributes of the Topic are not
                 valid.
         """
         self.require_valid_name(self.name)
@@ -1038,7 +1045,7 @@ class Topic(python_utils.OBJECT):
             new_name: str. The updated name for the topic.
 
         Raises:
-            ValidationError: Name should be a string.
+            ValidationError. Name should be a string.
         """
         if not isinstance(new_name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
@@ -1264,16 +1271,18 @@ class Topic(python_utils.OBJECT):
             Exception. Invalid input.
         """
         if not isinstance(from_index, int):
-            raise Exception('Expected from_index value to be a number, '
-                            'received %s' % from_index)
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
 
         if not isinstance(to_index, int):
-            raise Exception('Expected to_index value to be a number, '
-                            'received %s' % to_index)
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
 
         if from_index == to_index:
-            raise Exception('Expected from_index and to_index values '
-                            'to be different.')
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
 
         subtopic_index = self.get_subtopic_index(subtopic_id)
 
@@ -1290,6 +1299,41 @@ class Topic(python_utils.OBJECT):
         del self.subtopics[subtopic_index].skill_ids[from_index]
         self.subtopics[subtopic_index].skill_ids.insert(
             to_index, skill_to_move)
+
+    def rearrange_subtopic(self, from_index, to_index):
+        """Rearranges the subtopic in the topic.
+
+        Args:
+            from_index: int. The index of subtopic to move.
+            to_index: int. The index at which to insert the moved subtopic.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
+
+        if from_index >= len(self.subtopics) or from_index < 0:
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if to_index >= len(self.subtopics) or to_index < 0:
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        skill_to_move = copy.deepcopy(
+            self.subtopics[from_index])
+        del self.subtopics[from_index]
+        self.subtopics.insert(to_index, skill_to_move)
 
     def move_skill_id_to_subtopic(
             self, old_subtopic_id, new_subtopic_id, skill_id):
@@ -1416,7 +1460,7 @@ class TopicSummary(python_utils.OBJECT):
         """Validates all properties of this topic summary.
 
         Raises:
-            ValidationError: One or more attributes of the Topic summary
+            ValidationError. One or more attributes of the Topic summary
                 are not valid.
         """
         if not isinstance(self.name, python_utils.BASESTRING):

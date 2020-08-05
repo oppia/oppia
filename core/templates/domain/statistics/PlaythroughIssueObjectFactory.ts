@@ -20,16 +20,16 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-export interface IEarlyQuitCustomizationArgs {
+export interface EarlyQuitCustomizationArgs {
   'state_name': { value: string };
   'time_spent_in_exp_in_msecs': { value: number };
 }
 
-export interface ICyclicStateTransitionsCustomizationArgs {
+export interface CyclicStateTransitionsCustomizationArgs {
   'state_names': { value: string[] };
 }
 
-export interface IMultipleIncorrectSubmissionsCustomizationArgs {
+export interface MultipleIncorrectSubmissionsCustomizationArgs {
   'state_name': { value: string };
   'num_times_answered_incorrectly': { value: number };
 }
@@ -38,16 +38,16 @@ export interface IMultipleIncorrectSubmissionsCustomizationArgs {
 // This type takes one of the values of the above customization args based
 // on the type of IssueType.
 type IssueCustomizationArgs<IssueType> = (
-  IssueType extends 'EarlyQuit' ? IEarlyQuitCustomizationArgs :
+  IssueType extends 'EarlyQuit' ? EarlyQuitCustomizationArgs :
   IssueType extends 'CyclicStateTransitions' ?
-  ICyclicStateTransitionsCustomizationArgs :
+  CyclicStateTransitionsCustomizationArgs :
   IssueType extends 'MultipleIncorrectSubmissions' ?
-  IMultipleIncorrectSubmissionsCustomizationArgs : never);
+  MultipleIncorrectSubmissionsCustomizationArgs : never);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This interface takes the type of backend dict according to the IssueType
 // parameter.
-interface IPlaythroughIssueBackendDictBase<IssueType> {
+interface PlaythroughIssueBackendDictBase<IssueType> {
   'issue_type': IssueType;
   'issue_customization_args': IssueCustomizationArgs<IssueType>;
   'playthrough_ids': string[];
@@ -55,23 +55,23 @@ interface IPlaythroughIssueBackendDictBase<IssueType> {
   'is_valid': boolean;
 }
 
-export type IEarlyQuitPlaythroughIssueBackendDict = (
-  IPlaythroughIssueBackendDictBase<'EarlyQuit'>);
+export type EarlyQuitPlaythroughIssueBackendDict = (
+  PlaythroughIssueBackendDictBase<'EarlyQuit'>);
 
-export type IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict = (
-  IPlaythroughIssueBackendDictBase<'MultipleIncorrectSubmissions'>);
+export type MultipleIncorrectSubmissionsPlaythroughIssueBackendDict = (
+  PlaythroughIssueBackendDictBase<'MultipleIncorrectSubmissions'>);
 
-export type ICyclicStateTransitionsPlaythroughIssueBackendDict = (
-  IPlaythroughIssueBackendDictBase<'CyclicStateTransitions'>);
+export type CyclicStateTransitionsPlaythroughIssueBackendDict = (
+  PlaythroughIssueBackendDictBase<'CyclicStateTransitions'>);
 
-export type IPlaythroughIssueBackendDict = (
-  IEarlyQuitPlaythroughIssueBackendDict |
-  IMultipleIncorrectSubmissionsPlaythroughIssueBackendDict |
-  ICyclicStateTransitionsPlaythroughIssueBackendDict);
+export type PlaythroughIssueBackendDict = (
+  EarlyQuitPlaythroughIssueBackendDict |
+  MultipleIncorrectSubmissionsPlaythroughIssueBackendDict |
+  CyclicStateTransitionsPlaythroughIssueBackendDict);
 
 // NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
 // This class takes the type according to the IssueType parameter.
-class PlaythroughIssueBase<IssueType> {
+abstract class PlaythroughIssueBase<IssueType> {
   constructor(
     public readonly issueType: IssueType,
     public issueCustomizationArgs: IssueCustomizationArgs<IssueType>,
@@ -79,7 +79,9 @@ class PlaythroughIssueBase<IssueType> {
     public schemaVersion: number,
     public isValid: boolean) { }
 
-  toBackendDict(): IPlaythroughIssueBackendDictBase<IssueType> {
+  abstract getStateNameWithIssue(): string;
+
+  toBackendDict(): PlaythroughIssueBackendDictBase<IssueType> {
     return {
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
@@ -91,13 +93,26 @@ class PlaythroughIssueBase<IssueType> {
 }
 
 export class EarlyQuitPlaythroughIssue extends
-  PlaythroughIssueBase<'EarlyQuit'> { }
+  PlaythroughIssueBase<'EarlyQuit'> {
+  getStateNameWithIssue(): string {
+    return this.issueCustomizationArgs.state_name.value;
+  }
+}
 
 export class MultipleIncorrectSubmissionsPlaythroughIssue extends
-  PlaythroughIssueBase<'MultipleIncorrectSubmissions'> { }
+  PlaythroughIssueBase<'MultipleIncorrectSubmissions'> {
+  getStateNameWithIssue(): string {
+    return this.issueCustomizationArgs.state_name.value;
+  }
+}
 
 export class CyclicStateTransitionsPlaythroughIssue extends
-  PlaythroughIssueBase<'CyclicStateTransitions'> { }
+  PlaythroughIssueBase<'CyclicStateTransitions'> {
+  getStateNameWithIssue(): string {
+    const stateNames = this.issueCustomizationArgs.state_names.value;
+    return stateNames[stateNames.length - 1];
+  }
+}
 
 export type PlaythroughIssue = (
   EarlyQuitPlaythroughIssue |
@@ -109,8 +124,7 @@ export type PlaythroughIssue = (
 })
 export class PlaythroughIssueObjectFactory {
   createFromBackendDict(
-      backendDict: IPlaythroughIssueBackendDict):
-    PlaythroughIssue {
+      backendDict: PlaythroughIssueBackendDict): PlaythroughIssue {
     switch (backendDict.issue_type) {
       case 'EarlyQuit':
         return new EarlyQuitPlaythroughIssue(

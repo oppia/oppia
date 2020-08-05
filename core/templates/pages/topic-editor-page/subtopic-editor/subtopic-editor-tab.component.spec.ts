@@ -32,6 +32,7 @@ describe('Subtopic editor tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var ContextService = null;
+  var skillSummary = null;
   var ImageUploadHelperService = null;
   var directive = null;
   var TopicEditorStateService = null;
@@ -39,11 +40,15 @@ describe('Subtopic editor tab', function() {
   var EntityCreationService = null;
   var SubtopicValidationService = null;
   var TopicEditorRoutingService = null;
+  var WindowDimensionsService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var QuestionBackendApiService = null;
-  var SkillSummaryObjectFactory = null;
+  var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
+  var MockWindowDimensionsService = {
+    isWindowNarrow: () => false
+  };
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
@@ -56,7 +61,9 @@ describe('Subtopic editor tab', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
+    ShortSkillSummaryObjectFactory = $injector.get(
+      'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     QuestionBackendApiService = $injector.get('QuestionBackendApiService');
@@ -68,6 +75,9 @@ describe('Subtopic editor tab', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
+    skillSummary = ShortSkillSummaryObjectFactory.create(
+      'skill_1', 'Description 1');
+    topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
 
@@ -79,9 +89,9 @@ describe('Subtopic editor tab', function() {
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
-
     ctrl = $componentController('subtopicEditorTab', {
-      QuestionBackendApiService: MockQuestionBackendApiService
+      QuestionBackendApiService: MockQuestionBackendApiService,
+      WindowDimensionsService: MockWindowDimensionsService
     });
     ctrl.$onInit();
   }));
@@ -120,7 +130,6 @@ describe('Subtopic editor tab', function() {
       expect(thubmnailSpy).not.toHaveBeenCalled();
     });
 
-
   it('should call TopicUpdateService if subtopic thumbnail bg color updates',
     function() {
       var thubmnailBgSpy = (
@@ -152,7 +161,7 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should return if skill is deleted', function() {
-    var skillSummary = SkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummaryObjectFactory.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
@@ -212,4 +221,79 @@ describe('Subtopic editor tab', function() {
       ctrl.updateHtmlData();
       expect(updateSubtopicSpy).toHaveBeenCalled();
     });
+
+  it('should call the TopicUpdateService if skill is removed from subtopic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromSubtopic(0, null);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if skill is removed from topic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromTopic(skillSummary);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should set skill edit options index', function() {
+    ctrl.showSkillEditOptions(10);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(10);
+    ctrl.showSkillEditOptions(20);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(20);
+  });
+
+  it('should toggle skills list preview only in mobile view', function() {
+    MockWindowDimensionsService.isWindowNarrow = () => true;
+    expect(ctrl.skillsListIsShown).toEqual(true);
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(false);
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(true);
+    ctrl.togglePreviewSkillCard();
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
+    ctrl.skillsListIsShown = true;
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(true);
+  });
+
+  it('should toggle subtopic editor card only in mobile view', function() {
+    MockWindowDimensionsService.isWindowNarrow = () => true;
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicEditorCard();
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
+    ctrl.subtopicEditorCardIsShown = true;
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
+  });
+
+  it('should toggle subtopic preview', function() {
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicPreview();
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicPreview();
+    expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicPreview();
+  });
+
+  it('should call TopicEditorRoutingService to navigate To Topic Editor',
+    function() {
+      var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
+      ctrl.navigateToTopicEditor();
+      expect(navigateSpy).toHaveBeenCalled();
+    });
+
+  it('should hide the html data input on canceling', function() {
+    ctrl.schemaEditorIsShown = true;
+    ctrl.cancelHtmlDataChange();
+    expect(ctrl.schemaEditorIsShown).toEqual(false);
+  });
 });

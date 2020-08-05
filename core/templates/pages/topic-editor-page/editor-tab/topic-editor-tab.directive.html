@@ -1,96 +1,115 @@
+<p class="topic-dashboard-link">
+  <a href="/topics-and-skills-dashboard">
+    Back to Topics Dashboard <i class="fa fa-angle-left"></i>
+  </a>
+  <span><[editableName]></span>
+</p>
+<a class="oppia-mobile-back-to-parent" href="/topics-and-skills-dashboard">
+  <i class="fa fa-angle-left"></i>
+  <span>Back to Topics Dashboard</span>
+</a>
 <div role="form" class="form-horizontal topic-editor">
   <div class="topic-content-container">
-    <p class="topic-dashboard-link">
-      <a href="/topics-and-skills-dashboard">
-        Back to Topics Dashboard <i class="fa fa-angle-left"></i>
-      </a>
-      <span><[editableName]></span>
-    </p>
-    <md-card class="oppia-long-text">
+    <md-card class="oppia-long-text topic-item-card oppia-mobile-collapsible-card">
       <div class="topic-editor-main-container">
-        <label class="form-heading">Topic Thumbnail</label>
-        <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                            filename="topic.getThumbnailFilename()"
-                            update-filename="updateTopicThumbnailFilename"
-                            bg-color="topic.getThumbnailBgColor()"
-                            update-bg-color="updateTopicThumbnailBgColor"
-                            allowed-bg-colors="allowedBgColors"
-                            aspect-ratio="'4:3'"
-                            preview-title="editableName"
-                            preview-description=""
-                            preview-description-bg-color="'#2F6687'"
-                            preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
-        </thumbnail-uploader>
-        <div class="topic-name">
-          <label for="topicName" class="form-heading protractor-test-topic-name-heading">Topic Name</label>
-          <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
-                 ng-disabled="!topicRights.canEditTopic()"
-                 ng-model="editableName" ng-blur="updateTopicName(editableName)"
-                 placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
-          <span class="oppia-input-box-subtitle">
-            <i>
-              Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
-            </i>
-          </span>
+        <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards()">
+          <h3 class="topic-card-header">Details</h3>
+          <i class="fa fa-caret-down"
+             ng-if="!mainTopicCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             ng-if="mainTopicCardIsShown"
+             aria-hidden="true">
+          </i>
         </div>
-        <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
-          <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
-          <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
-                    ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
-                    ng-change="updateTopicDescriptionStatus(editableDescription)"
-                    ng-blur="updateTopicDescription(editableDescription)"
-                    placeholder="Enter the description of the topic">
-          </textarea>
-          <span class="oppia-input-box-subtitle">
-            <i>
-              Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
-            </i>
-          </span>
-          <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
-            What does this topic contain?
-          </span>
+        <div ng-if="mainTopicCardIsShown">
+          <div class="oppia-mobile-collapsible-card-content">
+            <div class="topic-name">
+              <label for="topicName" class="form-heading protractor-test-topic-name-heading">Name</label>
+              <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
+                     ng-disabled="!topicRights.canEditTopic()"
+                     ng-model="editableName" ng-blur="updateTopicName(editableName)"
+                     placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+                </i>
+              </span>
+            </div>
+            <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+              <label for="topicDescription" class="form-heading protractor-test-topic-description-heading">Description</label>
+              <textarea type="text" class="form-control topic-description protractor-test-topic-description-field"
+                        ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
+                        ng-change="updateTopicDescriptionStatus(editableDescription)"
+                        ng-blur="updateTopicDescription(editableDescription)"
+                        placeholder="Enter the description of the topic">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+                </i>
+              </span>
+              <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
+                What does this topic contain?
+              </span>
+            </div>
+            <label class="form-heading">Thumbnail</label>
+            <thumbnail-uploader disabled="!topicRights.canEditTopic()"
+                                filename="topic.getThumbnailFilename()"
+                                update-filename="updateTopicThumbnailFilename"
+                                bg-color="topic.getThumbnailBgColor()"
+                                update-bg-color="updateTopicThumbnailBgColor"
+                                allowed-bg-colors="allowedBgColors"
+                                aspect-ratio="'4:3'"
+                                preview-title="editableName"
+                                preview-description=""
+                                preview-description-bg-color="'#2F6687'"
+                                preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
+            </thumbnail-uploader>
+          </div>
         </div>
       </div>
-      <div ng-if="!topicPreviewCardIsShown" >
-        <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
-          Preview Topic Card
-          <i class="fa fa-angle-down"></i>
-        </button>
-      </div>
-      <div ng-if="topicPreviewCardIsShown">
-        <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
-          Collapse Topic Card
-          <i class="fa fa-angle-up"></i>
-        </button>
-      </div>
-      <div ng-if="topic.getId() && topicPreviewCardIsShown">
-        <preview-thumbnail name="editableName"
-                           description="editableDescription"
-                           preview-footer="getPreviewFooter()"
-                           filename = "topic.getThumbnailFilename()"
-                           thumbnail-bg-color="topic.getThumbnailBgColor()"
-                           bg-color="'#2F6687'">
-        </preview-thumbnail>
+      <div ng-if="topic.getThumbnailFilename() && mainTopicCardIsShown">
+        <div ng-if="!topicPreviewCardIsShown" >
+          <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
+            Expand Preview
+            <i class="fa fa-angle-down"></i>
+          </button>
+        </div>
+        <div ng-if="topicPreviewCardIsShown">
+          <button class="btn btn-default show-topic-preview-button" ng-click="togglePreview()">
+            Collapse Preview
+            <i class="fa fa-angle-up"></i>
+          </button>
+        </div>
+        <div ng-if="topic.getId() && topicPreviewCardIsShown">
+          <preview-thumbnail name="editableName"
+                             aspect-ratio="'4:3'"
+                             preview-footer="getPreviewFooter()"
+                             filename = "topic.getThumbnailFilename()"
+                             thumbnail-bg-color="topic.getThumbnailBgColor()"
+                             bg-color="'#2F6687'">
+          </preview-thumbnail>
+        </div>
       </div>
     </md-card>
-    <md-card class="item-list-card">
-      <div class="item-list-card-header">
+    <md-card class="item-list-card subtopic-skill-card-container topic-bottom-card oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(SUBTOPIC_LIST)">
         <div class="subtopic-reassign-header">
           <h3>Subtopics</h3>
-          <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">Reassign</span>
-          <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
-             class="fa fa-angle-down"
+          <span class="reassign-button protractor-test-reassign-skill-button" ng-click="reassignSkillsInSubtopics()">REASSIGN</span>
+          <i class="fa fa-caret-down"
              ng-if="!subtopicsListIsShown"
              aria-hidden="true">
           </i>
-          <i ng-click="togglePreviewListCards(SUBTOPIC_LIST)"
-             class="fa fa-angle-up"
+          <i class="fa fa-caret-up"
              ng-if="subtopicsListIsShown"
              aria-hidden="true">
           </i>
         </div>
       </div>
-      <div ng-if="subtopicsListIsShown">
+      <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
         <button class="btn add-subtopic-btn protractor-test-add-subtopic-button" ng-click="createSubtopic()">
           + ADD SUBTOPIC
         </button>
@@ -100,23 +119,43 @@
         <div ng-if="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">
           <div class="list-header">
             <span>Name</span>
-            <span># of Skills</span>
+            <span class="number-skills-header"># of Questions</span>
           </div>
           <div class="subtopic-name-header" ng-class="{'skills-valid': !uncategorizedSkillSummaries.length, 'skills-invalid': uncategorizedSkillSummaries.length}">
             <span>Uncategorized Skills</span>
           </div>
-          <div ng-repeat="skillSummary in uncategorizedSkillSummaries" class="subtopic-skill skills-list-item protractor-test-skill-item">
+          <div ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index" class="subtopic-skill skills-list-item protractor-test-skill-item">
             <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
               <span class="clickable-item"><[skillSummary.getDescription()]></span>
             </a>
-            <i class="fa fa-trash" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></i>
+            <div class="edit-options-container">
+              <i class="fa fa-ellipsis-v" ng-click="toggleUncategorizedSkillOptions($index)"></i>
+            </div>
+            <div class="uncategorized-skill-option-box"
+                 ng-if="uncategorizedEditOptionsIndex === $index"
+                 ng-mouseleave="toggleUncategorizedSkillOptions(null)"
+                 ng-click="toggleUncategorizedSkillOptions(null)">
+              <div class="uncategorized-skill-edit-option" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
+                <i class="fa fa-trash"></i>
+                <span>Delete skill</span>
+              </div>
+              <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSubtopicAssignment(null, skillSummary)">
+                <i class="fa fa-plus"></i>
+                <span>Assign to Subtopic</span>
+              </div>
+            </div>
           </div>
-          <div ng-repeat="subtopic in subtopics track by $index" ng-init="subtopicIndex = $index">
+          <div ng-repeat="subtopic in subtopics track by $index"
+               ng-init="subtopicIndex = $index"
+               dnd-list="subtopics"
+               dnd-dragstart="onRearrangeSubtopicStart($index)"
+               dnd-drop="onRearrangeSubtopicEnd($index)"
+               dnd-draggable="subtopic">
             <div class="subtopics-list-item">
               <div class="subtopic-name-header subtopic-name-card-header" ng-click="toggleSubtopicCard(subtopicIndex)">
-                <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId())"><[subtopic.getTitle()]></span>
-                <div class="subtopic-edit-options-container">
-                  <span><[subtopic.getSkillSummaries().length]></span>
+                <span class="clickable-item protractor-test-subtopic" ng-click="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())"><[subtopic.getTitle()]></span>
+                <div class="subtopic-edit-options-container edit-options-container">
+                  <span><[subtopicQuestionCountDict[subtopic.getId()] ]></span>
                   <i class="fa fa-ellipsis-v protractor-test-show-subtopic-options" ng-click="showSubtopicEditOptions($index);$event.stopPropagation()"></i>
                   <div ng-if="subtopicEditOptionsAreShown === subtopicIndex" class="subtopic-edit-options" ng-click="deleteSubtopic(subtopic.getId())" ng-mouseleave="showSubtopicEditOptions(null)">
                     <i class="fa fa-trash protractor-test-delete-subtopic-button"></i>
@@ -125,19 +164,33 @@
                 </div>
               </div>
               <div ng-if="subtopicCardSelectedIndexes[subtopicIndex]">
-                <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skill-description-container">
-                  <span class="clickable-item"><[skillSummary.getDescription()]></span>
-                  <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
-                  <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)">
-                    <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
-                      <i class="fa fa-trash"></i>
-                      <span>Remove from subtopic</span>
+                <div ng-if="subtopic.getSkillSummaries().length">
+                  <div ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index" ng-init="skillIndex = $index" class="subtopic-skill skills-list-item skill-description-container">
+                    <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+                      <span class="clickable-item"><[skillSummary.getDescription()]></span>
+                    </a>
+                    <div class="edit-options-container">
+                      <span><[skillQuestionCountDict[skillSummary.getId()] ]></span>
+                      <i class="fa fa-ellipsis-v" ng-click="showSkillEditOptions(subtopicIndex, skillIndex);$event.stopPropagation()"></i>
                     </div>
-                    <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
-                      <i class="fa fa-trash"></i>
-                      <span>Remove from topic</span>
+                    <div class="skill-option-box" ng-if="selectedSkillEditOptionsIndex[subtopicIndex][skillIndex]" ng-mouseleave="showSkillEditOptions(null)" ng-click="showSkillEditOptions(null)">
+                      <div class="skill-edit-option" ng-click="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-trash"></i>
+                        <span>Remove from subtopic</span>
+                      </div>
+                      <div class="skill-edit-option" ng-click="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-plus"></i>
+                        <span>Change Subtopic</span>
+                      </div>
+                      <div class="skill-edit-option remove-from-topic-option" ng-click="removeSkillFromTopic(subtopic.getId(), skillSummary)">
+                        <i class="fa fa-trash"></i>
+                        <span>Remove from topic</span>
+                      </div>
                     </div>
                   </div>
+                </div>
+                <div ng-if="!subtopic.getSkillSummaries().length">
+                  <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
                 </div>
               </div>
             </div>
@@ -147,21 +200,19 @@
     </md-card>
   </div>
   <div class="topic-info-container">
-    <md-card class="item-list-card">
-      <div class="item-list-card-header">
+    <md-card class="item-list-card topic-item-card topic-bottom-card oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards(STORY_LIST)">
         <h3>Canonical Stories</h3>
-        <i ng-click="togglePreviewListCards(STORY_LIST)"
-           class="fa fa-angle-down"
+        <i class="fa fa-caret-down"
            ng-if="!storiesListIsShown"
            aria-hidden="true">
         </i>
-        <i ng-click="togglePreviewListCards(STORY_LIST)"
-           class="fa fa-angle-up"
+        <i class="fa fa-caret-up"
            ng-if="storiesListIsShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="storiesListIsShown">
+      <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
         <button class="btn add-story-btn protractor-test-create-story-button"
                 ng-click="createCanonicalStory()">
           + ADD STORY
@@ -193,27 +244,33 @@
   </div>
 </div>
 <style>
-  .topic-editor thumbnail-uploader {
+  topic-editor-tab .topic-editor thumbnail-uploader {
     margin-bottom: 15px;
   }
 
-  .topic-editor textarea {
+  topic-editor-tab .topic-editor textarea {
     resize: vertical;
   }
 
-  .topic-editor {
+  topic-editor-tab .topic-editor {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    margin: 0 auto;
+    width: 85%;
   }
 
   .topic-editor .topic-content-container {
-    width: 45%;
+    margin-right: 3%;
+    width: 50%;
   }
 
   .topic-editor .topic-info-container {
-    margin-top: 34px;
     width: 35%;
+  }
+
+  .topic-editor .topic-item-card {
+    margin: 0;
   }
 
   .topic-editor .add-entity-text {
@@ -221,12 +278,13 @@
     margin-top: 20px;
   }
 
-  .topic-editor .topic-dashboard-link {
-    font-weight: bold;
+  topic-editor-tab .topic-dashboard-link {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
   }
 
-  .topic-editor .topic-dashboard-link a {
-    margin-left: 1%;
+  topic-editor-tab .topic-dashboard-link a {
     text-decoration: none;
   }
 
@@ -240,12 +298,16 @@
 
   .topic-editor .entity-count {
     align-items: center;
-    background-color: #ffffff;
+    background-color: #FFF;
+    border: 1px solid #aaaac1;
+    border-radius: 6px;
+    box-shadow: none;
     display: flex;
     flex-wrap: wrap;
-    height: 100px;
+    height: 110px;
     justify-content: center;
-    margin: 30px 8px 0;
+    margin: 30px auto 0;
+    width: 97%;
   }
 
   .topic-editor .subtopic-count,
@@ -260,16 +322,35 @@
   .topic-editor .story-count {
     border-right: none;
   }
+  .topic-editor .topic-card-header {
+    margin-bottom: 30px;
+    margin-left: -20px;
+  }
 
   .topic-editor .skills-list-item {
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    position: relative;
   }
 
   .topic-editor .skills-list-item a {
     color: inherit;
     text-decoration: none;
+    width: 75%;
+  }
+
+  .topic-editor .edit-options-container {
+    margin-right: 14px;
+  }
+
+  .topic-editor .edit-options-container span {
+    margin-right: 38px;
+  }
+
+  .topic-editor .number-skills-header {
+    margin-right: 30px;
   }
 
   .topic-editor .subtopic-count-value,
@@ -294,11 +375,12 @@
   }
 
   .topic-editor .form-heading {
-    font-size: 1.2em;
+    font-size: 15px;
   }
 
   .topic-editor .topic-name {
-    margin-bottom: 1.5%;
+    margin-bottom: 25px;
+    margin-top: 32px;
   }
 
   .topic-editor .canonical-stories {
@@ -314,6 +396,7 @@
   .topic-editor .add-story-btn {
     background-color: #008098;
     color: #FFFFFF;
+    font-weight: bold;
     text-align: left;
   }
 
@@ -322,7 +405,7 @@
   }
 
   .topic-editor .add-skill-btn {
-    width: 120px;
+    width: 108px;
   }
 
   .topic-editor .add-story-btn {
@@ -369,11 +452,32 @@
     z-index: 1;
   }
 
+  .topic-editor .uncategorized-skill-option-box {
+    background-color: #e1dcdc;
+    border: 1px solid #000;
+    padding: 0;
+    position: absolute;
+    right: 7px;
+    width: 210px;
+    z-index: 1;
+  }
+
   .topic-editor .skill-edit-option {
     border-bottom: 1px solid #000;
     cursor: pointer;
     font-size: 15px;
     padding: 5px;
+  }
+
+  .topic-editor .uncategorized-skill-edit-option {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+  }
+
+  .topic-editor .edit-option-assign {
+    border-bottom: none;
   }
 
   .topic-editor .remove-from-topic-option {
@@ -406,33 +510,38 @@
   }
 
   .topic-editor .skill-description-container {
+    align-items: center;
     display: flex;
     justify-content: space-between;
     position: relative;
   }
 
-  .topic-editor  .skills-valid {
+  .topic-editor .skills-valid {
     background-color: #009C8A33;
     border: 2px solid #009C8A;
   }
 
-  .topic-editor  .skills-invalid {
+  .topic-editor .skills-invalid {
     background-color: #C55F4533;
     border: 2px solid #C55F45;
   }
 
-  .clickable-item:hover {
+  .topic-editor .clickable-item:hover {
     cursor: pointer;
     font-weight: bold;
   }
 
-  .subtopic-skill {
+  .topic-editor .subtopic-skill {
     border-bottom: 1px solid #e3e3e3;
-    padding: 8px 10px;
+    padding: 8px 10px 8px 32px;
   }
 
-  .topic-editor  .item-list-card-header i {
+  .topic-editor .item-list-card-header i {
     display: none;
+  }
+
+  .topic-editor .subtopic-skill-card-container {
+    margin-top: 64px;
   }
 
   @media screen and (max-width: 1200px) {
@@ -458,15 +567,29 @@
   }
 
   @media screen and (max-width: 768px) {
-    .topic-editor {
+    topic-editor-tab .topic-editor {
       margin-bottom: 15px;
+      width: 100%;
+    }
+
+    topic-editor-tab .topic-dashboard-link {
+      display: none;
+    }
+
+    .topic-editor .topic-bottom-card {
+      margin-top: 40px;
     }
 
     .topic-editor .item-list-card {
-      padding: 15px 10px;
+      padding: 0;
     }
+
     .topic-editor .entity-count {
       display: none;
+    }
+
+    .topic-editor .subtopic-skill-card-container {
+      margin-top: inherit;
     }
 
     .topic-editor .item-list-card-header {
@@ -475,13 +598,45 @@
       justify-content: space-between;
     }
 
+    .topic-editor .topic-editor-main-container {
+      padding: 0;
+    }
+
+    .topic-editor .skills-list-item a {
+      color: inherit;
+      text-decoration: none;
+      width: 65%;
+    }
+
+    .topic-editor .topic-card-header,
+    .topic-editor .subtopic-reassign-header,
+    .topic-editor .item-list-card-header h3 {
+      font-size: 19px;
+      margin: 0;
+    }
+
+    .topic-editor .subtopic-skill {
+      border-bottom: 1px solid #e3e3e3;
+      padding: 8px 10px 8px 20px;
+    }
+
     .topic-editor .item-list-card-header i {
       display: inline-block;
-      font-size: 25px;
+      font-size: 18px;
     }
 
     .topic-editor .topic-content-container {
+      margin-right: 0;
+      margin-top: 30px;
       width: 100%;
+    }
+
+    .topic-editor .subtopic-reassign-header {
+      width: 100%;
+    }
+
+    .topic-editor .reassign-button {
+      display: none;
     }
 
     .topic-editor .topic-info-container {
@@ -490,7 +645,23 @@
     }
 
     .topic-editor .add-subtopic-btn {
-      width: 50%;
+      width: 44%;
+    }
+
+    .topic-editor .add-skill-btn {
+      margin-left: 3%;
+    }
+
+    .topic-editor .skill-option-box {
+      right: 40px;
+    }
+
+    .topic-editor .subtopic-edit-options {
+      right: 13px;
+    }
+
+    .topic-editor .uncategorized-skill-option-box {
+      right: 43px;
     }
   }
 </style>

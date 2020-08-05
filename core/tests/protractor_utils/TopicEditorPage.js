@@ -18,6 +18,8 @@
  */
 
 var dragAndDropScript = require('html-dnd').code;
+var action = require('../protractor_utils/action.js');
+var general = require('../protractor_utils/general.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -109,6 +111,10 @@ var TopicEditorPage = function() {
     by.css('.thumbnail-editor .protractor-test-photo-button'));
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
+  var newStoryDescriptionField = element(
+    by.css('.protractor-test-new-story-description-field'));
+  var storyThumbnailButton = element(
+    by.css('.thumbnail-editor .protractor-test-photo-button'));
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
@@ -204,6 +210,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeSubtopicPageContents = async function(content) {
+    await general.scrollToTop();
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-edit-html-content'));
     await waitFor.elementToBeClickable(subtopicPageContentButton,
@@ -389,13 +396,21 @@ var TopicEditorPage = function() {
       storyListTable, 'Story list table too long to disappear.');
   };
 
-  this.createStory = async function(storyTitle) {
+  this.createStory = async function(storyTitle, storyDescription, imgPath) {
     await waitFor.elementToBeClickable(
       createStoryButton,
       'Create Story button takes too long to be clickable');
     await createStoryButton.click();
 
-    await newStoryTitleField.sendKeys(storyTitle);
+    await action.sendKeys(
+      'Create new story title', newStoryTitleField, storyTitle);
+    await action.sendKeys(
+      'Create new story description', newStoryDescriptionField,
+      storyDescription);
+
+    await workflow.submitImage(
+      storyThumbnailButton, thumbnailContainer, imgPath, false);
+
     await waitFor.elementToBeClickable(
       confirmStoryCreationButton,
       'Confirm Create Story button takes too long to be clickable');
@@ -435,7 +450,8 @@ var TopicEditorPage = function() {
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
     await closeSaveModalButton.click();
-    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for saving topic takes too long to appear.');
   };
 };
 

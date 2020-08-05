@@ -1,25 +1,23 @@
-<md-card class="oppia-editor-card-with-avatar">
+<md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
   <div class="oppia-editor-card-body">
-    <div class="oppia-editor-card-section">
-      <div class="oppia-prerequisite-skills-header">
+    <div class="oppia-editor-card-section prerequisite-skill-content">
+      <div class="oppia-prerequisite-skills-header oppia-mobile-collapsible-card-header" ng-click="togglePrerequisiteSkills()">
         <strong class="heading-text">
           Prerequisite Skills
         </strong>
-        <i ng-click="togglePrerequisiteSkills()"
-           class="fa fa-angle-down"
+        <i class="fa fa-caret-down"
            ng-if="!prerequisiteSkillsAreShown"
            aria-hidden="true">
         </i>
-        <i ng-click="togglePrerequisiteSkills()"
-           class="fa fa-angle-up"
+        <i class="fa fa-caret-up"
            ng-if="prerequisiteSkillsAreShown"
            aria-hidden="true">
         </i>
       </div>
-      <div ng-if="prerequisiteSkillsAreShown">
+      <div ng-if="prerequisiteSkillsAreShown" class="oppia-mobile-collapsible-card-content">
         <md-card class="skill-id" ng-repeat="skillId in skill.getPrerequisiteSkillIds()">
           <div class="skill-description-card">
-            <span ng-click="removeSkillId(skillId)" aria-hidden="true">
+            <span class="remove-skill-icon" ng-click="removeSkillId(skillId)" aria-hidden="true">
               <i class="material-icons md-18">&#xE14C;</i>
             </span>
             <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
@@ -31,6 +29,12 @@
   </div>
 </md-card>
 <style>
+  skill-prerequisite-skills-editor .remove-skill-icon {
+    color: #f00;
+    cursor: pointer;
+    float: right;
+  }
+
   skill-prerequisite-skills-editor .skill-id {
     background-color: #efefef;
     margin-left: 0;
@@ -46,7 +50,9 @@
     background-color: #e0e0e0;
   }
   skill-prerequisite-skills-editor .skill-description-card {
-    height: 2.5em;
+    max-height: 10em;
+    overflow-wrap: break-word;
+    padding-bottom: 10px;
     padding-left: 10px;
     padding-top: 10px;
   }
@@ -61,6 +67,9 @@
   @media screen and (max-width: 768px) {
     skill-prerequisite-skills-editor .oppia-prerequisite-skills-header i {
       display: block;
+    }
+    skill-prerequisite-skills-editor .prerequisite-skill-content {
+      padding: 0;
     }
   }
 </style>

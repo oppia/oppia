@@ -52,8 +52,10 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
-    exp_jobs_one_off.ExplorationMathTagValidationOneOffJob,
+    exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
     exp_jobs_one_off.ExplorationMockMathMigrationOneOffJob,
+    exp_jobs_one_off.ExplorationMathRichTextInfoModelGenerationOneOffJob,
+    exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
@@ -66,8 +68,10 @@ ONE_OFF_JOB_MANAGERS = [
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
+    question_jobs_one_off.QuestionsMathRteAuditOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
+    skill_jobs_one_off.SkillMathRteAuditOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
@@ -78,10 +82,12 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    story_jobs_one_off.StoryMathRteAuditOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
+    topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
@@ -96,118 +102,137 @@ ONE_OFF_JOB_MANAGERS = [
 # to show controls on the admin dashboard.
 AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
-    prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .TrainingJobExplorationMappingModelAuditOneOffJob),
+    prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionModelAuditOneOffJob,
-    prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionProgressModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionRightsModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .CollectionRightsSnapshotMetadataModelAuditOneOffJob),
+        .CollectionRightsSnapshotContentModelAuditOneOffJob
+    ),
     (
         prod_validation_jobs_one_off
-        .CollectionRightsSnapshotContentModelAuditOneOffJob),
-    prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
+        .CollectionRightsSnapshotMetadataModelAuditOneOffJob
+    ),
+    prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .ExplorationOpportunitySummaryModelAuditOneOffJob),
+    prod_validation_jobs_one_off.CompletedActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.ConfigPropertyModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .ConfigPropertySnapshotMetadataModelAuditOneOffJob),
+        .ConfigPropertySnapshotContentModelAuditOneOffJob
+    ),
     (
         prod_validation_jobs_one_off
-        .ConfigPropertySnapshotContentModelAuditOneOffJob),
-    prod_validation_jobs_one_off.SentEmailModelAuditOneOffJob,
-    prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
+        .ConfigPropertySnapshotMetadataModelAuditOneOffJob
+    ),
+    prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationMathRichTextInfoModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationSnapshotContentModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .ExplorationOpportunitySummaryModelAuditOneOffJob
+    ),
+    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRightsModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .ExplorationRightsSnapshotMetadataModelAuditOneOffJob),
+        .ExplorationRightsSnapshotContentModelAuditOneOffJob
+    ),
     (
         prod_validation_jobs_one_off
-        .ExplorationRightsSnapshotContentModelAuditOneOffJob),
-    prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob,
-    prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob,
-    prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
+        .ExplorationRightsSnapshotMetadataModelAuditOneOffJob
+    ),
+    prod_validation_jobs_one_off.ExplorationSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.JobModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillCommitLogEntryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillSummaryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.StoryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.StorySnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
+    prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralVoiceoverApplicationModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicRightsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicRightsSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicRightsSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicCommitLogEntryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob,
+    prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.JobModelAuditOneOffJob,
+    prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .SubtopicPageSnapshotMetadataModelAuditOneOffJob),
-    prod_validation_jobs_one_off.SubtopicPageSnapshotContentModelAuditOneOffJob,
+        .PlatformParameterSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .PlatformParameterSnapshotContentModelAuditOneOffJob),
+    prod_validation_jobs_one_off.PlaythroughModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PseudonymizedUserModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SentEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillOpportunityModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryProgressModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StorySnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.SubtopicPageCommitLogEntryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserSettingsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,
-    prod_validation_jobs_one_off.CompletedActivitiesModelAuditOneOffJob,
-    prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
-    prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SubtopicPageSnapshotContentModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .SubtopicPageSnapshotMetadataModelAuditOneOffJob
+    ),
+    prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicRightsSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicRightsSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .TrainingJobExplorationMappingModelAuditOneOffJob
+    ),
+    prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserAuthModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserSubscriptionsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserSubscribersModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserRecentChangesBatchModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserStatsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.CollectionProgressModelAuditOneOffJob,
-    prod_validation_jobs_one_off.StoryProgressModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,
     prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserRecentChangesBatchModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserSettingsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSkillMasteryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
-    prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillOpportunityModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.TaskEntryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.PlaythroughModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserStatsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserSubscribersModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserSubscriptionsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob
 ]
 
 # List of all ContinuousComputation managers to show controls for on the
@@ -232,7 +257,7 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
 
         Args:
             event_type: str. The type of the event.
-            *args: *. Positional arguments to pass to on_incoming_event().
+            *args: list(*). Positional arguments to pass to on_incoming_event().
             **kwargs: *. Keyword arguments to pass to on_incoming_event().
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:

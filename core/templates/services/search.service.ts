@@ -18,6 +18,8 @@
 
 require('services/services.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('SearchService', [
   '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',
   function($http, $log, $rootScope, $translate, SEARCH_DATA_URL) {
@@ -27,7 +29,7 @@ angular.module('oppia').factory('SearchService', [
     var _searchCursor = null;
     var _isCurrentlyFetchingResults = false;
     var numSearchesInProgress = 0;
-
+    var _searchBarLoadedEventEmitter = new EventEmitter();
     // Appends a suffix to the query describing allowed category and language
     // codes to filter on.
     var _getSuffixForQuery =
@@ -138,7 +140,7 @@ angular.module('oppia').factory('SearchService', [
             $log.error('Mismatch');
             $log.error('SearchQuery: ' + searchQuery);
             $log.error('Input: ' + (
-              <string><any>$('.oppia-search-bar-input').val()).trim());
+              <string>$('.oppia-search-bar-input').val()).trim());
           }
         })['catch'](function() {
           numSearchesInProgress--;
@@ -215,6 +217,10 @@ angular.module('oppia').factory('SearchService', [
             successCallback(response.data, hasReachedEndOfPage());
           }
         });
+      },
+
+      get onSearchBarLoaded() {
+        return _searchBarLoadedEventEmitter;
       }
     };
   }

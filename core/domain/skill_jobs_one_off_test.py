@@ -26,6 +26,7 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_jobs_one_off
 from core.domain import skill_services
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -62,7 +63,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new skill that should not be affected by the
         # job.
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description', rubrics=self.rubrics)
+            self.SKILL_ID, 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
         self.assertEqual(
             skill.skill_contents_schema_version,
@@ -103,7 +104,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description', rubrics=self.rubrics)
+            self.SKILL_ID, 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
         # Delete the skill before migration occurs.
@@ -205,7 +206,7 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             return 'invalid_skill'
 
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description', rubrics=self.rubrics)
+            self.SKILL_ID, 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
         get_skill_by_id_swap = self.swap(
@@ -228,3 +229,216 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                       'no attribute \'validate\'' % (self.SKILL_ID)]]]
         self.assertEqual(
             expected, [ast.literal_eval(x) for x in output])
+
+
+class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    SKILL_ID = 'skill_id'
+
+    def setUp(self):
+        super(SkillMathRteAuditOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test skills.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+
+    def test_job_when_skills_have_math_rich_text_components(self):
+        valid_html_1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        valid_html_2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        valid_html_3 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', valid_html_1),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
+        skill_contents1 = skill_domain.SkillContents(
+            state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
+        misconceptions1 = [skill_domain.Misconception(
+            0, 'name', valid_html_1,
+            valid_html_2, True)]
+        rubrics1 = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], [valid_html_1]),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], [valid_html_3])]
+        skill1 = skill_domain.Skill(
+            'skill_id1', 'Description', misconceptions1, rubrics1,
+            skill_contents1, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
+            None, False, ['skill_id_2']
+        )
+        skill_services.save_new_skill(self.albert_id, skill1)
+        job_id = (
+            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
+        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+            job_id)
+
+        overall_result = ast.literal_eval(output[0])
+        expected_overall_result = {
+            'total_number_skills_requiring_svgs': 1,
+            'total_number_of_latex_strings_without_svg': 3
+        }
+
+        self.assertEqual(overall_result[1], expected_overall_result)
+        detailed_result = ast.literal_eval(output[1])
+        expected_skill1_info = {
+            'skill_id': 'skill_id1',
+            'latex_strings_without_svg_in_skill': [
+                '+,+,+,+', '-,-,-,-',
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+        }
+        skill_latex_info = detailed_result[1]
+        self.assertEqual(skill_latex_info[0], expected_skill1_info)
+
+    def test_job_when_skills_do_not_have_math_rich_text_components(self):
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+
+        skill = skill_domain.Skill.create_default_skill(
+            'valid_skill', 'A description', rubrics)
+        skill_services.save_new_skill(self.albert_id, skill)
+        job_id = (
+            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
+        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])
+
+    def test_job_when_skills_have_math_rich_text_components_with_svgs(self):
+        valid_html_1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file1.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        valid_html_2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;file2.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', valid_html_1),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
+        skill_contents1 = skill_domain.SkillContents(
+            state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
+        misconceptions1 = [skill_domain.Misconception(
+            0, 'name', '<p>misconception html1</p>',
+            '<p>misconception html2</p>', True)]
+        rubrics1 = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], [valid_html_2]),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+        skill1 = skill_domain.Skill(
+            'skill_id1', 'Description', misconceptions1, rubrics1,
+            skill_contents1, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
+            None, False, ['skill_id_2']
+        )
+        skill_services.save_new_skill(self.albert_id, skill1)
+        job_id = (
+            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
+        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+            job_id)
+        overall_result = ast.literal_eval(output[0])
+        expected_skill1_info = {
+            'skill_id': 'skill_id1',
+            'latex_strings_with_svg': [
+                '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+        }
+        skill_latex_info = overall_result[1]
+        self.assertEqual(skill_latex_info[0], expected_skill1_info)
+
+    def test_job_skips_deleted_skills(self):
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
+
+        skill = skill_domain.Skill.create_default_skill(
+            'valid_skill', 'A description', rubrics)
+        skill_services.save_new_skill(self.albert_id, skill)
+
+        skill_services.delete_skill(
+            self.albert_id, skill.id)
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            skill_fetchers.get_skill_by_id(skill.id)
+
+        job_id = (
+            skill_jobs_one_off.SkillMathRteAuditOneOffJob.create_new())
+        skill_jobs_one_off.SkillMathRteAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.SkillMathRteAuditOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])

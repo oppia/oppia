@@ -43,7 +43,9 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
     def test_generate_value_of_base_value_generator_raises_error(self):
         base_generator = value_generators_domain.BaseValueGenerator()
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'generate_value\(\) method has not yet been implemented'):
             base_generator.generate_value()
 
 
@@ -54,7 +56,7 @@ class ValueGeneratorNameTests(test_utils.GenericTestBase):
         directory.
 
         Returns:
-            a list of Python files.
+            list(str). A list of Python files.
         """
         current_dir = os.getcwd()
         files_in_directory = []
