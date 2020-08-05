@@ -257,10 +257,10 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.fetchAndGenerateSvgsForExplorations = async function() {
           while (ctrl.generateSvgs) {
-            if (ctrl.numberOfExplorationsLeftToUpdate === 0) {
+            if (ctrl.numberOfExplorationsLeftToUpdate === '0') {
               ctrl.setStatusMessage('SVGs generated for all explorations .');
               $scope.$apply();
-              break;
+              return;
             }
             var response = await $http.get(
               ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER, {

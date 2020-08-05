@@ -996,7 +996,8 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             multiple_explorations_math_rich_text_info)
 
         response_dict = self.get_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER)
+            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            params={'item_to_fetch': 'exp_id_to_latex_mapping'})
         expected_response = {
             'exp_id1': ['abc1', 'xyz1'],
             'exp_id2': ['abc2', 'xyz2'],
@@ -1005,6 +1006,13 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict,
             {'latex_strings_to_exp_id_mapping': expected_response})
+
+        response_dict2 = self.get_json(
+            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            params={'item_to_fetch': 'number_of_explorations_left_to_update'})
+        self.assertEqual(
+            response_dict2,
+            {'number_of_explorations_left_to_update': '3'})
 
     def test_post_svgs_when_all_values_are_valid(self):
         user_email = 'user1@example.com'
