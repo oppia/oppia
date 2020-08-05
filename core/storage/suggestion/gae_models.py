@@ -123,7 +123,7 @@ ACTION_TYPE_REJECT = 'reject'
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
 
-    The ID of the suggestions are created is the same as the ID of the thread
+    The ID of the suggestions created is the same as the ID of the thread
     linked to the suggestion.
     """
 
@@ -251,15 +251,22 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of translation suggestions that
-            correspond to the given exploration ids, up to a maximum of
-            feconf.DEFAULT_QUERY_LIMIT suggestions.
+            correspond to the given exploration ids.
         """
-        return (
+
+        query = (
             cls.get_all()
+            .order(cls.key)
             .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id.IN(exp_ids))
-            .fetch(feconf.DEFAULT_QUERY_LIMIT)
         )
+        suggestion_models = []
+        cursor, more = (None, True)
+        while more:
+            results, cursor, more = query.fetch_page(
+                feconf.DEFAULT_QUERY_LIMIT, start_cursor=cursor)
+            suggestion_models.extend(results)
+        return suggestion_models
 
 
     @classmethod

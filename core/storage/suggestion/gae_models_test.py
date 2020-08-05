@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (base_models, suggestion_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.suggestion, models.NAMES.user])
@@ -342,6 +343,38 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_with_exp_ids(
                 ['invalid_exp'])), 0)
+
+    def test_get_translation_suggestions_with_exp_ids_past_default_query_limit(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp4', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_9')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp5', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_10')
+
+        with self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1):
+            suggestion_model_results = (
+                suggestion_models
+                .GeneralSuggestionModel
+                .get_translation_suggestions_with_exp_ids(
+                    ['exp4', 'exp5'])
+            )
+
+        # Assert that there are two translation suggestions with the given
+        # exploration ids found. There should be two fetch_page calls.
+        self.assertEqual(len(suggestion_model_results), 2)
+        # Assert that the models returned are in the same order as the exp_ids.
+        self.assertEqual(suggestion_model_results[0].target_id, 'exp4')
+        self.assertEqual(suggestion_model_results[1].target_id, 'exp5')
 
     def test_get_all_stale_suggestions(self):
         with self.swap(
