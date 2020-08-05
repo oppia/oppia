@@ -115,8 +115,8 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             ).put()
 
     @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
+    def reduce(error_message, val):
+        yield (error_message)
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):

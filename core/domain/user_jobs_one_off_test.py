@@ -206,6 +206,15 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
     USER_B_ID = 'user_b_id'
     USER_B_GAE_ID = 'user_b_gae_id'
 
+    # def _run_one_off_job(self):
+    #     """Runs the one-off MapReduce job."""
+    #     job_id = user_jobs_one_off.UserAuthModelOneOffJob.create_new()
+    #     user_jobs_one_off.UserAuthModelOneOffJob.enqueue(job_id)
+    #     self.assertEqual(
+    #         self.count_jobs_in_taskqueue(
+    #             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+    #     self.process_and_flush_pending_tasks()
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.UserAuthModelOneOffJob.create_new()
@@ -214,6 +223,11 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off.UserAuthModelOneOffJob.get_output(
+                job_id))
+        return output
 
     def setUp(self):
         super(UserAuthModelOneOffJobTests, self).setUp()
@@ -248,9 +262,15 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(user_auth_model.id, self.USER_B_ID)
 
     def test_one_off_job_gae_id_registered_to_multiple_users_raises_error(self):
+        self._run_one_off_job()
         self.user_b_model.gae_id = self.USER_A_GAE_ID
         self.user_b_model.put()
-        self._run_one_off_job()
+        output = self._run_one_off_job()
+        self.assertEqual(len(output), 1)
+        expected_error = python_utils.UNICODE(
+            'GAE_ID %s already registered with user_id %s.' % (
+            self.USER_A_GAE_ID, self.user_a_model.id))
+        self.assertEqual(expected_error, output[0])
 
     def test_one_off_job_run_multiple_times_raises_no_error(self):
         self.user_b_model.put()
