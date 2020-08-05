@@ -324,7 +324,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         Args:
             message_identifier: FullyQualifiedMessageIdentifier. The message
-                identifier consists of the thread_id and message_id.
+                identifier consists of the thread_id and its corresponding
+                message_id.
 
         Returns:
             GeneralFeedbackMessageModel. Instance of the new
@@ -344,7 +345,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         Args:
             message_identifiers: list(FullyQualifiedMessageIdentifier). Each
-                message identifier consists of the thread_id and message_id.
+                message identifier consists of the thread_id and its
+                corresponding message_id.
 
         Returns:
             list(GeneralFeedbackMessageModel). Instances of the new
