@@ -17,6 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { StoryEditorNavigationService } from
@@ -28,6 +29,8 @@ describe('Story Preview tab', function() {
   var ctrl = null;
   var story = null;
   var MockStoryEditorNavigationService = null;
+  var storyInitializedEventEmitter = null;
+  var storyReinitializedEventEmitter = null;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -93,13 +96,29 @@ describe('Story Preview tab', function() {
       version: '1',
       corresponding_topic_id: 'topic_id'
     });
+
+    storyInitializedEventEmitter = new EventEmitter();
+    storyReinitializedEventEmitter = new EventEmitter();
+
     spyOn(StoryEditorStateService, 'getStory').and.returnValue(story);
+    spyOnProperty(StoryEditorStateService, 'onStoryInitialized').and.callFake(
+      function() {
+        return storyInitializedEventEmitter;
+      });
+    spyOnProperty(StoryEditorStateService, 'onStoryReinitialized').and.callFake(
+      function() {
+        return storyReinitializedEventEmitter;
+      });
     ctrl = $componentController('storyPreviewTab', {
       $scope: $scope,
       StoryEditorStateService: StoryEditorStateService,
       StoryEditorNavigationService: MockStoryEditorNavigationService,
     });
   }));
+
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
 
   it('should set initialize the variables', function() {
     ctrl.$onInit();
@@ -116,4 +135,13 @@ describe('Story Preview tab', function() {
     expect(ctrl.getExplorationUrl(node)).toEqual(
       '/explore/exp_2?story_id=storyId_0&node_id=node_2');
   });
+
+  it('should called initEditor on calls from story being initialized',
+    function() {
+      spyOn(ctrl, 'initEditor').and.callThrough();
+      ctrl.$onInit();
+      storyInitializedEventEmitter.emit();
+      storyReinitializedEventEmitter.emit();
+      expect(ctrl.initEditor).toHaveBeenCalledTimes(3);
+    });
 });

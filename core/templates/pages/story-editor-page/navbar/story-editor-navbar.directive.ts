@@ -32,6 +32,8 @@ require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -42,17 +44,16 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'EditableStoryBackendApiService', 'UndoRedoService',
         'StoryEditorStateService', 'StoryEditorNavigationService', 'UrlService',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             EditableStoryBackendApiService, UndoRedoService,
             StoryEditorStateService, StoryEditorNavigationService, UrlService,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
           var EDITOR = 'Editor';
           var PREVIEW = 'Preview';
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.explorationValidationIssues = [];
 
           $scope.getChangeListLength = function() {
@@ -190,6 +191,14 @@ angular.module('oppia').directive('storyEditorNavbar', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryInitialized.subscribe(
+                () => _validateStory()
+              ));
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
+                () => _validateStory()
+              ));
             $scope.forceValidateExplorations = true;
             $scope.warningsAreShown = false;
             $scope.activeTab = EDITOR;
@@ -200,10 +209,12 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
-            $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
