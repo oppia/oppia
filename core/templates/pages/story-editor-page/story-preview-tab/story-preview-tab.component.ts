@@ -51,21 +51,23 @@ angular.module('oppia').component('storyPreviewTab', {
       ctrl.generatePathIconParameters = function() {
         var storyNodes = ctrl.nodes;
         var iconParametersArray = [];
+        let thumbnailIconUrl = storyNodes[0].getThumbnailFilename() ? (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  'story', ctrl.storyId,
+                  storyNodes[0].getThumbnailFilename())) : null;
         iconParametersArray.push({
-          thumbnailIconUrl: (
-            AssetsBackendApiService.getThumbnailUrlForPreview(
-              'story', ctrl.storyId,
-              storyNodes[0].getThumbnailFilename())),
+          thumbnailIconUrl: thumbnailIconUrl,
           thumbnailBgColor: storyNodes[0].getThumbnailBgColor()
         });
 
         for (
           var i = 1; i < ctrl.nodes.length; i++) {
-          iconParametersArray.push({
-            thumbnailIconUrl: (
+          thumbnailIconUrl = storyNodes[i].getThumbnailFilename() ? (
               AssetsBackendApiService.getThumbnailUrlForPreview(
                 'story', ctrl.storyId,
-                storyNodes[i].getThumbnailFilename())),
+                storyNodes[i].getThumbnailFilename())) : null;
+          iconParametersArray.push({
+            thumbnailIconUrl: thumbnailIconUrl,
             thumbnailBgColor: storyNodes[i].getThumbnailBgColor()
           });
         }
