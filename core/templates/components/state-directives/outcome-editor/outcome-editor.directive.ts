@@ -229,6 +229,9 @@ angular.module('oppia').directive('outcomeEditor', [
             // ctrl.savedOutcome now being set in onExternalSave().
             ctrl.savedOutcome = angular.copy(ctrl.outcome);
           };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
         }
       ]
     };

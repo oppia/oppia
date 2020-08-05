@@ -41,8 +41,6 @@ require('pages/interaction-specs.constants.ajs.ts');
 
 import { Subscription } from 'rxjs';
 
-
-
 angular.module('oppia').directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
