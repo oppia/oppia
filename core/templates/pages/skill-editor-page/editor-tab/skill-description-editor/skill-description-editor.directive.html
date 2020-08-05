@@ -1,5 +1,5 @@
 <div class="oppia-editor-card-body">
-  <div class="oppia-editor-card-section">
+  <div class="oppia-editor-card-section skill-description-container">
     <strong class="heading-text">Skill Description</strong>
     <div class="description-subtitle">
       This is the name of the skill as visible to learners and other creators.
@@ -38,5 +38,11 @@
 
   skill-description-editor .heading-text {
     font-size: 16px;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-description-editor .skill-description-container {
+      padding: 0;
+    }
   }
 </style>

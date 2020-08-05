@@ -39,7 +39,7 @@ require(
   'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
-require('domain/bottom_navbar/bottom-navbar-status.service.ts');
+require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 
 angular.module('oppia').component('storyEditorPage', {

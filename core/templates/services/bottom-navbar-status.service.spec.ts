@@ -31,7 +31,8 @@ describe('BottomNavbarStatusService', () => {
       providers: [{
         provide: WindowDimensionsService,
         useValue: {
-          isWindowNarrow: () => true
+          isWindowNarrow: () => true,
+          getWidth: () => 800
         }
       }]
     });
