@@ -28,7 +28,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('Exploration history', function() {
+fdescribe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
@@ -64,7 +64,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should display the history', async function() {
+  fit('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration();
@@ -432,7 +432,9 @@ describe('Exploration history', function() {
       '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
-      '      value: Continue\n' +
+      '      value:\n' +
+      '        content_id: ca_buttonText_0\n' +
+      '        unicode_str: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    feedback:\n' +
@@ -445,15 +447,17 @@ describe('Exploration history', function() {
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
-      'next_content_id_index: 0\n' +
+      'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
       '  voiceovers_mapping:\n' +
+      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
       'solicit_answer_details: false\n' +
       'written_translations:\n' +
       '  translations_mapping:\n' +
+      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
       '';
