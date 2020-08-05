@@ -21,7 +21,6 @@
 import 'mousetrap';
 
 import { UpgradedServices } from 'services/UpgradedServices';
-import { rootCertificates } from 'tls';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-player-page/exploration-player-page.component.ts');

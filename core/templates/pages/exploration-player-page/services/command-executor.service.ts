@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, HostListener } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service.ts';
 import {WindowWrapperMessageService} from
