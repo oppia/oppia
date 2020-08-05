@@ -29,24 +29,37 @@ require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
+require(
+  'pages/story-editor-page/story-preview-tab/story-preview-tab.component.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-
+require('pages/story-editor-page/services/story-editor-navigation.service');
+require(
+  'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('domain/bottom_navbar/bottom-navbar-status.service.ts');
+require('services/page-title.service.ts');
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
-    '$scope', '$uibModal', '$window', 'PageTitleService',
+    '$scope', '$uibModal', '$window', 'BottomNavbarStatusService',
+    'EditableStoryBackendApiService',
+    'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
+    'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
     function(
-        $scope, $uibModal, $window, PageTitleService,
+        $scope, $uibModal, $window, BottomNavbarStatusService,
+        EditableStoryBackendApiService,
+        PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
         UrlInterpolationService, UrlService,
-        EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+        EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
+        EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
       var ctrl = this;
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
@@ -76,12 +89,119 @@ angular.module('oppia').component('storyEditorPage', {
       var setPageTitle = function() {
         PageTitleService.setPageTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
+        PageTitleService.setPageSubtitleForMobileView(
+          StoryEditorStateService.getStory().getTitle());
+      };
+
+      ctrl.getActiveTab = function() {
+        return StoryEditorNavigationService.getActiveTab();
+      };
+
+      ctrl.getNavbarText = function() {
+        const activeTab = StoryEditorNavigationService.getActiveTab();
+        if (activeTab === 'story_editor') {
+          return 'Story Editor';
+        } else if (activeTab === 'story_preview') {
+          return 'Story Preview';
+        } else if (activeTab === 'chapter_editor') {
+          return 'Chapter Editor';
+        }
+      };
+
+      ctrl.toggleWarnings = function() {
+        ctrl.warningsAreShown = !ctrl.warningsAreShown;
+      };
+
+      ctrl.isMainEditorTabSelected = function() {
+        const activeTab = StoryEditorNavigationService.getActiveTab();
+        return activeTab === 'story_editor' || activeTab === 'chapter_editor';
+      };
+
+      var _validateStory = function() {
+        ctrl.validationIssues = ctrl.story.validate();
+        _validateExplorations();
+        var nodes = ctrl.story.getStoryContents().getNodes();
+        var storyPrepublishValidationIssues = (
+          ctrl.story.prepublishValidate());
+        var nodePrepublishValidationIssues = (
+          [].concat.apply([], nodes.map(
+            (node) => node.prepublishValidate())));
+        ctrl.prepublishValidationIssues = (
+          storyPrepublishValidationIssues.concat(
+            nodePrepublishValidationIssues));
+      };
+
+      var _validateExplorations = function() {
+        var nodes = ctrl.story.getStoryContents().getNodes();
+        var explorationIds = [];
+
+        if (
+          StoryEditorStateService.areAnyExpIdsChanged() ||
+            ctrl.forceValidateExplorations) {
+          ctrl.explorationValidationIssues = [];
+          for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].getExplorationId() !== null) {
+              explorationIds.push(nodes[i].getExplorationId());
+            } else {
+              ctrl.explorationValidationIssues.push(
+                'Some chapters don\'t have exploration IDs provided.');
+            }
+          }
+          ctrl.forceValidateExplorations = false;
+          if (explorationIds.length > 0) {
+            EditableStoryBackendApiService.validateExplorations(
+              ctrl.story.getId(), explorationIds
+            ).then(function(validationIssues) {
+              ctrl.explorationValidationIssues =
+                  ctrl.explorationValidationIssues.concat(validationIssues);
+            });
+          }
+        }
+        StoryEditorStateService.resetExpIdsChanged();
+      };
+
+      ctrl.getTotalWarningsCount = function() {
+        return (
+          ctrl.validationIssues.length +
+            ctrl.explorationValidationIssues.length +
+            ctrl.prepublishValidationIssues.length);
+      };
+
+      var _initPage = function() {
+        ctrl.story = StoryEditorStateService.getStory();
+        setPageTitle();
+        _validateStory();
+      };
+
+      ctrl.navigateToStoryPreviewTab = function() {
+        StoryEditorNavigationService.navigateToStoryPreviewTab();
+      };
+
+      ctrl.navigateToStoryEditor = function() {
+        StoryEditorNavigationService.navigateToStoryEditor();
       };
 
       ctrl.$onInit = function() {
+        ctrl.validationIssues = [];
+        ctrl.prepublishValidationIssues = [];
+        ctrl.explorationValidationIssues = [];
+        ctrl.forceValidateExplorations = true;
+        ctrl.warningsAreShown = false;
+        BottomNavbarStatusService.markBottomNavbarStatus(true);
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
-        $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
-        $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
+        ctrl.story = StoryEditorStateService.getStory();
+
+        PageTitleService.setPageTitleForMobileView('Story Editor');
+
+        if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
+          StoryEditorNavigationService.navigateToChapterEditor();
+        } else if (
+          StoryEditorNavigationService.checkIfPresentInStoryPreviewTab()) {
+          StoryEditorNavigationService.navigateToStoryPreviewTab();
+        }
+        $scope.$on(EVENT_STORY_INITIALIZED, _initPage);
+        $scope.$on(EVENT_STORY_REINITIALIZED, _initPage);
+        $scope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _initPage);
       };
     }
   ]

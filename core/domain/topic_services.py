@@ -93,10 +93,11 @@ def get_topic_summary_from_model(topic_summary_model):
     topic summary model.
 
     Args:
-        topic_summary_model: TopicSummaryModel.
+        topic_summary_model: TopicSummaryModel. The topic summary model object
+            to get the corresponding domain object.
 
     Returns:
-        TopicSummary.
+        TopicSummary. The domain object corresponding to the given model object.
     """
     return topic_domain.TopicSummary(
         topic_summary_model.id, topic_summary_model.name,
@@ -150,7 +151,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
 
     Args:
         committer_id: str. ID of the committer.
-        topic: Topic. topic domain object.
+        topic: Topic. Topic domain object.
         commit_message: str. A description of changes made to the topic.
         commit_cmds: list(TopicChange). A list of TopicChange objects that
             represent change commands made to the given topic.
@@ -222,8 +223,8 @@ def apply_change_list(topic_id, change_list):
             deletion of subtopics.
 
     Returns:
-        Topic, dict, list(int), list(int), list(SubtopicPageChange).
-        The modified topic object, the modified subtopic pages dict keyed
+        tuple(Topic, dict, list(int), list(int), list(SubtopicPageChange)). The
+        modified topic object, the modified subtopic pages dict keyed
         by subtopic page id containing the updated domain objects of
         each subtopic page, a list of ids of the deleted subtopics,
         a list of ids of the newly created subtopics and a list of changes
@@ -261,7 +262,7 @@ def apply_change_list(topic_id, change_list):
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))
                 modified_subtopic_pages[subtopic_page_id] = (
-                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( #pylint: disable=line-too-long
+                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
                         change.subtopic_id, topic_id)
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
@@ -299,6 +300,11 @@ def apply_change_list(topic_id, change_list):
                 topic.move_skill_id_to_subtopic(
                     change.old_subtopic_id, change.new_subtopic_id,
                     change.skill_id)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
+                topic.rearrange_skill_in_subtopic(
+                    change.subtopic_id, change.from_index, change.to_index)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
+                topic.rearrange_subtopic(change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
                 topic.remove_skill_id_from_subtopic(
                     change.subtopic_id, change.skill_id)
@@ -393,8 +399,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         change_list: list(TopicChange). List of changes applied to a topic.
 
     Raises:
-        Exception: Received invalid change list.
-        Exception: The topic model and the incoming topic domain
+        Exception. Received invalid change list.
+        Exception. The topic model and the incoming topic domain
             object have different version numbers.
     """
     if not change_list:
@@ -460,7 +466,7 @@ def update_topic_and_subtopic_pages(
             topic.
 
     Raises:
-        ValueError: Current user does not have enough rights to edit a topic.
+        ValueError. Current user does not have enough rights to edit a topic.
     """
     if not commit_message:
         raise ValueError(
@@ -557,7 +563,7 @@ def publish_story(topic_id, story_id, committer_id):
             story_nodes: list(dict(str, *)). The list of story nodes dicts.
 
         Raises:
-            Exception: The story node doesn't contain any exploration id or the
+            Exception. The story node doesn't contain any exploration id or the
                 exploration id is invalid or isn't published yet.
         """
         exploration_id_list = []
@@ -717,7 +723,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
             one.
 
     Raises:
-        ValueError: User does not have enough rights to delete a topic.
+        ValueError. User does not have enough rights to delete a topic.
     """
     topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
     topic_rights_model.delete(
@@ -817,8 +823,8 @@ def save_topic_summary(topic_summary):
     entity in the datastore.
 
     Args:
-        topic_summary: The topic summary object to be saved in the
-            datastore.
+        topic_summary: TopicSummaryModel. The topic summary object to be saved
+            in the datastore.
     """
     topic_summary_dict = {
         'name': topic_summary.name,
@@ -1112,7 +1118,7 @@ def assign_role(committer, assignee, new_role, topic_id):
         assignee: UserActionsInfo. UserActionsInfo object for the user
             whose role is being changed.
         new_role: str. The name of the new role. Possible values are:
-            ROLE_MANAGER
+            ROLE_MANAGER.
         topic_id: str. ID of the topic.
 
     Raises:

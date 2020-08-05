@@ -123,17 +123,21 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join('third_party', 'backports.functools_lru_cache-1.6.1'),
-    os.path.join('third_party', 'beautifulsoup4-4.9.0'),
+    os.path.join('third_party', 'beautifulsoup4-4.9.1'),
     os.path.join('third_party', 'bleach-3.1.5'),
     os.path.join('third_party', 'callbacks-0.3.0'),
+    os.path.join('third_party', 'future-0.17.1'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.22.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
+    os.path.join('third_party', 'graphy-1.0.0'),
+    os.path.join('third_party', 'html5lib-python-1.1'),
     os.path.join('third_party', 'mutagen-1.43.0'),
-    os.path.join('third_party', 'packaging-20.3'),
-    os.path.join('third_party', 'pylatexenc-2.5'),
+    os.path.join('third_party', 'packaging-20.4'),
+    os.path.join('third_party', 'simplejson-3.17.0'),
+    os.path.join('third_party', 'pylatexenc-2.6'),
     os.path.join('third_party', 'soupsieve-1.9.5'),
-    os.path.join('third_party', 'six-1.12.0'),
+    os.path.join('third_party', 'six-1.15.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),
 ]
 for path in _PATHS_TO_INSERT:
@@ -206,8 +210,8 @@ def _get_linters_for_file_extension(
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        custom_linter: list. Custom lint checks.
-        third_party_linter: list. Third party lint checks.
+        (CustomLintChecks, ThirdPartyLintChecks). A 2-tuple containing objects
+        of lint check classes to run in parallel processing.
     """
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     custom_linters = []
@@ -271,7 +275,7 @@ def _get_changed_filepaths():
     """Returns a list of modified files (both staged and unstaged)
 
     Returns:
-        a list of filepaths of modified files.
+        list. A list of filepaths of modified files.
     """
     unstaged_files = subprocess.check_output([
         'git', 'diff', '--name-only',
@@ -293,15 +297,17 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
             to be excluded.
 
     Returns:
-        a list of files in directory and subdirectories without excluded files.
+        list. A list of files in directory and subdirectories without excluded
+        files.
     """
     files_in_directory = []
     for _dir, _, files in os.walk(dir_path):
         for file_name in files:
             filepath = os.path.relpath(
                 os.path.join(_dir, file_name), os.getcwd())
-            if not any([fnmatch.fnmatch(filepath, gp) for gp in
-                        excluded_glob_patterns]):
+            if not any([
+                    fnmatch.fnmatch(filepath, gp) for gp in
+                    excluded_glob_patterns]):
                 files_in_directory.append(filepath)
     return files_in_directory
 
@@ -315,7 +321,7 @@ def _get_file_extensions(file_extensions_to_lint):
             linted and checked.
 
     Returns:
-        all_file_extensions_type: list(str). The list of all file extensions
+        list(str). The list of all file extensions
         to be linted and checked.
     """
     all_file_extensions_type = ['js', 'py', 'html', 'css', 'other']
@@ -348,8 +354,7 @@ def _get_all_filepaths(input_path, input_filenames):
             checked, ignored if input_path is specified.
 
     Returns:
-        all_filepaths: list(str). The list of filepaths to be linted and
-        checked.
+        list(str). The list of filepaths to be linted and checked.
     """
     eslintignore_path = os.path.join(os.getcwd(), '.eslintignore')
     if input_path:
@@ -574,7 +579,8 @@ def main(args=None):
     if errors_stacktrace:
         _print_errors_stacktrace(errors_stacktrace)
 
-    if any([message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
+    if any([
+            message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
             message in lint_messages]) or errors_stacktrace:
         _print_summary_of_error_messages(lint_messages)
         python_utils.PRINT('---------------------------')

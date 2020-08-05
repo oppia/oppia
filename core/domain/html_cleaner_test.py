@@ -41,7 +41,8 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'The filter_a method should only be used for a tags.'):
             html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 
     def test_good_tags_allowed(self):
@@ -237,9 +238,22 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             'filepath-with-value="&quot;img7.svg&quot;" caption-with-value='
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;quot;,&amp;quot;sv'
+            'g_filename&amp;quot;:&amp;quot;math1.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;x^2&amp;quot;,&amp;quot;sv'
+            'g_filename&amp;quot;:&amp;quot;math2.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;(x-1)(x-2)^2&amp;quot;,&amp;quot'
+            ';svg_filename&amp;quot;:&amp;quot;math3.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
         ]
         self.assertItemsEqual(
             [
                 'img.svg', 'img2.svg', 'img3.svg', 'img4.svg',
-                'img5.svg', 'img6.svg', 'img7.svg'],
+                'img5.svg', 'img6.svg', 'img7.svg', 'math1.svg',
+                'math2.svg', 'math3.svg'],
             html_cleaner.get_image_filenames_from_html_strings(html_strings))

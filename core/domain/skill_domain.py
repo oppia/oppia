@@ -195,7 +195,7 @@ class Misconception(python_utils.OBJECT):
         """Returns a dict representing this Misconception domain object.
 
         Returns:
-            A dict, mapping all fields of Misconception instance.
+            dict. A dict, mapping all fields of Misconception instance.
         """
         return {
             'id': self.id,
@@ -242,7 +242,7 @@ class Misconception(python_utils.OBJECT):
         """Validates various properties of the Misconception object.
 
         Raises:
-            ValidationError: One or more attributes of the misconception are
+            ValidationError. One or more attributes of the misconception are
                 invalid.
         """
         self.require_valid_misconception_id(self.id)
@@ -293,7 +293,7 @@ class Rubric(python_utils.OBJECT):
         """Returns a dict representing this Rubric domain object.
 
         Returns:
-            A dict, mapping all fields of Rubric instance.
+            dict. A dict, mapping all fields of Rubric instance.
         """
         return {
             'difficulty': self.difficulty,
@@ -319,7 +319,7 @@ class Rubric(python_utils.OBJECT):
         """Validates various properties of the Rubric object.
 
         Raises:
-            ValidationError: One or more attributes of the rubric are
+            ValidationError. One or more attributes of the rubric are
                 invalid.
         """
         if not isinstance(self.difficulty, python_utils.BASESTRING):
@@ -360,7 +360,7 @@ class WorkedExample(python_utils.OBJECT):
         """Validates various properties of the WorkedExample object.
 
         Raises:
-            ValidationError: One or more attributes of the worked example are
+            ValidationError. One or more attributes of the worked example are
                 invalid.
         """
         if not isinstance(self.question, state_domain.SubtitledHtml):
@@ -378,7 +378,7 @@ class WorkedExample(python_utils.OBJECT):
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
-            A dict, mapping all fields of WorkedExample instance.
+            dict. A dict, mapping all fields of WorkedExample instance.
         """
         return {
             'question': self.question.to_dict(),
@@ -436,7 +436,7 @@ class SkillContents(python_utils.OBJECT):
         """Validates various properties of the SkillContents object.
 
         Raises:
-            ValidationError: One or more attributes of skill contents are
+            ValidationError. One or more attributes of skill contents are
                 invalid.
         """
         available_content_ids = set([])
@@ -474,7 +474,7 @@ class SkillContents(python_utils.OBJECT):
         """Returns a dict representing this SkillContents domain object.
 
         Returns:
-            A dict, mapping all fields of SkillContents instance.
+            dict. A dict, mapping all fields of SkillContents instance.
         """
         return {
             'explanation': self.explanation.to_dict(),
@@ -609,7 +609,7 @@ class Skill(python_utils.OBJECT):
         """Validates various properties of the Skill object.
 
         Raises:
-            ValidationError: One or more attributes of skill are invalid.
+            ValidationError. One or more attributes of skill are invalid.
         """
         self.require_valid_description(self.description)
 
@@ -745,7 +745,7 @@ class Skill(python_utils.OBJECT):
         """Returns a dict representing this Skill domain object.
 
         Returns:
-            A dict, mapping all fields of Skill instance.
+            dict. A dict, mapping all fields of Skill instance.
         """
         return {
             'id': self.id,
@@ -1150,7 +1150,7 @@ class Skill(python_utils.OBJECT):
             skill_id: str. The skill ID to add.
 
         Raises:
-            ValueError: The skill is already a prerequisite skill.
+            ValueError. The skill is already a prerequisite skill.
         """
         if self._find_prerequisite_skill_id_index(skill_id) is not None:
             raise ValueError('The skill is already a prerequisite skill.')
@@ -1163,7 +1163,7 @@ class Skill(python_utils.OBJECT):
             skill_id: str. The skill ID to remove.
 
         Raises:
-            ValueError: The skill to remove is not a prerequisite skill.
+            ValueError. The skill to remove is not a prerequisite skill.
         """
         index = self._find_prerequisite_skill_id_index(skill_id)
         if index is None:
@@ -1203,7 +1203,7 @@ class Skill(python_utils.OBJECT):
             misconception_id: int. The id of the misconception to be removed.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1219,7 +1219,7 @@ class Skill(python_utils.OBJECT):
             name: str. The new name of the misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1238,8 +1238,8 @@ class Skill(python_utils.OBJECT):
                 misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
-            ValueError: must_be_addressed should be bool.
+            ValueError. There is no misconception with the given id.
+            ValueError. The must_be_addressed should be bool.
         """
         if not isinstance(must_be_addressed, bool):
             raise ValueError('must_be_addressed should be a bool value.')
@@ -1257,7 +1257,7 @@ class Skill(python_utils.OBJECT):
             notes: str. The new notes of the misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1274,7 +1274,7 @@ class Skill(python_utils.OBJECT):
                 of the misconception.
 
         Raises:
-            ValueError: There is no misconception with the given id.
+            ValueError. There is no misconception with the given id.
         """
         index = self._find_misconception_index(misconception_id)
         if index is None:
@@ -1319,7 +1319,7 @@ class SkillSummary(python_utils.OBJECT):
         """Validates various properties of the Skill Summary object.
 
         Raises:
-            ValidationError: One or more attributes of skill summary are
+            ValidationError. One or more attributes of skill summary are
                 invalid.
         """
         if not isinstance(self.description, python_utils.BASESTRING):
@@ -1436,6 +1436,44 @@ class AugmentedSkillSummary(python_utils.OBJECT):
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
+        }
+
+
+class TopicAssignment(python_utils.OBJECT):
+    """Domain object for Topic Assignment, which provides the details of a
+    single topic (and, if applicable, the subtopic within that topic) to which
+    the skill is assigned.
+    """
+
+    def __init__(
+            self, topic_id, topic_name, topic_version, subtopic_id):
+        """Constructs a TopicAssignment domain object.
+
+        Args:
+            topic_id: str. The unique id of the topic.
+            topic_name: str. The name of the topic.
+            topic_version: int. The current version of the topic to which the
+                skill is assigned.
+            subtopic_id: str or None. The id of the subtopic to which the skill
+                is assigned, or None if the skill is not assigned to any
+                subtopic.
+        """
+        self.topic_id = topic_id
+        self.topic_name = topic_name
+        self.topic_version = topic_version
+        self.subtopic_id = subtopic_id
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this TopicAssignment object.
+        """
+        return {
+            'topic_id': self.topic_id,
+            'topic_name': self.topic_name,
+            'topic_version': self.topic_version,
+            'subtopic_id': self.subtopic_id,
         }
 
 

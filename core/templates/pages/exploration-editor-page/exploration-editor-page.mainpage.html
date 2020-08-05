@@ -36,7 +36,7 @@
           <div class="oppia-base-container"
                ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
                ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
-            <div class="oppia-content-container">
+            <div class="oppia-content-container protractor-test-content-container">
               <div id="wrapper">
                 <div class="oppia-main-body">
                   <nav class="navbar navbar-expand navbar-light oppia-navbar oppia-prevent-selection" role="navigation"
@@ -116,7 +116,7 @@
 
     </oppia-root>
     @load('pages/footer_js_libs.html')
-    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
     @loadExtensions('interactions/dependency_html.html')
   </body>
 </html>

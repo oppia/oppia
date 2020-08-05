@@ -41,6 +41,7 @@ import sys
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
+from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
@@ -101,8 +102,8 @@ class ChangedBranch(python_utils.OBJECT):
 
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
 
@@ -116,16 +117,17 @@ def get_remote_name():
     remote_name = ''
     remote_num = 0
     get_remotes_name_cmd = 'git remote'.split()
-    task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        get_remotes_name_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     remotes = python_utils.UNICODE(out)[:-1].split('\n')
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (
                 'git config --get remote.%s.url' % remote).split()
-            task = subprocess.Popen(get_remotes_url_cmd, stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+            task = subprocess.Popen(
+                get_remotes_url_cmd, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
                 if remote_url.endswith('oppia/oppia.git\n'):
@@ -165,10 +167,10 @@ def git_diff_name_status(left, right, diff_filter=''):
         diff_filter: arguments given to --diff-filter (ACMRTD...)
 
     Returns:
-        List of FileDiffs (tuple with name/status)
+        list. List of FileDiffs (tuple with name/status).
 
     Raises:
-        ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
@@ -205,11 +207,11 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
             as local branch.
 
     Returns:
-        List of file names that are modified, changed, renamed or added
-        but not deleted
+        list(str). List of file names that are modified, changed, renamed or
+        added but not deleted.
 
     Raises:
-        ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
@@ -227,6 +229,18 @@ def extract_files_to_lint(file_diffs):
     return lint_files
 
 
+def get_parent_branch_name_for_diff():
+    """Returns remote branch name against which the diff has to be checked.
+
+    Returns:
+        str. The name of the remote branch.
+    """
+    if common.is_current_branch_a_hotfix_branch():
+        return 'release-%s' % common.get_current_release_version_number(
+            common.get_current_branch_name())
+    return 'develop'
+
+
 def collect_files_being_pushed(ref_list, remote):
     """Collect modified files and filter those that need linting.
 
@@ -235,7 +249,7 @@ def collect_files_being_pushed(ref_list, remote):
         remote: the remote being pushed to
 
     Returns:
-        dict: Dict mapping branch names to 2-tuples of the form (list of
+        dict. Dict mapping branch names to 2-tuples of the form (list of
         changed files, list of files to lint).
     """
     if not ref_list:
@@ -252,7 +266,7 @@ def collect_files_being_pushed(ref_list, remote):
     for branch, _ in python_utils.ZIP(branches, hashes):
         # Get the difference to remote/develop.
         modified_files = compare_to_remote(
-            remote, branch, remote_branch='develop')
+            remote, branch, remote_branch=get_parent_branch_name_for_diff())
         files_to_lint = extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 
@@ -312,7 +326,7 @@ def install_hook():
     It ensures that oppia/ is the root folder.
 
     Raises:
-        ValueError if chmod command fails.
+        ValueError. Raise ValueError if chmod command fails.
     """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
@@ -395,8 +409,9 @@ def main(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('remote', nargs='?', help='provided by git before push')
     parser.add_argument('url', nargs='?', help='provided by git before push')
-    parser.add_argument('--install', action='store_true', default=False,
-                        help='Install pre_push_hook to the .git/hooks dir')
+    parser.add_argument(
+        '--install', action='store_true', default=False,
+        help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args(args=args)
     if args.install:
         install_hook()

@@ -26,7 +26,7 @@ require(
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.directive.ts');
+  'thread-table.component.ts');
 
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
@@ -280,65 +280,20 @@ angular.module('oppia').component('creatorDashboardPage', {
               SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
             ctrl.isCurrentSortDescending = true;
             ctrl.isCurrentSubscriptionSortDescending = true;
-            ctrl.explorationsList = responseData.explorations_list;
-            ctrl.collectionsList = responseData.collections_list;
-            ctrl.subscribersList = responseData.subscribers_list;
-            ctrl.dashboardStats = responseData.dashboard_stats;
-            ctrl.lastWeekStats = responseData.last_week_stats;
-            ctrl.myExplorationsView = responseData.display_preference;
-            var numberOfCreatedSuggestions = (
-              responseData.threads_for_created_suggestions_list.length);
-            var numberOfSuggestionsToReview = (
-              responseData.threads_for_suggestions_to_review_list.length);
-            ctrl.mySuggestionsList = [];
-            for (var i = 0; i < numberOfCreatedSuggestions; i++) {
-              if (responseData.created_suggestions_list.length !==
-                  numberOfCreatedSuggestions) {
-                $log.error('Number of suggestions does not match number ' +
-                          'of suggestion threads');
-              }
-              for (var j = 0; j < numberOfCreatedSuggestions; j++) {
-                var suggestionThreadId = SuggestionsService
-                  .getThreadIdFromSuggestionBackendDict(
-                    responseData.created_suggestions_list[j]);
-                var threadDict = (
-                  responseData.threads_for_created_suggestions_list[i]);
-                if (threadDict.thread_id === suggestionThreadId) {
-                  var suggestionThread = (
-                    SuggestionThreadObjectFactory.createFromBackendDicts(
-                      threadDict,
-                      responseData.created_suggestions_list[j]));
-                  ctrl.mySuggestionsList.push(suggestionThread);
-                }
-              }
-            }
-            ctrl.suggestionsToReviewList = [];
-            for (var i = 0; i < numberOfSuggestionsToReview; i++) {
-              if (responseData.suggestions_to_review_list.length !==
-                  numberOfSuggestionsToReview) {
-                $log.error('Number of suggestions does not match number' +
-                          'of suggestion threads');
-              }
-              for (var j = 0; j < numberOfSuggestionsToReview; j++) {
-                var suggestionThreadId = SuggestionsService
-                  .getThreadIdFromSuggestionBackendDict(
-                    responseData.suggestions_to_review_list[j]);
-                var threadDict = (
-                  responseData.threads_for_suggestions_to_review_list[i]);
-                if (threadDict.thread_id === suggestionThreadId) {
-                  var suggestionThread = (
-                    SuggestionThreadObjectFactory.createFromBackendDicts(
-                      threadDict,
-                      responseData.suggestions_to_review_list[j]));
-                  ctrl.suggestionsToReviewList.push(suggestionThread);
-                }
-              }
-            }
+            ctrl.explorationsList = responseData.explorationsList;
+            ctrl.collectionsList = responseData.collectionsList;
+            ctrl.subscribersList = responseData.subscribersList;
+            ctrl.dashboardStats = responseData.dashboardStats;
+            ctrl.lastWeekStats = responseData.lastWeekStats;
+            ctrl.myExplorationsView = responseData.displayPreference;
+            ctrl.mySuggestionsList = responseData.createdSuggestionThreadsList;
+            ctrl.suggestionsToReviewList = (
+              responseData.suggestionThreadsToReviewList);
 
             if (ctrl.dashboardStats && ctrl.lastWeekStats) {
               ctrl.relativeChangeInTotalPlays = (
-                ctrl.dashboardStats.total_plays - (
-                  ctrl.lastWeekStats.total_plays)
+                ctrl.dashboardStats.totalPlays - (
+                  ctrl.lastWeekStats.totalPlays)
               );
             }
 

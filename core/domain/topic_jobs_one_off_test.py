@@ -25,6 +25,9 @@ import logging
 from constants import constants
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
@@ -66,7 +69,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # job.
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'A name', 'abbrev', 'description')
-        topic.add_subtopic(1, title='A subtitle')
+        topic.add_subtopic(1, 'A subtitle')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
             topic.subtopic_schema_version,
@@ -84,8 +87,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
-        self.assertEqual(topic.subtopics[0].to_dict(),
-                         updated_topic.subtopics[0].to_dict())
+        self.assertEqual(
+            topic.subtopics[0].to_dict(), updated_topic.subtopics[0].to_dict())
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_migrated',
@@ -235,11 +238,11 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         deleted uncategorized skills ids from the topic.
         """
         valid_skill_1 = skill_domain.Skill.create_default_skill(
-            'valid_skill_1', description='A description', rubrics=self.rubrics)
+            'valid_skill_1', 'A description', self.rubrics)
         valid_skill_2 = skill_domain.Skill.create_default_skill(
-            'valid_skill_2', description='A description', rubrics=self.rubrics)
+            'valid_skill_2', 'A description', self.rubrics)
         valid_skill_3 = skill_domain.Skill.create_default_skill(
-            'valid_skill_3', description='A description', rubrics=self.rubrics)
+            'valid_skill_3', 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, valid_skill_1)
         skill_services.save_new_skill(self.albert_id, valid_skill_2)
         skill_services.save_new_skill(self.albert_id, valid_skill_3)
@@ -247,7 +250,7 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         # job.
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'A name', 'abbrev', 'description')
-        topic.add_subtopic(1, title='A subtitle')
+        topic.add_subtopic(1, 'A subtitle')
         topic.add_uncategorized_skill_id('valid_skill_1')
         topic.add_uncategorized_skill_id('valid_skill_2')
         topic.add_uncategorized_skill_id('valid_skill_3')
@@ -340,3 +343,262 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         expected = [[u'topic_deleted',
                      [u'Encountered 1 deleted topics.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+
+    def setUp(self):
+        super(SubTopicPageMathRteAuditOneOffJobTests, self).setUp()
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_job_when_subtopics_have_math_rich_text(self):
+        valid_html_1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        valid_html_2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        topic_id1 = topic_services.get_new_topic_id()
+        subtopic_page1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id1))
+
+        subtopic_page1.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': valid_html_1,
+                'content_id': 'content'
+            }))
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': valid_html_2,
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+
+        subtopic_page1.update_page_contents_written_translations(
+            written_translations_dict)
+
+        subtopic_page_services.save_subtopic_page(
+            self.albert_id, subtopic_page1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page1_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id1, 1))
+
+        topic_id2 = topic_services.get_new_topic_id()
+        subtopic_page2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                2, topic_id2))
+
+        subtopic_page2.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': valid_html_2,
+                'content_id': 'content'
+            }))
+
+        subtopic_page_services.save_subtopic_page(
+            self.albert_id, subtopic_page2, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 2,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page2_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id2, 2))
+
+        job_id = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .create_new())
+        topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .get_output(job_id))
+
+        overall_result = ast.literal_eval(output[0])
+        expected_overall_result = {
+            'total_number_subtopics_requiring_svgs': 2,
+            'total_number_of_latex_strings_without_svg': 3
+        }
+
+        self.assertEqual(overall_result[1], expected_overall_result)
+        detailed_result = ast.literal_eval(output[1])
+        expected_subtopic1_info = {
+            'subtopic_id': subtopic_page1_id,
+            'latex_strings_without_svg': [
+                '+,+,+,+', '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+        }
+        expected_subtopic2_info = {
+            'subtopic_id': subtopic_page2_id,
+            'latex_strings_without_svg': ['+,+,+,+']
+        }
+        subtopics_latex_info = sorted(detailed_result[1])
+        self.assertEqual(subtopics_latex_info[0], expected_subtopic2_info)
+        self.assertEqual(subtopics_latex_info[1], expected_subtopic1_info)
+
+    def test_job_when_subtopics_do_not_have_math_rich_text(self):
+        topic_id1 = topic_services.get_new_topic_id()
+        subtopic_page1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id1))
+        subtopic_page_services.save_subtopic_page(
+            self.albert_id, subtopic_page1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+
+        job_id = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .create_new())
+        topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .get_output(job_id))
+
+        self.assertEqual(output, [])
+
+    def test_job_when_subtopics_have_math_rich_text_with_svgs(self):
+
+        valid_html_1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file1.svg&amp;quot;}"></oppia-nonint'
+            'eractive-math>'
+        )
+        valid_html_2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;file1.svg&amp;quot;}"></'
+            'oppia-noninteractive-math>'
+        )
+        topic_id1 = topic_services.get_new_topic_id()
+        subtopic_page1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id1))
+
+        subtopic_page1.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': valid_html_1,
+                'content_id': 'content'
+            }))
+
+        subtopic_page_services.save_subtopic_page(
+            self.albert_id, subtopic_page1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page1_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id1, 1))
+
+        topic_id2 = topic_services.get_new_topic_id()
+        subtopic_page2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                2, topic_id2))
+
+        subtopic_page2.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': valid_html_2,
+                'content_id': 'content'
+            }))
+
+        subtopic_page_services.save_subtopic_page(
+            self.albert_id, subtopic_page2, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 2,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page2_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id2, 2))
+
+        job_id = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .create_new())
+        topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .get_output(job_id))
+
+        overall_result = ast.literal_eval(output[0])
+        expected_subtopic1_info = {
+            'subtopic_id': subtopic_page1_id,
+            'latex_strings_with_svg': [
+                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n-1)(x - a_n)']
+        }
+        expected_subtopic2_info = {
+            'subtopic_id': subtopic_page2_id,
+            'latex_strings_with_svg': ['+,+,+,+']
+        }
+        subtopic_latex_info = sorted(overall_result[1])
+        self.assertEqual(subtopic_latex_info[0], expected_subtopic1_info)
+        self.assertEqual(subtopic_latex_info[1], expected_subtopic2_info)
+
+    def test_job_skips_deleted_subtopics(self):
+        topic_id1 = topic_services.get_new_topic_id()
+        subtopic_page1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id1))
+        subtopic_page_services.save_subtopic_page(
+            self.albert_id, subtopic_page1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page_services.delete_subtopic_page(
+            self.albert_id, topic_id1, 1)
+
+        job_id = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .create_new())
+        topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob
+            .get_output(job_id))
+
+        self.assertEqual(output, [])

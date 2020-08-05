@@ -132,8 +132,9 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
     def test_export_data_nonexistent_user(self):
-        with self.assertRaises(user_models.UserSettingsModel
-                               .EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            user_models.UserSettingsModel.EntityNotFoundError,
+            'Entity for class UserSettingsModel with id fake_user not found'):
             user_models.UserSettingsModel.export_data('fake_user')
 
     def test_export_data_trivial(self):
@@ -1923,8 +1924,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_scores_of_user('user1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('user1'))
         self.assertEqual(len(score_models), 1)
         self.assertEqual(score_models[0].id, 'category1.user1')
         self.assertEqual(score_models[0].user_id, 'user1')
@@ -1953,9 +1955,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.create('user3', 'category2', 1)
         user_models.UserContributionScoringModel.create('user4', 'category2', 1)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_users_with_score_above_minimum_for_category(
-                            'category1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category1'))
 
         self.assertEqual(len(score_models), 3)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
@@ -1965,9 +1967,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category1.user4'), score_models)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_users_with_score_above_minimum_for_category(
-                            'category2'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category2'))
 
         self.assertEqual(len(score_models), 1)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
@@ -1976,8 +1978,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     def test_get_score_of_user_for_category(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
 
-        score = (user_models.UserContributionScoringModel
-                 .get_score_of_user_for_category('user1', 'category1'))
+        score = (
+            user_models.UserContributionScoringModel
+            .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 1)
 
@@ -1987,8 +1990,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.increment_score_for_user(
             'user1', 'category1', 2)
 
-        score = (user_models.UserContributionScoringModel
-                 .get_score_of_user_for_category('user1', 'category1'))
+        score = (
+            user_models.UserContributionScoringModel
+            .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 3)
 
@@ -1997,8 +2001,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.create('user1', 'category2', 1)
         user_models.UserContributionScoringModel.create('user1', 'category3', 1)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_scores_of_user('user1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('user1'))
         self.assertEqual(len(score_models), 3)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category1.user1'), score_models)
@@ -2196,4 +2201,104 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             user_models.PendingDeletionRequestModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+
+class PseudonymizedUserModelTests(test_utils.GenericTestBase):
+    """Tests for PseudonymizedUserModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.PseudonymizedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.PseudonymizedUserModel.get_new_id('exploration')
+
+
+class UserAuthModelTests(test_utils.GenericTestBase):
+    """Tests for UserAuthModel."""
+
+    NONEXISTENT_AUTH_TYPE_NAME = 'id_x'
+    NONEXISTENT_USER_ID = 'id_x'
+    NONREGISTERED_GAE_ID = 'gae_id_x'
+    USER_ID = 'user_id'
+    USER_GAE_ID = 'gae_id'
+    USER_PIN = '123'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserAuthModelTests, self).setUp()
+
+        user_models.UserAuthModel(
+            id=self.USER_ID,
+            gae_id=self.USER_GAE_ID,
+            pin=self.USER_PIN
+        ).put()
+
+    def test_get_export_policy_is_not_applicable(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_deletion_policy_is_delete(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy_registered_user_is_deleted(self):
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.USER_ID)
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_id(
+                self.USER_ID
+            )
+        )
+
+    def test_apply_deletion_policy_nonexistent_user_no_exception_raised(self):
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_has_reference_to_existing_user_id_is_true(self):
+        self.assertTrue(
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.USER_ID)
+        )
+
+    def test_has_reference_to_non_existing_user_id_is_false(self):
+        self.assertFalse(
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_by_auth_id_with_invalid_auth_type_name_is_none(self):
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_GAE_ID)
+        )
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.NONREGISTERED_GAE_ID)
+        )
+
+    def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID)
+        )
+
+    def test_get_by_auth_id_for_registered_auth_id_is_correct(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_by_id(self.USER_ID),
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )

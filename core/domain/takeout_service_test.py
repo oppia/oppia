@@ -25,6 +25,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
 from core.platform import models
@@ -461,6 +462,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             resolver_id=self.USER_ID_1
         ).put()
 
+        config_models.PlatformParameterSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -474,8 +481,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_user(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaises(
-            user_models.UserSettingsModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            user_models.UserSettingsModel.EntityNotFoundError,
+            'Entity for class UserSettingsModel with id fake_user_id '
+            'not found'):
             takeout_service.export_data_for_user('fake_user_id')
 
     def test_export_data_trivial(self):
@@ -517,7 +526,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_started_state_translation_tutorial': None,
             'last_logged_in': None,
             'last_edited_an_exploration': None,
-            'profile_picture_data_url': None,
+            'profile_picture_filename': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': None,
@@ -558,60 +567,68 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_config_property_sm = {}
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
+        expected_platform_parameter_sm = {}
 
         expected_data = {
-            'user_stats_data': stats_data,
-            'user_settings_data': settings_data,
-            'user_subscriptions_data': subscriptions_data,
-            'user_skill_mastery_data': skill_data,
-            'user_contributions_data': contribution_data,
-            'exploration_user_data_data': exploration_data,
-            'completed_activities_data': completed_activities_data,
-            'incomplete_activities_data': incomplete_activities_data,
-            'exp_user_last_playthrough_data': last_playthrough_data,
-            'learner_playlist_data': learner_playlist_data,
-            'task_entry_data': task_entry_data,
-            'topic_rights_data': topic_rights_data,
-            'collection_progress_data': collection_progress_data,
-            'story_progress_data': story_progress_data,
-            'general_feedback_thread_data': general_feedback_thread_data,
-            'general_feedback_thread_user_data':
+            'user_stats': stats_data,
+            'user_settings': settings_data,
+            'user_subscriptions': subscriptions_data,
+            'user_skill_mastery': skill_data,
+            'user_contributions': contribution_data,
+            'exploration_user_data': exploration_data,
+            'completed_activities': completed_activities_data,
+            'incomplete_activities': incomplete_activities_data,
+            'exp_user_last_playthrough': last_playthrough_data,
+            'learner_playlist': learner_playlist_data,
+            'task_entry': task_entry_data,
+            'topic_rights': topic_rights_data,
+            'collection_progress': collection_progress_data,
+            'story_progress': story_progress_data,
+            'general_feedback_thread': general_feedback_thread_data,
+            'general_feedback_thread_user':
                 general_feedback_thread_user_data,
-            'general_feedback_message_data': general_feedback_message_data,
-            'collection_rights_data': collection_rights_data,
-            'general_suggestion_data': general_suggestion_data,
-            'exploration_rights_data': exploration_rights_data,
-            'general_feedback_email_reply_to_id_data': reply_to_data,
-            'general_voiceover_application_data':
+            'general_feedback_message': general_feedback_message_data,
+            'collection_rights': collection_rights_data,
+            'general_suggestion': general_suggestion_data,
+            'exploration_rights': exploration_rights_data,
+            'general_feedback_email_reply_to_id': reply_to_data,
+            'general_voiceover_application':
                 expected_voiceover_application_data,
-            'user_contribution_scoring_data': expected_contrib_score_data,
-            'user_community_rights_data': expected_community_rights_data,
-            'collection_rights_snapshot_metadata_data':
+            'user_contribution_scoring': expected_contrib_score_data,
+            'user_community_rights': expected_community_rights_data,
+            'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
-            'collection_snapshot_metadata_data':
+            'collection_snapshot_metadata':
                 expected_collection_sm,
-            'skill_snapshot_metadata_data':
+            'skill_snapshot_metadata':
                 expected_skill_sm,
-            'subtopic_page_snapshot_metadata_data':
+            'subtopic_page_snapshot_metadata':
                 expected_subtopic_page_sm,
-            'topic_rights_snapshot_metadata_data':
+            'topic_rights_snapshot_metadata':
                 expected_topic_rights_sm,
-            'topic_snapshot_metadata_data': expected_topic_sm,
-            'story_snapshot_metadata_data': expected_story_sm,
-            'question_snapshot_metadata_data': expected_question_sm,
-            'config_property_snapshot_metadata_data':
+            'topic_snapshot_metadata': expected_topic_sm,
+            'story_snapshot_metadata': expected_story_sm,
+            'question_snapshot_metadata': expected_question_sm,
+            'config_property_snapshot_metadata':
                 expected_config_property_sm,
-            'exploration_rights_snapshot_metadata_data':
+            'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
-            'exploration_snapshot_metadata_data': expected_exploration_sm,
+            'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
         }
 
         # Perform export and compare.
-        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        user_takeout_object = takeout_service.export_data_for_user(
+            self.USER_ID_1)
+        observed_data = user_takeout_object.user_data
+        observed_images = user_takeout_object.user_images
         self.assertEqual(expected_data, observed_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
         self.assertEqual(json.loads(expected_json), json.loads(observed_json))
+        expected_images = []
+        self.assertEqual(expected_images, observed_images)
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
@@ -755,8 +772,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
-                'suggestion_type': (suggestion_models.
-                                    SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                 'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
@@ -783,7 +800,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
             'last_logged_in': self.GENERIC_EPOCH,
             'last_edited_an_exploration': self.GENERIC_EPOCH,
-            'profile_picture_data_url': self.GENERIC_IMAGE_URL,
+            'profile_picture_filename': 'user_settings_profile_picture.png',
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': self.GENERIC_USER_BIO,
@@ -949,57 +966,84 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        expected_data = {
-            'user_stats_data': expected_stats_data,
-            'user_settings_data': expected_settings_data,
-            'user_subscriptions_data': expected_subscriptions_data,
-            'user_skill_mastery_data': expected_skill_data,
-            'user_contributions_data': expected_contribution_data,
-            'exploration_user_data_data': expected_exploration_data,
-            'completed_activities_data': expected_completed_activities_data,
-            'incomplete_activities_data': expected_incomplete_activities_data,
-            'exp_user_last_playthrough_data': expected_last_playthrough_data,
-            'learner_playlist_data': expected_learner_playlist_data,
-            'task_entry_data': expected_task_entry_data,
-            'topic_rights_data': expected_topic_data,
-            'collection_progress_data': expected_collection_progress_data,
-            'story_progress_data': expected_story_progress_data,
-            'general_feedback_thread_data':
-                expected_general_feedback_thread_data,
-            'general_feedback_thread_user_data':
-                expected_general_feedback_thread_user_data,
-            'general_feedback_message_data':
-                expected_general_feedback_message_data,
-            'collection_rights_data':
-                expected_collection_rights_data,
-            'general_suggestion_data': expected_general_suggestion_data,
-            'exploration_rights_data': expected_exploration_rights_data,
-            'general_feedback_email_reply_to_id_data': expected_reply_to_data,
-            'general_voiceover_application_data':
-                expected_voiceover_application_data,
-            'user_contribution_scoring_data': expected_contrib_score_data,
-            'user_community_rights_data': expected_community_rights_data,
-            'collection_rights_snapshot_metadata_data':
-                expected_collection_rights_sm,
-            'collection_snapshot_metadata_data':
-                expected_collection_sm,
-            'skill_snapshot_metadata_data':
-                expected_skill_sm,
-            'subtopic_page_snapshot_metadata_data':
-                expected_subtopic_page_sm,
-            'topic_rights_snapshot_metadata_data':
-                expected_topic_rights_sm,
-            'topic_snapshot_metadata_data': expected_topic_sm,
-            'story_snapshot_metadata_data': expected_story_sm,
-            'question_snapshot_metadata_data': expected_question_sm,
-            'config_property_snapshot_metadata_data':
-                expected_config_property_sm,
-            'exploration_rights_snapshot_metadata_data':
-                expected_exploration_rights_sm,
-            'exploration_snapshot_metadata_data': expected_exploration_sm,
+        expected_platform_parameter_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
         }
-        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+
+        expected_data = {
+            'user_stats': expected_stats_data,
+            'user_settings': expected_settings_data,
+            'user_subscriptions': expected_subscriptions_data,
+            'user_skill_mastery': expected_skill_data,
+            'user_contributions': expected_contribution_data,
+            'exploration_user_data': expected_exploration_data,
+            'completed_activities': expected_completed_activities_data,
+            'incomplete_activities': expected_incomplete_activities_data,
+            'exp_user_last_playthrough': expected_last_playthrough_data,
+            'learner_playlist': expected_learner_playlist_data,
+            'task_entry': expected_task_entry_data,
+            'topic_rights': expected_topic_data,
+            'collection_progress': expected_collection_progress_data,
+            'story_progress': expected_story_progress_data,
+            'general_feedback_thread':
+                expected_general_feedback_thread_data,
+            'general_feedback_thread_user':
+                expected_general_feedback_thread_user_data,
+            'general_feedback_message':
+                expected_general_feedback_message_data,
+            'collection_rights':
+                expected_collection_rights_data,
+            'general_suggestion': expected_general_suggestion_data,
+            'exploration_rights': expected_exploration_rights_data,
+            'general_feedback_email_reply_to_id': expected_reply_to_data,
+            'general_voiceover_application':
+                expected_voiceover_application_data,
+            'user_contribution_scoring': expected_contrib_score_data,
+            'user_community_rights': expected_community_rights_data,
+            'collection_rights_snapshot_metadata':
+                expected_collection_rights_sm,
+            'collection_snapshot_metadata':
+                expected_collection_sm,
+            'skill_snapshot_metadata':
+                expected_skill_sm,
+            'subtopic_page_snapshot_metadata':
+                expected_subtopic_page_sm,
+            'topic_rights_snapshot_metadata':
+                expected_topic_rights_sm,
+            'topic_snapshot_metadata': expected_topic_sm,
+            'story_snapshot_metadata': expected_story_sm,
+            'question_snapshot_metadata': expected_question_sm,
+            'config_property_snapshot_metadata':
+                expected_config_property_sm,
+            'exploration_rights_snapshot_metadata':
+                expected_exploration_rights_sm,
+            'exploration_snapshot_metadata': expected_exploration_sm,
+            'platform_parameter_snapshot_metadata':
+                expected_platform_parameter_sm,
+        }
+        user_takeout_object = takeout_service.export_data_for_user(
+            self.USER_ID_1)
+        observed_data = user_takeout_object.user_data
+        observed_images = user_takeout_object.user_images
         self.assertEqual(observed_data, expected_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
         self.assertEqual(json.loads(observed_json), json.loads(expected_json))
+        expected_images = [
+            takeout_domain.TakeoutImage(
+                self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
+        ]
+        self.assertEqual(len(expected_images), len(observed_images))
+        for i, _ in enumerate(expected_images):
+            self.assertEqual(
+                expected_images[i].b64_image_data,
+                observed_images[i].b64_image_data
+            )
+            self.assertEqual(
+                expected_images[i].image_export_path,
+                observed_images[i].image_export_path
+            )

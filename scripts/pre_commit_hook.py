@@ -58,7 +58,7 @@ def install_hook():
     It ensures that oppia/ is the root folder.
 
     Raises:
-        ValueError if chmod command fails.
+        ValueError. If chmod command fails.
     """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
@@ -90,8 +90,8 @@ def install_hook():
 
 def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
 
@@ -103,7 +103,7 @@ def does_diff_include_package_lock_file():
         bool. Whether the diff includes package-lock.json.
 
     Raises:
-        ValueError if git command fails.
+        ValueError. If git command fails.
     """
 
     git_cmd = ['git', 'diff', '--name-only', '--cached']
@@ -158,7 +158,7 @@ def check_changes_in_config():
     deployment.
 
     Raises:
-        Exception: There are deployment changes in feconf or constants filepath.
+        Exception. There are deployment changes in feconf or constants filepath.
     """
     if not check_changes('feconf'):
         raise Exception(
@@ -176,8 +176,9 @@ def main(args=None):
     in a commit.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--install', action='store_true', default=False,
-                        help='Install pre_commit_hook to the .git/hooks dir')
+    parser.add_argument(
+        '--install', action='store_true', default=False,
+        help='Install pre_commit_hook to the .git/hooks dir')
     args = parser.parse_args(args=args)
     if args.install:
         install_hook()

@@ -85,20 +85,20 @@ describe('MathInteractionsService', () => {
     // Failure cases.
     expect(mathInteractionsService.validateExpression('')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Please enter a non-empty answer.');
+      'Please enter an answer before submitting.');
 
     expect(mathInteractionsService.validateExpression('a/')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      '/ is not a valid postfix operator.');
+      'Your answer seems to be missing a variable/number after the "/".');
 
     expect(mathInteractionsService.validateExpression('(x-)3')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      '- is not a valid postfix operator.');
+      'Your answer seems to be missing a variable/number after the "-".');
 
     expect(mathInteractionsService.validateExpression(
       '(x^3.5)^/2')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'A prefix operator was expected.');
+      'Your answer has two symbols next to each other: "^" and "/".');
 
     expect(mathInteractionsService.validateExpression(
       '12+sqrt(4)')).toBeFalse();
@@ -124,12 +124,12 @@ describe('MathInteractionsService', () => {
 
     expect(mathInteractionsService.validateExpression('(x+y)/0')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Division by zero not allowed.');
+      'Your answer includes a division by zero, which is not valid.');
 
     expect(mathInteractionsService.validateExpression(
       '(x+y)/(y-y)')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Division by zero not allowed.');
+      'Your answer includes a division by zero, which is not valid.');
 
     expect(mathInteractionsService.validateExpression('a)(b')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
@@ -137,23 +137,23 @@ describe('MathInteractionsService', () => {
 
     expect(mathInteractionsService.validateExpression('a_2 + 3')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Invalid character \'_\' present in the expression.');
+      'Your answer contains an invalid character: "_".');
 
     expect(mathInteractionsService.validateExpression(
       '3.4.5 + 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Invalid integer.');
+      'Your answer contains an invalid term: 3.4.5');
 
     expect(mathInteractionsService.validateExpression(
       'a/2', false)).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'It looks like you have entered some non-numeric values. ' +
+      'It looks like you have entered some variables. ' +
       'Please enter numbers only.');
 
     expect(mathInteractionsService.validateExpression(
       'sqrt(alpha/beta)', false)).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'It looks like you have entered some non-numeric values. ' +
+      'It looks like you have entered some variables. ' +
       'Please enter numbers only.');
   });
 
@@ -186,7 +186,7 @@ describe('MathInteractionsService', () => {
     // Failure cases.
     expect(mathInteractionsService.validateEquation('')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Please enter a non-empty answer.');
+      'Please enter an answer before submitting.');
 
     expect(mathInteractionsService.validateEquation('a+b = ')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
@@ -198,16 +198,16 @@ describe('MathInteractionsService', () => {
 
     expect(mathInteractionsService.validateEquation('a/ = (-5)')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      '/ is not a valid postfix operator.');
+      'Your answer seems to be missing a variable/number after the "/".');
 
     expect(mathInteractionsService.validateEquation('(x-)3 = 2.5')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      '- is not a valid postfix operator.');
+      'Your answer seems to be missing a variable/number after the "-".');
 
     expect(mathInteractionsService.validateEquation(
       '(x^3.5)^/2 = 0')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'A prefix operator was expected.');
+      'Your answer has two symbols next to each other: "^" and "/".');
 
     expect(mathInteractionsService.validateEquation(
       '12 = sqrt(144)')).toBeFalse();
@@ -233,12 +233,12 @@ describe('MathInteractionsService', () => {
 
     expect(mathInteractionsService.validateEquation('(x+y)/0 = 5')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Division by zero not allowed.');
+      'Your answer includes a division by zero, which is not valid.');
 
     expect(mathInteractionsService.validateEquation(
-      '3*x^2 = (x+y)/(y-y)')).toBeFalse();
+      '(x+y)/(y-y) = 3*x^2')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Division by zero not allowed.');
+      'Your answer includes a division by zero, which is not valid.');
 
     expect(mathInteractionsService.validateEquation('a)(b = x')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
@@ -247,7 +247,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateEquation(
       '3.4.5 = 45/a')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Invalid integer.');
+      'Your answer contains an invalid term: 3.4.5');
   });
 
   it('should insert missing multiplication signs', function() {
@@ -265,6 +265,20 @@ describe('MathInteractionsService', () => {
       'log(alpha/pi)')).toBe('log(alpha/pi)');
     expect(mathInteractionsService.insertMultiplicationSigns(
       'Al^2')).toBe('A*l^2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'a(b)/2')).toBe('a*(b)/2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '(a)b/2')).toBe('(a)*b/2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '(a)(b)/2')).toBe('(a)*(b)/2');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '5sqrt(4)')).toBe('5*sqrt(4)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'cos(theta)sin(theta)')).toBe('cos(theta)*sin(theta)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'sqrt(4)abs(5)')).toBe('sqrt(4)*abs(5)');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      '(3+alpha)(3-alpha)4')).toBe('(3+alpha)*(3-alpha)*4');
   });
 
   it('should replace abs symbol with text', function() {
@@ -278,5 +292,75 @@ describe('MathInteractionsService', () => {
       '|sqrt(a+b^2)|')).toBe('abs(sqrt(a+b^2))');
     expect(mathInteractionsService.replaceAbsSymbolWithText(
       '||')).toBe('abs()');
+  });
+
+  it('should get terms from given expression', function() {
+    // Split by addition.
+    expect(mathInteractionsService.getTerms('3+4*a')).toEqual(
+      ['3', '4*a']);
+    expect(mathInteractionsService.getTerms('4-(-beta)')).toEqual(
+      ['4', '-((-beta))']);
+    expect(mathInteractionsService.getTerms('3*10^(-1)')).toEqual(
+      ['3*10^(-1)']);
+    expect(mathInteractionsService.getTerms('a-x+4.5')).toEqual(
+      ['a', '-(x)', '4.5']);
+    expect(mathInteractionsService.getTerms('4----5')).toEqual(
+      ['4', '-(---5)']);
+    expect(mathInteractionsService.getTerms('100 + 20 + 3')).toEqual(
+      ['100', '20', '3']);
+    expect(mathInteractionsService.getTerms('4-sqrt(x + alpha)')).toEqual(
+      ['4', '-(sqrt(x+alpha))']);
+    expect(mathInteractionsService.getTerms('a^2+b^2+2*a*b')).toEqual(
+      ['a^2', 'b^2', '2*a*b']);
+    expect(mathInteractionsService.getTerms('pi/(4+3)')).toEqual(
+      ['pi/(4+3)']);
+    expect(mathInteractionsService.getTerms('tan(30)-(-cos(60))')).toEqual(
+      ['tan(30)', '-((-cos(60)))']);
+
+    // Split by multiplication.
+    expect(mathInteractionsService.getTerms('4*a', false)).toEqual(
+      ['4', 'a']);
+    expect(mathInteractionsService.getTerms('4/beta', false)).toEqual(
+      ['4', '(beta)^(-1)']);
+    expect(mathInteractionsService.getTerms('3*10^(-1)', false)).toEqual(
+      ['3', '10^(-1)']);
+    expect(mathInteractionsService.getTerms('(a)/((x)/(3))', false)).toEqual(
+      ['(a)', '(((x)/(3)))^(-1)']);
+    expect(mathInteractionsService.getTerms('2*2*3*4', false)).toEqual(
+      ['2', '2', '3', '4']);
+    expect(mathInteractionsService.getTerms('100 + 20 + 3', false)).toEqual(
+      ['100+20+3']);
+    expect(mathInteractionsService.getTerms('4/sqrt(x+alpha)', false)).toEqual(
+      ['4', '(sqrt(x+alpha))^(-1)']);
+    expect(mathInteractionsService.getTerms('(x+y)*(x-y)', false)).toEqual(
+      ['(x+y)', '(x-y)']);
+    expect(mathInteractionsService.getTerms('pi/(4+3)', false)).toEqual(
+      ['pi', '((4+3))^(-1)']);
+  });
+
+  it('should correctly match terms', function() {
+    expect(mathInteractionsService.termsMatch('4*5', '5*4')).toBeTrue();
+    expect(mathInteractionsService.termsMatch(
+      '3*10^2', '3/10^(-2)')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('1/3', '1*3^(-1)')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('sqrt(4)', '2')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('abs(-4)', '4')).toBeTrue();
+    expect(mathInteractionsService.termsMatch(
+      'sqrt(x^2)', 'abs(x)')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('(x^2)/2', '(x*x)/2')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('2*pi*r', 'r*pi*2')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('x*(y+z)', '(y+z)*x')).toBeTrue();
+    expect(mathInteractionsService.termsMatch(
+      'x*(y+z)*(3-alpha)/2', '(3-alpha)/2*(z+y)*x')).toBeTrue();
+    expect(mathInteractionsService.termsMatch('2*4.5', '(9/2)*2')).toBeTrue();
+
+    expect(mathInteractionsService.termsMatch('4*5', '20')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('3*10^2', '300')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('1/3', '3^(-1)')).toBeFalse();
+    expect(mathInteractionsService.termsMatch(
+      'pi*r^2', '(pi*r^3)/r')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('1/3', '0.333')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('4*(5+3)', '32')).toBeFalse();
+    expect(mathInteractionsService.termsMatch('sqrt(x^2)', 'x')).toBeFalse();
   });
 });

@@ -21,26 +21,61 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ExplorationOpportunitySummary } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import { SkillOpportunity } from
+import {
+  ExplorationOpportunitySummary,
+  ExplorationOpportunitySummaryBackendDict
+} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { SkillOpportunity, SkillOpportunityBackendDict } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
-  FeaturedTranslationLanguageObjectFactory,
-  IFeaturedTranslationLanguageBackendDict,
+  FeaturedTranslationLanguage,
+  FeaturedTranslationLanguageBackendDict,
+  FeaturedTranslationLanguageObjectFactory
 } from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 
 const constants = require('constants.ts');
 
-type ContributionOpportunityCategoryType =
-  'skill' | 'voiceover' | 'translation';
+interface SkillContributionOpportunitiesBackendDict {
+  'opportunities': SkillOpportunityBackendDict[];
+  'next_cursor': string;
+  'more': boolean;
+}
 
-type ContributionOpportunityParams = {
-  'cursor': string;
-  'language_code'?: string;
-};
+interface TranslationContributionOpportunitiesBackendDict {
+  'opportunities': ExplorationOpportunitySummaryBackendDict[];
+  'next_cursor': string;
+  'more': boolean;
+}
+
+interface VoiceoverContributionOpportunitiesBackendDict {
+  'opportunities': ExplorationOpportunitySummaryBackendDict[];
+  'next_cursor': string;
+  'more': boolean;
+}
+
+interface SkillContributionOpportunities {
+  opportunities: SkillOpportunity[];
+  nextCursor: string;
+  more: boolean;
+}
+
+interface TranslationContributionOpportunities {
+  opportunities: ExplorationOpportunitySummary[];
+  nextCursor: string;
+  more: boolean;
+}
+
+interface VoiceoverContributionOpportunities {
+  opportunities: ExplorationOpportunitySummary[];
+  nextCursor: string;
+  more: boolean;
+}
+
+interface FeaturedTranslationLanguagesBackendDict {
+  'featured_translation_languages': FeaturedTranslationLanguageBackendDict[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -54,102 +89,109 @@ export class ContributionOpportunitiesBackendApiService {
       FeaturedTranslationLanguageObjectFactory
   ) {}
 
-  // TODO(#7165): Replace any with exact type.
-  private _getOpportunityFromDict(
-      opportunityType: ContributionOpportunityCategoryType,
-      opportunityDict: any
-  ): ExplorationOpportunitySummary | SkillOpportunity {
-    if (
-      opportunityType === constants.OPPORTUNITY_TYPE_VOICEOVER ||
-      opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
-      return new ExplorationOpportunitySummary(opportunityDict.id,
-        opportunityDict.topic_name, opportunityDict.story_title,
-        opportunityDict.chapter_title, opportunityDict.content_count,
-        opportunityDict.translation_counts);
-    } else if (opportunityType === constants.OPPORTUNITY_TYPE_SKILL) {
-      return new SkillOpportunity(
-        opportunityDict.id, opportunityDict.skill_description,
-        opportunityDict.topic_name, opportunityDict.question_count);
-    }
+  private _getExplorationOpportunityFromDict(
+      opportunityDict: ExplorationOpportunitySummaryBackendDict):
+      ExplorationOpportunitySummary {
+    return new ExplorationOpportunitySummary(opportunityDict.id,
+      opportunityDict.topic_name, opportunityDict.story_title,
+      opportunityDict.chapter_title, opportunityDict.content_count,
+      opportunityDict.translation_counts);
   }
 
-  // TODO(#7165): Replace any with exact type.
-  private _fetchOpportunities(
-      opportunityType: ContributionOpportunityCategoryType,
-      params: ContributionOpportunityParams,
-      successCallback: (
-        opportunities?: Array<any>, nextCursor?: string, more?: boolean
-        ) => void,
-      errorCallback: (reason: string) => void
-  ): void {
-    this.http.get(this.urlInterpolationService.interpolateUrl(
-      this.urlTemplate, { opportunityType }
-    ), { params }).toPromise().then((data: any) => {
-      const opportunities = [];
-      for (const index in data.opportunities) {
-        opportunities.push(this._getOpportunityFromDict(
-          opportunityType, data.opportunities[index]));
-      }
-      if (successCallback) {
-        successCallback(opportunities, data.next_cursor, data.more);
-      }
-    }, (error) => {
-      if (errorCallback) {
-        errorCallback(error);
-      }
-    });
+  private _getSkillOpportunityFromDict(
+      opportunityDict: SkillOpportunityBackendDict): SkillOpportunity {
+    return new SkillOpportunity(
+      opportunityDict.id, opportunityDict.skill_description,
+      opportunityDict.topic_name, opportunityDict.question_count);
   }
 
-  fetchSkillOpportunities(cursor: string): Promise<Object> {
-    const params: ContributionOpportunityParams = {
+  fetchSkillOpportunities(cursor: string):
+  Promise<SkillContributionOpportunities> {
+    const params = {
       cursor: cursor
     };
-    return new Promise((resolve, reject) => {
-      this._fetchOpportunities(
-        constants.OPPORTUNITY_TYPE_SKILL, params, resolve, reject);
+
+    return this.http.get<SkillContributionOpportunitiesBackendDict>(
+      this.urlInterpolationService.interpolateUrl(
+        this.urlTemplate, {
+          opportunityType: constants.OPPORTUNITY_TYPE_SKILL
+        }
+      ), { params }).toPromise().then(data => {
+      const opportunities = data.opportunities.map(
+        dict => this._getSkillOpportunityFromDict(dict));
+
+      return {
+        opportunities: opportunities,
+        nextCursor: data.next_cursor,
+        more: data.more
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
-  fetchTranslationOpportunities(
-      languageCode: string, cursor: string): Promise<Object> {
-    const params: ContributionOpportunityParams = {
+  fetchTranslationOpportunities(languageCode: string, cursor: string):
+  Promise<TranslationContributionOpportunities> {
+    const params = {
       language_code: languageCode,
       cursor: cursor
     };
-    return new Promise((resolve, reject) => {
-      this._fetchOpportunities(
-        constants.OPPORTUNITY_TYPE_TRANSLATION,
-        params, resolve, reject);
+
+    return this.http.get<TranslationContributionOpportunitiesBackendDict>(
+      this.urlInterpolationService.interpolateUrl(
+        this.urlTemplate, {
+          opportunityType: constants.OPPORTUNITY_TYPE_TRANSLATION
+        }
+      ), { params }).toPromise().then(data => {
+      const opportunities = data.opportunities.map(
+        dict => this._getExplorationOpportunityFromDict(dict));
+
+      return {
+        opportunities: opportunities,
+        nextCursor: data.next_cursor,
+        more: data.more
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
-  fetchVoiceoverOpportunities(
-      languageCode: string, cursor: string): Promise<Object> {
-    const params: ContributionOpportunityParams = {
+  fetchVoiceoverOpportunities(languageCode: string, cursor: string):
+  Promise<VoiceoverContributionOpportunities> {
+    const params = {
       language_code: languageCode,
       cursor: cursor
     };
-    return new Promise((resolve, reject) => {
-      this._fetchOpportunities(
-        constants.OPPORTUNITY_TYPE_VOICEOVER,
-        params, resolve, reject);
+
+    return this.http.get<VoiceoverContributionOpportunitiesBackendDict>(
+      this.urlInterpolationService.interpolateUrl(
+        this.urlTemplate, {
+          opportunityType: constants.OPPORTUNITY_TYPE_VOICEOVER
+        }
+      ), { params }).toPromise().then(data => {
+      const opportunities = data.opportunities.map(
+        dict => this._getExplorationOpportunityFromDict(dict));
+
+      return {
+        opportunities: opportunities,
+        nextCursor: data.next_cursor,
+        more: data.more
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
     });
   }
 
-  async fetchFeaturedTranslationLanguages(): Promise<Object> {
+  async fetchFeaturedTranslationLanguages():
+  Promise<FeaturedTranslationLanguage[]> {
     try {
       const response = await this.http
-        .get('/retrivefeaturedtranslationlanguages')
-        .toPromise() as {
-          'featured_translation_languages':
-          IFeaturedTranslationLanguageBackendDict[]
-        };
+        .get<FeaturedTranslationLanguagesBackendDict>(
+          '/retrivefeaturedtranslationlanguages').toPromise();
 
-      return response.featured_translation_languages.map(
-        (backendDict: IFeaturedTranslationLanguageBackendDict) =>
-          this.featuredTranslationLanguageObjectFactory
-            .createFromBackendDict(backendDict)
-      );
+      return response.featured_translation_languages.map(backendDict =>
+        this.featuredTranslationLanguageObjectFactory
+          .createFromBackendDict(backendDict));
     } catch {
       return [];
     }

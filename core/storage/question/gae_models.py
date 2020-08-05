@@ -98,7 +98,7 @@ class QuestionModel(base_models.VersionedModel):
             new_id: int. ID of the new QuestionModel instance.
 
         Raises:
-            Exception: The ID generator for QuestionModel is
+            Exception. The ID generator for QuestionModel is
                 producing too many collisions.
         """
 
@@ -159,7 +159,7 @@ class QuestionModel(base_models.VersionedModel):
             QuestionModel. Instance of the new QuestionModel entry.
 
         Raises:
-            Exception: A model with the same ID already exists.
+            Exception. A model with the same ID already exists.
         """
         instance_id = cls._get_new_id()
         question_model_instance = cls(
@@ -261,6 +261,22 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill_difficulty=skill_difficulty
         )
         return question_skill_link_model_instance
+
+    @classmethod
+    def get_total_question_count_for_skill_ids(cls, skill_ids):
+        """Returns the number of questions assigned to the given skill_ids.
+
+        Args:
+            skill_ids: list(str). Skill IDs for which the question count is
+                requested.
+
+        Returns:
+            int. The number of questions assigned to the given skill_ids.
+        """
+        total_question_count = cls.query().filter(
+            cls.skill_id.IN(skill_ids)).count()
+
+        return total_question_count
 
     @classmethod
     def get_question_skill_links_by_skill_ids(

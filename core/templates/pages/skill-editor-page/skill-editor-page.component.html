@@ -1,12 +1,12 @@
 <div>
   <div class="skill-editor-main">
     <div class="navbar-helper">
-      <div class="navbar-tabs">
-        <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'active': $ctrl.getActiveTabName() === 'main'}"
+      <div class="navbar-tabs navbar-icons">
+        <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'navbar-tab-active': $ctrl.getActiveTabName() === 'main'}"
             ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>"
-            ng-click="$ctrl.selectMainTab()" class="navbar-tab">
+            ng-click="$ctrl.selectMainTab()" class="navbar-tab nav-list-item">
           <a uib-tooltip="Main Editor" tooltip-placement="bottom" class=" protractor-test-main-tab">
-            <i class="material-icons">&#xE254;</i><span>Skill</span>
+            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
           </a>
           <div ng-show="$ctrl.getWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
@@ -23,16 +23,16 @@
             </li>
           </ul>
         </li>
-        <li class="navbar-tab icon protractor-test-questions-tab"
-            ng-class="{'active': $ctrl.getActiveTabName() === 'questions'}"
+        <li class="navbar-tab icon nav-list-item protractor-test-questions-tab"
+            ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}"
             ng-click="$ctrl.selectQuestionsTab()">
           <a uib-tooltip="Questions" tooltip-placement="bottom">
-            <i class="fa fa-book"></i><span>Questions</span>
+            <i class="fa fa-book navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}"></i>
           </a>
         </li>
-        <li class="navbar-tab icon">
-          <a ng-click="$ctrl.selectPreviewTab()" class="nav-link" uib-tooltip="Preview (new tab)" tooltip-placement="bottom">
-            <i class="material-icons">&#xE037;</i><span>Preview</span>
+        <li class="navbar-tab icon nav-list-item" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview'}">
+          <a ng-click="$ctrl.selectPreviewTab()" class="nav-link" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0">
+            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}">&#xE037;</i>
           </a>
         </li>
       </div>
@@ -56,7 +56,6 @@
 <style>
   .skill-editor-main .navbar-helper {
     background-color: #00008B;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     height: 70px;
     margin-bottom: 20px;
     text-align: center;
@@ -78,10 +77,9 @@
   .skill-editor-main .navbar-tab {
     align-items: center;
     display: flex;
-    margin: 0 30px;
   }
 
-  .skill-editor-main .navbar-tab i {
+  .skill-editor-main .navbar-tab-icon {
     color: #FFFFFF;
     display: block;
     font-size: 30px;
@@ -91,5 +89,26 @@
   .skill-editor-main .navbar-tab span {
     color: #FFFFFF;
     font-size: 12px;
+  }
+  .skill-editor-main .navbar-tab-active {
+    background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
+  }
+  .skill-editor-main .nav-list-item {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    width: 90px;
+  }
+  .skill-editor-main .navbar-icons li:hover {
+    background-color: #4eb0c0;
+  }
+  .skill-editor-main .navbar-tab-active-icon {
+    color: #00609C;
+  }
+  @media screen and (max-width: 768px) {
+    .skill-editor-main .navbar-helper {
+      display: none;
+    }
   }
 </style>

@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -38,7 +38,7 @@ def create_new_question(committer_id, question, commit_message):
 
     Args:
         committer_id: str. ID of the committer.
-        question: Question. question domain object.
+        question: Question. Question domain object.
         commit_message: str. A description of changes made to the question.
     """
     question.validate()
@@ -74,7 +74,7 @@ def link_multiple_skills_for_question(
 
     Raises:
         Exception. The lengths of the skill_ids and skill_difficulties
-        lists are different.
+            lists are different.
     """
     if len(skill_ids) != len(skill_difficulties):
         raise Exception(
@@ -167,9 +167,10 @@ def _update_linked_skill_ids_of_question(
     change_list = [question_domain.QuestionChange(change_dict)]
     update_question(
         user_id, question_id, change_list, 'Updated linked skill ids')
-    (opportunity_services
-     .update_skill_opportunities_on_question_linked_skills_change(
-         old_linked_skill_ids, new_linked_skill_ids))
+    (
+        opportunity_services
+        .update_skill_opportunities_on_question_linked_skills_change(
+            old_linked_skill_ids, new_linked_skill_ids))
 
 
 def delete_question_skill_link(user_id, question_id, skill_id):
@@ -199,6 +200,24 @@ def delete_question_skill_link(user_id, question_id, skill_id):
         delete_question(user_id, question_id)
 
     question_skill_link_model.delete()
+
+
+def get_total_question_count_for_skill_ids(skill_ids):
+    """Returns the number of questions assigned to the given skill_ids.
+
+    Args:
+        skill_ids: list(str). Skill IDs for which the question count is
+            requested.
+
+    Returns:
+        int. The total number of questions assigned to the given skill_ids.
+    """
+    question_skill_link_model = question_models.QuestionSkillLinkModel
+    question_count = (
+        question_skill_link_model.get_total_question_count_for_skill_ids(
+            skill_ids))
+
+    return question_count
 
 
 def get_questions_by_skill_ids(
@@ -232,13 +251,14 @@ def get_questions_by_skill_ids(
 
     if require_medium_difficulty:
         question_skill_link_models = (
-            question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
+            question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
                 total_question_count, skill_ids,
                 constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
                     constants.SKILL_DIFFICULTY_MEDIUM]))
     else:
         question_skill_link_models = (
-            question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_equidistributed_by_skill(
                 total_question_count, skill_ids))
 
     question_ids = [model.question_id for model in question_skill_link_models]
@@ -362,7 +382,7 @@ def get_skills_linked_to_question(question_id):
         list(Skill). The list of skills that are linked to the question.
     """
     question = get_question_by_id(question_id)
-    skills = skill_services.get_multi_skills(question.linked_skill_ids)
+    skills = skill_fetchers.get_multi_skills(question.linked_skill_ids)
     return skills
 
 
@@ -419,7 +439,7 @@ def get_displayable_question_skill_link_details(
 
     Raises:
         Exception. Querying linked question summaries for more than 3 skills at
-        a time is not supported currently.
+            a time is not supported currently.
 
     Returns:
         list(QuestionSummary), list(MergedQuestionSkillLink), str|None.
@@ -436,7 +456,8 @@ def get_displayable_question_skill_link_details(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
     question_skill_link_models, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
+        question_models.QuestionSkillLinkModel.
+        get_question_skill_links_by_skill_ids(
             question_count, skill_ids, start_cursor))
 
     # Deduplicate question_ids and group skill_descriptions that are linked to
@@ -542,7 +563,7 @@ def _save_question(committer_id, question, change_list, commit_message):
             question.
 
     Raises:
-        Exception: Received an invalid change list.
+        Exception. Received an invalid change list.
     """
     if not change_list:
         raise Exception(
@@ -576,7 +597,7 @@ def update_question(
             question.
 
     Raises:
-        ValueError: No commit message was provided.
+        ValueError. No commit message was provided.
     """
     if not commit_message:
         raise ValueError(
@@ -621,8 +642,8 @@ def save_question_summary(question_summary):
     entity in the datastore.
 
     Args:
-        question_summary: The question summary object to be saved in the
-            datastore.
+        question_summary: QuestionSummaryModel. The question summary object to
+            be saved in the datastore.
     """
     question_summary_model = question_models.QuestionSummaryModel(
         id=question_summary.id,
@@ -639,10 +660,12 @@ def get_question_summary_from_model(question_summary_model):
     question summary model.
 
     Args:
-        question_summary_model: QuestionSummaryModel.
+        question_summary_model: QuestionSummaryModel. The QuestionSummary model
+            object to fetch corresponding QuestionSummary domain object.
 
     Returns:
-        QuestionSummary.
+        QuestionSummary. The domain object corresponding to the given question
+        summary model.
     """
     return question_domain.QuestionSummary(
         question_summary_model.id,

@@ -29,6 +29,7 @@ from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import topic_domain
@@ -125,16 +126,12 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                     skills_list.append(skill_dict)
                 categorized_skills_dict[topic.name][
                     subtopic.title] = skills_list
-        categorized_skills_dict['untriaged_skills'] = []
+
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
-                categorized_skills_dict['untriaged_skills'].append({
-                    'skill_id': skill_id,
-                    'skill_description': skill_summary_dict['description']
-                })
             if (skill_id in skill_ids_assigned_to_some_topic) and (
                     skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
@@ -164,6 +161,25 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
             'categorized_skills_dict': categorized_skills_dict
         })
         self.render_json(self.values)
+
+
+class TopicAssignmentsHandler(base.BaseHandler):
+    """Provides information about which topics contain the given skill."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self, skill_id):
+        """Handles GET requests."""
+        topic_assignments = skill_services.get_all_topic_assignments_for_skill(
+            skill_id)
+        topic_assignment_dicts = [
+            topic_assignment.to_dict()
+            for topic_assignment in topic_assignments]
+
+        self.render_json({
+            'topic_assignment_dicts': topic_assignment_dicts
+        })
 
 
 class SkillsDashboardPageDataHandler(base.BaseHandler):
@@ -197,9 +213,10 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Number of skills to fetch should be a number.')
 
-        if (keywords is not None and (not isinstance(keywords, list) or not all(
-                [isinstance(keyword, python_utils.BASESTRING)
-                 for keyword in keywords]))):
+        if (keywords is not None and (not isinstance(keywords, list) or (
+                not all(
+                    [isinstance(keyword, python_utils.BASESTRING)
+                     for keyword in keywords])))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 
@@ -368,11 +385,11 @@ class MergeSkillHandler(base.BaseHandler):
         """Handles the POST request."""
         old_skill_id = self.payload.get('old_skill_id')
         new_skill_id = self.payload.get('new_skill_id')
-        new_skill = skill_services.get_skill_by_id(new_skill_id, strict=False)
+        new_skill = skill_fetchers.get_skill_by_id(new_skill_id, strict=False)
         if new_skill is None:
             raise self.PageNotFoundException(
                 Exception('The new skill with the given id doesn\'t exist.'))
-        old_skill = skill_services.get_skill_by_id(old_skill_id, strict=False)
+        old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=False)
         if old_skill is None:
             raise self.PageNotFoundException(
                 Exception('The old skill with the given id doesn\'t exist.'))
@@ -385,18 +402,12 @@ class MergeSkillHandler(base.BaseHandler):
                     skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
                 'old_value': old_skill.superseding_skill_id,
                 'new_value': new_skill_id
-            }),
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                'old_value': False,
-                'new_value': True
             })
         ]
         skill_services.update_skill(
             self.user_id, old_skill_id, changelist,
             'Marking the skill as having being merged successfully.')
+        skill_services.delete_skill(self.user_id, old_skill_id)
         self.render_json({
             'merged_into_skill': new_skill_id
         })

@@ -530,8 +530,8 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
             _save_incomplete_activities(incomplete_activities)
 
 
-def _remove_activity_ids_from_incomplete_list(user_id, exploration_ids=None,
-                                              collection_ids=None):
+def _remove_activity_ids_from_incomplete_list(
+        user_id, exploration_ids=None, collection_ids=None):
     """Removes the collections and explorations from the incomplete list of the
     user.
 

@@ -75,19 +75,19 @@ DIRS_TO_ADD_TO_SYS_PATH = [
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     common.CURR_DIR,
     os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.9.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.5'),
     os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.43.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.3'),
-    os.path.join(common.THIRD_PARTY_DIR, 'pylatexenc-2.5'),
+    os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.4'),
+    os.path.join(common.THIRD_PARTY_DIR, 'pylatexenc-2.6'),
     os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.17.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'six-1.15.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
@@ -104,7 +104,8 @@ TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
 IMPORTANT: Only one of --test_path and --test_target should be specified.
@@ -263,8 +264,8 @@ def main(args=None):
                 os.path.join(
                     common.OPPIA_TOOLS_DIR,
                     'coverage-%s' % common.COVERAGE_VERSION)):
-            raise Exception('Coverage is not installed, please run the start '
-                            'script.')
+            raise Exception(
+                'Coverage is not installed, please run the start script.')
 
         pythonpath_components = [COVERAGE_DIR]
         if os.environ.get('PYTHONPATH'):
@@ -273,8 +274,8 @@ def main(args=None):
         os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
     if parsed_args.test_target and parsed_args.test_path:
-        raise Exception('At most one of test_path and test_target '
-                        'should be specified.')
+        raise Exception(
+            'At most one of test_path and test_target should be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:

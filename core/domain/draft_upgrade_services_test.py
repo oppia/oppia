@@ -96,6 +96,209 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
+    def test_extract_html_from_draft_change_list(self):
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state2',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            html_content,
+                            '<p>4</p>'
+                        ]
+                    },
+                    'maxAllowableSelectionCount': {
+                        'value': 1
+                    },
+                    'minAllowableSelectionCount': {
+                        'value': 1
+                    }
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'answer_groups',
+                'state_name': 'State 1',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'ContainsAtLeastOneOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'IsProperSubsetOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'DoesNotContainAtLeastOneOf',
+                        'inputs': {
+                            'x': [html_content]
+                        }
+                    }, {
+                        'rule_type': 'Equals',
+                        'inputs': {
+                            'x': 1
+                        }
+                    }, {
+                        'rule_type': 'HasElementXAtPositionY',
+                        'inputs': {
+                            'x': html_content,
+                            'y': 2
+                        }
+                    }, {
+                        'rule_type': 'IsEqualToOrdering',
+                        'inputs': {
+                            'x': [[html_content]]
+                        }
+                    }, {
+                        'rule_type': 'HasElementXBeforeElementY',
+                        'inputs': {
+                            'x': html_content,
+                            'y': html_content
+                        }
+                    }, {
+                        'rule_type': (
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'),
+                        'inputs': {
+                            'x': [[html_content]]
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': html_content
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': html_content
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'written_translations',
+                'new_value': {
+                    'translations_mapping': {
+                        'content1': {
+                            'en': {
+                                'html': html_content,
+                                'needs_update': True
+                            },
+                            'hi': {
+                                'html': 'Hey!',
+                                'needs_update': False
+                            }
+                        },
+                        'feedback_1': {
+                            'hi': {
+                                'html': html_content,
+                                'needs_update': False
+                            },
+                            'en': {
+                                'html': 'hello!',
+                                'needs_update': False
+                            }
+                        }
+                    }
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'answer_is_exclusive': False,
+                    'correct_answer': 'helloworld!',
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': html_content
+                    },
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'solution',
+                'new_value': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [html_content],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': '<p>This is solution for state1</p>'
+                    }
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'default_outcome',
+                'new_value': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': html_content
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'hints',
+                'new_value': [{
+                    'hint_content': {
+                        'content_id': 'hint1',
+                        'html': html_content
+                    }
+                }]
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Intro',
+                'new_state_name': 'Introduction',
+            })
+        ]
+
+        list_of_html = (
+            draft_upgrade_services.extract_html_from_draft_change_list(
+                draft_change_list))
+        self.assertEqual(len(list_of_html), 27)
+        expected_html_strings = [
+            html_content, '<p>1</p>', '<p>2</p>', '<p>3</p>', '<p>4</p>',
+            '<p>This is solution for state1</p>', 'Hey!', 'hello!']
+        for html in list_of_html:
+            self.assertTrue(html in expected_html_strings)
+
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     """Test the DraftUpgradeUtil module."""
@@ -104,8 +307,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     USER_ID = 'user_id'
     EXP_MIGRATION_CHANGE_LIST = [exp_domain.ExplorationChange({
         'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-        'from_version': '33',
-        'to_version': '34'
+        'from_version': '34',
+        'to_version': '35'
     })]
 
     # EXP_ID and USER_ID used to create default explorations.
@@ -169,6 +372,77 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
+
+    def test_convert_states_v34_dict_to_v35_dict(self):
+        draft_change_list_1_v34 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'IsMathematicallyEquivalentTo',
+                        'inputs': {
+                            'x': 'x+y/2'
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Content</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            })
+        ]
+        draft_change_list_2_v34 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        # Migrate exploration to state schema version 35.
+        self.create_and_migrate_new_exploration('34', '35')
+        migrated_draft_change_list_1_v35 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v34, 1, 2, self.EXP_ID))
+        self.assertIsNone(migrated_draft_change_list_1_v35)
+
+        migrated_draft_change_list_2_v35 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_2_v34, 1, 2, self.EXP_ID))
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_2_v34_dict_list = [
+            change.to_dict() for change in draft_change_list_2_v34
+        ]
+        migrated_draft_change_list_2_v35_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_2_v35
+        ]
+        self.assertEqual(
+            draft_change_list_2_v34_dict_list,
+            migrated_draft_change_list_2_v35_dict_list)
 
     def test_convert_states_v33_dict_to_v34_dict(self):
         html_content = (
@@ -367,14 +641,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-        exp_services.update_exploration(
-            self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
-            'Ran Exploration Migration job.')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.create_and_migrate_new_exploration('33', '34')
         migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                draft_change_list, 1, exploration.version, self.EXP_ID))
+                draft_change_list, 1, 2, self.EXP_ID))
         self.assertEqual(
             migrated_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({

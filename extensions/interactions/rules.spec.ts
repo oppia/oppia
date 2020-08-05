@@ -48,20 +48,22 @@ import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
+import { NumericExpressionInputRulesService } from
+  'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { IImageClickAnswer, IMathExpressionAnswer } from './answer-defs';
-import { IImageClickRuleInputs, IMathExpressionRuleInputs } from './rule-input-defs';
+import { ImageClickAnswer, MathExpressionAnswer } from './answer-defs';
+import { ImageClickRuleInputs, MathExpressionRuleInputs } from './rule-input-defs';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
   var rulesServices = {};
-  var ruleTemplates: IRuleTemplates;
+  var ruleTemplates: RuleTemplates;
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -96,6 +98,8 @@ describe('Rule spec services', function() {
         new NumberWithUnitsObjectFactory(
           new UnitsObjectFactory(), new FractionObjectFactory(),
         ), new UtilsService()));
+    $provide.value('NumericExpressionInputRulesService',
+      new NumericExpressionInputRulesService());
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
         new FractionObjectFactory(), new UtilsService()));
@@ -112,13 +116,13 @@ describe('Rule spec services', function() {
     $provide.value('EndExplorationRulesService', {});
     $provide.value('ImageClickInputRulesService', {
       IsInRegion: function(
-          answer: IImageClickAnswer, inputs: IImageClickRuleInputs) {
+          answer: ImageClickAnswer, inputs: ImageClickRuleInputs) {
         return answer.clickedRegions.indexOf(inputs.x) !== -1;
       }
     });
     $provide.value('MathExpressionInputRulesService', {
       IsMathematicallyEquivalentTo: function(
-          answer: IMathExpressionAnswer, inputs: IMathExpressionRuleInputs) {
+          answer: MathExpressionAnswer, inputs: MathExpressionRuleInputs) {
         return (
           MathExpression.fromLatex(answer.latex).equals(
             MathExpression.fromLatex(inputs.x)));

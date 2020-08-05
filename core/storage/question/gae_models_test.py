@@ -257,6 +257,59 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(question_skill_links), 0)
 
+    def test_get_total_question_count_for_skill_ids(self):
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
+
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', skill_id_1, 0.1)
+        )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_1, 0.5)
+        )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id3', skill_id_2, 0.8)
+        )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+
+        question_skill_link_model = question_models.QuestionSkillLinkModel
+        question_count = (
+            question_skill_link_model.get_total_question_count_for_skill_ids(
+                [skill_id_1, skill_id_2]))
+
+        self.assertEqual(question_count, 3)
+
+        question_count = (
+            question_skill_link_model.get_total_question_count_for_skill_ids(
+                [skill_id_1]))
+
+        self.assertEqual(question_count, 2)
+
+        question_count = (
+            question_skill_link_model.get_total_question_count_for_skill_ids(
+                [skill_id_1, skill_id_1]))
+
+        self.assertEqual(question_count, 2)
+
+        question_count = (
+            question_skill_link_model.get_total_question_count_for_skill_ids(
+                [skill_id_2]))
+
+        self.assertEqual(question_count, 1)
+
+        question_count = (
+            question_skill_link_model.get_total_question_count_for_skill_ids(
+                [skill_id_1, skill_id_2, skill_id_1]))
+
+        self.assertEqual(question_count, 3)
+
     def test_get_question_skill_links_by_skill_ids(self):
         skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_1, 'user', description='Description 1')
@@ -446,10 +499,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
-            (question_models.QuestionSkillLinkModel.
-             get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
-                 3, skill_ids, 0.6
-             ))
+            (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                    3, skill_ids, 0.6
+                ))
 
     def test_get_questions_with_no_skills(self):
         question_skill_links = (
@@ -624,9 +678,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]
         with self.assertRaisesRegexp(
             Exception, 'Please keep the number of skill IDs below 20.'):
-            (question_models.QuestionSkillLinkModel.
-             get_question_skill_links_equidistributed_by_skill(
-                 3, skill_ids))
+            (
+                question_models.QuestionSkillLinkModel.
+                get_question_skill_links_equidistributed_by_skill(
+                    3, skill_ids))
 
 
 class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):

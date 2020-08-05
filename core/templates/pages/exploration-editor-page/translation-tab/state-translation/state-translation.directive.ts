@@ -23,7 +23,7 @@ require(
   'audio-translation-bar.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation-editor/' +
-  'state-translation-editor.directive.ts'
+  'state-translation-editor.component.ts'
 );
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -64,7 +64,7 @@ angular.module('oppia').directive('stateTranslation', [
         '/pages/exploration-editor-page/translation-tab/' +
         'state-translation/state-translation.directive.html'),
       controller: [
-        '$filter', '$rootScope', '$scope',
+        '$filter', '$rootScope', '$scope', 'CkEditorCopyContentService',
         'ExplorationCorrectnessFeedbackService',
         'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
         'ExplorationStatesService', 'RouterService', 'StateEditorService',
@@ -75,7 +75,7 @@ angular.module('oppia').directive('stateTranslation', [
         'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
         'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
-            $filter, $rootScope, $scope,
+            $filter, $rootScope, $scope, CkEditorCopyContentService,
             ExplorationCorrectnessFeedbackService,
             ExplorationInitStateNameService, ExplorationLanguageCodeService,
             ExplorationStatesService, RouterService, StateEditorService,
@@ -84,7 +84,8 @@ angular.module('oppia').directive('stateTranslation', [
             TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
-            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT
+        ) {
           var ctrl = this;
           $scope.isVoiceoverModeActive = (
             TranslationTabActiveModeService.isVoiceoverModeActive);
@@ -131,6 +132,17 @@ angular.module('oppia').directive('stateTranslation', [
 
           $scope.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
+          };
+
+          $scope.onContentClick = function($event) {
+            if (CkEditorCopyContentService.copyModeActive) {
+              $event.stopPropagation();
+            }
+            CkEditorCopyContentService.broadcastCopy($event.target);
+          };
+
+          $scope.isCopyModeActive = function() {
+            return CkEditorCopyContentService.copyModeActive;
           };
 
           $scope.onTabClick = function(tabId) {

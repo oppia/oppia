@@ -26,7 +26,7 @@ from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
@@ -121,7 +121,7 @@ class BaseSuggestion(python_utils.OBJECT):
         The subclasses must validate the change and score_category fields.
 
         Raises:
-            ValidationError: One or more attributes of the BaseSuggestion object
+            ValidationError. One or more attributes of the BaseSuggestion object
                 are invalid.
         """
         if (
@@ -296,7 +296,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Validates a suggestion object of type SuggestionEditStateContent.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 SuggestionEditStateContent object are invalid.
         """
         super(SuggestionEditStateContent, self).validate()
@@ -385,7 +385,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             change: ExplorationChange. The new change.
 
         Raises:
-            ValidationError: Invalid new change.
+            ValidationError. Invalid new change.
         """
         if self.change.cmd != change.cmd:
             raise utils.ValidationError(
@@ -459,7 +459,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """Validates a suggestion object of type SuggestionTranslateContent.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 SuggestionTranslateContent object are invalid.
         """
         super(SuggestionTranslateContent, self).validate()
@@ -585,7 +585,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Validates a suggestion object of type SuggestionAddQuestion.
 
         Raises:
-            ValidationError: One or more attributes of the SuggestionAddQuestion
+            ValidationError. One or more attributes of the SuggestionAddQuestion
                 object are invalid.
         """
         super(SuggestionAddQuestion, self).validate()
@@ -658,7 +658,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Question state schema version is not up to date.')
 
         skill_domain.Skill.require_valid_skill_id(self.change.skill_id)
-        skill = skill_services.get_skill_by_id(
+        skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
@@ -683,7 +683,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)
-        skill = skill_services.get_skill_by_id(
+        skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
             raise utils.ValidationError(
@@ -705,7 +705,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             change: QuestionChange. The new change.
 
         Raises:
-            ValidationError: Invalid new change.
+            ValidationError. Invalid new change.
         """
         if self.change.cmd != change.cmd:
             raise utils.ValidationError(
@@ -799,7 +799,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
         """Validates the BaseVoiceoverApplication object.
 
         Raises:
-            ValidationError: One or more attributes of the
+            ValidationError. One or more attributes of the
                 BaseVoiceoverApplication object are invalid.
         """
 

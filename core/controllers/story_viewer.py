@@ -21,10 +21,11 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
+from core.domain import topic_fetchers
 import feconf
 
 
@@ -54,6 +55,8 @@ class StoryPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         story = story_fetchers.get_story_by_id(story_id)
+        topic_id = story.corresponding_topic_id
+        topic_name = topic_fetchers.get_topic_by_id(topic_id).name
 
         completed_node_ids = [
             completed_node.id for completed_node in
@@ -79,7 +82,8 @@ class StoryPageDataHandler(base.BaseHandler):
         self.values.update({
             'story_title': story.title,
             'story_description': story.description,
-            'story_nodes': ordered_node_dicts
+            'story_nodes': ordered_node_dicts,
+            'topic_name': topic_name
         })
         self.render_json(self.values)
 
@@ -136,7 +140,7 @@ class StoryProgressHandler(base.BaseHandler):
 
         # If there are no questions for any of the acquired skills that the
         # learner has completed, do not show review tests.
-        acquired_skills = skill_services.get_multi_skills(
+        acquired_skills = skill_fetchers.get_multi_skills(
             story.get_acquired_skill_ids_for_node_ids(
                 completed_node_ids
             ))
