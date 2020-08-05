@@ -805,6 +805,43 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(story.language_code, 'bn')
 
+    def test_update_story_url_fragment(self):
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.url_fragment, 'title')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+            'property_name': story_domain.STORY_PROPERTY_URL_FRAGMENT,
+            'old_value': 'title',
+            'new_value': 'updated-title'
+        })]
+
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list,
+            'Updated story url_fragment.')
+
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+
+        self.assertEqual(story.url_fragment, 'updated-title')
+
+    def test_cannot_update_story_if_url_fragment_already_exists(self):
+        topic_id = topic_services.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id, self.USER_ID, topic_id,
+            title='original', url_fragment='original')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+            'property_name': story_domain.STORY_PROPERTY_URL_FRAGMENT,
+            'old_value': 'title',
+            'new_value': 'original'
+        })]
+        exception_message = 'Story Url Fragment is not unique across the site.'
+        with self.assertRaisesRegexp(Exception, exception_message):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list,
+                'Updated story url_fragment.')
+
     def test_cannot_update_story_with_no_change_list(self):
         with self.assertRaisesRegexp(
             Exception,

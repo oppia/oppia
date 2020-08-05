@@ -201,6 +201,41 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(
             json_response['error'], 'Image exceeds file size limit of 100 KB.')
 
+    def test_story_creation_fails_with_duplicate_story_url_fragment(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'original'
+        }
+        self.save_new_story(
+            story_services.get_new_story_id(),
+            self.admin_id,
+            topic_services.get_new_topic_id(),
+            title='title',
+            description='description',
+            notes='note',
+            url_fragment='original'
+        )
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Story url fragment is not unique across the site.')
+
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 

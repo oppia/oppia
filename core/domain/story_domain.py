@@ -1070,9 +1070,6 @@ class Story(python_utils.OBJECT):
         Args:
             url_fragment: str. The new url fragment of the story.
         """
-        utils.require_valid_url_fragment(
-            url_fragment, 'Story Url Fragment',
-            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
         self.url_fragment = url_fragment
 
     def add_node(self, desired_node_id, node_title):
