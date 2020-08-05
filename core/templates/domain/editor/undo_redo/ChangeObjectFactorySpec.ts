@@ -16,7 +16,7 @@
  * @fileoverview Tests for ChangeObjectFactory.
  */
 
-import { ChangeObjectFactory } from
+import { BackendChangeObject, ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 
 describe('Factory for Change domain objects', () => {
@@ -30,8 +30,11 @@ describe('Factory for Change domain objects', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     const reverseFunc = jasmine.createSpy('reverseChange');
 
-    const backendChangeObject = {
-      property_name: 'value'
+    const backendChangeObject: BackendChangeObject = {
+      cmd: 'update_question_property',
+      property_name: 'value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     };
     changeObjectFactory.create(backendChangeObject, applyFunc, reverseFunc);
 
@@ -43,14 +46,20 @@ describe('Factory for Change domain objects', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     const reverseFunc = jasmine.createSpy('reverseChange');
 
-    const backendChangeObject = {
-      property_name: 'value'
+    const backendChangeObject: BackendChangeObject = {
+      cmd: 'update_question_property',
+      property_name: 'value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     };
     const changeDomainObject = changeObjectFactory.create(
       backendChangeObject, applyFunc, reverseFunc);
 
-    const fakeDomainObject = {
-      property_name: 'fake value'
+    const fakeDomainObject: BackendChangeObject = {
+      cmd: 'update_question_property',
+      property_name: 'fake value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     };
     changeDomainObject.applyChange(fakeDomainObject);
 
@@ -63,14 +72,20 @@ describe('Factory for Change domain objects', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     const reverseFunc = jasmine.createSpy('reverseChange');
 
-    const backendChangeObject = {
-      property_name: 'value'
+    const backendChangeObject: BackendChangeObject = {
+      cmd: 'update_question_property',
+      property_name: 'value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     };
     const changeDomainObject = changeObjectFactory.create(
       backendChangeObject, applyFunc, reverseFunc);
 
-    const fakeDomainObject = {
-      property_name: 'fake value'
+    const fakeDomainObject: BackendChangeObject = {
+      cmd: 'update_question_property',
+      property_name: 'fake value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     };
     changeDomainObject.reverseChange(fakeDomainObject);
 
@@ -81,8 +96,11 @@ describe('Factory for Change domain objects', () => {
 
   it('should not receive changes to the provided change backend object',
     () => {
-      const backendChangeObject = {
-        property_name: 'value'
+      const backendChangeObject: BackendChangeObject = {
+        cmd: 'update_question_property',
+        property_name: 'value',
+        new_value: 'newVal',
+        old_value: 'oldVal'
       };
       const changeDomainObject = changeObjectFactory.create(
         backendChangeObject, () => {}, () => {});
@@ -92,25 +110,40 @@ describe('Factory for Change domain objects', () => {
         .property_name = 'new value';
 
       expect(changeDomainObject.getBackendChangeObject()).toEqual({
-        property_name: 'value'
+        cmd: 'update_question_property',
+        property_name: 'value',
+        new_value: 'newVal',
+        old_value: 'oldVal'
       });
     });
 
   it('should set new backend change object when using specific method', () => {
     const changeDomainObject = changeObjectFactory.create({
-      property_name: 'value'
+      cmd: 'update_question_property',
+      property_name: 'value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     }, () => {}, () => {});
 
     expect(changeDomainObject.getBackendChangeObject()).toEqual({
-      property_name: 'value'
+      cmd: 'update_question_property',
+      property_name: 'value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     });
 
     changeDomainObject.setBackendChangeObject({
-      property_name: 'new value'
+      cmd: 'update_question_property',
+      property_name: 'new value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     });
 
     expect(changeDomainObject.getBackendChangeObject()).toEqual({
-      property_name: 'new value'
+      cmd: 'update_question_property',
+      property_name: 'new value',
+      new_value: 'newVal',
+      old_value: 'oldVal'
     });
   });
 });
