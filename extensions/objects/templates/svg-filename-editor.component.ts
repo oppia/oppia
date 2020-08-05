@@ -16,6 +16,7 @@
  * @fileoverview Component for svg filename editor.
  */
 
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/alerts.service.ts');
@@ -58,6 +59,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       const DRAW_MODE_PENCIL = 'pencil';
       const DRAW_MODE_BEZIER = 'bezier';
       const DRAW_MODE_PIECHART = 'piechart';
+      const DRAW_MODE_SVG_UPLOAD = 'svgupload';
       const DRAW_MODE_NONE = 'none';
       const OPEN_POLYGON_MODE = 'open';
       const CLOSED_POLYGON_MODE = 'closed';
@@ -145,6 +147,9 @@ angular.module('oppia').component('svgFilenameEditor', {
         color: '#00ff00',
         angle: 0
       }];
+      ctrl.imageType = 'svg';
+      ctrl.uploadedSVG = null;
+      ctrl.loadType = 'group';
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
@@ -925,6 +930,68 @@ angular.module('oppia').component('svgFilenameEditor', {
         return Boolean(ctrl.drawMode === DRAW_MODE_PIECHART);
       };
 
+      ctrl.uploadSVGFile = function() {
+        if (ctrl.drawMode === DRAW_MODE_NONE) {
+          ctrl.drawMode = DRAW_MODE_SVG_UPLOAD;
+        } else {
+          ctrl.drawMode = DRAW_MODE_NONE;
+          if (ctrl.uploadedSVG !== null) {
+            var svgString = atob(ctrl.uploadedSVG.split(',')[1]);
+            fabric.loadSVGFromString(svgString, function(objects) {
+              if (ctrl.loadType === 'group') {
+                objects.forEach(function(obj) {
+                  obj.set({
+                    id: 'group' + ctrl.groupCount
+                  });
+                  obj.toSVG = ctrl.createCustomToSVG(
+                    obj.toSVG, obj.type, obj.id);
+                });
+                ctrl.canvas.add(new fabric.Group(objects));
+                ctrl.groupCount += 1;
+              } else {
+                objects.forEach(function(obj) {
+                  ctrl.canvas.add(obj);
+                });
+              }
+            });
+          }
+          ctrl.canvas.renderAll();
+          ctrl.uploadedSVG = null;
+          $scope.$applyAsync();
+        }
+      };
+
+      ctrl.setUploadedFile = function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            ctrl.uploadedSVG = (<FileReader>e.target).result;
+            $scope.$apply();
+          };
+          img.src = <string>((<FileReader>e.target).result);
+        };
+        reader.readAsDataURL(file);
+      };
+
+      ctrl.onFileChanged = function(file, filename) {
+        ctrl.setUploadedFile(file)
+      };
+
+      ctrl.isFileUploaded = function() {
+        return Boolean(ctrl.uploadedSVG !== null);
+      };
+
+      ctrl.isDrawModeSVGUpload = function() {
+        return Boolean(ctrl.drawMode === DRAW_MODE_SVG_UPLOAD);
+      };
+
+      ctrl.isSVGUploadEnabled = function() {
+        return Boolean(
+          ctrl.areAllToolsEnabled() ||
+          ctrl.drawMode === DRAW_MODE_SVG_UPLOAD);
+      };
+
       ctrl.bringObjectForward = function() {
         ctrl.canvas.bringForward(ctrl.canvas.getActiveObject());
         if (ctrl.layerNum < ctrl.canvas._objects.length) {
@@ -1380,6 +1447,18 @@ angular.module('oppia').component('svgFilenameEditor', {
             initializeFabricJs();
           });
         }
+        angular.element(document).on(
+          'change', '.svg-file-upload-input', function(evt) {
+            var file = (<HTMLInputElement>evt.currentTarget).files[0];
+            console.log(file)
+            // scope.errorMessage = validateUploadedFile(file, filename);
+            // if (!scope.errorMessage) {
+            //   // Only fire this event if validations pass.
+            //   scope.onFileChanged(file, filename);
+            // }
+            // scope.$apply();
+          }
+        );
       };
     }
   ]

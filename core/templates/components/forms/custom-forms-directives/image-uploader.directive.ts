@@ -23,6 +23,7 @@ interface ImageUploaderCustomScope extends ng.IScope {
   errorMessage?: string;
   onFileChanged?: (file: File, fileName?: string) => void;
   fileInputClassName?: string;
+  allowedImageType?: string;
 }
 
 angular.module('oppia').directive('imageUploader', [
@@ -34,7 +35,8 @@ angular.module('oppia').directive('imageUploader', [
         height: '@',
         onFileChanged: '=',
         errorMessage: '@',
-        width: '@'
+        width: '@',
+        allowedImageType: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -51,19 +53,28 @@ angular.module('oppia').directive('imageUploader', [
             return 'This file is not recognized as an image.';
           }
 
-          if (!file.type.match('image/jpeg') &&
-            !file.type.match('image/gif') &&
-            !file.type.match('image/jpg') &&
-            !file.type.match('image/png') &&
-            !file.type.match('image/svg\\+xml')) {
-            return 'This image format is not supported.';
-          }
+          if (scope.allowedImageType === 'svg') {
+            if (!file.type.match('image/svg\\+xml')) {
+              return 'This image format is not supported.';
+            }
+            if (file.type.match(/svg\+xml$/) && !file.name.match(/\.svg$/)) {
+              return 'This image format does not match the filename extension.';
+            }
+          } else {
+            if (!file.type.match('image/jpeg') &&
+              !file.type.match('image/gif') &&
+              !file.type.match('image/jpg') &&
+              !file.type.match('image/png') &&
+              !file.type.match('image/svg\\+xml')) {
+              return 'This image format is not supported.';
+            }
 
-          if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
-            (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
-            (file.type.match(/png$/) && !file.name.match(/\.png$/)) ||
-            (file.type.match(/svg\+xml$/) && !file.name.match(/\.svg$/))) {
-            return 'This image format does not match the filename extension.';
+            if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
+              (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
+              (file.type.match(/png$/) && !file.name.match(/\.png$/)) ||
+              (file.type.match(/svg\+xml$/) && !file.name.match(/\.svg$/))) {
+              return 'This image format does not match the filename extension.';
+            }
           }
 
           const HUNDRED_KB_IN_BYTES = 100 * 1024;
