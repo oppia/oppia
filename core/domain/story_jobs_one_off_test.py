@@ -590,7 +590,7 @@ class StoryMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_job_skips_deleted_stories(self):
         story = story_domain.Story.create_default_story(
-            'story_id', 'A title', 'Description', 'topic_id')
+            'story_id', 'A title', 'Description', 'topic_id', 'title')
         story_services.save_new_story(self.albert_id, story)
         story_services.delete_story(self.albert_id, 'story_id')
         job_id = (

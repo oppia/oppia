@@ -52,7 +52,7 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
           $scope.storyUrlFragmentExists = (
             StoryEditorStateService.getStoryWithUrlFragmentExists());
           $rootScope.$applyAsync();
-      });
+        });
     };
 
     $scope.isValid = function() {

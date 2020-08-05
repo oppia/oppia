@@ -471,8 +471,8 @@ def update_story(
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
     if (
-        old_story.url_fragment != new_story.url_fragment and
-        does_story_exist_with_url_fragment(new_story.url_fragment)):
+            old_story.url_fragment != new_story.url_fragment and
+            does_story_exist_with_url_fragment(new_story.url_fragment)):
         raise utils.ValidationError(
             'Story Url Fragment is not unique across the site.')
     _save_story(committer_id, new_story, commit_message, change_list)

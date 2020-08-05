@@ -252,7 +252,7 @@ angular.module('oppia').directive('storyEditor', [
                   StoryEditorStateService.getStoryWithUrlFragmentExists());
                 StoryUpdateService.setStoryUrlFragment(
                   $scope.story, newUrlFragment);
-            });
+              });
           };
 
           $scope.updateStoryThumbnailFilename = function(
