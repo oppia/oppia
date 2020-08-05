@@ -140,6 +140,7 @@ class UserSettingsModel(base_models.BaseModel):
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
+
         Returns:
             bool. Whether any models refer to the given user ID.
         """
@@ -151,6 +152,7 @@ class UserSettingsModel(base_models.BaseModel):
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
+
         Returns:
             dict. Dictionary of the data from UserSettingsModel.
         """
@@ -208,8 +210,10 @@ class UserSettingsModel(base_models.BaseModel):
         Args:
             unused_entity_name: The name of the entity. Coerced to a utf-8
                 encoded string. Defaults to ''.
+
         Returns:
             str. New unique id for this entity class.
+
         Raises:
             Exception. An ID cannot be generated within a reasonable number
                 of attempts.
@@ -229,10 +233,10 @@ class UserSettingsModel(base_models.BaseModel):
 
         Args:
             normalized_username: str. The given user's normalized username.
+
         Returns:
             bool. Whether the normalized_username has already been taken.
          """
-
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
 
@@ -242,11 +246,11 @@ class UserSettingsModel(base_models.BaseModel):
 
         Args:
             gae_id: str. The GAE user ID that is being queried for.
+
         Returns:
             UserSettingsModel. The UserSettingsModel instance which has the same
             GAE user ID.
         """
-
         return cls.query(cls.gae_id == gae_id).get()
 
     @classmethod
@@ -255,11 +259,11 @@ class UserSettingsModel(base_models.BaseModel):
 
         Args:
             normalized_username: str. The user's normalized username.
+
         Returns:
             UserSettingsModel. The UserSettingsModel instance which contains
             the same normalized_username.
         """
-
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
 
@@ -269,11 +273,11 @@ class UserSettingsModel(base_models.BaseModel):
 
         Args:
             role: str. The role ID that is being queried for.
+
         Returns:
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
-
         return cls.query(cls.role == role).fetch()
 
 
