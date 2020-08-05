@@ -772,7 +772,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
     opportunity_services.delete_skill_opportunity(skill_id)
-    suggestion_services.auto_reject_question_suggestions_with_skill_id(
+    suggestion_services.auto_reject_question_suggestions_for_skill_id(
         skill_id)
 
 

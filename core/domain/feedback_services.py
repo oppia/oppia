@@ -158,8 +158,8 @@ def create_messages(
     for each message, subscribes the author to the thread.
 
     Args:
-        thread_ids: list(str). The thread ids the messages belong to.
-        author_id: str. The author id who creates the messages.
+        thread_ids: list(str). The thread ids to append the messages to.
+        author_id: str. The id of the author who creates the messages.
         updated_status: str. One of STATUS_CHOICES. Applied to each thread.
             Must be supplied if this is the first message of the threads.
             Otherwise, this property should only exist when the status
@@ -168,7 +168,7 @@ def create_messages(
             be supplied if this is the first message of the threads. Otherwise,
             this property should only exist when the subject changes.
         text: str. The text of the feedback message. This may be ''.
-        received_via_email: bool. Whether new the message(s) are received via
+        received_via_email: bool. Whether the new message(s) are received via
             email or web.
 
     Returns:
@@ -195,14 +195,16 @@ def create_messages(
         if thread_model is None:
             thread_ids_that_do_not_have_models.append(thread_ids[index])
     if len(thread_ids_that_do_not_have_models) > 0:
-        missing_thread_models = len(thread_ids_that_do_not_have_models) > 1
+        multiple_thread_models_are_missing = (
+            len(thread_ids_that_do_not_have_models) > 1
+        )
         raise Exception(
             'Thread%s belonging to the GeneralFeedbackThreadModel class with '
             'id%s:[%s] %s not found.' % (
-                's' if missing_thread_models else '',
-                's' if missing_thread_models else '',
+                's' if multiple_thread_models_are_missing else '',
+                's' if multiple_thread_models_are_missing else '',
                 ' '.join(thread_ids_that_do_not_have_models),
-                'were' if missing_thread_models else 'was'
+                'were' if multiple_thread_models_are_missing else 'was'
             )
         )
 
@@ -342,15 +344,14 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
 
 
 def add_message_ids_to_read_by_list(user_id, message_identifiers):
-    """Ensures that there is a GeneralFeedbackThreadUserModel for each
-    thread_id and then adds the thread_id's corresponing message_id to the
-    thread's list of message ids read by the user.
+    """Adds the given message IDs to the list of message IDs read by the user.
 
     Args:
         user_id: str. The id of the user reading the messages.
         message_identifiers: list(FullyQualifiedMessageIdentifier). Each
-            message_identifier contains a thread_id and its corresponding
-            message_id.
+            message_identifier contains a thread_id and the corresponding
+            message_id that will be added to the thread's list of message IDs
+            read by the user.
     """
     # Extract the thread_ids and message_ids from the
     # FullyQualifiedMessageIdentifier objects.
@@ -366,55 +367,53 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     # Get all of the GeneralFeedbackThreadUserModels that already exist. These
     # models will be None if a GeneralFeedbackThreadUserModel does not exist
     # for the user_id and thread_id yet.
-    current_feedback_thread_user_models = (
+    current_feedback_thread_user_models_with_possible_nones = (
         feedback_models.GeneralFeedbackThreadUserModel.get_multi(
             user_id, thread_ids))
 
     # Keep track of which thread_ids do not have models yet.
-    missing_thread_ids = []
-    # Keep track of an updated version of the models.
-    updated_feedback_thread_user_models = []
+    thread_ids_missing_models = []
+    # Keep track of the message_ids corresponding to the thread_ids that do not
+    # have models yet.
+    message_ids_for_missing_thread_models = []
+    # Keep track of the feedback thread user models that already exist and
+    # aren't None. This list will be used when we update the datastore.
+    current_feedback_thread_user_models = []
+
     for index, feedback_thread_user_model in enumerate(
-            current_feedback_thread_user_models):
+            current_feedback_thread_user_models_with_possible_nones):
         if feedback_thread_user_model is None:
-            missing_thread_ids.append(thread_ids[index])
+            thread_ids_missing_models.append(thread_ids[index])
+            message_ids_for_missing_thread_models.append(message_ids[index])
         else:
-            updated_feedback_thread_user_models.append(
+            current_feedback_thread_user_models.append(
                 feedback_thread_user_model)
+            # Add the message_id to the messages read by the user.
+            feedback_thread_user_model.message_ids_read_by_user.append(
+                message_ids[index])
 
     # Create the new GeneralFeedbackThreadUserModels for each of the thread_ids
     # that do not have a model yet.
     new_feedback_thread_user_models = []
-    if missing_thread_ids:
+    if thread_ids_missing_models:
         new_feedback_thread_user_models = (
             feedback_models.GeneralFeedbackThreadUserModel.create_multi(
-                user_id, missing_thread_ids)
+                user_id, thread_ids_missing_models)
         )
 
-    # Update the feedback_thread_user_models to include the new models that
-    # we created.
-    new_model_index = 0
-    for index, feedback_thread_user_model in enumerate(
-            current_feedback_thread_user_models):
-        if feedback_thread_user_model is None:
-            updated_feedback_thread_user_models.insert(
-                index,
-                new_feedback_thread_user_models[new_model_index]
-            )
-            new_model_index += 1
-
-    # For each of the models, append the message_id to the
+    # For each of the new models, append the message_id to the
     # message_ids_read_by_user property.
     for index, feedback_thread_user_model in enumerate(
-            updated_feedback_thread_user_models):
+            new_feedback_thread_user_models):
         feedback_thread_user_model.message_ids_read_by_user.append(
-            message_ids[index]
+            message_ids_for_missing_thread_models[index]
         )
 
-    # Update the models in the datastore.
+    # Update both the new and previously existing models in the datastore.
+    current_feedback_thread_user_models.extend(
+        new_feedback_thread_user_models)
     feedback_models.GeneralFeedbackThreadUserModel.put_multi(
-        updated_feedback_thread_user_models
-    )
+        current_feedback_thread_user_models)
 
 
 def _get_message_from_model(message_model):

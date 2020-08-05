@@ -387,7 +387,7 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
     )
 
 
-def auto_reject_question_suggestions_with_skill_id(skill_id):
+def auto_reject_question_suggestions_for_skill_id(skill_id):
     """Rejects all SuggestionAddQuestions with target ID matching the supplied
     skill ID. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
@@ -408,7 +408,7 @@ def auto_reject_question_suggestions_with_skill_id(skill_id):
         suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
-def auto_reject_translation_suggestions_with_exp_ids(exp_ids):
+def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
     """Rejects all translation suggestions with target IDs matching the
     supplied exploration IDs. These suggestions are being rejected because
     their corresponding exploration was removed from a story or the story was

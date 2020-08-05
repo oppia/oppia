@@ -364,28 +364,24 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             in message_identifiers]
 
         # Generate the new ids.
-        instance_ids = []
-        for thread_id, message_id in python_utils.ZIP(thread_ids, message_ids):
-            instance_id = cls._generate_id(thread_id, message_id)
-            instance_ids.append(instance_id)
+        instance_ids = [
+            cls._generate_id(thread_id, message_id) for thread_id, message_id
+            in python_utils.ZIP(thread_ids, message_ids)
+        ]
 
         # Check if the new ids are valid.
         current_instances = cls.get_multi(instance_ids)
-        conflict_ids = []
-        for current_instance in current_instances:
-            if current_instance is not None:
-                conflict_ids.append(current_instance.id)
+        conflict_ids = [
+            current_instance.id for current_instance in current_instances if
+            current_instance is not None
+        ]
         if len(conflict_ids) > 0:
             raise Exception(
                 'The following feedback message ID(s) conflicted on '
                 'create: %s' % (' '.join(conflict_ids))
             )
 
-        # Create a list of the new instances.
-        new_instances = []
-        for instance_id in instance_ids:
-            new_instances.append(cls(id=instance_id))
-        return new_instances
+        return [cls(id=instance_id) for instance_id in instance_ids]
 
     @classmethod
     def get(cls, thread_id, message_id, strict=True):
@@ -470,10 +466,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             list(int). List of the message counts for the threads.
         """
         thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
-        message_counts = []
-        for thread_model in thread_models:
-            message_counts.append(thread_model.message_count)
-        return message_counts
+
+        return [thread_model.message_count for thread_model in thread_models]
 
 
     @classmethod
@@ -603,6 +597,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             new_instance = cls(
                 id=instance_id, user_id=user_id, thread_id=thread_id)
             new_instances.append(new_instance)
+
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 

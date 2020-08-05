@@ -60,18 +60,13 @@ def subscribe_to_threads(user_id, feedback_thread_ids):
 
     # Using sets for efficiency.
     current_feedback_thread_ids_set = set(
-        subscriptions_model.general_feedback_thread_ids
-    )
+        subscriptions_model.general_feedback_thread_ids)
     # Determine which thread_ids are not already in the subscriptions model.
-    feedback_thread_ids_to_add_to_subscriptions_model = (
-        list(
-            set(feedback_thread_ids)
-            .difference(current_feedback_thread_ids_set)
-        )
+    feedback_thread_ids_to_add_to_subscriptions_model = list(
+        set(feedback_thread_ids).difference(current_feedback_thread_ids_set)
     )
     subscriptions_model.general_feedback_thread_ids.extend(
-        feedback_thread_ids_to_add_to_subscriptions_model
-    )
+        feedback_thread_ids_to_add_to_subscriptions_model)
     subscriptions_model.put()
 
 

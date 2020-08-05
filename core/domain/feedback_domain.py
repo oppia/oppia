@@ -200,8 +200,8 @@ class FeedbackMessage(python_utils.OBJECT):
 
 
 class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
-    """Domain object for keeping track of (thread_id, message_id) pairs in the
-    GeneralFeedbackMessageModel.
+    """Domain object representing the full identifier of a message in a
+    feedback thread.
 
     Attributes:
         thread_id: str. The ID of the thread.
