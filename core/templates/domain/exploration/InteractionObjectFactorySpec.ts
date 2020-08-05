@@ -774,7 +774,7 @@ describe('Interaction object factory', () => {
       ['ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1']);
   });
 
-  it('should fully cover constructing customization arguments for all' +
+  it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
     Object.keys(INTERACTION_SPECS).forEach(interactionId => {
       expect(() => {
@@ -782,7 +782,7 @@ describe('Interaction object factory', () => {
         const caSpecs = INTERACTION_SPECS[
           interactionId].customization_arg_specs;
         caSpecs.forEach(caSpec => {
-          defaultCa[caSpec.name] = caSpec.default_value;
+          defaultCa[caSpec.name] = {value: caSpec.default_value};
         });
 
         iof.createFromBackendDict({
