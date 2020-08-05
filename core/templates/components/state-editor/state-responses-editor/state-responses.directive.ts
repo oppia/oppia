@@ -524,25 +524,27 @@ angular.module('oppia').directive('stateResponses', [
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
             $scope.stateSolicitAnswerDetailsService = (
               StateSolicitAnswerDetailsService);
-            $scope.$on('initializeAnswerGroups', function(evt, data) {
-              ResponsesService.init(data);
-              $scope.answerGroups = ResponsesService.getAnswerGroups();
-              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+            ctrl.directiveSubscriptions.add(
+              ResponsesService.onInitializeAnswerGroups.subscribe((data) => {
+                ResponsesService.init(data);
+                $scope.answerGroups = ResponsesService.getAnswerGroups();
+                $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
-              // If the creator selects an interaction which has only one
-              // possible answer, automatically expand the default response.
-              // Otherwise, default to having no responses initially selected.
-              if ($scope.isCurrentInteractionLinear()) {
-                ResponsesService.changeActiveAnswerGroupIndex(0);
-              }
+                // If the creator selects an interaction which has only one
+                // possible answer, automatically expand the default response.
+                // Otherwise, default to having no responses initially selected.
+                if ($scope.isCurrentInteractionLinear()) {
+                  ResponsesService.changeActiveAnswerGroupIndex(0);
+                }
 
-              // Initialize training data for these answer groups.
-              _initializeTrainingData();
+                // Initialize training data for these answer groups.
+                _initializeTrainingData();
 
-              $scope.activeAnswerGroupIndex = (
-                ResponsesService.getActiveAnswerGroupIndex());
-              $rootScope.$broadcast('externalSave');
-            });
+                $scope.activeAnswerGroupIndex = (
+                  ResponsesService.getActiveAnswerGroupIndex());
+                $rootScope.$broadcast('externalSave');
+              })
+            );
 
             $scope.getStaticImageUrl = function(imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -581,12 +583,15 @@ angular.module('oppia').directive('stateResponses', [
               )
             );
 
-            $scope.$on('answerGroupChanged', function() {
-              $scope.answerGroups = ResponsesService.getAnswerGroups();
-              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-              $scope.activeAnswerGroupIndex = (
-                ResponsesService.getActiveAnswerGroupIndex());
-            });
+            ctrl.directiveSubscriptions.add(
+              ResponsesService.onAnswerGroupsChanged.subscribe(
+                () => {
+                  $scope.answerGroups = ResponsesService.getAnswerGroups();
+                  $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+                  $scope.activeAnswerGroupIndex =
+                  ResponsesService.getActiveAnswerGroupIndex();
+                }
+              ));
 
             $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
               ResponsesService.updateAnswerChoices(newAnswerChoices);
