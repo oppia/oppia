@@ -94,8 +94,9 @@ THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
     THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
 
 # The default message to be shown when accepting stale suggestions.
-DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
-                                     ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
+DEFAULT_SUGGESTION_ACCEPT_MESSAGE = (
+    'Automatically accepting suggestion after'
+    ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
 
 # The message to be shown when rejecting a suggestion with a target ID of a
 # deleted skill.
@@ -192,15 +193,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 suggestion.
 
         Raises:
-            Exception: There is already a suggestion with the given id.
+            Exception. There is already a suggestion with the given id.
         """
         instance_id = thread_id
 
         if cls.get_by_id(instance_id):
-            raise Exception('There is already a suggestion with the given'
-                            ' id: %s' % instance_id)
+            raise Exception(
+                'There is already a suggestion with the given'
+                ' id: %s' % instance_id)
 
-        cls(id=instance_id, suggestion_type=suggestion_type,
+        cls(
+            id=instance_id, suggestion_type=suggestion_type,
             target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
@@ -250,7 +253,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         score_categories.
 
         Args:
-            score_categories: list(str). list of score categories to query for.
+            score_categories: list(str). List of score categories to query for.
             user_id: list(str). The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.

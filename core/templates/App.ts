@@ -44,7 +44,6 @@ require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
 
-require('domain/bottom_navbar/bottom-navbar-status.service.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -124,7 +123,7 @@ angular.module('oppia').config([
       'GuestCollectionProgressObjectFactory', 'GuestCollectionProgressService',
       'HtmlEscaperService', 'I18nLanguageCodeService', 'IdGenerationService',
       'ImageFileObjectFactory', 'ImprovementsService',
-      'InteractionObjectFactory',
+      'InteractionObjectFactory', 'KeyboardShortcutService',
       'InteractionRulesRegistryService', 'LanguageUtilService',
       'LearnerAnswerDetailsBackendApiService',
       'LearnerDashboardBackendApiService', 'LearnerParamsService',

@@ -1,6 +1,9 @@
 <div>
   <div class="skill-editor-main">
     <div class="navbar-helper">
+      <div class="navbar-text">
+        Skill Editor
+      </div>
       <div class="navbar-tabs navbar-icons">
         <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'navbar-tab-active': $ctrl.getActiveTabName() === 'main'}"
             ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>"
@@ -55,13 +58,25 @@
 
 <style>
   .skill-editor-main .navbar-helper {
-    background-color: #00008B;
+    background-color: #00609C;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+    display: flex;
     height: 70px;
     margin-bottom: 20px;
     text-align: center;
     width: 100%;
+    z-index: 10;
   }
 
+  .skill-editor-main .navbar-text {
+    align-items: center;
+    color: #FFF;
+    display: flex;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    margin-left: 4%;
+    width: 35%;
+  }
   .skill-editor-main .oppia-editor-warnings-box-block {
     display: block;
   }
@@ -92,6 +107,7 @@
   }
   .skill-editor-main .navbar-tab-active {
     background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
   }
   .skill-editor-main .nav-list-item {
     align-items: center;

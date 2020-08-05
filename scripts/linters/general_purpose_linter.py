@@ -182,16 +182,17 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
-                             r'throw\s\b(\bError|\bTypeError|\bRangeError'
-                             r'\bSyntaxError|\bDimensionError)\('),
+        'regexp': re.compile(
+            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
+            r'throw\s\b(\bError|\bTypeError|\bRangeError'
+            r'\bSyntaxError|\bDimensionError)\('),
         'message': 'Please use \'throw new\' instead of \'throw\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
-                             r'throw\s\'.*\';'),
+        'regexp': re.compile(
+            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})throw\s\'.*\';'),
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
@@ -232,6 +233,15 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             'typings/guppy-defs-b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.d.ts',
             'core/templates/services/UpgradedServices.ts'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'no-explicit-any'),
+        'message': (
+            'Please do not define "any" types. You can refer '
+            'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
+            'if you\'re having trouble declaring types.'),
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]
@@ -526,11 +536,12 @@ def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
         filepath: str. Path of the file.
 
     Returns:
-        bool: Whether to exclude the given file from this
+        bool. Whether to exclude the given file from this
         particular pattern check.
     """
-    return (any(filepath.startswith(bad_pattern)
-                for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
+    return (any(
+        filepath.startswith(bad_pattern)
+        for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])
             or filepath in BAD_PATTERNS[pattern]['excluded_files'])
 
 
@@ -555,10 +566,12 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
     summary_messages = []
     failed = False
     regexp = pattern['regexp']
-    if not (any(filepath.startswith(excluded_dir)
-                for excluded_dir in pattern['excluded_dirs'])
-            or any(filepath.endswith(excluded_file)
-                   for excluded_file in pattern['excluded_files'])):
+    if not (any(
+            filepath.startswith(excluded_dir)
+            for excluded_dir in pattern['excluded_dirs'])
+            or any(
+                filepath.endswith(excluded_file)
+                for excluded_file in pattern['excluded_files'])):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content, 1):
             if line.endswith('\n'):
@@ -588,7 +601,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
         content: str. Contents of the file.
 
     Returns:
-        failed: bool. True if there is bad pattern else false.
+        bool. True if there is bad pattern else false.
         total_error_count: int. The number of errors.
     """
     summary_messages = []
@@ -851,7 +864,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         the checks.
 
         Returns:
-            all_messages: str. All the messages returned by the lint checks.
+            str. All the messages returned by the lint checks.
         """
         mandatory_patterns_messages = self._check_mandatory_patterns()
         pattern_messages = self._check_bad_patterns()

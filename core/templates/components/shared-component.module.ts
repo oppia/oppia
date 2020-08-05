@@ -32,6 +32,7 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { SafePipe } from 'filters/safe-pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
@@ -47,6 +48,10 @@ import { SocialButtonsComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
+import { ProfileLinkImageComponent } from
+  'components/profile-link-directives/profile-link-image.component';
+import { ProfileLinkTextComponent } from
+  'components/profile-link-directives/profile-link-text.component';
 
 
 @NgModule({
@@ -59,6 +64,9 @@ import { ExplorationSummaryTileDirective } from
     ExplorationSummaryTileDirective,
     LazyLoadingComponent,
     LoadingDotsComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
+    SafePipe,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
@@ -72,6 +80,7 @@ import { ExplorationSummaryTileDirective } from
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     SkillMasteryViewerComponent,
@@ -85,6 +94,7 @@ import { ExplorationSummaryTileDirective } from
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    SafePipe,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
