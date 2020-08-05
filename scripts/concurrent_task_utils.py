@@ -51,7 +51,7 @@ class OutputStream(python_utils.OBJECT):
         """Constructs a OutputStream object.
 
         Args:
-            name: str. Name of the check currently running.
+            name: str. Name of the check running.
             failed: bool. Status of the check currently running.
             summary_messages: list(str). List of summary messages returned by
                 the objects.

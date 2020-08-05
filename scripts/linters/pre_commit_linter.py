@@ -66,7 +66,7 @@ from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
-from . import other_linter
+from . import other_files_linter
 from . import python_linter
 from .. import common
 from .. import concurrent_task_utils
@@ -261,7 +261,7 @@ def _get_linters_for_file_extension(file_extension_to_lint):
         custom_linter, _ = codeowner_linter.get_linters(FILE_CACHE)
         custom_linters.append(custom_linter)
 
-        custom_linter, _ = other_linter.get_linters(FILE_CACHE)
+        custom_linter, _ = other_files_linter.get_linters(FILE_CACHE)
         custom_linters.append(custom_linter)
 
     return custom_linters, third_party_linters
