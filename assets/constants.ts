@@ -5269,7 +5269,6 @@ export = {
         "default_outcome": {}
       }
     },
-    "next_interaction_id_index": 0,
     "solicit_answer_details": false,
     "written_translations": {
       "translations_mapping": {
