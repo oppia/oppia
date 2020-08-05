@@ -12,17 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: skip-file
-
 """Configuration for App Engine."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import os
 import sys
-import time
 
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
