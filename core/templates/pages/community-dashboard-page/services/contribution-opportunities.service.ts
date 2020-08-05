@@ -20,11 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ExplorationOpportunitySummary } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import { SkillOpportunity } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
-import { 
+import {
   ContributionOpportunitiesBackendApiService,
   SkillContributionOpportunities,
   TranslationContributionOpportunities,
