@@ -410,8 +410,7 @@
         "rootDirPrefix": "ng-joyride-",
         "targetDir": "ng-joyride-b117e0",
         "bundle": {
-          "css": ["ng-joyride.css"],
-          "js": ["ng-joyride.js"]
+          "css": ["ng-joyride.css"]
         }
       },
       "ngInfiniteScroll": {
