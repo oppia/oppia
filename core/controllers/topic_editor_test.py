@@ -450,9 +450,21 @@ class TopicEditorTests(
                     'content_id': 'content'
                 }
             }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
             }, {
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
@@ -643,9 +655,21 @@ class TopicEditorTests(
                     'content_id': 'content'
                 }
             }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
             }, {
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',

@@ -21,6 +21,9 @@ export class StoryDomainConstants {
     EDITABLE_STORY_DATA_URL_TEMPLATE =
     '/story_editor_handler/data/<story_id>';
 
+  public static STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE = (
+    '/story_url_fragment_handler/<story_url_fragment>');
+
   public static STORY_PUBLISH_URL_TEMPLATE =
     '/story_publish_handler/<story_id>';
 

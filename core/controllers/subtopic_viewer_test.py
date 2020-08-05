@@ -195,7 +195,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'id': 2,
                 'thumbnail_filename': None,
                 'title': 'Subtopic Title 2',
-                'url_fragment': None
+                'url_fragment': ''
             }
 
             expected_dict = {
@@ -225,7 +225,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'id': 1,
                 'thumbnail_filename': None,
                 'title': 'Subtopic Title',
-                'url_fragment': None
+                'url_fragment': ''
             }
 
             expected_dict = {

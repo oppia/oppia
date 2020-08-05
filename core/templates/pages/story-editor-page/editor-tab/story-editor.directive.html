@@ -54,12 +54,18 @@
               <label for="storyUrlFragment" class="form-heading">Url Fragment*</label>
               <input id="storyUrlFragment" type="text" class="form-control protractor-test-story-url-fragment-field"
                      ng-model="editableUrlFragment" ng-blur="updateStoryUrlFragment(editableUrlFragment)"
-                     placeholder="Enter url fragment for the story." maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>" ng-trim="true">
+                     placeholder="Enter url fragment for the story." maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>" ng-trim="true"
+                     ng-class="{'is-invalid': storyUrlFragmentExists}">
               <span class="oppia-input-box-subtitle">
                 <i>
                   The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_STORY_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
                 </i>
               </span>
+              <div ng-if="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+                <i>
+                  This story URL fragment already exists.
+                </i>
+              </div>
             </div>
             <div class="story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>

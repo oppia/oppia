@@ -25,6 +25,7 @@ describe('Create New Story Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
+  var StoryEditorStateService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -38,6 +39,7 @@ describe('Create New Story Modal Controller', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
+    StoryEditorStateService = $injector.get('StoryEditorStateService');
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
       [{filename: 'a.png', image: 'faf'}]);
@@ -55,6 +57,20 @@ describe('Create New Story Modal Controller', function() {
     expect($scope.story.description).toBe('');
     expect($scope.MAX_CHARS_IN_STORY_TITLE).toBe(
       CONSTANTS.MAX_CHARS_IN_STORY_TITLE);
+  });
+
+  it('should check if url fragment already exists', function() {
+    spyOn(
+      StoryEditorStateService,
+      'changeStoryWithUrlFragmentExists').and.callFake(
+        (urlFragment, callback) => callback());
+    spyOn(
+      StoryEditorStateService,
+      'getStoryWithUrlFragmentExists').and.returnValue(true);
+    expect($scope.storyUrlFragmentExists).toBeFalse();
+    $scope.story.urlFragment = 'test-url';
+    $scope.onStoryUrlFragmentChange();
+    expect($scope.storyUrlFragmentExists).toBeTrue();
   });
 
   it('should check if the story is valid', function() {

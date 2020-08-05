@@ -67,7 +67,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
       ctrl.subtopicTitle = '';
       ctrl.errorMsg = null;
-      ctrl.subtopicExists = false;
+      ctrl.subtopicUrlFragmentExists = false;
       TopicUpdateService.addSubtopic(ctrl.topic, ctrl.subtopicTitle);
     };
 
@@ -99,7 +99,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
         ctrl.subtopicTitle &&
         ctrl.htmlData &&
         ctrl.editableUrlFragment &&
-        ctrl.checkUrlFragmentValidity());
+        ctrl.isUrlFragmentValid());
     };
 
     ctrl.cancel = function() {
@@ -110,13 +110,13 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       $uibModalInstance.dismiss('cancel');
     };
 
-    ctrl.checkUrlFragmentValidity = function() {
-      return SubtopicValidationService.validateUrlFragment(
+    ctrl.isUrlFragmentValid = function() {
+      return SubtopicValidationService.isUrlFragmentValid(
         ctrl.editableUrlFragment);
     };
 
     ctrl.checkSubtopicExistence = function() {
-      ctrl.subtopicExists = (
+      ctrl.subtopicUrlFragmentExists = (
         SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
           ctrl.editableUrlFragment));
     };

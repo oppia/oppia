@@ -34,26 +34,51 @@ describe('Newly Created Story Object Factory', () => {
   });
 
   it('should validate the new story fields', () => {
+    // Fails when title, description, and url fragment are empty.
     expect(story.isValid()).toBe(false);
 
+    // Fails when description is valid but title and url fragment are empty.
     story.description = 'story description';
     expect(story.isValid()).toBe(false);
 
+    // Fails when title is valid but description and url fragment are empty.
     story.title = 'storyName1';
-    expect(story.isValid()).toBe(false);
-
     story.description = '';
     expect(story.isValid()).toBe(false);
 
-    story.description = 'story description';
+    // Fails when url fragment is valid but description and title are empty.
+    story.title = '';
+    story.description = '';
+    story.urlFragment = 'story-fragment';
     expect(story.isValid()).toBe(false);
 
+    // Fails when title and description are valid but url fragment is empty.
+    story.title = 'storyName1';
+    story.description = 'story description';
     story.urlFragment = '';
     expect(story.isValid()).toBe(false);
 
+    // Fails when url fragment and description are valid but title is empty.
+    story.title = '';
+    story.description = 'story description';
+    story.urlFragment = 'story-fragment';
+    expect(story.isValid()).toBe(false);
+
+    // Fails when title and url fragment are valid but description is empty.
+    story.title = 'storyName1';
+    story.description = '';
+    story.urlFragment = 'story-fragment';
+    expect(story.isValid()).toBe(false);
+
+    // Fails when url fragment has invalid characters.
+    story.title = 'storyName1';
+    story.description = 'story description';
     story.urlFragment = 'story Fragment';
     expect(story.isValid()).toBe(false);
 
+    // Passes when title, description, and url fragment are valid.
+    story.title = 'storyName1';
+    story.description = 'story description';
     story.urlFragment = 'story-fragment';
     expect(story.isValid()).toBe(true);
   });

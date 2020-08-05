@@ -399,8 +399,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'title': 'Title2',
             'subtopic_id': 2
         }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'title-two',
+            'old_value': '',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title3',
+            'subtopic_id': 3
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'title-three',
+            'old_value': '',
             'subtopic_id': 3
         })]
         topic_services.update_topic_and_subtopic_pages(
@@ -1073,6 +1085,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_subtopic_id': self.subtopic_id,
                 'new_subtopic_id': 2,
                 'skill_id': self.skill_id_2
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+                'new_value': 'new-subtopic',
+                'old_value': '',
+                'subtopic_id': 2
             })
         ]
         topic_services.update_topic_and_subtopic_pages(
@@ -1510,7 +1529,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             'thumbnail_bg_color': None,
             'title': 'subtopic_title',
             'skill_ids': [],
-            'url_fragment': None
+            'url_fragment': 'subtopictitle'
         }
         model = topic_models.TopicModel(
             id='topic_id',

@@ -21,18 +21,21 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 require('domain/topic/NewlyCreatedStoryObjectFactory.ts');
+require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 const newStoryConstants = require('constants.ts');
 
 angular.module('oppia').controller('CreateNewStoryModalController', [
-  '$controller', '$scope', '$uibModalInstance',
+  '$controller', '$rootScope', '$scope', '$uibModalInstance',
   'ImageLocalStorageService', 'NewlyCreatedStoryObjectFactory',
-  'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
-  function($controller, $scope, $uibModalInstance,
+  'StoryEditorStateService', 'MAX_CHARS_IN_STORY_TITLE',
+  'MAX_CHARS_IN_STORY_URL_FRAGMENT',
+  function($controller, $rootScope, $scope, $uibModalInstance,
       ImageLocalStorageService, NewlyCreatedStoryObjectFactory,
-      MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+      StoryEditorStateService, MAX_CHARS_IN_STORY_TITLE,
+      MAX_CHARS_IN_STORY_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -42,10 +45,20 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
     $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = MAX_CHARS_IN_STORY_URL_FRAGMENT;
     $scope.allowedBgColors = (
       newStoryConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+    $scope.storyUrlFragmentExists = false;
+    $scope.onStoryUrlFragmentChange = function() {
+      StoryEditorStateService.changeStoryWithUrlFragmentExists(
+        $scope.story.urlFragment, function() {
+          $scope.storyUrlFragmentExists = (
+            StoryEditorStateService.getStoryWithUrlFragmentExists());
+          $rootScope.$applyAsync();
+      });
+    };
 
     $scope.isValid = function() {
       return Boolean($scope.story.isValid() &&
-          ImageLocalStorageService.getStoredImagesData().length > 0);
+          ImageLocalStorageService.getStoredImagesData().length > 0 &&
+          !$scope.storyUrlFragmentExists);
     };
   }
 ]);

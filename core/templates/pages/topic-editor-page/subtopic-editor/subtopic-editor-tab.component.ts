@@ -66,7 +66,7 @@ angular.module('oppia').component('subtopicEditorTab', {
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;
-        ctrl.subtopicExists = false;
+        ctrl.subtopicUrlFragmentExists = false;
         ctrl.subtopicUrlFragmentIsValid = false;
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
@@ -99,7 +99,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.uncategorizedSkillSummaries = (
             ctrl.topic.getUncategorizedSkillSummaries());
           ctrl.subtopicUrlFragmentIsValid = (
-            SubtopicValidationService.validateUrlFragment(
+            SubtopicValidationService.isUrlFragmentValid(
               ctrl.editableUrlFragment));
         }
       };
@@ -121,18 +121,18 @@ angular.module('oppia').component('subtopicEditorTab', {
 
       ctrl.updateSubtopicUrlFragment = function(urlFragment) {
         ctrl.subtopicUrlFragmentIsValid = (
-          SubtopicValidationService.validateUrlFragment(urlFragment));
+          SubtopicValidationService.isUrlFragmentValid(urlFragment));
         if (urlFragment === ctrl.subtopic.getUrlFragment()) {
-          ctrl.subtopicExists = false;
+          ctrl.subtopicUrlFragmentExists = false;
           return;
         }
 
-        ctrl.subtopicExists = (
+        ctrl.subtopicUrlFragmentExists = (
           SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
             urlFragment));
         if (
           !ctrl.subtopicUrlFragmentIsValid ||
-          ctrl.subtopicExists) {
+          ctrl.subtopicUrlFragmentExists) {
           return;
         }
 

@@ -11155,12 +11155,12 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for subtopic count check of Topi'
-                'cSummaryModel\', [u"Entity id 0: Subtopic count: 10 does not '
-                'match the total number of subtopics in topic model: [{u\'thum'
-                'bnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
-                'u\'1\'], u\'id\': 1, u\'thumbnail_filename\': None, u\'title'
-                '\': u\'subtopic1\'}] "]]'
+               u'[u\'failed validation check for subtopic count check of '
+               'TopicSummaryModel\', [u"Entity id 0: Subtopic count: 10 '
+               'does not match the total number of subtopics in topic model: '
+               '[{u\'thumbnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
+               'u\'1\'], u\'title\': u\'subtopic1\', u\'url_fragment\': u\'\','
+               ' u\'thumbnail_filename\': None, u\'id\': 1}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 

@@ -43,14 +43,14 @@ angular.module('oppia').factory('SubtopicValidationService', [
         subtopic => subtopic.getUrlFragment() === urlFragment);
     };
 
-    var validateUrlFragment = function(urlFragment) {
+    var isUrlFragmentValid = function(urlFragment) {
       return VALID_URL_FRAGMENT_REGEX.test(urlFragment);
     };
 
     return {
       checkValidSubtopicName: checkValidSubtopicName,
       doesSubtopicWithUrlFragmentExist: doesSubtopicWithUrlFragmentExist,
-      validateUrlFragment: validateUrlFragment
+      isUrlFragmentValid: isUrlFragmentValid
     };
   }
 ]);

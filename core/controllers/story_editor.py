@@ -162,3 +162,22 @@ class ValidateExplorationsHandler(base.BaseHandler):
             'validation_error_messages': validation_error_messages
         })
         self.render_json(self.values)
+
+
+class StoryUrlFragmentHandler(base.BaseHandler):
+    """A data handler for checking if a story with given url fragment exists.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, story_url_fragment):
+        """Handler that receives a story url fragment, checks whether the
+        a story with the same url fragment exists or not.
+        """
+        self.values.update({
+            'story_url_fragment_exists': (
+                story_services.does_story_exist_with_url_fragment(
+                    story_url_fragment))
+        })
+        self.render_json(self.values)

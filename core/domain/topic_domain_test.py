@@ -97,7 +97,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
                 'thumbnail_bg_color': '#FFFFFF',
-                'title': 'Title'}])
+                'title': 'Title',
+                'url_fragment': 'dummy-subtopic-url'}])
 
     def test_delete_canonical_story(self):
         self.topic.canonical_story_references = [

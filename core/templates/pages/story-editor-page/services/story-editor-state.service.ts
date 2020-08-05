@@ -41,6 +41,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _storyIsPublished = false;
     var _skillSummaries = [];
     var _expIdsChanged = false;
+    var _storyWithUrlFragmentExists = false;
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -67,6 +68,10 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _updateStory = function(newBackendStoryObject) {
       _setStory(
         StoryObjectFactory.createFromBackendDict(newBackendStoryObject));
+    };
+
+    var _setStoryWithUrlFragmentExists = function(storyWithUrlFragmentExists) {
+      _storyWithUrlFragmentExists = storyWithUrlFragmentExists;
     };
 
     return {
@@ -221,6 +226,27 @@ angular.module('oppia').factory('StoryEditorStateService', [
        */
       isSavingStory: function() {
         return _storyIsBeingSaved;
+      },
+
+      getStoryWithUrlFragmentExists: function() {
+        return _storyWithUrlFragmentExists;
+      },
+
+      changeStoryWithUrlFragmentExists: function(
+          storyUrlFragment, successCallback) {
+        EditableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
+          storyUrlFragment).then(
+          function(storyUrlFragmentExists) {
+            _setStoryWithUrlFragmentExists(storyUrlFragmentExists);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when checking if the story url fragment ' +
+              'exists for another story.');
+          });
       }
     };
   }

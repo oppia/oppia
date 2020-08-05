@@ -48,7 +48,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         'skill_ids': ['skill_1'],
         'thumbnail_bg_color': None,
         'thumbnail_filename': None,
-        'title': 'A subtitle'
+        'title': 'A subtitle',
+        'url_fragment': 'subtitle'
     }
 
     def setUp(self):
@@ -146,7 +147,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'title': 'A subtitle'
             })
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(topic.subtopic_schema_version, 3)
         self.assertEqual(
             topic.subtopics[0].to_dict(),
             self.MIGRATED_SUBTOPIC_DICT)

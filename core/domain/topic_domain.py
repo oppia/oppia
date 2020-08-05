@@ -1450,20 +1450,18 @@ class Topic(python_utils.OBJECT):
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
 
-    def does_subtopic_exist_with_url_fragment(self, url_fragment):
-        """Checks if the url fragment for the subtopic is unique across the
-        subtopics in the topic.
-
-        Args:
-            url_fragment: str. The url_fragment of the subtopic.
+    def are_subtopic_url_fragments_unique(self):
+        """Checks if all the subtopic url fragments are unique across the
+        topic.
 
         Returns:
-            bool. Whether the the url fragment for the subtopic is exists or
+            bool. Whether the subtopic url fragments are unique in the topic or
             not.
         """
-        return any([
-            subtopic.url_fragment == url_fragment
-            for subtopic in self.subtopics])
+        url_fragments_list = [
+            subtopic.url_fragment for subtopic in self.subtopics]
+        url_fragments_set = set(url_fragments_list)
+        return len(url_fragments_list) == len(url_fragments_set)
 
 
 class TopicSummary(python_utils.OBJECT):

@@ -25,6 +25,10 @@ angular.module('oppia').constant(
   StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant(
+  'STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
+  StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
   'STORY_PUBLISH_URL_TEMPLATE',
   StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE);
 
