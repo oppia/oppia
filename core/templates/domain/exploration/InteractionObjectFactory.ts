@@ -343,7 +343,6 @@ export class InteractionObjectFactory {
       interactionId: string,
       caBackendDict: InteractionCustomizationArgsBackendDict
   ) : InteractionCustomizationArgs {
-    console.log(interactionId, caBackendDict)
     if (interactionId === null) {
       return {};
     }
