@@ -126,7 +126,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is the stringified version number of the objects.
-            If sub-namespace is not required, pass in None.
+            If the sub-namespace is not required, pass in None.
         obj_ids: list(str). List of object ids corresponding to values to
             retrieve from the cache.
 
@@ -169,7 +169,7 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is the stringified version number of the objects.
-            If sub-namespace is not required, pass in None.
+            If the sub-namespace is not required, pass in None.
         id_value_mapping:
             dict(str, Exploration|Skill|Story|Topic|Collection|str). A dict of
             {id, value} pairs to set to the cache.
@@ -207,7 +207,7 @@ def delete_multi(namespace, sub_namespace, obj_ids):
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
             the sub-namespace is the stringified version number of the objects.
-            If sub-namespace is not required, pass in None.
+            If the sub-namespace is not required, pass in None.
         obj_ids: list(str). A list of id strings to delete from the cache.
 
     Raises:
