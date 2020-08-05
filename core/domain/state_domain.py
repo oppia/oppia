@@ -1279,6 +1279,19 @@ class WrittenTranslations(python_utils.OBJECT):
 
         return translation_counts
 
+    def get_translation_content_count(self):
+        """Returns the number of content IDs that map to non-empty content
+        objects.
+
+        Returns:
+            int. The number of content IDs mapping to non-empty content objects.
+        """
+        count = 0
+        for translations in self.translations_mapping.values():
+            if translations:
+                count += 1
+        return count
+
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the WrittenTranslations.
 
@@ -1994,7 +2007,7 @@ class State(python_utils.OBJECT):
         Returns:
             int. The number of distinct content fields available in the state.
         """
-        return len(self.written_translations.translations_mapping)
+        return self.written_translations.get_translation_content_count()
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state

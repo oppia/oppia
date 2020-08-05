@@ -239,8 +239,15 @@ def update_opportunity_with_updated_exploration(exp_id):
 
     exploration_opportunity_summary.validate()
 
-    _save_multi_exploration_opportunity_summary(
-        [exploration_opportunity_summary])
+    # After all available content has been translated, delete the opportunity.
+    if (
+        exploration_opportunity_summary.translation_counts >=
+        exploration_opportunity_summary.content_count
+    ):
+        delete_exploration_opportunities([exp_id])
+    else:
+        _save_multi_exploration_opportunity_summary(
+            [exploration_opportunity_summary])
 
 
 def update_exploration_opportunities_with_story_changes(story, exp_ids):
@@ -654,7 +661,8 @@ def increment_question_counts(skill_ids, delta):
         delta: int. The delta for which to increment each question_count.
     """
     updated_skill_opportunities = (
-        _get_skill_opportunity_with_updated_question_count(skill_ids, delta))
+        _get_skill_opportunities_with_updated_question_counts(skill_ids, delta))
+    # Delete complete opportunities.
     _save_skill_opportunities(updated_skill_opportunities)
 
 
@@ -680,15 +688,15 @@ def update_skill_opportunities_on_question_linked_skills_change(
     skill_ids_removed_from_question = old_skill_ids_set - new_skill_ids_set
     updated_skill_opportunities = []
     updated_skill_opportunities.extend(
-        _get_skill_opportunity_with_updated_question_count(
+        _get_skill_opportunities_with_updated_question_counts(
             new_skill_ids_added_to_question, 1))
     updated_skill_opportunities.extend(
-        _get_skill_opportunity_with_updated_question_count(
+        _get_skill_opportunities_with_updated_question_counts(
             skill_ids_removed_from_question, -1))
     _save_skill_opportunities(updated_skill_opportunities)
 
 
-def _get_skill_opportunity_with_updated_question_count(skill_ids, delta):
+def _get_skill_opportunities_with_updated_question_counts(skill_ids, delta):
     """Returns a list of SkillOpportunities with corresponding skill_ids
     with question_count(s) updated by delta.
 
