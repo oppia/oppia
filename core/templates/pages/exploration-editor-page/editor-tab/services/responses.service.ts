@@ -39,8 +39,10 @@ require('services/context.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('ResponsesService', [
-  '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
+  'AlertsService', 'AnswerGroupsCacheService',
   'LoggerService', 'OutcomeObjectFactory',
   'SolutionValidityService', 'SolutionVerificationService',
   'StateEditorService', 'StateInteractionIdService',
@@ -49,7 +51,7 @@ angular.module('oppia').factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
-      $rootScope, AlertsService, AnswerGroupsCacheService,
+      AlertsService, AnswerGroupsCacheService,
       LoggerService, OutcomeObjectFactory,
       SolutionValidityService, SolutionVerificationService,
       StateEditorService, StateInteractionIdService,
@@ -69,6 +71,8 @@ angular.module('oppia').factory('ResponsesService', [
     var _defaultOutcome = null;
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
+    var _answerGroupsChangedEventEmitter = new EventEmitter();
+    var _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
     var _verifySolution = function() {
       // This checks if the solution is valid once a rule has been changed or
@@ -114,7 +118,7 @@ angular.module('oppia').factory('ResponsesService', [
       if (newAnswerGroups && oldAnswerGroups &&
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
-        $rootScope.$broadcast('answerGroupChanged', newAnswerGroups);
+        _answerGroupsChangedEventEmitter.emit();
         _verifySolution();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
       }
@@ -461,6 +465,14 @@ angular.module('oppia').factory('ResponsesService', [
         _saveAnswerGroups(newAnswerGroups);
         _saveDefaultOutcome(defaultOutcome);
         callback(_answerGroupsMemento, _defaultOutcomeMemento);
+      },
+
+      get onAnswerGroupsChanged() {
+        return _answerGroupsChangedEventEmitter;
+      },
+
+      get onInitializeAnswerGroups() {
+        return _initializeAnswerGroupsEventEmitter;
       }
     };
   }

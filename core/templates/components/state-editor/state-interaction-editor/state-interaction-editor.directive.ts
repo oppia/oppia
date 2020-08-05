@@ -33,6 +33,8 @@ require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');
 require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-content.service.ts');
 require(
@@ -84,17 +86,17 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'INTERACTION_SPECS', 'StateInteractionIdService',
         'StateCustomizationArgsService', 'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
-        'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
-        'StateSolutionService', 'StateHintsService',
-        'StateContentService', function(
+        'ExplorationHtmlFormatterService', 'ResponsesService',
+        'SubtitledHtmlObjectFactory', 'StateSolutionService',
+        'StateHintsService', 'StateContentService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
             AlertsService, HtmlEscaperService, StateEditorService,
             INTERACTION_SPECS, StateInteractionIdService,
             StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
-            ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
-            StateSolutionService, StateHintsService,
-            StateContentService) {
+            ExplorationHtmlFormatterService, ResponsesService,
+            SubtitledHtmlObjectFactory, StateSolutionService,
+            StateHintsService, StateContentService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var DEFAULT_TERMINAL_STATE_CONTENT =
@@ -272,7 +274,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                   }
                   $scope.hasLoaded = false;
                   InteractionDetailsCacheService.reset();
-                  $rootScope.$broadcast('initializeAnswerGroups', {
+                  ResponsesService.onInitializeAnswerGroups.emit({
                     interactionId: stateData.interaction.id,
                     answerGroups: stateData.interaction.answerGroups,
                     defaultOutcome: stateData.interaction.defaultOutcome,
