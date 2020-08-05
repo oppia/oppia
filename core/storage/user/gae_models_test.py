@@ -117,21 +117,29 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy_for_registered_users_deletes_them(self):
         # Case for a full user.
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
 
         # Case for a profile user.
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.PROFILE_1_ID))
         user_models.UserSettingsModel.apply_deletion_policy(self.PROFILE_1_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.PROFILE_1_ID))
 
     def test_apply_deletion_policy_for_banned_user_deletes_them(self):
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_2_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.NONEXISTENT_USER_ID))
         user_models.UserSettingsModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
@@ -236,7 +244,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
 
-    def test_get_new_id_for_too_many_collisions_raises_error_(self):
+    def test_get_new_id_for_too_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             user_models.UserSettingsModel, 'get_by_id', types.MethodType(
