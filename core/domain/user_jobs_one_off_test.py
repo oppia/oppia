@@ -206,15 +206,6 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
     USER_B_ID = 'user_b_id'
     USER_B_GAE_ID = 'user_b_gae_id'
 
-    # def _run_one_off_job(self):
-    #     """Runs the one-off MapReduce job."""
-    #     job_id = user_jobs_one_off.UserAuthModelOneOffJob.create_new()
-    #     user_jobs_one_off.UserAuthModelOneOffJob.enqueue(job_id)
-    #     self.assertEqual(
-    #         self.count_jobs_in_taskqueue(
-    #             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-    #     self.process_and_flush_pending_tasks()
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs_one_off.UserAuthModelOneOffJob.create_new()
@@ -253,7 +244,7 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
 
         self._run_one_off_job()
-        
+
         user_auth_model = user_models.UserAuthModel.get_by_auth_id(
             feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
         self.assertEqual(user_auth_model.id, self.USER_A_ID)

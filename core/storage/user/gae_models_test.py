@@ -2233,7 +2233,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
-    USER_PIN = '123'
+    USER_PIN = '12345'
     PROFILE_ID = 'profile_id'
     PROFILE_PIN = '123'
     PROFILE_2_ID = 'profile2_id'
@@ -2247,8 +2247,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
         user_models.UserAuthModel(
             id=self.USER_ID,
             gae_id=self.USER_GAE_ID,
-            pin=self.USER_PIN,
-            parent_user_id=None
+            pin=self.USER_PIN
         ).put()
         user_models.UserAuthModel(
             id=self.PROFILE_ID,
@@ -2273,7 +2272,7 @@ class UserAuthModelTests(test_utils.GenericTestBase):
             user_models.UserAuthModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy_for_registered_user_deletes_it(self):
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.
         user_models.UserAuthModel.apply_deletion_policy(self.USER_ID)
         self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_ID))
@@ -2283,10 +2282,12 @@ class UserAuthModelTests(test_utils.GenericTestBase):
         self.assertIsNone(user_models.UserAuthModel.get_by_id(self.PROFILE_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(
+            self.NONEXISTENT_USER_ID))
         user_models.UserAuthModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
-    def test_has_reference_to_existing_user_is_true(self):
+    def test_has_reference_to_existing_user_id_is_true(self):
         # For a full user.
         self.assertTrue(
             user_models.UserAuthModel.has_reference_to_user_id(
@@ -2306,13 +2307,13 @@ class UserAuthModelTests(test_utils.GenericTestBase):
         )
 
     def test_get_by_auth_id_with_invalid_auth_method_name_is_none(self):
-        # For registered users: Full user.
+        # For registered gae_id.
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
                 self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID)
         )
 
-        # For non registered users.
+        # For non registered gae_id.
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
                 self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID)
@@ -2321,10 +2322,9 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
         self.assertIsNone(
             user_models.UserAuthModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID)
-        )
+                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID))
 
-    def test_get_by_auth_id_for_registered_auth_id_returns_only_full_user(self):
+    def test_get_by_auth_id_for_correct_user_id_auth_id_mapping(self):
         self.assertEqual(
             user_models.UserAuthModel.get_by_id(self.USER_ID),
             user_models.UserAuthModel.get_by_auth_id(
@@ -2334,11 +2334,6 @@ class UserAuthModelTests(test_utils.GenericTestBase):
     def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(self):
         self.assertNotEqual(
             user_models.UserAuthModel.get_by_id(self.PROFILE_ID),
-            user_models.UserAuthModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
-        )
-        self.assertNotEqual(
-            user_models.UserAuthModel.get_by_id(self.PROFILE_2_ID),
             user_models.UserAuthModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )

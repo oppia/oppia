@@ -66,7 +66,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         edited_exploration_ids = set()
 
         edits = [ast.literal_eval(v) for v in version_and_exp_ids]
-
         for edit in edits:
             edited_exploration_ids.add(edit['exploration_id'])
             if edit['version_string'] == '1':
