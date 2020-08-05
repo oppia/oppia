@@ -55,19 +55,19 @@ interface VoiceoverContributionOpportunitiesBackendDict {
   'more': boolean;
 }
 
-interface SkillContributionOpportunities {
+export interface SkillContributionOpportunities {
   opportunities: SkillOpportunity[];
   nextCursor: string;
   more: boolean;
 }
 
-interface TranslationContributionOpportunities {
+export interface TranslationContributionOpportunities {
   opportunities: ExplorationOpportunitySummary[];
   nextCursor: string;
   more: boolean;
 }
 
-interface VoiceoverContributionOpportunities {
+export interface VoiceoverContributionOpportunities {
   opportunities: ExplorationOpportunitySummary[];
   nextCursor: string;
   more: boolean;

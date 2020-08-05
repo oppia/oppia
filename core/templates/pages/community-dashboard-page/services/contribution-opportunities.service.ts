@@ -20,32 +20,18 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ContributionOpportunitiesBackendApiService } from
-  // eslint-disable-next-line max-len
-  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ExplorationOpportunitySummary } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { SkillOpportunity } from
   'domain/opportunity/SkillOpportunityObjectFactory';
-
-
-interface SkillContributionOpportunities {
-  opportunities: SkillOpportunity[];
-  nextCursor: string;
-  more: boolean;
-}
-
-interface TranslationContributionOpportunities {
-  opportunities: ExplorationOpportunitySummary[];
-  nextCursor: string;
-  more: boolean;
-}
-
-interface VoiceoverContributionOpportunities {
-  opportunities: ExplorationOpportunitySummary[];
-  nextCursor: string;
-  more: boolean;
-}
+import { 
+  ContributionOpportunitiesBackendApiService,
+  SkillContributionOpportunities,
+  TranslationContributionOpportunities,
+  VoiceoverContributionOpportunities
+} from
+  // eslint-disable-next-line max-len
+  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
