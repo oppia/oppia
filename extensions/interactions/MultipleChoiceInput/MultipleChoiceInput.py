@@ -54,8 +54,8 @@ class MultipleChoiceInput(base.BaseInteraction):
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,
-                        'placeholder':
-                            'Enter an option for the learner to select',
+                        'placeholder': (
+                            'Enter an option for the learner to select'),
                     }
                 }
             },

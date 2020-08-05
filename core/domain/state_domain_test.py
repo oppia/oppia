@@ -3677,7 +3677,7 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
                 value: SubtitledHtml|SubtitledUnicode. The value in the
                     customization argument value to be converted.
                 unused_schema_obj_type: str. The schema obj_type for the
-                    customization argument value, which is one
+                    customization argument value, which is one of
                     'SubtitledUnicode' or 'SubtitledHtml'.
 
             Returns:

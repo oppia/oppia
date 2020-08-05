@@ -57,8 +57,8 @@ class DragAndDropSortInput(base.BaseInteraction):
                 'replacement_ui_config': {
                     'html': {
                         'hide_complex_extensions': True,
-                        'placeholder': 'Enter an option for the learner to ' +
-                                       'drag and drop.',
+                        'placeholder': (
+                            'Enter an option for the learner to drag and drop.')
                     }
                 }
             },

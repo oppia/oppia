@@ -135,13 +135,16 @@ class Html(BaseObject):
 class SubtitledUnicode(BaseObject):
     """SubtitledUnicode class."""
 
-    description = 'An dictionary with properties content id and unicode.'
+    description = 'A dictionary with properties "content_id" and "unicode".'
 
     SCHEMA = {
         'type': 'dict',
         'properties': [{
             'name': 'content_id',
             'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledUnicode in state_domain
+                # has validation checks for this).
                 'type': 'unicode_or_none'
             }
         }, {
@@ -156,13 +159,16 @@ class SubtitledUnicode(BaseObject):
 class SubtitledHtml(BaseObject):
     """SubtitledHtml class."""
 
-    description = 'An dictionary with properties content id and html.'
+    description = 'A dictionary with properties "content_id" and "html".'
 
     SCHEMA = {
         'type': 'dict',
         'properties': [{
             'name': 'content_id',
             'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledHtml in state_domain
+                # has validation checks for this).
                 'type': 'unicode_or_none'
             }
         }, {

@@ -794,7 +794,7 @@ describe('Interaction object factory', () => {
           id: interactionId,
           solution: solutionDict
         });
-      }).not.toThrowError(`Unrecognized interaction id ${interactionId}`);
+      }).not.toThrow();
     });
   });
 });

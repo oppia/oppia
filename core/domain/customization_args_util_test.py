@@ -357,17 +357,24 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
     def test_frontend_customization_args_defs_coverage(self):
         """Test to ensure that customization-args-defs.ts has frontend and
-        backend interfaces for customization arguments for each interaction.
+        backend interfaces for customization arguments for each interaction. Ie
+        for each interaction with id 'X', there exists an interface in
+        customization-args-defs.ts named XCustomizationArgs and
+        XCustomizationArgsBackendDict.
         """
         filepath = os.path.join(
             feconf.INTERACTIONS_DIR, 'customization-args-defs.ts')
         with python_utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
-        actual_interaction_ca_backend_interfaces = set()
-        actual_interaction_ca_frontend_interfaces = set()
+        all_interaction_ids = (
+            set(interaction_registry.Registry.get_all_interaction_ids()))
+        interaction_ids_with_ca_backend_interfaces = set()
+        interaction_ids_with_ca_frontend_interfaces = set()
 
         for line in lines:
+            # Search for XCustomizationArgsBackendDict interfaces and extract X,
+            # where X is a interaction id.
             # Group 1: The characters 'interface'.
             # Group 2: The interaction id.
             # Group 3: The characters 'CustomizationArgsBackendDict'.
@@ -377,9 +384,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                     line
                 ))
             if ca_backend_interface_match:
-                actual_interaction_ca_backend_interfaces.add(
+                interaction_ids_with_ca_backend_interfaces.add(
                     ca_backend_interface_match.group(2))
 
+            # Search for XCustomizationArgs interfaces and extract X,
+            # where X is a interaction id.
             # Group 1: The characters 'interface'.
             # Group 2: The interaction id.
             # Group 3: The characters 'CustomizationArgs'.
@@ -390,25 +399,25 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                     line
                 ))
             if ca_frontend_interface_match:
-                actual_interaction_ca_frontend_interfaces.add(
+                interaction_ids_with_ca_frontend_interfaces.add(
                     ca_frontend_interface_match.group(2))
 
-        expected_interaction_ca_interfaces = (
-            set(interaction_registry.Registry.get_all_interaction_ids()))
+        self.assertTrue(len(interaction_ids_with_ca_backend_interfaces) > 0)
+        self.assertEqual(
+            all_interaction_ids,
+            interaction_ids_with_ca_backend_interfaces)
 
+        self.assertTrue(len(interaction_ids_with_ca_frontend_interfaces) > 0)
         self.assertEqual(
-            expected_interaction_ca_interfaces,
-            actual_interaction_ca_backend_interfaces)
-        self.assertEqual(
-            expected_interaction_ca_interfaces,
-            actual_interaction_ca_frontend_interfaces)
+            all_interaction_ids,
+            interaction_ids_with_ca_frontend_interfaces)
 
     def test_frontend_customization_args_constructor_coverage(self):
         """Test to ensure that InteractionObjectFactory.ts covers constructing
         customization arguments for each interaction. Uses regex to confirm
         that the CustomizationArgs interface is imported for each interaction
         id, and that the CustomizationArgs or CustomizationArgsBackendDict
-        interface is used in the file to typecast.
+        interface is used in the file to typecast customization arguments.
         """
         filepath = os.path.join(
             'core', 'templates', 'domain', 'exploration',
@@ -416,22 +425,15 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         with python_utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 
-        imported_interaction_ca_frontend_interfaces = set()
-        used_interaction_ca_frontend_interfaces = set()
+        all_interaction_ids = (
+            set(interaction_registry.Registry.get_all_interaction_ids()))
+        interaction_ids_with_used_ca_frontend_interfaces = set()
 
         for line in lines:
-            # Group 1: The interaction id.
-            # Group 2: The characters 'CustomizationArgs'.
-            # Group 3: A comma or a new line character.
-            imported_match = (
-                re.search(
-                    r'([a-zA-Z]+)(CustomizationArgs)(,|\n)',
-                    line
-                ))
-            if imported_match:
-                imported_interaction_ca_frontend_interfaces.add(
-                    imported_match.group(1))
-
+            # Checks that the customization args interfaces are being used
+            # to typecast the customization args. Matches patterns
+            # <XCustomizationArgs> or <XCustomizationArgsBackendDict> where
+            # X is a interaction id.
             # Group 1: The character '<'.
             # Group 2: The interaction id.
             # Group 3: The characters 'CustomizationArgs'.
@@ -443,21 +445,9 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                     line
                 ))
             if used_match:
-                used_interaction_ca_frontend_interfaces.add(
+                interaction_ids_with_used_ca_frontend_interfaces.add(
                     used_match.group(2))
 
-        all_interaction_ids = (
-            set(interaction_registry.Registry.get_all_interaction_ids()))
-
-        # We use issubset here because there may be extra elements in
-        # imported_interaction_ca_frontend_interfaces. For example,
-        # InteractionCustomizationArgs gets captured by the regex but
-        # Interaction is not an interaction id.
-        self.assertTrue(
-            set.issubset(
-                all_interaction_ids,
-                imported_interaction_ca_frontend_interfaces)
-        )
         self.assertEqual(
             all_interaction_ids,
-            used_interaction_ca_frontend_interfaces)
+            interaction_ids_with_used_ca_frontend_interfaces)

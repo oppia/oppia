@@ -22,7 +22,7 @@ import { CustomSchema } from 'services/schema-default-value.service';
 
 interface ObjectEditorCustomScope extends ng.IScope {
   objType?: string;
-  schema?: CustomSchema;
+  schema: CustomSchema;
   initArgs?: Object;
   getInitArgs?: (() => Object);
   alwaysEditable?: boolean;
@@ -40,7 +40,7 @@ angular.module('oppia').directive('objectEditor', [
         initArgs: '=',
         isEditable: '@',
         objType: '@',
-        schema: '=',
+        getSchema: '&schema',
         value: '='
       },
       link: function(scope: ObjectEditorCustomScope, element) {
@@ -56,9 +56,6 @@ angular.module('oppia').directive('objectEditor', [
         };
         scope.getIsEditable = function() {
           return scope.isEditable;
-        };
-        scope.getSchema = function() {
-          return scope.schema;
         };
         if (directiveName) {
           element.html(
