@@ -139,6 +139,10 @@ def create_message(
         received_via_email: bool. Whether new message is received via email or
             web.
 
+    Returns:
+        FeedbackMessage. The domain object representing the new message added in
+        the datastore.
+
     Raises:
         Exception. GeneralFeedbackThreadModel entity not found.
     """
@@ -304,6 +308,8 @@ def create_messages(
         subscription_services.subscribe_to_threads(author_id, thread_ids)
         add_message_ids_to_read_by_list(author_id, message_identifiers)
 
+    return _get_message_from_model(message)
+
 
 def update_messages_read_by_the_user(user_id, thread_id, message_ids):
     """Replaces the list of message ids read by the message ids given to the
@@ -338,7 +344,7 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     # Extract the thread_ids and message_ids from the
     # FullyQualifiedMessageIdentifier objects.
     thread_ids = [
-        message_identifier.thread_id for message_identifier 
+        message_identifier.thread_id for message_identifier
         in message_identifiers
     ]
     message_ids = [

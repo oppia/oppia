@@ -235,6 +235,7 @@ def mark_review_completed(suggestion, status, reviewer_id):
     """
     mark_multiple_reviews_completed([suggestion], status, reviewer_id)
 
+
 def mark_multiple_reviews_completed(
         suggestions, status, reviewer_id):
     """Marks that multiple reviews have been completed.
