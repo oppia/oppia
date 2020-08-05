@@ -270,7 +270,7 @@ def main(args=None):
     if not common.is_windows_os():
         # Redis does not run on Windows machines.
         python_utils.PRINT('Starting Redis development server.')
-        #Use daemonize argument to prevent redis-server from exiting
+        # Use daemonize argument to prevent redis-server from exiting
         # on its own.
         subprocess.call([
             './third_party/redis-cli-6.0.6/src/redis-server',

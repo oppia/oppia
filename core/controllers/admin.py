@@ -963,8 +963,10 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
         else:
             raise self.InvalidInputException('This app cannot send emails.')
 
+
 class MemoryCacheHandler(base.BaseHandler):
     """Handler for the memory cache."""
+
     @acl_decorators.can_access_admin_page
     def post(self):
         caching_services.flush_memory_cache()
@@ -978,6 +980,7 @@ class MemoryCacheHandler(base.BaseHandler):
             'peak_allocation': memory_stats['peak_memory_usage_in_bytes'],
             'total_keys_stored': memory_stats['total_number_of_keys_stored']
         })
+
 
 class UpdateUsernameHandler(base.BaseHandler):
     """Handler for renaming usernames."""
