@@ -620,7 +620,9 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
                 'number_of_explorations_left_to_update': '%d' % (
                     number_of_explorations_left_to_update)
             })
-
+        else:
+            raise self.InvalidInputException(
+                'Please specify a valid type of item to fetch.')
 
     @acl_decorators.can_access_admin_page
     def post(self):
