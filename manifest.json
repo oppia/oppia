@@ -201,10 +201,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/marceljuenemann/angular-drag-and-drop-lists/archive/2.1.0.zip",
         "rootDirPrefix": "angular-drag-and-drop-lists-",
-        "targetDirPrefix": "angular-drag-and-drop-lists-",
-        "bundle": {
-          "js": ["angular-drag-and-drop-lists.min.js"]
-        }
+        "targetDirPrefix": "angular-drag-and-drop-lists-"
       },
       "angularStorageCookiesRev": {
         "version": "2.18.1",
