@@ -21,7 +21,7 @@ import 'zone.js';
 
 angular.module('oppia', [
   'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
+  require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
   'ui.validate'

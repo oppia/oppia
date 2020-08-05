@@ -155,10 +155,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
         "rootDirPrefix": "ngAudio-",
-        "targetDirPrefix": "angular-audio-",
-        "bundle": {
-          "js": ["app/angular.audio.js"]
-        }
+        "targetDirPrefix": "angular-audio-"
       },
       "lamejs": {
         "version": "1.2.0",

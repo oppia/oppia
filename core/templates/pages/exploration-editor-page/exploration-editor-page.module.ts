@@ -19,6 +19,8 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/ng-audio.import';
+
 angular.module('oppia', [
   'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
