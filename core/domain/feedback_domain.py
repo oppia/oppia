@@ -160,43 +160,19 @@ class FeedbackMessage(python_utils.OBJECT):
         self.last_updated = last_updated
         self.received_via_email = received_via_email
 
-    @property
-    def entity_id(self):
-        """Returns the entity ID corresponding to this FeedbackMessage instance.
 
-        Returns:
-            str. The entity_id.
-        """
-        return self.id.split('.')[1]
+class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
+    """Domain object for keeping track of (thread_id, message_id) pairs in the
+    GeneralFeedbackMessageModel.
 
-    @property
-    def entity_type(self):
-        """Returns the entity type corresponding to this FeedbackMessage
-        instance.
+    Attributes:
+        thread_id: str. The ID of the thread.
+        message_id: str. The ID of a message beloning to the thread.
+    """
 
-        Returns:
-            str. The entity_type.
-        """
-        return self.id.split('.')[0]
-
-    def to_dict(self):
-        """Returns a dict representation of this FeedbackMessage object.
-
-        Returns:
-            dict. Dict representation of the FeedbackMessage object.
-        """
-        return {
-            'author_username': (
-                user_services.get_username(self.author_id)
-                if self.author_id else None),
-            'created_on_msecs': utils.get_time_in_millisecs(self.created_on),
-            'entity_type': self.entity_type,
-            'entity_id': self.entity_id,
-            'message_id': self.message_id,
-            'text': self.text,
-            'updated_status': self.updated_status,
-            'updated_subject': self.updated_subject
-        }
+    def __init__(self, thread_id, message_id):
+        self.thread_id = thread_id
+        self.message_id = message_id
 
 
 class FeedbackAnalytics(python_utils.OBJECT):

@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import types
 
+from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
@@ -190,7 +191,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             feedback_models.GeneralFeedbackMessageModel.create(
-                thread_id, '0')
+                feedback_domain.FullyQualifiedMessageIdentifier(
+                thread_id, '0'))
 
     def test_create_multi_raises_exception_for_invalid_arg_lengths(self):
         test_thread_ids = ['thread_id_1']

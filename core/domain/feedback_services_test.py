@@ -79,13 +79,37 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         # stop, followed by the message id.
         self.assertEqual(datastore_id, '%s.%s' % (thread_id, message_id))
 
-    def test_create_message_fails_if_invalid_thread_id(self):
+    def test_create_message_raises_exception_for_invalid_thread_id(self):
+        thread_id = 'invalid_thread_id'
+
+        expected_exception_regexp = (
+            r'Thread belonging to the GeneralFeedbackThreadModel class '
+            r'with id:\[%s\] was not found.' % (thread_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            feedback_services.create_message(
+                thread_id, self.user_id, None, None, 'Hello')
+
+    def test_create_messages_raises_pluralized_exception_for_bad_thread_ids(self):
+        thread_ids = ['invalid_thread_id_1', 'invalid_thread_id_2']
+
+        expected_exception_regexp = (
+            r'Threads belonging to the GeneralFeedbackThreadModel class '
+            r'with ids:\[%s\] were not found.' % (' '.join(thread_ids))
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            feedback_services.create_messages(
+                thread_ids, self.user_id, None, None, 'Hello')
+
+    def test_create_messages_raises_an_exception_if_thread_ids_are_not_unique(
+            self):
+        repeated_thread_ids = ['thread_id', 'thread_id']
+   
         with self.assertRaisesRegexp(
             Exception,
-            r'Thread\(s\) belonging to the GeneralFeedbackThreadModel class '
-            r'with id\(s\):\[invalid_thread_id\] were not found.'):
-            feedback_services.create_message(
-                'invalid_thread_id', self.user_id, None, None, 'Hello')
+            'Thread ids must be distinct when calling create_messsages.'):
+            feedback_services.create_messages(
+                repeated_thread_ids, self.user_id, None, None, 'Hello')
 
     def test_status_of_newly_created_thread_is_open(self):
         exp_id = '0'
@@ -407,6 +431,54 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Check if the message is added to the read section of the viewer.
         self.assertEqual(self._get_all_messages_read(
             self.viewer_id, thread_id), message_ids)
+
+    def test_add_message_ids_to_read_by_list_adds_msgs_to_threads_in_order(
+            self):
+        """add_message_ids_to_read_by_list adds message_ids to the
+        GeneralFeedbackThreadUserModel message_ids_read_by_user property for
+        each thread. The GeneralFeedbackThreadUserModel may or may not already
+        exist for the thread. This test tests that we are adding the right
+        message_ids to the corresponding threads when there are some threads
+        that are already created before the method is called and some that will
+        be created in the method call itself.
+        """
+        sample_message_ids = [1, 2, 3]
+        sample_thread_ids = [
+            'sample_thread_id_1', 'sample_thread_id_2',
+            'sample_thread_id_3'
+        ]
+        # The GeneralFeedbackThreadUserModel is created for the
+        # sample_thread_id_1 and sample_thread_id_3 thread ids.
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            self.user_id, sample_thread_ids[0])
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            self.user_id, sample_thread_ids[2])
+        # Assert that no messages are read for any of the threads yet.
+        for sample_thread_id in sample_thread_ids:
+            self.assertEqual(
+                self._get_all_messages_read(self.user_id, sample_thread_id),[])
+        # Create a list of FullyQualifiedMessageIdentifier objects for the
+        # sample_message_ids and sample_thread_ids.
+        message_identifiers = []
+        for sample_thread_id, sample_message_id in python_utils.ZIP(
+                sample_thread_ids, sample_message_ids):
+            message_identifiers.append(
+                feedback_domain.FullyQualifiedMessageIdentifier(
+                sample_thread_id, sample_message_id))
+
+        # In the add_message_ids_to_read_by_list method, the
+        # GeneralFeedbackUserModel is created for thread id
+        # sample_thread_id_2. 
+        feedback_services.add_message_ids_to_read_by_list(
+            self.user_id, message_identifiers)
+
+        # Assert tht the message_ids were added to message_ids_read_by_user
+        # property of the corresponding thread.
+        for sample_thread_id, sample_message_id in python_utils.ZIP(
+                sample_thread_ids, sample_message_ids):
+            self.assertEqual(
+                self._get_all_messages_read(self.user_id, sample_thread_id),
+                [sample_message_id])
 
     def test_only_exploration_threads_trigger_events(self):
         exp_id = 'eid'
