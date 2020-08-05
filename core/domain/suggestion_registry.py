@@ -691,7 +691,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_services.create_new_question_skill_link(
             self.author_id, question_dict['id'], self.change.skill_id,
             self._get_skill_difficulty())
-        #TODO: delete opportunity if progress is 100%
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""

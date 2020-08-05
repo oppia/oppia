@@ -70,11 +70,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
-            print exp.id
-            for state in exp.states.values():
-                print state.written_translations.to_dict()
-
-        for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -317,6 +312,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
+        # content_count is 0 since the exploration state translation mappings
+        # contents are empty:
+        # {u'translations_mapping': {u'content': {}, u'default_outcome': {}}}
+        # {u'translations_mapping': {u'content': {}}}
         self.assertEqual(translation_opportunities[0].content_count, 0)
 
         answer_group_dict = {
@@ -388,6 +387,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 })], 'Add state name')
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
+        # Translation opportunity gets deleted upon update as translation count
+        # >= content_count.
         self.assertEqual(len(translation_opportunities), 0)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):

@@ -241,8 +241,8 @@ def update_opportunity_with_updated_exploration(exp_id):
 
     # After all available content has been translated, delete the opportunity.
     if (
-        exploration_opportunity_summary.translation_counts >=
-        exploration_opportunity_summary.content_count
+            exploration_opportunity_summary.translation_counts >=
+            exploration_opportunity_summary.content_count
     ):
         delete_exploration_opportunities([exp_id])
     else:
@@ -656,7 +656,7 @@ def delete_skill_opportunities(skill_ids):
     skill_ids.
 
     Args:
-        skill_id: list(str). A list of skill_id IDs whose opportunity models
+        skill_ids: list(str). A list of skill_id IDs whose opportunity models
             are to be deleted.
     """
     skill_opportunity_models = (
