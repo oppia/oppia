@@ -138,11 +138,13 @@ export class CommandExecutorService {
       this.setElementsOnPage = 0;
     }
     for (var i = 0; i < elements.length; i++) {
-      var box;
       if (this.setElementsOnPage === 0) {
         var box = windowRef.nativeWindow.document.querySelector(
-          '.form-control');
+          '.form-control') as HTMLInputElement;
         box.value = elements[i];
+        var evt = document.createEvent('HTMLEvents');
+        evt.initEvent('change', false, true);
+        box.dispatchEvent(evt);
         this.setElementsOnPage += 1;
       } else {
         var addButton = windowRef.nativeWindow.document.querySelectorAll(
@@ -151,12 +153,12 @@ export class CommandExecutorService {
         addButton.click();
         this.setElementsOnPage += 1;
         var box = windowRef.nativeWindow.document.querySelectorAll(
-          '.form-control')[this.setElementsOnPage - 1];
+          '.form-control')[this.setElementsOnPage - 1] as HTMLInputElement;
         box.value = elements[i];
+        var evt = document.createEvent('HTMLEvents');
+        evt.initEvent('change', false, true);
+        box.dispatchEvent(evt);
       }
-      var evt = document.createEvent('HTMLEvents');
-      evt.initEvent('change', false, true);
-      box.dispatchEvent(evt);
     }
   }
 

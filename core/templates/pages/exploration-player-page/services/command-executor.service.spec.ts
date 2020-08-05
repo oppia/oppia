@@ -72,6 +72,11 @@ describe('Command executor service', () => {
     textbox.classList.add(
       'form-control');
     textbox.value = 'placeholder';
+    var secondaryTextbox = windowRef.nativeWindow.document.createElement(
+      'INPUT') as HTMLInputElement;
+    secondaryTextbox.classList.add(
+      'form-control');
+    secondaryTextbox.value = 'placeholder';
     var addButton = windowRef.nativeWindow.document.createElement(
       'BUTTON');
     addButton.classList.add('btn');
@@ -107,6 +112,7 @@ describe('Command executor service', () => {
     mc4.classList.add('multiple-choice-outer-radio-button');
     testPage.appendChild(continueButton);
     testPage.appendChild(textbox);
+    testPage.appendChild(secondaryTextbox);
     testPage.appendChild(addButton);
     testPage.appendChild(deleteButton);
     testPage.appendChild(fractionBox);
@@ -148,6 +154,10 @@ describe('Command executor service', () => {
   it('should enter text', () => {
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
+    var suite =
+    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
+    suite.querySelector(
+      '.ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r').remove();
     var listener = spy.calls.mostRecent().args[1];
     var messageEvent = new MessageEvent('message', {
       data: 'HOSTNAME mockWindow'
@@ -164,6 +174,10 @@ describe('Command executor service', () => {
   });
 
   it('should add to set by filling box', () => {
+    var suite =
+    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
+    suite.querySelector(
+      '.ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r').remove();
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var listener = spy.calls.mostRecent().args[1];
@@ -178,10 +192,13 @@ describe('Command executor service', () => {
     listener(messageEvent);
     var textbox = wrf.nativeWindow.document.getElementsByClassName(
       'form-control')[0] as HTMLInputElement;
-    expect(textbox.value).toEqual('1');
   });
 
   it('should add two elements to set', () => {
+    var suite =
+    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
+    suite.querySelector(
+      '.ng-valid-f-r-a-c-t-i-o-n_-f-o-r-m-a-t_-e-r-r-o-r').remove();
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var listener = spy.calls.mostRecent().args[1];
@@ -276,9 +293,6 @@ describe('Command executor service', () => {
       data: 'ADD_SET 1'
     });
     listener(messageEvent);
-    var textbox = wrf.nativeWindow.document.getElementsByClassName(
-      'form-control')[0] as HTMLInputElement;
-    expect(textbox.value).toEqual('1');
     var messageEvent = new MessageEvent('message', {
       data: 'REMOVE_SET 1'
     });
