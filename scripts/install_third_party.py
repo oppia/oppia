@@ -384,7 +384,7 @@ def install_redis_cli():
             # without modifying anything outside of the oppia root directory.
             # It will build the redis-cli and redis-server files so that we can
             # run the server from inside the oppia folder by executing the
-            # script src/redis-cli and src/redis-server,
+            # script src/redis-cli and src/redis-server.
             subprocess.call(['make'])
 
         # Make the scripts executable.

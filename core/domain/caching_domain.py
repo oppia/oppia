@@ -26,6 +26,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import python_utils
 
+
 class MemoryStats(python_utils.OBJECT):
     """Domain object for an Oppia memory profile object that contains
     information about the memory cache.
