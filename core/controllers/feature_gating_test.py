@@ -18,8 +18,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import platform_parameter_domain as param_domain
 from core.domain import feature_gating_services as feature_services
+from core.domain import platform_parameter_domain as param_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
 from core.tests import test_utils
