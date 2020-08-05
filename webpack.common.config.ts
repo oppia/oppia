@@ -680,17 +680,12 @@ module.exports = {
         path.resolve(__dirname, 'typings')
       ],
       use: [
-        {
-          loader: 'cache-loader'
-        },
-        {
-          loader: 'thread-loader'
-        },
+        'cache-loader',
         {
           loader: 'ts-loader',
           options: {
-            // This is needed for thread-loader to work correctly.
-            happyPackMode: true
+            // Typescript checks do the type checking.
+            transpileOnly: true
           }
         },
         {
@@ -708,9 +703,7 @@ module.exports = {
     {
       test: /(directive|component)\.html$/,
       use: [
-        {
-          loader: 'cache-loader'
-        },
+        'cache-loader',
         {
           loader: 'html-loader',
           options: {
