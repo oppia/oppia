@@ -27,7 +27,6 @@ from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
 import feconf
-import python_utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -214,10 +213,8 @@ def _update_suggestions(suggestions):
         suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
     )
 
-    for suggestion_model in suggestion_models_to_update:
-        suggestion = python_utils.NEXT(
-            suggestion for suggestion in suggestions
-            if suggestion.suggestion_id == suggestion_model.id)
+    for index, suggestion_model in enumerate(suggestion_models_to_update):
+        suggestion = suggestions[index]
         suggestion_model.status = suggestion.status
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
         suggestion_model.change_cmd = suggestion.change.to_dict()
@@ -236,15 +233,29 @@ def mark_review_completed(suggestion, status, reviewer_id):
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
+    mark_multiple_reviews_completed([suggestion], status, reviewer_id)
+
+
+def mark_multiple_reviews_completed(
+        suggestions, status, reviewer_id):
+    """Marks that multiple reviews have been completed.
+
+    Args:
+        suggestions: list(Suggestion). The suggestions to be updated.
+        status: str. The status of the suggestions post review. Possible values
+            are STATUS_ACCEPTED or STATUS_REJECTED.
+        reviewer_id: str. The ID of the user who completed the reviews.
+    """
     if status not in [
             suggestion_models.STATUS_ACCEPTED,
             suggestion_models.STATUS_REJECTED]:
         raise Exception('Invalid status after review.')
 
-    suggestion.status = status
-    suggestion.final_reviewer_id = reviewer_id
+    for suggestion in suggestions:
+        suggestion.status = status
+        suggestion.final_reviewer_id = reviewer_id
 
-    _update_suggestion(suggestion)
+    _update_suggestions(suggestions)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -365,11 +376,9 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
     if not review_message:
         raise Exception('Review message cannot be empty.')
 
-    for suggestion in suggestions:
-        suggestion.status = suggestion_models.STATUS_REJECTED
-        suggestion.final_reviewer_id = reviewer_id
-
-    _update_suggestions(suggestions)
+    mark_multiple_reviews_completed(
+        suggestions, suggestion_models.STATUS_REJECTED, reviewer_id
+    )
 
     thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
     feedback_services.create_messages(
@@ -378,7 +387,7 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
     )
 
 
-def auto_reject_question_suggestions_with_skill_target_id(skill_id):
+def auto_reject_question_suggestions_for_skill_id(skill_id):
     """Rejects all SuggestionAddQuestions with target ID matching the supplied
     skill ID. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
 
@@ -399,7 +408,7 @@ def auto_reject_question_suggestions_with_skill_target_id(skill_id):
         suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
-def auto_reject_translation_suggestions_with_exp_target_ids(exp_ids):
+def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
     """Rejects all translation suggestions with target IDs matching the
     supplied exploration IDs. These suggestions are being rejected because
     their corresponding exploration was removed from a story or the story was

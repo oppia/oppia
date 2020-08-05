@@ -104,8 +104,8 @@ DELETED_SKILL_REJECT_MESSAGE = 'The associated skill no longer exists.'
 
 # The message to be shown when rejecting a translation suggestion that is
 # associated with an exploration that no longer corresponds to the story.
-# The story could be deleted or the exploration could have been
-# removed from the story.
+# The story could have been deleted or the exploration could have been removed
+# from the story.
 INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG = (
     'This text snippet has been removed from the story, and no longer needs '
     'translation. Sorry about that!'
