@@ -4,39 +4,35 @@
       <[$ctrl.getNavbarText()]>
     </div>
     <div class="navbar-icons">
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getTotalWarningsCount()}"
-          ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>"
-          class="nav-item icon nav-list-item"
-          ng-click="$ctrl.selectMainTab()">
-        <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab" tabindex="0">
+      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
+          class = "nav-item icon nav-list-item" style="position: relative">
+        <a href="#" class="nav-link navbar-tab" uib-tooltip="Editor" tooltip-placement="<[$ctrl.countWarnings() ? 'left' : 'bottom']>">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
         </a>
-        <div ng-show="$ctrl.getTotalWarningsCount()"
-             class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+        <div ng-show="$ctrl.countWarnings()" class="oppia-editor-warnings-indicator"
              ng-mouseover="$ctrl.warningsAreShown=true"
              ng-mouseleave="$ctrl.warningsAreShown=false"
-             ng-click="$ctrl.selectMainTab()">
+             ng-class="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
           <span class="oppia-editor-warnings-count">
-            <[$ctrl.getTotalWarningsCount()]>
+            <[$ctrl.countWarnings()]>
           </span>
-          <ul uib-dropdown-menu ng-if="$ctrl.warningsAreShown" class="uib-dropdown-menu topic-warning-container oppia-editor-warnings-box">
+          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" ng-if="$ctrl.warningsAreShown">
             <span class="oppia-editor-warnings-header">Warnings</span>
-            <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.validationIssues track by $index">
+            <li class="oppia-editor-warnings-text" ng-repeat="warning in $ctrl.getWarnings() track by $index">
               <hr class="oppia-editor-warnings-separator">
-              <[issue]>
-            </li>
-            <li class="oppia-editor-warnings-text"
-                ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
-              <hr class="oppia-editor-warnings-separator">
-              <[issue]>
+              <span ng-if="warning.type === 'critical'">
+                <strong><[warning.message]></strong>
+              </span>
+              <span ng-if="warning.type !== 'critical'">
+                <[warning.message]>
+              </span>
             </li>
           </ul>
         </div>
       </li>
 
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'translation'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectTranslationTab()">
-        <a class="nav-link  navbar-tab" uib-tooltip="Translations" tooltip-placement="bottom" tabindex="0">
+        <a class="nav-link navbar-tab" uib-tooltip="Translations" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'translation'}">&#xE029;</i>
         </a>
       </li>
@@ -59,7 +55,7 @@
         </a>
       </li>
 
-      <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'improvements'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectImprovementsTab()">
+      <li  ng-if="$ctrl.isImprovementsTabEnabled() && $ctrl.screenIsLarge" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'improvements'}" class="nav-item icon nav-list-item" ng-click="$ctrl.selectImprovementsTab()">
         <a class="nav-link  navbar-tab" uib-tooltip="Improvements" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'improvements'}">trending_up</i>
         </a>
@@ -75,9 +71,9 @@
         <a class="nav-link  navbar-tab" uib-tooltip="Feedback" tooltip-placement="bottom" tabindex="0">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'feedback'}">&#xE87F;</i>
         </a>
-        <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
+        <div ng-show="$ctrl.getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
           <span class="oppia-exploration-open-threads-count">
-              <[getOpenThreadsCount()]>&nbsp;open
+              <[$ctrl.getOpenThreadsCount()]>
           </span>
         </div>
       </li>
@@ -197,10 +193,34 @@
   exploration-editor-page .navbar-tab-active-icon {
     color: #00609C;
   }
-  exploration-editor-page .topic-warning-container {
+  exploration-editor-page .exploration-editor-warning-box {
     display: block;
   }
 
+  exploration-editor-page .oppia-exploration-open-threads-indicator {
+    border-radius: 50%;
+    bottom: 5px;
+    height: 15px;
+    position: absolute;
+    right: 3px;
+    text-align: center;
+  }
+  exploration-editor-page .oppia-exploration-open-threads-color {
+    background-color: #4078C0;
+  }
+  exploration-editor-page .oppia-exploration-open-threads-count {
+    background-color: #4078C0;
+    border: 1px solid;
+    border-radius: 10px;
+    bottom: 8px;
+    color: white;
+    font-size: 12px;
+    height: 16px;
+    line-height: 16px;
+    padding: 0 5px;
+    position: relative;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
+  }
   @media screen and (max-width: 768px) {
     .navbar-helper {
       display: none;

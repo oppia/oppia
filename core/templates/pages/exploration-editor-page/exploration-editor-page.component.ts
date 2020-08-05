@@ -148,12 +148,15 @@ require('services/state-top-answers-stats.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/bottom-navbar-status.service.ts');
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
     '$q', '$scope', '$rootScope', '$templateCache', '$timeout', '$uibModal',
-    'AutosaveInfoModalsService', 'ChangeListService', 'ContextService',
+    'AutosaveInfoModalsService', 'BottomNavbarStatusService',
+    'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
@@ -169,10 +172,12 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+    'WindowDimensionsService',
     'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
         $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
-        AutosaveInfoModalsService, ChangeListService, ContextService,
+        AutosaveInfoModalsService, BottomNavbarStatusService,
+        ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
@@ -188,6 +193,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
+        WindowDimensionsService,
         EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
@@ -494,6 +500,8 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.$onInit = function() {
         $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
+        ctrl.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
+        BottomNavbarStatusService.markBottomNavbarStatus(true);
         $scope.$on('refreshGraph', function() {
           GraphDataService.recompute();
           ExplorationWarningsService.updateWarnings();
