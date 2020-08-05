@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak">
+<ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right ng-cloak">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
       <button class="btn btn-light oppia-save-changes-button protractor-test-save-story-button"
@@ -51,9 +51,207 @@
     </button>
   </li>
 </ul>
+<div class="story-nav-mobile">
+  <div class="story-navbar-mobile-tabs">
+    <div class="story-nav-dropdown-container">
+      <div class="story-nav-story-nav-dropdown-options" ng-if="showNavigationOptions">
+        <div class="story-nav-dropdown-option" ng-click="selectMainTab()">
+          <i class="material-icons">&#xE254;</i><span>Editor</span>
+        </div>
+        <div class="story-nav-dropdown-option" ng-click="selectPreviewTab()">
+          <i class="material-icons">&#xE037;</i><span>Preview</span>
+        </div>
+      </div>
+      <div>
+        <div ng-if="warningsAreShown" class="warning-box">
+          <span>Warnings</span>
+          <div ng-repeat="issue in validationIssues track by $index">
+            <hr class="oppia-editor-warnings-separator">
+            <[issue]>
+          </div>
+          <div ng-repeat="issue in prepublishValidationIssues track by $index">
+            <hr class="oppia-editor-warnings-separator">
+            <[issue]>
+          </div>
+        </div>
+      </div>
+      <div class="story-nav-dropdown-content">
+        <div class="story-nav-dropdown-text" ng-click="toggleWarningText()">
+          <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
+          <span><[activeTab]></span>
+          <span ng-if="getTotalWarningsCount()">(<[getTotalWarningsCount()]> <i class="fa fa-exclamation-triangle error-icon"></i>)</span>
+        </div>
+        <div class="story-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
+          <i class="fa fa-caret-down"></i>
+        </div>
+      </div>
+    </div>
+    <div class="story-nav-dropdown-container save-options-dropdown">
+      <div class="story-nav-story-nav-dropdown-options" ng-if="showStoryEditOptions">
+        <div class="story-nav-dropdown-option" ng-click="discardChanges()">
+          <i class="material-icons">&#xE254;</i>
+          <span>Discard Changes</span>
+        </div>
+        <div class="story-nav-dropdown-option">
+          <div ng-if="!isStoryPublished()"
+               ng-click="publishStory()"
+               ng-disabled="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+            <i class="material-icons">&#xE254;</i>
+            <span>Publish Story</span>
+          </div>
+          <div ng-click="unpublishStory()"
+               ng-if="isStoryPublished()"
+               ng-disabled="isStorySaveable()">
+            <i class="material-icons">&#xE254;</i>
+            <span>Unpublish Story</span>
+          </div>
+        </div>
+      </div>
+      <div class="story-nav-dropdown-content right-container">
+        <div class="story-nav-dropdown-text" ng-disabled="!isStorySaveable()" ng-click="saveChanges()">
+          <span ng-if="isSaveInProgress()">
+            <span>Saving</span>
+          </span>
+          <span ng-if="!isSaveInProgress()">
+            Save Changes
+          </span>
+          <span ng-if="getChangeListLength() > 0">
+            (<[getChangeListLength()]>)
+          </span>
+        </div>
+        <div class="story-nav-dropdown-icon" ng-click="toggleStoryEditOptions()">
+          <i class="fa fa-caret-down"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <style>
   .oppia-editor-warnings-text {
     width: 100%;
     word-wrap: break-word;
+  }
+  story-editor-navbar .icon {
+    width: 3.5em;
+  }
+  story-editor-navbar .icon .material-icons {
+    font-size: 1.4em;
+    margin-left: 0.3vw;
+  }
+  story-editor-navbar .story-nav-mobile {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    story-editor-navbar .navbar-desktop li {
+      display: none;
+    }
+    story-editor-navbar .story-nav-mobile {
+      display: block;
+    }
+    story-editor-navbar .story-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    story-editor-navbar .save-change-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    story-editor-navbar .save-changes-btn {
+      background-color: #008098;
+      color: #FFFFFF;
+      font-weight: bold;
+      width: 80%;
+    }
+    story-editor-navbar .discard-changes-btn {
+      background-color: #008098;
+      bottom: 47px;
+      color: #FFFFFF;
+      font-weight: bold;
+      left: 12px;
+      position: absolute;
+      width: 144px;
+    }
+    story-editor-navbar .btn-publish-topic {
+      background-color: white;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+    .arrow-up-container {
+      align-items: center;
+      background-color: #FFFFFF;
+      border: 1px solid #808080;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      width: 20%;
+    }
+    .arrow-up-container i {
+      color: #008098;
+    }
+    .publish-button-container {
+      width: 40%;
+    }
+    .publish-button-container button {
+      width: 100%;
+    }
+    story-editor-navbar .story-nav-dropdown-container {
+      position: relative;
+      text-align: left;
+      width: 45%;
+    }
+    story-editor-navbar .story-nav-story-nav-dropdown-options {
+      background-color: #FFF;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+      width: 100%;
+    }
+    story-editor-navbar .story-nav-dropdown-content {
+      background-color: #FFF;
+      border: 1.5px solid #6d6969;
+      border-radius: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    story-editor-navbar .right-container {
+      background-color: #419889;
+      color: #FFF;
+    }
+
+    story-editor-navbar .story-nav-dropdown-option {
+      padding: 5px 0;
+    }
+
+    story-editor-navbar .story-nav-dropdown-icon {
+      align-items: center;
+      background-color: #e6e6e6;
+      border-left: 1.5px solid #6d6969;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: 20%;
+    }
+    story-editor-navbar .story-nav-dropdown-text {
+      padding: 5px 10px;
+    }
+    story-editor-navbar .save-options-dropdown {
+      width: 52%;
+    }
+    story-editor-navbar .warning-box {
+      background-color: #f5f55a;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+    }
+    story-editor-navbar .error-icon {
+      background-color: #f5f55a;
+    }
   }
 </style>

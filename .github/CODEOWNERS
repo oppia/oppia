@@ -150,6 +150,7 @@
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
+/scripts/linters/ts_ignore_exceptions.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
 
 
@@ -322,7 +323,6 @@
 
 
 # Navigation bar project.
-/core/templates/domain/bottom_navbar/ @nithusha21 @showtim3
 /core/templates/domain/sidebar/ @nithusha21
 /core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
 /core/templates/components/button-directives/create-activity-button.directive.html @nithusha21

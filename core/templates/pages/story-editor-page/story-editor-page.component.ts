@@ -39,24 +39,29 @@ require(
   'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('services/bottom-navbar-status.service.ts');
+require('services/page-title.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
-    '$scope', '$uibModal', '$window', 'EditableStoryBackendApiService',
+    '$scope', '$uibModal', '$window', 'BottomNavbarStatusService',
+    'EditableStoryBackendApiService',
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
-    'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
     'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
     function(
-        $scope, $uibModal, $window, EditableStoryBackendApiService,
+        $scope, $uibModal, $window, BottomNavbarStatusService,
+        EditableStoryBackendApiService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
         UrlInterpolationService, UrlService,
-        EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
         EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
       ctrl.returnToTopicEditorPage = function() {
         if (UndoRedoService.getChangeCount() > 0) {
@@ -85,6 +90,8 @@ angular.module('oppia').component('storyEditorPage', {
       var setPageTitle = function() {
         PageTitleService.setPageTitle(
           StoryEditorStateService.getStory().getTitle() + ' - Oppia');
+        PageTitleService.setPageSubtitleForMobileView(
+          StoryEditorStateService.getStory().getTitle());
       };
 
       ctrl.getActiveTab = function() {
@@ -176,20 +183,36 @@ angular.module('oppia').component('storyEditorPage', {
       };
 
       ctrl.$onInit = function() {
+        ctrl.directiveSubscriptions.add(
+          StoryEditorStateService.onStoryInitialized.subscribe(
+            () => _initPage()
+          ));
+        ctrl.directiveSubscriptions.add(
+          StoryEditorStateService.onStoryReinitialized.subscribe(
+            () => _initPage()
+          ));
         ctrl.validationIssues = [];
         ctrl.prepublishValidationIssues = [];
         ctrl.explorationValidationIssues = [];
         ctrl.forceValidateExplorations = true;
+        ctrl.warningsAreShown = false;
+        BottomNavbarStatusService.markBottomNavbarStatus(true);
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
+        ctrl.story = StoryEditorStateService.getStory();
+
+        PageTitleService.setPageTitleForMobileView('Story Editor');
+
         if (StoryEditorNavigationService.checkIfPresentInChapterEditor()) {
           StoryEditorNavigationService.navigateToChapterEditor();
         } else if (
           StoryEditorNavigationService.checkIfPresentInStoryPreviewTab()) {
           StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
-        $scope.$on(EVENT_STORY_INITIALIZED, _initPage);
-        $scope.$on(EVENT_STORY_REINITIALIZED, _initPage);
         $scope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _initPage);
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
