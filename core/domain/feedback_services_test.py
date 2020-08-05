@@ -435,13 +435,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_add_message_ids_to_read_by_list_adds_msgs_to_threads_in_order(
             self):
-        """add_message_ids_to_read_by_list adds message_ids to the
-        GeneralFeedbackThreadUserModel message_ids_read_by_user property for
-        each thread. The GeneralFeedbackThreadUserModel may or may not already
-        exist for the thread. This test tests that we are adding the right
-        message_ids to the corresponding threads when there are some threads
-        that are already created before the method is called and some that will
-        be created in the method call itself.
+        """Tests that the message_ids are being added to the correct feedback
+        thread user model instances when the feedback thread user models exist
+        for some of the threads before the method is called and some do not.
         """
         sample_message_ids = [1, 2, 3]
         sample_thread_ids = [
