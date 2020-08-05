@@ -256,6 +256,7 @@ angular.module('oppia').directive('adminMiscTab', [
         // datastore.
 
         ctrl.fetchAndGenerateSvgsForExplorations = async function() {
+          ctrl.generateSvgs = true;
           while (ctrl.generateSvgs) {
             if (ctrl.numberOfExplorationsLeftToUpdate === '0') {
               ctrl.setStatusMessage('SVGs generated for all explorations .');
@@ -324,6 +325,7 @@ angular.module('oppia').directive('adminMiscTab', [
               saveResponse.number_of_explorations_updated);
             ctrl.numberOfExplorationsLeftToUpdate = (
               saveResponse.number_of_explorations_left_to_update);
+            $scope.$apply();
             ctrl.setStatusMessage(
               'Successfully updated ' + numberOfExplorationsUpdated +
               ' explorations, ' + ctrl.numberOfExplorationsLeftToUpdate +
