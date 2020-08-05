@@ -34,7 +34,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # @marianazangrossi first.
 NOT_FULLY_COVERED_FILENAMES = [
     'about-page.module.ts',
-    'activity-tiles-infinity-grid.directive.ts',
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
     'admin-jobs-tab.directive.ts',

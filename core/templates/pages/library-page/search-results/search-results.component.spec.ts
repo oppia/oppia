@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
-describe('Confirm Or Cancel Modal Controller', function() {
+describe('Search Results component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
   var $q = null;
