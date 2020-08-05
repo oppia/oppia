@@ -56,9 +56,9 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts'
         ]
         def mock_open_file(path, unused_permissions):
-            if path == other_linter.MANIFEST_JSON_FILE_PATH:
+            if path == other_files_linter.MANIFEST_JSON_FILE_PATH:
                 return self.manifest_file
-            elif path == other_linter.PACKAGE_JSON_FILE_PATH:
+            elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
                 return self.package_file
         def mock_listdir(unused_path):
             return self.files_in_typings_dir
@@ -76,7 +76,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
             expected_summary_messages = ['SUCCESS  App dev file check passed']
             self.assertEqual(
@@ -90,7 +90,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
         self.assertEqual(len(summary_messages.all_messages), 2)
         self.assertTrue(
@@ -115,7 +115,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
         expected_summary_messages = [
             'SUCCESS  Webpack config file check passed']
@@ -136,7 +136,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
         expected_summary_messages = [
             'Line 2: The following keys: meta, template are missing in '
@@ -156,7 +156,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             pre_commit_linter.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
         expected_summary_messages = [
             'Line 2: The following keys: chunks, filename, meta, template,'
@@ -170,7 +170,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_summary_messages = [
             'SUCCESS  Third party type defs check passed']
         with self.open_file_swap, self.listdir_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
                 summary_messages.all_messages, expected_summary_messages)
@@ -180,7 +180,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_summary_messages = [
             'SUCCESS  Third party type defs check passed']
         with self.open_file_swap, self.listdir_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
                 summary_messages.all_messages, expected_summary_messages)
@@ -189,7 +189,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_summary_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap, self.print_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
                 summary_messages.all_messages[1], expected_summary_messages)
@@ -206,7 +206,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         ]
         expected_summary_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
                 summary_messages.all_messages[1], expected_summary_messages)
@@ -224,7 +224,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         ]
         expected_summary_messages = 'FAILED  Third party type defs check failed'
         with self.open_file_swap, self.listdir_swap, self.print_swap:
-            summary_messages = other_linter.CustomLintChecksManager(
+            summary_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_third_party_libs_type_defs()
             self.assertEqual(
                 summary_messages.all_messages[1], expected_summary_messages)
@@ -235,12 +235,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'for more details.'], summary_messages.all_messages)
 
     def test_perform_all_lint_checks(self):
-        linter_stdout = other_linter.CustomLintChecksManager(
+        linter_stdout = other_files_linter.CustomLintChecksManager(
             FILE_CACHE).perform_all_lint_checks()
         self.assertTrue(isinstance(linter_stdout, list))
 
     def test_get_linters_with_success(self):
-        custom_linter, third_party_linter = other_linter.get_linters(FILE_CACHE)
+        custom_linter, third_party_linter = (
+            other_files_linter.get_linters(FILE_CACHE))
         self.assertTrue(
-            isinstance(custom_linter, other_linter.CustomLintChecksManager))
+            isinstance(
+                custom_linter, other_files_linter.CustomLintChecksManager))
         self.assertEqual(third_party_linter, None)
