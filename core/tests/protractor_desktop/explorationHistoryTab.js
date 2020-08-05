@@ -28,7 +28,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-fdescribe('Exploration history', function() {
+describe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
@@ -64,7 +64,7 @@ fdescribe('Exploration history', function() {
     await users.logout();
   });
 
-  fit('should display the history', async function() {
+  it('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration();

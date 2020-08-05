@@ -1075,8 +1075,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
     def traverse_by_schema_and_get(
             schema, value, obj_types_to_search_for, value_extractor):
         """Recursively traverses an interaction customization argument spec to
-        locate values with schema obj_type in obj_types_to_search_for, and extracting
-        the value using a value_extractor function.
+        locate values with schema obj_type in obj_types_to_search_for, and
+        extracting the value using a value_extractor function.
 
         Args:
             schema: dict. The customization dict to be modified: dict
@@ -1084,8 +1084,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
                 value of the customization arg.
             value: dict. The current nested customization argument value to be
                 modified.
-            obj_types_to_search_for: list(str). The obj types to search for. If this
-                list contains the current obj type, the value is passed to
+            obj_types_to_search_for: list(str). The obj types to search for. If
+                this list contains the current obj type, the value is passed to
                 value_extractor and the results are collected.
             value_extractor: function. The function that extracts the wanted
                 computed value from each value that matches the obj_types. It
@@ -1095,9 +1095,9 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         Returns:
             list(*). A list of the extracted values returned from
             value_extractor, which is run on any values that have a schema type
-            equal to 'custom' and have a obj_type in obj_types_to_search_for. Because
-            value_extractor can return any type, the result is a list of any
-            type.
+            equal to 'custom' and have a obj_type in obj_types_to_search_for.
+            Because value_extractor can return any type, the result is a list of
+            any type.
         """
         result = []
         schema_type = schema['type']

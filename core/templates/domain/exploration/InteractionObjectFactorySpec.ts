@@ -794,7 +794,7 @@ describe('Interaction object factory', () => {
           id: interactionId,
           solution: solutionDict
         });
-      }).not.toThrow();
+      }).not.toThrowError();
     });
   });
 });
