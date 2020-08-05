@@ -34,11 +34,11 @@ def get_memory_stats():
 
     Returns:
         dict(str, str). Dictionary with the total allocated memory in bytes,
-        peak memory usage in bytes, total number of keys stored.
+        peak memory usage in bytes, and the total number of keys stored.
     """
     redis_full_profile = REDIS_CLIENT.memory_stats()
     memory_stats = {
-        'totalAllocatedInBytes': redis_full_profile.get('total.allocated'),
+        'total_allocated_in_bytes': redis_full_profile.get('total.allocated'),
         'peak_memory_usage_in_bytes': redis_full_profile.get('peak.allocated'),
         'total_number_of_keys_stored': redis_full_profile.get('keys.count')
     }

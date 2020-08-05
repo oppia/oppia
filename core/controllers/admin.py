@@ -965,7 +965,7 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
 
 
 class MemoryCacheHandler(base.BaseHandler):
-    """Handler for the memory cache."""
+    """Handler for memory cache functions used in the Misc Page."""
 
     @acl_decorators.can_access_admin_page
     def post(self):

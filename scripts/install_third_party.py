@@ -348,15 +348,16 @@ def install_redis_cli():
     using Python. The redis-cli package installed in this function contains
     scripts for the redis-cli and redis-server programs detailed below.
 
-    Redis-server starts a local Redis database on the machine that can be
-    queried using either the Python redis library or the Redis-cli program.
+    The Redis-cli is the command line interface that serves up an interpreter
+    that allows users to connects to a redis database cache and query the cache
+    using redis's API.
 
-    Redis-cli is the command line interface that serves up an interpreter that
-    connects to a redis database cache and queries it to retrieve/set data.
+    Redis-server starts a local Redis database on the machine that can be
+    queried using either the Python redis library or the Redis-cli interpreter.
     """
-    # We need to install redis-cli separately from using manifest.json since it
-    # is a system program and we need to install it after the library is
-    # untarred.
+    # We need to install redis-cli separately from the default way since it
+    # is a system program and we need to build the program files after the
+    # library is untarred.
     try:
         # Pipe output to /dev/null for silence in console.
         null = python_utils.open_file('/dev/null', 'w')
@@ -379,8 +380,8 @@ def install_redis_cli():
         # build the source code.
         with common.CD('third_party/redis-cli-6.0.6/'):
             # Build the scripts necessary to start the redis server.
-            # The make command only builds the C++ files in the Redis-cli in the
-            # src/ folder and does anything outside of the oppia root directory.
+            # The make command only builds the C++ files in the
+            # src/ folder and does nothing outside of the oppia root directory.
             # It will build the redis-cli and redis-server files so that we can
             # run the server from inside the oppia folder by executing the
             # script src/redis-cli and src/redis-server.

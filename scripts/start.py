@@ -148,9 +148,6 @@ def main(args=None):
         time.sleep(10)
         # Redis-cli is only required in a development environment.
         python_utils.PRINT('Starting Redis development server.')
-        # Not appended to background_processes since this server is not a python
-        # backend process. It does not hang the terminal but returns
-        # automatically and runs the service in the system background.
         # Start the redis local development server. Redis doesn't run on
         # Windows machine. Use daemonize argument to prevent redis-server from
         # exiting on its own.
@@ -159,6 +156,11 @@ def main(args=None):
                 subprocess.call([
                     './third_party/redis-cli-6.0.6/src/redis-server',
                     (common.REDIS_CONF_PATH), '--daemonize', 'yes']))
+        else:
+        raise Exception(
+            'Redis command line interface is not installed because your ' +
+            'machine is on the Windows operating system. Caching will not ' +
+            'work on a non-Windows machine,')
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(

@@ -676,7 +676,7 @@ class Exploration(python_utils.OBJECT):
         """Return a Exploration domain object from a dict.
 
         Args:
-            exploration_dict: dict. The dict representation of exploration
+            exploration_dict: dict. The dict representation of Exploration
                 object.
             exploration_version: int. The version of the exploration.
             exploration_created_on: datetime.datetime. Date and time when the

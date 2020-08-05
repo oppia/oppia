@@ -89,7 +89,7 @@ def _get_memcache_key(namespace, sub_namespace, obj_id):
             are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
-            values. For Explorations, Skills, Stories, Topics, Collections, the
+            values. For Explorations, Skills, Stories, Topics, and Collections, the
             sub-namespace is the version number of the objects.
         obj_id: str. The id of the value to store in the memory cache.
 
@@ -122,7 +122,7 @@ def get_multi(namespace, sub_namespace, obj_ids):
             as namespace for objects that are not associated with a conceptual
             domain-layer entity and therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
-            values. For Explorations, Skills, Stories, Topics, Collections, the
+            values. For Explorations, Skills, Stories, Topics, and Collections, the
             sub-namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
         obj_ids: list(str). List of object ids corresponding to values to
@@ -165,7 +165,7 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
             are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
-            values. For Explorations, Skills, Stories, Topics, Collections, the
+            values. For Explorations, Skills, Stories, Topics, and Collections, the
             sub-namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
         id_value_mapping:
@@ -203,7 +203,7 @@ def delete_multi(namespace, sub_namespace, obj_ids):
             are not associated with a conceptual domain-layer entity and
             therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
-            values. For Explorations, Skills, Stories, Topics, Collections, the
+            values. For Explorations, Skills, Stories, Topics, and Collections, the
             sub-namespace is the version number of the objects. If sub-namespace
             is not required, pass in None.
         obj_ids: list(str). A list of id strings to delete from the cache.
@@ -229,10 +229,13 @@ def delete_multi(namespace, sub_namespace, obj_ids):
 
 def get_memory_stats():
     """Get a memory profile of the cache in a dictionary dependent on how the
-    caching service profiles its own cache.
+    caching service profiles its own cache. Expects a dictionary with the
+    keys 'total_allocated_in_bytes', 'peak_memory_usage_in_bytes', and
+    'total_number_of_keys_stored'.
 
     Returns:
-        dict(str, str). String value denoting the profile metric and the
-        corresponding metric value.
+        dict(str, str). A dictionary with the keys 'total_allocated_in_bytes',
+        'peak_memory_usage_in_bytes', and 'total_number_of_keys_stored'
+        with the corresponding metric value strings as the value.
     """
     return memory_cache_services.get_memory_stats()

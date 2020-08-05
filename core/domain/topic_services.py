@@ -749,6 +749,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     topic_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
+
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.
     caching_services.delete_multi(

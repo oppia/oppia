@@ -260,13 +260,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 exploration_id: default_exploration
             })
 
-        non_existent_result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
-            [exploration_id])
-
-        self.assertEqual(non_existent_result, {})
-
         existent_result = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
             python_utils.convert_to_bytes(1),
