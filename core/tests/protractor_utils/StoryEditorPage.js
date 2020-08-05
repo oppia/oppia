@@ -55,7 +55,7 @@ var StoryEditorPage = function() {
   var destinationSelect = element(
     by.css('.protractor-test-destination-select'));
   var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
-  var deleteChapterButtons = element.all(
+  var deleteChapterButton = element(
     by.css('.protractor-test-delete-chapter-button'));
   var confirmDeleteChapterButton = element(
     by.css('.protractor-test-confirm-delete-chapter-button'));
@@ -63,6 +63,9 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-publish-story-button'));
   var unpublishStoryButton = element(
     by.css('.protractor-test-unpublish-story-button'));
+  var chapterEditOptions = element.all(by.css('.protractor-test-edit-options'));
+  var backToStoryEditorButton = element(
+    by.css('.protractor-test-back-to-story-editor-button'));
 
   /*
    * CHAPTER
@@ -90,8 +93,6 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-confirm-skill-selection-button'));
   var skillListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
-  var disconnectedChapterWarning = element(
-    by.css('.protractor-test-disconnected-node-warning'));
   var deletePrerequisiteSkillButton = element.all(
     by.css('.protractor-test-remove-prerequisite-skill'));
   var deleteAcquiredSkillButton = element.all(
@@ -149,8 +150,11 @@ var StoryEditorPage = function() {
   };
 
   this.deleteChapterWithIndex = async function(index) {
-    await general.scrollToTop();
-    await deleteChapterButtons.get(index).click();
+    await waitFor.visibilityOf(
+      chapterEditOptions.first(),
+      'Chapter list taking too long to appear.');
+    await action.click('Chapter edit options', chapterEditOptions.get(index));
+    await action.click('Delete chapter button', deleteChapterButton);
     await confirmDeleteChapterButton.click();
   };
 
@@ -168,6 +172,29 @@ var StoryEditorPage = function() {
 
     await confirmChapterCreationButton.click();
     await general.scrollToTop();
+  };
+
+  this.navigateToChapterWithName = async function(chapterName) {
+    await waitFor.visibilityOf(
+      chapterTitles.first(), 'Chapter list taking too long to appear');
+    var chapterIndex = -1;
+    for (var i = 0; i < await chapterTitles.count(); i++) {
+      if (await chapterTitles.get(i).getText() === chapterName) {
+        chapterIndex = i;
+        break;
+      }
+    }
+    expect(chapterIndex).not.toEqual(-1);
+
+    await action.click('Chapter list item', chapterTitles.get(i));
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      nodeOutlineEditor, 'Chapter editor is taking too long to appear.');
+    await general.scrollToTop();
+  };
+
+  this.navigateToStoryEditorTab = async function() {
+    await action.click('Back to story editor tab', backToStoryEditorButton);
   };
 
   this.expectChaptersListToBe = async function(chapters) {
@@ -319,6 +346,7 @@ var StoryEditorPage = function() {
       nodeOutlineEditor);
     await editor.clear();
     await richTextInstructions(editor);
+    await action.click('Chapter node editor', nodeOutlineEditor);
     await nodeOutlineSaveButton.click();
   };
 
@@ -415,13 +443,16 @@ var StoryEditorPage = function() {
   };
 
   this.expectWarningInIndicator = async function(warning) {
-    await (await browser.actions().mouseMove(warningIndicator)).perform();
+    await waitFor.visibilityOf(warningIndicator,
+      'Warning Indicator taking too long to appear.');
+    await browser.actions().mouseMove(warningIndicator).perform();
     var warningElemCount = await warningTextElements.count();
-    matchFound = false;
+    var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {
-      var text = await (await warningTextElements.get(i)).getText();
+      var text = await warningTextElements.get(i).getText();
       if (warning.test(text)) {
         matchFound = true;
+        break;
       }
     }
     expect(matchFound).toBe(true);
