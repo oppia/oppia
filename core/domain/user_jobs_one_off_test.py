@@ -260,7 +260,7 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(output), 1)
         expected_error = python_utils.UNICODE(
             'GAE_ID %s already registered with user_id %s.' % (
-            self.USER_A_GAE_ID, self.user_a_model.id))
+                self.USER_A_GAE_ID, self.user_a_model.id))
         self.assertEqual(expected_error, output[0])
 
     def test_one_off_job_run_multiple_times_raises_no_error(self):

@@ -128,6 +128,7 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instance of UserSettingsModel for the user.
+
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
@@ -136,6 +137,7 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether UserSettingsModel exists for user.
+
         Args:
             user_id: str. The ID of the user whose data should be checked.
         Returns:
@@ -146,6 +148,7 @@ class UserSettingsModel(base_models.BaseModel):
     @staticmethod
     def export_data(user_id):
         """Exports the data from UserSettingsModel into dict format for Takeout.
+
         Args:
             user_id: str. The ID of the user whose data should be exported.
         Returns:
@@ -201,6 +204,7 @@ class UserSettingsModel(base_models.BaseModel):
         """Gets a new id for an entity, based on its name.
         The returned id is guaranteed to be unique among all instances of this
         entity.
+
         Args:
             unused_entity_name: The name of the entity. Coerced to a utf-8
                 encoded string. Defaults to ''.
@@ -222,46 +226,54 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
         """Returns whether or not a given normalized_username is taken.
+
         Args:
             normalized_username: str. The given user's normalized username.
         Returns:
             bool. Whether the normalized_username has already been taken.
          """
+
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
 
     @classmethod
     def get_by_gae_id(cls, gae_id):
         """Returns a user model with given GAE user ID.
+
         Args:
             gae_id: str. The GAE user ID that is being queried for.
         Returns:
             UserSettingsModel. The UserSettingsModel instance which has the same
             GAE user ID.
         """
+
         return cls.query(cls.gae_id == gae_id).get()
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
         """Returns a user model given a normalized username.
+
         Args:
             normalized_username: str. The user's normalized username.
         Returns:
             UserSettingsModel. The UserSettingsModel instance which contains
             the same normalized_username.
         """
+
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
 
     @classmethod
     def get_by_role(cls, role):
         """Returns user models with given role.
+
         Args:
             role: str. The role ID that is being queried for.
         Returns:
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
+
         return cls.query(cls.role == role).fetch()
 
 

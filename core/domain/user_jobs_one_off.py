@@ -104,7 +104,7 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if (user_auth_model is not None) and (user_auth_model.id != item.id):
             yield ('GAE_ID %s already registered with user_id %s.' % (
                 item.gae_id, user_auth_model.id), 1
-            )
+                  )
         else:
             user_models.UserAuthModel(
                 id=item.id,
@@ -115,7 +115,7 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(error_message, val):
-        yield (error_message)
+        yield error_message
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
