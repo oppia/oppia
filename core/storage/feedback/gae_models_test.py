@@ -192,20 +192,8 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             feedback_models.GeneralFeedbackMessageModel.create(
                 feedback_domain.FullyQualifiedMessageIdentifier(
-                thread_id, '0'))
-
-    def test_create_multi_raises_exception_for_invalid_arg_lengths(self):
-        test_thread_ids = ['thread_id_1']
-        test_message_ids = ['message_id_1', 'message_id_2']
-        expected_exception_regexp = (
-            'The number of thread_ids must be equal to the number of '
-            'message_ids when using create_multi. There are %s thread_ids '
-            ' and %s message_ids.' % (
-                len(test_thread_ids), len(test_message_ids))
-        )
-        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
-            feedback_models.GeneralFeedbackMessageModel.create_multi(
-                test_thread_ids, test_message_ids)
+                thread_id, '0')
+            )
 
     def test_get_all_messages(self):
         thread_id = feedback_services.create_thread(

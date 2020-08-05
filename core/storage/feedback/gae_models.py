@@ -335,7 +335,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 in the given thread.
         """
 
-        return cls.create_multi([thread_id], [message_id])[0]
+        return cls.create_multi([message_identifier])[0]
 
     @classmethod
     def create_multi(cls, message_identifiers):
