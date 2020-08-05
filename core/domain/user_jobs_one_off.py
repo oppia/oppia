@@ -104,7 +104,7 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             feconf.AUTH_METHOD_GAE, item.gae_id)
         if (user_auth_model is not None) and (user_auth_model.id != item.id):
             yield ('GAE_ID %s already registered with user_id %s.' % (
-                item.gae_id, user_auth_model.id)
+                item.gae_id, user_auth_model.id), 1
             )
         else:
             user_models.UserAuthModel(
@@ -113,6 +113,10 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 pin=None,
                 parent_user_id=None
             ).put()
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):

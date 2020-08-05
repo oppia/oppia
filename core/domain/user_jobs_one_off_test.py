@@ -198,7 +198,64 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
 class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off UserAuthModel migration job."""
-    pass
+
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_ID = 'user_a_id'
+    USER_A_GAE_ID = 'user_a_gae_id'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_ID = 'user_b_id'
+    USER_B_GAE_ID = 'user_b_gae_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.UserAuthModelOneOffJob.create_new()
+        user_jobs_one_off.UserAuthModelOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+    def setUp(self):
+        super(UserAuthModelOneOffJobTests, self).setUp()
+        self.user_a_model = user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_GAE_ID,
+            email=self.USER_A_EMAIL,
+        )
+        self.user_b_model = user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL
+        )
+        self.user_a_model.put()
+
+    def test_before_migration_user_does_not_exist_in_user_auth_model(self):
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
+
+    def test_one_off_job_migrates_users_without_any_error(self):
+        self.user_b_model.put()
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
+
+        self._run_one_off_job()
+        
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_A_ID)
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_B_ID)
+
+    def test_one_off_job_gae_id_registered_to_multiple_users_raises_error(self):
+        self.user_b_model.gae_id = self.USER_A_GAE_ID
+        self.user_b_model.put()
+        self._run_one_off_job()
+
+    def test_one_off_job_run_multiple_times_raises_no_error(self):
+        self.user_b_model.put()
+        self._run_one_off_job()
+        self._run_one_off_job()
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
