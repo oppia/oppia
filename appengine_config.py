@@ -24,10 +24,18 @@ import os
 import sys
 import time
 
+# Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
 
+# oppia_tools/ is available locally (in both dev and prod mode). However,
+# on the GAE production server, oppia_tools/ is not available, and the default
+# PIL third-party library is used instead.
+#
+# We cannot special-case this using DEV_MODE because it is possible to run
+# Oppia in production mode locally, where a built-in PIL won't be available.
+# Hence the check for oppia_tools instead.
 if os.path.isdir(OPPIA_TOOLS_PATH):
     PIL_PATH = os.path.join(
         OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
