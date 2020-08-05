@@ -70,6 +70,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
+            print exp.id
+            for state in exp.states.values():
+                print state.written_translations.to_dict()
+
+        for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -312,7 +317,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 3)
+        self.assertEqual(translation_opportunities[0].content_count, 0)
 
         answer_group_dict = {
             'outcome': {
@@ -383,8 +388,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 })], 'Add state name')
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 6)
+        self.assertEqual(len(translation_opportunities), 0)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):
         skill_opportunities, _, _ = (
@@ -487,6 +491,20 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = skill_opportunities[0]
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity.question_count, 1)
+
+    def test_complete_skill_opportunity_deletes_opportunity(self):
+        opportunity_services.create_skill_opportunity(
+            self.SKILL_ID, 'description')
+
+        # Set max number of questions per skill opportunity to 1.
+        with self.swap(constants, 'MAX_QUESTIONS_PER_SKILL', 1):
+            self.save_new_question(
+                self.QUESTION_ID, self.USER_ID,
+                self._create_valid_question_data('ABC'), [self.SKILL_ID])
+
+        skill_opportunities, _, _ = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertEqual(len(skill_opportunities), 0)
 
     def test_create_question_skill_link_increments_question_count(self):
         opportunity_services.create_skill_opportunity(

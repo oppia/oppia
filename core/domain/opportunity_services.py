@@ -651,6 +651,20 @@ def delete_skill_opportunity(skill_id):
         opportunity_models.SkillOpportunityModel.delete(skill_opportunity_model)
 
 
+def delete_skill_opportunities(skill_ids):
+    """Deletes the SkillOpportunityModels corresponding to the supplied
+    skill_ids.
+
+    Args:
+        skill_id: list(str). A list of skill_id IDs whose opportunity models
+            are to be deleted.
+    """
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(skill_ids))
+    opportunity_models.SkillOpportunityModel.delete_multi(
+        skill_opportunity_models)
+
+
 def increment_question_counts(skill_ids, delta):
     """Increments question_count(s) of SkillOpportunityModel(s) with
     corresponding skill_ids.
@@ -662,8 +676,16 @@ def increment_question_counts(skill_ids, delta):
     """
     updated_skill_opportunities = (
         _get_skill_opportunities_with_updated_question_counts(skill_ids, delta))
-    # Delete complete opportunities.
-    _save_skill_opportunities(updated_skill_opportunities)
+    to_be_updated_opportunities = []
+    to_be_deleted_opportunity_ids = []
+    for opp in updated_skill_opportunities:
+        if opp.question_count >= constants.MAX_QUESTIONS_PER_SKILL:
+            to_be_deleted_opportunity_ids.append(opp.id)
+        else:
+            to_be_updated_opportunities.append(opp)
+    # Delete completed opportunities.
+    delete_skill_opportunities(to_be_deleted_opportunity_ids)
+    _save_skill_opportunities(to_be_updated_opportunities)
 
 
 def update_skill_opportunities_on_question_linked_skills_change(
