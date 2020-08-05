@@ -43,8 +43,8 @@ SCHEMA_KEY_UI_CONFIG = 'ui_config'
 # is a dictionary mapping the accessor of the object value to the ui_config.
 # For example, for SubtitledHtml (defined as a dict), to replace the ui_config
 # of the inner html schema, the accessor/key would be 'html'. Note that the
-# the actual ui_config is not replaced - the frontend needs to handle the
-# override of the ui_config, usually in a custom object editor.
+# existing ui_config is not replaced or deleted - the frontend needs to handle
+# the override of the ui_config, usually in a custom object editor.
 SCHEMA_KEY_REPLACEMENT_UI_CONFIG = 'replacement_ui_config'
 
 # The following keys are always accepted as optional keys in any schema.

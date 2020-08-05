@@ -357,7 +357,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
     def test_frontend_customization_args_defs_coverage(self):
         """Test to ensure that customization-args-defs.ts has frontend and
-        backend interfaces for customization arguments for each interaction. Ie
+        backend interfaces for customization arguments for each interaction. I.e
         for each interaction with id 'X', there exists an interface in
         customization-args-defs.ts named XCustomizationArgs and
         XCustomizationArgsBackendDict.
@@ -402,12 +402,12 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 interaction_ids_with_ca_frontend_interfaces.add(
                     ca_frontend_interface_match.group(2))
 
-        self.assertTrue(len(interaction_ids_with_ca_backend_interfaces) > 0)
+        self.assertGreater(len(interaction_ids_with_ca_backend_interfaces), 0)
         self.assertEqual(
             all_interaction_ids,
             interaction_ids_with_ca_backend_interfaces)
 
-        self.assertTrue(len(interaction_ids_with_ca_frontend_interfaces) > 0)
+        self.assertGreater(len(interaction_ids_with_ca_frontend_interfaces), 0)
         self.assertEqual(
             all_interaction_ids,
             interaction_ids_with_ca_frontend_interfaces)
@@ -415,8 +415,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
     def test_frontend_customization_args_constructor_coverage(self):
         """Test to ensure that InteractionObjectFactory.ts covers constructing
         customization arguments for each interaction. Uses regex to confirm
-        that the CustomizationArgs interface is imported for each interaction
-        id, and that the CustomizationArgs or CustomizationArgsBackendDict
+        that that the CustomizationArgs or CustomizationArgsBackendDict
         interface is used in the file to typecast customization arguments.
         """
         filepath = os.path.join(
