@@ -191,8 +191,8 @@ def create_messages(
     thread_models = feedback_models.GeneralFeedbackThreadModel.get_multi(
         thread_ids)
     thread_ids_that_do_not_have_models = []
-    for index, thread in enumerate(thread_models):
-        if thread is None:
+    for index, thread_model in enumerate(thread_models):
+        if thread_model is None:
             thread_ids_that_do_not_have_models.append(thread_ids[index])
     if len(thread_ids_that_do_not_have_models) > 0:
         missing_thread_models = len(thread_ids_that_do_not_have_models) > 1
