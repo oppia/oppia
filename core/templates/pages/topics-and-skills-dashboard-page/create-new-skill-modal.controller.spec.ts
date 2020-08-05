@@ -73,27 +73,21 @@ describe('Create new skill modal', function() {
     expect($scope.conceptCardExplanationEditorIsShown).toEqual(true);
   });
 
-  it('should clear error message when resetting error message', function() {
-    expect($scope.errorMsg).toEqual('');
+  it('should update the rubrics explanation and clear error message when' +
+    ' changing skill description', function() {
     $scope.errorMsg = 'Please enter a valid description';
-    expect($scope.errorMsg).toEqual('Please enter a valid description');
-    $scope.resetErrorMsg();
+    $scope.newSkillDescription = 'Addition';
+    $scope.updateSkillDescription();
+    expect($scope.rubrics[1].getExplanations()).toEqual(['Addition']);
     expect($scope.errorMsg).toEqual('');
   });
-
-  it('should update the rubrics explanation when skill description updates',
-    function() {
-      $scope.newSkillDescription = 'Addition';
-      $scope.updateSkillDescription();
-      expect($scope.rubrics[1].getExplanations()).toEqual(['Addition']);
-    });
 
   it('should dismiss modal when clicking on cancel', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
 
-  it('should set the error message when skill description is invalid',
+  it('should add error message text when skill description is invalid',
     function() {
       var errorString = (
         'Please use a non-empty description consisting of ' +
@@ -114,7 +108,7 @@ describe('Create new skill modal', function() {
       expect($scope.errorMsg).toEqual(errorString);
     });
 
-  it('should close the modal with skill input values ', function() {
+  it('should close the modal with skill input values', function() {
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),
       RubricObjectFactory.create(skillDifficulties[1], ['Large addition']),

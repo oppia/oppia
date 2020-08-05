@@ -114,7 +114,7 @@ describe('Signup page', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('should show warning if email preferences is null but user can send' +
+    it('should show warning when email preferences is null but user can send' +
       ' emails and reset its value', function() {
       expect(ctrl.emailPreferencesWarningText).toBe(undefined);
 
@@ -130,7 +130,7 @@ describe('Signup page', function() {
       expect(ctrl.emailPreferencesWarningText).toBe('');
     });
 
-    it('should send correct information if can receive email updates',
+    it('should send correct information when can receive email updates',
       function() {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
           return_url: '/expected_url'
@@ -151,7 +151,7 @@ describe('Signup page', function() {
         expect(mockWindow.location.href).toBe('/expected_url');
       });
 
-    it('should send correct information if cannot receive email updates',
+    it('should send correct information when cannot receive email updates',
       function() {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
           return_url: '/expected_url'
@@ -172,7 +172,7 @@ describe('Signup page', function() {
         expect(mockWindow.location.href).toBe('/expected_url');
       });
 
-    it('should throw an error if email preferences is invalid', function() {
+    it('should throw an error when email preferences is invalid', function() {
       expect(() => {
         ctrl.submitPrerequisitesForm(true, '', 'invalid value');
       }).toThrowError('Invalid value for email preferences: invalid value');
@@ -195,7 +195,7 @@ describe('Signup page', function() {
       expect(loadingMessage).toBeFalsy();
     });
 
-    it('should show warning if user has not agreed to terms', function() {
+    it('should show warning when user has not agreed to terms', function() {
       ctrl.submitPrerequisitesForm(false, null);
       expect(alertsServiceSpy.addWarning).toHaveBeenCalledWith(
         'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
@@ -212,7 +212,7 @@ describe('Signup page', function() {
       expect(ctrl.isFormValid()).toBe(false);
     });
 
-    it('should not check username disponibility if user is already logged',
+    it('should not check username disponibility when user is already logged',
       function() {
         $httpBackend.flush();
         ctrl.onUsernameInputFormBlur();
@@ -299,7 +299,7 @@ describe('Signup page', function() {
       expect(ctrl.warningI18nCode).toEqual('');
     });
 
-  it('should show warning if no username is provided', function() {
+  it('should show warning when no username is provided', function() {
     ctrl.updateWarningText('');
     expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
 
@@ -307,20 +307,20 @@ describe('Signup page', function() {
     expect(ctrl.warningI18nCode).toEqual('I18N_SIGNUP_ERROR_NO_USERNAME');
   });
 
-  it('should show warning if username has spaces', function() {
+  it('should show warning when username has spaces', function() {
     ctrl.updateWarningText('new user');
     expect(ctrl.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES');
   });
 
-  it('should show warning if username is too long', function() {
+  it('should show warning when username is too long', function() {
     ctrl.updateWarningText(
       'abcdefghijklmnopqrstuvwxyzyxwvu');
     expect(ctrl.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG');
   });
 
-  it('should show warning if username has non-alphanumeric characters',
+  it('should show warning when username has non-alphanumeric characters',
     function() {
       ctrl.updateWarningText('a-a');
       expect(ctrl.warningI18nCode).toEqual(
@@ -328,36 +328,36 @@ describe('Signup page', function() {
     }
   );
 
-  it('should show warning if username has \'admin\' in it', function() {
+  it('should show warning when username has \'admin\' in it', function() {
     ctrl.updateWarningText('administrator');
     expect(ctrl.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN');
   });
 
-  it('should show warning if username contains oppia word', function() {
+  it('should show warning when username contains oppia word', function() {
     ctrl.updateWarningText('oppiauser');
     expect(ctrl.warningI18nCode).toEqual(
       'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE');
   });
 
-  it('should show continue registration modal if user is logged out in new tab',
-    function() {
-      spyOn(ctrl, 'showRegistrationSessionExpiredModal');
-      var errorResponseObject = {
-        status_code: 401,
-        error: (
-          'Sorry, you have been logged out [probably in another ' +
-          'window]. Please log in again. You will be redirected ' +
-          'to main page in a while!')
-      };
-      $httpBackend.expectPOST('/signuphandler/data').respond(
-        401, errorResponseObject);
-      ctrl.submitPrerequisitesForm(true, 'myUsername', 'no');
-      $httpBackend.flush();
-      expect(ctrl.showRegistrationSessionExpiredModal).toHaveBeenCalled();
-    });
+  it('should show continue registration modal when user is logged out in new' +
+    ' tab', function() {
+    spyOn(ctrl, 'showRegistrationSessionExpiredModal');
+    var errorResponseObject = {
+      status_code: 401,
+      error: (
+        'Sorry, you have been logged out [probably in another ' +
+        'window]. Please log in again. You will be redirected ' +
+        'to main page in a while!')
+    };
+    $httpBackend.expectPOST('/signuphandler/data').respond(
+      401, errorResponseObject);
+    ctrl.submitPrerequisitesForm(true, 'myUsername', 'no');
+    $httpBackend.flush();
+    expect(ctrl.showRegistrationSessionExpiredModal).toHaveBeenCalled();
+  });
 
-  it('should call close callback license explanation modal', function() {
+  it('should close license explanation modal', function() {
     var modalSpy = spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
     });
@@ -367,7 +367,7 @@ describe('Signup page', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should call dismiss callback license explanation modal', function() {
+  it('should dismiss license explanation modal', function() {
     var modalSpy = spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
@@ -377,7 +377,7 @@ describe('Signup page', function() {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should call close callback registration session expired modal',
+  it('should close registration session expired modal',
     function() {
       var modalSpy = spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -388,7 +388,7 @@ describe('Signup page', function() {
       expect(modalSpy).toHaveBeenCalled();
     });
 
-  it('should call dismiss callback registration session expired modal',
+  it('should dismiss registration session expired modal',
     function() {
       var modalSpy = spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()

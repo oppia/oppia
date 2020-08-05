@@ -103,7 +103,7 @@ describe('Add Misconception Modal Controller', function() {
     expect($scope.misconceptionMustBeAddressed).toBe(true);
   });
 
-  it('should close modal when saving misconception successfully', function() {
+  it('should close modal when saving misconception', function() {
     $scope.saveMisconception();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       misconception: MisconceptionObjectFactory.create(

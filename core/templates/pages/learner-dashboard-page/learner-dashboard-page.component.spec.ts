@@ -289,38 +289,37 @@ describe('Learner dashboard page', function() {
       $scope.$apply();
     }));
 
-    it('should get data from backend when controller is initialized',
-      function() {
-        expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
-        expect(ctrl.username).toBe(userInfo.getUsername());
+    it('should initialize correctly controller properties after its' +
+    ' initialization and get data from backend', function() {
+      expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
+      expect(ctrl.username).toBe(userInfo.getUsername());
 
-        expect(ctrl.noExplorationActivity).toBe(false);
-        expect(ctrl.noCollectionActivity).toBe(false);
-        expect(ctrl.noActivity).toBe(false);
-      });
+      expect(ctrl.noExplorationActivity).toBe(false);
+      expect(ctrl.noCollectionActivity).toBe(false);
+      expect(ctrl.noActivity).toBe(false);
+    });
 
-    it('should sort collection playlist by index changing ui height',
-      function() {
-        var mockedUi = {
-          placeholder: {
-            height: (setHeight) => {
-              if (setHeight) {
-                return setHeight;
-              }
-              return 0;
+    it('should set ui height when sorting collection playlist ', function() {
+      var mockedUi = {
+        placeholder: {
+          height: (setHeight) => {
+            if (setHeight) {
+              return setHeight;
             }
-          },
-          item: {
-            height: () => 50
+            return 0;
           }
-        };
-        spyOn(mockedUi.placeholder, 'height').and.callThrough();
+        },
+        item: {
+          height: () => 50
+        }
+      };
+      spyOn(mockedUi.placeholder, 'height').and.callThrough();
 
-        ctrl.collectionPlaylistSortableOptions.start(null, mockedUi);
-        expect(mockedUi.placeholder.height).toHaveBeenCalled();
-      });
+      ctrl.collectionPlaylistSortableOptions.start(null, mockedUi);
+      expect(mockedUi.placeholder.height).toHaveBeenCalled();
+    });
 
-    it('should stop collection playlist sorting by setting ui top to 0',
+    it('should set ui top to 0 when stop collection playlist sorting',
       function() {
         var mockedUi = {
           helper: {
@@ -334,7 +333,7 @@ describe('Learner dashboard page', function() {
         expect(mockedUi.helper.css).toHaveBeenCalledWith({top: '0 px'});
       });
 
-    it('should update collection playlist sorting by index', function() {
+    it('should sort collection playlist by index', function() {
       var mockedUi = {
         item: {
           sortable: {
@@ -400,26 +399,29 @@ describe('Learner dashboard page', function() {
       expect(ctrl.feedbackThreadActive).toBe(false);
     });
 
-    it('should toggle active subsection type successfully', function() {
-      // Active subsection is set as I18N_DASHBOARD_EXPLORATIONS when controller
-      // is initialized.
-      expect(ctrl.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
+    it('should toggle active subsection type when changing subsection type',
+      function() {
+        // Active subsection is set as I18N_DASHBOARD_EXPLORATIONS when
+        // controller is initialized.
+        expect(ctrl.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
 
-      var newActiveSubsection = 'I18N_DASHBOARD_COLLECTIONS';
-      ctrl.setActiveSubsection(newActiveSubsection);
-      expect(ctrl.activeSubsection).toBe(newActiveSubsection);
+        var newActiveSubsection = 'I18N_DASHBOARD_COLLECTIONS';
+        ctrl.setActiveSubsection(newActiveSubsection);
+        expect(ctrl.activeSubsection).toBe(newActiveSubsection);
 
-      var newActiveSubsection2 = 'I18N_DASHBOARD_EXPLORATIONS';
-      ctrl.setActiveSubsection(newActiveSubsection2);
-      expect(ctrl.activeSubsection).toBe(newActiveSubsection2);
-    });
+        var newActiveSubsection2 = 'I18N_DASHBOARD_EXPLORATIONS';
+        ctrl.setActiveSubsection(newActiveSubsection2);
+        expect(ctrl.activeSubsection).toBe(newActiveSubsection2);
+      });
 
-    it('should get exploration url', function() {
+    it('should get the correct exploration page URL corresponding to a given' +
+      ' exploration ID.', function() {
       expect(ctrl.getExplorationUrl('1')).toBe('/explore/1');
       expect(ctrl.getExplorationUrl()).toBe('/explore/undefined');
     });
 
-    it('should get collection url', function() {
+    it('should get the correct collection page URL corresponding to a given' +
+      ' collection ID.', function() {
       expect(ctrl.getCollectionUrl('1')).toBe('/collection/1');
       expect(ctrl.getCollectionUrl()).toBe('/collection/undefined');
     });
@@ -501,7 +503,7 @@ describe('Learner dashboard page', function() {
           .toEqual(completedExplorations.slice(0, 8));
       });
 
-    it('should go to through page of completed collections successfully',
+    it('should change page when going through pages of completed collections',
       function() {
         var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
         var subsection = 'I18N_DASHBOARD_COLLECTIONS';
@@ -515,37 +517,49 @@ describe('Learner dashboard page', function() {
         expect(ctrl.startCompletedCollectionIndex).toBe(0);
       });
 
-    it('should change explorations sorting options by title or last played',
-      function() {
-        expect(ctrl.isCurrentExpSortDescending).toBe(true);
-        expect(ctrl.currentExpSortType).toBe('last_played');
-        ctrl.setExplorationsSortingOptions('last_played');
-        expect(ctrl.isCurrentExpSortDescending).toBe(false);
+    it('should change explorations sorting options by title when changing' +
+      ' sorting type', function() {
+      ctrl.setExplorationsSortingOptions('title');
+      expect(ctrl.currentExpSortType).toBe('title');
+      expect(ctrl.isCurrentExpSortDescending).toBe(true);
+    });
 
-        ctrl.setExplorationsSortingOptions('title');
-        expect(ctrl.currentExpSortType).toBe('title');
-      });
+    it('should change explorations sorting options by last played when' +
+      ' changing sorting type', function() {
+      expect(ctrl.isCurrentExpSortDescending).toBe(true);
+      expect(ctrl.currentExpSortType).toBe('last_played');
+      ctrl.setExplorationsSortingOptions('last_played');
+      expect(ctrl.isCurrentExpSortDescending).toBe(false);
+    });
 
-    it('should change subscription sorting options by username or impact',
-      function() {
-        expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
-        expect(ctrl.currentSubscribersSortType).toBe('username');
-        ctrl.setSubscriptionSortingOptions('username');
-        expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
+    it('should change subscription sorting options by username when changing' +
+      ' sorting type', function() {
+      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
+      expect(ctrl.currentSubscribersSortType).toBe('username');
+      ctrl.setSubscriptionSortingOptions('username');
+      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
+    });
 
-        ctrl.setSubscriptionSortingOptions('impact');
-        expect(ctrl.currentSubscribersSortType).toBe('impact');
-      });
+    it('should change subscription sorting options by impact when changing' +
+      ' sorting type', function() {
+      ctrl.setSubscriptionSortingOptions('impact');
+      expect(ctrl.currentSubscribersSortType).toBe('impact');
+      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
+    });
 
-    it('should change feedback sorting options by exploration or last update' +
-      ' msecs', function() {
+    it('should change feedback sorting options by last update msecs when' +
+      ' changing sorting type', function() {
       expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
       expect(ctrl.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
       ctrl.setFeedbackSortingOptions('lastUpdatedMsecs');
       expect(ctrl.isCurrentFeedbackSortDescending).toBe(false);
+    });
 
+    it('should change feedback sorting options by exploration when changing' +
+      ' sorting type', function() {
       ctrl.setFeedbackSortingOptions('exploration');
       expect(ctrl.currentFeedbackThreadsSortType).toBe('exploration');
+      expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
     });
 
     it('should evaluate value of exploration sort key property as null when' +
@@ -624,7 +638,7 @@ describe('Learner dashboard page', function() {
         expect(ctrl.messageSummaries.length).toBe(1);
       });
 
-    it('should show all threads when a thread is clicked', function() {
+    it('should show all threads when a thread is selected', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -743,7 +757,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.incompleteExplorationsList.length).toBe(11);
     });
 
-    it('should not remove an activity if its not present', function() {
+    it('should not remove an activity when its not present', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -842,7 +856,7 @@ describe('Learner dashboard page', function() {
         'Not Actionable');
     });
 
-    it('should date formated when getting locale date string', function() {
+    it('should date formatted when getting locale date string', function() {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       var NOW_MILLIS = 1416563100000;
       spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')

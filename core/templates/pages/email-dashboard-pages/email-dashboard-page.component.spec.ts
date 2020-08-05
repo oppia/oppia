@@ -202,18 +202,6 @@ describe('Email Dashboard Page', function() {
     });
   });
 
-  it('should show link to result page to be true after controller' +
-    ' initialization', function() {
-    expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(false);
-    expect(ctrl.username).toBe(undefined);
-
-    ctrl.$onInit();
-    $scope.$apply();
-
-    expect(ctrl.username).toBe('username');
-    expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(true);
-  });
-
   it('should get user info and next queries after controller initialization',
     function() {
       spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(

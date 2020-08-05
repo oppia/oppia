@@ -66,16 +66,14 @@ describe('Skill editor page', function() {
       expect(ctrl.getActiveTabName()).toBe('questions');
     });
 
-  it('should go to main tab when skill editor routing service is called to' +
-    ' navigate to main', function() {
+  it('should go to main tab when selecting main tab', function() {
     var routingSpy = spyOn(
       SkillEditorRoutingService, 'navigateToMainTab');
     ctrl.selectMainTab();
     expect(routingSpy).toHaveBeenCalled();
   });
 
-  it('should go to preview tab when skill editor routing service is called to' +
-    ' navigate to preview', function() {
+  it('should go to preview tab when selecting preview tab', function() {
     var routingSpy = spyOn(
       SkillEditorRoutingService, 'navigateToPreviewTab');
     ctrl.selectPreviewTab();
