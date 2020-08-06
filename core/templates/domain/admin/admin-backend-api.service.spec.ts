@@ -220,7 +220,7 @@ describe('Admin backend api service', () => {
 
     abas.sendMathSvgsToBackend(latexToSvgMapping);
     let req = httpTestingController.expectOne(
-      '/adminmathsvghandler');
+      '/explorationslatexsvghandler');
     var requestBody = req.request.body;
     expect(requestBody instanceof FormData).toBeTruthy();
     var rawImageSentToBackend = null;

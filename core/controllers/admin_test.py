@@ -996,7 +996,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             multiple_explorations_math_rich_text_info)
 
         response_dict = self.get_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             params={'item_to_fetch': 'exp_id_to_latex_mapping'})
         expected_response = {
             'exp_id1': ['abc1', 'xyz1'],
@@ -1013,7 +1013,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response_dict = self.get_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             params={'item_to_fetch': 'invalid'},
             expected_status_int=400)
 
@@ -1045,7 +1045,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             multiple_explorations_math_rich_text_info)
 
         response_dict = self.get_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             params={'item_to_fetch': 'number_of_explorations_left_to_update'})
         self.assertEqual(
             response_dict,
@@ -1112,7 +1112,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             estimated_max_size_of_images_in_bytes=20000).put()
 
         response_dict = self.post_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             {'latexMapping': post_data},
             csrf_token=csrf_token,
             upload_files=(
@@ -1172,7 +1172,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(editor_id, exploration1)
         response_dict = self.post_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             {'latexMapping': post_data},
             csrf_token=csrf_token,
             upload_files=(

@@ -53,7 +53,7 @@ angular.module('oppia').directive('adminMiscTab', [
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
         var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        var ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler';
+        var EXPLORATIONS_LATEX_SVG_HANDLER = '/explorationslatexsvghandler';
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
@@ -264,7 +264,7 @@ angular.module('oppia').directive('adminMiscTab', [
               return;
             }
             var response = await $http.get(
-              ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER, {
+              EXPLORATIONS_LATEX_SVG_HANDLER, {
                 params: {
                   item_to_fetch: 'exp_id_to_latex_mapping'
                 }
@@ -390,7 +390,7 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.$onInit = function() {
           ctrl.numberOfExplorationsLeftToUpdate;
           $http.get(
-            ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER, {
+            EXPLORATIONS_LATEX_SVG_HANDLER, {
               params: {
                 item_to_fetch: 'number_of_explorations_left_to_update'
               }

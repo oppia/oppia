@@ -681,7 +681,7 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler'
+EXPLORATIONS_LATEX_SVG_HANDLER = '/explorationslatexsvghandler'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
