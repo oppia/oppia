@@ -1174,7 +1174,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             'ExplorationStats',
             'NormalizeWhitespacePunctuationAndCasePipe\n',
             'MockCsrfTokenService',
-            'StatePropertyService'
+            'StatePropertyService',
+            'UpgradedServices'
         ]
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Angular Services Index file check')
@@ -1205,8 +1206,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
                 if not service_name_type_pair in angular_services_index:
                     summary_message = (
-                        'Please add the pair %s to the angularServices array'
-                        % service_name_type_pair)
+                        'Please add the pair %s to the angularServices in %s'
+                        % (service_name_type_pair, angular_services_index_path)
+                    )
                     summary_messages.append(summary_message)
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')

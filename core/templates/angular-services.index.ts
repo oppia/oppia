@@ -638,6 +638,17 @@ import { WrittenTranslationsObjectFactory } from
 import { TranslateService } from 'services/translate.service';
 
 export const angularServices: [string, unknown][] = [
+  ['AdminBackendApiService', AdminBackendApiService],
+  ['AdminDataService', AdminDataService],
+  ['AdminRouterService', AdminRouterService],
+  ['AdminTaskManagerService', AdminTaskManagerService],
+  ['AlertsService', AlertsService],
+  ['AlgebraicExpressionInputRulesService', AlgebraicExpressionInputRulesService],
+  ['AlgebraicExpressionInputValidationService', AlgebraicExpressionInputValidationService],
+  ['AngularNameService', AngularNameService],
+  ['AnswerClassificationResultObjectFactory', AnswerClassificationResultObjectFactory],
+  ['AnswerClassificationService', AnswerClassificationService],
+  ['AnswerGroupsCacheService', AnswerGroupsCacheService],
   ['AnswerGroupObjectFactory', AnswerGroupObjectFactory],
   ['AnswerStatsObjectFactory', AnswerStatsObjectFactory],
   ['AppService', AppService],
