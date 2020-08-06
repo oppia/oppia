@@ -605,6 +605,7 @@ def wait_for_port_to_be_open(port_number):
             port_number)
         sys.exit(1)
 
+
 def start_redis_server():
     """Start the redis server with the daemonize argument to prevent
     the redis-server from exiting on its own.
