@@ -246,6 +246,34 @@ describe('Exploration editor page component', function() {
       expect(es.markTranslatable).toHaveBeenCalled();
     });
 
+    it('should return navbar text', () => {
+      expect(ctrl.getNavbarText()).toEqual('Exploration Editor');
+    });
+
+    it('should return warning count, warnings list & critical warning',
+      () => {
+        spyOn(ews, 'countWarnings').and.returnValue(1);
+        expect(ctrl.countWarnings()).toEqual(1);
+        spyOn(ews, 'getWarnings').and.returnValue([]);
+        expect(ctrl.getWarnings()).toEqual([]);
+        // This approach was choosen because spyOn() doesn't work on properties
+        // that doesn't have a get access type.
+        // eslint-disable-next-line max-len
+        // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+        Object.defineProperty(ews, 'hasCriticalWarnings', {
+          get: () => true
+        });
+        spyOnProperty(ews, 'hasCriticalWarnings')
+          .and.returnValue(true);
+
+        expect(ctrl.hasCriticalWarnings()).toEqual(true);
+      });
+
+    it('should return the thread count', () => {
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      expect(ctrl.getOpenThreadsCount()).toEqual(1);
+    });
+
     it('should set active state name when active state name does not exist' +
       ' on exploration', () => {
       spyOn(ses, 'getActiveStateName').and.returnValue(
@@ -280,6 +308,63 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
 
       expect(rs.navigateToMainTab).toHaveBeenCalled();
+    });
+
+    it('should navigate between tabs', () => {
+      spyOn(rs, 'navigateToMainTab').and.stub();
+      ctrl.selectMainTab();
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToTranslationTab').and.stub();
+      ctrl.selectTranslationTab();
+      expect(rs.navigateToTranslationTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToPreviewTab').and.stub();
+      ctrl.selectPreviewTab();
+      expect(rs.navigateToPreviewTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToSettingsTab').and.stub();
+      ctrl.selectSettingsTab();
+      expect(rs.navigateToSettingsTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToStatsTab').and.stub();
+      ctrl.selectStatsTab();
+      expect(rs.navigateToStatsTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToImprovementsTab').and.stub();
+      ctrl.selectImprovementsTab();
+      expect(rs.navigateToImprovementsTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToHistoryTab').and.stub();
+      ctrl.selectHistoryTab();
+      expect(rs.navigateToHistoryTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToFeedbackTab').and.stub();
+      ctrl.selectFeedbackTab();
+      expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+    });
+
+    it('should show the user help modal for editor tutorial', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('editor')
+      });
+      spyOn($rootScope, '$broadcast');
+      ctrl.showUserHelpModal();
+      $rootScope.$apply();
+      expect($uibModal.open).toHaveBeenCalled();
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('openEditorTutorial');
+    });
+
+    it('should show the user help modal for editor tutorial', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('translation')
+      });
+      spyOn($rootScope, '$broadcast');
+      ctrl.showUserHelpModal();
+      $rootScope.$apply();
+      expect($uibModal.open).toHaveBeenCalled();
+      expect($rootScope.$broadcast).toHaveBeenCalledWith(
+        'openTranslationTutorial');
     });
   });
 

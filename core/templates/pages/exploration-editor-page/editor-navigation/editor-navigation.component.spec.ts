@@ -18,6 +18,8 @@
 
 import { of } from 'rxjs';
 
+import { UpgradedServices } from 'services/UpgradedServices';
+
 describe('Editor Navigation Component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
@@ -39,6 +41,13 @@ describe('Editor Navigation Component', function() {
   };
   var windowWidth = null;
   var isImprovementsTabEnabledAsyncSpy = null;
+
+  beforeEach(angular.mock.module('oppia', $provide => {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(

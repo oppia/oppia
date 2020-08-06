@@ -172,8 +172,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'WindowDimensionsService',
-    'EVENT_EXPLORATION_PROPERTY_CHANGED',
+    'WindowDimensionsService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
     function(
         $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
@@ -193,8 +192,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        WindowDimensionsService,
-        EVENT_EXPLORATION_PROPERTY_CHANGED) {
+        WindowDimensionsService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
       var ctrl = this;
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
       var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -453,14 +451,15 @@ angular.module('oppia').component('explorationEditorPage', {
           StateTutorialFirstTimeService.markEditorTutorialFinished();
         });
       };
+
       ctrl.getNavbarText = function() {
         return 'Exploration Editor';
       };
 
       ctrl.countWarnings = () => ExplorationWarningsService.countWarnings();
       ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
-      ctrl.hasCriticalWarnings = (
-        () => ExplorationWarningsService.hasCriticalWarnings);
+      ctrl.hasCriticalWarnings = () => (
+        ExplorationWarningsService.hasCriticalWarnings);
       ctrl.selectMainTab = () => RouterService.navigateToMainTab();
       ctrl.selectTranslationTab = (
         () => RouterService.navigateToTranslationTab());

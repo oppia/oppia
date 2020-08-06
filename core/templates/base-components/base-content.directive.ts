@@ -95,7 +95,6 @@ angular.module('oppia').directive('baseContent', [
             ctrl.iframed = UrlService.isIframed();
 
             ctrl.isBottomNavbarShown = () => {
-              console.log(BottomNavbarStatusService.isBottomNavbarEnabled());
               return BottomNavbarStatusService.isBottomNavbarEnabled();
             };
 

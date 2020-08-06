@@ -39,21 +39,23 @@ require('pages/exploration-editor-page/services/change-list.service.ts');
 angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService', 'ChangeListService',
-    'EditabilityService',
+    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
+    'ChangeListService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
-    'ThreadDataService', 'UrlInterpolationService', 'UserExplorationPermissionsService',
-    'UserService', 'WindowDimensionsService',
+    'ThreadDataService', 'UrlInterpolationService',
+    'UserExplorationPermissionsService', 'UserService',
+    'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $timeout, $uibModal, ContextService, ChangeListService,
-        EditabilityService,
+        $q, $rootScope, $scope, $timeout, $uibModal, ContextService,
+        ChangeListService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
-        ThreadDataService, UrlInterpolationService, UserExplorationPermissionsService,
-        UserService, WindowDimensionsService) {
+        ThreadDataService, UrlInterpolationService,
+        UserExplorationPermissionsService, UserService,
+        WindowDimensionsService) {
       $scope.showUserHelpModal = () => {
         var explorationId = ContextService.getExplorationId();
         SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
