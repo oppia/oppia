@@ -42,6 +42,11 @@ import {
   JobStatusSummaryBackendDict,
   JobStatusSummaryObjectFactory
 } from 'domain/admin/job-status-summary-object.factory';
+import {
+  PlatformParameterBackendDict,
+  PlatformParameter,
+  PlatformParameterObjectFactory
+} from 'domain/feature_gating/PlatformParameterObjectFactory';
 
 
 interface UserRoles {
@@ -77,6 +82,7 @@ export interface AdminPageDataBackendDict {
   'recent_job_data': JobDataBackendDict[];
   'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
+  'feature_flags': {[name: string]: PlatformParameterBackendDict};
 }
 
 export interface AdminPageData {
@@ -94,6 +100,7 @@ export interface AdminPageData {
   recentJobData: Job[];
   continuousComputationsData: ComputationData[];
   topicSummaries: TopicSummary[];
+  featureFlags: PlatformParameter[];
 }
 
 @Injectable({
@@ -105,7 +112,8 @@ export class AdminBackendApiService {
     private computationDataObjectFactory: ComputationDataObjectFactory,
     private jobDataObjectFactory: JobDataObjectFactory,
     private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
+    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
+    private platformParameterObjectFactory: PlatformParameterObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -131,7 +139,9 @@ export class AdminBackendApiService {
           continuousComputationsData: response.continuous_computations_data.map(
             this.computationDataObjectFactory.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
-            this.topicSummaryObjectFactory.createFromBackendDict)
+            this.topicSummaryObjectFactory.createFromBackendDict),
+          featureFlags: Object.values(response.feature_flags).map(
+            this.platformParameterObjectFactory.createFromBackendDict)
         });
       }, errorResponse => {
         reject(errorResponse.error.error);

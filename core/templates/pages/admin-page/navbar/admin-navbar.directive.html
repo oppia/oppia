@@ -114,6 +114,15 @@
               </a>
             </li>
             <li class="nav-item oppia-clickable-navbar-element float-right">
+              <a class="nav-link oppia-navbar-tab protractor-test-admin-features-tab"
+                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.FEATURES]>"
+                 ng-class="{active: $ctrl.isFeaturesTabOpen()}"
+                 uib-tooltip="Features"
+                 tooltip-placement="bottom">
+                Features
+              </a>
+            </li>
+            <li class="nav-item oppia-clickable-navbar-element float-right">
               <a class="nav-link oppia-navbar-tab protractor-test-admin-roles-tab"
                  ng-href="<[::$ctrl.ADMIN_TAB_URLS.ROLES]>"
                  ng-class="{active: $ctrl.isRolesTabOpen()}"

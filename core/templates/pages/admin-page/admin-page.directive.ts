@@ -26,6 +26,7 @@ require(
   'pages/admin-page/activities-tab/' +
   'admin-prod-mode-activities-tab.directive.ts');
 require('pages/admin-page/config-tab/admin-config-tab.directive.ts');
+require('pages/admin-page/features-tab/admin-features-tab.directive.ts');
 require('pages/admin-page/jobs-tab/admin-jobs-tab.directive.ts');
 require('pages/admin-page/misc-tab/admin-misc-tab.directive.ts');
 require('pages/admin-page/roles-tab/admin-roles-tab.directive.ts');
@@ -61,6 +62,9 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           };
           ctrl.isConfigTabOpen = function() {
             return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isFeaturesTabOpen = function() {
+            return AdminRouterService.isFeaturesTabOpen();
           };
           ctrl.isRolesTabOpen = function() {
             return AdminRouterService.isRolesTabOpen();

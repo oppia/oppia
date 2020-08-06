@@ -1253,7 +1253,8 @@ export class UpgradedServices {
       upgradedServices['ComputationDataObjectFactory'],
       upgradedServices['JobDataObjectFactory'],
       upgradedServices['JobStatusSummaryObjectFactory'],
-      upgradedServices['TopicSummaryObjectFactory']);
+      upgradedServices['TopicSummaryObjectFactory'],
+      upgradedServices['PlatformParameterObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardBackendApiService'] =
