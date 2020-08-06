@@ -25,8 +25,11 @@ from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -406,6 +409,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
+        expected_exception_regexp = (
+            'Invalid math tags found in the suggestion with id %s.' % (
+                suggestion.suggestion_id)
+        )
         with self.swap(
             exp_services, 'update_exploration', self.mock_update_exploration):
             with self.swap(
@@ -420,8 +427,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         'get_change_list_for_accepting_suggestion',
                         self.mock_get_change_list_does_nothing):
                         with self.assertRaisesRegexp(
-                            Exception,
-                            'Invalid math tags found in the suggestion'):
+                            Exception, expected_exception_regexp):
                             suggestion_services.accept_suggestion(
                                 suggestion, self.reviewer_id,
                                 self.COMMIT_MESSAGE, 'review message')
@@ -445,9 +451,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -458,9 +466,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion.status = suggestion_models.STATUS_REJECTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -559,9 +569,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'reject review message')
 
@@ -573,9 +585,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion.status = suggestion_models.STATUS_REJECTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'reject review message')
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -599,6 +613,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id)
         suggestion_services.reject_suggestion(
             suggestion, self.reviewer_id, 'reject review message')
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
         suggestion_services.resubmit_rejected_suggestion(
             suggestion, 'resubmit summary message', self.author_id)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -624,8 +640,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
                 suggestion, '', self.author_id)
-        with self.assertRaisesRegexp(
-            Exception, 'The suggestion is not yet handled.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s is not yet handled.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 suggestion, 'resubmit summary message', self.author_id)
 
@@ -651,10 +670,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         self.COMMIT_MESSAGE, 'review message')
                 suggestion = suggestion_services.get_suggestion_by_id(
                     self.suggestion_id)
+                expected_exception_regexp = (
+                    'The suggestion with id %s was accepted. Only rejected '
+                    'suggestions can be resubmitted.' % (
+                        suggestion.suggestion_id)
+                )
                 with self.assertRaisesRegexp(
-                    Exception,
-                    'The suggestion was accepted. Only rejected suggestions '
-                    'can be resubmitted.'):
+                    Exception, expected_exception_regexp):
                     suggestion_services.resubmit_rejected_suggestion(
                         suggestion, 'resubmit summary message', self.author_id)
 
@@ -685,6 +707,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     target_id_1 = 'exp1'
     target_id_2 = 'exp2'
+    target_id_3 = 'exp3'
     target_version_at_submission = 1
     change = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -692,7 +715,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'state_name': 'state_1',
         'new_value': 'new suggestion content'
     }
-
 
     AUTHOR_EMAIL_1 = 'author1@example.com'
     REVIEWER_EMAIL_1 = 'reviewer1@example.com'
@@ -708,10 +730,20 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.states = states
             self.category = 'Algebra'
 
+        def get_content_html(self, state_name, content_id):
+            """Used to mock the get_content_html method for explorations."""
+            # state_name and content_id are used here to suppress the unused
+            # arguments warning. The main goal of this method is to just
+            # produce content html for the tests.
+            return '<p>State name: %s, Content id: %s</p>' % (
+                state_name, content_id
+            )
+
     # All mock explorations created for testing.
     explorations = [
         MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp2', {'state_1': {}, 'state_2': {}})
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
     ]
 
     def mock_get_exploration_by_id(self, exp_id):
@@ -819,6 +851,94 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
+    def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        # Create the translation suggestion associated with exploration id
+        # target_id_1.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, 1, self.author_id_1,
+                    add_translation_change_dict, 'test description')
+
+        # Assert that there is one translation suggestion with the given
+        # exploration id found.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [self.target_id_1])), 1)
+
+    def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
+            self):
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        # Create the translation suggestion associated with exploration id
+        # target_id_2.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_2, 1, self.author_id_1,
+                    add_translation_change_dict, 'test description')
+        # Create the translation suggestion associated with exploration id
+        # target_id_3.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_3, 1, self.author_id_1,
+                    add_translation_change_dict, 'test description')
+
+        # Assert that there are two translation suggestions with the given
+        # exploration ids found.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [self.target_id_2, self.target_id_3])), 2)
+
+    def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
+            self):
+        # Assert that there are no translation suggestions with an invalid
+        # exploration id found.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                ['invalid_exp_id'])), 0)
+
+    def test_get_translation_suggestions_with_exp_ids_with_empty_exp_list(
+            self):
+        # Assert that there are no translation suggestions found when we
+        # use an empty exp_ids list.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [])), 0)
+
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         suggestion_services.create_new_user_contribution_scoring_model(
             'user1', 'category1', 15)
@@ -859,10 +979,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
 
 
-
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp1'
+    TOPIC_ID = 'topic1'
+    STORY_ID = 'story1'
     TRANSLATION_LANGUAGE_CODE = 'en'
 
     AUTHOR_EMAIL = 'author@example.com'
@@ -911,7 +1032,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                         'duration_secs': 42.43
                     }
                 },
-                'default_outcome': {}
+                'default_outcome': {},
+                'ca_placeholder_0': {}
             }
         }
         self.old_recorded_voiceovers = (
@@ -939,6 +1061,72 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         }
 
         self.target_version_at_submission = exploration.version
+
+        # Set up for testing translation suggestions. Translation suggestions
+        # correspond to a given topic, story and exploration.
+
+        self.save_new_topic(self.TOPIC_ID, self.owner_id)
+
+        self.save_new_story(
+            self.STORY_ID, self.owner_id, self.TOPIC_ID, title='A story',
+            description='Description', notes='Notes')
+
+        # Adds the story to the topic.
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        # Adds the exploration to the story.
+        story_change_list_to_add_an_exp = [
+            story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })
+        ]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID,
+            story_change_list_to_add_an_exp, 'Added exploration.')
+
+    def create_translation_suggestion_associated_with_exp(
+            self, exp_id, author_id):
+        """Creates a translation suggestion that is associated with an
+        exploration with id exp_id. The author of the created suggestion is
+        author_id.
+        """
+        # Gets the html content in the exploration to be translated.
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_html = exploration.states['State 1'].content.html
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': content_html,
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            exp_id, 1, author_id, add_translation_change_dict,
+            'test description')
+
+    def assert_created_suggestion_is_valid(self, target_id, author_id):
+        """Assert that the created suggestion is in review and that only one
+        suggestion with the given target_id and author_id exists.
+        """
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', author_id), ('target_id', target_id)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
 
     def test_create_and_accept_suggestion(self):
         with self.swap(
@@ -989,6 +1177,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             exploration.states['State 1'].content.html,
             '<p>old content</p>')
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
     def test_create_and_accept_suggestion_with_message(self):
@@ -1042,16 +1231,27 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
-
-        suggestions = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), ('target_id', skill_id)])
-        self.assertEqual(len(suggestions), 1)
+        self.assert_created_suggestion_is_valid(skill_id, self.author_id)
 
         skill_services.delete_skill(self.author_id, skill_id)
 
         # Suggestion should be rejected after corresponding skill is deleted.
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', skill_id)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
+
+    def test_delete_topic_rejects_translation_suggestion(self):
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
+        self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
+
+        topic_services.delete_topic(self.author_id, self.TOPIC_ID)
+
+        # Suggestion should be rejected after corresponding topic is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)

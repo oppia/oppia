@@ -20,6 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+const constants = require('constants.ts');
+
 import {
   StoryContentsBackendDict,
   StoryContents,
@@ -37,6 +39,7 @@ interface StoryBackendDict {
   'corresponding_topic_id': string;
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
+  'url_fragment': string;
 }
 
 export class Story {
@@ -50,11 +53,12 @@ export class Story {
   _correspondingTopicId: string;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
+  _urlFragment: string;
   constructor(
       id: string, title: string, description: string, notes: string,
       storyContents: StoryContents, languageCode: string, version: number,
       correspondingTopicId: string, thumbnailBgColor: string,
-      thumbnailFilename: string) {
+      thumbnailFilename: string, urlFragment: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -65,6 +69,7 @@ export class Story {
     this._correspondingTopicId = correspondingTopicId;
     this._thumbnailBgColor = thumbnailBgColor;
     this._thumbnailFilename = thumbnailFilename;
+    this._urlFragment = urlFragment;
   }
 
   getId(): string {
@@ -131,11 +136,39 @@ export class Story {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
+  getUrlFragment(): string {
+    return this._urlFragment;
+  }
+
+  setUrlFragment(urlFragment: string): void {
+    this._urlFragment = urlFragment;
+  }
+
   validate(): string[] {
     var issues = [];
     if (this._title === '') {
       issues.push('Story title should not be empty');
     }
+    const VALID_URL_FRAGMENT_REGEX = new RegExp(
+      constants.VALID_URL_FRAGMENT_REGEX);
+    if (!this._urlFragment) {
+      issues.push(
+        'Url Fragment should not be empty.');
+    } else {
+      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
+        issues.push(
+          'Url Fragment contains invalid characters. ' +
+          'Only lowercase words separated by hyphens are allowed.');
+      }
+      if (
+        this._urlFragment.length >
+        constants.MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+        issues.push(
+          'Url Fragment should not be greater than ' +
+          `${constants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
+      }
+    }
+
     issues = issues.concat(this._storyContents.validate());
     return issues;
   }
@@ -162,6 +195,7 @@ export class Story {
     this._correspondingTopicId = otherStory.getCorrespondingTopicId();
     this._thumbnailFilename = otherStory.getThumbnailFilename();
     this._thumbnailBgColor = otherStory.getThumbnailBgColor();
+    this._urlFragment = otherStory.getUrlFragment();
   }
 }
 
@@ -179,7 +213,8 @@ export class StoryObjectFactory {
       storyBackendDict.language_code,
       storyBackendDict.version, storyBackendDict.corresponding_topic_id,
       storyBackendDict.thumbnail_bg_color,
-      storyBackendDict.thumbnail_filename
+      storyBackendDict.thumbnail_filename,
+      storyBackendDict.url_fragment
     );
   }
 
@@ -188,7 +223,7 @@ export class StoryObjectFactory {
   createInterstitialStory() {
     return new Story(
       null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null, null, null);
+      'Story notes loading', null, 'en', 1, null, null, null, null);
   }
 }
 

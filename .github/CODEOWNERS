@@ -201,6 +201,7 @@
 
 
 # Google-app-engine configurations
+/appengine_config.py @nithusha21
 /cron.yaml @nithusha21
 /dispatch.yaml @seanlip
 /index.yaml @seanlip
@@ -323,7 +324,6 @@
 
 
 # Navigation bar project.
-/core/templates/domain/bottom_navbar/ @nithusha21 @showtim3
 /core/templates/domain/sidebar/ @nithusha21
 /core/templates/components/button-directives/create-activity-button.directive.ts @nithusha21
 /core/templates/components/button-directives/create-activity-button.directive.html @nithusha21
@@ -570,7 +570,7 @@
 
 # Dynamic Feature Gating project
 /core/storage/config/ @BenHenning @vinitamurthi
-/core/domain/platform_parameter_domain*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
