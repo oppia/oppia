@@ -1189,6 +1189,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             ]
             self.assertEqual(actual_output, expected_output)
 
+
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
