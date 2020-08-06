@@ -1111,7 +1111,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             migrated_answer_group.outcome.feedback.html,
             expected_feeedback_html_content)
 
-    def test_migrate_question_state_from_v34_to_v35(self):
+    def test_migrate_question_state_from_v34_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -1204,22 +1204,18 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
-
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id, 'MathEquationInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
+        self.assertEqual(answer_groups[0].rule_inputs, {
+            'MatchesExactlyWith': [{'x': 'x=y', 'y': 'both'}]
+        })
 
         answer_group = {
             'outcome': {
@@ -1313,23 +1309,19 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
 
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+        self.assertEqual(answer_groups[0].rule_inputs, {
+            'MatchesExactlyWith': [{'x': 'x+y'}]
+        })
 
         answer_group = {
             'outcome': {
@@ -1418,23 +1410,18 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
-
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id,
             'NumericExpressionInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
+        self.assertEqual(answer_groups[0].rule_inputs, {
+            'MatchesExactlyWith': [{'x': '1.2 + 3'}]
+        })
 
         answer_groups_list = [{
             'outcome': {
@@ -1536,23 +1523,20 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
 
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(len(answer_groups), 1)
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+        self.assertEqual(answer_groups[0].rule_inputs, {
+            'MatchesExactlyWith': [{'x': 'x+y'}]
+        })
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
