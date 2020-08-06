@@ -5236,8 +5236,6 @@ export = {
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
 
-  "OPPIA_AVATAR_IMAGE_LINK": "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/when-and-how-to-use-masks",
-
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
     "content": {
@@ -5354,6 +5352,9 @@ export = {
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
+
+  // Link to open when the Oppia avatar is clicked on any page.
+  "OPPIA_AVATAR_IMAGE_LINK": "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/when-and-how-to-use-masks",
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
