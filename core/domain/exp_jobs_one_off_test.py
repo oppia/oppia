@@ -1071,7 +1071,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v35(
+        self.save_new_exp_with_states_schema_v36(
             self.NEW_EXP_ID, self.albert_id, {
                 'Introduction': states_dict
             })
@@ -1154,7 +1154,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v35(
+        self.save_new_exp_with_states_schema_v36(
             self.NEW_EXP_ID, self.albert_id, {
                 'Introduction': states_dict
             })
@@ -1185,7 +1185,8 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
             expected_output = [
                 u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
-                'n to v41: u\'property_that_dne\'"]]'
+                'n to v%s: u\'property_that_dne\'"]]' % (
+                    current_exp_schema_version)
             ]
             self.assertEqual(actual_output, expected_output)
 
