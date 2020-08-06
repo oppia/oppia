@@ -106,7 +106,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
     def mock_generate_new_thread_id_for_suggestion(
             self, unused_entity_type, unused_entity_id):
-        """Mock generate_new_thread_id function when creating suggestions. """
+        """Mock generate_new_thread_id function when creating suggestions."""
         return self.THREAD_ID
 
     def create_translation_suggestion_for_exploration_0_and_verify(self):
@@ -130,6 +130,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
     def add_exploration_0_to_story(self):
+        """Adds exploration 0 as a node to the test story."""
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
