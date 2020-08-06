@@ -302,19 +302,29 @@ class UserAuth(python_utils.OBJECT):
         user_id: str. The unique ID of the user.
         gae_id: str. The ID of the user retrieved from GAE.
         pin: str or None. The PIN of the user's profile for android.
+        parent_user_id: str or None. The user_id of the full user with which
+            a profile user is linked to. None for full users.
     """
 
-    def __init__(self, user_id, gae_id, pin=None, deleted=False):
+    def __init__(
+            self, user_id, gae_id, pin=None, parent_user_id=None,
+            deleted=False):
         """Constructs a UserAuth domain object.
 
         Args:
             user_id: str. The unique ID of the user.
             gae_id: str. The ID of the user retrieved from GAE.
             pin: str or None. The PIN of the user's profile for android.
+            parent_user_id: str or None. The user_id of the full user with which
+                a profile user is linked to. None for full users.
+            deleted: bool. Whether the user has requested removal of their
+                account.
         """
         self.user_id = user_id
         self.gae_id = gae_id
         self.pin = pin
+        self.parent_user_id = parent_user_id
+        self.deleted = deleted
 
     def validate(self):
         """Checks that user_id, gae_id and email fields of this UserAuth domain
@@ -324,6 +334,7 @@ class UserAuth(python_utils.OBJECT):
             ValidationError. The user_id is not str.
             ValidationError. The gae_id is not str.
             ValidationError. The pin is not str.
+            ValidationError. The parent_user_id is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -346,6 +357,15 @@ class UserAuth(python_utils.OBJECT):
                 'Expected PIN to be a string, received %s' %
                 self.pin
             )
+
+        if self.parent_user_id is not None:
+            if not isinstance(self.user_id, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected parent_user_id to be a string, received %s'
+                    % self.parent_user_id)
+            if not is_user_id_correct(self.parent_user_id):
+                raise utils.ValidationError(
+                    'The parent user ID is in a wrong format.')
 
 
 def is_user_id_correct(user_id):
@@ -578,8 +598,17 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_settings = _transform_user_settings(
-        user_models.UserSettingsModel.get_by_gae_id(gae_id))
+    if feconf.ENABLE_USER_AUTH_MODEL is False:
+        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+            gae_id)
+    else:
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, gae_id)
+        user_settings_model = None
+        if user_auth_model is not None:
+            user_settings_model = user_models.UserSettingsModel.get_by_id(
+                user_auth_model.id)
+    user_settings = _transform_user_settings(user_settings_model)
     if strict and user_settings is None:
         logging.error('Could not find user with id %s' % gae_id)
         raise Exception('User not found.')

@@ -259,40 +259,114 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
-    def test_get_user_settings_by_gae_id(self):
-        gae_id = 'gae_id'
-        user_models.UserSettingsModel(
-            id='user_id',
-            gae_id=gae_id,
-            email='user@example.com',
-            username='username',
-        ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-            gae_id)
-        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
-        self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.email, user_settings.email)
-        self.assertEqual(user_settings_model.username, user_settings.username)
-        self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
+    def test_user_settings_by_gae_id_with_user_auth_disabled_is_not_none(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
+            gae_id = 'gae_id'
+            user_models.UserSettingsModel(
+                id='user_id',
+                gae_id=gae_id,
+                email='user@example.com',
+                username='username'
+            ).put()
+            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+                gae_id)
+            user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+            self.assertEqual(user_settings_model.id, user_settings.user_id)
+            self.assertEqual(user_settings_model.email, user_settings.email)
+            self.assertEqual(
+                user_settings_model.username, user_settings.username)
+            self.assertIsNone(
+                user_services.get_user_settings_by_gae_id('id_x'))
 
-    def test_get_user_settings_by_gae_id_strict(self):
-        gae_id = 'gae_id'
-        user_models.UserSettingsModel(
-            id='user_id',
-            gae_id=gae_id,
-            email='user@example.com',
-            username='username',
-        ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-            gae_id)
-        user_settings = user_services.get_user_settings_by_gae_id(
-            gae_id, strict=True)
-        self.assertEqual(user_settings_model.id, user_settings.user_id)
-        self.assertEqual(user_settings_model.email, user_settings.email)
-        self.assertEqual(user_settings_model.username, user_settings.username)
+    def test_user_settings_by_auth_model_with_user_auth_enabled_not_none(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', True):
+            user_id = 'user_id'
+            gae_id = 'gae_id'
+            user_models.UserAuthModel(
+                id=user_id,
+                gae_id=gae_id
+            ).put()
 
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.get_user_settings_by_gae_id('id_x', strict=True)
+            # Remove the gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag is set True.
+            user_models.UserSettingsModel(
+                id=user_id,
+                gae_id=gae_id,
+                email='user@example.com',
+                username='username'
+            ).put()
+            user_settings_model = user_models.UserSettingsModel.get_by_id(
+                user_id)
+            user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+            self.assertEqual(user_settings_model.id, user_settings.user_id)
+            self.assertEqual(user_settings_model.email, user_settings.email)
+            self.assertEqual(
+                user_settings_model.username, user_settings.username)
+            self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
+
+    def test_user_settings_by_auth_model_with_user_auth_disabled_is_none(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
+            user_id = 'user_id'
+            gae_id = 'gae_id'
+            user_models.UserSettingsModel(
+                id=user_id,
+                gae_id=gae_id,
+                email='user@example.com',
+                username='username',
+            ).put()
+            self.assertIsNone(user_models.UserAuthModel.get_by_id(user_id))
+            self.assertIsNone(user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id))
+
+    def test_user_settings_by_gae_id_strict_user_auth_disabled_not_none(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
+            gae_id = 'gae_id'
+            user_models.UserSettingsModel(
+                id='user_id',
+                gae_id=gae_id,
+                email='user@example.com',
+                username='username',
+            ).put()
+            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+                gae_id)
+            user_settings = user_services.get_user_settings_by_gae_id(
+                gae_id, strict=True)
+            self.assertEqual(user_settings_model.id, user_settings.user_id)
+            self.assertEqual(user_settings_model.email, user_settings.email)
+            self.assertEqual(
+                user_settings_model.username, user_settings.username)
+
+            with self.assertRaisesRegexp(Exception, 'User not found.'):
+                user_services.get_user_settings_by_gae_id('id_x', strict=True)
+
+    def test_user_setting_strict_by_auth_model_user_auth_enabled_not_none(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', True):
+            user_id = 'user_id'
+            gae_id = 'gae_id'
+            user_models.UserAuthModel(
+                id=user_id,
+                gae_id=gae_id
+            ).put()
+
+            # Remove the gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag is set True.
+            user_models.UserSettingsModel(
+                id=user_id,
+                gae_id=gae_id,
+                email='user@example.com',
+                username='username',
+            ).put()
+            user_settings_model = user_models.UserSettingsModel.get_by_id(
+                user_id)
+            user_settings = user_services.get_user_settings_by_gae_id(
+                gae_id, strict=True)
+            self.assertEqual(user_settings_model.id, user_settings.user_id)
+            self.assertEqual(user_settings_model.email, user_settings.email)
+            self.assertEqual(
+                user_settings_model.username, user_settings.username)
+
+            with self.assertRaisesRegexp(Exception, 'User not found.'):
+                user_services.get_user_settings_by_gae_id('id_x', strict=True)
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
