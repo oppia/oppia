@@ -321,12 +321,13 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return self.id.split('.')[0]
 
     @classmethod
-    def create(cls, thread_id, message_id):
+    def create(cls, message_identifier):
         """Creates a new GeneralFeedbackMessageModel entry.
 
         Args:
-            thread_id: str. ID of the thread.
-            message_id: int. ID of the message.
+            message_identifier: FullyQualifiedMessageIdentifier. The message
+                identifier consists of the thread_id and its corresponding
+                message_id.
 
         Returns:
             GeneralFeedbackMessageModel. Instance of the new
@@ -336,10 +337,55 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             Exception. A message with the same ID already exists
                 in the given thread.
         """
-        instance_id = cls._generate_id(thread_id, message_id)
-        if cls.get_by_id(instance_id):
-            raise Exception('Feedback message ID conflict on create.')
-        return cls(id=instance_id)
+
+        return cls.create_multi([message_identifier])[0]
+
+    @classmethod
+    def create_multi(cls, message_identifiers):
+        """Creates a new GeneralFeedbackMessageModel entry for each
+        (thread_id, message_id) pair.
+
+        Args:
+            message_identifiers: list(FullyQualifiedMessageIdentifier). Each
+                message identifier consists of the thread_id and its
+                corresponding message_id.
+
+        Returns:
+            list(GeneralFeedbackMessageModel). Instances of the new
+            GeneralFeedbackMessageModel entries.
+
+        Raises:
+            Exception. The number of thread_ids must be equal to the number of
+                message_ids.
+            Exception. A message with the same ID already exists
+                in the given thread.
+        """
+        thread_ids = [
+            message_identifier.thread_id for message_identifier
+            in message_identifiers]
+        message_ids = [
+            message_identifier.message_id for message_identifier
+            in message_identifiers]
+
+        # Generate the new ids.
+        instance_ids = [
+            cls._generate_id(thread_id, message_id) for thread_id, message_id
+            in python_utils.ZIP(thread_ids, message_ids)
+        ]
+
+        # Check if the new ids are valid.
+        current_instances = cls.get_multi(instance_ids)
+        conflict_ids = [
+            current_instance.id for current_instance in current_instances if
+            current_instance is not None
+        ]
+        if len(conflict_ids) > 0:
+            raise Exception(
+                'The following feedback message ID(s) conflicted on '
+                'create: %s' % (' '.join(conflict_ids))
+            )
+
+        return [cls(id=instance_id) for instance_id in instance_ids]
 
     @classmethod
     def get(cls, thread_id, message_id, strict=True):
@@ -410,12 +456,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             GeneralFeedbackMessageModel. Last message in the thread.
         """
         thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
-        if thread.message_count:
-            most_recent_message = cls.get(thread_id, thread.message_count - 1)
-            return most_recent_message
-        else:
-            return cls.get_all().filter(
-                cls.thread_id == thread_id).order(-cls.last_updated).get()
+        return cls.get(thread_id, thread.message_count - 1)
 
     @classmethod
     def get_message_count(cls, thread_id):
@@ -428,12 +469,23 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             int. Number of messages in the thread.
         """
-        thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
-        if thread.message_count:
-            return thread.message_count
-        else:
-            return cls.get_all(include_deleted=True).filter(
-                cls.thread_id == thread_id).count()
+        return cls.get_message_counts([thread_id])[0]
+
+    @classmethod
+    def get_message_counts(cls, thread_ids):
+        """Returns a list containing the number of messages in the threads.
+        Includes the deleted entries.
+
+        Args:
+            thread_ids: list(str). ID of the threads.
+
+        Returns:
+            list(int). List of the message counts for the threads.
+        """
+        thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
+
+        return [thread_model.message_count for thread_model in thread_models]
+
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
@@ -540,10 +592,31 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             FeedbackThreadUserModel. The newly created FeedbackThreadUserModel
             instance.
         """
-        instance_id = cls.generate_full_id(user_id, thread_id)
-        new_instance = cls(id=instance_id, user_id=user_id, thread_id=thread_id)
-        new_instance.put()
-        return new_instance
+
+        return cls.create_multi(user_id, [thread_id])[0]
+
+    @classmethod
+    def create_multi(cls, user_id, thread_ids):
+        """Creates new FeedbackThreadUserModel instances for user_id for each
+        of the thread_ids.
+
+        Args:
+            user_id: str. The id of the user.
+            thread_ids: list(str). The ids of the threads.
+
+        Returns:
+            list(FeedbackThreadUserModel). The newly created
+            FeedbackThreadUserModel instances.
+        """
+        new_instances = []
+        for thread_id in thread_ids:
+            instance_id = cls.generate_full_id(user_id, thread_id)
+            new_instance = cls(
+                id=instance_id, user_id=user_id, thread_id=thread_id)
+            new_instances.append(new_instance)
+
+        GeneralFeedbackThreadUserModel.put_multi(new_instances)
+        return new_instances
 
     @classmethod
     def get_multi(cls, user_id, thread_ids):

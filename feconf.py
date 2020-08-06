@@ -61,6 +61,10 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
+INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs'))
+INTERACTIONS_SPECS_FILE_PATH = (
+    os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
@@ -206,7 +210,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 35
+CURRENT_STATE_SCHEMA_VERSION = 36
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -227,7 +231,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -786,6 +790,7 @@ STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 STORY_PROGRESS_URL_PREFIX = '/story_progress_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
+STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
@@ -1041,7 +1046,7 @@ AVAILABLE_LANDING_PAGES = {
 }
 
 # Classroom page names for generating URLs. These need to be kept in sync with
-# TOPIC_IDS_FOR_CLASSROOM_PAGES property in config_domain.
+# CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
 
 # Authentication method using GAE ID (google sign in)
