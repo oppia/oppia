@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EventEmitter } from '@angular/core';
+
 /**
  * @fileoverview Service to operate the playback of audio.
  */
@@ -25,6 +27,8 @@ angular.module('oppia').factory('AudioPlayerService', [
     var _currentTrackFilename = null;
     var _currentTrack = null;
     var _currentTrackDuration = null;
+
+    var _autoplayAudioEventEmitter = new EventEmitter();
 
     var _load = function(
         filename, successCallback, errorCallback) {
@@ -165,6 +169,9 @@ angular.module('oppia').factory('AudioPlayerService', [
       clear: function() {
         _currentTrack = null;
         _currentTrackFilename = null;
+      },
+      get onAutoplayAudio() {
+        return _autoplayAudioEventEmitter;
       }
     };
   }
