@@ -617,9 +617,11 @@ def start_redis_server():
             REDIS_SERVER_PATH, REDIS_CONF_PATH, '--daemonize', 'yes'
         ), shell=True)
 
+
 def stop_redis_server():
     """Stops the redis server by shutting it down."""
     subprocess.call(['./%s' % REDIS_CLI_PATH, 'shutdown'])
+
 
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""

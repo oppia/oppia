@@ -981,6 +981,7 @@ class MemoryCacheAdminHandler(base.BaseHandler):
         caching_services.flush_memory_cache()
         self.render_json({})
 
+
 class UpdateUsernameHandler(base.BaseHandler):
     """Handler for renaming usernames."""
 
