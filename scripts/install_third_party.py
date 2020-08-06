@@ -360,8 +360,8 @@ def install_redis_cli():
     queried using either the Python redis library or the redis-cli interpreter.
     """
     try:
-        subprocess.call([
-            '%s' % common.REDIS_SERVER_PATH, '--version'],
+        subprocess.call(
+            ['%s' % common.REDIS_SERVER_PATH, '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)

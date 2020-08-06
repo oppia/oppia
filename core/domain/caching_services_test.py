@@ -24,8 +24,6 @@ from core.domain import caching_services
 from core.domain import exp_domain
 from core.tests import test_utils
 
-import python_utils
-
 
 class CachingServicesUnitTests(test_utils.GenericTestBase):
     """Tests for caching_services."""

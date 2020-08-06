@@ -105,6 +105,7 @@ SERIALIZATION_FUNCTIONS = {
 # sub-namespace, and the id in the key.
 MEMCACHE_KEY_DELIMITER = ':'
 
+
 def _get_memcache_key(namespace, sub_namespace, obj_id):
     """Returns a memcache key for the class under namespace and sub_namespace.
 
@@ -129,7 +130,8 @@ def _get_memcache_key(namespace, sub_namespace, obj_id):
     if MEMCACHE_KEY_DELIMITER in sub_namespace_key_string:
         raise ValueError(
             'Sub-namespace %s cannot contain \':\'.' % sub_namespace_key_string)
-    return '%s%s%s%s%s' % (namespace, MEMCACHE_KEY_DELIMITER,
+    return '%s%s%s%s%s' % (
+        namespace, MEMCACHE_KEY_DELIMITER,
         sub_namespace_key_string, MEMCACHE_KEY_DELIMITER, obj_id)
 
 
