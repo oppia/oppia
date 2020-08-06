@@ -184,9 +184,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # Find all RuleSpecs in AnwerGroups and change
                 # CaseSensitiveEquals rule types to Equals.
                 for answer_group_dict in change.new_value:
-                   for rule_spec_dict in answer_group_dict['rule_specs']:
-                       if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
-                           rule_spec_dict['rule_type'] = 'Equals'
+                    for rule_spec_dict in answer_group_dict['rule_specs']:
+                        if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                            rule_spec_dict['rule_type'] = 'Equals'
 
         return draft_change_list
 
