@@ -372,9 +372,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # Assert that there are two translation suggestions with the given
         # exploration ids found. There should be two fetch_page calls.
         self.assertEqual(len(suggestion_model_results), 2)
-        # Assert that the models returned are in the same order as the exp_ids.
-        self.assertEqual(suggestion_model_results[0].target_id, 'exp4')
-        self.assertEqual(suggestion_model_results[1].target_id, 'exp5')
 
     def test_get_all_stale_suggestions(self):
         with self.swap(
