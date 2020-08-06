@@ -371,11 +371,12 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
         feedback_models.GeneralFeedbackThreadUserModel.get_multi(
             user_id, thread_ids))
 
-    # Keep track of which thread_ids do not have models yet.
-    thread_ids_missing_models = []
+    # Keep track of which thread_ids do not have feedback thread user models
+    # yet.
+    thread_ids_missing_user_models = []
     # Keep track of the message_ids corresponding to the thread_ids that do not
-    # have models yet.
-    message_ids_for_missing_thread_models = []
+    # have feedback thread user models yet.
+    message_ids_for_missing_user_models = []
     # Keep track of the feedback thread user models that already exist and
     # aren't None. This list will be used when we update the datastore.
     current_feedback_thread_user_models = []
@@ -383,8 +384,8 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     for index, feedback_thread_user_model in enumerate(
             current_feedback_thread_user_models_with_possible_nones):
         if feedback_thread_user_model is None:
-            thread_ids_missing_models.append(thread_ids[index])
-            message_ids_for_missing_thread_models.append(message_ids[index])
+            thread_ids_missing_user_models.append(thread_ids[index])
+            message_ids_for_missing_user_models.append(message_ids[index])
         else:
             current_feedback_thread_user_models.append(
                 feedback_thread_user_model)
@@ -395,10 +396,10 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     # Create the new GeneralFeedbackThreadUserModels for each of the thread_ids
     # that do not have a model yet.
     new_feedback_thread_user_models = []
-    if thread_ids_missing_models:
+    if thread_ids_missing_user_models:
         new_feedback_thread_user_models = (
             feedback_models.GeneralFeedbackThreadUserModel.create_multi(
-                user_id, thread_ids_missing_models)
+                user_id, thread_ids_missing_user_models)
         )
 
     # For each of the new models, append the message_id to the
@@ -406,7 +407,7 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     for index, feedback_thread_user_model in enumerate(
             new_feedback_thread_user_models):
         feedback_thread_user_model.message_ids_read_by_user.append(
-            message_ids_for_missing_thread_models[index]
+            message_ids_for_missing_user_models[index]
         )
 
     # Update both the new and previously existing models in the datastore.

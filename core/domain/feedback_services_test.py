@@ -436,8 +436,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     def test_add_message_ids_to_read_by_list_adds_msgs_to_threads_in_order(
             self):
         """Tests that the message_ids are being added to the correct feedback
-        thread user model instances when the feedback thread user models exist
-        for some of the threads before the method is called and some do not.
+        thread user model instances when when some of these models exist before
+        the method is called and some do not.
         """
         sample_message_ids = [1, 2, 3]
         sample_thread_ids = [
