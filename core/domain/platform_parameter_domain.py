@@ -39,7 +39,7 @@ ALLOWED_SERVER_MODES = [
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
 ALLOWED_CLIENT_TYPES = ['Web', 'Android']
-ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Others']
+ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Unknown']
 
 # The ordering of elements in ALLOWED_APP_VERSION_FLAVOR implies the ordering
 # of corresponding flavors, which is used in app_version_flavor filter for order
