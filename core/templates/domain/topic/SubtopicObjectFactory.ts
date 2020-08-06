@@ -101,7 +101,7 @@ export class Subtopic {
     return issues;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Subtopic ' + this._title + ' should have a thumbnail.');
@@ -114,7 +114,7 @@ export class Subtopic {
     return this._skillSummaries.slice();
   }
 
-  getSkillIds(): Array<string> {
+  getSkillIds(): string[] {
     return this._skillIds.slice();
   }
 

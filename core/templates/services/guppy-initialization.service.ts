@@ -34,7 +34,7 @@ class GuppyObject {
   providedIn: 'root'
 })
 export class GuppyInitializationService {
-  private guppyInstances: Array<GuppyObject> = [];
+  private guppyInstances: GuppyObject[] = [];
   private onScreenKeyboardShown = false;
 
   init(guppyDivClassName: string, placeholderText: string, initialValue = ''):

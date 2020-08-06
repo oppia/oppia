@@ -53,7 +53,7 @@ export class ExprUndefinedVarError extends ExpressionError {
 
 export class ExprWrongNumArgsError extends ExpressionError {
   constructor(
-      public args: Array<number|string>,
+      public args: (number|string)[],
       public expectedMin: number, public expectedMax: number) {
     super(
       '{' + args + '} not in range [' + expectedMin + ', ' + expectedMax + ']');
@@ -153,7 +153,7 @@ export class ExpressionSyntaxTreeService {
     return coercedValue;
   }
 
-  private coerceAllArgsToNumber(args: Array<number|string>): number[] {
+  private coerceAllArgsToNumber(args: (number|string)[]): number[] {
     return args.map(this.coerceToNumber);
   }
 
