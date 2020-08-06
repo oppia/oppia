@@ -87,6 +87,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryMathRteAuditOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
+    topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     topic_jobs_one_off.SubTopicPageMathRteAuditOneOffJob,
