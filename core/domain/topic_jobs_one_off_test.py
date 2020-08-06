@@ -384,7 +384,8 @@ class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': valid_html_2,
+                        'data_format': 'html',
+                        'translation': valid_html_2,
                         'needs_update': False
                     }
                 }

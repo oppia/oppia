@@ -367,11 +367,16 @@ def apply_change_list(exploration_id, change_list):
                         list(python_utils.MAP(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    state.update_content(
+                    content = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
+                    content.validate()
+                    state.update_content(content)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    state.update_next_content_id_index(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
@@ -1417,7 +1422,7 @@ def get_image_filenames_from_exploration(exploration):
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
-                'imageAndRegions']['value']['imagePath'])
+                'imageAndRegions'].value['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
     filenames.extend(
@@ -1692,7 +1697,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_upgrade_services.try_upgrading_draft_to_exp_version(
                         draft_change_list,
                         exp_user_data.draft_change_list_exp_version,
-                        exploration.version, exp_id))
+                        exploration.version, exploration.id))
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
