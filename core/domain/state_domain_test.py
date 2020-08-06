@@ -92,31 +92,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_inputs': {
+                'IsEqualToOrdering': [{
                     'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+                }],
+                'HasElementXAtPositionY': [{
                     'x': '<p>HasElementXAtPositionY rule_spec html</p>',
                     'y': 2
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': '<p>x input for HasElementXAtPositionY rule_spec </p>',
                     'y': '<p>y input for HasElementXAtPositionY rule_spec </p>'
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
                     'x': [[(
                         '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition r'
                         'ule_spec htmls</p>')]]
-                }
-            }],
+                }]
+            },
+            'rule_input_translations_mapping': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -350,13 +344,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state written_translation ca_choices_3-hi</p>',
                 '<p>state written_translation ca_choices_3-en</p>',
                 '<p>State Feedback</p>',
-                '<p>IsEqualToOrdering rule_spec htmls</p>',
-                '<p>HasElementXAtPositionY rule_spec html</p>',
-                '<p>y input for HasElementXAtPositionY rule_spec </p>',
-                '<p>x input for HasElementXAtPositionY rule_spec </p>',
                 (
                     '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
                     'pec htmls</p>'),
+                '<p>HasElementXAtPositionY rule_spec html</p>',
+                '<p>IsEqualToOrdering rule_spec htmls</p>',
+                '<p>y input for HasElementXAtPositionY rule_spec </p>',
+                '<p>x input for HasElementXAtPositionY rule_spec </p>',
                 '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
@@ -396,12 +390,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_inputs': {
+                'Equals': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Equals'
-            }],
+                }]
+            },
+            'rule_input_translations_mapping': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -505,27 +499,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
         state_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
+            'rule_inputs': {
+                'Equals': [{
                     'x': ['<p>Equals rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+                }],
+                'ContainsAtLeastOneOf': [{
                     'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
+                }],
+                'IsProperSubsetOf': [{
                     'x': ['<p>IsProperSubsetOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
-                }
-            }],
+                }]
+            },
+            'rule_input_translations_mapping': {},
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -584,10 +572,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             html_list,
             [
                 '<p>state outcome html</p>',
-                '<p>Equals rule_spec html</p>',
+                '<p>DoesNotContainAtLeastOneOf rule_spec html</p>',
                 '<p>ContainsAtLeastOneOf rule_spec html</p>',
                 '<p>IsProperSubsetOf rule_spec html</p>',
-                '<p>DoesNotContainAtLeastOneOf rule_spec html</p>', '',
+                '<p>Equals rule_spec html</p>',
+                '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
                 '<p>state customization arg html 1</p>',
@@ -610,27 +599,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': ['<p>Equals rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
-                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
-                }
-            }],
+                }],
+                'Equals': [{
+                    'x': ['<p>Equals rule_spec html</p>']
+                }],
+                'IsProperSubsetOf': [{
+                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                }]
+            },
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -711,12 +694,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['State1'])
         state = exploration.states['State1']
         state_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
                     'x': ['<p>init_state customization arg html 1</p>']
-                }
-            }],
+                }]
+            },
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -1079,12 +1062,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Contains': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1224,12 +1207,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Contains': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1679,34 +1662,33 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[html_with_old_math_schema]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': html_with_old_math_schema,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[html_with_old_math_schema]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': html_with_old_math_schema,
                     'y': html_with_old_math_schema
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[html_with_old_math_schema]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                        'x': [
+                            [html_with_old_math_schema]
+                        ]
+                    },
+                    {
+                        'x': [
+                            [html_with_old_math_schema]
+                        ]
+                    }
+                ],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [html_with_old_math_schema]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1722,34 +1704,33 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[html_with_new_math_schema]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': html_with_new_math_schema,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[html_with_new_math_schema]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': html_with_new_math_schema,
                     'y': html_with_new_math_schema
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[html_with_new_math_schema]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                        'x': [
+                            [html_with_new_math_schema]
+                        ]
+                    },
+                    {
+                        'x': [
+                            [html_with_new_math_schema]
+                        ]
+                    }
+                ],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [html_with_new_math_schema]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1932,27 +1913,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [html_with_old_math_schema]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': [html_with_old_math_schema]
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
+                }],
+                'Equals': [{
                     'x': [html_with_old_math_schema]
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'IsProperSubsetOf': [{
                     'x': [html_with_old_math_schema]
-                }
-            }],
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -1969,27 +1944,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         answer_group_with_new_math_schema = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [html_with_new_math_schema]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': [html_with_new_math_schema]
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
+                }],
+                'Equals': [{
                     'x': [html_with_new_math_schema]
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'IsProperSubsetOf': [{
                     'x': [html_with_new_math_schema]
-                }
-            }],
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -2178,12 +2147,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Equals'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2199,12 +2168,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Equals'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2341,17 +2310,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [html_with_old_math_schema]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+                }],
+                'Equals': [{
                     'x': [html_with_old_math_schema]
-                }
-            }],
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -2444,17 +2411,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
         answer_group_with_old_math_schema = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [html_with_old_math_schema]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+                }],
+                'Equals': [{
                     'x': [html_with_old_math_schema]
-                }
-            }],
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -3140,12 +3105,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Contains': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -3503,12 +3468,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Contains': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
@@ -3549,40 +3514,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': [],
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected rule_inputs to be a dict'):
-            exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
-
-    def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_list = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Contains': [[]]
             },
-            'rule_specs': {},
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected answer group rule specs to be a list'):
+            Exception, 'Expected rule_input to be a dict'):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3600,12 +3541,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Contains': [{
                     'x': []
-                },
-                'rule_type': 'Contains'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
@@ -3639,12 +3580,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Contains': [{
                     'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
@@ -3653,7 +3594,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
             (
                 exploration.init_state.interaction.answer_groups[0]
-                .rule_specs[0].validate([], {})
+                .validate_rule_input(
+                    {'x': 'Test'},
+                    'Contains',
+                    [],
+                    {} )
             )
 
         self.assertEqual(
