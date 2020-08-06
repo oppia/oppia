@@ -332,9 +332,15 @@ def install_hook():
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
     chmod_cmd = ['chmod', '+x', pre_push_file]
-    if os.path.islink(pre_push_file):
+    file_is_symlink = os.path.islink(pre_push_file)
+    file_exists = os.path.exists(pre_push_file)
+    if file_is_symlink and file_exists:
         python_utils.PRINT('Symlink already exists')
     else:
+        # If its a broken symlink, delete it.
+        if file_is_symlink and not file_exists:
+            os.unlink(pre_push_file)
+            python_utils.PRINT('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(__file__), pre_push_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
