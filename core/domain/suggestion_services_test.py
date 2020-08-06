@@ -911,7 +911,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                         'duration_secs': 42.43
                     }
                 },
-                'default_outcome': {}
+                'default_outcome': {},
+                'ca_placeholder_0': {}
             }
         }
         self.old_recorded_voiceovers = (
