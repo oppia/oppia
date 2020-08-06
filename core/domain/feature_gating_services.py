@@ -138,7 +138,6 @@ def _create_evaluation_context_for_server():
     """
     return param_domain.EvaluationContext.from_dict(
         {
-            'client_platform': None,
             'client_type': None,
             'browser_type': None,
             'app_version': None,
