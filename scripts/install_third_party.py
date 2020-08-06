@@ -342,22 +342,23 @@ def download_manifest_files(filepath):
 def install_redis_cli():
     """This installs the redis-cli to the local oppia third_party directory so
     that development servers and backend tests can make use of a local redis
-    cache. Redis-cli installed here is different from the redis package
-    installed in manifest.json. The redis package detailed in manifest.json is
-    the Python library that allows users to communicate with any Redis cache
-    using Python. The redis-cli package installed in this function contains
-    scripts for the redis-cli and redis-server programs detailed below.
+    cache. Redis-cli installed here (redis-cli-6.0.6) is different from the
+    redis package installed in manifest.json (redis-3.5.3). The redis-3.5.3
+    package detailed in manifest.json is the Python library that allows users to
+    communicate with any Redis cache using Python. The redis-cli-6.0.6 package
+    installed in this function contains C++ scripts for the redis-cli and
+    redis-server programs detailed below.
 
-    The Redis-cli is the command line interface that serves up an interpreter
-    that allows users to connects to a redis database cache and query the cache
-    using redis's API.
+    The redis-cli program is the command line interface that serves up an
+    interpreter that allows users to connect to a redis database cache and
+    query the cache using the Redis CLI API. It also contains functionality to
+    shutdown the redis server. We need to install redis-cli separately from the
+    default installation of backend libraries since it is a system program and
+    we need to build the program files after the library is untarred.
 
-    Redis-server starts a local Redis database on the machine that can be
-    queried using either the Python redis library or the Redis-cli interpreter.
+    The redis-server starts a Redis database on the local machine that can be
+    queried using either the Python redis library or the redis-cli interpreter.
     """
-    # We need to install redis-cli separately from the default way since it
-    # is a system program and we need to build the program files after the
-    # library is untarred.
     try:
         # Pipe output to /dev/null for silence in console.
         null = python_utils.open_file('/dev/null', 'w')
@@ -366,9 +367,8 @@ def install_redis_cli():
         null.close()
         python_utils.PRINT('Redis-cli is already installed.')
     except OSError:
-        # Redis-cli is not installed, run the script to install it.
-        # NOTE: We do the installation here (rather than in manifest.json)
-        # since we need to use make.
+        # The redis-cli is not installed, run the script to install it.
+        # NOTE: We do the installation here since we need to use make.
         python_utils.PRINT('Installing redis-cli...')
 
         download_and_untar_files(
@@ -389,9 +389,9 @@ def install_redis_cli():
 
         # Make the scripts executable.
         subprocess.call([
-            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-cli'])
+            'chmod', '+x', common.REDIS_SERVER_PATH])
         subprocess.call([
-            'chmod', '+x', 'third_party/redis-cli-6.0.6/src/redis-server'])
+            'chmod', '+x', common.REDIS_CLI_PATH])
 
         python_utils.PRINT('Redis-cli installed successfully.')
 

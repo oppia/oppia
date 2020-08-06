@@ -31,8 +31,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     """Tests for caching_services."""
 
     def test_retrieved_memory_profile_contains_correct_elements(self):
-        memory_profile = caching_services.get_memory_stats()
-        self.assertIsInstance(memory_profile, caching_domain.MemoryStats)
+        memory_profile = caching_services.get_memory_cache_stats()
+        self.assertIsInstance(memory_profile, caching_domain.MemoryCacheStats)
         self.assertIsNotNone(memory_profile.total_allocated_in_bytes)
         self.assertIsNotNone(memory_profile.peak_memory_usage_in_bytes)
         self.assertIsNotNone(memory_profile.total_number_of_keys_stored)

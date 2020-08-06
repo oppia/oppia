@@ -95,8 +95,7 @@ def cleanup():
         # Redis does not run on Windows machines.
         python_utils.PRINT('Cleaning up the redis_servers.')
         # Shutdown the redis server before exiting.
-        subprocess.call([
-            './third_party/redis-cli-6.0.6/src/redis-cli', 'shutdown'])
+        common.stop_redis_server()
 
 
 def main(args=None):
@@ -149,13 +148,9 @@ def main(args=None):
         # Redis-cli is only required in a development environment.
         python_utils.PRINT('Starting Redis development server.')
         # Start the redis local development server. Redis doesn't run on
-        # Windows machine. Use daemonize argument to prevent redis-server from
-        # exiting on its own.
+        # Windows machine.
         if not common.is_windows_os():
-            background_processes.append(
-                subprocess.call([
-                    './third_party/redis-cli-6.0.6/src/redis-server',
-                    (common.REDIS_CONF_PATH), '--daemonize', 'yes']))
+            background_processes.append(common.start_redis_server())
         else:
             raise Exception(
                 'Redis command line interface is not installed because your ' +

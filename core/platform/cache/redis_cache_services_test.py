@@ -27,7 +27,7 @@ class RedisCacheServicesUnitTests(test_utils.GenericTestBase):
     """Tests for redis_cache_services."""
 
     def test_memory_stats_returns_dict(self):
-        memory_stats = redis_cache_services.get_memory_stats()
+        memory_stats = redis_cache_services.get_memory_cache_stats()
         self.assertIsNotNone(memory_stats.total_allocated_in_bytes)
         self.assertIsNotNone(memory_stats.peak_memory_usage_in_bytes)
         self.assertIsNotNone(memory_stats.total_number_of_keys_stored)

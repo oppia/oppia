@@ -75,6 +75,10 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+REDIS_SERVER_PATH = os.path.join(
+    'third_party', 'redis-cli-6.0.6', 'src', 'redis-server')
+REDIS_CLI_PATH = os.path.join(
+    'third_party', 'redis-cli-6.0.6', 'src', 'redis-cli')
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
@@ -601,6 +605,21 @@ def wait_for_port_to_be_open(port_number):
             port_number)
         sys.exit(1)
 
+def start_redis_server():
+    """Start the redis server with the daemonize argument to prevent
+    the redis-server from exiting on its own.
+
+    Returns:
+        subprocess.pOpen object. The process object of the redis server.
+    """
+    return subprocess.Popen(
+        './%s %s %s %s' % (
+            REDIS_SERVER_PATH, REDIS_CONF_PATH, '--daemonize', 'yes'
+        ), shell=True)
+
+def stop_redis_server():
+    """Stops the redis server by shutting it down."""
+    subprocess.call(['./%s' % REDIS_CLI_PATH, 'shutdown'])
 
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""

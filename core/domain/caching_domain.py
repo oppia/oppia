@@ -27,7 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import python_utils
 
 
-class MemoryStats(python_utils.OBJECT):
+class MemoryCacheStats(python_utils.OBJECT):
     """Domain object for an Oppia memory profile object that contains
     information about the memory cache.
     """
@@ -35,7 +35,7 @@ class MemoryStats(python_utils.OBJECT):
     def __init__(
             self, total_allocated_in_bytes, peak_memory_usage_in_bytes,
             total_number_of_keys_stored):
-        """Initializes a Memory Stats domain object.
+        """Initializes a Memory Cache Stats domain object.
 
         Args:
             total_allocated_in_bytes: int. The total number of bytes allocated
@@ -45,9 +45,6 @@ class MemoryStats(python_utils.OBJECT):
             total_number_of_keys_stored: int. The number of keys stored in the
                 memory cache.
         """
-        self.total_allocated_in_bytes = python_utils.convert_to_bytes(
-            total_allocated_in_bytes)
-        self.peak_memory_usage_in_bytes = python_utils.convert_to_bytes(
-            peak_memory_usage_in_bytes)
-        self.total_number_of_keys_stored = python_utils.convert_to_bytes(
-            total_number_of_keys_stored)
+        self.total_allocated_in_bytes = total_allocated_in_bytes
+        self.peak_memory_usage_in_bytes = peak_memory_usage_in_bytes
+        self.total_number_of_keys_stored = total_number_of_keys_stored

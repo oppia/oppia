@@ -968,19 +968,18 @@ class MemoryCacheAdminHandler(base.BaseHandler):
     """Handler for memory cache functions used in the Misc Page."""
 
     @acl_decorators.can_access_admin_page
+    def get(self):
+        cache_stats = caching_services.get_memory_cache_stats()
+        self.render_json({
+            'total_allocation': cache_stats.total_allocated_in_bytes,
+            'peak_allocation': cache_stats.peak_memory_usage_in_bytes,
+            'total_keys_stored': cache_stats.total_number_of_keys_stored
+        })
+
+    @acl_decorators.can_access_admin_page
     def post(self):
         caching_services.flush_memory_cache()
         self.render_json({})
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        memory_stats = caching_services.get_memory_stats()
-        self.render_json({
-            'total_allocation': memory_stats.total_allocated_in_bytes,
-            'peak_allocation': memory_stats.peak_memory_usage_in_bytes,
-            'total_keys_stored': memory_stats.total_number_of_keys_stored
-        })
-
 
 class UpdateUsernameHandler(base.BaseHandler):
     """Handler for renaming usernames."""

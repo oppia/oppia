@@ -28,18 +28,18 @@ REDIS_CLIENT = redis.Redis(
     host=feconf.REDISHOST, port=feconf.REDISPORT)
 
 
-def get_memory_stats():
+def get_memory_cache_stats():
     """Returns a memory profile of the redis cache. Visit
     https://redis.io/commands/memory-stats for more details on what exactly is
     returned.
 
     Returns:
-        MemoryStats. MemoryStats object containing the total allocated memory in
-        bytes, peak memory usage in bytes, and the total number of keys stored
-        as values.
+        MemoryCacheStats. MemoryCacheStats object containing the total allocated
+        memory in bytes, peak memory usage in bytes, and the total number of
+        keys stored as values.
     """
     redis_full_profile = REDIS_CLIENT.memory_stats()
-    memory_stats = caching_domain.MemoryStats(
+    memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
         redis_full_profile.get('keys.count'))

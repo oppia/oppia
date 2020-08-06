@@ -29,36 +29,51 @@ import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 
-# NOTE: Namespaces cannot contain ':'.
-# The sub-namespace is defined as the stringified version number of the
-# Exploration. The namespace handles Exploration objects and returns an
-# Exploration object in the format of a dictionary with strings as keys and
-# Explorations as values.
+# NOTE: Namespaces and sub-namespaces cannot contain ':'.
+# This namespace supports sub-namespaces which are identified by the stringified
+# version number of the explorations within the sub-namespace. The value for
+# each key in this namespace should be a serialized representation of an
+# Exploration. If we are not storing multiple versions of an Exploration in the
+# cache, the sub-namespace is not required to differentiate the keys of multiple
+# versions of an exploration and can therefore be None.
 CACHE_NAMESPACE_EXPLORATION = 'exploration'
-# The sub-namespace is defined as the stringified version number of the
-# Collection. The namespace handles Collection objects and returns a Collection
-# object in the format of a dictionary with strings as keys and Collections as
-# values.
+# This namespace supports sub-namespaces which are identified by the stringified
+# version number of the collections within the sub-namespace. The value for
+# each key in this namespace should be a serialized representation of a
+# Collection. If we are not storing multiple versions of a Collection in the
+# cache, the sub-namespace is not required to differentiate the keys of multiple
+# versions of a collection and can therefore be None.
 CACHE_NAMESPACE_COLLECTION = 'collection'
-# The sub-namespace is defined as the stringified version number of the Skill.
-# The namespace handles Skill objects and returns Skill objects in the format of
-# a dictionary with strings as keys and Skills as values.
+# This namespace supports sub-namespaces which are identified by the stringified
+# version number of the skills within the sub-namespace. The value for
+# each key in this namespace should be a serialized representation of a
+# Skill. If we are not storing multiple versions of a Skill in the
+# cache, the sub-namespace is not required to differentiate the keys of multiple
+# versions of a skill and can therefore be None.
 CACHE_NAMESPACE_SKILL = 'skill'
-# Sub-namespace is defined as the stringified version number of the Story. The
-# namespace handles Story objects and returns Story objects in the format of a
-# dictionary with strings as keys and Stories as values.
+# This namespace supports sub-namespaces which are identified by the stringified
+# version number of the stories within the sub-namespace. The value for
+# each key in this namespace should be a serialized representation of a
+# Story. If we are not storing multiple versions of a Story in the
+# cache, the sub-namespace is not required to differentiate the keys of multiple
+# versions of a story and can therefore be None.
 CACHE_NAMESPACE_STORY = 'story'
-# The sub-namespace is defined as the stringified version number of the Topic.
-# The namespace handles Topic objects and returns Topic objects in the format of
-# a dictionary with strings as keys and Topics as values.
+# This namespace supports sub-namespaces which are identified by the stringified
+# version number of the topics within the sub-namespace. The value for
+# each key in this namespace should be a serialized representation of a
+# Topic. If we are not storing multiple versions of a Topic in the
+# cache, the sub-namespace is not required to differentiate the keys of multiple
+# versions of a topic and can therefore be None.
 CACHE_NAMESPACE_TOPIC = 'topic'
-# The sub-namespace is not defined. The namespace handles a ConfigPropertyModel
-# value and returns a ConfigPropertyModel value (the 'value' attribute of a
-# ConfigPropertyModel object).
+# The value for each key in this namespace should be a serialized representation
+# of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
+# object). Since we are not storing multiple versions of a ConfigPropertyModel,
+# the sub-namespace is not required to differentiate the keys of multiple
+# versions of a ConfigPropertyModel and can therefore be None.
 CACHE_NAMESPACE_CONFIG = 'config'
-# The sub-namespace is not defined. The namespace handles default datatypes
-# allowed by Redis including Strings, Lists, Sets, and Hashes. More details
-# can be found at: https://redis.io/topics/data-types.
+# The sub-namespace is not necessary for the default namespace. The namespace
+# handles default datatypes allowed by Redis including Strings, Lists, Sets,
+# and Hashes. More details can be found at: https://redis.io/topics/data-types.
 CACHE_NAMESPACE_DEFAULT = 'default'
 
 DESERIALIZATION_FUNCTIONS = {
@@ -229,13 +244,13 @@ def delete_multi(namespace, sub_namespace, obj_ids):
     return memory_cache_services.delete_multi(memcache_keys) == len(obj_ids)
 
 
-def get_memory_stats():
+def get_memory_cache_stats():
     """Get a memory profile of the cache in a dictionary dependent on how the
     caching service profiles its own cache.
 
     Returns:
-        MemoryStats. MemoryStats object containing the total allocated memory in
-        bytes, peak memory usage in bytes, and the total number of keys stored
-        as values.
+        MemoryCacheStats. MemoryCacheStats object containing the total allocated
+        memory in bytes, peak memory usage in bytes, and the total number of
+        keys stored as values.
     """
-    return memory_cache_services.get_memory_stats()
+    return memory_cache_services.get_memory_cache_stats()

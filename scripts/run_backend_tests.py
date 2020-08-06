@@ -242,8 +242,7 @@ def cleanup():
     """Cleanup the redis server when the backend tests finish."""
     python_utils.PRINT('Cleaning up the redis_servers.')
     # Shutdown the redis server before exiting.
-    subprocess.call([
-        './third_party/redis-cli-6.0.6/src/redis-cli', 'shutdown'])
+    common.stop_redis_server()
 
 
 def main(args=None):
@@ -270,11 +269,7 @@ def main(args=None):
     if not common.is_windows_os():
         # Redis does not run on Windows machines.
         python_utils.PRINT('Starting Redis development server.')
-        # We use the --daemonize argument to prevent the redis-server from
-        # exiting on its own.
-        subprocess.call([
-            './third_party/redis-cli-6.0.6/src/redis-server',
-            (common.REDIS_CONF_PATH), '--daemonize', 'yes'])
+        common.start_redis_server()
         atexit.register(cleanup)
     else:
         raise Exception(
