@@ -161,7 +161,9 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
 
     Returns:
         list(Suggestion). A list of translation suggestions that
-        correspond to the given exploration ids.
+        correspond to the given exploration ids. Note: there is no
+        guarantee that the suggestions returned are ordered by the
+        exploration ids in exp_ids.
     """
     if len(exp_ids) == 0:
         return []

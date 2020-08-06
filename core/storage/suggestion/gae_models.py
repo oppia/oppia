@@ -251,9 +251,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of translation suggestions that
-            correspond to the given exploration ids.
+            correspond to the given exploration ids. Note: there is no
+            guarantee that the suggestions returned are ordered by the
+            exploration ids in exp_ids.
         """
-
         query = (
             cls.get_all()
             .order(cls.key)
@@ -267,7 +268,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 feconf.DEFAULT_QUERY_LIMIT, start_cursor=cursor)
             suggestion_models.extend(results)
         return suggestion_models
-
 
     @classmethod
     def get_all_stale_suggestions(cls):
