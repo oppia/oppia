@@ -208,7 +208,6 @@ interface RuleTemplates {
   };
   TextInput: {
     Equals: IRuleDescription;
-    CaseSensitiveEquals: IRuleDescription;
     StartsWith: IRuleDescription;
     Contains: IRuleDescription;
     FuzzyEquals: IRuleDescription;

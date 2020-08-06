@@ -2634,6 +2634,129 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
+        """Converts from version 34 to 35. Version 35 upgrades all explorations
+        that use the MathExpressionInput interaction to use one of
+        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
+        interactions.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'MathExpressionInput':
+                new_answer_groups = []
+                types_of_inputs = set()
+                for group in state_dict['interaction']['answer_groups']:
+                    new_answer_group = copy.deepcopy(group)
+                    for rule_spec in new_answer_group['rule_specs']:
+                        rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+
+                        rule_input = clean_math_expression(
+                            rule_input)
+
+                        type_of_input = TYPE_INVALID_EXPRESSION
+                        if is_valid_algebraic_expression(rule_input):
+                            type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
+                        elif is_valid_numeric_expression(rule_input):
+                            type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
+                        elif is_valid_math_equation(rule_input):
+                            type_of_input = TYPE_VALID_MATH_EQUATION
+
+                        types_of_inputs.add(type_of_input)
+
+                        if type_of_input != TYPE_INVALID_EXPRESSION:
+                            rule_spec['inputs']['x'] = rule_input
+                            if type_of_input == TYPE_VALID_MATH_EQUATION:
+                                rule_spec['inputs']['y'] = 'both'
+                            rule_spec['rule_type'] = 'MatchesExactlyWith'
+
+                    new_answer_groups.append(new_answer_group)
+
+                if TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                    # If at least one rule input is an equation, we remove
+                    # all other rule inputs that are expressions.
+                    if TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                        new_interaction_id = TYPE_VALID_MATH_EQUATION
+                        for group in new_answer_groups:
+                            new_rule_specs = []
+                            for rule_spec in group['rule_specs']:
+                                if is_valid_math_equation(
+                                        rule_spec['inputs']['x']):
+                                    new_rule_specs.append(rule_spec)
+                            group['rule_specs'] = new_rule_specs
+                    # Otherwise, if at least one rule_input is an algebraic
+                    # expression, we remove all other rule inputs that are
+                    # numeric expressions.
+                    elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                            types_of_inputs):
+                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
+                        for group in new_answer_groups:
+                            new_rule_specs = []
+                            for rule_spec in group['rule_specs']:
+                                if is_valid_algebraic_expression(
+                                        rule_spec['inputs']['x']):
+                                    new_rule_specs.append(rule_spec)
+                            group['rule_specs'] = new_rule_specs
+                    else:
+                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
+
+                    # Removing answer groups that have no rule specs left after
+                    # the filtration done above.
+                    new_answer_groups = [
+                        answer_group for answer_group in new_answer_groups if (
+                            len(answer_group['rule_specs']) != 0)]
+
+                    # Removing feedback keys, from voiceovers_mapping and
+                    # translations_mapping, that correspond to the rules that
+                    # got deleted.
+                    old_answer_groups_feedback_keys = [
+                        answer_group['outcome'][
+                            'feedback']['content_id'] for answer_group in (
+                                state_dict['interaction']['answer_groups'])]
+                    new_answer_groups_feedback_keys = [
+                        answer_group['outcome'][
+                            'feedback']['content_id'] for answer_group in (
+                                new_answer_groups)]
+                    content_ids_to_delete = set(
+                        old_answer_groups_feedback_keys) - set(
+                            new_answer_groups_feedback_keys)
+                    for content_id in content_ids_to_delete:
+                        if content_id in state_dict['recorded_voiceovers'][
+                                'voiceovers_mapping']:
+                            del state_dict['recorded_voiceovers'][
+                                'voiceovers_mapping'][content_id]
+                        if content_id in state_dict['written_translations'][
+                                'translations_mapping']:
+                            del state_dict['written_translations'][
+                                'translations_mapping'][content_id]
+
+                    state_dict['interaction']['id'] = new_interaction_id
+                    state_dict['interaction']['answer_groups'] = (
+                        new_answer_groups)
+                    if state_dict['interaction']['solution']:
+                        correct_answer = state_dict['interaction'][
+                            'solution']['correct_answer']['ascii']
+                        correct_answer = clean_math_expression(correct_answer)
+                        state_dict['interaction'][
+                            'solution']['correct_answer'] = correct_answer
+
+        return states_dict
+
+    @classmethod
     def _convert_states_v35_dict_to_v36_dict(cls, states_dict):
         """Converts from version 35 to 36. Version 36 adds translation support
         for interaction customization arguments. This migration converts
@@ -2815,125 +2938,16 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-    def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
-        """Converts from version 34 to 35. Version 35 upgrades all explorations
-        that use the MathExpressionInput interaction to use one of
-        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
-        interactions.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
+    def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
+        """Converts from version 36 to 37. Version 37 changes all rule with type
+        CaseSensitiveEquals to Equals.
         """
-        is_valid_algebraic_expression = schema_utils.get_validator(
-            'is_valid_algebraic_expression')
-        is_valid_numeric_expression = schema_utils.get_validator(
-            'is_valid_numeric_expression')
-        is_valid_math_equation = schema_utils.get_validator(
-            'is_valid_math_equation')
-        ltt = latex2text.LatexNodes2Text()
-
         for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'MathExpressionInput':
-                new_answer_groups = []
-                types_of_inputs = set()
-                for group in state_dict['interaction']['answer_groups']:
-                    new_answer_group = copy.deepcopy(group)
-                    for rule_spec in new_answer_group['rule_specs']:
-                        rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
-
-                        rule_input = clean_math_expression(
-                            rule_input)
-
-                        type_of_input = TYPE_INVALID_EXPRESSION
-                        if is_valid_algebraic_expression(rule_input):
-                            type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        elif is_valid_numeric_expression(rule_input):
-                            type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
-                        elif is_valid_math_equation(rule_input):
-                            type_of_input = TYPE_VALID_MATH_EQUATION
-
-                        types_of_inputs.add(type_of_input)
-
-                        if type_of_input != TYPE_INVALID_EXPRESSION:
-                            rule_spec['inputs']['x'] = rule_input
-                            if type_of_input == TYPE_VALID_MATH_EQUATION:
-                                rule_spec['inputs']['y'] = 'both'
-                            rule_spec['rule_type'] = 'MatchesExactlyWith'
-
-                    new_answer_groups.append(new_answer_group)
-
-                if TYPE_INVALID_EXPRESSION not in types_of_inputs:
-                    # If at least one rule input is an equation, we remove
-                    # all other rule inputs that are expressions.
-                    if TYPE_VALID_MATH_EQUATION in types_of_inputs:
-                        new_interaction_id = TYPE_VALID_MATH_EQUATION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_math_equation(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    # Otherwise, if at least one rule_input is an algebraic
-                    # expression, we remove all other rule inputs that are
-                    # numeric expressions.
-                    elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
-                            types_of_inputs):
-                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_algebraic_expression(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    else:
-                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
-
-                    # Removing answer groups that have no rule specs left after
-                    # the filtration done above.
-                    new_answer_groups = [
-                        answer_group for answer_group in new_answer_groups if (
-                            len(answer_group['rule_specs']) != 0)]
-
-                    # Removing feedback keys, from voiceovers_mapping and
-                    # translations_mapping, that correspond to the rules that
-                    # got deleted.
-                    old_answer_groups_feedback_keys = [
-                        answer_group['outcome'][
-                            'feedback']['content_id'] for answer_group in (
-                                state_dict['interaction']['answer_groups'])]
-                    new_answer_groups_feedback_keys = [
-                        answer_group['outcome'][
-                            'feedback']['content_id'] for answer_group in (
-                                new_answer_groups)]
-                    content_ids_to_delete = set(
-                        old_answer_groups_feedback_keys) - set(
-                            new_answer_groups_feedback_keys)
-                    for content_id in content_ids_to_delete:
-                        if content_id in state_dict['recorded_voiceovers'][
-                                'voiceovers_mapping']:
-                            del state_dict['recorded_voiceovers'][
-                                'voiceovers_mapping'][content_id]
-                        if content_id in state_dict['written_translations'][
-                                'translations_mapping']:
-                            del state_dict['written_translations'][
-                                'translations_mapping'][content_id]
-
-                    state_dict['interaction']['id'] = new_interaction_id
-                    state_dict['interaction']['answer_groups'] = (
-                        new_answer_groups)
-                    if state_dict['interaction']['solution']:
-                        correct_answer = state_dict['interaction'][
-                            'solution']['correct_answer']['ascii']
-                        correct_answer = clean_math_expression(correct_answer)
-                        state_dict['interaction'][
-                            'solution']['correct_answer'] = correct_answer
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                for rule_spec_dict in answer_group['rule_specs']:
+                    if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                        rule_spec_dict['rule_type'] = 'Equals'
 
         return states_dict
 
@@ -2972,7 +2986,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 41
+    CURRENT_EXP_SCHEMA_VERSION = 42
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3934,6 +3948,27 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v41_dict_to_v42_dict(cls, exploration_dict):
+        """Converts a v41 exploration dict into a v42 exploration dict.
+        Adds translation support to customization args.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v39.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v41.
+        """
+        exploration_dict['schema_version'] = 42
+
+        exploration_dict['states'] = cls._convert_states_v36_dict_to_v37_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 37
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4170,6 +4205,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v40_dict_to_v41_dict(
                 exploration_dict)
             exploration_schema_version = 41
+
+        if exploration_schema_version == 41:
+            exploration_dict = cls._convert_v41_dict_to_v42_dict(
+                exploration_dict)
+            exploration_schema_version = 42
 
         return (exploration_dict, initial_schema_version)
 
