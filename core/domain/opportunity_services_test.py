@@ -31,15 +31,31 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import python_utils
+
+(suggestion_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.suggestion, models.NAMES.feedback])
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     """Test the opportunity services module."""
+
+    suggestion_target_id = '0'
+    suggestion_target_version_at_submission = 1
+    suggestion_change = {
+        'cmd': exp_domain.CMD_ADD_TRANSLATION,
+        'state_name': 'End State',
+        'content_id': 'content',
+        'language_code': 'hi',
+        'content_html': '',
+        'translation_html': '<p>This is translated html.</p>'
+    }
 
     def setUp(self):
         super(OpportunityServicesIntegrationTest, self).setUp()
@@ -57,6 +73,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
         self.QUESTION_ID = question_services.get_new_question_id()
+        self.THREAD_ID = 'exploration.exp1.thread_1'
 
         # Since a valid exploration is created here, it has EndExploration
         # state as well, so the content in that has to be taken into account as
@@ -87,11 +104,28 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
-    def test_new_opportunity_with_adding_exploration_in_story_node(self):
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
-        self.assertEqual(len(translation_opportunities), 0)
+    def mock_generate_new_thread_id_for_suggestion(
+        self, unused_entity_type, unused_entity_id):
+        return self.THREAD_ID
 
+    def create_translation_suggestion_for_exploration_0_and_verify(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_thread_id_for_suggestion):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.suggestion_target_id,
+                self.suggestion_target_version_at_submission, self.owner_id,
+                self.suggestion_change, 'test description')
+
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
+    def add_exploration_0_to_story(self):
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
@@ -104,6 +138,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'old_value': None,
                 'new_value': '0'
             })], 'Changes.')
+
+    def test_new_opportunity_with_adding_exploration_in_story_node(self):
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 0)
+
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -114,18 +155,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
             self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -142,18 +172,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 0)
 
     def test_opportunity_get_deleted_with_deleting_story(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -166,18 +185,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 0)
 
     def test_opportunity_get_deleted_with_deleting_topic(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -190,18 +198,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 0)
 
     def test_opportunities_updates_with_updating_topic_name(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -228,18 +225,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.topic_name, 'A new topic')
 
     def test_opportunities_updates_with_updating_story_title(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -264,18 +250,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.story_title, 'A new story')
 
     def test_opportunity_updates_with_updating_story_node_title(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -301,18 +276,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.chapter_title, 'A new Node1')
 
     def test_opportunity_updates_with_updating_exploration(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
@@ -495,18 +459,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 0)
 
     def test_publish_story_creates_exploration_opportunity(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
         # Story is already published, so unpublish first.
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
@@ -523,18 +476,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
     def test_publish_story_does_not_create_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
         self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
         # Story and topic are already published, so unpublish first.
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
@@ -551,18 +493,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 0)
 
     def test_publish_topic_creates_exploration_opportunity(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
         # Topic is already published, so unpublish first.
         topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
         translation_opportunities, _, _ = (
@@ -577,18 +508,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
     def test_publish_topic_does_not_create_exploration_opportunity_if_story_is_not_published( # pylint: disable=line-too-long
         self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
         # Story and topic are already published, so unpublish first.
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
@@ -604,18 +524,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 0)
 
     def test_unpublish_story_deletes_exploration_opportunity(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
@@ -627,19 +536,20 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)
 
+    def test_unpublish_story_rejects_translation_suggestions(self):
+        self.add_exploration_0_to_story()
+        self.create_translation_suggestion_for_exploration_0_and_verify()
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
+
     def test_unpublish_topic_deletes_exploration_opportunity(self):
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': '0'
-            })], 'Changes.')
+        self.add_exploration_0_to_story()
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
@@ -649,6 +559,17 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)
+
+    def test_unpublish_topic_rejects_translation_suggestions(self):
+        self.add_exploration_0_to_story()
+        self.create_translation_suggestion_for_exploration_0_and_verify()
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
     def test_add_question_increments_skill_opportunity_question_count(self):
         opportunity_services.create_skill_opportunity(

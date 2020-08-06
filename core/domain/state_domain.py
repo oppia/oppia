@@ -719,7 +719,7 @@ class InteractionInstance(python_utils.OBJECT):
                 feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None, None)
 
         return cls(
-            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
+            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
 
     def get_all_html_content_strings(self):
         """Get all html content strings in the interaction.

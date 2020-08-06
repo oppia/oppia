@@ -29,6 +29,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import user_services
@@ -657,8 +658,7 @@ def unpublish_story(topic_id, story_id, committer_id):
         change_list)
     generate_topic_summary(topic.id)
 
-    # TODO(#10094): Reject corresponding suggestions once new reject_suggestion
-    # functions in #9635 are done.
+    # Delete corresponding exploration opportunities.
     exp_ids = story.story_contents.get_all_linked_exp_ids()
     opportunity_services.delete_exploration_opportunities(exp_ids)
 
@@ -957,8 +957,6 @@ def unpublish_topic(topic_id, committer_id):
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
 
-    # TODO(#10094): Reject corresponding suggestions once new reject_suggestion
-    # functions in #9635 are done.
     (opportunity_services
         .delete_exploration_opportunities_corresponding_to_topic(topic_id))
 

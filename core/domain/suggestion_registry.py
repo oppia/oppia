@@ -22,9 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import exp_services
+# from core.domain import exp_services
 from core.domain import question_domain
-from core.domain import question_services
+# from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain

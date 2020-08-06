@@ -26,6 +26,7 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import question_fetchers
 from core.domain import story_fetchers
+from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
@@ -330,7 +331,8 @@ def update_exploration_voiceover_opportunities(
 
 def delete_exploration_opportunities(exp_ids):
     """Deletes the ExplorationOpportunitySummaryModel models corresponding to
-    the given exp_ids.
+    the given exp_ids and rejects suggestions matching each opportunity's
+    exploration.
 
     Args:
         exp_ids: list(str). A list of exploration IDs whose opportunity summary
@@ -344,11 +346,14 @@ def delete_exploration_opportunities(exp_ids):
         if model is not None]
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         exp_opportunity_models_to_be_deleted)
+    exp_ids = [model.id for model in exp_opportunity_models_to_be_deleted]
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def delete_exploration_opportunities_corresponding_to_topic(topic_id):
     """Deletes the ExplorationOpportunitySummaryModel models which corresponds
-    to the given topic_id.
+    to the given topic_id and rejects suggestions matching each opportunity's
+    exploration.
 
     Args:
         topic_id: str. The ID of the topic.
@@ -358,6 +363,8 @@ def delete_exploration_opportunities_corresponding_to_topic(topic_id):
             topic_id))
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         exp_opportunity_models)
+    exp_ids = [model.id for model in exp_opportunity_models]
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def update_exploration_opportunities(old_story, new_story):
