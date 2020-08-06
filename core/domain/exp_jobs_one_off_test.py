@@ -1172,7 +1172,8 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
         with self.swap(
-                exp_domain.Exploration, conversion_fn_name, mock_conversion):
+            exp_domain.Exploration, conversion_fn_name, mock_conversion
+        ):
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
