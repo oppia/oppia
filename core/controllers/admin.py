@@ -257,7 +257,7 @@ class AdminHandler(base.BaseHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            Exception: Cannot reload an exploration in production.
+            Exception. Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -287,11 +287,24 @@ class AdminHandler(base.BaseHandler):
         state = state_domain.State.create_default_state(
             'ABC', is_initial_state=True)
         state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        })
+
+        state.update_next_content_id_index(1)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
+        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
         recorded_voiceovers.add_content_id_for_voiceover('1')
         recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+        written_translations.add_content_id_for_translation('ca_placeholder_0')
         written_translations.add_content_id_for_translation('1')
         written_translations.add_content_id_for_translation('default_outcome')
 
@@ -308,10 +321,6 @@ class AdminHandler(base.BaseHandler):
 
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.update_interaction_customization_args({
-            'placeholder': 'Enter text here',
-            'rows': 1
-        })
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
@@ -354,8 +363,8 @@ class AdminHandler(base.BaseHandler):
         attached to each skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -501,8 +510,8 @@ class AdminHandler(base.BaseHandler):
         linked to the skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -537,7 +546,7 @@ class AdminHandler(base.BaseHandler):
             collection_id: str. The collection id.
 
         Raises:
-            Exception: Cannot reload a collection in production.
+            Exception. Cannot reload a collection in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -562,7 +571,7 @@ class AdminHandler(base.BaseHandler):
                 be published.
 
         Raises:
-            Exception: Environment is not DEVMODE.
+            Exception. Environment is not DEVMODE.
         """
 
         if constants.DEV_MODE:

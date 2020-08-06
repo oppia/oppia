@@ -26,7 +26,8 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 
 import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
@@ -37,8 +38,8 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
   'interactions/LogicProof/static/js/generatedDefaultData.ts';
 
 angular.module('oppia').directive('oppiaInteractiveLogicProof', [
-  'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
+  'InteractionAttributesExtractorService', 'EVENT_NEW_CARD_AVAILABLE',
+  function(InteractionAttributesExtractorService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -235,8 +236,13 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
               ctrl.interactionIsActive = false;
             });
-            ctrl.localQuestionData = HtmlEscaperService.escapedJsonToObj(
-              $attrs.questionWithValue);
+            const {
+              question
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'LogicProof',
+              $attrs
+            );
+            ctrl.localQuestionData = question;
 
             // This is the information about how to mark a question (e.g. the
             // permitted line templates) that is stored in defaultData.js within

@@ -271,7 +271,7 @@ class ConfigProperty(python_utils.OBJECT):
         necessary.
 
         Args:
-            value: The value of the configuration property.
+            value: str. The value of the configuration property.
 
         Returns:
             instance. The normalized object.
