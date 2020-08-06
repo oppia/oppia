@@ -106,6 +106,7 @@
 /core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
 /core/templates/pages/terms-page/ @DubeySandeep
 /core/templates/pages/terms-page/terms-page.mainpage.html @seanlip
+/core/templates/pages/terms-page/terms-page.component.html @seanlip
 
 
 # Dashboard pages.
