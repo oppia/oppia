@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/classroom-page/classroom-page.component.ts');
 
-fdescribe('Classroom page', () => {
+describe('Classroom page', () => {
   var ctrl = null;
   var $q = null;
   var $rootScope = null;

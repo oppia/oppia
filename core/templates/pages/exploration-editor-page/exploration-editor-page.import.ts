@@ -31,5 +31,5 @@ require(
   'editor-navigation.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
+  'exploration-save-and-publish-buttons.component.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
