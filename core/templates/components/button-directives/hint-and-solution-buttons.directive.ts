@@ -52,14 +52,14 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         '$scope', '$rootScope', 'HintsAndSolutionManagerService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
-        'LearnerAnswerInfoService', 'PlayerPositionService',
-        'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS', 'StatsReportingService',
+        'PlayerPositionService', 'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS',
+        'StatsReportingService',
         function(
             $scope, $rootScope, HintsAndSolutionManagerService,
             PlayerTranscriptService, ExplorationPlayerStateService,
             HintAndSolutionModalService, DeviceInfoService, ContextService,
-            LearnerAnswerInfoService, PlayerPositionService,
-            EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
+            PlayerPositionService, EVENT_NEW_CARD_OPENED, INTERACTION_SPECS,
+            StatsReportingService) {
           var ctrl = this;
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
@@ -151,7 +151,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
               resetLocalHintsArray();
             });
             ctrl.directiveSubscriptions.add(
-              LearnerAnswerInfoService.onActiveCardChanged.subscribe(
+              PlayerPositionService.onActiveCardChanged.subscribe(
                 () => {
                   var displayedCardIndex =
                   PlayerPositionService.getDisplayedCardIndex();
