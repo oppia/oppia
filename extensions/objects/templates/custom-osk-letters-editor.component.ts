@@ -69,8 +69,9 @@ angular.module('oppia').component('customOskLettersEditor', {
         } else if (keyPressed === 'Backspace') {
           ctrl.value.pop();
         } else if (
-          ctrl.latinLowerCase.join('').indexOf(keyPressed.toLowerCase()) !== -1
-          && ctrl.value.indexOf(keyPressed) === -1) {
+          ctrl.latinLowerCase.join('').indexOf(
+            keyPressed.toLowerCase()) !== -1 &&
+          ctrl.value.indexOf(keyPressed) === -1) {
           $('button#custom-letter-' + keyPressed).click();
         }
         $scope.$apply();

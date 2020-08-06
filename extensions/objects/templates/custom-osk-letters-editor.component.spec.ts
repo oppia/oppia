@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the custom OSK letters component.
  */
 
-fdescribe('OnScreenKeyboard', function() {
+describe('OnScreenKeyboard', function() {
   let ctrl = null, $window = null;
 
   beforeEach(angular.mock.module('oppia'));
