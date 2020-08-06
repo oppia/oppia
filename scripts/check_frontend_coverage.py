@@ -342,7 +342,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-editor.service.ts',
     'state-hints-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'state-name-editor.directive.ts',
     'state-property.service.ts',
     'state-responses.directive.ts',
     'state-solution-editor.directive.ts',
