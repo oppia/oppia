@@ -501,205 +501,10 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self.assertFalse(filter_domain.evaluate(
             self._create_example_context(app_version='2.0.0')))
 
-    def test_evaluate_alpha_version_with_eq_alpha_cond_returns_true(
+    def test_evaluate_test_version_with_eq_test_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '=', 'alpha')
-
-    def test_evaluate_alpha_version_with_eq_beta_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '=', 'beta')
-
-    def test_evaluate_alpha_version_with_eq_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '=', 'test')
-
-    def test_evaluate_alpha_version_with_eq_release_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '=', 'release')
-
-    def test_evaluate_alpha_version_with_lt_alpha_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '<', 'alpha')
-
-    def test_evaluate_alpha_version_with_lt_beta_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '<', 'beta')
-
-    def test_evaluate_alpha_version_with_lt_test_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '<', 'test')
-
-    def test_evaluate_alpha_version_with_lt_release_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '<', 'release')
-
-    def test_evaluate_alpha_version_with_lte_alpha_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '<=', 'alpha')
-
-    def test_evaluate_alpha_version_with_lte_beta_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '<=', 'beta')
-
-    def test_evaluate_alpha_version_with_lte_test_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '<=', 'test')
-
-    def test_evaluate_alpha_version_with_lte_release_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '<=', 'release')
-
-    def test_evaluate_alpha_version_with_gt_alpha_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>', 'alpha')
-
-    def test_evaluate_alpha_version_with_gt_beta_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>', 'beta')
-
-    def test_evaluate_alpha_version_with_gt_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>', 'test')
-
-    def test_evaluate_alpha_version_with_gt_release_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>', 'release')
-
-    def test_evaluate_alpha_version_with_gte_alpha_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-alpha', '>=', 'alpha')
-
-    def test_evaluate_alpha_version_with_gte_beta_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>=', 'beta')
-
-    def test_evaluate_alpha_version_with_gte_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>=', 'test')
-
-    def test_evaluate_alpha_version_with_gte_release_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-alpha', '>=', 'release')
-
-    def test_evaluate_beta_version_with_eq_alpha_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '=', 'alpha')
-
-    def test_evaluate_beta_version_with_eq_beta_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '=', 'beta')
-
-    def test_evaluate_beta_version_with_eq_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '=', 'test')
-
-    def test_evaluate_beta_version_with_eq_release_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '=', 'release')
-
-    def test_evaluate_beta_version_with_lt_alpha_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<', 'alpha')
-
-    def test_evaluate_beta_version_with_lt_beta_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<', 'beta')
-
-    def test_evaluate_beta_version_with_lt_test_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '<', 'test')
-
-    def test_evaluate_beta_version_with_lt_release_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '<', 'release')
-
-    def test_evaluate_beta_version_with_lte_alpha_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '<=', 'alpha')
-
-    def test_evaluate_beta_version_with_lte_beta_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '<=', 'beta')
-
-    def test_evaluate_beta_version_with_lte_test_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '<=', 'test')
-
-    def test_evaluate_beta_version_with_lte_release_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '<=', 'release')
-
-    def test_evaluate_beta_version_with_gt_alpha_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '>', 'alpha')
-
-    def test_evaluate_beta_version_with_gt_beta_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>', 'beta')
-
-    def test_evaluate_beta_version_with_gt_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>', 'test')
-
-    def test_evaluate_beta_version_with_gt_release_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>', 'release')
-
-    def test_evaluate_beta_version_with_gte_alpha_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '>=', 'alpha')
-
-    def test_evaluate_beta_version_with_gte_beta_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-beta', '>=', 'beta')
-
-    def test_evaluate_beta_version_with_gte_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>=', 'test')
-
-    def test_evaluate_beta_version_with_gte_release_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-beta', '>=', 'release')
+            '1.0.0-abcdef-test', '=', 'test')
 
     def test_evaluate_test_version_with_eq_alpha_cond_returns_false(
             self):
@@ -711,95 +516,295 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-test', '=', 'beta')
 
-    def test_evaluate_test_version_with_eq_test_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-test', '=', 'test')
-
     def test_evaluate_test_version_with_eq_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-test', '=', 'release')
-
-    def test_evaluate_test_version_with_lt_alpha_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '<', 'alpha')
-
-    def test_evaluate_test_version_with_lt_beta_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '<', 'beta')
 
     def test_evaluate_test_version_with_lt_test_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-test', '<', 'test')
 
+    def test_evaluate_test_version_with_lt_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '<', 'alpha')
+
+    def test_evaluate_test_version_with_lt_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '<', 'beta')
+
     def test_evaluate_test_version_with_lt_release_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-test', '<', 'release')
-
-    def test_evaluate_test_version_with_lte_alpha_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '<=', 'alpha')
-
-    def test_evaluate_test_version_with_lte_beta_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-test', '<=', 'beta')
 
     def test_evaluate_test_version_with_lte_test_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-test', '<=', 'test')
 
+    def test_evaluate_test_version_with_lte_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '<=', 'alpha')
+
+    def test_evaluate_test_version_with_lte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-test', '<=', 'beta')
+
     def test_evaluate_test_version_with_lte_release_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-test', '<=', 'release')
-
-    def test_evaluate_test_version_with_gt_alpha_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-test', '>', 'alpha')
-
-    def test_evaluate_test_version_with_gt_beta_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-test', '>', 'beta')
 
     def test_evaluate_test_version_with_gt_test_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-test', '>', 'test')
 
+    def test_evaluate_test_version_with_gt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '>', 'alpha')
+
+    def test_evaluate_test_version_with_gt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '>', 'beta')
+
     def test_evaluate_test_version_with_gt_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-test', '>', 'release')
-
-    def test_evaluate_test_version_with_gte_alpha_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-test', '>=', 'alpha')
-
-    def test_evaluate_test_version_with_gte_beta_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-test', '>=', 'beta')
 
     def test_evaluate_test_version_with_gte_test_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-test', '>=', 'test')
 
+    def test_evaluate_test_version_with_gte_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '>=', 'alpha')
+
+    def test_evaluate_test_version_with_gte_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-test', '>=', 'beta')
+
     def test_evaluate_test_version_with_gte_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-test', '>=', 'release')
+
+    def test_evaluate_alpha_version_with_eq_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '=', 'test')
+
+    def test_evaluate_alpha_version_with_eq_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '=', 'alpha')
+
+    def test_evaluate_alpha_version_with_eq_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '=', 'beta')
+
+    def test_evaluate_alpha_version_with_eq_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '=', 'release')
+
+    def test_evaluate_alpha_version_with_lt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '<', 'test')
+
+    def test_evaluate_alpha_version_with_lt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '<', 'alpha')
+
+    def test_evaluate_alpha_version_with_lt_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<', 'beta')
+
+    def test_evaluate_alpha_version_with_lt_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<', 'release')
+
+    def test_evaluate_alpha_version_with_lte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '<=', 'test')
+
+    def test_evaluate_alpha_version_with_lte_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<=', 'alpha')
+
+    def test_evaluate_alpha_version_with_lte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<=', 'beta')
+
+    def test_evaluate_alpha_version_with_lte_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '<=', 'release')
+
+    def test_evaluate_alpha_version_with_gt_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '>', 'test')
+
+    def test_evaluate_alpha_version_with_gt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>', 'alpha')
+
+    def test_evaluate_alpha_version_with_gt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>', 'beta')
+
+    def test_evaluate_alpha_version_with_gt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>', 'release')
+
+    def test_evaluate_alpha_version_with_gte_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '>=', 'test')
+
+    def test_evaluate_alpha_version_with_gte_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-alpha', '>=', 'alpha')
+
+    def test_evaluate_alpha_version_with_gte_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>=', 'beta')
+
+    def test_evaluate_alpha_version_with_gte_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-alpha', '>=', 'release')
+
+    def test_evaluate_beta_version_with_eq_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '=', 'test')
+
+    def test_evaluate_beta_version_with_eq_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '=', 'alpha')
+
+    def test_evaluate_beta_version_with_eq_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '=', 'beta')
+
+    def test_evaluate_beta_version_with_eq_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '=', 'release')
+
+    def test_evaluate_beta_version_with_lt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<', 'test')
+
+    def test_evaluate_beta_version_with_lt_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<', 'alpha')
+
+    def test_evaluate_beta_version_with_lt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<', 'beta')
+
+    def test_evaluate_beta_version_with_lt_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<', 'release')
+
+    def test_evaluate_beta_version_with_lte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<=', 'test')
+
+    def test_evaluate_beta_version_with_lte_alpha_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '<=', 'alpha')
+
+    def test_evaluate_beta_version_with_lte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<=', 'beta')
+
+    def test_evaluate_beta_version_with_lte_release_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '<=', 'release')
+
+    def test_evaluate_beta_version_with_gt_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>', 'test')
+
+    def test_evaluate_beta_version_with_gt_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>', 'alpha')
+
+    def test_evaluate_beta_version_with_gt_beta_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>', 'beta')
+
+    def test_evaluate_beta_version_with_gt_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>', 'release')
+
+    def test_evaluate_beta_version_with_gte_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>=', 'test')
+
+    def test_evaluate_beta_version_with_gte_alpha_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>=', 'alpha')
+
+    def test_evaluate_beta_version_with_gte_beta_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-beta', '>=', 'beta')
+
+    def test_evaluate_beta_version_with_gte_release_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-beta', '>=', 'release')
+
+    def test_evaluate_release_version_with_eq_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '=', 'test')
 
     def test_evaluate_release_version_with_eq_alpha_cond_returns_false(
             self):
@@ -811,15 +816,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-release', '=', 'beta')
 
-    def test_evaluate_release_version_with_eq_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '=', 'test')
-
     def test_evaluate_release_version_with_eq_release_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-release', '=', 'release')
+
+    def test_evaluate_release_version_with_lt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<', 'test')
 
     def test_evaluate_release_version_with_lt_alpha_cond_returns_false(
             self):
@@ -831,15 +836,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-release', '<', 'beta')
 
-    def test_evaluate_release_version_with_lt_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<', 'test')
-
     def test_evaluate_release_version_with_lt_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-release', '<', 'release')
+
+    def test_evaluate_release_version_with_lte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef-release', '<=', 'test')
 
     def test_evaluate_release_version_with_lte_alpha_cond_returns_false(
             self):
@@ -851,15 +856,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-release', '<=', 'beta')
 
-    def test_evaluate_release_version_with_lte_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef-release', '<=', 'test')
-
     def test_evaluate_release_version_with_lte_release_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-release', '<=', 'release')
+
+    def test_evaluate_release_version_with_gt_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>', 'test')
 
     def test_evaluate_release_version_with_gt_alpha_cond_returns_true(
             self):
@@ -871,15 +876,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-release', '>', 'beta')
 
-    def test_evaluate_release_version_with_gt_test_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-release', '>', 'test')
-
     def test_evaluate_release_version_with_gt_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef-release', '>', 'release')
+
+    def test_evaluate_release_version_with_gte_test_cond_returns_true(
+            self):
+        self._test_flavor_relation_holds(
+            '1.0.0-abcdef-release', '>=', 'test')
 
     def test_evaluate_release_version_with_gte_alpha_cond_returns_true(
             self):
@@ -891,15 +896,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-release', '>=', 'beta')
 
-    def test_evaluate_release_version_with_gte_test_cond_returns_true(
-            self):
-        self._test_flavor_relation_holds(
-            '1.0.0-abcdef-release', '>=', 'test')
-
     def test_evaluate_release_version_with_gte_release_cond_returns_true(
             self):
         self._test_flavor_relation_holds(
             '1.0.0-abcdef-release', '>=', 'release')
+
+    def test_evaluate_unspecified_version_with_eq_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '=', 'test')
 
     def test_evaluate_unspecified_version_with_eq_alpha_cond_returns_false(
             self):
@@ -911,15 +916,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '=', 'beta')
 
-    def test_evaluate_unspecified_version_with_eq_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef', '=', 'test')
-
     def test_evaluate_unspecified_version_with_eq_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '=', 'release')
+
+    def test_evaluate_unspecified_version_with_lt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<', 'test')
 
     def test_evaluate_unspecified_version_with_lt_alpha_cond_returns_false(
             self):
@@ -931,15 +936,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '<', 'beta')
 
-    def test_evaluate_unspecified_version_with_lt_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef', '<', 'test')
-
     def test_evaluate_unspecified_version_with_lt_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '<', 'release')
+
+    def test_evaluate_unspecified_version_with_lte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '<=', 'test')
 
     def test_evaluate_unspecified_version_with_lte_alpha_cond_returns_false(
             self):
@@ -951,15 +956,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '<=', 'beta')
 
-    def test_evaluate_unspecified_version_with_lte_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef', '<=', 'test')
-
     def test_evaluate_unspecified_version_with_lte_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '<=', 'release')
+
+    def test_evaluate_unspecified_version_with_gt_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>', 'test')
 
     def test_evaluate_unspecified_version_with_gt_alpha_cond_returns_false(
             self):
@@ -971,15 +976,15 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '>', 'beta')
 
-    def test_evaluate_unspecified_version_with_gt_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef', '>', 'test')
-
     def test_evaluate_unspecified_version_with_gt_release_cond_returns_false(
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '>', 'release')
+
+    def test_evaluate_unspecified_version_with_gte_test_cond_returns_false(
+            self):
+        self._test_flavor_relation_does_not_hold(
+            '1.0.0-abcdef', '>=', 'test')
 
     def test_evaluate_unspecified_version_with_gte_alpha_cond_returns_false(
             self):
@@ -990,11 +995,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             self):
         self._test_flavor_relation_does_not_hold(
             '1.0.0-abcdef', '>=', 'beta')
-
-    def test_evaluate_unspecified_version_with_gte_test_cond_returns_false(
-            self):
-        self._test_flavor_relation_does_not_hold(
-            '1.0.0-abcdef', '>=', 'test')
 
     def test_evaluate_unspecified_version_with_gte_release_cond_returns_false(
             self):

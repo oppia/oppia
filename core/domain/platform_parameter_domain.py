@@ -43,8 +43,8 @@ ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Others']
 
 # The ordering of elements in ALLOWED_APP_VERSION_FLAVOR implies the ordering
 # of corresponding flavors, which is used in app_version_flavor filter for order
-# comparison, with following ordering: 'alpha' < 'beta' < 'test' < 'release'.
-ALLOWED_APP_VERSION_FLAVOR = ['alpha', 'beta', 'test', 'release']
+# comparison, with following ordering: 'test' < 'alpha' < 'beta' < 'release'.
+ALLOWED_APP_VERSION_FLAVOR = ['test', 'alpha', 'beta', 'release']
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
     r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+(?:-(.+))?)?$')
@@ -417,7 +417,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
                 'release'.
             client_version: str. The version of the client, given in the form
                 of '<version>-<hash>-<flavor>'. The hash and flavor of client
-                version is optional, if absent, the flavor is considered 'n/a'.
+                version is optional, but if absent, no flavor filter will
+                match to it.
 
         Returns:
             bool. True is the client_version matches the given flavor using
@@ -451,7 +452,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
     def _is_first_flavor_smaller(self, flavor_a, flavor_b):
         """Compares two version flavors, return True if the first version is
         smaller in the following ordering:
-        'alpha' < 'beta' < 'test' < 'release'.
+        'test' < 'alpha' < 'beta' < 'release'.
 
         Args:
             flavor_a: str. The version flavor.
