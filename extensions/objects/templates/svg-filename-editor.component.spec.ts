@@ -41,7 +41,7 @@ var initializeMockDocument = function(svgFilenameCtrl) {
   $document.find('body').append(mockDocument.outerHTML);
 };
 
-describe('SvgFilenameEditor', function() {
+fdescribe('SvgFilenameEditor', function() {
   var alertSpy = null;
   var contextService = null;
   var CsrfService = null;
@@ -141,6 +141,20 @@ describe('SvgFilenameEditor', function() {
     }
   };
 
+  class mockReaderObject {
+    result = null;
+    onload = null;
+    constructor() {
+      this.onload = function() {
+        return 'Fake onload executed';
+      };
+    }
+    readAsDataURL(file) {
+      this.onload();
+      return 'The file is loaded';
+    }
+  }
+
   class mockImageObject {
     source = null;
     onload = null;
@@ -189,6 +203,12 @@ describe('SvgFilenameEditor', function() {
     // the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     svgFilenameCtrl = $componentController('svgFilenameEditor');
     initializeMockDocument(svgFilenameCtrl);
@@ -422,6 +442,33 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.isDrawModePieChart()).toBe(false);
   });
 
+  it('should upload an svg file', function() {
+    var fileContent = (
+      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
+      'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
+      'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
+      'WVsbG93IiAvPjwvc3ZnPg==');
+    svgFilenameCtrl.uploadSVGFile();
+    expect(svgFilenameCtrl.isSVGUploadEnabled()).toBe(true);
+    expect(svgFilenameCtrl.isDrawModeSVGUpload()).toBe(true);
+    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    svgFilenameCtrl.onFileChanged(file, 'circle.svg')
+    svgFilenameCtrl.uploadedSVG = fileContent;
+    expect(svgFilenameCtrl.isFileUploaded()).toBe(true);
+    svgFilenameCtrl.uploadSVGFile();
+    expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('group');
+    svgFilenameCtrl.uploadSVGFile();
+    expect(svgFilenameCtrl.isDrawModeSVGUpload()).toBe(true);
+    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    svgFilenameCtrl.onFileChanged(file, 'circle.svg')
+    svgFilenameCtrl.uploadedSVG = fileContent;
+    expect(svgFilenameCtrl.isFileUploaded()).toBe(true);
+    svgFilenameCtrl.loadType = 'nogroup';
+    svgFilenameCtrl.uploadSVGFile();
+    expect(svgFilenameCtrl.canvas.getObjects()[1].get('type')).toBe('circle');
+  });
+
+
   it('should trigger object selection and scaling events', function() {
     svgFilenameCtrl.createRect();
     svgFilenameCtrl.createText();
@@ -516,7 +563,7 @@ describe('SvgFilenameEditor', function() {
 });
 
 
-describe('SvgFilenameEditor initialized with value attribute',
+fdescribe('SvgFilenameEditor initialized with value attribute',
   function() {
     var svgFilenameCtrl = null;
     var $httpBackend = null;
@@ -569,7 +616,7 @@ describe('SvgFilenameEditor initialized with value attribute',
   }
 );
 
-describe('SvgFilenameEditor with image save destination as ' +
+fdescribe('SvgFilenameEditor with image save destination as ' +
   'local storage', function() {
   var contextService = null;
   var svgFilenameCtrl = null;
@@ -693,7 +740,7 @@ describe('SvgFilenameEditor with image save destination as ' +
 });
 
 
-describe('should fail svg tag validation', function() {
+fdescribe('should fail svg tag validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {
@@ -724,7 +771,7 @@ describe('should fail svg tag validation', function() {
   });
 });
 
-describe('should fail svg attribute validation', function() {
+fdescribe('should fail svg attribute validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {

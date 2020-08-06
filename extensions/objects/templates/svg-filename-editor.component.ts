@@ -963,13 +963,13 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.setUploadedFile = function(file) {
         var reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function() {
           var img = new Image();
           img.onload = function() {
-            ctrl.uploadedSVG = (<FileReader>e.target).result;
+            ctrl.uploadedSVG = reader.result;
             $scope.$apply();
           };
-          img.src = <string>((<FileReader>e.target).result);
+          img.src = <string>(reader.result);
         };
         reader.readAsDataURL(file);
       };
@@ -1447,18 +1447,6 @@ angular.module('oppia').component('svgFilenameEditor', {
             initializeFabricJs();
           });
         }
-        angular.element(document).on(
-          'change', '.svg-file-upload-input', function(evt) {
-            var file = (<HTMLInputElement>evt.currentTarget).files[0];
-            console.log(file)
-            // scope.errorMessage = validateUploadedFile(file, filename);
-            // if (!scope.errorMessage) {
-            //   // Only fire this event if validations pass.
-            //   scope.onFileChanged(file, filename);
-            // }
-            // scope.$apply();
-          }
-        );
       };
     }
   ]
