@@ -60,6 +60,7 @@ export class TopicDomainConstants {
   public static SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static SUBTOPIC_PROPERTY_TITLE = 'title';
+  public static SUBTOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment';
 
   public static
     SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html';

@@ -509,6 +509,38 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
+  it('should create a proper backend change dict for changing subtopic ' +
+    'url fragment', function() {
+    TopicUpdateService.setSubtopicUrlFragment(_sampleTopic, 1, 'subtopic-url');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_subtopic_property',
+      subtopic_id: 1,
+      property_name: 'url_fragment',
+      new_value: 'subtopic-url',
+      old_value: undefined
+    }]);
+  });
+
+  it('should not create a backend change dict for changing subtopic ' +
+    'url fragment when the subtopic does not exist', function() {
+    expect(function() {
+      TopicUpdateService.setSubtopicUrlFragment(_sampleTopic, 10, 'whatever');
+    }).toThrowError('Subtopic doesn\'t exist');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it('should set/unset changes to a subtopic\'s url fragment', function() {
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+
+    TopicUpdateService.setSubtopicUrlFragment(_sampleTopic, 1, 'test-url');
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(
+      'test-url');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment())
+      .toEqual(undefined);
+  });
+
   it('should set/unset changes to a subtopic\'s thumbnail bg ' +
     'color', function() {
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor())

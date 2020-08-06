@@ -41,6 +41,7 @@ angular.module('oppia').factory('TopicUpdateService', [
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML',
   'SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
   'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME', 'SUBTOPIC_PROPERTY_TITLE',
+  'SUBTOPIC_PROPERTY_URL_FRAGMENT',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
   'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
@@ -59,6 +60,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
       SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, SUBTOPIC_PROPERTY_TITLE,
+      SUBTOPIC_PROPERTY_URL_FRAGMENT,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
       TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -477,6 +479,30 @@ angular.module('oppia').factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // ---- Undo ----
             subtopic.setThumbnailFilename(oldThumbnailFilename);
+          });
+      },
+
+      /**
+       * Changes the url fragment of a subtopic and records the change in
+       * the undo/redo service.
+       */
+      setSubtopicUrlFragment: function(topic, subtopicId, urlFragment) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          throw new Error('Subtopic doesn\'t exist');
+        }
+        var oldUrlFragment = angular.copy(subtopic.getUrlFragment());
+        _applySubtopicPropertyChange(
+          topic, SUBTOPIC_PROPERTY_URL_FRAGMENT, subtopicId,
+          urlFragment, oldUrlFragment,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var newUrlFragment = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            subtopic.setUrlFragment(newUrlFragment);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            subtopic.setUrlFragment(oldUrlFragment);
           });
       },
 

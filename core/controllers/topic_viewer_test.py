@@ -51,12 +51,14 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
 
         self.story_1 = story_domain.Story.create_default_story(
-            self.story_id_1, 'story_title', 'description', self.topic_id_1)
+            self.story_id_1, 'story_title', 'description', self.topic_id_1,
+            'story-one')
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'story_title', 'description', self.topic_id_2)
+            self.story_id_2, 'story_title', 'description', self.topic_id_2,
+            'story-two')
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
 
@@ -65,7 +67,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            'subtopic-name'))
         self.topic.next_subtopic_id = 2
         self.topic.thumbnail_filename = 'Image.svg'
         self.topic.thumbnail_bg_color = (
@@ -166,7 +169,8 @@ class TopicPageDataHandlerTests(
                     u'thumbnail_bg_color': u'#FFFFFF',
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
-                    u'title': u'subtopic_name'}],
+                    u'title': u'subtopic_name',
+                    u'url_fragment': u'subtopic-name'}],
                 'degrees_of_mastery': {
                     self.skill_id_1: None,
                     self.skill_id_2: None
@@ -228,7 +232,8 @@ class TopicPageDataHandlerTests(
                         u'thumbnail_bg_color': u'#FFFFFF',
                         u'skill_ids': [self.skill_id_2],
                         u'id': 1,
-                        u'title': u'subtopic_name'}],
+                        u'title': u'subtopic_name',
+                        u'url_fragment': u'subtopic-name'}],
                     'degrees_of_mastery': {
                         self.skill_id_1: 0.3,
                         self.skill_id_2: 0.5

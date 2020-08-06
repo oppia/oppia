@@ -106,6 +106,9 @@ angular.module('oppia').constant(
   TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR);
 angular.module('oppia').constant(
   'SUBTOPIC_PROPERTY_TITLE', TopicDomainConstants.SUBTOPIC_PROPERTY_TITLE);
+angular.module('oppia').constant(
+  'SUBTOPIC_PROPERTY_URL_FRAGMENT',
+  TopicDomainConstants.SUBTOPIC_PROPERTY_URL_FRAGMENT);
 
 angular.module('oppia').constant(
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML',

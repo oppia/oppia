@@ -286,6 +286,24 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
 
+    def test_does_story_exist_with_url_fragment(self):
+        story_id_1 = story_services.get_new_story_id()
+        story_id_2 = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id_1, self.USER_ID, self.TOPIC_ID, url_fragment='story-one')
+        self.save_new_story(
+            story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two')
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_1)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_2)
+        self.assertTrue(
+            story_services.does_story_exist_with_url_fragment('story-one'))
+        self.assertTrue(
+            story_services.does_story_exist_with_url_fragment('story-two'))
+        self.assertFalse(
+            story_services.does_story_exist_with_url_fragment('story-three'))
+
     def test_update_story_with_invalid_corresponding_topic_id_value(self):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
@@ -788,6 +806,43 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertEqual(story.language_code, 'bn')
+
+    def test_update_story_url_fragment(self):
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.url_fragment, 'title')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+            'property_name': story_domain.STORY_PROPERTY_URL_FRAGMENT,
+            'old_value': 'title',
+            'new_value': 'updated-title'
+        })]
+
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list,
+            'Updated story url_fragment.')
+
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+
+        self.assertEqual(story.url_fragment, 'updated-title')
+
+    def test_cannot_update_story_if_url_fragment_already_exists(self):
+        topic_id = topic_services.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id, self.USER_ID, topic_id,
+            title='original', url_fragment='original')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+            'property_name': story_domain.STORY_PROPERTY_URL_FRAGMENT,
+            'old_value': 'title',
+            'new_value': 'original'
+        })]
+        exception_message = 'Story Url Fragment is not unique across the site.'
+        with self.assertRaisesRegexp(Exception, exception_message):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list,
+                'Updated story url_fragment.')
 
     def test_cannot_update_story_with_no_change_list(self):
         with self.assertRaisesRegexp(
@@ -1572,7 +1627,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID)
+            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID, 'title')
 
         self.node_1 = {
             'id': self.NODE_ID_1,

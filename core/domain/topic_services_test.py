@@ -402,8 +402,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'title': 'Title2',
             'subtopic_id': 2
         }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'title-two',
+            'old_value': '',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title3',
+            'subtopic_id': 3
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'title-three',
+            'old_value': '',
             'subtopic_id': 3
         })]
         topic_services.update_topic_and_subtopic_pages(
@@ -1082,6 +1094,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_subtopic_id': self.subtopic_id,
                 'new_subtopic_id': 2,
                 'skill_id': self.skill_id_2
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+                'new_value': 'new-subtopic',
+                'old_value': '',
+                'subtopic_id': 2
             })
         ]
         topic_services.update_topic_and_subtopic_pages(
@@ -1306,6 +1325,41 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 canonical_story_ids=[], additional_story_ids=[],
                 uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
+    def test_does_not_update_subtopic_url_fragment_if_it_already_exists(self):
+        topic_id = topic_services.get_new_topic_id()
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title',
+            'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'original',
+            'old_value': '',
+            'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT,
+            'new_value': 'original',
+            'old_value': '',
+            'subtopic_id': 2
+        })]
+        self.save_new_topic(
+            topic_id, self.user_id, name='topic-with-duplicate-subtopic',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+        with self.assertRaisesRegexp(
+            Exception,
+            'Subtopic url fragments are not unique across subtopics '
+            'in the topic'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, changelist, 'Update url fragment')
+
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.language_code, 'en')
@@ -1515,12 +1569,13 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             'title': 'subtopic_title',
             'skill_ids': []
         }
-        subtopic_v2_dict = {
+        subtopic_v3_dict = {
             'id': 1,
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'title': 'subtopic_title',
-            'skill_ids': []
+            'skill_ids': [],
+            'url_fragment': 'subtopictitle'
         }
         model = topic_models.TopicModel(
             id='topic_id',
@@ -1541,18 +1596,18 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
 
         swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 3)
 
         with swap_topic_object, current_schema_version_swap:
             topic = topic_fetchers.get_topic_from_model(model)
 
-        self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(topic.subtopic_schema_version, 3)
         self.assertEqual(topic.name, 'name')
         self.assertEqual(topic.canonical_name, 'name')
         self.assertEqual(topic.next_subtopic_id, 1)
         self.assertEqual(topic.language_code, 'en')
         self.assertEqual(len(topic.subtopics), 1)
-        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v2_dict)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v3_dict)
 
 
 class StoryReferenceMigrationTests(test_utils.GenericTestBase):

@@ -44,7 +44,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -98,7 +99,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
                 'thumbnail_bg_color': '#FFFFFF',
-                'title': 'Title'}])
+                'title': 'Title',
+                'url_fragment': 'dummy-subtopic-url'}])
 
     def test_delete_canonical_story(self):
         self.topic.canonical_story_references = [
@@ -250,7 +252,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
 
         skill_ids = self.topic.subtopics[0].skill_ids
 
@@ -320,9 +323,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title1', [], None, None),
-            topic_domain.Subtopic(2, 'Title2', [], None, None),
-            topic_domain.Subtopic(3, 'Title3', [], None, None)]
+            topic_domain.Subtopic(1, 'Title1', [], None, None, 'title-one'),
+            topic_domain.Subtopic(2, 'Title2', [], None, None, 'title-two'),
+            topic_domain.Subtopic(3, 'Title3', [], None, None, 'title-three')]
 
         subtopics = self.topic.subtopics
 
@@ -720,7 +723,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-title-two'))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -853,6 +857,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.update_subtopic_thumbnail_filename(
                 'invalid_id', 'new title')
 
+    def test_update_subtopic_url_fragment(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.assertEqual(
+            self.topic.subtopics[0].url_fragment, 'dummy-subtopic-url')
+        self.topic.update_subtopic_url_fragment(1, 'new-subtopic-url')
+        self.assertEqual(
+            self.topic.subtopics[0].url_fragment, 'new-subtopic-url')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_url_fragment('invalid_id', 'new-url')
+
     def test_update_subtopic_thumbnail_bg_color(self):
         self.assertEqual(len(self.topic.subtopics), 1)
         self.topic.subtopics[0].thumbnail_bg_color = None
@@ -883,10 +899,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]),
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-one'),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-two')]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):

@@ -69,7 +69,8 @@ describe('Topic editor functionality', function() {
 
   it('should add and delete subtopics correctly', async function() {
     await topicEditorPage.addSubtopic(
-      'Subtopic 1', '../data/test2_svg.svg', 'Subtopic content');
+      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+      'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
 
     await topicEditorPage.get(topicId);
@@ -126,7 +127,8 @@ describe('Topic editor functionality', function() {
   it('should add a canonical story to topic correctly', async function() {
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'Story description', Constants.TEST_SVG_PATH);
+      'Story Title', 'topic-and-story-editor-one', 'Story description',
+      Constants.TEST_SVG_PATH);
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -186,12 +188,14 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
 
       await topicEditorPage.addSubtopic(
-        'Subtopic 1', '../data/test2_svg.svg', 'Subtopic1 Content');
+        'Subtopic 1', 'subtopic-two', '../data/test2_svg.svg',
+        'Subtopic1 Content');
       await topicEditorPage.saveTopic('Added subtopic.');
 
       await topicEditorPage.navigateToTopicEditorTab();
       await topicEditorPage.addSubtopic(
-        'Subtopic 2', '../data/test2_svg.svg', 'Subtopic2 Content');
+        'Subtopic 2', 'subtopic-three', '../data/test2_svg.svg',
+        'Subtopic2 Content');
       await topicEditorPage.saveTopic('Added subtopics.');
 
       await topicEditorPage.navigateToTopicEditorTab();
@@ -275,7 +279,8 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       topicName, topicUrlFragment, 'Description', false);
     await topicEditorPage.createStory(
-      'Story 0', 'Story description', Constants.TEST_SVG_PATH);
+      'Story 0', 'topic-and-story-editor-two', 'Story description',
+      Constants.TEST_SVG_PATH);
     var url = await browser.getCurrentUrl();
     storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
