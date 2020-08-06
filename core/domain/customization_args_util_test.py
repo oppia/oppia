@@ -356,10 +356,11 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
     def test_frontend_customization_args_defs_coverage(self):
-        """Test to ensure that customization-args-defs.ts has frontend and
-        backend interfaces for customization arguments for each interaction.
-        I.e. for each interaction with id 'X', there exists an interface in
-        customization-args-defs.ts named XCustomizationArgs and
+        """Test to ensure that customization-args-defs.ts has both frontend and
+        backend interfaces for each interaction's customization arguments.
+
+        Specifically: given an interaction with id 'X', there must exist an
+        interface in customization-args-defs.ts named XCustomizationArgs and
         XCustomizationArgsBackendDict.
         """
         filepath = os.path.join(
