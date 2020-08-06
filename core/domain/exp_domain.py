@@ -3793,6 +3793,7 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v35.
         """
+        raise Exception('haha')
         exploration_dict['schema_version'] = 35
 
         exploration_dict['states'] = cls._convert_states_v29_dict_to_v30_dict(
