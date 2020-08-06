@@ -6,6 +6,7 @@
       "startServerReadyPattern": "default: \"GET /_ah/warmup HTTP/1.1\"",
       "startServerReadyTimeout": 250000,
       "url": [
+        "http://127.0.0.1:8181/signup?return_url=%2F",
         "http://127.0.0.1:8181/",
         "http://127.0.0.1:8181/admin",
         "http://127.0.0.1:8181/about",
@@ -22,7 +23,9 @@
         "http://127.0.0.1:8181/nonprofits",
         "http://127.0.0.1:8181/parents",
         "http://127.0.0.1:8181/partners",
+        "http://127.0.0.1:8181/preferences",
         "http://127.0.0.1:8181/privacy-policy",
+        "http://127.0.0.1:8181/profile/username1",
         "http://127.0.0.1:8181/teach",
         "http://127.0.0.1:8181/teachers",
         "http://127.0.0.1:8181/terms",
