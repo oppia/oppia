@@ -137,8 +137,8 @@ export class AlgebraicExpressionInputValidationService {
     /* eslint-disable dot-notation */
     let greekLetters = AppConstants['GREEK_LETTERS'];
     let greekSymbols = (
-      AppConstants['GREEK_SYMBOLS_LOWERCASE'] + AppConstants[
-        'GREEK_SYMBOLS_UPPERCASE']);
+      AppConstants['GREEK_SYMBOLS_LOWERCASE'].concat(AppConstants[
+        'GREEK_SYMBOLS_UPPERCASE']));
     /* eslint-enable dot-notation */
     let missingVariables = [];
 
@@ -154,6 +154,7 @@ export class AlgebraicExpressionInputValidationService {
     }
 
     if (missingVariables.length > 0) {
+      console.log(missingVariables);
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (

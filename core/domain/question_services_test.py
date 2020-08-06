@@ -1113,7 +1113,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             migrated_answer_group.outcome.feedback.html,
             expected_feeedback_html_content)
 
-    def test_migrate_question_state_from_v34_to_v35(self):
+    def test_migrate_question_state_from_v34_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -1206,13 +1206,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
+        question = question_fetchers.get_question_from_model(question_model)
 
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
@@ -1315,13 +1313,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
+        question = question_fetchers.get_question_from_model(question_model)
 
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
@@ -1420,13 +1416,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
+        question = question_fetchers.get_question_from_model(question_model)
 
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
@@ -1538,13 +1532,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 35)
+        question = question_fetchers.get_question_from_model(question_model)
 
-        with current_schema_version_swap:
-            question = question_fetchers.get_question_from_model(question_model)
-
-        self.assertEqual(question.question_state_data_schema_version, 35)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
@@ -1926,6 +1918,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'solution': {},
                 'id': 'AlgebraicExpressionInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -1952,4 +1945,4 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            sorted(cust_args['customOskLetters']['value']), ['x', 'α', 'β'])
+            sorted(cust_args['customOskLetters'].value), ['x', 'α', 'β'])
