@@ -26,13 +26,13 @@ angular.module('oppia').component('customOskLettersEditor', {
   },
   template: require('./custom-osk-letters-editor.component.html'),
   controller: [
-    'ALLOWED_CUSTOM_LETTERS_LIMIT', 'CUSTOM_LETTERS_GREEK_TAB',
-    'CUSTOM_LETTERS_LATIN_TAB', 'GREEK_SYMBOLS_LOWERCASE',
-    'GREEK_SYMBOLS_UPPERCASE',
+    '$scope', '$window', 'ALLOWED_CUSTOM_LETTERS_LIMIT',
+    'CUSTOM_LETTERS_GREEK_TAB', 'CUSTOM_LETTERS_LATIN_TAB',
+    'GREEK_SYMBOLS_LOWERCASE', 'GREEK_SYMBOLS_UPPERCASE',
     function(
-        ALLOWED_CUSTOM_LETTERS_LIMIT, CUSTOM_LETTERS_GREEK_TAB,
-        CUSTOM_LETTERS_LATIN_TAB, GREEK_SYMBOLS_LOWERCASE,
-        GREEK_SYMBOLS_UPPERCASE) {
+        $scope, $window, ALLOWED_CUSTOM_LETTERS_LIMIT,
+        CUSTOM_LETTERS_GREEK_TAB, CUSTOM_LETTERS_LATIN_TAB,
+        GREEK_SYMBOLS_LOWERCASE, GREEK_SYMBOLS_UPPERCASE) {
       const ctrl = this;
       ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
@@ -61,6 +61,31 @@ angular.module('oppia').component('customOskLettersEditor', {
       ctrl.getRemainingLettersCount = function() {
         return Math.max(ALLOWED_CUSTOM_LETTERS_LIMIT - ctrl.value.length, 0);
       };
+
+      ctrl.keyDownCallBack = function(e) {
+        let keyPressed = e.key;
+        if (keyPressed === 'Shift') {
+          ctrl.lettersAreLowercase = false;
+        } else if (keyPressed === 'Backspace') {
+          ctrl.value.pop();
+        } else if (
+          ctrl.latinLowerCase.join('').indexOf(keyPressed.toLowerCase()) !== -1
+          && ctrl.value.indexOf(keyPressed) === -1) {
+          $('button#custom-letter-' + keyPressed).click();
+        }
+        $scope.$apply();
+      };
+
+      ctrl.keyUpCallBack = function(e) {
+        let keyPressed = e.key;
+        if (keyPressed === 'Shift') {
+          ctrl.lettersAreLowercase = true;
+          $scope.$apply();
+        }
+      };
+
+      $window.addEventListener('keydown', ctrl.keyDownCallBack);
+      $window.addEventListener('keyup', ctrl.keyUpCallBack);
 
       ctrl.$onInit = function() {
         ctrl.alwaysEditable = true;

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the custom OSK letters component.
  */
 
-describe('OnScreenKeyboard', function() {
+fdescribe('OnScreenKeyboard', function() {
   let ctrl = null, $window = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -42,5 +42,18 @@ describe('OnScreenKeyboard', function() {
     ctrl.updateLettersList('alpha');
     expect(ctrl.value).toEqual([]);
     expect(ctrl.getRemainingLettersCount()).toBe(10);
+  });
+
+  it('should correctly identify keyboard events', function() {
+    ctrl.lettersAreLowercase = true;
+    ctrl.keyDownCallBack({key: 'Shift'});
+    expect(ctrl.lettersAreLowercase).toBeFalse();
+    ctrl.keyUpCallBack({key: 'Shift'});
+    expect(ctrl.lettersAreLowercase).toBeTrue();
+
+    ctrl.value = ['x'];
+    ctrl.keyDownCallBack({key: 'Backspace'});
+    expect(ctrl.value.length).toBe(0);
+    ctrl.keyDownCallBack({key: 'x'});
   });
 });
