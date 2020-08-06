@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Constants that are relevant to the validation of new structures for Android
-app. This file should only contain validations which affects UI display and
+app. This file should only contain validations which affect UI display and
 general functionality on Android.
 """
 
