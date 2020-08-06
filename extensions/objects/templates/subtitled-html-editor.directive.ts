@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,29 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for creating text links to a user's profile page.
+ * @fileoverview Directive for Subtitled Html editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-angular.module('oppia').directive('profileLinkText', [
-  'UrlInterpolationService', 'SYSTEM_USER_IDS',
-  function(UrlInterpolationService, SYSTEM_USER_IDS) {
+angular.module('oppia').directive('subtitledHtmlEditor', [
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
-        username: '&'
+        value: '=',
+        getSchema: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/' +
-        'profile-link-text.directive.html'),
+      template: require('./subtitled-html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.isUsernameLinkable = function(username) {
-          return SYSTEM_USER_IDS.indexOf(username) === -1;
+        ctrl.$onInit = function() {
+          const uiConfig = (
+            ctrl.getSchema().replacement_ui_config ?
+              ctrl.getSchema().replacement_ui_config :
+              {});
+          ctrl.schema = {
+            type: 'html',
+            ui_config: uiConfig
+          };
         };
       }]
     };
-  }]);
+  }
+]);

@@ -23,7 +23,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { LogicCustomizationArgs } from
+import { LogicProofCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -37,13 +37,13 @@ export class LogicProofValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: LogicCustomizationArgs): Warning[] {
+      customizationArgs: LogicProofCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: LogicCustomizationArgs,
+      stateName: string, customizationArgs: LogicProofCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     // We do not require a default rule for this interaction, since the
     // feedback is mostly provided from within the interaction itself.
