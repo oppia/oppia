@@ -29,13 +29,16 @@ require(
   'interactive-map-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
-  'HtmlEscaperService', 'InteractiveMapRulesService', 'UrlInterpolationService',
+  'InteractionAttributesExtractorService',
+  'InteractiveMapRulesService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, InteractiveMapRulesService, UrlInterpolationService,
+      InteractionAttributesExtractorService,
+      InteractiveMapRulesService, UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
@@ -152,11 +155,17 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
                     [newLat, newLng], InteractiveMapRulesService);
                 }
               });
-            ctrl.coords = [
-              HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
-              HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
-            ctrl.zoom = (
-              HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
+
+            const {
+              latitude,
+              longitude,
+              zoom
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'InteractiveMap',
+              $attrs
+            );
+            ctrl.coords = [latitude, longitude];
+            ctrl.zoom = zoom;
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
             ctrl.mapMarkers = {};
             refreshMap();

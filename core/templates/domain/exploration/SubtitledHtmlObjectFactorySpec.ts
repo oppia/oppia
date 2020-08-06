@@ -20,55 +20,49 @@ import { SubtitledHtmlObjectFactory, SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('SubtitledHtml object factory', () => {
-  describe('SubtitledHtmlObjectFactory', () => {
-    let shof: SubtitledHtmlObjectFactory, subtitledHtml: SubtitledHtml;
+  let shof: SubtitledHtmlObjectFactory, subtitledHtml: SubtitledHtml;
 
-    beforeEach(() => {
-      shof = new SubtitledHtmlObjectFactory();
+  beforeEach(() => {
+    shof = new SubtitledHtmlObjectFactory();
 
-      subtitledHtml = shof.createFromBackendDict({
-        content_id: 'content_id',
-        html: '<p>some html</p>'
-      });
+    subtitledHtml = shof.createFromBackendDict({
+      content_id: 'content_id',
+      html: '<p>some html</p>'
     });
+  });
 
-    it('should get and set HTML correctly', () => {
-      expect(subtitledHtml.getHtml()).toEqual('<p>some html</p>');
-      subtitledHtml.setHtml('new html');
-      expect(subtitledHtml.getHtml()).toEqual('new html');
+  it('should get and set HTML correctly', () => {
+    expect(subtitledHtml.getHtml()).toEqual('<p>some html</p>');
+    subtitledHtml.setHtml('new html');
+    expect(subtitledHtml.getHtml()).toEqual('new html');
+  });
+
+  it('should get and set contentId correctly', () => {
+    expect(subtitledHtml.getContentId()).toEqual('content_id');
+    subtitledHtml.setContentId('new_content_id');
+    expect(subtitledHtml.getContentId()).toEqual('new_content_id');
+  });
+
+  it('should correctly check emptiness', () => {
+    expect(subtitledHtml.isEmpty()).toBe(false);
+
+    subtitledHtml.setHtml('');
+    expect(subtitledHtml.isEmpty()).toBe(true);
+
+    subtitledHtml.setHtml('hello');
+    expect(subtitledHtml.isEmpty()).toBe(false);
+  });
+
+  it('should convert to backend dict correctly', () => {
+    expect(subtitledHtml.toBackendDict()).toEqual({
+      content_id: 'content_id',
+      html: '<p>some html</p>'
     });
+  });
 
-    it('should get contentId correctly', () => {
-      expect(subtitledHtml.getContentId()).toEqual('content_id');
-    });
-
-    it('should correctly check existence of HTML', () => {
-      expect(subtitledHtml.hasNoHtml()).toBe(false);
-      subtitledHtml.setHtml('');
-      expect(subtitledHtml.hasNoHtml()).toBe(true);
-    });
-
-    it('should correctly check emptiness', () => {
-      expect(subtitledHtml.isEmpty()).toBe(false);
-
-      subtitledHtml.setHtml('');
-      expect(subtitledHtml.isEmpty()).toBe(true);
-
-      subtitledHtml.setHtml('hello');
-      expect(subtitledHtml.isEmpty()).toBe(false);
-    });
-
-    it('should convert to backend dict correctly', () => {
-      expect(subtitledHtml.toBackendDict()).toEqual({
-        content_id: 'content_id',
-        html: '<p>some html</p>'
-      });
-    });
-
-    it('should create default object', () => {
-      var defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
-      expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
-      expect(defaultSubtitledHtml.getContentId()).toEqual('content_id');
-    });
+  it('should create default object', () => {
+    const defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
+    expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
+    expect(defaultSubtitledHtml.getContentId()).toEqual('content_id');
   });
 });

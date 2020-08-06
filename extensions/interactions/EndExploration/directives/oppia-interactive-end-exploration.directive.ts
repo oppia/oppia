@@ -22,7 +22,8 @@
 
 require('domain/collection/read-only-collection-backend-api.service.ts');
 require('services/context.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveEndExploration', [
@@ -37,17 +38,23 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
         '$http', '$attrs', '$q', 'UrlService',
         'ContextService', 'ReadOnlyCollectionBackendApiService',
         'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
-        'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'InteractionAttributesExtractorService',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
             $http, $attrs, $q, UrlService,
             ContextService, ReadOnlyCollectionBackendApiService,
             PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
-            HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+            InteractionAttributesExtractorService,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.$onInit = function() {
-            var authorRecommendedExplorationIds = (
-              HtmlEscaperService.escapedJsonToObj(
-                $attrs.recommendedExplorationIdsWithValue));
+            const {
+              recommendedExplorationIds
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'EndExploration',
+              $attrs
+            );
+            var authorRecommendedExplorationIds = recommendedExplorationIds;
 
             ctrl.isIframed = UrlService.isIframed();
             ctrl.isInEditorPage = (

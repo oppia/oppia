@@ -17,16 +17,16 @@
  * worked examples.
  */
 
-export interface WorkedExampleBackendDict {
-  question: SubtitledHtmlBackendDict,
-  explanation: SubtitledHtmlBackendDict
-}
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import {
   SubtitledHtml, SubtitledHtmlObjectFactory, SubtitledHtmlBackendDict
 } from 'domain/exploration/SubtitledHtmlObjectFactory';
+
+export interface WorkedExampleBackendDict {
+  question: SubtitledHtmlBackendDict,
+  explanation: SubtitledHtmlBackendDict
+}
 
 export class WorkedExample {
   _question: SubtitledHtml;

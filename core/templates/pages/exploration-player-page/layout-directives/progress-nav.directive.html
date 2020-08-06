@@ -26,7 +26,7 @@
       <!-- Special case for the 'Continue' interaction. -->
       <md-button ng-if="interactionId === 'Continue'" ng-click="onSubmit()"
                  class="oppia-learner-confirm-button protractor-test-continue-button">
-        <[interactionCustomizationArgs.buttonText.value]>
+        <[interactionCustomizationArgs.buttonText.value.getUnicode()]>
         <i class="fas fa-arrow-right" style="font-size: 19px; padding-top: 1.5px;"></i>
       </md-button>
       <md-button ng-if="shouldGenericSubmitButtonBeShown()"

@@ -324,7 +324,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -339,14 +341,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """),
@@ -360,7 +365,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -375,14 +382,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """),
@@ -396,7 +406,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -411,14 +423,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
@@ -434,7 +449,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -449,14 +466,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """)
@@ -503,15 +523,81 @@ written_translations:
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State A',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State A',
+                    'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 2',
                     'new_value': 'TextInput'
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State 2',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State 2',
+                    'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 3',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State 3',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State 3',
+                    'new_value': 1
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
@@ -664,7 +750,8 @@ written_translations:
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
@@ -1363,9 +1450,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exploration.states['State 3'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
 
         csrf_token = self.get_new_csrf_token()
 
@@ -1420,11 +1510,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
-                }, {
-                    'cmd': 'edit_state_property',
-                    'state_name': 'State 4',
-                    'property_name': 'widget_id',
-                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,
@@ -1461,11 +1546,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 5'
-                }, {
-                    'cmd': 'edit_state_property',
-                    'state_name': 'State 5',
-                    'property_name': 'widget_id',
-                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,

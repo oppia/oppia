@@ -1774,7 +1774,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'html': 'option 1',
+                            'content_id': 'ca_choices_0'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True

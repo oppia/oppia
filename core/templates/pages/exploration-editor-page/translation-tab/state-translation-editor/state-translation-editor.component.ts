@@ -16,6 +16,9 @@
  * @fileoverview Component for the state translation editor.
  */
 
+import { WRITTEN_TRANSLATION_TYPE_HTML } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -103,9 +106,10 @@ angular.module('oppia').component('stateTranslationEditor', {
           .displayed.getWrittenTranslation(contentId, languageCode));
         var newWrittenTranslation = writtenTranslation;
         if (oldWrittenTranslation === null || (
-          oldWrittenTranslation.html !== newWrittenTranslation.html || (
-            oldWrittenTranslation.needsUpdate !== (
-              newWrittenTranslation.needsUpdate)))) {
+          oldWrittenTranslation.getHtml() !== newWrittenTranslation.getHtml() ||
+          (oldWrittenTranslation.needsUpdate !== (
+            newWrittenTranslation.needsUpdate)))
+        ) {
           var stateName = StateEditorService.getActiveStateName();
           showMarkAudioAsNeedingUpdateModalIfRequired(
             contentId, languageCode);
@@ -122,7 +126,8 @@ angular.module('oppia').component('stateTranslationEditor', {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
-              WrittenTranslationObjectFactory.createNew(''));
+              WrittenTranslationObjectFactory
+                .createNew(WRITTEN_TRANSLATION_TYPE_HTML, ''));
           }
         }
       };

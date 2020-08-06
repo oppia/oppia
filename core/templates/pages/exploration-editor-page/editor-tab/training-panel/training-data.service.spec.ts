@@ -216,6 +216,15 @@ describe('TrainingDataService', function() {
             training_data: [],
             tagged_skill_misconception_id: null
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'State',
             feedback: {

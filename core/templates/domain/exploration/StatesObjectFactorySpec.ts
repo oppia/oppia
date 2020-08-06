@@ -22,6 +22,8 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 
@@ -65,12 +67,7 @@ describe('States Object Factory', () => {
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: 'Type your answer here.'
-          }
+          recommendedExplorationIds: { value: [] }
         },
         default_outcome: {
           dest: 'new state',
@@ -85,6 +82,7 @@ describe('States Object Factory', () => {
         },
         hints: [],
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
@@ -115,7 +113,7 @@ describe('States Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: 'Type your answer here.'
+            value: new SubtitledUnicode('Type your answer here.', '')
           }
         },
         default_outcome: {
@@ -132,6 +130,7 @@ describe('States Object Factory', () => {
         hints: [],
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
@@ -171,7 +170,15 @@ describe('States Object Factory', () => {
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
-        customization_args: {},
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         default_outcome: {
           dest: 'new state',
           feedback: {
@@ -192,11 +199,13 @@ describe('States Object Factory', () => {
         },
         id: 'TextInput'
       },
+      next_content_id_index: 1,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
         translations_mapping: {
           content: {},
+          ca_placeholder_0: {},
           default_outcome: {}
         }
       }
@@ -220,7 +229,7 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'second state',
@@ -274,7 +283,7 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'first state',
@@ -405,7 +414,15 @@ describe('States Object Factory', () => {
             }]
           }],
           confirmed_unclassified_answers: [],
-          customization_args: {},
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_3',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'new state',
             feedback: {
@@ -428,11 +445,13 @@ describe('States Object Factory', () => {
           }],
           id: 'TextInput'
         },
+        next_content_id_index: 4,
         param_changes: [],
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
+            ca_placeholder_3: {},
             default_outcome: {},
             feedback_1: {},
             hint_1: {},
@@ -465,7 +484,7 @@ describe('States Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: 'Type your answer here.'
+            value: new SubtitledUnicode('Type your answer here.', '')
           }
         },
         default_outcome: {
@@ -483,6 +502,7 @@ describe('States Object Factory', () => {
         solution: null,
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
@@ -551,7 +571,7 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'third state',

@@ -86,7 +86,7 @@ describe('Training Panel Component', function() {
       confirmed_unclassified_answers: null,
       customization_args: {},
       hints: [],
-      id: 'interaction_1',
+      id: null,
       solution: {
         answer_is_exclusive: false,
         correct_answer: 'This is the correct answer',
@@ -96,6 +96,7 @@ describe('Training Panel Component', function() {
         }
       }
     },
+    next_content_id_index: 1,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {}
@@ -140,12 +141,13 @@ describe('Training Panel Component', function() {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(explorationStatesService, 'getState').and.returnValue(
       stateObjectFactory.createFromBackendDict(stateName, state));
+    spyOn(generateContentIdService, 'getNextStateId').and.returnValue(
+      'feedback_1');
 
-    stateInteractionIdService.init(stateName, 'interaction_1');
+    stateInteractionIdService.init(stateName, 'MultipleChoiceInput');
     stateCustomizationArgsService.init(stateName, {
-      choices: {
-        value: null
-      }
+      choices: {value: []},
+      showChoicesInShuffledOrder: {value: true}
     });
 
     $scope = $rootScope.$new();
@@ -171,8 +173,8 @@ describe('Training Panel Component', function() {
       expect($scope.allOutcomes.length).toBe(2);
       expect($scope.selectedAnswerGroupIndex).toBe(0);
       expect($scope.answerTemplate).toBe(
-        '<oppia-response-interaction_1 answer="{}">' +
-        '</oppia-response-interaction_1>');
+        '<oppia-response-multiple-choice-input answer="{}" choices="[]">' +
+        '</oppia-response-multiple-choice-input>');
     });
 
   it('should evaluate active state name', function() {

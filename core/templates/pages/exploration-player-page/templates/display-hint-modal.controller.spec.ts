@@ -80,7 +80,7 @@ describe('Display Hint Modal Controller', function() {
       confirmed_unclassified_answers: [],
       customization_args: {},
       hints: [],
-      id: 'interaction_1'
+      id: null
     });
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(

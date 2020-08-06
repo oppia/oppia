@@ -318,7 +318,9 @@ class NewSkillHandler(base.BaseHandler):
                 'Explanation should be a dict.')
 
         try:
-            state_domain.SubtitledHtml.from_dict(explanation_dict)
+            subtitled_html = (
+                state_domain.SubtitledHtml.from_dict(explanation_dict))
+            subtitled_html.validate()
         except:
             raise self.InvalidInputException(
                 'Explanation should be a valid SubtitledHtml dict.')

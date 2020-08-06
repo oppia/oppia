@@ -66,7 +66,7 @@ describe('Learner answer info service', function() {
         }
       },
       interaction: {
-        id: 'RuleTest',
+        id: null,
         answer_groups: [{
           outcome: {
             dest: 'outcome 1',
@@ -254,7 +254,7 @@ describe('Learner answer info service', function() {
       LearnerAnswerInfoService.recordLearnerAnswerInfo('My details');
       expect(
         ladbas.recordLearnerAnswerDetails).toHaveBeenCalledWith(
-        '10', 'new state', 'RuleTest', 'This is my answer', 'My details');
+        '10', 'new state', null, 'This is my answer', 'My details');
     });
   });
 

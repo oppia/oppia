@@ -137,9 +137,11 @@ class SubtopicPageContents(python_utils.OBJECT):
         Returns:
             SubtopicPageContents. The corresponding object.
         """
+        page_contents = state_domain.SubtitledHtml.from_dict(
+            page_contents_dict['subtitled_html'])
+        page_contents.validate()
         return cls(
-            state_domain.SubtitledHtml.from_dict(
-                page_contents_dict['subtitled_html']),
+            page_contents,
             state_domain.RecordedVoiceovers.from_dict(page_contents_dict[
                 'recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict(page_contents_dict[

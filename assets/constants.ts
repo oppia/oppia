@@ -5261,6 +5261,7 @@ export = {
       "hints": [],
       "solution": null
     },
+    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
       "voiceovers_mapping": {

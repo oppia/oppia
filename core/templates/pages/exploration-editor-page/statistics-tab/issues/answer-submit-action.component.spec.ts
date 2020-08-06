@@ -20,6 +20,8 @@ import { TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
 
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
@@ -30,11 +32,13 @@ describe('Answer Submit Action directive', function() {
   var $scope = null;
   var explorationHtmlFormatterService = null;
   var htmlEscaperService = null;
+  var interactionObjectFactory = null;
 
   beforeEach(function() {
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService);
     htmlEscaperService = TestBed.get(HtmlEscaperService);
+    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -43,11 +47,21 @@ describe('Answer Submit Action directive', function() {
       answer: '"This is an answer string."',
       currentStateName: 'State name',
       destStateName: 'Introduction',
-      interactionCustomizationArgs: '{"choices":{"value":"Value"}}',
-      interactionId: '1',
+      interactionCustomizationArgs:
+        `{
+          "choices": {
+            "value": [{
+              "content_id": "",
+              "html": "Value"
+            }]
+          },
+          "showChoicesInShuffledOrder": {"value": true}
+        }`,
+      interactionId: 'MultipleChoiceInput',
       timeSpentInStateSecs: 2000
     });
   }));
+
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
@@ -56,7 +70,8 @@ describe('Answer Submit Action directive', function() {
     ctrl = $componentController('answerSubmitAction', {
       $scope: $scope,
       ExplorationHtmlFormatterService: explorationHtmlFormatterService,
-      HtmlEscaperService: htmlEscaperService
+      HtmlEscaperService: htmlEscaperService,
+      InteractionObjectFactory: interactionObjectFactory
     });
     ctrl.$onInit();
   }));
@@ -70,8 +85,8 @@ describe('Answer Submit Action directive', function() {
 
   it('should get short answer html', function() {
     expect(ctrl.getShortAnswerHtml()).toBe(
-      '<oppia-short-response-1 answer="&amp;quot;This is an answer string.' +
-      '&amp;quot;" choices="&amp;quot;Value&amp;quot;"' +
-      '></oppia-short-response-1>');
+      '<oppia-short-response-multiple-choice-input answer="&amp;quot;This is' +
+      ' an answer string.&amp;quot;" choices="[&amp;quot;Value&amp;quot;]"' +
+      '></oppia-short-response-multiple-choice-input>');
   });
 });

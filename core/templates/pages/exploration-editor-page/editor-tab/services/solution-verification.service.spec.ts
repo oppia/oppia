@@ -116,6 +116,15 @@ describe('Solution Verification Service', function() {
               rule_type: 'Contains'
             }]
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'First State',
             feedback: {
@@ -177,6 +186,15 @@ describe('Solution Verification Service', function() {
               refresher_exploration_id: null
             }
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'default',
             feedback: {

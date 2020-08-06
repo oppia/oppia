@@ -21,7 +21,7 @@
     <div class="oppia-state-content-display oppia-transition-200"
          ng-class="{'oppia-prevent-selection': isEditable()}"
          title="Card Content">
-      <span ng-show="StateContentService.savedMemento.hasNoHtml()" class="oppia-placeholder">
+      <span ng-show="StateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
         <[getStateContentPlaceholder()]>
       </span>
       <span>

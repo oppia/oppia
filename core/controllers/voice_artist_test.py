@@ -50,6 +50,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',
@@ -158,6 +159,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',

@@ -145,6 +145,7 @@ describe('Compare versions service', function() {
             }
           },
           interaction: {
+            id: null,
             answer_groups: [],
             default_outcome: {
               dest: 'default',

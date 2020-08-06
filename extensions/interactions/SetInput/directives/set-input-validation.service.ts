@@ -21,6 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
+import { AppConstants } from 'app.constants';
 import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { SetInputCustomizationArgs } from
@@ -29,7 +30,6 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
   'domain/exploration/RuleObjectFactory';
-import { AppConstants } from 'app.constants';
 
 interface PreviousRule {
   answerGroupIndex: number;
@@ -89,14 +89,14 @@ export class SetInputValidationService {
       customizationArgs: SetInputCustomizationArgs): Warning[] {
     let warningsList = [];
 
-    let buttonText = customizationArgs.buttonText &&
-      customizationArgs.buttonText.value;
-    if (!angular.isString(buttonText)) {
+    let buttonText = (
+      customizationArgs.buttonText && customizationArgs.buttonText.value);
+    if (!buttonText || !angular.isString(buttonText.getUnicode())) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Button text must be a string.'
       });
-    } else if (buttonText.length === 0) {
+    } else if (buttonText.getUnicode().length === 0) {
       warningsList.push({
         message: 'Label for this button should not be empty.',
         type: AppConstants.WARNING_TYPES.ERROR

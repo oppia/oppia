@@ -30,9 +30,15 @@ var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
 var expectInteractionDetailsToMatch = async function(
     elem, placeholderText, heightOfBox) {
   if (placeholderText) {
-    expect((await element(by.tagName('oppia-interactive-text-input'))
-      .getAttribute('placeholder-with-value')))
-      .toEqual('&quot;' + placeholderText + '&quot;');
+    placeholderValue = (
+      await element(by.tagName('oppia-interactive-text-input'))
+        .getAttribute('placeholder-with-value')
+    );
+    placeholderValueUnicode = JSON.parse(
+      placeholderValue.replace(/&quot;/g, '"')
+    ).unicode_str;
+    expect(placeholderValueUnicode)
+      .toEqual(placeholderText);
   }
   if (heightOfBox) {
     expect((await element(by.tagName('oppia-interactive-text-input'))

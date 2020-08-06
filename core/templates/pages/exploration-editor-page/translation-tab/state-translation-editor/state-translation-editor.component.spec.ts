@@ -82,7 +82,7 @@ describe('State Translation Editor Component', function() {
       confirmed_unclassified_answers: null,
       customization_args: {},
       hints: [],
-      id: 'interaction_1',
+      id: null,
       solution: {
         answer_is_exclusive: false,
         correct_answer: 'This is the correct answer',
@@ -153,7 +153,8 @@ describe('State Translation Editor Component', function() {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a html',
+            data_format: 'html',
+            translation: 'This is a html',
             needs_update: true
           })
         ),
@@ -175,7 +176,8 @@ describe('State Translation Editor Component', function() {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a html',
+            data_format: 'html',
+            translation: 'This is a html',
             needs_update: true
           }));
       });
@@ -189,7 +191,8 @@ describe('State Translation Editor Component', function() {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a second html',
+            data_format: 'html',
+            translation: 'This is a second html',
             needs_update: true
           })
         )
@@ -213,7 +216,8 @@ describe('State Translation Editor Component', function() {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a second html',
+            data_format: 'html',
+            translation: 'This is a second html',
             needs_update: true
           })
         )
@@ -246,7 +250,8 @@ describe('State Translation Editor Component', function() {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a second html',
+            data_format: 'html',
+            translation: 'This is a second html',
             needs_update: true
           })
         )
@@ -288,7 +293,8 @@ describe('State Translation Editor Component', function() {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a second html',
+            data_format: 'html',
+            translation: 'This is a second html',
             needs_update: true
           })
         )
@@ -296,8 +302,9 @@ describe('State Translation Editor Component', function() {
       $scope.cancelEdit();
 
       expect(
-        stateWrittenTranslationsService.displayed.getWrittenTranslation().html)
-        .toBe('This is a html');
+        stateWrittenTranslationsService.displayed.getWrittenTranslation()
+          .getHtml()
+      ).toBe('This is a html');
     });
 
     it('should init editor when changing active content id language',
@@ -306,7 +313,8 @@ describe('State Translation Editor Component', function() {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a html',
+            data_format: 'html',
+            translation: 'This is a html',
             needs_update: true
           }));
       });
@@ -316,7 +324,8 @@ describe('State Translation Editor Component', function() {
       expect($scope.translationEditorIsOpen).toBe(false);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createFromBackendDict({
-          html: 'This is a html',
+          data_format: 'html',
+          translation: 'This is a html',
           needs_update: true
         }));
     });
@@ -345,7 +354,8 @@ describe('State Translation Editor Component', function() {
         hasWrittenTranslation: () => false,
         getWrittenTranslation: () => (
           writtenTranslationObjectFactory.createFromBackendDict({
-            html: 'This is a html',
+            data_format: 'html',
+            translation: 'This is a html',
             needs_update: true
           })
         ),
@@ -372,7 +382,7 @@ describe('State Translation Editor Component', function() {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(
-        writtenTranslationObjectFactory.createNew(''));
+        writtenTranslationObjectFactory.createNew('html', ''));
     });
 
     it('should add written translation html when clicking on save' +

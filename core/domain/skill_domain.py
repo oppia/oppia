@@ -404,6 +404,8 @@ class WorkedExample(python_utils.OBJECT):
                 worked_example_dict['explanation']['content_id'],
                 worked_example_dict['explanation']['html'])
         )
+        worked_example.question.validate()
+        worked_example.explanation.validate()
 
         return worked_example
 
@@ -506,6 +508,7 @@ class SkillContents(python_utils.OBJECT):
             state_domain.WrittenTranslations.from_dict(skill_contents_dict[
                 'written_translations'])
         )
+        skill_contents.explanation.validate()
 
         return skill_contents
 
@@ -795,6 +798,7 @@ class Skill(python_utils.OBJECT):
                     explanation_content_id: {}
                 }
             }))
+        skill_contents.explanation.validate()
         return cls(
             skill_id, description, [], rubrics, skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,

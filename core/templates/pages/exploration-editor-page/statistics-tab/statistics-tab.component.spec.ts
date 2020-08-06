@@ -75,7 +75,14 @@ describe('Statistics Tab Component', function() {
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,
-      customization_args: {},
+      customization_args: {
+        buttonText: {
+          value: {
+            content_id: 'ca_buttonText_0',
+            unicode_str: 'Continue'
+          }
+        }
+      },
       hints: [],
       solution: {
         answer_is_exclusive: false,
@@ -86,6 +93,7 @@ describe('Statistics Tab Component', function() {
         }
       }
     },
+    next_content_id_index: 0,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {}

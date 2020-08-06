@@ -22,12 +22,15 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
-  'DragAndDropSortInputRulesService', 'HtmlEscaperService',
-  function(DragAndDropSortInputRulesService, HtmlEscaperService) {
+  'DragAndDropSortInputRulesService',
+  'InteractionAttributesExtractorService',
+  function(DragAndDropSortInputRulesService,
+      InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
@@ -56,14 +59,20 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               answers, DragAndDropSortInputRulesService);
           };
           ctrl.$onInit = function() {
-            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
-              $attrs.choicesWithValue);
+            const {
+              choices,
+              allowMultipleItemsInSamePosition
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'DragAndDropSortInput',
+              $attrs
+            );
+            ctrl.choices = choices.map(choice => choice.getHtml());
 
             ctrl.list = [];
             ctrl.dataMaxDepth = 1;
 
             ctrl.allowMultipleItemsInSamePosition = (
-              $attrs.allowMultipleItemsInSamePositionWithValue === 'true');
+              allowMultipleItemsInSamePosition);
 
             if (ctrl.allowMultipleItemsInSamePosition) {
               ctrl.dataMaxDepth = 2;

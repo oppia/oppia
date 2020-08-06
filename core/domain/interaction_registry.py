@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import itertools
+import json
 import os
 import pkgutil
 
@@ -33,6 +34,9 @@ class Registry(python_utils.OBJECT):
 
     # Dict mapping interaction ids to instances of the interactions.
     _interactions = {}
+    # Dict mapping State schema version (XX) to interaction specs dict,
+    # retrieved from interaction_specs_vXX.json.
+    _state_schema_version_to_interaction_specs = {}
 
     @classmethod
     def get_all_interaction_ids(cls):
@@ -105,3 +109,41 @@ class Registry(python_utils.OBJECT):
             interaction.id: interaction.to_dict()
             for interaction in cls.get_all_interactions()
         }
+
+    @classmethod
+    def get_all_specs_for_state_schema_version(cls, state_schema_version):
+        """Returns a dict containing the full specs of each interaction for the
+        given state schema version, if available.
+
+        Args:
+            state_schema_version: int. The state schema version to retrieve
+                interaction specs for.
+
+        Returns:
+            dict. The interaction specs for the given state schema
+            version, in the form of a mapping of interaction id to the
+            interaction specs. See interaction_specs.json for an example.
+
+        Raises:
+            Exception. No interaction specs json file found for the given state
+                schema version.
+        """
+        if (state_schema_version not in
+                cls._state_schema_version_to_interaction_specs):
+            file_name = 'interaction_specs_stateV%i.json' % state_schema_version
+            spec_file = os.path.join(
+                feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
+
+            try:
+                with python_utils.open_file(spec_file, 'r') as f:
+                    specs_from_json = json.loads(f.read())
+            except:
+                raise Exception(
+                    'No specs json file found for state schema v%i' %
+                    state_schema_version)
+
+            cls._state_schema_version_to_interaction_specs[
+                state_schema_version] = specs_from_json
+
+        return cls._state_schema_version_to_interaction_specs[
+            state_schema_version]

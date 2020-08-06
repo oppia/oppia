@@ -146,7 +146,15 @@ describe('Question object factory', function() {
             }],
           }],
           confirmed_unclassified_answers: [],
-          customization_args: {},
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: null,
             feedback: {

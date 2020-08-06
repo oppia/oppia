@@ -31,7 +31,8 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 
 interface MusicNote {
   baseNoteMidiNumber: number;
@@ -74,12 +75,12 @@ interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
 
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   '$timeout', 'AlertsService', 'CurrentInteractionService',
-  'HtmlEscaperService', 'MusicNotesInputRulesService',
+  'InteractionAttributesExtractorService', 'MusicNotesInputRulesService',
   'MusicPhrasePlayerService', 'EVENT_NEW_CARD_AVAILABLE',
   'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       $timeout, AlertsService, CurrentInteractionService,
-      HtmlEscaperService, MusicNotesInputRulesService,
+      InteractionAttributesExtractorService, MusicNotesInputRulesService,
       MusicPhrasePlayerService, EVENT_NEW_CARD_AVAILABLE,
       NOTE_NAMES_TO_MIDI_VALUES) {
     return {
@@ -99,13 +100,19 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
 
         scope.SOUNDFONT_URL =
         '/third_party/static/midi-js-a8a842/examples/soundfont/';
-        scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
-          attrs.sequenceToGuessWithValue);
+
+        const {
+          sequenceToGuess,
+          initialSequence
+        } = InteractionAttributesExtractorService.getValuesFromAttributes(
+          'MusicNotesInput', attrs);
+
+        scope.sequenceToGuess = sequenceToGuess;
 
         scope.interactionIsActive = (scope.getLastAnswer() === null);
 
         scope.initialSequence = scope.interactionIsActive ?
-          HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
+          initialSequence :
           scope.getLastAnswer();
 
         scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {

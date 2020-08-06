@@ -122,6 +122,13 @@ export class AppConstants {
     EXPLANATION: 'worked_example_explanation'
   };
 
+  // Do not modify these without a state migration of all existing content ids.
+  // Content id prefixes should indicate what type of content they are
+  // associated with.
+  public static CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS = 'ca';
+  public static CONTENT_ID_PREFIX_HINT = 'hint';
+  public static CONTENT_ID_PREFIX_FEEDBACK = 'feedback';
+
   public static ACTION_TYPE_EXPLORATION_START: 'ExplorationStart' =
     'ExplorationStart';
   public static ACTION_TYPE_ANSWER_SUBMIT: 'AnswerSubmit' = 'AnswerSubmit';

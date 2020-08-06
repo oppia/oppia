@@ -110,7 +110,15 @@ describe('Exploration improvements task registrar service', () => {
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
-        customization_args: {},
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         default_outcome: {
           dest: 'new state',
           feedback: {
@@ -133,6 +141,7 @@ describe('Exploration improvements task registrar service', () => {
         },
         id: 'TextInput'
       },
+      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       written_translations: {
