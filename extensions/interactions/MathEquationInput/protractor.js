@@ -17,18 +17,28 @@
  * interaction
  */
 
+var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = async function(elem, customLetters) {
-  expect(await elem.element(
-    by.css('.protractor-test-custom-letters-div')).isPresent()).toBe(true);
+  await waitFor.presenceOf(elem.element(by.css(
+    '.protractor-test-custom-letters-div')), 'Element took too long to load.');
   for (let letter of customLetters) {
-    await elem.element(by.buttonText('abc')).click();
-    let letterIsPresent = await elem.element(by.buttonText(letter)).isPresent();
-    if (!letterIsPresent) {
-      await elem.element(by.buttonText('αβγ')).click();
+    await action.click('Math OSK Tab', elem.element(by.buttonText('abc')));
+    let letterIsPresent = true;
+    try {
+      await browser.wait(
+        await waitFor.until.presenceOf(elem.element(by.buttonText(letter))),
+        waitFor.DEFAULT_WAIT_TIME_MSECS, 'Element took too long to load.');
+    } catch (e) {
+      letterIsPresent = false;
     }
-    await elem.element(by.buttonText(letter)).click();
+    if (!letterIsPresent) {
+      await action.click('Math OSK Tab', elem.element(by.buttonText('αβγ')));
+    }
+    await action.click('Math OSK Letter', elem.element(by.buttonText(letter)));
   }
 };
 
