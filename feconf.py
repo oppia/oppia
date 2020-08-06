@@ -1048,8 +1048,8 @@ AVAILABLE_LANDING_PAGES = {
 # TOPIC_IDS_FOR_CLASSROOM_PAGES property in config_domain.
 CLASSROOM_PAGES = ['math']
 
-# Authentication method using GAE ID (google sign in)
+# Authentication method using GAE ID (google sign in).
 AUTH_METHOD_GAE = 'gae'
 
-# Used to disable usage of UserAuthModel until it is fully implemented
+# Used to disable usage of UserAuthModel until it is fully implemented.
 ENABLE_USER_AUTH_MODEL = False
