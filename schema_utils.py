@@ -390,6 +390,18 @@ class _Validators(python_utils.OBJECT):
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
 
     @staticmethod
+    def is_valid_ratio(obj):
+        """Ensures that `obj` (a string) is a valid ratio input.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid ratio input.
+        """
+        return bool(re.search(r'^\d+(:\d+)+$', obj))
+
+    @staticmethod
     def is_valid_math_expression(obj, algebraic):
         """Checks if the given obj (a string) represents a valid algebraic or
         numeric expression. Note that purely-numeric expressions are NOT

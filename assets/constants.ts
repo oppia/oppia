@@ -5129,7 +5129,8 @@ export = {
       "AlgebraicExpressionInput",
       "MathEquationInput",
       "MathExpressionInput",
-      "NumberWithUnits"
+      "NumberWithUnits",
+      "RatioInput"
     ]
   }, {
     "name": "Programming",
@@ -5329,7 +5330,8 @@ export = {
   "MATH_INTERACTION_PLACEHOLDERS": {
     "AlgebraicExpressionInput": "Type an expression here.",
     "NumericExpressionInput": "Type an expression here, using only numbers.",
-    "MathEquationInput": "Type an equation here."
+    "MathEquationInput": "Type an equation here.",
+    "RatioInput": "Type an ratio here."
   },
 
   // Unfinished features.

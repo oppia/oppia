@@ -1146,3 +1146,19 @@ class PositionOfTerms(BaseObject):
         'type': 'unicode',
         'choices': ['lhs', 'rhs', 'both', 'irrelevant']
     }
+
+
+class RatioExpression(BaseObject):
+    """Class for position of terms. Denotes the position of terms relative to
+    the equals sign in a math equation.
+    """
+
+    description = 'A string for ratio expression.'
+    default_value = '1:1'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'validators': [{
+            'id': 'is_valid_ratio'
+        }]
+    }
