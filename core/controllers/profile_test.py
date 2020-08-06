@@ -823,6 +823,8 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_settings.last_agreed_to_terms = self.GENERIC_DATE
         user_settings.last_logged_in = self.GENERIC_DATE
         user_settings.validate()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             gae_id=user_settings.gae_id,

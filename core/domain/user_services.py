@@ -487,6 +487,8 @@ def get_users_settings(user_ids):
     result = []
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             result.append(UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
                 gae_id=feconf.SYSTEM_COMMITTER_ID,
@@ -836,6 +838,8 @@ def _transform_user_settings(user_settings_model):
         UserSettings. Domain object for user settings.
     """
     if user_settings_model:
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         return UserSettings(
             user_id=user_settings_model.id,
             gae_id=user_settings_model.gae_id,

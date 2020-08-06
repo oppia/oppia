@@ -287,8 +287,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 gae_id=gae_id
             ).put()
 
-            # Remove the gae_id attribute from UserSettingsModel below
-            # when feconf.ENABLE_USER_AUTH_MODEL flag is set True.
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             user_models.UserSettingsModel(
                 id=user_id,
                 gae_id=gae_id,
@@ -303,20 +303,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 user_settings_model.username, user_settings.username)
             self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
-
-    def test_user_settings_by_auth_model_with_user_auth_disabled_is_none(self):
-        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
-            user_id = 'user_id'
-            gae_id = 'gae_id'
-            user_models.UserSettingsModel(
-                id=user_id,
-                gae_id=gae_id,
-                email='user@example.com',
-                username='username',
-            ).put()
-            self.assertIsNone(user_models.UserAuthModel.get_by_id(user_id))
-            self.assertIsNone(user_models.UserAuthModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id))
 
     def test_user_settings_by_gae_id_strict_user_auth_disabled_not_none(self):
         with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
@@ -348,8 +334,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 gae_id=gae_id
             ).put()
 
-            # Remove the gae_id attribute from UserSettingsModel below
-            # when feconf.ENABLE_USER_AUTH_MODEL flag is set True.
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             user_models.UserSettingsModel(
                 id=user_id,
                 gae_id=gae_id,

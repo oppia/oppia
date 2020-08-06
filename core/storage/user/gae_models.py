@@ -46,7 +46,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
-    # TODO(sajalasati): When feconf.ENABLE_USER_AUTH_MODEL is set True,
+    # TODO(#10178): When feconf.ENABLE_USER_AUTH_MODEL is set True,
     # required parameter should be set to false.
     gae_id = ndb.StringProperty(required=True, indexed=True)
     # Email address of the user.
