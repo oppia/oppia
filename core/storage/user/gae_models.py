@@ -44,6 +44,8 @@ class UserSettingsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
+    # Attributes used for both full users and profile users.
+
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
     # TODO(#10178): When feconf.ENABLE_USER_AUTH_MODEL is set True,
@@ -57,48 +59,24 @@ class UserSettingsModel(base_models.BaseModel):
     # migration (to give role to all users) is run.
     role = ndb.StringProperty(
         required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
-    # Identifiable username to display in the UI. May be None.
-    username = ndb.StringProperty(indexed=True)
-    # Normalized username to use for duplicate-username queries. May be None.
-    normalized_username = ndb.StringProperty(indexed=True)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
-    # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
-    # When the user last started the state translation tutorial. May be None.
-    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
-    # When the user last edited an exploration.
-    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
-    # When the user last created an exploration.
-    last_created_an_exploration = ndb.DateTimeProperty(default=None)
-    # User uploaded profile picture as a dataURI string. May be None.
-    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
-    # The preferred dashboard of the user.
-    default_dashboard = ndb.StringProperty(
-        default=constants.DASHBOARD_TYPE_LEARNER,
-        indexed=True,
-        choices=[
-            constants.DASHBOARD_TYPE_LEARNER,
-            constants.DASHBOARD_TYPE_CREATOR])
-    # The preferred dashboard display preference.
-    creator_dashboard_display_pref = ndb.StringProperty(
-        default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
-        indexed=True,
-        choices=list(
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
+    # Name of a user displayed in Android UI. Unlike username, it can be
+    # edited and is unique only among the profiles of the corresponding
+    # regular user account.
+    display_alias = ndb.StringProperty(default=None)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
+    # User uploaded profile picture as a dataURI string. May be None.
+    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # Subject interests specified by the user.
     subject_interests = ndb.StringProperty(repeated=True, indexed=True)
-    # The time, in milliseconds, when the user first contributed to Oppia.
-    # May be None.
-    first_contribution_msec = ndb.FloatProperty(default=None)
+    # When the user last edited an exploration.
     # Exploration language preferences specified by the user.
-    # TODO(sll): Add another field for the language that the user wants the
-    # site to display in. These language preferences are mainly for the purpose
+    # These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
@@ -112,6 +90,36 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+
+    # Attributes used for full users only.
+
+    # Identifiable username to display in the UI. May be None.
+    username = ndb.StringProperty(indexed=True)
+    # Normalized username to use for duplicate-username queries. May be None.
+    normalized_username = ndb.StringProperty(indexed=True)
+    # When the user last started the state editor tutorial. May be None.
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    # When the user last started the state translation tutorial. May be None.
+    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
+    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
+    # When the user last created an exploration.
+    last_created_an_exploration = ndb.DateTimeProperty(default=None)
+    # The preferred dashboard of the user.
+    default_dashboard = ndb.StringProperty(
+        default=constants.DASHBOARD_TYPE_LEARNER,
+        indexed=True,
+        choices=[
+            constants.DASHBOARD_TYPE_LEARNER,
+            constants.DASHBOARD_TYPE_CREATOR])
+    # The preferred dashboard display preference.
+    creator_dashboard_display_pref = ndb.StringProperty(
+        default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
+        indexed=True,
+        choices=list(
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
+    # The time, in milliseconds, when the user first contributed to Oppia.
+    # May be None.
+    first_contribution_msec = ndb.FloatProperty(default=None)
 
     # DEPRECATED in 2.8.7. Do not use.
     gae_user_id = ndb.StringProperty(required=False, indexed=False)
@@ -201,7 +209,8 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec': user.first_contribution_msec,
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
-            'preferred_audio_language_code': user.preferred_audio_language_code
+            'preferred_audio_language_code': user.preferred_audio_language_code,
+            'display_alias': user.display_alias
         }
 
     @classmethod
@@ -2227,8 +2236,8 @@ class UserAuthModel(base_models.BaseModel):
 
     # Authentication detail for sign-in using google id (GAE).
     gae_id = ndb.StringProperty(indexed=True)
-    # A code associated with profiles on android to provide a PIN based
-    # authentication within the account.
+    # A code associated with profile and full user on Android to provide a PIN
+    # based authentication within the account.
     pin = ndb.StringProperty(default=None)
 
     @staticmethod
