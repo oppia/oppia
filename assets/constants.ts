@@ -5235,6 +5235,16 @@ export = {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  // This represents the maximum number of characters in the URL fragment for
+  // story in the story page URL. E.g.
+  // in /learn/math/fractions/story/bakery/..., 'bakery' is the
+  // 'story URL fragment'.
+  "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
+  // This represents the maximum number of characters in the URL fragment for
+  // subtopic in the revision page URL. E.g.
+  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // 'subtopic URL fragment'.
+  "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5292,6 +5302,9 @@ export = {
     "answer", "choices", "abs", "all", "and", "any", "else",
     "floor", "if", "log", "or", "pow", "round", "then"
   ],
+
+  // A regular expression for allowed characters in URL fragment fields.
+  "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
   // NOTE: The GREEK_LETTERS array's values should correspond to the symbols
   // array (lowercase + uppercase).
