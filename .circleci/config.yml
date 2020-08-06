@@ -98,15 +98,20 @@ commands:
               circleci-agent step halt
             fi
 
+  install_dependencies:
+    description: "Install dependencies"
+    steps:
+      - run:
+          name: Install dependencies
+          command: python -m scripts.install_third_party_libs
+
 jobs:
   setup_and_typescript_tests:
     <<: *job_defaults
     steps:
       - checkout
       - merge_target_branch
-      - run:
-          name: Install dependencies
-          command: python -m scripts.install_third_party_libs
+      - install_dependencies
       - run:
           name: Check that all e2e test files are captured in protractor.conf.js
           command: python -m scripts.check_e2e_tests_are_captured_in_ci
@@ -124,6 +129,7 @@ jobs:
       - checkout
       - merge_target_branch
       - install_chrome
+      - install_dependencies
       - run:
           name: Run e2e navigation test
           command: |
@@ -146,6 +152,7 @@ jobs:
       - check_release_chaneglog_update_branch
       - merge_target_branch
       - install_chrome
+      - install_dependencies
       - run:
           name: Run e2e publication test
           command: |
@@ -174,6 +181,7 @@ jobs:
       - check_release_chaneglog_update_branch
       - merge_target_branch
       - install_chrome
+      - install_dependencies
       - run:
           name: Run e2e users test
           command: |
@@ -205,6 +213,7 @@ jobs:
       - check_release_chaneglog_update_branch
       - merge_target_branch
       - install_chrome
+      - install_dependencies
       - run:
           name: Run e2e file upload features test
           command: |
