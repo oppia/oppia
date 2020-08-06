@@ -19,9 +19,12 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/ng-audio.import';
+import 'third-party-imports/ui-tree.import';
+
 angular.module('oppia', [
   'headroom', 'ngAnimate',
-  require('angular-cookies'), 'ngMaterial',
+  'ngAudio', require('angular-cookies'), 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
 ]);

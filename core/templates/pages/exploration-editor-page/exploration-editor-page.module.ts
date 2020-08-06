@@ -21,6 +21,7 @@ import 'zone.js';
 
 import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
+import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
   'headroom', 'ngAnimate',

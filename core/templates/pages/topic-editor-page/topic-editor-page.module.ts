@@ -20,6 +20,7 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'third-party-imports/dnd-lists.import';
+import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
   'dndLists', 'headroom', 'ngAnimate',

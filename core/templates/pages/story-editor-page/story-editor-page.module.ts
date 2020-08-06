@@ -25,7 +25,7 @@ angular.module('oppia', [
   'dndLists', 'headroom', 'ngAnimate',
   require('angular-cookies'), 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
+  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable',
   'ui.validate'
 ]);
 

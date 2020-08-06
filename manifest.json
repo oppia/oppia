@@ -480,8 +480,7 @@
         "rootDirPrefix": "angular-ui-tree-master",
         "targetDirPrefix": "ui-tree-2.22.6",
         "bundle": {
-          "css": ["dist/angular-ui-tree.min.css"],
-          "js": ["dist/angular-ui-tree.js"]
+          "css": ["dist/angular-ui-tree.min.css"]
         }
       },
       "uiValidate": {
