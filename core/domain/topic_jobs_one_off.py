@@ -210,6 +210,7 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, values)
 
+
 class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks for existence of math components in the SubTopicPage."""
 
