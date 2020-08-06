@@ -159,31 +159,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
-    def test_convert_to_valid_dict_format_basic(self):
-        transformed_dict = (
-            collection_models.CollectionRightsModel
-            .convert_to_valid_dict(self.col_1_dict))
-        self.assertEqual(transformed_dict, self.col_1_dict)
-
-    def test_convert_to_valid_dict_format_status(self):
-        broken_dict = dict(**self.col_1_dict)
-        broken_dict['status'] = 'publicized'
-
-        transformed_dict = (
-            collection_models.CollectionRightsModel
-            .convert_to_valid_dict(broken_dict))
-        self.assertEqual(transformed_dict, self.col_1_dict)
-
-    def test_convert_to_valid_dict_format_translator_ids(self):
-        broken_dict = dict(**self.col_1_dict)
-        del broken_dict['voice_artist_ids']
-        broken_dict['translator_ids'] = [self.USER_ID_1]
-
-        transformed_dict = (
-            collection_models.CollectionRightsModel
-            .convert_to_valid_dict(broken_dict))
-        self.assertEqual(transformed_dict, self.col_1_dict)
-
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
@@ -278,6 +253,90 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             'viewable_collection_ids': []
         }
         self.assertEqual(expected_collection_ids, collection_ids)
+
+
+class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
+        """Test the revert method on CollectionRightsModel class."""
+
+        COLLECTION_ID_1 = '1'
+        USER_ID_1 = 'id_1'
+        USER_ID_2 = 'id_2'
+        USER_ID_COMMITTER = 'id_3'  # User id used in commits
+
+        def setUp(self):
+            super(CollectionRightsModelRevertUnitTest, self).setUp()
+            self.collection_model = collection_models.CollectionRightsModel(
+                id=self.COLLECTION_ID_1,
+                owner_ids=[self.USER_ID_1],
+                editor_ids=[self.USER_ID_1],
+                voice_artist_ids=[self.USER_ID_1],
+                viewer_ids=[self.USER_ID_1],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.4
+            )
+            self.collection_model.save(
+                self.USER_ID_COMMITTER, 'Created new collection right',
+                [{'cmd': rights_manager.CMD_CREATE_NEW}]
+            )
+            self.original_dict = (
+                collection_models.CollectionRightsModel.get_by_id(
+                    self.COLLECTION_ID_1).to_dict())
+            self.collection_model.owner_ids = [self.USER_ID_1, self.USER_ID_2]
+            self.collection_model.save(
+                self.USER_ID_COMMITTER, 'Add owner',
+                [{'cmd': rights_manager.CMD_CHANGE_ROLE}]
+            )
+
+        def test_revert_with_to_valid_version(self):
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+            new_collection_model = (
+                collection_models.CollectionRightsModel.get_by_id(
+                    self.COLLECTION_ID_1))
+            self.assertEqual(self.original_dict, new_collection_model.to_dict())
+
+        def test_revert_with_to_version_with_invalid_status(self):
+            broken_dict = dict(**self.original_dict)
+            broken_dict['status'] = 'publicized'
+
+            snapshot_model = (
+                collection_models.CollectionRightsSnapshotContentModel
+                .get_by_id(
+                    collection_models.CollectionRightsModel.get_snapshot_id(
+                    self.COLLECTION_ID_1, 1))
+            )
+            snapshot_model.content = broken_dict
+            snapshot_model.put()
+
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+            new_collection_model = (
+                collection_models.CollectionRightsModel.get_by_id(
+                    self.COLLECTION_ID_1))
+            self.assertEqual(self.original_dict, new_collection_model.to_dict())
+
+        def test_convert_to_valid_dict_format_translator_ids(self):
+            broken_dict = dict(**self.original_dict)
+            del broken_dict['voice_artist_ids']
+            broken_dict['translator_ids'] = [self.USER_ID_1]
+
+            snapshot_model = (
+                collection_models.CollectionRightsSnapshotContentModel
+                    .get_by_id(
+                    collection_models.CollectionRightsModel.get_snapshot_id(
+                        self.COLLECTION_ID_1, 1))
+            )
+            snapshot_model.content = broken_dict
+            snapshot_model.put()
+
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+            new_collection_model = (
+                collection_models.CollectionRightsModel.get_by_id(
+                    self.COLLECTION_ID_1))
+            self.assertEqual(self.original_dict, new_collection_model.to_dict())
 
 
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
