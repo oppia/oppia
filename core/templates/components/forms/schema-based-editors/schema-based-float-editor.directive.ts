@@ -23,6 +23,7 @@ require(
 require('components/forms/validators/is-float.filter.ts');
 require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
+require('services/schema-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
@@ -42,9 +43,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$timeout', 'FocusManagerService',
-        'NumericInputValidationService',
+        'NumericInputValidationService', 'SchemaSubmittedService',
         function($scope, $timeout, FocusManagerService,
-            NumericInputValidationService) {
+            NumericInputValidationService, SchemaSubmittedService) {
           var ctrl = this;
           ctrl.validate = function(localValue) {
             return (
@@ -98,7 +99,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                 ctrl.isUserCurrentlyTyping = false;
                 FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
               } else {
-                $scope.$emit('submittedSchemaBasedFloatForm');
+                SchemaSubmittedService.onSubmittedSchemaBasedForm.emit();
               }
             } else {
               ctrl.isUserCurrentlyTyping = true;

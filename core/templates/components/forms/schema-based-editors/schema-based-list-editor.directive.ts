@@ -23,16 +23,22 @@ require('services/id-generation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 require('services/schema-default-value.service.ts');
 require('services/schema-undefined-last-element.service.ts');
+require('services/schema-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
+
+import { Subscription } from 'rxjs';
+
 
 angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
+  'SchemaDefaultValueService', 'SchemaSubmitedService',
+  'SchemaUndefinedLastElementService',
   function(
       FocusManagerService, IdGenerationService,
       NestedDirectivesRecursionTimeoutPreventionService,
-      SchemaDefaultValueService, SchemaUndefinedLastElementService) {
+      SchemaDefaultValueService, SchemaSubmitedService,
+      SchemaUndefinedLastElementService) {
     return {
       scope: {
         localValue: '=',
@@ -52,6 +58,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        ctrl.directiveSubscriptions = new Subscription();
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
           IdGenerationService.generateNewId() + '-');
@@ -205,13 +212,12 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               }
               evt.stopPropagation();
             };
-
-            $scope.$on(
-              'submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
-            $scope.$on(
-              'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
-            $scope.$on(
-              'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
+            SchemaSubmitedService;
+            ctrl.directiveSubscriptions.add(
+              SchemaSubmitedService.onSubmittedSchemaBasedForm.subscribe(
+                () => $scope._onChildFormSubmit()
+              )
+            );
 
             $scope.deleteElement = function(index) {
               // Need to let the RTE know that HtmlContent has been changed.

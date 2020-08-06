@@ -495,6 +495,8 @@ import { RubricObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
+import { SchemaSubmittedService } from
+  'services/schema-submitted.service';
 import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 import { SearchExplorationsBackendApiService } from
@@ -911,6 +913,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static rubricObjectFactory: RubricObjectFactory;
   static ruleObjectFactory: RuleObjectFactory;
   static schemaDefaultValueService: SchemaDefaultValueService;
+  static schemaSubmittedService: SchemaSubmittedService;
   static schemaUndefinedLastElementService: SchemaUndefinedLastElementService;
   static searchExplorationsBackendApiService: SearchExplorationsBackendApiService;
   static setInputRulesService: SetInputRulesService;
@@ -1230,6 +1233,7 @@ private reviewTestObjectFactory: ReviewTestObjectFactory,
 private rubricObjectFactory: RubricObjectFactory,
 private ruleObjectFactory: RuleObjectFactory,
 private schemaDefaultValueService: SchemaDefaultValueService,
+private schemaSubmittedService: SchemaSubmittedService,
 private schemaUndefinedLastElementService: SchemaUndefinedLastElementService,
 private searchExplorationsBackendApiService: SearchExplorationsBackendApiService,
 private setInputRulesService: SetInputRulesService,
@@ -1550,6 +1554,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.rubricObjectFactory = this.rubricObjectFactory;
     OppiaAngularRootComponent.ruleObjectFactory = this.ruleObjectFactory;
     OppiaAngularRootComponent.schemaDefaultValueService = this.schemaDefaultValueService;
+    OppiaAngularRootComponent.schemaSubmittedService = this.schemaSubmittedService;
     OppiaAngularRootComponent.schemaUndefinedLastElementService = this.schemaUndefinedLastElementService;
     OppiaAngularRootComponent.searchExplorationsBackendApiService = this.searchExplorationsBackendApiService;
     OppiaAngularRootComponent.setInputRulesService = this.setInputRulesService;

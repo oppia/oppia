@@ -23,6 +23,7 @@ require(
 
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('services/contextual/device-info.service.ts');
+require('services/schema-submitted.service.ts');
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
   function() {
@@ -42,14 +43,14 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$sce', '$timeout', '$translate',
-        'DeviceInfoService',
+        'DeviceInfoService', 'SchemaSubmittedService',
         function(
             $scope, $filter, $sce, $timeout, $translate,
-            DeviceInfoService) {
+            DeviceInfoService, SchemaSubmittedService) {
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
-              $scope.$emit('submittedSchemaBasedUnicodeForm');
+              SchemaSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };
 
