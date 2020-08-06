@@ -595,8 +595,10 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
-                    skill.update_explanation(
+                    explanation = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
+                    explanation.validate()
+                    skill.update_explanation(explanation)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     worked_examples_list = [
@@ -772,7 +774,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
     opportunity_services.delete_skill_opportunity(skill_id)
-    suggestion_services.reject_question_suggestions_with_skill_target_id(
+    suggestion_services.auto_reject_question_suggestions_for_skill_id(
         skill_id)
 
 

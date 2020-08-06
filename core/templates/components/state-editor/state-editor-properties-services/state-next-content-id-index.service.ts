@@ -13,34 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for maintaining the open/closed status of the
- * bottom navigation bar.
+ * @fileoverview A data service that stores the next content id index.
  */
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
-
+import { AlertsService } from 'services/alerts.service';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BottomNavbarStatusService {
-  constructor(private windowDimensionsService: WindowDimensionsService) {}
-    bottomNavbarIsEnabled: boolean = false;
-
-    markBottomNavbarStatus(status: boolean): void {
-      this.bottomNavbarIsEnabled = status;
-    }
-
-    isBottomNavbarEnabled(): boolean {
-      return (
-        this.bottomNavbarIsEnabled &&
-          this.windowDimensionsService.isWindowNarrow());
-    }
+export class StateNextContentIdIndexService
+  extends StatePropertyService<number> {
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
+    this.setterMethodKey = 'saveNextContentIdIndex';
+  }
 }
 
 angular.module('oppia').factory(
-  'BottomNavbarStatusService', downgradeInjectable(BottomNavbarStatusService));
+  'StateNextContentIdIndexService',
+  downgradeInjectable(StateNextContentIdIndexService));
