@@ -15,7 +15,7 @@
 /**
  * @fileoverview End-to-end testing utilities for the Text interaction.
  */
-
+var waitFor = require('../../../core/tests/protractor_utils/waitFor');
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
@@ -29,16 +29,18 @@ var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
 
 var expectInteractionDetailsToMatch = async function(
     elem, placeholderText, heightOfBox) {
+  const textInputInteraction = (
+    element(by.tagName('oppia-interactive-text-input')));
+  await waitFor.visibilityOf(
+    textInputInteraction,
+    'TextInput interaction taking too long to appear');
   if (placeholderText) {
-    placeholderValue = (
-      await element(by.tagName('oppia-interactive-text-input'))
-        .getAttribute('placeholder-with-value')
-    );
+    placeholderValue = await textInputInteraction.getAttribute(
+      'placeholder-with-value');
     placeholderValueUnicode = JSON.parse(
       placeholderValue.replace(/&quot;/g, '"')
     ).unicode_str;
-    expect(placeholderValueUnicode)
-      .toEqual(placeholderText);
+    expect(placeholderValueUnicode).toEqual(placeholderText);
   }
   if (heightOfBox) {
     expect((await element(by.tagName('oppia-interactive-text-input'))
