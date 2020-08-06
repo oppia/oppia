@@ -5235,12 +5235,13 @@ export = {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
-  // This represents the URL fragment for story in the story page URL.
-  // eg. in /learn/math/fractions/story/bakery/...., 'baker' is the
-  // 'story URL fragment'.
+  // This represents the maximum number of characters in URL fragment for story
+  // in the story page URL. E.g. in /learn/math/fractions/story/bakery/....,
+  // 'bakery' is the 'story URL fragment'.
   "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
-  // This represents the URL fragment for subtopic in the revision page URL.
-  // eg. in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // This represents the maximum number of characters in URL fragment for
+  // subtopic in the revision page URL. E.g.
+  // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
 

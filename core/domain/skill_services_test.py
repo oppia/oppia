@@ -566,7 +566,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'url_fragment': 'subtopic'
+            'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
             topic_id_1, self.USER_ID, name='Topic2',
@@ -607,7 +607,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'url_fragment': 'subtopic'
+            'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
             topic_id_1, self.USER_ID, name='Topic2',

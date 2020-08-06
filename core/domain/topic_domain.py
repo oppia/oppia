@@ -1455,8 +1455,7 @@ class Topic(python_utils.OBJECT):
         topic.
 
         Returns:
-            bool. Whether the subtopic url fragments are unique in the topic or
-            not.
+            bool. Whether the subtopic url fragments are unique in the topic.
         """
         url_fragments_list = [
             subtopic.url_fragment for subtopic in self.subtopics]

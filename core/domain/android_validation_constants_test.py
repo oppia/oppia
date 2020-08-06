@@ -52,9 +52,3 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
         self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_MISCONCEPTION_NAME,
             constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
-        self.assertEqual(
-            android_validation_constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
-            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
-        self.assertEqual(
-            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
-            constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)

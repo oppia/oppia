@@ -172,7 +172,7 @@ class StoryUrlFragmentHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self, story_url_fragment):
-        """Handler that receives a story url fragment, checks whether the
+        """Handler that receives a story url fragment and checks whether
         a story with the same url fragment exists or not.
         """
         self.values.update({

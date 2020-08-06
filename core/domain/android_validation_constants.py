@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """Constants that are relevant to the validation of new structures for Android
-app.
+app. This file should only contain validations which affects UI display and
+general functionality on Android. 
 """
 
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -43,11 +44,3 @@ MAX_CHARS_IN_STORY_TITLE = 39
 MAX_CHARS_IN_CHAPTER_TITLE = 36
 MAX_CHARS_IN_CHAPTER_DESCRIPTION = 152
 MAX_CHARS_IN_MISCONCEPTION_NAME = 100
-# This represents the URL fragment for story in the story page URL.
-# eg. in /learn/math/fractions/story/bakery/...., 'baker' is the
-# 'story URL fragment'.
-MAX_CHARS_IN_STORY_URL_FRAGMENT = 30
-# This represents the URL fragment for subtopic in the revision page URL.
-# eg. in /learn/math/fractions/revision/place-values, 'place-values' is the
-# 'subtopic URL fragment'.
-MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = 25
