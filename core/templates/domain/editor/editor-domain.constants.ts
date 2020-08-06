@@ -17,4 +17,6 @@
  */
 
 export class EditorDomainConstants {
+  public static EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED =
+    'undoRedoServiceChangeApplied';
 }
