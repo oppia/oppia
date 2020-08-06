@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview  A service for retriving feature flags.
+ * @fileoverview A service for retriving feature flags.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -74,13 +74,8 @@ export class FeatureGatingService {
         this.featureFlagResults = await this.loadFeatureFlagsFromServer();
         this.saveResults(this.featureFlagResults);
       }
-
-      console.log(
-        'initialization done, results:' +
-        JSON.stringify(this.featureFlagResults.toBackendDict()));
     } catch (err) {
       // If any error, just disable all features.
-      console.error(err);
       this._initializedWithError = true;
       this.clearSavedResults();
     }
@@ -130,7 +125,6 @@ export class FeatureGatingService {
       sessionId: this.getSessionIdFromCookie(),
       featureFlagResults: results.toBackendDict(),
     };
-    console.log(`saving at timestamp ${item.timestamp}`);
     this.windowRef.nativeWindow.sessionStorage.setItem(
       FeatureGatingService.SESSION_STORAGE_KEY, JSON.stringify(item));
   }
@@ -157,7 +151,6 @@ export class FeatureGatingService {
   }
 
   private validateSavedResults(item: FeatureFlagsCacheItem): boolean {
-    console.log(`saved timestamp ${item.timestamp}`);
     if (this.getCurrentTimestamp() - item.timestamp >
         FeatureGatingService.SESSION_STORAGE_CACHE_TTL) {
       return false;

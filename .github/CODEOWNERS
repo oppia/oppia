@@ -576,6 +576,7 @@
 /core/features_registry*.py @BenHenning @vinitamurthi
 /core/controllers/feature_gating*.py @BenHenning @vinitamurthi
 /core/templates/domain/feature_gating/ @BenHenning @vinitamurthi
+/core/templates/services/feature_gating*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
