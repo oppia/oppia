@@ -251,8 +251,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of translation suggestions that
-            correspond to the given exploration ids. Note: there is no
-            guarantee that the suggestions returned are ordered by the
+            correspond to the given exploration ids. Note: it is not
+            guaranteed that the suggestions returned are ordered by the
             exploration ids in exp_ids.
         """
         query = (
