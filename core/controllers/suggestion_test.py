@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -38,6 +40,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
@@ -735,6 +738,152 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_suggestion_creation_with_valid_images(self):
+        self.save_new_skill(
+            'skill_id2', self.admin_id, description='description')
+        question_state_data_dict = self._create_valid_question_data(
+            'default_state').to_dict()
+        valid_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data_dict['content']['html'] = valid_html
+        self.question_dict = {
+            'question_state_data': question_state_data_dict,
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_id2']
+        }
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                'target_id': self.SKILL_ID,
+                'target_version_at_submission': 1,
+                'change': {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': self.question_dict,
+                    'skill_id': self.SKILL_ID,
+                    'skill_difficulty': 0.3
+                },
+                'description': 'Add new question to skill'
+            }, csrf_token=csrf_token, upload_files=(
+                ('file.svg', 'file.svg', raw_image), ))
+        self.logout()
+
+    def test_suggestion_creation_when_images_are_not_provided(self):
+        self.save_new_skill(
+            'skill_id2', self.admin_id, description='description')
+        question_state_data_dict = self._create_valid_question_data(
+            'default_state').to_dict()
+        valid_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data_dict['content']['html'] = valid_html
+        self.question_dict = {
+            'question_state_data': question_state_data_dict,
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_id2']
+        }
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                'target_id': self.SKILL_ID,
+                'target_version_at_submission': 1,
+                'change': {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': self.question_dict,
+                    'skill_id': self.SKILL_ID,
+                    'skill_difficulty': 0.3
+                },
+                'description': 'Add new question to skill'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertIn(
+            'No image data provided for file with name file.svg.',
+            response_dict['error'])
+        self.logout()
+
+    def test_suggestion_creation_when_images_are_not_valid(self):
+        self.save_new_skill(
+            'skill_id2', self.admin_id, description='description')
+        question_state_data_dict = self._create_valid_question_data(
+            'default_state').to_dict()
+        valid_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        question_state_data_dict['content']['html'] = valid_html
+        self.question_dict = {
+            'question_state_data': question_state_data_dict,
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_id2']
+        }
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                'target_id': self.SKILL_ID,
+                'target_version_at_submission': 1,
+                'change': {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': self.question_dict,
+                    'skill_id': self.SKILL_ID,
+                    'skill_difficulty': 0.3
+                },
+                'description': 'Add new question to skill'
+            }, csrf_token=csrf_token,
+            upload_files=(
+                ('file.svg', 'file.svg', large_image),),
+            expected_status_int=400)
+
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
         self.logout()
 
     def test_query_question_suggestions(self):

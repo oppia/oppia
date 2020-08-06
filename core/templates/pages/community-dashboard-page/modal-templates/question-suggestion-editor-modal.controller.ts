@@ -26,17 +26,21 @@ require(
   'pages/community-dashboard-page/services/' +
   'question-suggestion.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
-  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
-  'QuestionSuggestionService', 'QuestionUndoRedoService',
+  '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
+  'ImageLocalStorageService', 'QuestionSuggestionService',
+  'QuestionUndoRedoService',
   'QuestionValidationService', 'UrlInterpolationService',
   'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $scope, $uibModal, $uibModalInstance, AlertsService,
-      QuestionSuggestionService, QuestionUndoRedoService,
+      $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
+      ImageLocalStorageService, QuestionSuggestionService,
+      QuestionUndoRedoService,
       QuestionValidationService, UrlInterpolationService,
       question, questionId, questionStateData, skill, skillDifficulty,
       SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
@@ -57,8 +61,12 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       if (!$scope.isQuestionValid()) {
         return;
       }
+      var imagesData = ImageLocalStorageService.getStoredImagesData();
+      ImageLocalStorageService.flushStoredImagesData();
+      ContextService.resetImageSaveDestination();
       QuestionSuggestionService.submitSuggestion(
-        $scope.question, $scope.skill, $scope.skillDifficulty, function() {
+        $scope.question, $scope.skill, $scope.skillDifficulty, imagesData,
+        function() {
           AlertsService.addSuccessMessage('Submitted question for review.');
         });
       $uibModalInstance.close();
@@ -80,6 +88,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
+          ImageLocalStorageService.flushStoredImagesData();
+          ContextService.resetImageSaveDestination();
           $uibModalInstance.dismiss('cancel');
         }, function() {
           // Note to developers:
@@ -87,6 +97,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
           // No further action is needed.
         });
       } else {
+        ImageLocalStorageService.flushStoredImagesData();
+        ContextService.resetImageSaveDestination();
         $uibModalInstance.dismiss('cancel');
       }
     };

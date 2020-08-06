@@ -50,6 +50,7 @@ require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').directive('questionOpportunities', [
   'UrlInterpolationService', 'MAX_QUESTIONS_PER_SKILL',
@@ -63,11 +64,11 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$uibModal', 'AlertsService',
+        '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
         'ContributionOpportunitiesService', 'QuestionObjectFactory',
         'QuestionUndoRedoService',
         function(
-            $rootScope, $uibModal, AlertsService,
+            $rootScope, $uibModal, AlertsService, ContextService,
             ContributionOpportunitiesService, QuestionObjectFactory,
             QuestionUndoRedoService) {
           const ctrl = this;
@@ -126,6 +127,7 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           ctrl.createQuestion = function(skill, skillDifficulty) {
+            ContextService.setImageSaveDestinationToLocalStorage();
             const skillId = skill.getId();
             const question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
@@ -149,6 +151,7 @@ angular.module('oppia').directive('questionOpportunities', [
               },
               controller: 'QuestionSuggestionEditorModalController'
             }).result.then(function() {}, function() {
+              ContextService.resetImageSaveDestination();
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.

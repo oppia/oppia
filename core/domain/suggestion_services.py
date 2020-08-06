@@ -53,6 +53,9 @@ def create_suggestion(
         author_id: str. The ID of the user who submitted the suggestion.
         change: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
+
+    Returns:
+        Suggestion. The newly created suggestion domain object.
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
@@ -97,6 +100,7 @@ def create_suggestion(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
         None, change, score_category, thread_id)
+    return get_suggestion_by_id(thread_id)
 
 
 def get_suggestion_from_model(suggestion_model):
