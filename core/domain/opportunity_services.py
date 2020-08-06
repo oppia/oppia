@@ -368,7 +368,7 @@ def get_exp_ids_corresponding_to_exploration_opportunity_topic(topic_id):
         topic_id: str. The ID of the topic.
 
     Returns:
-        list(str): The exploration IDs.
+        list(str). The exploration IDs.
     """
     exp_opportunity_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(

@@ -105,10 +105,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
     def mock_generate_new_thread_id_for_suggestion(
-        self, unused_entity_type, unused_entity_id):
+            self, unused_entity_type, unused_entity_id):
+        """Mock generate_new_thread_id function when creating suggestions. """
         return self.THREAD_ID
 
     def create_translation_suggestion_for_exploration_0_and_verify(self):
+        """Creates a translation suggestion for exploration 0 and performs basic
+        assertions.
+        """
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
@@ -475,7 +479,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
     def test_publish_story_does_not_create_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
-        self):
+            self):
         self.add_exploration_0_to_story()
         # Story and topic are already published, so unpublish first.
         topic_services.unpublish_story(
@@ -507,7 +511,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
     def test_publish_topic_does_not_create_exploration_opportunity_if_story_is_not_published( # pylint: disable=line-too-long
-        self):
+            self):
         self.add_exploration_0_to_story()
         # Story and topic are already published, so unpublish first.
         topic_services.unpublish_story(
@@ -539,8 +543,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_unpublish_story_rejects_translation_suggestions(self):
         self.add_exploration_0_to_story()
         self.create_translation_suggestion_for_exploration_0_and_verify()
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
 
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
@@ -563,8 +565,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_unpublish_topic_rejects_translation_suggestions(self):
         self.add_exploration_0_to_story()
         self.create_translation_suggestion_for_exploration_0_and_verify()
-        translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', None))
 
         topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
 

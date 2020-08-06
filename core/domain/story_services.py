@@ -345,7 +345,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
 
 
 def _save_story(
-    committer_id, story, commit_message, change_list, is_story_published):
+        committer_id, story, commit_message, change_list, is_story_published):
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -415,7 +415,7 @@ def _save_story(
 
 
 def _is_story_published_and_present_in_topic(story):
-    """ Returns whether a story is published. Raises an exception if the story
+    """Returns whether a story is published. Raises an exception if the story
     is not present in the corresponding topic's story references.
 
     Args:
