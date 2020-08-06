@@ -361,7 +361,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-selector-editor.directive.ts',
     'skill-selector.directive.ts',
     'skill-update.service.ts',
-    'SkillDifficultyObjectFactory.ts',
     'SkillObjectFactory.ts',
     'skills-list.directive.ts',
     'skills-mastery-list.directive.ts',
