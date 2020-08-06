@@ -17,7 +17,7 @@
       <mat-card-actions>
         <div class="fx-row fx-main-center fx-cross-center full-width">
           <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button">
-            <span [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
+            <span class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
           </button>
         </div>
       </mat-card-actions>
@@ -28,6 +28,11 @@
   .practice-tab .oppia-practice-tab-container .oppia-page-card {
     padding: 30px 55px 30px 45px;
     width: 550px;
+  }
+
+  .practice-tab .font-heavy {
+    font-size: medium;
+    font-weight: bold;
   }
 
   .practice-tab .tab-title {

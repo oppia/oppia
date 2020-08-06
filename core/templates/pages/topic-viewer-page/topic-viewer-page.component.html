@@ -18,7 +18,7 @@
             </a>
           </div>
         </li>
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
             <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
             <a class="tab-title"
