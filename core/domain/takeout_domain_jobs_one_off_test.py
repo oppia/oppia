@@ -119,7 +119,9 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
         """
         model_class = config_models.ConfigPropertySnapshotMetadataModel
 
-        def replacement_put(*args, **kwargs):
+        def replacement_put(*_, **_):
+            """Intended to be a replacement for the default put function for
+            models, and raises an exception."""
             raise Exception('Failed to put.')
 
         model_class(
