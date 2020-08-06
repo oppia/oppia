@@ -285,7 +285,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'request-interceptor.service.ts',
     'response-header.directive.ts',
     'review-material-editor.directive.ts',
-    'review-test-page.directive.ts',
     'role-graph.directive.ts',
     'rubrics-editor.directive.ts',
     'rule-editor.directive.ts',
