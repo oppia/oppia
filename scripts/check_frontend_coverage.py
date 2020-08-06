@@ -33,7 +33,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @marianazangrossi first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'about-page.module.ts',
     'activity-tiles-infinity-grid.directive.ts',
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
@@ -111,6 +110,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'entity-creation.service.ts',
     'exploration-creation.service.ts',
     'exploration-diff.service.ts',
+    'exploration-editor-page.module.ts',
     'exploration-engine.service.ts',
     'exploration-footer.directive.ts',
     'exploration-player-state.service.ts',
