@@ -1249,7 +1249,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         topic_services.delete_topic(self.author_id, self.TOPIC_ID)
 
-<<<<<<< HEAD
         # Suggestion should be rejected after the topic is deleted.
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])
@@ -1290,11 +1289,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         # story.
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])
-=======
-        # Suggestion should be rejected after corresponding topic is deleted.
-        suggestions = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
->>>>>>> upstream/develop
         self.assertEqual(len(suggestions), 1)
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
