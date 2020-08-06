@@ -1000,8 +1000,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             params={'item_to_fetch': 'exp_id_to_latex_mapping'})
         expected_response = {
             'exp_id1': ['abc1', 'xyz1'],
-            'exp_id2': ['abc2', 'xyz2'],
-            'exp_id3': ['abc3', 'xyz3']
+            'exp_id2': ['abc2', 'xyz2']
         }
         self.assertEqual(
             response_dict,
