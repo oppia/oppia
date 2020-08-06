@@ -78,7 +78,6 @@ angular.module('oppia').factory('TopicCreationService', [
           TopicCreationBackendApiService.createTopic(
             newlyCreatedTopic, imagesData, bgColor).then(
             function(response) {
-              console.log('Emitted: T&SDashboardInitialized in TopicCreationService');
               TopicsAndSkillsDashboardBackendApiService.
                 onTopicsAndSkillsDashboardReinitialized.emit();
               topicCreationInProgress = false;

@@ -120,7 +120,6 @@ angular.module('oppia').directive('topicsList', [
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
-                  console.log('Emitted: T&SDashboardInitialized in TopicsList deleteTopic');
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
                 },

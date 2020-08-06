@@ -106,7 +106,6 @@ angular.module('oppia').directive('skillsList', [
               SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
                   $timeout(function() {
-                    console.log('Emitted: T&SDashboardInitialized in SkillsList deleteSkill');
                     TopicsAndSkillsDashboardBackendApiService.
                       onTopicsAndSkillsDashboardReinitialized.emit();
                     var successToast = 'The skill has been deleted.';
@@ -153,7 +152,6 @@ angular.module('oppia').directive('skillsList', [
                   changeList
                 ).then(function() {
                   $timeout(function() {
-                    console.log('Emitted: T&SDashboardInitialized in SkillsList unassignskill');
                     TopicsAndSkillsDashboardBackendApiService.
                       onTopicsAndSkillsDashboardReinitialized.emit(true);
                   }, 100);
@@ -193,7 +191,6 @@ angular.module('oppia').directive('skillsList', [
                       changeList
                     ).then(function() {
                       $timeout(function() {
-                        console.log('Emitted: T&SDashboardInitialized in SkillsList assignSkill');
                         TopicsAndSkillsDashboardBackendApiService.
                           onTopicsAndSkillsDashboardReinitialized.emit(true);
                       }, 100);
@@ -241,7 +238,6 @@ angular.module('oppia').directive('skillsList', [
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.
                 $timeout(function() {
-                  console.log('Emitted: T&SDashboardInitialized in SkillsList mergeskill');
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
                 }, 100);

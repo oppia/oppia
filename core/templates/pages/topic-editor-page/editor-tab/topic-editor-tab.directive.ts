@@ -396,7 +396,6 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicsAndSkillsDashboardBackendApiService.
                 onTopicsAndSkillsDashboardReinitialized.subscribe(
                   () => {
-                    console.log('Caught: T&SDashboardInitialized in topic-editor-tab directive');
                     $scope.refreshTopic();
                   }
                 )
