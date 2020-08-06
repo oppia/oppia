@@ -14,7 +14,7 @@
 
 """Constants that are relevant to the validation of new structures for Android
 app. This file should only contain validations which affects UI display and
-general functionality on Android. 
+general functionality on Android.
 """
 
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
