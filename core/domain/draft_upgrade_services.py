@@ -186,11 +186,14 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     @classmethod
     def _convert_states_v35_dict_to_v36_dict(cls, draft_change_list):
         """Converts draft change list from version 35 to 36.
+
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
+
         Returns:
             list(ExplorationChange). The converted draft_change_list.
+
         Raises:
             Exception. Conversion cannot be completed.
         """

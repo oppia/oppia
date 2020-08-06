@@ -515,6 +515,7 @@ class Question(python_utils.OBJECT):
 
             def __init__(self, next_content_id_index):
                 """Initializes a ContentIdCounter object.
+
                 Args:
                     next_content_id_index: int. The next content id index.
                 """
@@ -523,8 +524,10 @@ class Question(python_utils.OBJECT):
             def generate_content_id(self, content_id_prefix):
                 """Generate a new content_id from the prefix provided and
                 the next content id index.
+
                 Args:
                     content_id_prefix: str. The prefix of the content_id.
+
                 Returns:
                     str. The generated content_id.
                 """
