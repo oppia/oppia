@@ -273,9 +273,9 @@ def main(args=None):
         atexit.register(cleanup)
     else:
         raise Exception(
-            'Redis command line interface is not installed because your ' +
-            'machine is on the Windows operating system. Many backend tests ' +
-            'will not work on a non-Windows machine.')
+            'THe redis command line interface cannot get installed because ' +
+            'your machine is on the Windows operating system. Most backend ' +
+            'tests will not pass on a Windows machine.')
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

@@ -81,20 +81,6 @@ def set_multi(key_value_mapping):
     return REDIS_CLIENT.mset(key_value_mapping)
 
 
-def delete(key):
-    """Deletes a key in the Redis cache.
-
-    Args:
-        key: str. A key (string) to delete.
-
-    Returns:
-        int. Number of successfully deleted keys.
-    """
-    assert isinstance(key, python_utils.BASESTRING)
-    number_of_deleted_keys = REDIS_CLIENT.delete(key)
-    return number_of_deleted_keys
-
-
 def delete_multi(keys):
     """Deletes multiple keys in the Redis cache.
 

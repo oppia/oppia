@@ -29,47 +29,52 @@ import python_utils
 
 memory_cache_services = models.Registry.import_cache_services()
 
-# NOTE: Namespaces and sub-namespaces cannot contain ':'.
+# NOTE: Namespaces and sub-namespaces cannot contain ':' because this is used as
+# an internal delimiter for cache keys.
+
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the explorations within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of an
-# Exploration. If we are not storing multiple versions of an Exploration in the
-# cache, the sub-namespace is not required to differentiate the keys of multiple
-# versions of an exploration and can therefore be None.
+# Exploration. There is also a special sub-namespace represented by the empty
+# string; this sub-namespace handles the explorations where only one version is
+# stored in the cache at a time (a sub-namespace is not required to
+# differentiate them).
 CACHE_NAMESPACE_EXPLORATION = 'exploration'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the collections within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
-# Collection. If we are not storing multiple versions of a Collection in the
-# cache, the sub-namespace is not required to differentiate the keys of multiple
-# versions of a collection and can therefore be None.
+# Collection. There is also a special sub-namespace represented by the empty
+# string; this sub-namespace handles the collections where only one version is
+# stored in the cache at a time (a sub-namespace is not required to
+# differentiate them).
 CACHE_NAMESPACE_COLLECTION = 'collection'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the skills within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
-# Skill. If we are not storing multiple versions of a Skill in the
-# cache, the sub-namespace is not required to differentiate the keys of multiple
-# versions of a skill and can therefore be None.
+# Skill. There is also a special sub-namespace represented by the empty
+# string; this sub-namespace handles the skills where only one version is
+# stored in the cache at a time (a sub-namespace is not required to
+# differentiate them).
 CACHE_NAMESPACE_SKILL = 'skill'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the stories within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
-# Story. If we are not storing multiple versions of a Story in the
-# cache, the sub-namespace is not required to differentiate the keys of multiple
-# versions of a story and can therefore be None.
+# Story. There is also a special sub-namespace represented by the empty
+# string; this sub-namespace handles the stories where only one version is
+# stored in the cache at a time (a sub-namespace is not required to
+# differentiate them).
 CACHE_NAMESPACE_STORY = 'story'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
-# Topic. If we are not storing multiple versions of a Topic in the
-# cache, the sub-namespace is not required to differentiate the keys of multiple
-# versions of a topic and can therefore be None.
+# Topic. There is also a special sub-namespace represented by the empty
+# string; this sub-namespace handles the topics where only one version is
+# stored in the cache at a time (a sub-namespace is not required to
+# differentiate them).
 CACHE_NAMESPACE_TOPIC = 'topic'
 # The value for each key in this namespace should be a serialized representation
 # of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
-# object). Since we are not storing multiple versions of a ConfigPropertyModel,
-# the sub-namespace is not required to differentiate the keys of multiple
-# versions of a ConfigPropertyModel and can therefore be None.
+# object). This namespace does not support sub-namespaces.
 CACHE_NAMESPACE_CONFIG = 'config'
 # The sub-namespace is not necessary for the default namespace. The namespace
 # handles default datatypes allowed by Redis including Strings, Lists, Sets,
@@ -96,6 +101,9 @@ SERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_DEFAULT: lambda x: x
 }
 
+# The delimiter for a memcache key that separates the namespace, the
+# sub-namespace, and the id in the key.
+MEMCACHE_KEY_DELIMITER = ':'
 
 def _get_memcache_key(namespace, sub_namespace, obj_id):
     """Returns a memcache key for the class under namespace and sub_namespace.
@@ -117,11 +125,12 @@ def _get_memcache_key(namespace, sub_namespace, obj_id):
         str. The generated key for use in the memory cache in order to
         differentiate a passed-in key based on namespace and sub-namespace.
     """
-    sub_namespace_key_string = sub_namespace if sub_namespace else ''
-    if ':' in sub_namespace_key_string:
+    sub_namespace_key_string = (sub_namespace or '')
+    if MEMCACHE_KEY_DELIMITER in sub_namespace_key_string:
         raise ValueError(
             'Sub-namespace %s cannot contain \':\'.' % sub_namespace_key_string)
-    return '%s:%s:%s' % (namespace, sub_namespace_key_string, obj_id)
+    return '%s%s%s%s%s' % (namespace, MEMCACHE_KEY_DELIMITER,
+        sub_namespace_key_string, MEMCACHE_KEY_DELIMITER, obj_id)
 
 
 def flush_memory_cache():
@@ -140,8 +149,8 @@ def get_multi(namespace, sub_namespace, obj_ids):
             domain-layer entity and therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
-            the sub-namespace is the stringified version number of the objects.
-            If the sub-namespace is not required, pass in None.
+            the sub-namespace is either None or the stringified version number
+            of the objects. If the sub-namespace is not required, pass in None.
         obj_ids: list(str). List of object ids corresponding to values to
             retrieve from the cache.
 
@@ -183,8 +192,8 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
             therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
-            the sub-namespace is the stringified version number of the objects.
-            If the sub-namespace is not required, pass in None.
+            the sub-namespace is either None or the stringified version number
+            of the objects. If the sub-namespace is not required, pass in None.
         id_value_mapping:
             dict(str, Exploration|Skill|Story|Topic|Collection|str). A dict of
             {id, value} pairs to set to the cache.
@@ -199,8 +208,7 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
         return True
 
     if namespace not in SERIALIZATION_FUNCTIONS:
-        raise ValueError(
-            'Invalid namespace: %s.' % namespace)
+        raise ValueError('Invalid namespace: %s.' % namespace)
 
     memory_cache_id_value_mapping = (
         {
@@ -221,8 +229,8 @@ def delete_multi(namespace, sub_namespace, obj_ids):
             therefore don't require serialization.
         sub_namespace: str|None. The sub-namespace further differentiates the
             values. For Explorations, Skills, Stories, Topics, and Collections,
-            the sub-namespace is the stringified version number of the objects.
-            If the sub-namespace is not required, pass in None.
+            the sub-namespace is either None or the stringified version number
+            of the objects. If the sub-namespace is not required, pass in None.
         obj_ids: list(str). A list of id strings to delete from the cache.
 
     Raises:
@@ -235,8 +243,7 @@ def delete_multi(namespace, sub_namespace, obj_ids):
         return True
 
     if namespace not in DESERIALIZATION_FUNCTIONS:
-        raise ValueError(
-            'Invalid namespace: %s.' % namespace)
+        raise ValueError('Invalid namespace: %s.' % namespace)
 
     memcache_keys = [
         _get_memcache_key(namespace, sub_namespace, obj_id)

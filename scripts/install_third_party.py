@@ -360,11 +360,11 @@ def install_redis_cli():
     queried using either the Python redis library or the redis-cli interpreter.
     """
     try:
-        # Pipe output to /dev/null for silence in console.
-        null = python_utils.open_file('/dev/null', 'w')
         subprocess.call([
-            './third_party/redis-cli-6.0.6/src/redis-cli', '--version'])
-        null.close()
+            '%s' % common.REDIS_SERVER_PATH, '--version'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
         python_utils.PRINT('Redis-cli is already installed.')
     except OSError:
         # The redis-cli is not installed, run the script to install it.
@@ -373,19 +373,23 @@ def install_redis_cli():
 
         download_and_untar_files(
             'https://download.redis.io/releases/redis-6.0.6.tar.gz',
-            TARGET_DOWNLOAD_DIRS['backend'],
-            'redis-6.0.6', 'redis-cli-6.0.6')
+            TARGET_DOWNLOAD_DIRS['oppiaTools'],
+            'redis-%s' % common.REDIS_CLI_VERSION,
+            'redis-cli-%s' % common.REDIS_CLI_VERSION)
 
         # Temporarily change the working directory to redis-cli-6.0.6 so we can
         # build the source code.
-        with common.CD('third_party/redis-cli-6.0.6/'):
+        with common.CD(
+            os.path.join(
+                TARGET_DOWNLOAD_DIRS['oppiaTools'],
+                'redis-cli-%s' % common.REDIS_CLI_VERSION, 'src')):
             # Build the scripts necessary to start the redis server.
             # The make command only builds the C++ files in the src/ folder
             # without modifying anything outside of the oppia root directory.
             # It will build the redis-cli and redis-server files so that we can
             # run the server from inside the oppia folder by executing the
             # script src/redis-cli and src/redis-server.
-            subprocess.call(['make'])
+            subprocess.call(['make test'])
 
         # Make the scripts executable.
         subprocess.call([

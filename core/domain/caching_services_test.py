@@ -50,7 +50,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
+            '0',
             {
                 exploration_id: default_exploration
             })
@@ -60,15 +60,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 caching_services.CACHE_NAMESPACE_DEFAULT, None,
                 ['a', 'b', 'c']), key_value_mapping)
 
-        retrieved_exploration = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
-            [exploration_id]).get(exploration_id)
-        self.assertEqual(
-            retrieved_exploration.to_dict(),
-            default_exploration.to_dict())
+        self.assertIsNotNone(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                '0',
+                [exploration_id]
+            ).get(exploration_id))
 
         caching_services.flush_memory_cache()
+
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_DEFAULT, None,
@@ -76,7 +76,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
-                python_utils.convert_to_bytes(0),
+                '0',
                 [exploration_id]),
             {})
 
@@ -140,7 +140,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
-                python_utils.convert_to_bytes(0),
+                '0',
                 [exploration_id]),
             {})
 
@@ -151,23 +151,28 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
+            '0',
             {
                 exploration_id: default_exploration
             })
-        keys_exist_result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, ['a', 'b', 'c'])
-        self.assertEqual(keys_exist_result, key_value_mapping)
-        keys_non_existent_result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, ['d', 'e'])
-        self.assertEqual(keys_non_existent_result, {})
 
-        exploration_dict = caching_services.get_multi(
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                ['a', 'b', 'c']),
+            key_value_mapping)
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None, ['d', 'e']),
+            {})
+
+        exp_ids_to_explorations = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0), [exploration_id])
+            '0', [exploration_id])
         self.assertEqual(
             default_exploration.to_dict(),
-            exploration_dict.get(exploration_id).to_dict())
+            exp_ids_to_explorations[exploration_id].to_dict())
 
     def test_partial_fetches_returns_correct_elements(self):
         """Testing that querying the cache for elements where only a subsection
@@ -183,7 +188,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             caching_services.get_multi(
                 caching_services.CACHE_NAMESPACE_EXPLORATION,
-                python_utils.convert_to_bytes(0),
+                '0',
                 [exploration_id]),
             {})
 
@@ -199,7 +204,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
+            '0',
             {
                 exploration_id: default_exploration
             })
@@ -207,14 +212,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
 
-        result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, ['a', 'b', 'c'])
-
-        self.assertEqual(result, {'a': '1', 'c': '3'})
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                ['a', 'b', 'c']),
+            {'a': '1', 'c': '3'})
 
         result = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
+            '0',
             [exploration_id, nonexistent_exploration_id])
 
         self.assertEqual(
@@ -231,39 +237,39 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
+            '0',
             {
                 exploration_id: default_exploration
             })
 
-        result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT,
-            python_utils.convert_to_bytes(0),
-            [exploration_id])
-
-        self.assertEqual(result, {})
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                '0',
+                [exploration_id]), {})
 
     def test_queries_to_wrong_sub_namespace_returns_none(self):
         exploration_id = 'id'
         default_exploration = (
             exp_domain.Exploration.create_default_exploration(
                 'exp_id_1', title='A title', category='A category'))
-        result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(1),
-            [exploration_id])
-        self.assertEqual(result, {})
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                '1',
+                [exploration_id]), {})
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(1),
+            '1',
             {
                 exploration_id: default_exploration
             })
 
         existent_result = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(1),
+            '1',
             [exploration_id])
         self.assertEqual(
             existent_result.get(exploration_id).to_dict(),
@@ -281,7 +287,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         cache_exploration_response = caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0),
+            '0',
             {
                 exploration_id: default_exploration
             })
@@ -294,9 +300,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_multi_returns_true_when_all_ids_exist(self):
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
 
-        is_successful = caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, ['a', 'b', 'c'])
-        self.assertFalse(is_successful)
+        self.assertFalse(
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                ['a', 'b', 'c']))
 
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
@@ -307,31 +314,35 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1', title='A title', category='A category'))
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0), {
+            '0', {
                 exploration_id: default_exploration
             })
 
-        is_successful = caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, [])
-        self.assertTrue(is_successful)
+        self.assertTrue(
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None, []))
 
-        is_successful = caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, ['a', 'b', 'c'])
-        self.assertTrue(is_successful)
+        self.assertTrue(
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                ['a', 'b', 'c']))
 
-        result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0), [exploration_id])
-        self.assertTrue(len(result) > 0)
-        is_successful = caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0), [exploration_id])
-        self.assertTrue(is_successful)
+        self.assertGreater(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                '0', [exploration_id]),
+            0)
 
-        result = caching_services.get_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION,
-            python_utils.convert_to_bytes(0), [exploration_id])
-        self.assertEqual(result, {})
+        self.assertTrue(
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                '0', [exploration_id]))
+
+        self.assertEqual(
+            caching_services.get_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                '0', [exploration_id]),
+            {})
 
     def test_delete_multi_returns_false_when_not_all_ids_exist(self):
         """Tests that deleting keys that don't exist returns false."""
@@ -340,9 +351,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
 
-        is_successful = caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT, None, ['a', 'e', 'f'])
-        self.assertFalse(is_successful)
+        self.assertFalse(
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT, None,
+                ['a', 'e', 'f']))
 
     def test_delete_multi_returns_false_when_namespace_incorrect(self):
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
@@ -350,9 +362,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
 
-        is_successful = caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['a', 'b', 'c'])
-        self.assertFalse(is_successful)
+        self.assertFalse(
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+                ['a', 'b', 'c']))
 
     def test_delete_multi_returns_false_when_sub_namespace_incorrect(self):
         key_value_mapping = {'a': '1', 'b': '2', 'c': '3'}
@@ -360,9 +373,13 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT, None, key_value_mapping)
 
-        incorrect_sub_namespace = 'sub'
+        self.assertFalse(
+            caching_services.delete_multi(
+                caching_services.CACHE_NAMESPACE_DEFAULT,
+                'invalid_sub_namespace', ['a', 'b', 'c']))
 
-        is_successful = caching_services.delete_multi(
-            caching_services.CACHE_NAMESPACE_DEFAULT,
-            incorrect_sub_namespace, ['a', 'b', 'c'])
-        self.assertFalse(is_successful)
+    def test_all_namespace_strings_does_not_contain_memcache_delimiter(self):
+        # SERIALIZATION_FUNCTIONS contains all the namespaces as keys in the
+        # dictionary.
+        for namespace in caching_services.SERIALIZATION_FUNCTIONS:
+            self.assertNotIn(caching_services.MEMCACHE_KEY_DELIMITER, namespace)
