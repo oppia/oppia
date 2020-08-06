@@ -15,7 +15,7 @@
 /**
  * @fileoverview End-to-end testing utilities for the Text interaction.
  */
-var waitFor = require('core/tests/protractor_utils/waitFor');
+var waitFor = require(process.cwd() + '/core/tests/protractor_utils/waitFor');
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
