@@ -69,7 +69,8 @@ angular.module('oppia').directive('imageUploader', [
               return 'This image format is not supported.';
             }
 
-            if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
+            if ((file.type.match(/jp(e?)g$/) &&
+              !file.name.match(/\.jp(e?)g$/)) ||
               (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
               (file.type.match(/png$/) && !file.name.match(/\.png$/)) ||
               (file.type.match(/svg\+xml$/) && !file.name.match(/\.svg$/))) {

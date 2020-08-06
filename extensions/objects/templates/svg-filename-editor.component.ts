@@ -975,7 +975,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.onFileChanged = function(file, filename) {
-        ctrl.setUploadedFile(file)
+        ctrl.setUploadedFile(file);
       };
 
       ctrl.isFileUploaded = function() {
