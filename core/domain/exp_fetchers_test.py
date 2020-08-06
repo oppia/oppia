@@ -482,16 +482,11 @@ title: Old Title
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
-    def test_exploration_upgrade_v34_to_v35(self):
+    def test_exploration_upgrade_v34_to_latest(self):
         """The following tests are specifically for state version upgrade from
         34 to 35. That migration function contains some conditional logic that
         is not fully tested by the test above.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id_1')
-
-        exploration.add_states(['State1'])
-
         answer_groups_1 = [{
             'outcome': {
                 'dest': 'Introduction',
@@ -519,71 +514,73 @@ title: Old Title
             'tagged_skill_misconception_id': None
         }]
 
-        exploration.states['State1'] = state_domain.State.from_dict({
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'hint_1': {},
-                    'content_2': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': answer_groups_1,
-                'confirmed_unclassified_answers': [],
-                'customization_args': {},
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'feedback_2',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
+        states_dict = {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content_1',
+                    'html': 'Question 1'
                 },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': 'Hint 1'
-                    }
-                }],
-                'solution': {
-                    'correct_answer': {
-                        'ascii': 'x=y',
-                        'latex': 'x=y'
-                    },
-                    'answer_is_exclusive': False,
-                    'explanation': {
-                        'html': 'Solution explanation',
-                        'content_id': 'content_2'
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content_1': {},
+                        'feedback_1': {},
+                        'feedback_2': {},
+                        'hint_1': {},
+                        'content_2': {}
                     }
                 },
-                'id': 'MathExpressionInput'
-            },
-            'next_content_id_index': 4,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        })
+                'written_translations': {
+                    'translations_mapping': {
+                        'content_1': {},
+                        'feedback_1': {},
+                        'feedback_2': {},
+                        'hint_1': {},
+                        'content_2': {}
+                    }
+                },
+                'interaction': {
+                    'answer_groups': answer_groups_1,
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {},
+                    'default_outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback_2',
+                            'html': 'Correct Answer'
+                        },
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'labelled_as_correct': True,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'hints': [{
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': 'Hint 1'
+                        }
+                    }],
+                    'solution': {
+                        'correct_answer': {
+                            'ascii': 'x=y',
+                            'latex': 'x=y'
+                        },
+                        'answer_is_exclusive': False,
+                        'explanation': {
+                            'html': 'Solution explanation',
+                            'content_id': 'content_2'
+                        }
+                    },
+                    'id': 'MathExpressionInput'
+                },
+                'next_content_id_index': 4,
+                'param_changes': [],
+                'solicit_answer_details': False,
+                'classifier_model_id': None
+            }
+        }
 
-        exploration.states_schema_version = 34
-        exp_services.save_new_exploration('owner_id', exploration)
+        self.save_new_exp_with_states_schema_v34(
+            'exp_id_1', 'owner_id', states_dict)
 
         # Ensure the exploration was converted.
         exploration = exp_fetchers.get_exploration_by_id('exp_id_1')
@@ -591,21 +588,17 @@ title: Old Title
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_groups = exploration.states['State1'].interaction.answer_groups
+        answer_groups = exploration.states[
+            'Introduction'].interaction.answer_groups
 
         self.assertEqual(
-            exploration.states['State1'].interaction.id, 'MathEquationInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
+            exploration.states['Introduction'].interaction.id,
+            'MathEquationInput')
         self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
+            answer_groups[0].rule_inputs, {
+                'MatchesExactlyWith': [{'x': 'x=y', 'y': 'both'}]
+            })
 
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id_2')
-
-        exploration.add_states(['State2'])
 
         answer_groups_2 = [{
             'outcome': {
@@ -634,71 +627,73 @@ title: Old Title
             'tagged_skill_misconception_id': None
         }]
 
-        exploration.states['State2'] = state_domain.State.from_dict({
-            'content': {
-                'content_id': 'content_2',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_2': {},
-                    'feedback_2': {},
-                    'feedback_3': {},
-                    'hint_2': {},
-                    'content_3': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_2': {},
-                    'feedback_2': {},
-                    'feedback_3': {},
-                    'hint_2': {},
-                    'content_3': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': answer_groups_2,
-                'confirmed_unclassified_answers': [],
-                'customization_args': {},
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'feedback_3',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
+        states_dict = {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content_2',
+                    'html': 'Question 1'
                 },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_2',
-                        'html': 'Hint 2'
-                    }
-                }],
-                'solution': {
-                    'correct_answer': {
-                        'ascii': 'x+y',
-                        'latex': 'x+y'
-                    },
-                    'answer_is_exclusive': False,
-                    'explanation': {
-                        'html': 'Solution explanation',
-                        'content_id': 'content_3'
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content_2': {},
+                        'feedback_2': {},
+                        'feedback_3': {},
+                        'hint_2': {},
+                        'content_3': {}
                     }
                 },
-                'id': 'MathExpressionInput'
-            },
-            'next_content_id_index': 4,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        })
+                'written_translations': {
+                    'translations_mapping': {
+                        'content_2': {},
+                        'feedback_2': {},
+                        'feedback_3': {},
+                        'hint_2': {},
+                        'content_3': {}
+                    }
+                },
+                'interaction': {
+                    'answer_groups': answer_groups_2,
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {},
+                    'default_outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback_3',
+                            'html': 'Correct Answer'
+                        },
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'labelled_as_correct': True,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'hints': [{
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': 'Hint 2'
+                        }
+                    }],
+                    'solution': {
+                        'correct_answer': {
+                            'ascii': 'x+y',
+                            'latex': 'x+y'
+                        },
+                        'answer_is_exclusive': False,
+                        'explanation': {
+                            'html': 'Solution explanation',
+                            'content_id': 'content_3'
+                        }
+                    },
+                    'id': 'MathExpressionInput'
+                },
+                'next_content_id_index': 4,
+                'param_changes': [],
+                'solicit_answer_details': False,
+                'classifier_model_id': None
+            }
+        }
 
-        exploration.states_schema_version = 34
-        exp_services.save_new_exploration('owner_id', exploration)
+        self.save_new_exp_with_states_schema_v34(
+            'exp_id_2', 'owner_id', states_dict)
 
         # Ensure the exploration was converted.
         exploration = exp_fetchers.get_exploration_by_id('exp_id_2')
@@ -706,26 +701,17 @@ title: Old Title
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_groups = exploration.states['State2'].interaction.answer_groups
+        answer_groups = exploration.states[
+            'Introduction'].interaction.answer_groups
 
         self.assertEqual(
-            exploration.states['State2'].interaction.id,
+            exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
         self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+            answer_groups[0].rule_inputs, {
+                'MatchesExactlyWith': [{'x': 'x+y'}]
+            })
 
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id_3')
-
-        exploration.add_states(['State3'])
-
-        state3 = exploration.states['State3']
-
-        state3.update_interaction_id('MathExpressionInput')
 
         answer_groups_3 = [{
             'outcome': {
@@ -749,10 +735,63 @@ title: Old Title
             'tagged_skill_misconception_id': None
         }]
 
-        state3.update_interaction_answer_groups(answer_groups_3)
-        state3.update_next_content_id_index(4)
-        exploration.states_schema_version = 34
-        exp_services.save_new_exploration('owner_id', exploration)
+        states_dict = {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content_2',
+                    'html': 'Question 1'
+                },
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content_2': {},
+                        'feedback_2': {},
+                        'feedback_3': {},
+                        'hint_2': {},
+                        'content_3': {}
+                    }
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content_2': {},
+                        'feedback_2': {},
+                        'feedback_3': {},
+                        'hint_2': {},
+                        'content_3': {}
+                    }
+                },
+                'interaction': {
+                    'answer_groups': answer_groups_3,
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {},
+                    'default_outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback_3',
+                            'html': 'Correct Answer'
+                        },
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'labelled_as_correct': True,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'hints': [{
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': 'Hint 2'
+                        }
+                    }],
+                    'solution': {},
+                    'id': 'MathExpressionInput'
+                },
+                'next_content_id_index': 4,
+                'param_changes': [],
+                'solicit_answer_details': False,
+                'classifier_model_id': None
+            }
+        }
+
+        self.save_new_exp_with_states_schema_v34(
+            'exp_id_3', 'owner_id', states_dict)
 
         # Ensure the exploration was converted.
         exploration = exp_fetchers.get_exploration_by_id('exp_id_3')
@@ -760,22 +799,16 @@ title: Old Title
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_groups = exploration.states['State3'].interaction.answer_groups
+        answer_groups = exploration.states[
+            'Introduction'].interaction.answer_groups
 
         self.assertEqual(
-            exploration.states['State3'].interaction.id,
+            exploration.states['Introduction'].interaction.id,
             'NumericExpressionInput')
-        self.assertEqual(len(answer_groups[0].rule_specs), 1)
         self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
-
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id_4')
-
-        exploration.add_states(['State4'])
+            answer_groups[0].rule_inputs, {
+                'MatchesExactlyWith': [{'x': '1.2 + 3'}]
+            })
 
         answer_groups_4 = [{
             'outcome': {
@@ -819,54 +852,57 @@ title: Old Title
             'tagged_skill_misconception_id': None
         }]
 
-        exploration.states['State4'] = state_domain.State.from_dict({
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'feedback_3': {}
-                }
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'content_1': {},
-                    'feedback_1': {},
-                    'feedback_2': {},
-                    'feedback_3': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': answer_groups_4,
-                'confirmed_unclassified_answers': [],
-                'customization_args': {},
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {
-                        'content_id': 'feedback_3',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
+        states_dict = {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content_1',
+                    'html': 'Question 1'
                 },
-                'hints': [],
-                'solution': None,
-                'id': 'MathExpressionInput'
-            },
-            'next_content_id_index': 4,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        })
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content_1': {},
+                        'feedback_1': {},
+                        'feedback_2': {},
+                        'feedback_3': {}
+                    }
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content_1': {},
+                        'feedback_1': {},
+                        'feedback_2': {},
+                        'feedback_3': {}
+                    }
+                },
+                'interaction': {
+                    'answer_groups': answer_groups_4,
+                    'confirmed_unclassified_answers': [],
+                    'customization_args': {},
+                    'default_outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback_3',
+                            'html': 'Correct Answer'
+                        },
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'labelled_as_correct': True,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'hints': [],
+                    'solution': None,
+                    'id': 'MathExpressionInput'
+                },
+                'next_content_id_index': 4,
+                'param_changes': [],
+                'solicit_answer_details': False,
+                'classifier_model_id': None
+            }
+        }
 
-        exploration.states_schema_version = 34
-        exp_services.save_new_exploration('owner_id', exploration)
+        self.save_new_exp_with_states_schema_v34(
+            'exp_id_4', 'owner_id', states_dict)
+
 
         # Ensure the exploration was converted.
         exploration = exp_fetchers.get_exploration_by_id('exp_id_4')
@@ -874,19 +910,19 @@ title: Old Title
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_groups = exploration.states['State4'].interaction.answer_groups
+        answer_groups = exploration.states[
+            'Introduction'].interaction.answer_groups
 
         self.assertEqual(
-            exploration.states['State4'].interaction.id,
+            exploration.states['Introduction'].interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(len(answer_groups), 1)
         self.assertEqual(
-            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
-        self.assertEqual(
-            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
+            answer_groups[0].rule_inputs, {
+                'MatchesExactlyWith': [{'x': 'x+y'}]
+            })
         self.assertEqual(sorted(exploration.states[
-            'State4'].recorded_voiceovers.voiceovers_mapping.keys()), [
+            'Introduction'].recorded_voiceovers.voiceovers_mapping.keys()), [
                 'content_1', 'feedback_1', 'feedback_3'])
         self.assertEqual(sorted(exploration.states[
-            'State4'].written_translations.translations_mapping.keys()), [
+            'Introduction'].written_translations.translations_mapping.keys()), [
                 'content_1', 'feedback_1', 'feedback_3'])

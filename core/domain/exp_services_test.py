@@ -1610,13 +1610,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{'x': 0}, {'x': 1}]
+            },
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -1637,10 +1634,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': 'state3',
                 'feedback': {
@@ -2443,10 +2440,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0},
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': self.init_state_name,
                 'feedback': {

@@ -137,10 +137,15 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [['a'], ['b']]}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsEqualToOrdering': [{
+                    'x': [
+                        ['a'],
+                        ['b']
+                    ]
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -168,51 +173,38 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': []
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': [['a']]}
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXBeforeElementY': [{
                     'x': '',
                     'y': ''
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
+                }],
+                'IsEqualToOrdering': [{
+                    'x': [
+                        ['a']
+                    ]
+                }, {
+                    'x': []
+                }],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': []
+                }]
             },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_specs': [{
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': '',
-                    'y': 1
-                }
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': 'a',
-                    'y': 2
-                }
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXAtPositionY': [{
+                        'x': '',
+                        'y': 1
+                    },
+                    {
+                        'x': 'a',
+                        'y': 2
+                    }
+                ]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -317,13 +309,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {'x': []}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsEqualToOrdering': [{
+                    'x': []
+                }, {
+                    'x': []
+                }]
+            },
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -392,10 +385,12 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '1'}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                    'x': '1'
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -446,13 +441,14 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '0'}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': '9007199254740991'}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                    'x': '0'
+                }, {
+                    'x': '9007199254740991'
+                }]
+            },
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -515,13 +511,14 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': '0'}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': '9007199254740991'}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                    'x': '0'
+                }, {
+                    'x': '9007199254740991'
+                }]
+            },
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -581,17 +578,14 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsMathematicallyEquivalentTo': [{
                     'x': 'x+y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }, {
-                'inputs': {
+                }, {
                     'x': 'x=y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
@@ -690,10 +684,12 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('MathExpressionInput')
 
         answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'y=mx+c\']'}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsMathematicallyEquivalentTo': [{
+                    'x': "['y=mx+c']"
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -1164,17 +1160,16 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value2 for ItemSelection</p>'
-                ]}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    },
+                    {
+                        'x': ['<p>This is value2 for ItemSelection</p>']
+                    }
+                ]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
@@ -1219,17 +1214,16 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    },
+                    {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    }
+                ]
+            },
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -1291,17 +1285,16 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                        'x': ['<p>This is value1 for ItemSelection</p>']
+                    },
+                    {
+                        'x': ['<p>This is value3 for ItemSelection</p>']
+                    }
+                ]
+            },
             'outcome': {
                 'dest': 'State1',
                 'feedback': {
@@ -2065,34 +2058,33 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': invalid_html_content2,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                        'x': [
+                            [invalid_html_content1]
+                        ]
+                    },
+                    {
+                        'x': [
+                            [invalid_html_content2]
+                        ]
+                    }
+                ],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [invalid_html_content1]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2357,34 +2349,33 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                        'x': [
+                            [valid_html_content]
+                        ]
+                    },
+                    {
+                        'x': [
+                            [valid_html_content]
+                        ]
+                    }
+                ],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2550,34 +2541,33 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content,
                     'y': valid_html_content
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                        'x': [
+                            [valid_html_content]
+                        ]
+                    },
+                    {
+                        'x': [
+                            [valid_html_content]
+                        ]
+                    }
+                ],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -2698,59 +2688,52 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementXAtPositionY': [{
                     'x': valid_html_content1,
                     'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[valid_html_content1]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
+                }],
+                'HasElementXBeforeElementY': [{
                     'x': valid_html_content2,
                     'y': valid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[valid_html_content2]]
-                }
-            }],
+                }],
+                'IsEqualToOrdering': [{
+                        'x': [
+                            [valid_html_content1]
+                        ]
+                    },
+                    {
+                        'x': [
+                            [valid_html_content1]
+                        ]
+                    }
+                ],
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
+                    'x': [
+                        [valid_html_content2]
+                    ]
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
         item_selection_answer_group = {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'ContainsAtLeastOneOf',
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'ContainsAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }, {
-                'rule_type': 'IsProperSubsetOf',
-                'inputs': {
-                    'x': [valid_html_content3]
-                }
-            }, {
-                'rule_type': 'DoesNotContainAtLeastOneOf',
-                'inputs': {
+                }],
+                'DoesNotContainAtLeastOneOf': [{
                     'x': [valid_html_content1]
-                }
-            }],
+                }],
+                'Equals': [{
+                    'x': [valid_html_content3]
+                }],
+                'IsProperSubsetOf': [{
+                    'x': [valid_html_content3]
+                }]
+            },
             'outcome': {
                 'dest': 'Introduction',
                 'feedback': {
