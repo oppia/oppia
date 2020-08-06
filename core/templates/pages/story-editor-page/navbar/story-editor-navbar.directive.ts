@@ -44,10 +44,12 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'EditableStoryBackendApiService', 'UndoRedoService',
         'StoryEditorStateService', 'StoryEditorNavigationService', 'UrlService',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             EditableStoryBackendApiService, UndoRedoService,
-            StoryEditorStateService, StoryEditorNavigationService, UrlService) {
+            StoryEditorStateService, StoryEditorNavigationService, UrlService,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
           var EDITOR = 'Editor';
           var PREVIEW = 'Preview';
@@ -207,14 +209,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
-            ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied().subscribe(
-                () => {
-                  console.log('Caught: undoRedoChangeApplied in story-editor-navbar');
-                  _validateStory();
-                }
-              )
-            );
+            $scope.$on(
+              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
           };
 
           ctrl.$onDestroy = function() {

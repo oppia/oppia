@@ -19,25 +19,21 @@
 
 require('domain/editor/editor-domain.constants.ajs.ts');
 
-import { EventEmitter } from '@angular/core';
-
 /**
  * Stores a stack of changes to a domain object. Please note that only one
  * instance of this service exists at a time, so multiple undo/redo stacks are
  * not currently supported.
  */
 angular.module('oppia').factory('BaseUndoRedoService', [
-  function() {
+  '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+  function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var BaseUndoRedoService = {};
 
-    this._undoRedoChangeAppliedEventEmitter = null;
     this._appliedChanges = [];
     this._undoneChanges = [];
 
     var _dispatchMutation = function() {
-      console.log('Emitted: UndoRedoChangeApplied in UndoRedoChangeApplied');
-      console.log(this._undoRedoChangeAppliedEventEmitter);
-      this._undoRedoChangeAppliedEventEmitter.emit();
+      $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
     };
     var _applyChange = function(changeObject, domainObject) {
       changeObject.applyChange(domainObject);
@@ -54,14 +50,13 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /* eslint-enable dot-notation */
       this._appliedChanges = [];
       this._undoneChanges = [];
-      this._undoRedoChangeAppliedEventEmitter = new EventEmitter();
     };
 
     /**
      * Pushes a change domain object onto the change stack and applies it to the
      * provided domain object. When a new change is applied, all undone changes
      * are lost and cannot be redone. This will fire an event as defined by the
-     * the emitter _undoRedoChangeAppliedEventEmitter
+     * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
@@ -75,8 +70,8 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /**
      * Undoes the last change to the provided domain object. This function
      * returns false if there are no changes to undo, and true otherwise. This
-     * will fire an event as defined by the emitter
-     * _undoRedoChangeAppliedEventEmitter
+     * will fire an event as defined by the constant
+     * EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
@@ -94,7 +89,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /**
      * Reverses an undo for the given domain object. This function returns false
      * if there are no changes to redo, and true if otherwise. This will fire an
-     * event as defined by thethe emitter _undoRedoChangeAppliedEventEmitter
+     * event as defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
@@ -172,7 +167,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /**
      * Clears the change history. This does not reverse any of the changes
      * applied from applyChange() or redoChange(). This will fire an event as
-     * defined by the the emitter _undoRedoChangeAppliedEventEmitter
+     * defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
@@ -181,13 +176,6 @@ angular.module('oppia').factory('BaseUndoRedoService', [
       this._appliedChanges = [];
       this._undoneChanges = [];
       _dispatchMutation();
-    };
-
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['onUndoRedoChangeApplied'] = function() {
-    /* eslint-disable dot-notation */
-      console.log('GETS HERE');
-      return this._undoRedoChangeAppliedEventEmitter;
     };
 
     return BaseUndoRedoService;
