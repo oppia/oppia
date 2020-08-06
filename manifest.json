@@ -177,10 +177,7 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1",
         "rootDirPrefix": "bower-angular-translate-",
         "targetDirPrefix": "bower-angular-translate-",
-        "files": ["angular-translate.min.js"],
-        "bundle": {
-          "js": ["angular-translate.min.js"]
-        }
+        "files": ["angular-translate.min.js"]
       },
       "angularTranslateLoader": {
         "version": "2.18.1",
@@ -188,10 +185,7 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files",
         "rootDirPrefix": "bower-angular-translate-loader-static-files-",
         "targetDirPrefix": "bower-angular-translate-loader-static-files-",
-        "files": ["angular-translate-loader-static-files.min.js"],
-        "bundle": {
-          "js": ["angular-translate-loader-static-files.min.js"]
-        }
+        "files": ["angular-translate-loader-static-files.min.js"]
       },
       "angularDragAndDrop": {
         "version": "2.1.0",
@@ -206,20 +200,14 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie",
         "rootDirPrefix": "bower-angular-translate-storage-cookie-",
         "targetDirPrefix": "bower-angular-translate-storage-cookie-",
-        "files": ["angular-translate-storage-cookie.min.js"],
-        "bundle": {
-          "js": ["angular-translate-storage-cookie.min.js"]
-        }
+        "files": ["angular-translate-storage-cookie.min.js"]
       },
       "messageFormat": {
         "version": "2.0.5",
         "downloadFormat": "zip",
         "url": "https://github.com/messageformat/messageformat/archive/v2.0.5.zip",
         "targetDirPrefix": "messageformat-",
-        "rootDirPrefix": "messageformat-",
-        "bundle": {
-          "js": ["messageformat.js"]
-        }
+        "rootDirPrefix": "messageformat-"
       },
       "angularTranslateInterpolationMessageFormat": {
         "version": "2.18.1",
@@ -227,10 +215,7 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat",
         "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
-        "files": ["angular-translate-interpolation-messageformat.min.js"],
-        "bundle": {
-          "js": ["angular-translate-interpolation-messageformat.min.js"]
-        }
+        "files": ["angular-translate-interpolation-messageformat.min.js"]
       },
       "angularToastr": {
         "version": "1.7.0",
@@ -270,10 +255,7 @@
         "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial",
         "rootDirPrefix": "bower-angular-translate-loader-partial-",
         "targetDirPrefix": "bower-angular-translate-loader-partial-",
-        "files": ["angular-translate-loader-partial.min.js"],
-        "bundle": {
-          "js": ["angular-translate-loader-partial.min.js"]
-        }
+        "files": ["angular-translate-loader-partial.min.js"]
       },
       "bowerMaterial": {
         "version": "1.1.19",

@@ -19,6 +19,8 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/translation-libs.import';
+
 angular.module('oppia', [
   'headroom', 'ngAnimate',
   require('angular-cookies'), 'ngMaterial',

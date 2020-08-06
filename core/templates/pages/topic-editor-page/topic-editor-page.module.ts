@@ -19,6 +19,8 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/translation-libs.import';
+
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/dnd-lists.import';

@@ -48,7 +48,8 @@ module.exports = {
     extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
       '@angular/upgrade/static': (
-        '@angular/upgrade/bundles/upgrade-static.umd.js')
+        '@angular/upgrade/bundles/upgrade-static.umd.js'),
+      messageformat: 'static/messageformat-2.0.5/messageformat.js'
     }
   },
   entry: {

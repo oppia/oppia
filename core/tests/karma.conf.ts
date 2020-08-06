@@ -157,7 +157,10 @@ module.exports = function(config) {
           'node_modules',
           'third_party',
         ],
-        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
+        alias: {
+          messageformat: 'static/messageformat-2.0.5/messageformat.js'
+        }
       },
       devtool: 'inline-cheap-source-map',
       module: {
