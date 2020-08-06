@@ -82,7 +82,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
-        all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+        all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
         all_classroom_names = [
             classroom['name'] for classroom in all_classrooms_dict]
 

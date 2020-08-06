@@ -38,7 +38,9 @@ describe('Topic summary object factory', () => {
       version: 1,
       additional_story_count: 0,
       topic_model_created_on: 231241343,
-      topic_model_last_updated: 3454354354
+      topic_model_last_updated: 3454354354,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA'
     };
     _sampleTopicSummary = topicSummaryObjectFactory.createFromBackendDict(
       sampleTopicSummaryBackendDict);
@@ -57,5 +59,7 @@ describe('Topic summary object factory', () => {
     expect(_sampleTopicSummary.getAdditionalStoryCount()).toEqual(0);
     expect(_sampleTopicSummary.getTopicModelCreatedOn()).toEqual(231241343);
     expect(_sampleTopicSummary.getTopicModelLastUpdated()).toEqual(3454354354);
+    expect(_sampleTopicSummary.getThumbnailFilename()).toEqual('image.svg');
+    expect(_sampleTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
   });
 });

@@ -108,6 +108,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.total_skill_count, 2)
+        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
     def test_get_all_summaries(self):
         topic_summaries = topic_services.get_all_topic_summaries()
@@ -224,6 +226,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
+        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
     def test_get_topic_summary_by_id(self):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
@@ -235,6 +239,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
+        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
     def test_get_all_skill_ids_assigned_to_some_topic(self):
         change_list = [topic_domain.TopicChange({
@@ -692,6 +698,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic_summary.version, 3)
+        self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
         # Test whether a topic_manager can edit a topic.
         changelist = [topic_domain.TopicChange({

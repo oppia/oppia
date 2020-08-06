@@ -26,7 +26,6 @@ require(
 require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('domain/classroom/classroom-backend-api.service.ts');
-require('domain/topic/TopicSummaryObjectFactory.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
@@ -65,8 +64,8 @@ angular.module('oppia').component('classroomPage', {
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.classroomBackendApiService.fetchClassroomData(
-          classroomName).then(function(topicSummaryObjects) {
-          ctrl.topicSummaries = topicSummaryObjects;
+          classroomName).then(function(classroomData) {
+          ctrl.classroomData = classroomData;
           LoaderService.hideLoadingScreen();
           $rootScope.$broadcast('initializeTranslation');
         }, function(errorResponse) {

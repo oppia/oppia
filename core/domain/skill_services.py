@@ -180,7 +180,7 @@ def _get_augmented_skill_summaries_in_batches(
                   for topic_model in all_topic_models]
 
     topic_classroom_dict = {}
-    all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
     for classroom in all_classrooms_dict:
         for topic_id in classroom['topic_ids']:

@@ -91,6 +91,8 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
+import { ClassroomDataObjectFactory } from
+  'domain/classroom/ClassroomDataObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -919,6 +921,9 @@ export class UpgradedServices {
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
+    upgradedServices['ClassroomDataObjectFactory'] =
+      new ClassroomDataObjectFactory(
+        upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['CodeReplValidationService'] =
       new CodeReplValidationService(
         upgradedServices['baseInteractionValidationService']);

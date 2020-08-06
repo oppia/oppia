@@ -18,6 +18,7 @@
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/assets-backend-api.service.ts');
 
 angular.module('oppia').directive('topicSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -30,18 +31,55 @@ angular.module('oppia').directive('topicSummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/topic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['TOPIC_VIEWER_URL_TEMPLATE',
-        function(TOPIC_VIEWER_URL_TEMPLATE) {
+      controller: [
+        '$window', 'AssetsBackendApiService', 'ENTITY_TYPE',
+        'TOPIC_VIEWER_URL_TEMPLATE',
+        function(
+            $window, AssetsBackendApiService, ENTITY_TYPE,
+            TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.getTopicLink = function() {
-            return UrlInterpolationService.interpolateUrl(
-              TOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.getTopicSummary().getName()
-              });
+          ctrl.openTopicPage = function() {
+            $window.open(
+              UrlInterpolationService.interpolateUrl(
+                TOPIC_VIEWER_URL_TEMPLATE, {
+                  topic_name: ctrl.getTopicSummary().getName()
+                }), '_self'
+            );
           };
 
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          var getColorValueInHexForm = function(colorValue) {
+            colorValue = (colorValue < 0) ? 0 : colorValue;
+            var colorValueString = colorValue.toString(16);
+            return (
+              (colorValueString.length === 1) ?
+              '0' + colorValueString : colorValueString);
+          };
+
+          ctrl.getDarkerThumbnailBgColor = function() {
+            var bgColor = ctrl.getTopicSummary().getThumbnailBgColor();
+            // Remove the '#' from the first position.
+            bgColor = bgColor.slice(1);
+
+            // Get RGB values of new darker color.
+            var newRValue = getColorValueInHexForm(
+              parseInt(bgColor.substring(0, 2), 16) - 100);
+            var newGValue = getColorValueInHexForm(
+              parseInt(bgColor.substring(2, 4), 16) - 100);
+            var newBValue = getColorValueInHexForm(
+              parseInt(bgColor.substring(4, 6), 16) - 100);
+
+            return '#' + newRValue + newGValue + newBValue;
+          };
+
+          ctrl.$onInit = function() {
+            if (ctrl.getTopicSummary().getThumbnailFilename()) {
+              ctrl.thumbnailUrl = (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  ENTITY_TYPE.TOPIC, ctrl.getTopicSummary().getId(),
+                  ctrl.getTopicSummary().getThumbnailFilename()));
+            } else {
+              ctrl.thumbnailUrl = null;
+            }
           };
         }
       ]

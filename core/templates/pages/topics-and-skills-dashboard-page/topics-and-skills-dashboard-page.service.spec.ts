@@ -56,6 +56,8 @@ describe('Topic and Skill dashboard page service', () => {
       description: 'Alpha description',
       subtopic_count: 0,
       language_code: 'en',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA'
     });
     const topic2 = tsof.createFromBackendDict({
       topic_model_created_on: 1681839432987.596,
@@ -72,7 +74,9 @@ describe('Topic and Skill dashboard page service', () => {
       version: 1,
       description: 'Beta description',
       subtopic_count: 0,
-      language_code: 'en'
+      language_code: 'en',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA'
     });
     const topic3 = tsof.createFromBackendDict({
       topic_model_created_on: 1781839432987.596,
@@ -90,6 +94,8 @@ describe('Topic and Skill dashboard page service', () => {
       description: 'Gamma description',
       subtopic_count: 0,
       language_code: 'en',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA'
     });
     let topicsArray = [topic1, topic2, topic3];
     let filterOptions = dfof.createDefault();

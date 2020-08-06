@@ -22,46 +22,58 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { TopicSummaryObjectFactory } from
+import { ClassroomDataObjectFactory } from
+  'domain/classroom/ClassroomDataObjectFactory';
+import { TopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
 
 describe('Classroom backend API service', function() {
   let classroomBackendApiService:
     ClassroomBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let topicSummaryObjectFactory:
-    TopicSummaryObjectFactory = null;
-  let responseDictionaries = {
-    topic_summary_dicts: [{
-      id: 'topic1',
-      name: 'Topic name',
-      description: 'Topic description',
-      canonical_story_count: 4,
-      subtopic_count: 5,
-      total_skill_count: 20,
-      uncategorized_skill_count: 5,
-      language_code: 'en',
-      version: 1,
-      additional_story_count: 0,
-      topic_model_created_on: 231241343,
-      topic_model_last_updated: 3454354354
-    }, {
-      id: 'topic2',
-      name: 'Topic name 2',
-      description: 'Topic description 2',
-      canonical_story_count: 3,
-      subtopic_count: 2,
-      total_skill_count: 10,
-      uncategorized_skill_count: 3,
-      language_code: 'en',
-      version: 1,
-      additional_story_count: 0,
-      topic_model_created_on: 231241343,
-      topic_model_last_updated: 3454354354
-    }]
+  let classroomDataObjectFactory:
+    ClassroomDataObjectFactory = null;
+  let firstTopicSummaryDict: TopicSummaryBackendDict = {
+    id: 'topic1',
+    name: 'Topic name',
+    canonical_story_count: 4,
+    subtopic_count: 5,
+    total_skill_count: 20,
+    uncategorized_skill_count: 5,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA',
+    language_code: 'en',
+    description: 'Topic description',
+    version: 2,
+    additional_story_count: 0,
+    topic_model_created_on: 231241343,
+    topic_model_last_updated: 3454354354
+  };
+  let secondTopicSummaryDict: TopicSummaryBackendDict = {
+    id: 'topic2',
+    name: 'Topic name 2',
+    canonical_story_count: 3,
+    subtopic_count: 2,
+    total_skill_count: 10,
+    uncategorized_skill_count: 3,
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#C6DCDA',
+    language_code: 'en',
+    description: 'Topic description',
+    version: 2,
+    additional_story_count: 0,
+    topic_model_created_on: 231241343,
+    topic_model_last_updated: 3454354354
   };
 
-  let sampleDataResultsObjects = null;
+  let responseDictionaries = {
+    name: 'Math',
+    topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
+    course_details: 'Course Details',
+    topic_list_intro: 'Topics Covered'
+  };
+
+  let sampleClassroomDataObject = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -69,17 +81,14 @@ describe('Classroom backend API service', function() {
     });
     classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
+    classroomDataObjectFactory = TestBed.get(ClassroomDataObjectFactory);
 
     // Sample topic object returnable from the backend.
-    sampleDataResultsObjects = {
-      topic_summary_objects: [
-        topicSummaryObjectFactory.createFromBackendDict(
-          responseDictionaries.topic_summary_dicts[0]),
-        topicSummaryObjectFactory.createFromBackendDict(
-          responseDictionaries.topic_summary_dicts[1])
-      ]
-    };
+    sampleClassroomDataObject = (
+      classroomDataObjectFactory.createFromBackendData(
+        responseDictionaries.name, responseDictionaries.topic_summary_dicts,
+        responseDictionaries.course_details,
+        responseDictionaries.topic_list_intro));
   });
 
   afterEach(() => {
@@ -101,8 +110,7 @@ describe('Classroom backend API service', function() {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.topic_summary_objects);
+      expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -142,8 +150,7 @@ describe('Classroom backend API service', function() {
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
       flushMicrotasks();
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.topic_summary_objects);
+      expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

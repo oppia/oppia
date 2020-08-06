@@ -30,13 +30,14 @@ describe('Classroom page', () => {
 
   var AlertsService = null;
   var ClassroomBackendApiService = null;
+  var ClassroomDataObjectFactory = null;
   var LoaderService = null;
   var PageTitleService = null;
   var UrlService = null;
 
   var loadingMessage = null;
   var subscriptions = [];
-  var topicSummaryObjects = [];
+  var classroomData = {};
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -51,6 +52,7 @@ describe('Classroom page', () => {
 
     AlertsService = $injector.get('AlertsService');
     ClassroomBackendApiService = $injector.get('ClassroomBackendApiService');
+    ClassroomDataObjectFactory = $injector.get('ClassroomDataObjectFactory');
     LoaderService = $injector.get('LoaderService');
     PageTitleService = $injector.get('PageTitleService');
     UrlService = $injector.get('UrlService');
@@ -91,8 +93,11 @@ describe('Classroom page', () => {
     beforeEach(function() {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
+      classroomData = ClassroomDataObjectFactory.createFromBackendData(
+        'Math', [], 'Course details', 'Topics covered'
+      );
       spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
-        $q.resolve(topicSummaryObjects));
+        $q.resolve(classroomData));
       spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
       spyOn(UrlService, 'getClassroomNameFromUrl').and.returnValue(
@@ -113,7 +118,7 @@ describe('Classroom page', () => {
       expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
         'Mock Classroom | Oppia');
 
-      expect(ctrl.topicSummaries).toEqual(topicSummaryObjects);
+      expect(ctrl.classroomData.getName()).toEqual('Math');
       expect($rootScope.$broadcast).toHaveBeenCalledWith(
         'initializeTranslation');
     });
@@ -141,7 +146,7 @@ describe('Classroom page', () => {
       expect(loadingMessage).toBe('Loading');
       expect(AlertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
-      expect(ctrl.topicSummaries).toBeUndefined();
+      expect(ctrl.classroomData).toBeUndefined();
     });
   });
 });
