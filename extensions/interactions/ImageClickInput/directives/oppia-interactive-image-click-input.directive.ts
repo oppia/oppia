@@ -27,18 +27,21 @@ require(
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
   'AssetsBackendApiService', 'ContextService',
-  'HtmlEscaperService', 'ImageClickInputRulesService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'EXPLORATION_EDITOR_TAB_CONTEXT', 'LOADING_INDICATOR_URL',
+  'ImageClickInputRulesService', 'ImagePreloaderService',
+  'InteractionAttributesExtractorService', 'UrlInterpolationService',
+  'EVENT_NEW_CARD_AVAILABLE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
-      HtmlEscaperService, ImageClickInputRulesService, ImagePreloaderService,
-      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      EXPLORATION_EDITOR_TAB_CONTEXT, LOADING_INDICATOR_URL) {
+      ImageClickInputRulesService, ImagePreloaderService,
+      InteractionAttributesExtractorService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE, EXPLORATION_EDITOR_TAB_CONTEXT,
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -51,8 +54,14 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
         '$element', '$attrs', '$scope', 'CurrentInteractionService',
         function($element, $attrs, $scope, CurrentInteractionService) {
           var ctrl = this;
-          var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
-            $attrs.imageAndRegionsWithValue);
+
+          const {
+            imageAndRegions,
+            highlightRegionsOnHover
+          } = InteractionAttributesExtractorService.getValuesFromAttributes(
+            'ImageClickInput',
+            $attrs
+          );
           ctrl.updateCurrentlyHoveredRegions = function() {
             for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
               var labeledRegion = imageAndRegions.labeledRegions[i];
@@ -137,8 +146,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
                 clickPosition: [ctrl.mouseX, ctrl.mouseY]
               };
             });
-            ctrl.highlightRegionsOnHover =
-              ($attrs.highlightRegionsOnHoverWithValue === 'true');
+            ctrl.highlightRegionsOnHover = highlightRegionsOnHover;
             ctrl.filepath = imageAndRegions.imagePath;
             ctrl.imageUrl = '';
             ctrl.loadingIndicatorUrl = UrlInterpolationService

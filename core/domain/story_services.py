@@ -32,6 +32,7 @@ from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_fetchers
+from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
@@ -330,7 +331,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
                 if state.interaction.id == 'EndExploration':
                     recommended_exploration_ids = (
                         state.interaction.customization_args[
-                            'recommendedExplorationIds']['value'])
+                            'recommendedExplorationIds'].value)
                     if len(recommended_exploration_ids) != 0:
                         error_string = (
                             'Exploration with ID: %s contains exploration '
@@ -521,9 +522,11 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # force_deletion is True or not).
     delete_story_summary(story_id)
 
-    # Delete the opportunities available related to the exploration used in the
-    # story.
+    # Delete the opportunities available and reject the suggestions related to
+    # the exploration used in the story.
     opportunity_services.delete_exploration_opportunities(exp_ids)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+        exp_ids)
 
 
 def delete_story_summary(story_id):
