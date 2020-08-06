@@ -718,7 +718,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'Line 39: Invalid punctuation used at '
             'the end of the comment.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
-    
+
     def test_angular_services_index_error(self):
         def mock_compile_all_ts_files():
             cmd = (
@@ -775,7 +775,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        
+
         self.assert_same_list_elements([
             'AngularServicesIndexFile linting linting passed'
         ], self.linter_stdout)

@@ -1142,15 +1142,18 @@ class JsTsLintChecksManager(python_utils.OBJECT):
     def _check_angular_services_index(self):
         """Finds all @Injectable classes and makes sure that they are added to
             Oppia root and Angular Services Index.
+
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
         def get_injectable_class_name(file_content):
             """Extarcts the class name from a file that has an Injectable
                 class.
+
             Args:
                 file_content: str. File content of the file that has an
                     Injectable class.
+
             Returns:
                 tuple(str, str). A two-tuple of class name and class name in
                 camelCase.
@@ -1180,7 +1183,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting Angular Services Index file check')
             python_utils.PRINT('----------------------------------------')
-        angular_services_index = self.file_cache.read(angular_services_index_path)
+        angular_services_index = self.file_cache.read(
+            angular_services_index_path)
         summary_messages = []
         total_error_count = 0
         total_files_checked = 0
@@ -1200,7 +1204,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
                     total_error_count += 1
-                
+
                 service_name_type_pair = (
                     '[\'%s\', %s]' % (class_name, class_name))
 
