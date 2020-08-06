@@ -71,7 +71,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
         'PageTitleService', 'SkillCreationService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'TopicsAndSkillsBackendApiService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
         'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',

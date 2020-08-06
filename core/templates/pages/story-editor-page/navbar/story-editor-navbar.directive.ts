@@ -208,7 +208,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied.subscribe(
+              UndoRedoService.onUndoRedoChangeApplied().subscribe(
                 () => {
                   console.log('Caught: undoRedoChangeApplied in story-editor-navbar');
                   _validateStory();

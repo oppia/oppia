@@ -301,8 +301,9 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.$on(EVENT_TOPIC_INITIALIZED, _validateTopic);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, _validateTopic);
-            ctrl.directieSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied.subscribe(
+            console.log(UndoRedoService.onUndoRedoChangeApplied());
+            ctrl.directiveSubscriptions.add(
+              UndoRedoService.onUndoRedoChangeApplied().subscribe(
                 () => {
                   console.log('Caught: undoRedoChangeApplied in topic-editor-navbar');
                   _validateTopic();

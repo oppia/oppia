@@ -214,7 +214,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
               EVENT_COLLECTION_INITIALIZED, _validateCollection);
             $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied.subscribe(
+              UndoRedoService.onUndoRedoChangeApplied().subscribe(
                 () => {
                   console.log('Caught: undoRedoChangeApplied in collection-editor-navbar');
                   _validateCollection();

@@ -29,14 +29,15 @@ import { EventEmitter } from '@angular/core';
 angular.module('oppia').factory('BaseUndoRedoService', [
   function() {
     var BaseUndoRedoService = {};
-    var _undoRedoChangeAppliedEventEmitter = new EventEmitter();
 
+    this._undoRedoChangeAppliedEventEmitter = null;
     this._appliedChanges = [];
     this._undoneChanges = [];
 
     var _dispatchMutation = function() {
       console.log('Emitted: UndoRedoChangeApplied in UndoRedoChangeApplied');
-      _undoRedoChangeAppliedEventEmitter.emit();
+      console.log(this._undoRedoChangeAppliedEventEmitter);
+      this._undoRedoChangeAppliedEventEmitter.emit();
     };
     var _applyChange = function(changeObject, domainObject) {
       changeObject.applyChange(domainObject);
@@ -53,6 +54,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /* eslint-enable dot-notation */
       this._appliedChanges = [];
       this._undoneChanges = [];
+      this._undoRedoChangeAppliedEventEmitter = new EventEmitter();
     };
 
     /**
@@ -181,10 +183,13 @@ angular.module('oppia').factory('BaseUndoRedoService', [
       _dispatchMutation();
     };
 
-    return {
-      get onUndoRedoChangeApplied() {
-        return _undoRedoChangeAppliedEventEmitter;
-      }
+    /* eslint-disable dot-notation */
+    BaseUndoRedoService['onUndoRedoChangeApplied'] = function() {
+    /* eslint-disable dot-notation */
+      console.log('GETS HERE');
+      return this._undoRedoChangeAppliedEventEmitter;
     };
+
+    return BaseUndoRedoService;
   }
 ]);
