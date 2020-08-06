@@ -129,10 +129,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to drag and drop."
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Enter an option for the learner to drag and drop."
+              }
             }
           },
           "type": "list",
@@ -147,7 +150,10 @@
           }
         },
         "default_value": [
-          ""
+          {
+            "content_id": null,
+            "html": ""
+          }
         ]
       },
       {
@@ -215,10 +221,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Sample item answer"
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Sample item answer"
+              }
             }
           },
           "type": "list",
@@ -226,9 +235,7 @@
             "add_element_text": "Add item for selection"
           }
         },
-        "default_value": [
-          ""
-        ]
+        "default_value": [{"content_id": null, "html": ""}]
       }
     ],
     "is_terminal": false,
@@ -258,9 +265,13 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": "Continue"
+        "default_value": {
+          "content_id": null,
+          "unicode_str": "Continue"
+        }
       }
     ],
     "is_terminal": false,
@@ -437,9 +448,13 @@
         "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": "Add item"
+        "default_value": {
+          "content_id": null,
+          "unicode_str": "Add Item"
+        }
       }
     ],
     "is_terminal": false,
@@ -625,10 +640,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to select"
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Enter an option for the learner to select"
+              }
             }
           },
           "type": "list",
@@ -642,9 +660,10 @@
             "add_element_text": "Add multiple choice option"
           }
         },
-        "default_value": [
-          ""
-        ]
+        "default_value": [{
+          "content_id": null,
+          "html": ""
+        }]
       }, {
         "name": "showChoicesInShuffledOrder",
         "description": "Shuffle answer choices",
@@ -676,7 +695,7 @@
     "customization_arg_specs": [
       {
         "description": "The initial code",
-        "name": "initial_code",
+        "name": "initialCode",
         "schema": {
           "type": "unicode",
           "ui_config": {
@@ -716,9 +735,13 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": ""
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
       },
       {
         "description": "Height (in rows)",
@@ -952,9 +975,13 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": ""
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
       }
     ],
     "is_terminal": false,

@@ -32,11 +32,13 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import customization_args_util
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
+from extensions import domain
 import feconf
 import python_utils
 import schema_utils
@@ -58,6 +60,7 @@ STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
+STATE_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
@@ -227,6 +230,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
+        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
         STATE_PROPERTY_INTERACTION_HANDLERS,
@@ -719,6 +723,7 @@ class Exploration(python_utils.OBJECT):
 
             state.content = state_domain.SubtitledHtml(
                 sdict['content']['content_id'], sdict['content']['html'])
+            state.content.validate()
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']
@@ -743,8 +748,15 @@ class Exploration(python_utils.OBJECT):
                 state_domain.Solution.from_dict(idict['id'], idict['solution'])
                 if idict['solution'] else None)
 
+            customization_args = (
+                state_domain.InteractionInstance.
+                convert_customization_args_dict_to_customization_args(
+                    idict['id'],
+                    idict['customization_args']
+                )
+            )
             state.interaction = state_domain.InteractionInstance(
-                idict['id'], idict['customization_args'],
+                idict['id'], customization_args,
                 interaction_answer_groups, default_outcome,
                 idict['confirmed_unclassified_answers'],
                 [state_domain.Hint.from_dict(h) for h in idict['hints']],
@@ -757,6 +769,8 @@ class Exploration(python_utils.OBJECT):
             state.written_translations = (
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
+
+            state.next_content_id_index = sdict['next_content_id_index']
 
             state.solicit_answer_details = sdict['solicit_answer_details']
 
@@ -2283,7 +2297,9 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.convert_to_textangular)
+                state_dict,
+                html_validation_service.convert_to_textangular,
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2301,7 +2317,9 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.add_caption_attr_to_image)
+                state_dict,
+                html_validation_service.add_caption_attr_to_image,
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2319,7 +2337,8 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.convert_to_ckeditor)
+                state_dict, html_validation_service.convert_to_ckeditor,
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2342,7 +2361,8 @@ class Exploration(python_utils.OBJECT):
                 exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
-                add_dimensions_to_image_tags)
+                add_dimensions_to_image_tags,
+                state_uses_old_interaction_cust_args_schema=True)
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
@@ -2608,7 +2628,9 @@ class Exploration(python_utils.OBJECT):
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_validation_service.add_math_content_to_math_rte_components)
+                html_validation_service.add_math_content_to_math_rte_components,
+                state_uses_old_interaction_cust_args_schema=True)
+
         return states_dict
 
     @classmethod
@@ -2736,7 +2758,188 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v35_dict_to_v36_dict(cls, states_dict):
-        """Converts from version 35 to 36. Version 36 adds a customization arg
+        """Converts from version 35 to 36. Version 36 adds translation support
+        for interaction customization arguments. This migration converts
+        customization arguments whose schemas have been changed from unicode to
+        SubtitledUnicode or html to SubtitledHtml. It also populates missing
+        customization argument keys on all interactions, removes extra
+        customization arguments, normalizes customization arguments against
+        its schema, and changes PencilCodeEditor's customization argument
+        name from initial_code to initialCode.
+        """
+        for state_dict in states_dict.values():
+            max_existing_content_id_index = -1
+            translations_mapping = state_dict[
+                'written_translations']['translations_mapping']
+            for content_id in translations_mapping:
+                # Find maximum existing content_id index.
+                content_id_suffix = content_id.split('_')[-1]
+
+                # Possible values of content_id_suffix are a digit, or from
+                # a 'outcome' (from 'default_outcome'). If the content_id_suffix
+                # is not a digit, we disregard it here.
+                if content_id_suffix.isdigit():
+                    max_existing_content_id_index = max(
+                        max_existing_content_id_index,
+                        int(content_id_suffix)
+                    )
+
+                # Move 'html' field to 'translation' field and set 'data_format'
+                # to 'html' for all WrittenTranslations.
+                for lang_code in translations_mapping[content_id]:
+                    translations_mapping[
+                        content_id][lang_code]['data_format'] = 'html'
+                    translations_mapping[
+                        content_id][lang_code]['translation'] = (
+                            translations_mapping[content_id][lang_code]['html'])
+                    del translations_mapping[content_id][lang_code]['html']
+
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id is None:
+                state_dict['next_content_id_index'] = (
+                    max_existing_content_id_index + 1)
+                continue
+
+            class ContentIdCounter(python_utils.OBJECT):
+                """This helper class is used to keep track of
+                next_content_id_index and new_content_ids, and provides a
+                function to generate new content_ids.
+                """
+
+                new_content_ids = []
+
+                def __init__(self, next_content_id_index):
+                    """Initializes a ContentIdCounter object.
+
+                    Args:
+                        next_content_id_index: int. The next content id index.
+                    """
+                    self.next_content_id_index = next_content_id_index
+
+                def generate_content_id(self, content_id_prefix):
+                    """Generate a new content_id from the prefix provided and
+                    the next content id index.
+
+                    Args:
+                        content_id_prefix: str. The prefix of the content_id.
+
+                    Returns:
+                        str. The generated content_id.
+                    """
+                    content_id = '%s%i' % (
+                        content_id_prefix,
+                        self.next_content_id_index)
+                    self.next_content_id_index += 1
+                    self.new_content_ids.append(content_id)
+                    return content_id
+
+            content_id_counter = (
+                ContentIdCounter(max_existing_content_id_index + 1))
+
+            ca_dict = state_dict['interaction']['customization_args']
+            if (interaction_id == 'PencilCodeEditor' and
+                    'initial_code' in ca_dict):
+                ca_dict['initialCode'] = ca_dict['initial_code']
+                del ca_dict['initial_code']
+
+            # Retrieve a cached version (state schema v35) of
+            # interaction_specs.json to ensure that this migration remains
+            # stable even when interaction_specs.json is changed.
+            ca_specs = [
+                domain.CustomizationArgSpec(
+                    ca_spec_dict['name'],
+                    ca_spec_dict['description'],
+                    ca_spec_dict['schema'],
+                    ca_spec_dict['default_value']
+                ) for ca_spec_dict in (
+                    interaction_registry.Registry
+                    .get_all_specs_for_state_schema_version(36)[
+                        interaction_id]['customization_arg_specs']
+                )
+            ]
+
+            for ca_spec in ca_specs:
+                schema = ca_spec.schema
+                ca_name = ca_spec.name
+                content_id_prefix = 'ca_%s_' % ca_name
+
+                # We only have to migrate unicode to SubtitledUnicode or
+                # list of html to list of SubtitledHtml. No interactions
+                # were changed from html to SubtitledHtml.
+                is_subtitled_unicode_spec = (
+                    schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                    schema['obj_type'] ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+                is_subtitled_html_list_spec = (
+                    schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                    schema['items']['type'] ==
+                    schema_utils.SCHEMA_TYPE_CUSTOM and
+                    schema['items']['obj_type'] ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+
+                if is_subtitled_unicode_spec:
+                    # Default is a SubtitledHtml dict or SubtitleUnicode dict.
+                    new_value = copy.deepcopy(ca_spec.default_value)
+
+                    # If available, assign value to html or unicode_str.
+                    if ca_name in ca_dict:
+                        new_value['unicode_str'] = ca_dict[ca_name]['value']
+
+                    # Assign content_id.
+                    new_value['content_id'] = (
+                        content_id_counter
+                        .generate_content_id(content_id_prefix)
+                    )
+
+                    ca_dict[ca_name] = {'value': new_value}
+                elif is_subtitled_html_list_spec:
+                    new_value = []
+
+                    if ca_name in ca_dict:
+                        # Assign values to html fields.
+                        for html in ca_dict[ca_name]['value']:
+                            new_value.append({
+                                'html': html, 'content_id': None
+                            })
+                    else:
+                        # Default is a list of SubtitledHtml dict.
+                        new_value.extend(copy.deepcopy(ca_spec.default_value))
+
+                    # Assign content_ids.
+                    for subtitled_html_dict in new_value:
+                        subtitled_html_dict['content_id'] = (
+                            content_id_counter
+                            .generate_content_id(content_id_prefix)
+                        )
+
+                    ca_dict[ca_name] = {'value': new_value}
+                elif ca_name not in ca_dict:
+                    ca_dict[ca_name] = {'value': ca_spec.default_value}
+
+            (
+                customization_args_util
+                .validate_customization_args_and_values(
+                    'interaction',
+                    interaction_id,
+                    ca_dict,
+                    ca_specs)
+            )
+
+            state_dict['next_content_id_index'] = (
+                content_id_counter.next_content_id_index)
+            for new_content_id in content_id_counter.new_content_ids:
+                state_dict[
+                    'written_translations'][
+                        'translations_mapping'][new_content_id] = {}
+                state_dict[
+                    'recorded_voiceovers'][
+                        'voiceovers_mapping'][new_content_id] = {}
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
+        """Converts from version 36 to 37. Version 37 adds a customization arg
         for the Math interactions that allows creators to specify the letters
         that would be displayed to the learner.
 
@@ -2821,7 +3024,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 41
+    CURRENT_EXP_SCHEMA_VERSION = 42
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3764,12 +3967,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v40_dict_to_v41_dict(cls, exploration_dict):
         """Converts a v40 exploration dict into a v41 exploration dict.
-        Adds a customization arg for the Math interactions that allows creators
-        to specify the letters that would be displayed to the learner.
+        Adds translation support to customization args.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v40.
+                with schema version v39.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
@@ -3780,6 +3982,28 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states'] = cls._convert_states_v35_dict_to_v36_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 36
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v41_dict_to_v42_dict(cls, exploration_dict):
+        """Converts a v41 exploration dict into a v42 exploration dict.
+        Adds a customization arg for the Math interactions that allows creators
+        to specify the letters that would be displayed to the learner.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v41.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v42.
+        """
+        exploration_dict['schema_version'] = 42
+
+        exploration_dict['states'] = cls._convert_states_v36_dict_to_v37_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 37
 
         return exploration_dict
 
@@ -4020,6 +4244,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v40_dict_to_v41_dict(
                 exploration_dict)
             exploration_schema_version = 41
+
+        if exploration_schema_version == 41:
+            exploration_dict = cls._convert_v41_dict_to_v42_dict(
+                exploration_dict)
+            exploration_schema_version = 42
 
         return (exploration_dict, initial_schema_version)
 

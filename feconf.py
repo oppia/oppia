@@ -61,6 +61,10 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
+INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs'))
+INTERACTIONS_SPECS_FILE_PATH = (
+    os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (

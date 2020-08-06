@@ -23,7 +23,8 @@ import { Injectable } from '@angular/core';
 import {
   TranslationBackendDict,
   WrittenTranslation,
-  WrittenTranslationObjectFactory
+  WrittenTranslationObjectFactory,
+  WRITTEN_TRANSLATION_TYPE_HTML
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
 export interface WrittenTranslationsBackendDict {
@@ -108,8 +109,8 @@ export class WrittenTranslations {
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
-    writtenTranslations[languageCode] = (
-      this._writtenTranslationObjectFactory.createNew(html));
+    writtenTranslations[languageCode] = this._writtenTranslationObjectFactory
+      .createNew(WRITTEN_TRANSLATION_TYPE_HTML, html);
   }
 
   updateWrittenTranslationHtml(
@@ -118,7 +119,7 @@ export class WrittenTranslations {
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');
     }
-    writtenTranslations[languageCode].setHtml(html);
+    writtenTranslations[languageCode].translation = html;
     // Marking translation updated.
     writtenTranslations[languageCode].needsUpdate = false;
   }
