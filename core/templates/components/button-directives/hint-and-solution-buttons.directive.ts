@@ -154,9 +154,9 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
               PlayerPositionService.onActiveCardChanged.subscribe(
                 () => {
                   var displayedCardIndex =
-                  PlayerPositionService.getDisplayedCardIndex();
+                    (PlayerPositionService.getDisplayedCardIndex());
                   ctrl.currentlyOnLatestCard =
-                    PlayerTranscriptService.isLastCard(displayedCardIndex);
+                    (PlayerTranscriptService.isLastCard(displayedCardIndex));
                   if (ctrl.currentlyOnLatestCard) {
                     resetLocalHintsArray();
                   }
