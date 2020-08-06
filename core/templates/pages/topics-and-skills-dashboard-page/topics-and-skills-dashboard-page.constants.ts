@@ -31,10 +31,6 @@ export enum ETopicPublishedOptions {
 }
 
 export class TopicsAndSkillsDashboardPageConstants {
-  public static EVENT_TYPE_TOPIC_CREATION_ENABLED = 'topicCreationEnabled';
-
-  public static EVENT_TYPE_SKILL_CREATION_ENABLED = 'skillCreationEnabled';
-
   public static SKILL_DESCRIPTION_STATUS_VALUES = {
     STATUS_UNCHANGED: 'unchanged',
     STATUS_CHANGED: 'changed',
