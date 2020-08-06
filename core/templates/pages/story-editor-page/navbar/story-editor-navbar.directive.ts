@@ -26,10 +26,13 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
+require('pages/story-editor-page/services/story-editor-navigation.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -40,16 +43,17 @@ angular.module('oppia').directive('storyEditorNavbar', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'EditableStoryBackendApiService', 'UndoRedoService',
-        'StoryEditorStateService', 'UrlService',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
+        'StoryEditorStateService', 'StoryEditorNavigationService', 'UrlService',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             EditableStoryBackendApiService, UndoRedoService,
-            StoryEditorStateService, UrlService,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
+            StoryEditorStateService, StoryEditorNavigationService, UrlService,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
+          var EDITOR = 'Editor';
+          var PREVIEW = 'Preview';
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.explorationValidationIssues = [];
 
           $scope.getChangeListLength = function() {
@@ -162,17 +166,55 @@ angular.module('oppia').directive('storyEditorNavbar', [
               });
           };
 
+          $scope.toggleWarningText = function() {
+            $scope.warningsAreShown = !$scope.warningsAreShown;
+          };
+
+          $scope.toggleNavigationOptions = function() {
+            $scope.showNavigationOptions = !$scope.showNavigationOptions;
+          };
+
+          $scope.toggleStoryEditOptions = function() {
+            $scope.showStoryEditOptions = !$scope.showStoryEditOptions;
+          };
+
+          $scope.selectMainTab = function() {
+            $scope.activeTab = EDITOR;
+            StoryEditorNavigationService.navigateToStoryEditor();
+            $scope.showNavigationOptions = false;
+          };
+
+          $scope.selectPreviewTab = function() {
+            $scope.activeTab = PREVIEW;
+            StoryEditorNavigationService.navigateToStoryPreviewTab();
+            $scope.showNavigationOptions = false;
+          };
+
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryInitialized.subscribe(
+                () => _validateStory()
+              ));
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
+                () => _validateStory()
+              ));
             $scope.forceValidateExplorations = true;
+            $scope.warningsAreShown = false;
+            $scope.activeTab = EDITOR;
+            $scope.showNavigationOptions = false;
+            $scope.showStoryEditOptions = false;
             $scope.story = StoryEditorStateService.getStory();
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
-            $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

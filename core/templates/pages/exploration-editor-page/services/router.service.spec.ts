@@ -73,6 +73,15 @@ describe('Router Service', () => {
               },
             },
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'Hola',
             feedback: {
@@ -115,6 +124,15 @@ describe('Router Service', () => {
               },
             },
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'Hola',
             feedback: {
@@ -141,11 +159,8 @@ describe('Router Service', () => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
-    // @ts-ignore
     var jQuerySpy = spyOn(window, '$');
-    // @ts-ignore
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
-      // @ts-ignore
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
@@ -182,11 +197,8 @@ describe('Router Service', () => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
-    // @ts-ignore
     var jQuerySpy = spyOn(window, '$');
-    // @ts-ignore
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
-      // @ts-ignore
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
