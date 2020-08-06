@@ -121,7 +121,8 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
 
         def replacement_put(*args, **kwargs): # pylint: disable=unused-argument
             """Intended to be a replacement for the default put function for
-            models, and raises an exception."""
+            models, and raises an exception.
+            """
             raise Exception('Failed to put.')
 
         model_class(
