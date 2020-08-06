@@ -2766,6 +2766,14 @@ class Exploration(python_utils.OBJECT):
         customization arguments, normalizes customization arguments against
         its schema, and changes PencilCodeEditor's customization argument
         name from initial_code to initialCode.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             max_existing_content_id_index = -1
@@ -2941,6 +2949,14 @@ class Exploration(python_utils.OBJECT):
     def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
         """Converts from version 36 to 37. Version 37 changes all rule with type
         CaseSensitiveEquals to Equals.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']

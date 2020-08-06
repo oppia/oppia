@@ -168,6 +168,29 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v36_dict_to_v37_dict(cls, draft_change_list):
+        """Converts draft change list from version 36 to 37.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Find all RuleSpecs in AnwerGroups and change
+                # CaseSensitiveEquals rule types to Equals.
+                for answer_group_dict in change.new_value:
+                   for rule_spec_dict in answer_group_dict['rule_specs']:
+                       if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                           rule_spec_dict['rule_type'] = 'Equals'
+
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v35_dict_to_v36_dict(cls, draft_change_list):
         """Converts draft change list from version 35 to 36.
 
