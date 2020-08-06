@@ -1175,9 +1175,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             './core/templates/angular-services.index.ts')
         injectables_to_ignore = [
             'ExplorationStats',
+            'InteractionAttributesExtractorService',
             'NormalizeWhitespacePunctuationAndCasePipe\n',
             'MockCsrfTokenService',
             'StatePropertyService',
+            'StateNextContentIdIndexService',
+            'SubtitledUnicodeObjectFactory',
             'UpgradedServices'
         ]
         if self.verbose_mode_enabled:

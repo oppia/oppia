@@ -15,9 +15,11 @@
 /**
  * @fileoverview Unit tests for CreateNewStoryModalController.
  */
-
+import { angularServices } from 'pages/../angular-services.index';
 import { NewlyCreatedStoryObjectFactory } from
   'domain/topic/NewlyCreatedStoryObjectFactory';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 const CONSTANTS = require('constants.ts');
 
@@ -26,8 +28,18 @@ describe('Create New Story Modal Controller', function() {
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let servicePair of angularServices) {
+      $provide.value(
+        servicePair[0], TestBed.get(servicePair[1]));
+    }
     $provide.value(
       'NewlyCreatedStoryObjectFactory', new NewlyCreatedStoryObjectFactory());
   }));
