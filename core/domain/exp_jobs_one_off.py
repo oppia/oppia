@@ -288,7 +288,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             except Exception as e:
                 error_message = (
                     'Exploration %s failed migration to v%s: %s' %
-                    (current_exp_schema_version, item.id, e))
+                    (item.id, current_exp_schema_version, e))
                 logging.error(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
         else:
