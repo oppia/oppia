@@ -24,8 +24,10 @@ import collections
 import copy
 
 from core import jobs
+from core.domain import action_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import playthrough_issue_registry
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
@@ -221,7 +223,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             associated with the map.
 
         Raises:
-            Exception: The item type is wrong.
+            Exception. The item type is wrong.
         """
         class_name_to_event_type = {
             'CompleteExplorationEventLogEntryModel':
@@ -592,7 +594,8 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationStatsModel.
+            item: ExplorationStatsModel. The Exploration stats model object to
+                fetch its properties.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
@@ -768,7 +771,8 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationStatsModel.
+            item: ExplorationStatsModel. The Exploration stats model object to
+                fetch its properties.
 
         Yields:
             tuple. For ExplorationStatsModel, a 2-tuple of the form
@@ -968,8 +972,8 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function. Must be declared @staticmethod.
 
         Args:
-            item: ExplorationAnnotationsModel or
-                StateCounterModel.
+            item: ExplorationAnnotationsModel or StateCounterModel. The object
+                to fetch its properties.
 
         Yields:
             tuple. Different for different models:
@@ -1376,3 +1380,95 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                     exp_id, status,
                     '' if len(exp_versions_without_stats_as_strs) == 1 else 's',
                     ', '.join(exp_versions_without_stats_as_strs)))
+
+
+class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to check if all customization arguments stored in
+    Playthrough, and ExplorationIssues are fully populated with
+    the appropriate keys.
+    """
+
+    STATUS_MISMATCH_KEYS = 'missing or extra customization argument key(s)'
+    STATUS_MATCH_KEYS = 'the correct customization argument key(s)'
+
+    JOB_RESULT_EXPECTED = 'EXPECTED'
+    JOB_RESULT_UNEXPECTED = 'UNEXPECTED'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            stats_models.ExplorationIssuesModel,
+            stats_models.PlaythroughModel
+        ]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, stats_models.ExplorationIssuesModel):
+            for issue in item.unresolved_issues:
+                ca_specs = (
+                    playthrough_issue_registry.Registry.get_issue_by_type(
+                        issue['issue_type']).customization_arg_specs)
+                all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
+                if all_ca_names == set(issue['issue_customization_args']):
+                    yield ('ExplorationIssue -- SUCCESS', 1)
+                else:
+                    ca = [
+                        ca_name.encode('utf-8')
+                        for ca_name in issue['issue_customization_args'].keys()
+                    ]
+                    yield (
+                        'ExplorationIssue -- FAILURE',
+                        (
+                            item.exp_id.encode('utf-8'),
+                            issue['issue_type'].encode('utf-8'),
+                            ca
+                        )
+                    )
+        elif isinstance(item, stats_models.PlaythroughModel):
+            ca_specs = playthrough_issue_registry.Registry.get_issue_by_type(
+                item.issue_type).customization_arg_specs
+            all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
+            if all_ca_names == set(item.issue_customization_args):
+                yield ('Playthrough Issue -- SUCCESS', 1)
+            else:
+                ca = [
+                    ca_name.encode('utf-8')
+                    for ca_name in item.issue_customization_args.keys()
+                ]
+                yield (
+                    'Playthrough Issue -- FAILURE',
+                    (
+                        item.exp_id.encode('utf-8'),
+                        item.issue_type.encode('utf-8'),
+                        ca
+                    )
+                )
+
+            for action in item.actions:
+                ca_specs = (
+                    action_registry.Registry.get_action_by_type(
+                        action['action_type']).customization_arg_specs)
+                all_ca_names = set([ca_spec.name for ca_spec in ca_specs])
+                if all_ca_names == set(action['action_customization_args']):
+                    yield ('Playthrough Action -- SUCCESS', 1)
+                else:
+                    ca = [
+                        ca_name.encode('utf-8')
+                        for ca_name in action[
+                            'action_customization_args'].keys()
+                    ]
+                    yield (
+                        'Playthrough Action -- FAILURE',
+                        (
+                            item.exp_id.encode('utf-8'),
+                            action['action_type'].encode('utf-8'),
+                            ca
+                        )
+                    )
+
+    @staticmethod
+    def reduce(key, values):
+        if 'SUCCESS' in key:
+            yield (key, len(values))
+        else:
+            yield (key, values)

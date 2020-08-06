@@ -32,6 +32,7 @@ from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_fetchers
+from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
@@ -330,7 +331,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
                 if state.interaction.id == 'EndExploration':
                     recommended_exploration_ids = (
                         state.interaction.customization_args[
-                            'recommendedExplorationIds']['value'])
+                            'recommendedExplorationIds'].value)
                     if len(recommended_exploration_ids) != 0:
                         error_string = (
                             'Exploration with ID: %s contains exploration '
@@ -357,9 +358,9 @@ def _save_story(
         is_story_published: bool. Whether the supplied story is published.
 
     Raises:
-        ValidationError: An invalid exploration was referenced in the
+        ValidationError. An invalid exploration was referenced in the
             story.
-        Exception: The story model and the incoming story domain
+        Exception. The story model and the incoming story domain
             object have different version numbers.
     """
     if not change_list:
@@ -454,7 +455,7 @@ def update_story(
         committer_id: str. The id of the user who is performing the update
             action.
         story_id: str. The story id.
-        change_list: list(StoryChange).These changes are applied in sequence to
+        change_list: list(StoryChange). These changes are applied in sequence to
             produce the resulting story.
         commit_message: str or None. A description of changes made to the
             story.
@@ -556,9 +557,11 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # force_deletion is True or not).
     delete_story_summary(story_id)
 
-    # Delete the opportunities available related to the exploration used in the
-    # story.
+    # Delete the opportunities available and reject the suggestions related to
+    # the exploration used in the story.
     opportunity_services.delete_exploration_opportunities(exp_ids)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+        exp_ids)
 
 
 def delete_story_summary(story_id):
@@ -609,7 +612,7 @@ def save_story_summary(story_summary):
     entity in the datastore.
 
     Args:
-        story_summary: The story summary object to be saved in the
+        story_summary: StorySummary. The story summary object to be saved in the
             datastore.
     """
     story_summary_dict = {

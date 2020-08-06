@@ -696,6 +696,19 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(
@@ -719,6 +732,19 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -1335,7 +1361,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
-        self.assertFalse(user_services.has_fully_registered(None))
+        self.assertFalse(user_services.has_fully_registered_account(None))
 
     def test_cannot_create_new_user_with_existing_user_id(self):
         with self.assertRaisesRegexp(
