@@ -680,6 +680,7 @@ module.exports = {
         path.resolve(__dirname, 'typings')
       ],
       use: [
+        'cache-loader',
         {
           loader: 'ts-loader',
           options: {
@@ -697,15 +698,20 @@ module.exports = {
         include: /.html$/,
         exclude: /(directive|component)\.html$/
       },
-      loader: 'underscore-template-loader'
+      loader: ['cache-loader', 'underscore-template-loader']
     },
     {
       test: /(directive|component)\.html$/,
-      loader: 'html-loader',
-      options: {
-        attributes: false,
-        minimize: htmlMinifyConfig,
-      },
+      use: [
+        'cache-loader',
+        {
+          loader: 'html-loader',
+          options: {
+            attributes: false,
+            minimize: htmlMinifyConfig,
+          }
+        }
+      ]
     },
     {
       test: /\.css$/,
@@ -713,7 +719,7 @@ module.exports = {
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'node_modules'),
       ],
-      use: ['style-loader', 'css-loader']
+      use: ['cache-loader', 'style-loader', 'css-loader']
     }]
   },
   optimization: {
