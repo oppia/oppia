@@ -679,6 +679,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.customization_args = {15: ''}
         self._assert_validation_error(
+            exploration,
+            (
+              'Expected customization arg value to be a '
+              'InteractionCustomizationArg'
+            )
+        )
+
+        interaction.customization_args = {
+          15: state_domain.InteractionCustomizationArg('', {
+            'type': 'unicode'
+          })
+        }
+        self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
         interaction.customization_args = valid_text_input_cust_args
