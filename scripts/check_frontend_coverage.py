@@ -106,7 +106,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'drag-and-drop-positive-int-editor.directive.ts',
     'editable-collection-backend-api.service.ts',
     'editable-story-backend-api.service.ts',
-    'editor-navigation.component.ts',
     'email-dashboard-data.service.ts',
     'entity-creation.service.ts',
     'exploration-creation.service.ts',
