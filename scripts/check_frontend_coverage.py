@@ -257,7 +257,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'parameterize-rule-description.filter.ts',
     'pencil-code-editor-validation.service.ts',
     'player-correctness-feedback-enabled.service.ts',
-    'player-position.service.ts',
     'player-transcript.service.ts',
     'Polyfills.ts',
     'practice-tab.directive.ts',
