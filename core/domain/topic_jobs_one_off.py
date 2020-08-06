@@ -175,6 +175,7 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     _DELETED_KEY = 'topic_deleted'
     _PROCESSED_KEY = 'topic_processed'
     _ERROR_KEY = 'topic_errored'
+    
 
     @classmethod
     def entity_classes_to_map_over(cls):
