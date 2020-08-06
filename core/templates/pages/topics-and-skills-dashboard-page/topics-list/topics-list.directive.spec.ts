@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { EventEmitter } from '@angular/core';
+
 
 /**
  * @fileoverview Unit tests for the topics and skills dashboard directive.
  */
 
-describe('Topics List Directive', function() {
+fdescribe('Topics List Directive', function() {
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
@@ -26,6 +28,7 @@ describe('Topics List Directive', function() {
   var $rootScope = null;
   var directive = null;
   var AlertsService = null;
+  var TopicsAndSkillsDashboardBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -37,9 +40,21 @@ describe('Topics List Directive', function() {
     directive = $injector.get('topicsListDirective')[0];
     $q = $injector.get('$q');
     AlertsService = $injector.get('AlertsService');
+    TopicsAndSkillsDashboardBackendApiService = (
+      $injector.get('TopicsAndSkillsDashboardBackendApiService'));
+
+    var sampleEmitter = new EventEmitter();
+
+    var MockTopicsAndSkillsDashboardBackendApiService = {
+      get onTopicsAndSkillsDashboardReinitialized() {
+        return sampleEmitter;
+      }
+    };
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope,
+      TopicsAndSkillsDashboardBackendApiService:
+        MockTopicsAndSkillsDashboardBackendApiService,
       $uibModal,
     });
   }));

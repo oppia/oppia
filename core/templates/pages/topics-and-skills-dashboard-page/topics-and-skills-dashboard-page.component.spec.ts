@@ -19,6 +19,8 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { EventEmitter } from '@angular/core';
+
 // ^^^ This block is to be removed.
 
 require(
@@ -95,6 +97,8 @@ describe('Topics and Skills Dashboard Page', function() {
       SkillSummaryObjectFactory = $injector.get(
         'SkillSummaryObjectFactory');
 
+      var sampleEmitter = new EventEmitter();
+
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
           var deferred = $q.defer();
@@ -120,6 +124,9 @@ describe('Topics and Skills Dashboard Page', function() {
             skillSummaries: sampleDataResults.skill_summary_dicts
           });
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return sampleEmitter;
         }
       };
       var MockWindowDimensionsService = {
@@ -378,6 +385,9 @@ describe('Topics and Skills Dashboard Page', function() {
         can_create_topic: true,
         can_create_skill: true
       };
+
+      var sampleEmitter = new EventEmitter();
+
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
           var deferred = $q.defer();
@@ -403,6 +413,9 @@ describe('Topics and Skills Dashboard Page', function() {
             nextCursor: 'kasfmk424'
           });
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return sampleEmitter;
         }
       };
 
@@ -503,6 +516,9 @@ describe('Topics and Skills Dashboard Page', function() {
       mockAlertsService = {
         addWarning: function() {}
       };
+
+      var sampleEmitter = new EventEmitter();
+
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
           var deferred = $q.defer();
@@ -511,6 +527,9 @@ describe('Topics and Skills Dashboard Page', function() {
           };
           deferred.reject(errorResponse);
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return sampleEmitter;
         }
       };
 
@@ -546,6 +565,9 @@ describe('Topics and Skills Dashboard Page', function() {
       $q = $injector.get('$q');
       TopicsAndSkillsDashboardBackendApiService = $injector.get(
         'TopicsAndSkillsDashboardBackendApiService');
+
+      var sampleEmitter = new EventEmitter();
+
       var MockTopicsAndSkillsDashboardBackendApiService = {
         fetchDashboardData: () => {
           var deferred = $q.defer();
@@ -554,6 +576,9 @@ describe('Topics and Skills Dashboard Page', function() {
           };
           deferred.reject(errorResponse);
           return deferred.promise;
+        },
+        get onTopicsAndSkillsDashboardReinitialized() {
+          return sampleEmitter;
         }
       };
 
