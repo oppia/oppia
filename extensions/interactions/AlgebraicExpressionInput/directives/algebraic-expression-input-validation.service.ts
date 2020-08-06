@@ -154,7 +154,6 @@ export class AlgebraicExpressionInputValidationService {
     }
 
     if (missingVariables.length > 0) {
-      console.log(missingVariables);
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
