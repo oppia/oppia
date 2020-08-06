@@ -102,6 +102,15 @@ DEFAULT_SUGGESTION_ACCEPT_MESSAGE = (
 # deleted skill.
 DELETED_SKILL_REJECT_MESSAGE = 'The associated skill no longer exists.'
 
+# The message to be shown when rejecting a translation suggestion that is
+# associated with an exploration that no longer corresponds to the story.
+# The story could have been deleted or the exploration could have been removed
+# from the story.
+INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG = (
+    'This text snippet has been removed from the story, and no longer needs '
+    'translation. Sorry about that!'
+)
+
 # The amount to increase the score of the author by after successfuly getting an
 # accepted suggestion.
 INCREMENT_SCORE_OF_AUTHOR_BY = 1
@@ -231,6 +240,27 @@ class GeneralSuggestionModel(base_models.BaseModel):
             query = query.filter(getattr(cls, field) == value)
 
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_translation_suggestions_with_exp_ids(cls, exp_ids):
+        """Gets all translation suggestions corresponding to explorations with
+        the given exploration ids.
+
+        Args:
+            exp_ids: list(str). List of exploration ids to query for.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions that
+            correspond to the given exploration ids, up to a maximum of
+            feconf.DEFAULT_QUERY_LIMIT suggestions.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.target_id.IN(exp_ids))
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+
 
     @classmethod
     def get_all_stale_suggestions(cls):
