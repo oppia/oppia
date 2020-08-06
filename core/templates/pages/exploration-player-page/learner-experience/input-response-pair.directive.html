@@ -20,7 +20,9 @@
 </div>
 
 <div class="conversation-skin-oppia-feedback-container" ng-if="data.oppiaResponse !== ''">
-  <img class="conversation-skin-oppia-avatar rounded-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
+  <a ng-href="<[OPPIA_AVATAR_IMAGE_LINK]>" target="_blank" rel="noopener">
+    <img class="conversation-skin-oppia-avatar rounded-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
+  </a>
   <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()" class="protractor-test-input-response-loading-dots">
     <div class="conversation-skin-feedback-dot-one"></div>
     <div class="conversation-skin-feedback-dot-two"></div>

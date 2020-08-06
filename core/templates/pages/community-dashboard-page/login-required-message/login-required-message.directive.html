@@ -1,7 +1,9 @@
 <div class="oppia-login-required-message-container">
   <div class="oppia-mascot-avatar-container">
-    <img class="oppia-mascot-avatar"
-         ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+    <a ng-href="<[$ctrl.OPPIA_AVATAR_IMAGE_LINK]>" rel="noopener" target="_blank">
+      <img class="oppia-mascot-avatar"
+           ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+    </a>
   </div>
   <div class="oppia-login-required-message">
     Oops! You haven't logged in yet.

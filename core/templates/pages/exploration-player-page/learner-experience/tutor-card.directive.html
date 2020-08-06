@@ -5,9 +5,11 @@
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
-      <img class="conversation-skin-oppia-avatar"
-           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt=""
-           ng-if="isAvatarImageShown()">
+      <a ng-href="<[OPPIA_AVATAR_IMAGE_LINK]>" target="_blank" rel="noopener">
+        <img class="conversation-skin-oppia-avatar"
+             ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt=""
+             ng-if="isAvatarImageShown()">
+      </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">

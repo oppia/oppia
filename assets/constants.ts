@@ -5236,6 +5236,8 @@ export = {
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
 
+  "OPPIA_AVATAR_IMAGE_LINK": "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public/when-and-how-to-use-masks",
+
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
     "content": {

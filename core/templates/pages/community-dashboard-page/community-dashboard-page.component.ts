@@ -52,13 +52,13 @@ angular.module('oppia').component('communityDashboardPage', {
   controller: [
     'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService', 'UserService',
-    'COMMUNITY_DASHBOARD_TABS_DETAILS',
-    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
+    'COMMUNITY_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
+    'OPPIA_AVATAR_IMAGE_LINK',
     function(
         LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService, UserService,
-        COMMUNITY_DASHBOARD_TABS_DETAILS,
-        DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
+        COMMUNITY_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_LANGUAGE_CODE,
+        OPPIA_AVATAR_IMAGE_LINK) {
       var ctrl = this;
 
       var prevSelectedLanguageCode = (
@@ -148,6 +148,7 @@ angular.module('oppia').component('communityDashboardPage', {
 
         ctrl.activeTabName = 'myContributionTab';
         ctrl.tabsDetails = COMMUNITY_DASHBOARD_TABS_DETAILS;
+        ctrl.OPPIA_AVATAR_IMAGE_LINK = OPPIA_AVATAR_IMAGE_LINK;
         ctrl.OPPIA_AVATAR_IMAGE_URL = (
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg'));
