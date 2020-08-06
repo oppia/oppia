@@ -52,14 +52,12 @@ angular.module('oppia').component('storyEditorPage', {
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
-    'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
     function(
         $scope, $uibModal, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
-        UrlInterpolationService, UrlService,
-        EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+        UrlInterpolationService, UrlService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
@@ -208,7 +206,13 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorNavigationService.checkIfPresentInStoryPreviewTab()) {
           StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
-        $scope.$on(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _initPage);
+        ctrl.directiveSubscriptions.add(
+          UndoRedoService.onUndoRedoChangeApplied.subscribe(
+            () => {
+              _initPage();
+            }
+          )
+        );
       };
 
       ctrl.$onDestroy = function() {

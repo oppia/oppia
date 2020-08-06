@@ -58,7 +58,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
      * Pushes a change domain object onto the change stack and applies it to the
      * provided domain object. When a new change is applied, all undone changes
      * are lost and cannot be redone. This will fire an event as defined by the
-     * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
+     * the emitter _undoRedoChangeAppliedEventEmitter
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
@@ -72,8 +72,8 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /**
      * Undoes the last change to the provided domain object. This function
      * returns false if there are no changes to undo, and true otherwise. This
-     * will fire an event as defined by the constant
-     * EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
+     * will fire an event as defined by the emitter
+     * _undoRedoChangeAppliedEventEmitter
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
@@ -91,7 +91,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /**
      * Reverses an undo for the given domain object. This function returns false
      * if there are no changes to redo, and true if otherwise. This will fire an
-     * event as defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
+     * event as defined by thethe emitter _undoRedoChangeAppliedEventEmitter
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
@@ -169,7 +169,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     /**
      * Clears the change history. This does not reverse any of the changes
      * applied from applyChange() or redoChange(). This will fire an event as
-     * defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
+     * defined by the the emitter _undoRedoChangeAppliedEventEmitter
      */
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */

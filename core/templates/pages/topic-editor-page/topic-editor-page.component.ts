@@ -42,6 +42,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('topicEditorPage', [
   'UrlInterpolationService', function(
       UrlInterpolationService) {
@@ -57,15 +59,16 @@ angular.module('oppia').directive('topicEditorPage', [
         'ContextService', 'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-        'TOPIC_VIEWER_URL_TEMPLATE',
+        'EVENT_TOPIC_REINITIALIZED', 'TOPIC_VIEWER_URL_TEMPLATE',
         function($scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED,
-            TOPIC_VIEWER_URL_TEMPLATE) {
+            EVENT_TOPIC_REINITIALIZED, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+
+          ctrl.directiveSubscriptions = new Subscription();
+
           ctrl.getActiveTabName = function() {
             return TopicEditorRoutingService.getActiveTabName();
           };
@@ -171,7 +174,6 @@ angular.module('oppia').directive('topicEditorPage', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
-
           ctrl.$onInit = function() {
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
             PageTitleService.setPageTitleForMobileView('Topic Editor');
@@ -181,8 +183,15 @@ angular.module('oppia').directive('topicEditorPage', [
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
             $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, setPageTitle);
+            ctrl.directiveSubscriptions.add(
+              () => {
+                setPageTitle();
+              }
+            );
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
