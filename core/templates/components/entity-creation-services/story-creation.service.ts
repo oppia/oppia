@@ -63,6 +63,7 @@ angular.module('oppia').factory('StoryCreationService', [
           let postData = {
             title: newlyCreatedStory.title,
             description: newlyCreatedStory.description,
+            story_url_fragment: newlyCreatedStory.urlFragment,
             thumbnailBgColor: bgColor,
             filename: imagesData[0].filename
           };

@@ -70,6 +70,9 @@ class StoryModel(base_models.VersionedModel):
         ndb.IntegerProperty(required=True, indexed=True))
     # The topic id to which the story belongs.
     corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
+    # The url fragment for the story.
+    # TODO(#10140): Change url_fragment to a required field.
+    url_fragment = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -120,6 +123,22 @@ class StoryModel(base_models.VersionedModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_by_url_fragment(cls, url_fragment):
+        """Gets StoryModel by url_fragment. Returns None if the story with
+        name url_fragment doesn't exist.
+
+        Args:
+            url_fragment: str. The url fragment of the story.
+
+        Returns:
+            StoryModel|None. The story model of the story or None if not
+            found.
+        """
+        return StoryModel.query().filter(
+            cls.url_fragment == url_fragment).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
 
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -197,6 +216,8 @@ class StorySummaryModel(base_models.BaseModel):
     # The thumbnail background color of the story.
     thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
+    # The url fragment for the story.
+    url_fragment = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():

@@ -194,7 +194,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'skill_ids': ['skill_id_2'],
                 'id': 2,
                 'thumbnail_filename': None,
-                'title': 'Subtopic Title 2'
+                'title': 'Subtopic Title 2',
+                'url_fragment': ''
             }
 
             expected_dict = {
@@ -223,7 +224,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'skill_ids': ['skill_id_1'],
                 'id': 1,
                 'thumbnail_filename': None,
-                'title': 'Subtopic Title'
+                'title': 'Subtopic Title',
+                'url_fragment': ''
             }
 
             expected_dict = {

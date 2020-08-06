@@ -370,6 +370,10 @@ def apply_change_list(topic_id, change_list):
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_subtopic_thumbnail_bg_color(
                         change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT):
+                    topic.update_subtopic_url_fragment(
+                        change.subtopic_id, change.new_value)
 
             elif (
                     change.cmd ==
@@ -415,6 +419,10 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
+    if not topic.are_subtopic_url_fragments_unique():
+        raise Exception(
+            'Subtopic url fragments are not unique across '
+            'subtopics in the topic')
 
     # Topic model cannot be None as topic is passed as parameter here and that
     # is only possible if a topic model with that topic id exists. Also this is

@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import re
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -54,6 +55,7 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
+SUBTOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
@@ -116,7 +118,8 @@ class TopicChange(change_domain.BaseChange):
     SUBTOPIC_PROPERTIES = (
         SUBTOPIC_PROPERTY_TITLE,
         SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
-        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR)
+        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+        SUBTOPIC_PROPERTY_URL_FRAGMENT)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -313,7 +316,7 @@ class Subtopic(python_utils.OBJECT):
 
     def __init__(
             self, subtopic_id, title, skill_ids, thumbnail_filename,
-            thumbnail_bg_color):
+            thumbnail_bg_color, url_fragment):
         """Constructs a Subtopic domain object.
 
         Args:
@@ -325,12 +328,15 @@ class Subtopic(python_utils.OBJECT):
                 subtopic.
             thumbnail_bg_color: str|None. The thumbnail background color for
                 the subtopic.
+            url_fragment: str. The url fragment for the subtopic.
         """
         self.id = subtopic_id
         self.title = title
         self.skill_ids = skill_ids
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.url_fragment = url_fragment
+
 
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
@@ -343,7 +349,8 @@ class Subtopic(python_utils.OBJECT):
             'title': self.title,
             'skill_ids': self.skill_ids,
             'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'url_fragment': self.url_fragment
         }
 
     @classmethod
@@ -359,7 +366,7 @@ class Subtopic(python_utils.OBJECT):
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
             subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'],
-            subtopic_dict['thumbnail_bg_color'])
+            subtopic_dict['thumbnail_bg_color'], subtopic_dict['url_fragment'])
         return subtopic
 
     @classmethod
@@ -374,7 +381,7 @@ class Subtopic(python_utils.OBJECT):
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None)
+        return cls(subtopic_id, title, [], None, None, '')
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -966,6 +973,23 @@ class Topic(python_utils.OBJECT):
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
 
     @classmethod
+    def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
+        """Converts old Subtopic schema to the modern v3 schema. v3 schema
+        introduces the url_fragment field.
+
+        Args:
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        subtopic_title = re.sub('[^a-z]+', '', subtopic_dict['title'])
+        subtopic_dict['url_fragment'] = (
+            subtopic_title[:constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT])
+        return subtopic_dict
+
+    @classmethod
     def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic_dict):
         """Converts old Subtopic schema to the modern v2 schema. v2 schema
         introduces the thumbnail_filename and thumbnail_bg_color field.
@@ -1240,6 +1264,22 @@ class Topic(python_utils.OBJECT):
         self.subtopics[subtopic_index].thumbnail_filename = (
             new_thumbnail_filename)
 
+    def update_subtopic_url_fragment(self, subtopic_id, new_url_fragment):
+        """Updates the url fragment of the subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_url_fragment: str. The new url fragment of the subtopic.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        utils.require_valid_url_fragment(
+            new_url_fragment, 'Subtopic Url Fragment',
+            constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+        self.subtopics[subtopic_index].url_fragment = new_url_fragment
+
     def update_subtopic_thumbnail_bg_color(
             self, subtopic_id, new_thumbnail_bg_color):
         """Updates the thumbnail background color property of the new subtopic.
@@ -1409,6 +1449,18 @@ class Topic(python_utils.OBJECT):
 
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
+
+    def are_subtopic_url_fragments_unique(self):
+        """Checks if all the subtopic url fragments are unique across the
+        topic.
+
+        Returns:
+            bool. Whether the subtopic url fragments are unique in the topic.
+        """
+        url_fragments_list = [
+            subtopic.url_fragment for subtopic in self.subtopics]
+        url_fragments_set = set(url_fragments_list)
+        return len(url_fragments_list) == len(url_fragments_set)
 
 
 class TopicSummary(python_utils.OBJECT):

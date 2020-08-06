@@ -61,7 +61,8 @@ describe('Read only topic object Factory', () => {
         id: 1,
         title: 'subtopic_name',
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74'
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
       }],
       degrees_of_mastery: {
         skill_id_1: 0.5,

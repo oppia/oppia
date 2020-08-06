@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """Constants that are relevant to the validation of new structures for Android
-app.
+app. This file should only contain validations which affect UI display and
+general functionality on Android.
 """
 
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
