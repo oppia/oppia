@@ -1206,6 +1206,20 @@ angular-route@^1.7.9:
   resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.8.0.tgz#cb8066c5d34284ffd6a15ac7be1b3d51c5ad7bb2"
   integrity sha512-ORvXAdVfCCA6XFwyjSkVQFFGufj0mNGiCvBR93Qsii8+7t/6Ioy6wheUoCj1x4NWUv7hAq3nYYGCVO6QEKb1BQ==
 
+angular-ui-sortable@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/angular-ui-sortable/-/angular-ui-sortable-0.19.0.tgz#4ac4391fc4d4de57110db4b5d31a7c198d314fd0"
+  integrity sha512-u/uc981Nzg4XN1bMU9qKleMTSt7F1XjMWnyGw6gxPLIeQeLZm8jWNy7tj8y2r2HmvzXFbQVq2z6rObznFKAekQ==
+  dependencies:
+    angular ">=1.2.x"
+    jquery ">=3.1.x"
+    jquery-ui-dist ">=1.12.x"
+
+angular-ui-validate@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/angular-ui-validate/-/angular-ui-validate-1.2.3.tgz#beb141f64409bfddba65c12f7581b893ddf59321"
+  integrity sha1-vrFB9kQJv926ZcEvdYG4k931kyE=
+
 angular2-template-loader@0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/angular2-template-loader/-/angular2-template-loader-0.6.2.tgz#c0d44e90fff0fac95e8b23f043acda7fd1c51d7c"
@@ -1213,7 +1227,7 @@ angular2-template-loader@0.6.2:
   dependencies:
     loader-utils "^0.2.15"
 
-angular@^1.7.9:
+angular@>=1.2.x, angular@^1.7.9:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.0.tgz#b1ec179887869215cab6dfd0df2e42caa65b1b51"
   integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
@@ -5967,7 +5981,12 @@ jpeg-js@^0.3.2:
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.3.7.tgz#471a89d06011640592d314158608690172b1028d"
   integrity sha512-9IXdWudL61npZjvLuVe/ktHiA41iE8qFyLB+4VDTblEsWBzeg8WQTlktdUK4CdncUqtUgUg0bbOmTE2bKBKaBQ==
 
-jquery@^3.4.0:
+jquery-ui-dist@>=1.12.x:
+  version "1.12.1"
+  resolved "https://registry.yarnpkg.com/jquery-ui-dist/-/jquery-ui-dist-1.12.1.tgz#5c0815d3cc6f90ff5faaf5b268a6e23b4ca904fa"
+  integrity sha1-XAgV08xvkP9fqvWyaKbiO0ypBPo=
+
+jquery@>=3.1.x, jquery@^3.4.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.1.tgz#d7b4d08e1bfdb86ad2f1a3d039ea17304717abb5"
   integrity sha512-XwIBPqcMn57FxfT+Go5pzySnm4KWkT1Tv7gjrpT1srtf8Weynl6R273VJ5GjkRb51IzMp5nbaPjJXMWeju2MKg==

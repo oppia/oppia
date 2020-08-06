@@ -463,16 +463,6 @@
         "rootDirPrefix": "ui-codemirror-",
         "targetDir": "ui-codemirror-5d04fa"
       },
-      "uiSortable": {
-        "version": "0.19.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.19.0.zip",
-        "rootDirPrefix": "ui-sortable-src",
-        "targetDirPrefix": "ui-sortable-",
-        "bundle": {
-          "js": ["src/sortable.js"]
-        }
-      },
       "uiTree": {
         "version": "",
         "downloadFormat": "zip",
@@ -481,16 +471,6 @@
         "targetDirPrefix": "ui-tree-2.22.6",
         "bundle": {
           "css": ["dist/angular-ui-tree.min.css"]
-        }
-      },
-      "uiValidate": {
-        "version": "1.2.3",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-validate/archive/1.2.3.zip",
-        "rootDirPrefix": "ui-validate-",
-        "targetDirPrefix": "ui-validate-",
-        "bundle": {
-          "js": ["src/validate.js"]
         }
       }
     },

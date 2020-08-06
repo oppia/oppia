@@ -19,6 +19,8 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/dnd-lists.import';
 
 angular.module('oppia', [
@@ -26,7 +28,7 @@ angular.module('oppia', [
   require('angular-cookies'), 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable',
-  'ui.validate'
+  uiValidate
 ]);
 
 import { NgModule, StaticProvider } from '@angular/core';

@@ -19,13 +19,15 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
 import ngInfiniteScroll from 'ng-infinite-scroll';
 
 angular.module('oppia', [
   'headroom', ngInfiniteScroll, 'ngAnimate',
   require('angular-cookies'), 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.validate'
+  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
 import { NgModule, StaticProvider } from '@angular/core';

@@ -119,6 +119,8 @@
     "angular": "^1.7.9",
     "angular-cookies": "^1.7.9",
     "angular-route": "^1.7.9",
+    "angular-ui-sortable": "^0.19.0",
+    "angular-ui-validate": "^1.2.3",
     "bootstrap": "^4.3.1",
     "cropperjs": "^1.5.6",
     "d3": "^5.9.2",

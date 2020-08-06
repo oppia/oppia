@@ -19,6 +19,8 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
 import 'third-party-imports/ui-tree.import';
@@ -28,7 +30,7 @@ angular.module('oppia', [
   'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
-  'ui.validate', 'ui-leaflet'
+  uiValidate, 'ui-leaflet'
 ]);
 
 import { NgModule, StaticProvider } from '@angular/core';
