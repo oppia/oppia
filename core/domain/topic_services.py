@@ -658,9 +658,11 @@ def unpublish_story(topic_id, story_id, committer_id):
         change_list)
     generate_topic_summary(topic.id)
 
-    # Delete corresponding exploration opportunities.
+    # Delete corresponding exploration opportunities and reject associated
+    # translation suggestions.
     exp_ids = story.story_contents.get_all_linked_exp_ids()
     opportunity_services.delete_exploration_opportunities(exp_ids)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def delete_canonical_story(user_id, topic_id, story_id):
@@ -957,8 +959,14 @@ def unpublish_topic(topic_id, committer_id):
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
 
-    (opportunity_services
-        .delete_exploration_opportunities_corresponding_to_topic(topic_id))
+    # Delete the exploration opportunities associated with the topic and reject
+    # the corresponding translation suggestions.
+    exp_ids = (
+        opportunity_services
+        .get_exp_ids_corresponding_to_exploration_opportunity_topic(topic_id)
+    )
+    opportunity_services.delete_exploration_opportunities(exp_ids)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on opportunity models."""
+"""Services for opportunity models to be ."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -26,7 +26,6 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import question_fetchers
 from core.domain import story_fetchers
-from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
@@ -331,8 +330,7 @@ def update_exploration_voiceover_opportunities(
 
 def delete_exploration_opportunities(exp_ids):
     """Deletes the ExplorationOpportunitySummaryModel models corresponding to
-    the given exp_ids and rejects suggestions matching each opportunity's
-    exploration.
+    the given exp_ids.
 
     Args:
         exp_ids: list(str). A list of exploration IDs whose opportunity summary
@@ -346,14 +344,11 @@ def delete_exploration_opportunities(exp_ids):
         if model is not None]
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         exp_opportunity_models_to_be_deleted)
-    exp_ids = [model.id for model in exp_opportunity_models_to_be_deleted]
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def delete_exploration_opportunities_corresponding_to_topic(topic_id):
     """Deletes the ExplorationOpportunitySummaryModel models which corresponds
-    to the given topic_id and rejects suggestions matching each opportunity's
-    exploration.
+    to the given topic_id.
 
     Args:
         topic_id: str. The ID of the topic.
@@ -363,8 +358,22 @@ def delete_exploration_opportunities_corresponding_to_topic(topic_id):
             topic_id))
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         exp_opportunity_models)
-    exp_ids = [model.id for model in exp_opportunity_models]
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+
+
+def get_exp_ids_corresponding_to_exploration_opportunity_topic(topic_id):
+    """Returns the exploration IDs corresponding to the supplied topic ID and
+    associated ExplorationOpportunitySummaryModels.
+
+    Args:
+        topic_id: str. The ID of the topic.
+
+    Returns:
+        list(str): The exploration IDs.
+    """
+    exp_opportunity_models = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get_by_topic(
+            topic_id))
+    return [model.id for model in exp_opportunity_models if model is not None]
 
 
 def update_exploration_opportunities(old_story, new_story):
