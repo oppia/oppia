@@ -2350,7 +2350,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
+            'story-one')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -5956,7 +5957,8 @@ class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(2)]
 
         for story in stories:
@@ -8239,7 +8241,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for index, story in enumerate(stories):
@@ -8441,7 +8444,8 @@ class StorySnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8608,7 +8612,8 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8727,7 +8732,8 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for story in stories:
@@ -8953,7 +8959,8 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(3)]
 
         for index, story in enumerate(stories):
@@ -9493,7 +9500,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -9790,7 +9798,8 @@ class TopicSnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -9984,7 +9993,8 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10146,7 +10156,8 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10323,7 +10334,8 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10529,7 +10541,8 @@ class TopicRightsSnapshotContentModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10689,7 +10702,8 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -10974,7 +10988,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11140,12 +11155,12 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for subtopic count check of Topi'
-                'cSummaryModel\', [u"Entity id 0: Subtopic count: 10 does not '
-                'match the total number of subtopics in topic model: [{u\'thum'
-                'bnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
-                'u\'1\'], u\'id\': 1, u\'thumbnail_filename\': None, u\'title'
-                '\': u\'subtopic1\'}] "]]'
+                u'[u\'failed validation check for subtopic count check of '
+                'TopicSummaryModel\', [u"Entity id 0: Subtopic count: 10 '
+                'does not match the total number of subtopics in topic model: '
+                '[{u\'thumbnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
+                'u\'1\'], u\'title\': u\'subtopic1\', u\'url_fragment\': u\'\','
+                ' u\'thumbnail_filename\': None, u\'id\': 1}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -11199,7 +11214,8 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11412,7 +11428,8 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11620,7 +11637,8 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -11789,7 +11807,8 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             '%s' % i,
             'title %d',
             'description %d' % i,
-            '%s' % (python_utils.divide(i, 2))
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(6)]
 
         for story in stories:
@@ -12200,8 +12219,8 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(
@@ -12390,8 +12409,8 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             intro_state = exploration.states['Introduction']
             end_state = exploration.states['End']
 
-            intro_state.update_interaction_id('TextInput')
-            end_state.update_interaction_id('EndExploration')
+            self.set_interaction_for_state(intro_state, 'TextInput')
+            self.set_interaction_for_state(end_state, 'EndExploration')
 
             default_outcome = state_domain.Outcome(
                 'End', state_domain.SubtitledHtml(
@@ -12581,8 +12600,8 @@ class ExpUserLastPlaythroughModelValidatorTests(
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(
@@ -12740,8 +12759,8 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(
@@ -14076,7 +14095,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             'story',
             'title %d',
             'description %d',
-            '0'
+            '0',
+            'title-z'
         )
 
         story.add_node('node_1', 'Node1')

@@ -36,6 +36,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -53,6 +54,7 @@ import main
 import main_mail
 import main_taskqueue
 import python_utils
+import schema_utils
 import utils
 
 from google.appengine.api import apiproxy_stub
@@ -305,8 +307,8 @@ class TestBase(unittest.TestCase):
                 'labelled_as_correct': True
             },
             'customization_args': {
-                u'rows': 1,
-                u'placeholder': u'Enter text here'
+                u'rows': {u'value': 1},
+                u'placeholder': {u'value': u'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': u'TextInput',
@@ -511,6 +513,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -542,6 +545,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -1129,6 +1133,77 @@ tags: []
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
+    def set_interaction_for_state(self, state, interaction_id):
+        """Sets the interaction_id, sets the fully populated default
+        interaction customization arguments, and increments
+        next_content_id_index as needed.
+
+        Args:
+            state: State. The state domain object to set the interaction for.
+            interaction_id: str. The interaction id to set. Also sets the
+                default customization args for the given interaction id.
+        """
+
+        # We wrap next_content_id_index in a dict so that modifying it in the
+        # inner function modifies the value.
+        next_content_id_index_dict = {
+            'value': state.next_content_id_index
+        }
+
+        def traverse_schema_and_assign_content_ids(value, schema, contentId):
+            """Generates content_id from recursively traversing the schema, and
+            assigning to the current value.
+
+            Args:
+                value: *. The current traversed value in customization
+                    arguments.
+                schema: dict. The current traversed schema.
+                contentId: str. The content_id generated so far.
+            """
+            is_subtitled_html_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+            is_subtitled_unicode_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+
+            if is_subtitled_html_spec or is_subtitled_unicode_spec:
+                value['content_id'] = '%s_%i' % (
+                    contentId, next_content_id_index_dict['value'])
+                next_content_id_index_dict['value'] += 1
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
+                for x in value:
+                    traverse_schema_and_assign_content_ids(
+                        x, schema['items'], contentId)
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+                for schema_property in schema['properties']:
+                    traverse_schema_and_assign_content_ids(
+                        x[schema_property.name],
+                        schema_property['schema'],
+                        '%s_%s' % (contentId, schema_property.name)
+                    )
+
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id)
+        ca_specs = interaction.customization_arg_specs
+        customization_args = {}
+
+        for ca_spec in ca_specs:
+            ca_name = ca_spec.name
+            ca_value = ca_spec.default_value
+            traverse_schema_and_assign_content_ids(
+                ca_value,
+                ca_spec.schema,
+                'ca_%s' % ca_name
+            )
+            customization_args[ca_name] = {'value': ca_value}
+
+        state.update_interaction_id(interaction_id)
+        state.update_interaction_customization_args(customization_args)
+        state.update_next_content_id_index(next_content_id_index_dict['value'])
+
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
@@ -1153,15 +1228,16 @@ tags: []
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
             language_code=language_code)
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            interaction_id)
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], interaction_id)
+
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
-            end_state.update_interaction_id('EndExploration')
+            self.set_interaction_for_state(end_state, 'EndExploration')
             end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
@@ -1210,10 +1286,11 @@ tags: []
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
+            self.set_interaction_for_state(
+                from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
@@ -1307,6 +1384,66 @@ tags: []
             blurb='',
             author_notes='',
             states_schema_version=34,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def save_new_exp_with_states_schema_v35(self, exp_id, user_id, states_dict):
+        """Saves a new default exploration with a default version 35 states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=35,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=states_dict,
             param_specs={},
@@ -1491,7 +1628,8 @@ tags: []
     def save_new_story(
             self, story_id, owner_id, corresponding_topic_id,
             title='Title', description='Description', notes='Notes',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='title'):
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -1509,16 +1647,18 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The url fragment of the story.
 
         Returns:
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, description, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id, url_fragment)
         story.title = title
         story.description = description
         story.notes = notes
         story.language_code = language_code
+        story.url_fragment = url_fragment
         story_services.save_new_story(owner_id, story)
         return story
 
@@ -2311,7 +2451,7 @@ class AppEngineTestBase(TestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        state.interaction.id = 'TextInput'
+        state.update_interaction_id('TextInput')
         solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -2329,10 +2469,16 @@ class AppEngineTestBase(TestBase):
             state.interaction.id, solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.interaction.customization_args = {
-            'placeholder': 'Enter text here',
-            'rows': 1
-        }
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder',
+                    'unicode_str': 'Enter text here'
+                }
+            },
+            'rows': {'value': 1}
+        })
+        state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state

@@ -80,6 +80,7 @@ describe('Sidebar state name controller', function() {
           }
         },
         interaction: {
+          id: null,
           answer_groups: [],
           default_outcome: {
             dest: 'Second State',
@@ -112,6 +113,7 @@ describe('Sidebar state name controller', function() {
           }
         },
         interaction: {
+          id: null,
           answer_groups: [],
           default_outcome: {
             dest: 'Second State',
@@ -144,6 +146,7 @@ describe('Sidebar state name controller', function() {
           }
         },
         interaction: {
+          id: null,
           answer_groups: [],
           default_outcome: {
             dest: 'Second State',

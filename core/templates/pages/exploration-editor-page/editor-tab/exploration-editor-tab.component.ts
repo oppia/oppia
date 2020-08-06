@@ -182,6 +182,12 @@ angular.module('oppia').component('explorationEditorTab', {
           angular.copy(displayedValue));
       };
 
+      ctrl.saveNextContentIdIndex = function(displayedValue) {
+        ExplorationStatesService.saveNextContentIdIndex(
+          StateEditorService.getActiveStateName(),
+          angular.copy(displayedValue));
+      };
+
       ctrl.saveSolution = function(displayedValue) {
         ExplorationStatesService.saveSolution(
           StateEditorService.getActiveStateName(),
