@@ -84,8 +84,11 @@ def try_upgrading_draft_to_exp_version(
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:
             draft_change_list = conversion_fn(draft_change_list)
-        except Exception:
-            return
+        except Exception as error:
+            if str(error) == 'Conversion cannot be completed.':
+                return
+            # A blank raise will raise the last exception.
+            raise
         upgrade_times += 1
     return draft_change_list
 
@@ -167,7 +170,7 @@ def extract_html_from_draft_change_list(draft_change_list):
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
-     @classmethod
+    @classmethod
     def _convert_states_v36_dict_to_v37_dict(cls, draft_change_list):
         """Converts draft change list from version 36 to 37.
 
@@ -191,6 +194,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             rule_inputs[rule_type] = []
                         rule_inputs[rule_type].append(
                             rule_spec_dict['inputs'])
+                    del answer_group_dict['rule_specs']
                     answer_group_dict['rule_input_translations_mapping'] = {}
                     answer_group_dict['rule_inputs'] = rule_inputs
 
@@ -343,7 +347,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 new_value = [
                     (state_domain.AnswerGroup.convert_html_in_answer_group(
-                        answer_group, conversion_fn))
+                        answer_group,
+                        conversion_fn,
+                        state_uses_old_rule_spec_schema=True))
                     for answer_group in new_value]
             if new_value is not None:
                 draft_change_list[i] = exp_domain.ExplorationChange({

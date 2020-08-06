@@ -2973,6 +2973,7 @@ class Exploration(python_utils.OBJECT):
                         rule_inputs[rule_type] = []
                     rule_inputs[rule_type].append(
                         rule_spec_dict['inputs'])
+                del answer_group_dicts[i]['rule_specs']
                 answer_group_dicts[i]['rule_input_translations_mapping'] = {}
                 answer_group_dicts[i]['rule_inputs'] = rule_inputs
 
