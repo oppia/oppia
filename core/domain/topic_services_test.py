@@ -1345,9 +1345,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
         with self.assertRaisesRegexp(
-                Exception,
-                'Subtopic url fragments are not unique across subtopics '
-                'in the topic'):
+            Exception,
+            'Subtopic url fragments are not unique across subtopics '
+            'in the topic'):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update url fragment')
 

@@ -1169,7 +1169,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.story.rearrange_node_in_story(0, -1)
-    
+
     def test_update_url_fragment(self):
         self.assertEqual(self.story.url_fragment, 'title')
         self.story.update_url_fragment('updated-title')
