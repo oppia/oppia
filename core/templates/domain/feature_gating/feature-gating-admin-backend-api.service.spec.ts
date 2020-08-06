@@ -27,7 +27,7 @@ import { FeatureGatingAdminBackendApiService } from
 import { PlatformParameterRuleObjectFactory } from
   'domain/feature_gating/PlatformParameterRuleObjectFactory';
 
-fdescribe('FeatureGatingAdminBackendApiService', () => {
+describe('FeatureGatingAdminBackendApiService', () => {
   let featureAdminService: FeatureGatingAdminBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let ruleFactory: PlatformParameterRuleObjectFactory = null;

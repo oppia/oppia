@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview  TODO A service for generating random and unique content_id for
- * SubtitledHtml domain objects.
+ * @fileoverview  A service for retriving feature flags.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -28,8 +27,8 @@ import {
 } from 'domain/feature_gating/FeatureFlagResultsObjectFactory';
 import { FeatureGatingBackendApiService } from
   'domain/feature_gating/feature-gating-backend-api.service';
-import { I18nLanguageCodeService } from './i18n-language-code.service';
-import { WindowRef } from './contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 export enum FeatureNames {
     DummyFeature = 'Dummy_Feature',
@@ -52,24 +51,21 @@ export class FeatureGatingService {
   private static COOKIE_NAME_FOR_SESSION_ID_IN_DEV = 'dev_appserver_login';
 
   private featureFlagResults: FeatureFlagResults = null;
-
-  private currentSessionId: string | null;
+  private _initializedWithError = false;
 
   constructor(
       private clientContextObjectFactory: ClientContextObjectFactory,
       private featureGatingBackendApiService: FeatureGatingBackendApiService,
       private featureFlagResultsObjectFactory: FeatureFlagResultsObjectFactory,
       private i18nLanguageCodeService: I18nLanguageCodeService,
-      private windowRef: WindowRef) {
-    this.currentSessionId = this.getSessionIdFromCookie();
-  }
+      private windowRef: WindowRef) {}
 
   async initialize(): Promise<void> {
     try {
       const item = this.loadSavedResults();
       if (item && this.validateSavedResults(item)) {
         this.featureFlagResults = item.featureFlagResults;
-        console('used results from session storage');
+        this.saveResults(this.featureFlagResults);
       } else {
         this.clearSavedResults();
       }
@@ -77,7 +73,6 @@ export class FeatureGatingService {
       if (!this.featureFlagResults) {
         this.featureFlagResults = await this.loadFeatureFlagsFromServer();
         this.saveResults(this.featureFlagResults);
-        console('used results from server');
       }
 
       console.log(
@@ -85,9 +80,8 @@ export class FeatureGatingService {
         JSON.stringify(this.featureFlagResults.toBackendDict()));
     } catch (err) {
       // If any error, just disable all features.
-      // TODO
-      console.log('loading error!');
       console.error(err);
+      this._initializedWithError = true;
       this.clearSavedResults();
     }
   }
@@ -95,9 +89,34 @@ export class FeatureGatingService {
   isFeatureEnabled(name: FeatureNames): boolean {
     if (this.featureFlagResults) {
       return this.featureFlagResults.isFeatureEnabled(name);
+    } else if (this._initializedWithError) {
+      return false;
     } else {
-      throw new Error('TODO not initialized.');
+      throw new Error('The feature gating service has not been initialized.');
     }
+  }
+
+  get initialzedWithError(): boolean {
+    return this._initializedWithError;
+  }
+
+  detectBrowserType(): string {
+    const ua = this.windowRef.nativeWindow.navigator.userAgent;
+
+    if (ua.includes('edg') || ua.includes('Edge')) {
+      return 'Edge';
+    }
+    if (ua.includes('Chrome')) {
+      return 'Chrome';
+    }
+    if (ua.includes('Firefox')) {
+      return 'Firefox';
+    }
+    if (ua.includes('Safari')) {
+      return 'Safari';
+    }
+
+    return 'Others';
   }
 
   private async loadFeatureFlagsFromServer(): Promise<FeatureFlagResults> {
@@ -105,26 +124,23 @@ export class FeatureGatingService {
     return this.featureGatingBackendApiService.fetchFeatureFlags(context);
   }
 
-  private saveResults(results: FeatureFlagResults) {
-    // TODO: May be useful (mock local storage in test):
-    // https://gist.github.com/wzr1337/b3fe4abcc46588aa8fcb
-    // this.windowRef.sessionStorage
+  private saveResults(results: FeatureFlagResults): void {
     const item = {
       timestamp: this.getCurrentTimestamp(),
-      sessionId: this.currentSessionId,
+      sessionId: this.getSessionIdFromCookie(),
       featureFlagResults: results.toBackendDict(),
     };
+    console.log(`saving at timestamp ${item.timestamp}`);
     this.windowRef.nativeWindow.sessionStorage.setItem(
       FeatureGatingService.SESSION_STORAGE_KEY, JSON.stringify(item));
   }
 
-  private clearSavedResults() {
+  private clearSavedResults(): void {
     this.windowRef.nativeWindow.sessionStorage.removeItem(
       FeatureGatingService.SESSION_STORAGE_KEY);
   }
 
-  private loadSavedResults():
-    FeatureFlagsCacheItem | null {
+  private loadSavedResults(): FeatureFlagsCacheItem | null {
     const savedStr = this.windowRef.nativeWindow.sessionStorage.getItem(
       FeatureGatingService.SESSION_STORAGE_KEY);
     if (savedStr) {
@@ -134,18 +150,19 @@ export class FeatureGatingService {
         sessionId: savedObj.sessionId,
         featureFlagResults: (
           this.featureFlagResultsObjectFactory.createFromBackendDict(
-            savedObj.featureFlags))
+            savedObj.featureFlagResults))
       };
     }
     return null;
   }
 
-  private validateSavedResults(cache: FeatureFlagsCacheItem): boolean {
-    if (this.getCurrentTimestamp() - cache.timestamp >
+  private validateSavedResults(item: FeatureFlagsCacheItem): boolean {
+    console.log(`saved timestamp ${item.timestamp}`);
+    if (this.getCurrentTimestamp() - item.timestamp >
         FeatureGatingService.SESSION_STORAGE_CACHE_TTL) {
       return false;
     }
-    if (this.currentSessionId !== cache.sessionId) {
+    if (this.getSessionIdFromCookie() !== item.sessionId) {
       return false;
     }
     return true;
@@ -178,26 +195,7 @@ export class FeatureGatingService {
   }
 
   private getCurrentTimestamp(): number {
-    return new Date().valueOf();
-  }
-
-  private detectBrowserType(): string {
-    const ua = this.windowRef.nativeWindow.navigator.userAgent;
-
-    if (ua.includes('edg') || ua.includes('Edge')) {
-      return 'Edge';
-    }
-    if (ua.includes('Chrome')) {
-      return 'Chrome';
-    }
-    if (ua.includes('Firefox')) {
-      return 'Firefox';
-    }
-    if (ua.includes('Safari')) {
-      return 'Safari';
-    }
-
-    return 'Others';
+    return Date.now();
   }
 }
 

@@ -27,9 +27,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
     // minimum limit, for all browsers, per hostname, that can be stored in
     // sessionStorage and 100kB is the max size limit for uploaded images, hence
     // the limit below.
-    // Since FeatureGatingService is also using sessionStorage for result
-    // caching, the MAX_IMAGES_STORABLE is reduced by one to reserve the space.
-    var MAX_IMAGES_STORABLE = 5 * 1024 / 100 - 1;
+    var MAX_IMAGES_STORABLE = 5 * 1024 / 100;
     var thumbnailBgColor = null;
 
     return {

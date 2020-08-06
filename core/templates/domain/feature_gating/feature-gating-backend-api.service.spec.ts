@@ -28,7 +28,7 @@ import { FeatureGatingDomainConstants } from
 import { FeatureGatingBackendApiService } from
   'domain/feature_gating/feature-gating-backend-api.service';
 
-fdescribe('FeatureGatingBackendApiService', () => {
+describe('FeatureGatingBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let featureGatingBackendApiService: FeatureGatingBackendApiService = null;
   let clientContextObjectFactory: ClientContextObjectFactory = null;
