@@ -127,7 +127,7 @@ jobs:
       - run:
           name: Run e2e navigation test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --suite="navigation"
           # Provide a longer time period for this first test (which omits the
           # --skip-build flag), since the webpack build process itself can take
           # up to 10 minutes. If this is not done, then the test may stall due
