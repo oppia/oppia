@@ -115,7 +115,8 @@ export class ExtractImageFilenamesFromStateService {
         let customizationArgsHtml = '';
         (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
           .choices.value.forEach(function(value) {
-            customizationArgsHtml = customizationArgsHtml.concat(value);
+            customizationArgsHtml = (
+              customizationArgsHtml.concat(value.getHtml()));
           });
         _allHtmlInTheState.push(customizationArgsHtml);
       }

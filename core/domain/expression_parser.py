@@ -95,7 +95,7 @@ def is_algebraic(expression):
         letter or greek symbol name.
 
     Raises:
-        Exception: Invalid syntax.
+        Exception. Invalid syntax.
     """
     # This raises an exception if the syntax is invalid.
     Parser().parse(expression)
@@ -117,7 +117,7 @@ def tokenize(expression):
         expression.
 
     Raises:
-        Exception: Invalid token.
+        Exception. Invalid token.
     """
     expression = expression.replace(' ', '')
 
@@ -188,7 +188,7 @@ class Token(python_utils.OBJECT):
             text: str. String representation of the token.
 
         Raises:
-            Exception: Invalid token.
+            Exception. Invalid token.
         """
         self.text = text
 
@@ -410,9 +410,9 @@ class Parser(python_utils.OBJECT):
             Node. Root node of the generated parse tree.
 
         Raises:
-            Exception: Invalid syntax: Unexpected end of expression.
-            Exception: Invalid character.
-            Exception: Invalid bracket pairing.
+            Exception. Invalid syntax: Unexpected end of expression.
+            Exception. Invalid character.
+            Exception. Invalid bracket pairing.
         """
         # Expression should not contain any invalid characters.
         for character in expression:
@@ -518,7 +518,7 @@ class Parser(python_utils.OBJECT):
             Node. Root node of the generated parse tree.
 
         Raises:
-            Exception: Invalid token.
+            Exception. Invalid token.
         """
         token = self._get_next_token(token_list)
         if token.category == _TOKEN_CATEGORY_IDENTIFIER:
@@ -552,7 +552,7 @@ class Parser(python_utils.OBJECT):
             Token. Token at the next position.
 
         Raises:
-            Exception: Invalid syntax: Unexpected end of expression.
+            Exception. Invalid syntax: Unexpected end of expression.
         """
         if self._next_token_index < len(token_list):
             token = token_list[self._next_token_index]

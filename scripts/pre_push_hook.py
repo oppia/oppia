@@ -167,10 +167,10 @@ def git_diff_name_status(left, right, diff_filter=''):
         diff_filter: arguments given to --diff-filter (ACMRTD...)
 
     Returns:
-        List of FileDiffs (tuple with name/status)
+        list. List of FileDiffs (tuple with name/status).
 
     Raises:
-        ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
@@ -207,11 +207,11 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
             as local branch.
 
     Returns:
-        List of file names that are modified, changed, renamed or added
-        but not deleted
+        list(str). List of file names that are modified, changed, renamed or
+        added but not deleted.
 
     Raises:
-        ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
@@ -233,7 +233,7 @@ def get_parent_branch_name_for_diff():
     """Returns remote branch name against which the diff has to be checked.
 
     Returns:
-        str: The name of the remote branch.
+        str. The name of the remote branch.
     """
     if common.is_current_branch_a_hotfix_branch():
         return 'release-%s' % common.get_current_release_version_number(
@@ -249,7 +249,7 @@ def collect_files_being_pushed(ref_list, remote):
         remote: the remote being pushed to
 
     Returns:
-        dict: Dict mapping branch names to 2-tuples of the form (list of
+        dict. Dict mapping branch names to 2-tuples of the form (list of
         changed files, list of files to lint).
     """
     if not ref_list:
@@ -326,15 +326,21 @@ def install_hook():
     It ensures that oppia/ is the root folder.
 
     Raises:
-        ValueError if chmod command fails.
+        ValueError. Raise ValueError if chmod command fails.
     """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
     chmod_cmd = ['chmod', '+x', pre_push_file]
-    if os.path.islink(pre_push_file):
+    file_is_symlink = os.path.islink(pre_push_file)
+    file_exists = os.path.exists(pre_push_file)
+    if file_is_symlink and file_exists:
         python_utils.PRINT('Symlink already exists')
     else:
+        # If its a broken symlink, delete it.
+        if file_is_symlink and not file_exists:
+            os.unlink(pre_push_file)
+            python_utils.PRINT('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(__file__), pre_push_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')

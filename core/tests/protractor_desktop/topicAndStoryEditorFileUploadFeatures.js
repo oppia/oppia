@@ -95,7 +95,8 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.changeTopicDescription('Topic Description');
     await topicEditorPage.saveTopic('Changed topic name and description.');
     await topicEditorPage.addSubtopic(
-      'Subtopic 1', '../data/test_svg.svg', 'Subtopic1 content');
+      'Subtopic 1', 'subtopic-one', '../data/test_svg.svg',
+      'Subtopic1 content');
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToSubtopicWithIndex(0);
     await topicEditorPage.changeSubtopicTitle('Modified Title');
@@ -130,7 +131,8 @@ describe('Topic editor functionality', function() {
 
     await topicEditorPage.expectNumberOfStoriesToBe(0);
     await topicEditorPage.createStory(
-      'Story Title', 'Story description', '../data/test_svg.svg');
+      'Story Title', 'tasefuf-one', 'Story description',
+      '../data/test_svg.svg');
     await storyEditorPage.returnToTopic();
 
     await topicEditorPage.expectNumberOfStoriesToBe(1);
@@ -216,28 +218,31 @@ describe('Chapter editor functionality', function() {
     await topicEditorPage.expectTopicDescriptionToBe('Topic Description');
     await topicEditorPage.saveTopic('Changed topic name and description.');
     await topicEditorPage.createStory(
-      'Story 0', 'Story description', '../data/test_svg.svg');
+      'Story 0', 'tasefuf-two', 'Story description', '../data/test_svg.svg');
     await storyEditorPage.submitStoryThumbnail('../data/test2_svg.svg', true);
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await storyEditorPage.createNewChapter(
       'Chapter 1', dummyExplorationIds[0], '../data/test_svg.svg');
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
     await storyEditorPage.submitChapterThumbnail(
       '../data/test2_svg.svg', true);
     expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
+    await storyEditorPage.expectChapterExplorationIdToBe(
+      dummyExplorationIds[0]);
     await storyEditorPage.changeNodeOutline(
       await forms.toRichText('First outline'));
     await storyEditorPage.expectNodeOutlineToMatch('First outline');
-    await storyEditorPage.expectChapterExplorationIdToBe(
-      dummyExplorationIds[0]);
     await storyEditorPage.saveStory('First save');
     // Check if the thumbnail images persist on reload.
     await browser.refresh();
     await general.scrollToTop();
+    await storyEditorPage.navigateToStoryEditorTab();
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
     await general.scrollToTop();
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
     expect(await storyEditorPage.getChapterThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
   });

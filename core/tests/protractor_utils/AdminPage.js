@@ -73,6 +73,24 @@ var AdminPage = function() {
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
 
+  // Adding a new community reviewer.
+  var addReviewerName = element(by.css(
+    '.protractor-test-add-reviewer-username'));
+  var selectReviewerRole = element(by.css(
+    '.protractor-test-select-reviewer-role'));
+  var addReviewerFormSubmitButton = element(by.css(
+    '.protractor-test-add-reviewer-form-submit-button'));
+
+  // Viewing community reviewers by role.
+  var reviewerMethodDropdown = element(by.css(
+    '.protractor-test-reviewer-role-method'));
+  var reviewerRoleValueOption = element(by.css(
+    '.protractor-test-reviewer-role-value'));
+  var viewReviewerRoleButton = element(by.css(
+    '.protractor-test-view-reviewer-role-button'));
+  var reviewerUsernamesResult = element(by.css(
+    '.protractor-test-reviewer-roles-result'));
+
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
