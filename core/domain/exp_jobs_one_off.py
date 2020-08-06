@@ -276,7 +276,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if item.states_schema_version == current_state_schema_version - 1:
             try:
                 conversion_fn = getattr(
-                     exp_domain.Exploration,
+                    exp_domain.Exploration,
                     '_convert_v%i_dict_to_v%i_dict' % (
                         current_state_schema_version - 1,
                         current_state_schema_version)
