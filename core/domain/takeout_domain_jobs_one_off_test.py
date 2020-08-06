@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
+
 from core.domain import takeout_domain_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
@@ -52,6 +54,13 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        stringified_output = (
+            takeout_domain_jobs_one_off
+            .SnapshotMetadataCommitMsgMigrationOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
 
     def test_indexing_fails(self):
         """Ensures the indexing does not work without the one-off-job."""
@@ -93,10 +102,35 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
         ).fetch()
         self.assertEqual(len(queried_models), 1)
 
-        self._run_one_off_job()
+        output = self._run_one_off_job()
+
+        # Ensure valid output.
+        self.assertEqual(output, [['SUCCESS', 2]])
 
         # Ensure valid querying on commit_message.
         queried_models = model_class.query(
             model_class.commit_message == 'test1').fetch()
         self.assertEqual(len(queried_models), 1)
         self.assertEqual(queried_models[0].id, 'model_id-1')
+
+    def test_exception_thrown_with_failed_put(self):
+        """Ensures that an exception is thrown when a put fails while
+        performing the one-off-job.
+        """
+        model_class = config_models.ConfigPropertySnapshotMetadataModel
+
+        def replacement_put(*args, **kwargs):
+            raise Exception('Failed to put.')
+
+        model_class(
+            id='model_id-1', committer_id='committer_id', commit_type='create',
+            commit_message='test1').put()
+
+        with self.swap(model_class, 'put', replacement_put):
+            output = self._run_one_off_job()
+            self.assertEqual(output, [['FAILURE', [
+                'ConfigPropertySnapshotMetadataModel with id model_id-1 ' +
+                'failed with error: Failed to put.',
+                'ConfigPropertySnapshotMetadataModel with id ' +
+                'oppia_csrf_secret-1 failed with error: Failed to put.'
+            ]]])
