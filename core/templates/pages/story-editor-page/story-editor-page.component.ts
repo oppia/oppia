@@ -209,6 +209,7 @@ angular.module('oppia').component('storyEditorPage', {
         ctrl.directiveSubscriptions.add(
           UndoRedoService.onUndoRedoChangeApplied.subscribe(
             () => {
+              console.log('Caught: undoRedoChangeApplied in story-editor-page');
               _initPage();
             }
           )

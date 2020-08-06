@@ -35,6 +35,7 @@ angular.module('oppia').factory('BaseUndoRedoService', [
     this._undoneChanges = [];
 
     var _dispatchMutation = function() {
+      console.log('Emitted: UndoRedoChangeApplied in UndoRedoChangeApplied');
       _undoRedoChangeAppliedEventEmitter.emit();
     };
     var _applyChange = function(changeObject, domainObject) {
