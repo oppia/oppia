@@ -110,14 +110,16 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        state1.update_interaction_id('DragAndDropSortInput')
-        state2.update_interaction_id('DragAndDropSortInput')
 
         customization_args_dict1 = {
-            'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_list1 = [{
@@ -141,10 +143,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_list2 = [{
@@ -208,25 +214,30 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state1.update_interaction_id('DragAndDropSortInput')
         state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
         # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
         job_id = (
-            interaction_jobs_one_off
-            .DragAndDropSortInputInteractionOneOffJob.create_new())
+            interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
+
         actual_output = (
-            interaction_jobs_one_off
-            .DragAndDropSortInputInteractionOneOffJob.get_output(job_id))
+            interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
         self.assertEqual(actual_output, [])
 
+        state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(2)
         state2.update_interaction_answer_groups(answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -234,15 +245,16 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # Start DragAndDropSortInputInteractionOneOffJob on sample exploration.
         job_id = (
-            interaction_jobs_one_off
-            .DragAndDropSortInputInteractionOneOffJob.create_new())
+            interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
+
         actual_output = (
-            interaction_jobs_one_off
-            .DragAndDropSortInputInteractionOneOffJob.get_output(job_id))
+            interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
         expected_output = [(
             u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule '
             'input x in rule with index 0 is empty. \', u\'State name: State2,'
@@ -259,15 +271,15 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Start DragAndDropSortInputInteractionOneOffJob on private
         # exploration.
         job_id = (
-            interaction_jobs_one_off
-            .DragAndDropSortInputInteractionOneOffJob.create_new())
+            interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .create_new())
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
         actual_output = (
-            interaction_jobs_one_off
-            .DragAndDropSortInputInteractionOneOffJob.get_output(job_id))
+            interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
+            .get_output(job_id))
         self.assertEqual(actual_output, [])
 
     def test_no_action_is_performed_for_deleted_exploration(self):
@@ -283,10 +295,14 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('DragAndDropSortInput')
 
         customization_args_dict = {
-            'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for DragAndDropSortInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_list = [{
@@ -313,6 +329,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -321,8 +338,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self,
-            interaction_jobs_one_off
-            .DragAndDropSortInputInteractionOneOffJob)
+            interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob)
 
 
 class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -354,14 +370,15 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        state1.update_interaction_id('MultipleChoiceInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-
         customization_args_dict1 = {
-            'choices': {'value': [
-                '<p>This is value1 for MultipleChoiceInput</p>',
-                '<p>This is value2 for MultipleChoiceInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         answer_group_list1 = [{
@@ -384,7 +401,9 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state1.update_interaction_id('MultipleChoiceInput')
         state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -392,9 +411,8 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.create_new())
-        (
-            interaction_jobs_one_off
-            .MultipleChoiceInteractionOneOffJob.enqueue(job_id))
+        interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(
+            job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
@@ -403,12 +421,20 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for MultipleChoiceInput</p>',
-                '<p>This is value2 for MultipleChoiceInput</p>',
-                '<p>This is value3 for MultipleChoiceInput</p>',
-                '<p>This is value4 for MultipleChoiceInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }, {
+                'html': '<p>This is value3 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_2'
+            }, {
+                'html': '<p>This is value4 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_3'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         answer_group_list2 = [{
@@ -434,7 +460,9 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state2.update_interaction_id('MultipleChoiceInput')
         state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(4)
         state2.update_interaction_answer_groups(answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -443,9 +471,8 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             interaction_jobs_one_off
             .MultipleChoiceInteractionOneOffJob.create_new())
-        (
-            interaction_jobs_one_off
-            .MultipleChoiceInteractionOneOffJob.enqueue(job_id))
+        interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(
+            job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
@@ -471,10 +498,14 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('MultipleChoiceInput')
 
         customization_args_dict = {
-            'choices': {'value': [
-                '<p>This is value1 for MultipleChoiceInput</p>',
-                '<p>This is value2 for MultipleChoiceInput</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for MultipleChoiceInput</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
 
         answer_group_list = [{
@@ -501,6 +532,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -508,9 +540,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(
-            self,
-            interaction_jobs_one_off
-            .MultipleChoiceInteractionOneOffJob)
+            self, interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob)
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -542,14 +572,16 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        state1.update_interaction_id('ItemSelectionInput')
-        state2.update_interaction_id('ItemSelectionInput')
-
         customization_args_dict1 = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
         }
 
         answer_group_list1 = [{
@@ -579,7 +611,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state1.update_interaction_id('ItemSelectionInput')
         state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -587,9 +621,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.create_new())
-        (
-            interaction_jobs_one_off
-            .ItemSelectionInteractionOneOffJob.enqueue(job_id))
+        interaction_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(
+            job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
@@ -598,10 +631,15 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
         }
 
         answer_group_list2 = [{
@@ -631,7 +669,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
+        state2.update_interaction_id('ItemSelectionInput')
         state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_next_content_id_index(2)
         state2.update_interaction_answer_groups(answer_group_list2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -640,9 +680,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             interaction_jobs_one_off
             .ItemSelectionInteractionOneOffJob.create_new())
-        (
-            interaction_jobs_one_off
-            .ItemSelectionInteractionOneOffJob.enqueue(job_id))
+        interaction_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(
+            job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
@@ -667,10 +706,15 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('ItemSelectionInput')
 
         customization_args_dict = {
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }, {
+                'html': '<p>This is value2 for ItemSelection</p>',
+                'content_id': 'ca_choices_1'
+            }]},
+            'minAllowableSelectionCount': {'value': 0},
+            'maxAllowableSelectionCount': {'value': 1}
         }
 
         answer_group_list = [{
@@ -701,6 +745,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -708,9 +753,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(
-            self,
-            interaction_jobs_one_off
-            .ItemSelectionInteractionOneOffJob)
+            self, interaction_jobs_one_off.ItemSelectionInteractionOneOffJob)
 
 
 class InteractionCustomizationArgsValidationOneOffJobTests(
@@ -746,15 +789,14 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         state2 = exploration.states['State2']
 
         state1.update_interaction_id('ItemSelectionInput')
-        state2.update_interaction_id('ItemSelectionInput')
 
         customization_args_dict1 = {
             'minAllowableSelectionCount': {'value': 1},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }]},
         }
 
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -777,12 +819,12 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         customization_args_dict2 = {
             'minAllowableSelectionCount': {'value': '1b'},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }]},
         }
-
+        state2.update_interaction_id('ItemSelectionInput')
         state2.update_interaction_customization_args(customization_args_dict2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -819,10 +861,10 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         customization_args_dict = {
             'minAllowableSelectionCount': {'value': '1b'},
             'maxAllowableSelectionCount': {'value': 1},
-            'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-            ]}
+            'choices': {'value': [{
+                'html': '<p>This is value1 for ItemSelection</p>',
+                'content_id': 'ca_choices_0'
+            }]},
         }
 
         state1.update_interaction_customization_args(customization_args_dict)

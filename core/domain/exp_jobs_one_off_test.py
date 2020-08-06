@@ -49,7 +49,8 @@ search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-# This mock should be used only in ExplorationContentValidationJobForCKEditor.
+# This mock should be used only in ExplorationContentValidationJobForCKEditor
+# and InteractionCustomizationArgsValidationJob.
 # The first job validates the html strings and produces as output the invalid
 # strings. If we do not use mock validation for rte while updating
 # states and saving exploration, the validation for subtitled html
@@ -193,6 +194,7 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MathExpressionInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -356,8 +358,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         intro_state = exploration.states['Introduction']
         end_state = exploration.states['End']
 
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(intro_state, 'TextInput')
+        self.set_interaction_for_state(end_state, 'EndExploration')
 
         default_outcome = state_domain.Outcome(
             'End', state_domain.SubtitledHtml(
@@ -432,8 +434,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         )]
         self.assertEqual(actual_output, expected_output)
 
-        exploration.states['Introduction'].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['Introduction'], 'TextInput')
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -500,7 +502,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exp_services.save_new_exploration(self.albert_id, exploration)
         self.assertEqual(
@@ -1206,13 +1208,21 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    invalid_html_content1,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    '<p>4</p>'
-                ]
-            }
+                'value': [{
+                    'html': invalid_html_content1,
+                    'content_id': 'ca_choices_0'
+                }, {
+                    'html': '<p>2</p>',
+                    'content_id': 'ca_choices_1'
+                }, {
+                    'html': '<p>3</p>',
+                    'content_id': 'ca_choices_2'
+                }, {
+                    'html': '<p>4</p>',
+                    'content_id': 'ca_choices_3'
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         answer_group_dict = {
@@ -1260,33 +1270,43 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         }
         written_translations_dict = {
             'translations_mapping': {
+                'ca_choices_0': {},
+                'ca_choices_1': {},
+                'ca_choices_2': {},
+                'ca_choices_3': {},
                 'content': {
                     'en': {
-                        'html': invalid_html_content1,
+                        'data_format': 'html',
+                        'translation': invalid_html_content1,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': invalid_html_content2,
+                        'data_format': 'html',
+                        'translation': invalid_html_content2,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': invalid_html_content2,
+                        'data_format': 'html',
+                        'translation': invalid_html_content2,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1300,6 +1320,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(
             customization_args_dict)
+        state2.update_next_content_id_index(4)
         state2.update_interaction_answer_groups([answer_group_dict])
         state2.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
@@ -1400,13 +1421,21 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    valid_html_content,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    '<p>4</p>'
-                ]
-            }
+                'value': [{
+                    'html': valid_html_content,
+                    'content_id': 'ca_choices_0'
+                }, {
+                    'html': '<p>2</p>',
+                    'content_id': 'ca_choices_1'
+                }, {
+                    'html': '<p>3</p>',
+                    'content_id': 'ca_choices_2'
+                }, {
+                    'html': '<p>4</p>',
+                    'content_id': 'ca_choices_3'
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         state1.update_content(
@@ -1416,6 +1445,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         state2.update_interaction_id('DragAndDropSortInput')
         state2.update_interaction_customization_args(
             customization_args_dict)
+        state2.update_next_content_id_index(4)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         job_id = (
@@ -1470,13 +1500,21 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         }
         customization_args_dict = {
             'choices': {
-                'value': [
-                    '<p>1</p>',
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    '<p>4</p>'
-                ]
-            }
+                'value': [{
+                    'html': '<p>1</p>',
+                    'content_id': 'ca_choices_0'
+                }, {
+                    'html': '<p>2</p>',
+                    'content_id': 'ca_choices_1'
+                }, {
+                    'html': '<p>3</p>',
+                    'content_id': 'ca_choices_2'
+                }, {
+                    'html': '<p>4</p>',
+                    'content_id': 'ca_choices_3'
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': False}
         }
 
         answer_group_dict = {
@@ -1524,33 +1562,43 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
         }
         written_translations_dict = {
             'translations_mapping': {
+                'ca_choices_0': {},
+                'ca_choices_1': {},
+                'ca_choices_2': {},
+                'ca_choices_3': {},
                 'content': {
                     'en': {
-                        'html': valid_html_content,
+                        'data_format': 'html',
+                        'translation': valid_html_content,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': valid_html_content,
+                        'data_format': 'html',
+                        'translation': valid_html_content,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 },
                 'feedback_1': {
                     'hi': {
-                        'html': valid_html_content,
+                        'data_format': 'html',
+                        'translation': valid_html_content,
                         'needs_update': False
                     },
                     'en': {
-                        'html': 'hello!',
+                        'data_format': 'html',
+                        'translation': 'hello!',
                         'needs_update': False
                     }
                 }
@@ -1565,12 +1613,13 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
             state1.update_interaction_id('DragAndDropSortInput')
             state1.update_interaction_customization_args(
                 customization_args_dict)
+            state1.update_next_content_id_index(4)
             state1.update_interaction_answer_groups([answer_group_dict])
             state1.update_written_translations(
                 state_domain.WrittenTranslations.from_dict(
                     written_translations_dict))
 
-        exp_services.save_new_exploration(self.albert_id, exploration)
+            exp_services.save_new_exploration(self.albert_id, exploration)
         with self.swap(
             html_validation_service,
             'add_math_content_to_math_rte_components', lambda html: html):
@@ -1710,7 +1759,7 @@ class ExplorationMockMathMigrationOneOffJobOneOffJobTests(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
             state2.update_content(
                 state_domain.SubtitledHtml.from_dict(content2_dict))
-            state2.update_interaction_id('DragAndDropSortInput')
+            self.set_interaction_for_state(state2, 'DragAndDropSortInput')
             state2.update_interaction_answer_groups(
                 [answer_group_dict])
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1793,15 +1842,20 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
             'content_id': 'content',
             'html': valid_html_content1
         }
-        customization_args_dict = {
-            'choices': {
-                'value': [
-                    valid_html_content1,
-                    '<p>2</p>',
-                    '<p>3</p>',
-                    valid_html_content2
-                ]
-            }
+        choices_customization_arg = {
+            'value': [{
+                'content_id': 'ca_choices_0',
+                'html': valid_html_content1
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': '<p>2</p>'
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': '<p>3</p>'
+            }, {
+                'content_id': 'ca_choices_3',
+                'html': valid_html_content2
+            }]
         }
 
         drag_and_drop_answer_group_dict = {
@@ -1886,22 +1940,32 @@ class ExplorationMathRichTextInfoModelGenerationOneOffJobTests(
         exploration1_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration1_state.update_interaction_id('DragAndDropSortInput')
-        exploration1_state.update_interaction_customization_args(
-            customization_args_dict)
+        exploration1_state.update_interaction_customization_args({
+            'choices': choices_customization_arg,
+            'allowMultipleItemsInSamePosition': {'value': True}
+        })
+        exploration1_state.update_next_content_id_index(4)
         exploration1_state.update_interaction_answer_groups(
             [drag_and_drop_answer_group_dict])
         exploration2_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration2_state.update_interaction_id('ItemSelectionInput')
-        exploration2_state.update_interaction_customization_args(
-            customization_args_dict)
+        exploration2_state.update_interaction_customization_args({
+            'choices': choices_customization_arg,
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 1}
+        })
+        exploration2_state.update_next_content_id_index(4)
         exploration2_state.update_interaction_answer_groups(
             [item_selection_answer_group])
         exploration3_state.update_content(
             state_domain.SubtitledHtml.from_dict(content_dict))
         exploration3_state.update_interaction_id('DragAndDropSortInput')
-        exploration3_state.update_interaction_customization_args(
-            customization_args_dict)
+        exploration3_state.update_interaction_customization_args({
+            'choices': choices_customization_arg,
+            'allowMultipleItemsInSamePosition': {'value': True}
+        })
+        exploration3_state.update_next_content_id_index(4)
         exploration3_state.update_interaction_answer_groups(
             [drag_and_drop_answer_group_dict])
 
@@ -2141,305 +2205,4 @@ class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
 
         expected_output = (
             [u'[u\'model_deleted\', [u\'3 models successfully delelted.\']]'])
-        self.assertEqual(actual_output, expected_output)
-
-
-class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            RTECustomizationArgsValidationOneOffJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_for_customization_arg_validation_job_with_single_exp(self):
-        """Check expected errors are produced for invalid html strings in RTE
-        components for a single exploration.
-        """
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1', 'State2', 'State3'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="'
-                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
-                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
-                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
-                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
-                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
-                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            )
-        }
-        default_outcome2 = state_domain.Outcome(
-            'State1',
-            state_domain.SubtitledHtml(
-                'default_outcome',
-                (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;What is a link?&amp;quot;" url-with-'
-                    'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            ), False, [], None, None
-        )
-        content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            )
-        }
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_interaction_default_outcome(default_outcome2)
-            state3.update_content(
-                state_domain.SubtitledHtml.from_dict(content3_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-            # Start CustomizationArgsValidation job on sample exploration.
-            job_id = (
-                exp_jobs_one_off
-                .RTECustomizationArgsValidationOneOffJob.create_new(
-                    ))
-            (
-                exp_jobs_one_off
-                .RTECustomizationArgsValidationOneOffJob.enqueue(
-                    job_id))
-            self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .RTECustomizationArgsValidationOneOffJob.get_output(
-                job_id))
-        expected_output = [(
-            '[u\'Invalid filepath\', '
-            '[[u\'Exp ID: exp_id0\', u\'<oppia-noninteractive-image '
-            'alt-with-value="&amp;quot;A circle divided into equal fifths.'
-            '&amp;quot;" caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-            '</oppia-noninteractive-image>\']]]'
-        ), (
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
-            'or \'https://\'; received htt://link.com", '
-            '[[u\'Exp ID: exp_id0\', u\'<p><oppia-noninteractive-link '
-            'text-with-value="&amp;quot;What is a link?&amp;quot;" '
-            'url-with-value="&amp;quot;htt://link.com&amp;quot;">'
-            '</oppia-noninteractive-link></p>\']]]')]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_for_customization_arg_validation_job_with_multiple_exp(self):
-        """Check expected errors are produced for invalid html strings in RTE
-        components for multiple explorations.
-        """
-
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exploration1.add_states(['State1', 'State2', 'State3'])
-        exp1_state1 = exploration1.states['State1']
-        exp1_state2 = exploration1.states['State2']
-        exp1_state3 = exploration1.states['State3']
-        exp1_content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="'
-                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
-                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
-                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
-                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
-                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
-                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            )
-        }
-        exp1_default_outcome2 = state_domain.Outcome(
-            'State1',
-            state_domain.SubtitledHtml(
-                'default_outcome',
-                (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;What is a link?&amp;quot;" url-with-'
-                    'value="&amp;quot;htt://link.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            ), False, [], None, None
-        )
-        exp1_content3_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            )
-        }
-
-        exploration2 = exp_domain.Exploration.create_default_exploration(
-            self.NEW_EXP_ID, title='title', category='category')
-        exploration2.add_states(['State1', 'State2'])
-        exp2_state1 = exploration2.states['State1']
-        exp2_content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'filepath-with-value="&amp;quot;123png&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            )
-        }
-        exp2_default_outcome1 = state_domain.Outcome(
-            'State2',
-            state_domain.SubtitledHtml(
-                'default_outcome',
-                (
-                    '<p><oppia-noninteractive-link text-with-value="'
-                    '&amp;quot;Test link?&amp;quot;" url-with-'
-                    'value="&amp;quot;test.com&amp'
-                    ';quot;"></oppia-noninteractive-link></p>'
-                )
-            ), False, [], None, None
-        )
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            exp1_state1.update_content(
-                state_domain.SubtitledHtml.from_dict(exp1_content1_dict))
-            exp1_state2.update_interaction_default_outcome(
-                exp1_default_outcome2)
-            exp1_state3.update_content(
-                state_domain.SubtitledHtml.from_dict(exp1_content3_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration1)
-
-            exp2_state1.update_content(
-                state_domain.SubtitledHtml.from_dict(exp2_content1_dict))
-            exp2_state1.update_interaction_default_outcome(
-                exp2_default_outcome1)
-            exp_services.save_new_exploration(self.albert_id, exploration2)
-
-            # Start CustomizationArgsValidation job on sample exploration.
-            job_id = (
-                exp_jobs_one_off
-                .RTECustomizationArgsValidationOneOffJob.create_new(
-                    ))
-            (
-                exp_jobs_one_off
-                .RTECustomizationArgsValidationOneOffJob.enqueue(
-                    job_id))
-            self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .RTECustomizationArgsValidationOneOffJob.get_output(
-                job_id))
-        expected_output = [(
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
-            'or \'https://\'; received htt://link.com", '
-            '[[u\'Exp ID: exp_id0\', '
-            'u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'What is a link?&amp;quot;" url-with-value="&amp;quot;htt://'
-            'link.com&amp;quot;"></oppia-noninteractive-link></p>\']]]'
-        ), (
-            '[u"Invalid URL: Sanitized URL should start with \'http://\' '
-            'or \'https://\'; received test.com", [[u\'Exp ID: exp_id1\', '
-            'u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;Test '
-            'link?&amp;quot;" url-with-value="&amp;quot;test.com&amp;quot;">'
-            '</oppia-noninteractive-link></p>\']]]'
-        ), (
-            '[u\'Invalid filepath\', [[u\'Exp ID: exp_id0\', '
-            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;'
-            'A circle divided into equal fifths.&amp;quot;" '
-            'caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
-            '</oppia-noninteractive-image>\'], '
-            '[u\'Exp ID: exp_id1\', '
-            'u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A circle '
-            'divided into equal fifths.&amp;quot;" caption-with-value='
-            '"&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;'
-            '123png&amp;quot;"></oppia-noninteractive-image>\']]]')]
-
-        self.assertEqual(actual_output, expected_output)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['State1'])
-
-        content_dict = {
-            'html': (
-                '<p><oppia-noninteractive-link text-with-value="'
-                '&amp;quot;What is a link?&amp;quot;" url-with-'
-                'value="&amp;quot;htt://link.com&amp'
-                ';quot;"></oppia-noninteractive-link></p>'
-            ),
-            'content_id': 'content'
-        }
-
-        state1 = exploration.states['State1']
-
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
-            state1.update_content(
-                state_domain.SubtitledHtml.from_dict(content_dict))
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self,
-            exp_jobs_one_off
-            .RTECustomizationArgsValidationOneOffJob)
-
-    def test_validation_job_fails_for_invalid_schema_version(self):
-        """Test that invalid schema version results in job failure."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
-        exploration_model.states_schema_version = 100
-        exploration_model.commit(
-            self.albert_id, 'Changed states_schema_version.', [])
-        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
-
-        job_id = (
-            exp_jobs_one_off
-            .RTECustomizationArgsValidationOneOffJob.create_new())
-        (
-            exp_jobs_one_off
-            .RTECustomizationArgsValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .RTECustomizationArgsValidationOneOffJob.get_output(
-                job_id))
-        expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
-            'exploration state schemas at present. when loading exploration\', '
-            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
-
         self.assertEqual(actual_output, expected_output)

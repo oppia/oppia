@@ -100,6 +100,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -173,6 +174,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -182,13 +184,15 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
                     'hint_1': {},
                     'solution': {
                         'en': {
-                            'html': html_content,
+                            'data_format': 'html',
+                            'translation': html_content,
                             'needs_update': True
                         }
                     }
@@ -199,7 +203,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': [html_content]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_content
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -232,6 +239,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -316,6 +324,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -411,6 +420,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -420,13 +430,15 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
                     'hint_1': {},
                     'solution': {
                         'en': {
-                            'html': html_content,
+                            'data_format': 'html',
+                            'translation': html_content,
                             'needs_update': True
                         }
                     }
@@ -437,7 +449,10 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': [html_content]
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': html_content
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -470,6 +485,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -572,6 +588,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -653,6 +670,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -662,6 +680,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -674,7 +693,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': 'option 1'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -707,6 +729,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -810,6 +833,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -921,6 +945,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
@@ -1016,6 +1041,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1025,6 +1051,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1037,7 +1064,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': 'option 1'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -1070,6 +1100,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None
@@ -1163,6 +1194,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1172,6 +1204,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             },
             'written_translations': {
                 'translations_mapping': {
+                    'ca_choices_0': {},
                     'content_1': {},
                     'feedback_1': {},
                     'feedback_2': {},
@@ -1184,7 +1217,10 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'choices': {
-                        'value': ['option 1']
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': 'option 1'
+                        }]
                     },
                     'showChoicesInShuffledOrder': {
                         'value': True
@@ -1217,6 +1253,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
             'classifier_model_id': None

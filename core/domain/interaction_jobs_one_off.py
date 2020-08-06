@@ -74,7 +74,7 @@ class DragAndDropSortInputInteractionOneOffJob(
 
 class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of all (exploration, state) pairs that use the
-    Multiple choice interaction and have rules that do not correspond to any
+    Multiple selection interaction and have rules that do not correspond to any
     answer choices.
     """
 
@@ -91,7 +91,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for state_name, state in exploration.states.items():
             if state.interaction.id == 'MultipleChoiceInput':
                 choices_length = len(
-                    state.interaction.customization_args['choices']['value'])
+                    state.interaction.customization_args['choices'].value)
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
                     for rule_index, rule_spec in enumerate(
@@ -128,8 +128,12 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration = exp_fetchers.get_exploration_from_model(item)
         for state_name, state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
-                choices = (
-                    state.interaction.customization_args['choices']['value'])
+                choices = [
+                    choice.html
+                    for choice in state.interaction.customization_args[
+                        'choices'].value
+                ]
+
                 for group in state.interaction.answer_groups:
                     for rule_spec in group.rule_specs:
                         for rule_item in rule_spec.inputs['x']:
