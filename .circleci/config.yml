@@ -143,7 +143,7 @@ jobs:
       - run:
           name: Run e2e admin page test
           command: |
-            python -m scripts.run_e2e_tests --suite="adminPage" --prod_env
+            python -m scripts.run_e2e_tests --deparallelize_terser --suite="adminPage" --prod_env
 
   e2e_library_and_collections:
     <<: *job_defaults
@@ -156,23 +156,23 @@ jobs:
       - run:
           name: Run e2e publication test
           command: |
-            python -m scripts.run_e2e_tests --suite="publication" --prod_env
+            python -m scripts.run_e2e_tests --deparallelize_terser --suite="publication" --prod_env
       - run:
           name: Run e2e library test
           command: |
-            python -m scripts.run_e2e_tests --suite="library" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="library" --prod_env
       - run:
           name: Run e2e classroomPage test
           command: |
-            python -m scripts.run_e2e_tests --suite="classroomPage" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="classroomPage" --prod_env
       - run:
           name: Run e2e collections test
           command: |
-            python -m scripts.run_e2e_tests --suite="collections" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="collections" --prod_env
       - run:
           name: Run e2e accessibility page test
           command: |
-            python -m scripts.run_e2e_tests --suite="accessibility" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="accessibility" --prod_env
 
   e2e_users:
     <<: *job_defaults
@@ -185,23 +185,23 @@ jobs:
       - run:
           name: Run e2e users test
           command: |
-            python -m scripts.run_e2e_tests --suite="users" --prod_env
+            python -m scripts.run_e2e_tests --deparallelize_terser --suite="users" --prod_env
       - run:
           name: Run e2e subscriptions test
           command: |
-            python -m scripts.run_e2e_tests --suite="subscriptions" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="subscriptions" --prod_env
       - run:
           name: Run e2e profileMenu test
           command: |
-            python -m scripts.run_e2e_tests --suite="profileMenu" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="profileMenu" --prod_env
       - run:
           name: Run e2e preferences test
           command: |
-            python -m scripts.run_e2e_tests --suite="preferences" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="preferences" --prod_env
       - run:
           name: Run e2e profileFeatures test
           command: |
-            python -m scripts.run_e2e_tests --suite="profileFeatures" --prod_env
+            python -m scripts.run_e2e_tests --skip-build --skip-install --deparallelize_terser --suite="profileFeatures" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
@@ -221,27 +221,27 @@ jobs:
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
-            python -m scripts.run_e2e_tests --suite="topicAndStoryEditor" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditor" --server_log_level=info
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --suite="classroomPageFileUploadFeatures" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-build --skip-install --suite="classroomPageFileUploadFeatures" --server_log_level=info
       - run:
           name: Run e2e topic and story editor test
           command: |
-            python -m scripts.run_e2e_tests --suite="topicAndStoryEditorFileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditorFileUploadFeatures"
       - run:
           name: Run e2e play voiceovers test
           command: |
-            python -m scripts.run_e2e_tests --suite="playVoiceovers"
+            python -m scripts.run_e2e_tests --skip-build --skip-install --suite="playVoiceovers"
       - run:
           name: Run e2e file upload extensions test
           command: |
-            python -m scripts.run_e2e_tests --suite="fileUploadExtensions"
+            python -m scripts.run_e2e_tests --skip-build --skip-install --suite="fileUploadExtensions"
 
 notify:
   webhooks:
