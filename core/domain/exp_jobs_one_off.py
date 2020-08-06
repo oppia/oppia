@@ -252,6 +252,58 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusbale one-off job for testing exploration migration from the
+    previous exploration schema version to the latest. This job runs the state
+    migration, but does not commit the new exploration to the store.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        if item.states_schema_version == current_state_schema_version - 1:
+            try:
+                conversion_fn = getattr(
+                     exp_domain.Exploration,
+                    '_convert_v%i_dict_to_v%i_dict' % (
+                        current_state_schema_version - 1,
+                        current_state_schema_version)
+                )
+                conversion_fn(item.to_dict())
+                yield ('SUCCESS', None)
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed migration to v41: %s' %
+                    (item.id, e))
+                logging.error(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+        else:
+            error_message = (
+                'Exploration %s was not migrated because its states '
+                'schema verison is %i' %
+                (item.id, item.states_schema_version))
+            yield ('WRONG_STATE_VERSION', error_message.encode('utf-8'))
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from the data store
