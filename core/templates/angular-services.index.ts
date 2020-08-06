@@ -636,6 +636,9 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
+import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { TaskEntryObjectFactory } from 'domain/improvements/TaskEntryObjectFactory';
+import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -686,6 +689,7 @@ export const angularServices: [string, unknown][] = [
   ['CollectionValidationService', CollectionValidationService],
   ['ComputationDataObjectFactory', ComputationDataObjectFactory],
   ['ComputeGraphService', ComputeGraphService],
+  ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
@@ -922,6 +926,7 @@ export const angularServices: [string, unknown][] = [
   ['SuggestionObjectFactory', SuggestionObjectFactory],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
+  ['TaskEntryObjectFactory', TaskEntryObjectFactory],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
   ['TextInputTokenizer', TextInputTokenizer],
@@ -938,6 +943,7 @@ export const angularServices: [string, unknown][] = [
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TranslateService', TranslateService],
+  ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],

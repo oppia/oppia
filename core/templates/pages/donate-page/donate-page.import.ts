@@ -20,5 +20,5 @@
 // main module the elements are attached to.
 require('pages/donate-page/donate-page.module.ts');
 require('App.ts');
-
+require('base-components/oppia-root.directive.ts');
 require('pages/OppiaFooterDirective.ts');
