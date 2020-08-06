@@ -4622,7 +4622,7 @@ class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
             .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 6)
         self.set_config_property((
             config_domain
-            .MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH), 3)
+            .MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH), 4)
 
         self.assertEqual(
             exp_services.get_batch_of_exps_for_latex_svg_generation(),
