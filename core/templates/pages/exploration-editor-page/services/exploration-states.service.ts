@@ -18,10 +18,11 @@
  * keeps no mementos.
  */
 
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
 require(
   'pages/exploration-editor-page/editor-tab/templates/' +
   'modal-templates/confirm-delete-state-modal.controller.ts');
-
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -108,6 +109,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       written_translations: function(writtenTranslations) {
         return writtenTranslations.toBackendDict();
+      },
+      widget_customization_args: function(customizationArgs) {
+        return Interaction.convertCustomizationArgsToBackendDict(
+          customizationArgs);
       }
     };
 
@@ -122,6 +127,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
+      next_content_id_index: ['nextContentIdIndex'],
       solicit_answer_details: ['solicitAnswerDetails'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
@@ -319,6 +325,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(_states.getState(stateName));
         });
+      },
+      saveNextContentIdIndex: function(stateName, newNextContentIdIndex) {
+        saveStateProperty(
+          stateName, 'next_content_id_index', newNextContentIdIndex);
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');

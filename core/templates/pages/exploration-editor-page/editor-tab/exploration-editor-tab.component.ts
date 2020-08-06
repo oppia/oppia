@@ -31,7 +31,7 @@ require(
   'state-param-changes-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
-  'unresolved-answers-overview.directive.ts');
+  'unresolved-answers-overview.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -119,7 +119,7 @@ angular.module('oppia').component('explorationEditorTab', {
             ExplorationStatesService.isInitialized()) {
               var stateData = (
                 ExplorationStatesService.getState(ctrl.stateName));
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
+              StateEditorService.onStateEditorInitialized.emit(stateData);
             }
           });
 
@@ -179,6 +179,12 @@ angular.module('oppia').component('explorationEditorTab', {
           angular.copy(displayedValue));
 
         StateEditorService.setInteractionCustomizationArgs(
+          angular.copy(displayedValue));
+      };
+
+      ctrl.saveNextContentIdIndex = function(displayedValue) {
+        ExplorationStatesService.saveNextContentIdIndex(
+          StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
       };
 

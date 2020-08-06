@@ -50,6 +50,10 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     USER_3_GAE_ID = 'gae3_id'
     USER_3_EMAIL = 'user3@example.com'
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
+    PROFILE_1_ID = 'profile_id'
+    PROFILE_1_GAE_ID = 'gae_id'
+    PROFILE_1_EMAIL = 'user@example.com'
+    PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
@@ -57,6 +61,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
+    GENERIC_DISPLAY_ALIAS = 'display_alias'
 
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
@@ -65,6 +70,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             gae_id=self.USER_1_GAE_ID,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.PROFILE_1_ID,
+            gae_id=self.PROFILE_1_GAE_ID,
+            email=self.PROFILE_1_EMAIL,
+            role=self.PROFILE_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
@@ -94,50 +105,85 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=1,
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
-            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            display_alias=self.GENERIC_DISPLAY_ALIAS
         ).put()
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy(self):
+    def test_apply_deletion_policy_for_registered_users_deletes_them(self):
+        # Case for a full user.
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
-        # Test that calling apply_deletion_policy with no existing model
-        # doesn't fail.
+
+        # Case for a profile user.
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.PROFILE_1_ID))
+        user_models.UserSettingsModel.apply_deletion_policy(self.PROFILE_1_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.PROFILE_1_ID))
+
+    def test_apply_deletion_policy_for_banned_user_deletes_them(self):
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
+        user_models.UserSettingsModel.apply_deletion_policy(self.USER_2_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.NONEXISTENT_USER_ID))
         user_models.UserSettingsModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
-    def test_has_reference_to_user_id(self):
+    def test_has_reference_to_registered_user_id_is_true(self):
+        # Case for a full user.
         self.assertTrue(
-            user_models.UserSettingsModel
-            .has_reference_to_user_id(self.USER_1_ID)
+            user_models.UserSettingsModel.has_reference_to_user_id(
+                self.USER_1_ID)
         )
+
+        # Case for a profile user.
         self.assertTrue(
-            user_models.UserSettingsModel
-            .has_reference_to_user_id(self.USER_2_ID)
+            user_models.UserSettingsModel.has_reference_to_user_id(
+                self.PROFILE_1_ID)
         )
+
+        # Case for a banned full user.
+        self.assertTrue(
+            user_models.UserSettingsModel.has_reference_to_user_id(
+                self.USER_2_ID)
+        )
+
+    def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
             user_models.UserSettingsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_by_role(self):
-        user = user_models.UserSettingsModel.get_by_role(
-            feconf.ROLE_ID_ADMIN)
-        self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
+    def test_get_by_role_for_admin_returns_admin_users(self):
+        actual_users = [
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
+            user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
+        ]
+        for user in user_models.UserSettingsModel.get_by_role(
+                feconf.ROLE_ID_ADMIN):
+            self.assertIn(user, actual_users)
 
-    def test_export_data_nonexistent_user(self):
+    def test_export_data_for_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user not found'):
             user_models.UserSettingsModel.export_data('fake_user')
 
-    def test_export_data_trivial(self):
+    def test_export_data_for_trivial_case_returns_data_correctly(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -158,11 +204,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'first_contribution_msec': None,
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
-            'preferred_audio_language_code': None
+            'preferred_audio_language_code': None,
+            'display_alias': None
         }
         self.assertEqual(expected_user_data, user_data)
 
-    def test_export_data_nontrivial(self):
+    def test_export_data_for_nontrivial_case_returns_data_correctly(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -183,11 +230,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'first_contribution_msec': 1,
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'display_alias': self.GENERIC_DISPLAY_ALIAS
         }
         self.assertEqual(expected_user_data, user_data)
 
-    def test_get_new_id_method_returns_unique_ids(self):
+    def test_get_new_id_under_normal_behaviour_returns_unique_ids(self):
         ids = set([])
         for _ in python_utils.RANGE(100):
             new_id = user_models.UserSettingsModel.get_new_id('')
@@ -196,7 +244,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
 
-    def test_create_raises_error_when_many_id_collisions_occur(self):
+    def test_get_new_id_for_too_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             user_models.UserSettingsModel, 'get_by_id', types.MethodType(
@@ -2223,3 +2271,82 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
             user_models.PseudonymizedUserModel.get_new_id('exploration')
+
+
+class UserAuthModelTests(test_utils.GenericTestBase):
+    """Tests for UserAuthModel."""
+
+    NONEXISTENT_AUTH_TYPE_NAME = 'id_x'
+    NONEXISTENT_USER_ID = 'id_x'
+    NONREGISTERED_GAE_ID = 'gae_id_x'
+    USER_ID = 'user_id'
+    USER_GAE_ID = 'gae_id'
+    USER_PIN = '123'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserAuthModelTests, self).setUp()
+
+        user_models.UserAuthModel(
+            id=self.USER_ID,
+            gae_id=self.USER_GAE_ID,
+            pin=self.USER_PIN
+        ).put()
+
+    def test_get_export_policy_is_not_applicable(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_deletion_policy_is_delete(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy_registered_user_is_deleted(self):
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.USER_ID)
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_id(
+                self.USER_ID
+            )
+        )
+
+    def test_apply_deletion_policy_nonexistent_user_no_exception_raised(self):
+        user_models.UserAuthModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_has_reference_to_existing_user_id_is_true(self):
+        self.assertTrue(
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.USER_ID)
+        )
+
+    def test_has_reference_to_non_existing_user_id_is_false(self):
+        self.assertFalse(
+            user_models.UserAuthModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_by_auth_id_with_invalid_auth_type_name_is_none(self):
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_GAE_ID)
+        )
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_TYPE_NAME, self.NONREGISTERED_GAE_ID)
+        )
+
+    def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
+        self.assertIsNone(
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID)
+        )
+
+    def test_get_by_auth_id_for_registered_auth_id_is_correct(self):
+        self.assertEqual(
+            user_models.UserAuthModel.get_by_id(self.USER_ID),
+            user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+        )

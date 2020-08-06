@@ -86,6 +86,9 @@ ACTION_VISIT_ANY_QUESTION_EDITOR = 'VISIT_ANY_QUESTION_EDITOR'
 ACTION_VISIT_ANY_TOPIC_EDITOR = 'VISIT_ANY_TOPIC_EDITOR'
 
 # Users can be updated to the following list of role IDs via admin interface.
+#
+# NOTE: LEARNER role should not be updated to any other role, hence do not
+#   add it to the following list.
 UPDATABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
@@ -96,6 +99,9 @@ UPDATABLE_ROLES = [
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
+#
+# NOTE: Do not include LEARNER role in this list as it does not represent
+#   role for a separate user account, but rather a profile within the account.
 VIEWABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
@@ -111,6 +117,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_COLLECTION_EDITOR: 'collection editor',
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
     feconf.ROLE_ID_GUEST: 'guest',
+    feconf.ROLE_ID_LEARNER: 'learner',
     feconf.ROLE_ID_MODERATOR: 'moderator',
     feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager'
 }
@@ -136,8 +143,9 @@ PARENT_ROLES = {
     feconf.ROLE_ID_ADMIN: [feconf.ROLE_ID_MODERATOR],
     feconf.ROLE_ID_BANNED_USER: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_COLLECTION_EDITOR: [feconf.ROLE_ID_EXPLORATION_EDITOR],
-    feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_GUEST],
+    feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_LEARNER],
     feconf.ROLE_ID_GUEST: [],
+    feconf.ROLE_ID_LEARNER: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_TOPIC_MANAGER],
     feconf.ROLE_ID_TOPIC_MANAGER: [feconf.ROLE_ID_COLLECTION_EDITOR]
 }
@@ -181,11 +189,9 @@ ROLE_ACTIONS = {
     ],
     feconf.ROLE_ID_EXPLORATION_EDITOR: [
         ACTION_ACCESS_CREATOR_DASHBOARD,
-        ACTION_ACCESS_LEARNER_DASHBOARD,
         ACTION_CREATE_EXPLORATION,
         ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
         ACTION_EDIT_OWNED_ACTIVITY,
-        ACTION_FLAG_EXPLORATION,
         ACTION_SUBSCRIBE_TO_USERS,
         ACTION_MANAGE_ACCOUNT,
         ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY,
@@ -196,6 +202,10 @@ ROLE_ACTIONS = {
     ],
     feconf.ROLE_ID_GUEST: [
         ACTION_PLAY_ANY_PUBLIC_ACTIVITY,
+    ],
+    feconf.ROLE_ID_LEARNER: [
+        ACTION_FLAG_EXPLORATION,
+        ACTION_ACCESS_LEARNER_DASHBOARD,
     ],
     feconf.ROLE_ID_MODERATOR: [
         ACTION_ACCESS_MODERATOR_PAGE,
@@ -232,7 +242,7 @@ def get_all_actions(role):
         list(str). A list of actions accessible to the role.
 
     Raises:
-        Exception: The given role does not exist.
+        Exception. The given role does not exist.
     """
     if role not in PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)

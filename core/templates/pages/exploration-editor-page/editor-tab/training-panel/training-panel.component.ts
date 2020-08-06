@@ -45,14 +45,14 @@ angular.module('oppia').component('trainingPanel', {
     'TrainingDataService', 'ResponsesService', 'StateInteractionIdService',
     'StateCustomizationArgsService',
     'OutcomeObjectFactory', 'GenerateContentIdService',
-    'COMPONENT_NAME_FEEDBACK',
+    'CONTENT_ID_PREFIX_FEEDBACK',
     function(
         $scope, ExplorationHtmlFormatterService,
         StateEditorService, ExplorationStatesService,
         TrainingDataService, ResponsesService, StateInteractionIdService,
         StateCustomizationArgsService,
         OutcomeObjectFactory, GenerateContentIdService,
-        COMPONENT_NAME_FEEDBACK) {
+        CONTENT_ID_PREFIX_FEEDBACK) {
       var ctrl = this;
       var _updateAnswerTemplate = function() {
         $scope.answerTemplate = (
@@ -61,22 +61,13 @@ angular.module('oppia').component('trainingPanel', {
             StateCustomizationArgsService.savedMemento));
       };
 
-      var _getExistingOutcomeContentIds = function() {
-        var existingContentIds = [];
-        $scope.allOutcomes.forEach(function(outcome) {
-          var contentId = outcome.feedback.getContentId();
-          existingContentIds.push(contentId);
-        });
-        return existingContentIds;
-      };
-
       $scope.getCurrentStateName = function() {
         return StateEditorService.getActiveStateName();
       };
 
       $scope.beginAddingNewResponse = function() {
-        var contentId = GenerateContentIdService.getNextId(
-          _getExistingOutcomeContentIds(), COMPONENT_NAME_FEEDBACK);
+        var contentId = GenerateContentIdService.getNextStateId(
+          CONTENT_ID_PREFIX_FEEDBACK);
         ctrl.classification.newOutcome = OutcomeObjectFactory.createNew(
           StateEditorService.getActiveStateName(), contentId, '', []);
         ctrl.addingNewResponse = true;

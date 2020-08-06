@@ -149,8 +149,8 @@ def get_previous_release_version(branch_type, current_release_version_number):
         str. The previous version.
 
     Raises:
-        Exception: Branch type is invalid.
-        Exception: Previous release version is same as current release version.
+        Exception. Branch type is invalid.
+        Exception. Previous release version is same as current release version.
     """
     all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the

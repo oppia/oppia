@@ -18,8 +18,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-
 from constants import constants
+
 from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import base
@@ -68,6 +68,7 @@ from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
+
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -213,6 +214,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
+    get_redirect_route(
+        r'/adminmathsvghandler', admin.ExplorationsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
