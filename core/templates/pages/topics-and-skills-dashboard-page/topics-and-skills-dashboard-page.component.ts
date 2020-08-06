@@ -386,7 +386,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
           TopicsAndSkillsDashboardBackendApiService.
             onTopicsAndSkillsDashboardReinitialized.subscribe(
               (stayInSameTab) => {
-                console.log('Caught: T&SDashboardComponent');
+                console.log('Caught: T&SDashboardInitialized in t&s-dashboard-page component');
                 ctrl._initDashboard(stayInSameTab);
               }
             )

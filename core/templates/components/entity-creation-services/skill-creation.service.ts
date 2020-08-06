@@ -96,7 +96,7 @@ angular.module('oppia').factory('SkillCreationService', [
             result.description, rubrics, result.explanation,
             topicIds || [], imagesData).then(function(response) {
             $timeout(function() {
-              console.log('Emitted: SkillCreationService');
+              console.log('Emitted: T&SDashboardInitialized in SkillCreationService');
               TopicsAndSkillsDashboardBackendApiService.
                 onTopicsAndSkillsDashboardReinitialized.emit(true);
               skillCreationInProgress = false;
