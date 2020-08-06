@@ -470,6 +470,20 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         return model
 
     @classmethod
+    def get_by_thread_id(cls, thread_id):
+        """Fetches the GeneralFeedbackEmailReplyToIdModel instance corresponding
+        to the given thread id.
+
+        Args:
+            thread_id: str. The thread id.
+
+        Returns:
+            list(FeedbackEmailReplyToIdModel). A list of instance corresponding
+            to the given thread_id.
+        """
+        return cls.query(cls.thread_id == thread_id).fetch()
+
+    @classmethod
     def get(cls, user_id, thread_id, strict=True):
         """Gets the FeedbackEmailReplyToIdModel instance corresponding to the
         unique instance id.

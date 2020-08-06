@@ -45,7 +45,8 @@ STATUS_CHOICES = [
 
 # Constants used for generating new ids.
 _MAX_RETRIES = 10
-_RAND_RANGE = 127 * 127
+THREAD_ID_PREFIX_MAX_LEN = 6
+THREAD_ID_SUFFIX_MAX_LEN = 6
 
 
 class GeneralFeedbackThreadModel(base_models.BaseModel):
@@ -160,10 +161,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 when attempting to generate a new thread ID.
         """
         for _ in python_utils.RANGE(_MAX_RETRIES):
-            thread_id = (
-                entity_type + '.' + entity_id + '.' +
-                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
-                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
+            thread_id_prefix = entity_type[:THREAD_ID_PREFIX_MAX_LEN]
+            thread_id_suffix = utils.generate_random_string(
+                THREAD_ID_SUFFIX_MAX_LEN)
+            thread_id = '.'.join(
+                [thread_id_prefix, entity_id, thread_id_suffix])
             if not cls.get_by_id(thread_id):
                 return thread_id
         raise Exception(
@@ -383,6 +385,19 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_all_thread_messages(cls, thread_id):
+        """Returns a list of messages in the given thread.
+
+        Args:
+            thread_id: str. ID of the thread.
+
+        Returns:
+            list(GeneralFeedbackMessageModel). A list of messages in the
+            given thread.
+        """
+        return cls.get_all().filter(cls.thread_id == thread_id).fetch()
 
     @classmethod
     def get_most_recent_message(cls, thread_id):

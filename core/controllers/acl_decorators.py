@@ -745,11 +745,13 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        thread = feedback_services.get_thread(thread_id)
 
-        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
+        if thread is None:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to view exploration feedback.')
 
+        exploration_id = thread.entity_id
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -797,10 +799,13 @@ def can_comment_on_feedback_thread(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
+        thread = feedback_services.get_thread(thread_id)
 
-        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
+        if thread is None:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to view exploration feedback.')
+
+        exploration_id = thread.entity_id
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException

@@ -835,6 +835,21 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         return user_data
 
+    @classmethod
+    def get_subscription_models_for_thread_id(cls, thread_id):
+        """Returns a list of UserSubscriptionsModel which contains the given
+        thread_id in the general_feedback_thread_ids property of the model.
+
+        Args:
+            thread_id: str. The ID of the thread.
+
+        Returns:
+            list(UserSubscriptionsModel). A list of UserSubscriptionsModel which
+            contains the given thread_id in the general_feedback_thread_ids
+            property of the model.
+        """
+        return cls.query(cls.general_feedback_thread_ids == thread_id).fetch()
+
 
 class UserSubscribersModel(base_models.BaseModel):
     """The list of subscribers of the user.

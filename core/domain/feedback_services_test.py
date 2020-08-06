@@ -118,11 +118,6 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         thread_status = threadlist[0].status
         self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
 
-    def test_get_exp_id_from_thread_id(self):
-        thread_id = 'exploration.exp1.1234'
-        self.assertEqual(
-            feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
-
 
 class MockFeedbackAnalyticsAggregator(
         feedback_jobs_continuous.FeedbackAnalyticsAggregator):
@@ -677,7 +672,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # There are no feedback message references to remove.
             self.assertIsNone(
                 feedback_services.clear_feedback_message_references(
-                    self.editor_id, self.exploration.id, 'thread_id'))
+                    self.editor_id, 'thread_id'))
 
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
@@ -697,7 +692,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
                 model.feedback_message_references[0]['thread_id'], thread_id)
 
             feedback_services.clear_feedback_message_references(
-                self.editor_id, self.exploration.id, 'new_thread_id')
+                self.editor_id, 'new_thread_id')
             model = feedback_models.UnsentFeedbackEmailModel.get(
                 self.editor_id)
             self.assertEqual(

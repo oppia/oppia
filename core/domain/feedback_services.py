@@ -43,23 +43,6 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
-def get_exp_id_from_thread_id(thread_id):
-    """Returns the exploration_id part of the thread_id.
-
-    TODO(#8370): Once feedback threads are generalized, this function needs to
-    be updated to get the id from any general entity, not just explorations. At
-    the moment, it still assumes that the thread id is associated to an
-    exploration.
-
-    Args:
-        thread_id: str. The id of the thread.
-
-    Returns:
-        str. The exploration id part of the thread_id.
-    """
-    return thread_id.split('.')[1]
-
-
 def _create_models_for_thread_and_first_message(
         entity_type, entity_id, original_author_id, subject, text,
         has_suggestion):
@@ -710,12 +693,11 @@ def pop_feedback_message_references(user_id, num_references_to_pop):
         enqueue_feedback_message_batch_email_task(user_id)
 
 
-def clear_feedback_message_references(user_id, exploration_id, thread_id):
+def clear_feedback_message_references(user_id, thread_id):
     """Removes feedback message references associated with a feedback thread.
 
     Args:
         user_id: str. The user who created this reference.
-        exploration_id: str. The id of the exploration.
         thread_id: str. The id of the thread.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
@@ -723,9 +705,10 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
         # Model exists only if user has received feedback on exploration.
         return
 
+    thread = get_thread(thread_id)
     updated_references = [
         reference for reference in model.feedback_message_references
-        if (reference['entity_id'] != exploration_id or
+        if (reference['entity_id'] != thread.entity_id or
             reference['thread_id'] != thread_id)
     ]
 
