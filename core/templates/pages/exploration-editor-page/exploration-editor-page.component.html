@@ -89,7 +89,7 @@
     </div>
   </div>
 </div>
-<div ng-cloak>
+<div class="exploration-editor-content" ng-cloak>
   <div class="container-fluid oppia-editor-page-container" ng-joy-ride="$ctrl.tutorialInProgress" config="$ctrl.EDITOR_TUTORIAL_OPTIONS" on-finish="$ctrl.onFinishTutorial()" on-skip="$ctrl.onSkipTutorial()">
     <div class="row" ng-if="$ctrl.ExplorationRightsService.isCloned()">
       <div class="col-lg-12 col-md-12 col-sm-12">
@@ -151,9 +151,8 @@
 </svg>
 
 <style>
-  exploration-editor-page .topic-editor-main {
-    margin-bottom: 50px;
-    margin-top: 110px;
+  exploration-editor-page .exploration-editor-content {
+    margin-top: 95px;
   }
   exploration-editor-page .navbar-helper {
     background-color: #00609C;
@@ -258,9 +257,6 @@
     }
     exploration-editor-page .navbar-text {
       display: none;
-    }
-    exploration-editor-page .topic-editor-main {
-      margin-top: 16px;
     }
   }
 </style>
