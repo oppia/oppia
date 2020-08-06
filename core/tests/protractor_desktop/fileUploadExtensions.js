@@ -53,7 +53,7 @@ describe('rich-text components', function() {
       // TODO(Jacob): Add test for image RTE component.
       await richTextEditor.addRteComponent('Math', 'x^2 + y^2');
       await richTextEditor.addRteComponent(
-        'Svgdiagram', ['rectangle', 'bezier', 'piechart'],
+        'Svgdiagram', ['rectangle', 'bezier', 'piechart', 'svgupload'],
         'An svg diagram.');
     });
 
@@ -65,7 +65,7 @@ describe('rich-text components', function() {
         await richTextChecker.readPlainText('This is a math expression');
         await richTextChecker.readRteComponent('Math', 'x^2 + y^2');
         await richTextChecker.readRteComponent(
-          'Svgdiagram', ['rectangle', 'bezier', 'piechart'],
+          'Svgdiagram', ['rectangle', 'bezier', 'piechart', 'svgupload'],
           'An svg diagram.');
       });
 

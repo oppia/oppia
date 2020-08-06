@@ -21,6 +21,7 @@ var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 var request = require('request');
+var path = require('path');
 
 const SVGTAGS = {
   rectangle: (
@@ -65,7 +66,7 @@ const SVGTAGS = {
     'ill-rule: nonzero; opacity: 1; white-space: pre;"><tspan x="-21.51" y="' +
     '-6.14">Enter</tspan><tspan x="-21.51" y="17.45">Text</tspan></text></g>' +
     '</svg>'),
-  rectangle_bezier_piechart: (
+  rectangle_bezier_piechart_svgupload: (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
     '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
@@ -112,7 +113,12 @@ const SVGTAGS = {
     'e-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-m' +
     'iterlimit: 4; fill: rgb(0,255,0); fill-rule: nonzero; opacity: 1; vecto' +
     'r-effect: non-scaling-stroke" points="0,0 0,30 0,-30 0,0 " id="group0"/' +
-    '></g></g></g></g></g></svg>')
+    '></g></g></g></g></g><g transform="matrix(1 0 0 1 50 50)"><g style=""><' +
+    'g transform="matrix(1 0 0 1 0 0)" id="group1"><circle style="stroke: rg' +
+    'b(0,128,0); stroke-width: 4; stroke-dasharray: none; stroke-linecap: bu' +
+    'tt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4;' +
+    ' fill: rgb(255,255,0); fill-rule: nonzero; opacity: 1;" cx="0" cy="0" r' +
+    '="40" id="group1"/></g></g></g></svg>')
 };
 
 var customizeComponent = async function(modal, shapes, altText) {
@@ -122,9 +128,15 @@ var customizeComponent = async function(modal, shapes, altText) {
     await waitFor.elementToBeClickable(
       shapeTool,
       'Could not click on the required tool');
-    var customTools = ['bezier', 'piechart'];
+    var customTools = ['bezier', 'piechart', 'svgupload'];
     if (customTools.includes(shapes[i])) {
       await shapeTool.click();
+      if (shapes[i] === 'svgupload') {
+        var imageUploadInput = element(
+          by.css('.protractor-test-photo-upload-input'));
+        absPath = path.resolve(__dirname, './circle.svg');
+        await imageUploadInput.sendKeys(absPath);
+      }
     }
     await shapeTool.click();
   }

@@ -117,7 +117,7 @@
                 tooltip-placement="left" uib-tooltip="Pie Chart" ng-disabled="!$ctrl.isPieChartEnabled()">
           <i class="fas fa-chart-pie pie-chart"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button" 
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-svgupload" 
                 ng-class="{'disabled' : !$ctrl.isSVGUploadEnabled()}" ng-click="$ctrl.uploadSVGFile()"
                 tooltip-placement="right" uib-tooltip="Upload SVG" ng-disabled="!$ctrl.isSVGUploadEnabled()">
           <i class="far fa-file-image file-upload"></i>
@@ -212,7 +212,7 @@
         </select>
       </div>
     </div>
-    <div class="horizontal-toolbar bottom-toolbar" ng-if="!$ctrl.isDrawModePieChart() && !ctrl.isDrawModeSVGUpload()">
+    <div class="horizontal-toolbar bottom-toolbar" ng-if="!$ctrl.isDrawModePieChart() && !$ctrl.isDrawModeSVGUpload()">
       <div class="input-tag" ng-if="$ctrl.isSizeVisible()">
         <select ng-model="$ctrl.fabricjsOptions.size" ng-options="size for size in $ctrl.sizes"
                 ng-change="$ctrl.onSizeChange()">
