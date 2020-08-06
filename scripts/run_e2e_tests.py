@@ -184,6 +184,13 @@ def cleanup():
         common.kill_processes_based_on_regex(p)
     build.set_constants_to_default()
 
+    if not common.is_windows_os():
+        # Redis does not run on Windows machines.
+        python_utils.PRINT('Cleaning up the redis_servers.')
+        # Shutdown the redis server before exiting.
+        common.stop_redis_server()
+
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -530,6 +537,12 @@ def main(args=None):
     if oppia_instance_is_already_running:
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
+
+    # Start the redis local development server.
+    if not common.is_windows_os():
+        # Redis does not run on Windows machines.
+        python_utils.PRINT('Starting Redis development server.')
+        common.start_redis_server()
 
     atexit.register(cleanup)
 
