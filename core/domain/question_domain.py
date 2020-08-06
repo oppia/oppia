@@ -670,6 +670,39 @@ class Question(python_utils.OBJECT):
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
 
+    @classmethod
+    def _convert_state_v36_dict_to_v37_dict(cls, question_state_dict):
+        """Converts from version 36 to 37. Version 37 removes the fields
+        rule_specs in AnswerGroups, and adds new fields rule_inputs and
+        rule_input_translations_mapping. rule_inputs is a dictionary that maps
+        rule type to a list of rule inputs that share the rule type.
+        rule_input_translations_mapping is a dict mapping abbreviated language
+        codes to a mapping of rule_type to rule_inputs.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for i, answer_group_dict in enumerate(answer_group_dicts):
+            rule_inputs = {}
+
+            # Convert the list of rule specs into the new rule_inputs dict
+            # format.
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                rule_type = rule_spec_dict['rule_type']
+                if rule_type not in rule_inputs:
+                    rule_inputs[rule_type] = []
+                rule_inputs[rule_type].append(
+                    rule_spec_dict['inputs'])
+            answer_group_dicts[i]['rule_input_translations_mapping'] = {}
+            answer_group_dicts[i]['rule_inputs'] = rule_inputs
+        return question_state_dict
+
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the
         object to contain an ID and a version. To be used to validate the
