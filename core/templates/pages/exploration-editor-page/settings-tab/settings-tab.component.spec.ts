@@ -42,12 +42,12 @@ import { UserExplorationPermissionsService } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockRouterService {
-  private refreshSettingsTabEmitter: EventEmitter<void>;
+  private refreshSettingsTabEventEmitter: EventEmitter<void>;
   get onRefreshSettingsTab() {
-    return this.refreshSettingsTabEmitter;
+    return this.refreshSettingsTabEventEmitter;
   }
-  set Emitter(val) {
-    this.refreshSettingsTabEmitter = val;
+  set refreshSettingsTabEmitter(val) {
+    this.refreshSettingsTabEventEmitter = val;
   }
 }
 
@@ -148,7 +148,7 @@ describe('Settings Tab Component', function() {
 
     explorationCategoryService.init('Astrology');
 
-    routerService.Emitter = new EventEmitter();
+    routerService.refreshSettingsTabEmitter = new EventEmitter();
     $scope = $rootScope.$new();
     ctrl = $componentController('settingsTab', {
       $scope: $scope,

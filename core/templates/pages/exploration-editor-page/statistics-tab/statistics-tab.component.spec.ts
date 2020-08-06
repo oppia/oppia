@@ -27,12 +27,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 
 class MockRouterService {
-  private refreshStatsticsTabEmitter: EventEmitter<void>;
+  private refreshStatisticsTabEventEmitter: EventEmitter<void>;
   get onRefreshStatisticsTab() {
-    return this.refreshStatsticsTabEmitter;
+    return this.refreshStatisticsTabEventEmitter;
   }
   set refreshStatisticsTabEmitter(val) {
-    this.refreshStatsticsTabEmitter = val;
+    this.refreshStatisticsTabEventEmitter = val;
   }
 }
 
