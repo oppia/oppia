@@ -172,6 +172,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         # Setup for UserSubscriptionsModel.
         for creator_id in self.CREATOR_IDS:
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             user_models.UserSettingsModel(
                 id=creator_id,
                 gae_id='gae_' + creator_id,
@@ -306,6 +308,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
         # Setup for UserSettingsModel.
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             gae_id=self.USER_GAE_ID_1,
@@ -473,6 +477,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             gae_id=self.USER_GAE_ID_1,

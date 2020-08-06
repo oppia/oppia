@@ -2775,6 +2775,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             id='config_model', value='c')
         self.config_model.commit(self.admin_id, [])
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
             gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
@@ -2912,6 +2914,8 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             id='config_model', value='c')
         self.config_model.commit(self.admin_id, [])
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
             gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
@@ -3014,6 +3018,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
 
         self.sender_email = 'sender@email.com'
         self.sender_id = 'sender'
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
             gae_id='gae_' + self.sender_id,
@@ -3022,6 +3028,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
 
         self.recipient_email = 'recipient@email.com'
         self.recipient_id = 'recipient'
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         self.recipient_model = user_models.UserSettingsModel(
             id=self.recipient_id,
             gae_id='gae_' + self.recipient_id,
@@ -3162,6 +3170,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
 
         self.sender_email = 'sender@email.com'
         self.sender_id = 'sender'
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
             gae_id='gae_' + self.sender_id,
@@ -3169,11 +3179,15 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         self.sender_model.put()
 
         self.recipient_ids = ['recipient1', 'recipient2']
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         self.recipient_model_1 = user_models.UserSettingsModel(
             id=self.recipient_ids[0],
             gae_id='gae_' + self.recipient_ids[0],
             email='recipient1@email.com')
         self.recipient_model_1.put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         self.recipient_model_2 = user_models.UserSettingsModel(
             id=self.recipient_ids[1],
             gae_id='gae_' + self.recipient_ids[1],
@@ -15420,6 +15434,8 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output)
 
     def test_model_not_same_id_as_user(self):
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.model_instance.id,
             gae_id='224169184123',
@@ -15538,6 +15554,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(self.admin_id, '', [])
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
             gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
@@ -15675,6 +15693,8 @@ class PlatformParameterSnapshotContentModelValidatorTests(
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION))
         self.parameter_model.commit(self.admin_id, '', [])
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
             gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,

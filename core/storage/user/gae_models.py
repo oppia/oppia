@@ -253,6 +253,9 @@ class UserSettingsModel(base_models.BaseModel):
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
 
+    # TODO(#10178): Remove this class method based on gae_id attribute when
+    # feconf.ENABLE_USER_AUTH_MODEL flag has been set True as gae_id would
+    # become a deprecated field.
     @classmethod
     def get_by_gae_id(cls, gae_id):
         """Returns a user model with given GAE user ID.

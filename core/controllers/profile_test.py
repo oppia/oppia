@@ -880,6 +880,9 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             )
 
             # Load golden zip file.
+            # TODO(#10178): Remove gae_id attribute inside the following zip
+            # file (oppia_takeout_data.zip) when feconf.ENABLE_USER_AUTH_MODEL
+            # flag has been set True.
             golden_zip_filepath = os.path.join(
                 feconf.TESTS_DATA_DIR,
                 'oppia_takeout_data.zip')

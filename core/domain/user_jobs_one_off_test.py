@@ -398,6 +398,8 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     def test_bio_length_for_users_with_no_bio(self):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         model1 = user_models.UserSettingsModel(
             id=user_id_a,
             gae_id='gae_' + user_id_a,
@@ -1162,6 +1164,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # We now manually reset the user's first_contribution_msec to None.
         # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.owner_id,
             gae_id='gae_id',
@@ -1223,7 +1227,8 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.exp_id, self.owner_id, end_state_name='End')
         self.logout()
-
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.owner_id,
             gae_id='gae_' + self.owner_id,
@@ -1254,7 +1259,8 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
                 'new_value': 'the objective'
             })], 'Test edit')
         self.logout()
-
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.editor_id,
             gae_id='gae_' + self.editor_id,
@@ -1294,6 +1300,8 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             })], 'Test edit new')
         self.logout()
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.owner_id,
             gae_id='gae_' + self.owner_id,
@@ -1302,6 +1310,8 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             last_edited_an_exploration=None
         ).put()
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.editor_id,
             gae_id='gae_' + self.editor_id,
@@ -1328,6 +1338,8 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(editor_settings.last_created_an_exploration)
 
     def test_that_last_edited_and_created_time_are_not_updated(self):
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.owner_id,
             gae_id='gae_' + self.owner_id,

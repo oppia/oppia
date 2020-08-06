@@ -262,6 +262,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_user_settings_by_gae_id_with_user_auth_disabled_is_not_none(self):
         with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
             gae_id = 'gae_id'
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             user_models.UserSettingsModel(
                 id='user_id',
                 gae_id=gae_id,
@@ -307,6 +309,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_user_settings_by_gae_id_strict_user_auth_disabled_not_none(self):
         with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
             gae_id = 'gae_id'
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             user_models.UserSettingsModel(
                 id='user_id',
                 gae_id=gae_id,
@@ -1466,6 +1470,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_get_human_readable_user_ids(self):
         # Create an unregistered user who has no username.
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id='unregistered_user_id',
             gae_id='gae_unregistered_user_id',

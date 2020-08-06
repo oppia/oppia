@@ -58,11 +58,15 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         """Set up user models in datastore for use in testing."""
         super(FeedbackThreadModelTest, self).setUp()
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
             gae_id='gae_1_id',
             email='some@email.com'
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.NEW_USER_2_ID,
             gae_id='gae_2_id',

@@ -65,18 +65,24 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
             gae_id=self.USER_1_GAE_ID,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.PROFILE_1_ID,
             gae_id=self.PROFILE_1_GAE_ID,
             email=self.PROFILE_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
             gae_id=self.USER_2_GAE_ID,
@@ -84,6 +90,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             role=self.USER_2_ROLE,
             deleted=True
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             gae_id=self.USER_3_GAE_ID,
@@ -240,6 +248,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         for _ in python_utils.RANGE(100):
             new_id = user_models.UserSettingsModel.get_new_id('')
             self.assertNotIn(new_id, ids)
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             user_models.UserSettingsModel(
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
@@ -779,11 +789,15 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserSubscriptionsModelTests, self).setUp()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             gae_id='gae_1_id',
             email='some@email.com'
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
             gae_id='gae_2_id',
@@ -793,6 +807,8 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
         for creator_id in self.CREATOR_IDS:
+            # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+            # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
             user_models.UserSettingsModel(
                 id=creator_id,
                 gae_id='gae_' + creator_id,
@@ -903,11 +919,15 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
         """Set up user models in datastore for use in testing."""
         super(UserSubscribersModelTests, self).setUp()
 
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             gae_id='gae_1_id',
             email='some@email.com'
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
             gae_id='gae_2_id',

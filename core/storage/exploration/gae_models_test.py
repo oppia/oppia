@@ -134,12 +134,16 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExplorationRightsModelUnitTest, self).setUp()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
             gae_id='gae_2_id',
@@ -433,12 +437,16 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ExpSummaryModelUnitTest, self).setUp()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
+        # TODO(#10178): Remove gae_id attribute from UserSettingsModel below
+        # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
         user_models.UserSettingsModel(
             id=self.USER_ID_2_NEW,
             gae_id='gae_2_id',
