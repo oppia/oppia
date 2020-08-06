@@ -190,7 +190,7 @@ def is_oppia_server_already_running():
     them is taken, it may indicate there is already one Oppia instance running.
 
     Returns:
-        bool: Whether there is a running Oppia instance.
+        bool. Whether there is a running Oppia instance.
     """
     running = False
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
@@ -346,7 +346,7 @@ def get_parameter_for_sharding(sharding_instances):
         sharding_instances: int. How many sharding instances to be running.
 
     Returns:
-        list(str): A list of parameters to represent the sharding configuration.
+        list(str). A list of parameters to represent the sharding configuration.
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
@@ -364,7 +364,7 @@ def get_parameter_for_dev_mode(dev_mode_setting):
         dev_mode_setting: bool. Whether the test is running on dev_mode.
 
     Returns:
-        str: A string for the testing mode command line parameter.
+        str. A string for the testing mode command line parameter.
     """
     return '--params.devMode=%s' % dev_mode_setting
 
@@ -377,7 +377,7 @@ def get_parameter_for_suite(suite_name):
             is `full`, all tests will run.
 
     Returns:
-        list(str): A list of command line parameters for the suite.
+        list(str). A list of command line parameters for the suite.
     """
     return ['--suite', suite_name]
 
@@ -394,7 +394,7 @@ def get_e2e_test_parameters(
             dev mode.
 
     Returns:
-        list(str): Parameters for running the tests.
+        list(str). Parameters for running the tests.
     """
     sharding_parameters = get_parameter_for_sharding(sharding_instances)
     dev_mode_parameters = get_parameter_for_dev_mode(dev_mode_setting)
@@ -435,18 +435,35 @@ def get_chrome_driver_version():
     This method follows the steps mentioned here:
     https://chromedriver.chromium.org/downloads/version-selection
     """
+    popen_args = ['google-chrome', '--version']
+    if common.is_mac_os():
+        # There are spaces between Google and Chrome in the path. Spaces don't
+        # need to be escaped when we're not using the terminal, ie. shell=False
+        # for Popen by default.
+        popen_args = [
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+            '--version'
+        ]
     try:
-        proc = subprocess.Popen(
-            ['google-chrome', '--version'], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(popen_args, stdout=subprocess.PIPE)
         output = proc.stdout.readline()
     except OSError:
+        # For the error message for the mac command, we need to add the
+        # backslashes in. This is because it is likely that a user will try to
+        # run the command on their terminal and, as mentioned above, the mac
+        # get chrome version command has spaces in the path which need to be
+        # escaped for successful terminal use.
         raise Exception(
-            'Failed to execute "google-chrome --version" command. This is '
-            'used to determine the chromedriver version to use. Please set '
-            'the chromedriver version manually using --chrome_driver_version '
-            'flag. To determine the chromedriver version to be used, please '
-            'follow the instructions mentioned in the following URL:\n'
-            'https://chromedriver.chromium.org/downloads/version-selection')
+            'Failed to execute "%s" command. '
+            'This is used to determine the chromedriver version to use. '
+            'Please set the chromedriver version manually using '
+            '--chrome_driver_version flag. To determine the chromedriver '
+            'version to be used, please follow the instructions mentioned '
+            'in the following URL:\n'
+            'https://chromedriver.chromium.org/downloads/version-selection' % (
+                ' '.join(arg.replace(' ', r'\ ') for arg in popen_args)
+            )
+        )
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     chrome_version = '.'.join(chrome_version.split('.')[:-1])
     response = python_utils.url_open(

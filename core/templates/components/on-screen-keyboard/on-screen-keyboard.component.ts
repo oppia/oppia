@@ -89,7 +89,7 @@ angular.module('oppia').component('onScreenKeyboard', {
       };
 
       ctrl.exponent = function(value) {
-        engine.insert_symbol('exp');
+        engine.insert_string('exp');
         engine.insert_string(value);
         engine.right();
         guppyInstance.activate();
