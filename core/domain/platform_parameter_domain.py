@@ -39,8 +39,12 @@ ALLOWED_SERVER_MODES = [
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
 ALLOWED_CLIENT_TYPES = ['Web', 'Android']
-ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Others']
-ALLOWED_APP_VERSION_FLAVOR = ['alpha', 'beta', 'test', 'release']
+ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Unknown']
+
+# The ordering of elements in ALLOWED_APP_VERSION_FLAVOR implies the ordering
+# of corresponding flavors, which is used in app_version_flavor filter for order
+# comparison, with following ordering: 'test' < 'alpha' < 'beta' < 'release'.
+ALLOWED_APP_VERSION_FLAVOR = ['test', 'alpha', 'beta', 'release']
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
     r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+(?:-(.+))?)?$')
@@ -138,8 +142,8 @@ class EvaluationContext(python_utils.OBJECT):
                 'Invalid browser type \'%s\', must be one of %s.' % (
                     self._browser_type, ALLOWED_BROWSER_TYPES))
 
-        match = APP_VERSION_WITH_HASH_REGEXP.match(self._app_version)
         if self._app_version is not None:
+            match = APP_VERSION_WITH_HASH_REGEXP.match(self._app_version)
             if match is None:
                 raise utils.ValidationError(
                     'Invalid version \'%s\', expected to match regexp %s.' % (
@@ -410,10 +414,11 @@ class PlatformParameterFilter(python_utils.OBJECT):
         Args:
             op: str. The operator for comparison, e.g. '=', '>'.
             flavor: str. The flavor to match, e.g. 'alpha', 'beta', 'test',
-                'n/a'.
+                'release'.
             client_version: str. The version of the client, given in the form
                 of '<version>-<hash>-<flavor>'. The hash and flavor of client
-                version is optional, if absent, the flavor is considered 'n/a'.
+                version is optional, but if absent, no flavor filter will
+                match to it.
 
         Returns:
             bool. True is the client_version matches the given flavor using
@@ -422,6 +427,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
         match = APP_VERSION_WITH_HASH_REGEXP.match(client_version)
         client_flavor = match.group(2)
 
+        # An unspecified client flavor means no flavor-based filters should
+        # match to it.
         if client_flavor is None:
             return False
 
@@ -443,9 +450,9 @@ class PlatformParameterFilter(python_utils.OBJECT):
             return is_equal or is_client_flavor_larger
 
     def _is_first_flavor_smaller(self, flavor_a, flavor_b):
-        """Compares two version flavors that are not 'unknown', return True
-        if the first version is smaller in the following ordering:
-        'alpha' < 'beta' < 'test' < 'release'
+        """Compares two version flavors, return True if the first version is
+        smaller in the following ordering:
+        'test' < 'alpha' < 'beta' < 'release'.
 
         Args:
             flavor_a: str. The version flavor.
