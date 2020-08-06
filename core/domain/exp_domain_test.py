@@ -681,15 +681,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration,
             (
-              'Expected customization arg value to be a '
-              'InteractionCustomizationArg'
+                'Expected customization arg value to be a '
+                'InteractionCustomizationArg'
             )
         )
 
         interaction.customization_args = {
-          15: state_domain.InteractionCustomizationArg('', {
-            'type': 'unicode'
-          })
+            15: state_domain.InteractionCustomizationArg('', {
+                'type': 'unicode'
+            })
         }
         self._assert_validation_error(
             exploration, 'Invalid customization arg name')
