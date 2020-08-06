@@ -951,5 +951,34 @@
       "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
       "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
     }
+  },
+  "RatioInput": {
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
+    "instructions": null,
+    "is_trainable": false,
+    "narrow_instructions": null,
+    "description": "Allows learners to enter ratios.",
+    "needs_summary": false,
+    "name": "Ratio Input",
+    "answer_type": "Ratio",
+    "is_linear": false,
+    "display_mode": "inline",
+    "id": "RatioInput",
+    "customization_arg_specs": [
+      {
+        "description": "Custom placeholder text (optional)",
+        "name": "customPlaceholder",
+        "schema": {
+          "type": "unicode"
+        },
+        "default_value": ""
+      }
+    ],
+    "is_terminal": false,
+    "default_outcome_heading": null,
+    "rule_descriptions": {
+      "Equals": "is equals to {{r|RatioExpression}}"
+    }
   }
 }
