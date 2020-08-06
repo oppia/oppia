@@ -26,6 +26,10 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 require('pages/exploration-editor-page/services/exploration-states.service');
 require(
@@ -52,16 +56,32 @@ describe('Learner Action Render Service', function() {
   beforeEach(() => {
     spyOn(explorationStatesService, 'getState')
       .withArgs('stateName1').and.returnValue({
-        interaction: { id: 'Continue'}
+        interaction: {
+          id: 'Continue',
+          customizationArgs: {
+            buttonText: {value: new SubtitledUnicode('', '')}
+          }
+        }
       })
       .withArgs('stateName2').and.returnValue({
-        interaction: { id: 'TextInput'}
+        interaction: {
+          id: 'TextInput',
+          customizationArgs: {
+            placeholder: {value: new SubtitledUnicode('', '')},
+            rows: {value: 1}
+          }
+        }
       })
       .withArgs('stateName3').and.returnValue({
         interaction: {
           id: 'MultipleChoiceInput',
           customizationArgs: {
-            choices: {value: ['Choice1', 'Choice2', 'Choice3']}
+            choices: {value: [
+              new SubtitledHtml('Choice1', ''),
+              new SubtitledHtml('Choice2', ''),
+              new SubtitledHtml('Choice3', '')
+            ]},
+            showChoicesInShuffledOrder: {value: true}
           }
         }
       });
