@@ -18,7 +18,5 @@
 
 export class StoryEditorPageConstants {
   public static NODE_ID_PREFIX = 'node_';
-  public static EVENT_STORY_INITIALIZED = 'storyInitialized';
-  public static EVENT_STORY_REINITIALIZED = 'storyReinitialized';
   public static EVENT_VIEW_STORY_NODE_EDITOR = 'viewStoryNodeEditor';
 }

@@ -28,6 +28,8 @@ import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -88,7 +90,12 @@ describe('DragAndDropSortInputValidationService', () => {
 
     customizationArgs = {
       choices: {
-        value: ['a', 'b', 'c', 'd']
+        value: [
+          new SubtitledHtml('a', ''),
+          new SubtitledHtml('b', ''),
+          new SubtitledHtml('c', ''),
+          new SubtitledHtml('d', '')
+        ]
       },
       allowMultipleItemsInSamePosition: {
         value: true
@@ -231,7 +238,9 @@ describe('DragAndDropSortInputValidationService', () => {
   });
 
   it('should expect at least two choices', () => {
-    customizationArgs.choices.value = ['1'];
+    customizationArgs.choices.value = [
+      new SubtitledHtml('1', '')
+    ];
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, [], goodDefaultOutcome);
@@ -243,7 +252,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
-    customizationArgs.choices.value[0] = '';
+    customizationArgs.choices.value[0].setHtml('');
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, [], goodDefaultOutcome);
@@ -255,7 +264,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
-    customizationArgs.choices.value.push('d');
+    customizationArgs.choices.value.push(new SubtitledHtml('d', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, [], goodDefaultOutcome);
