@@ -25,19 +25,19 @@ require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 require('services/assets-backend-api.service.ts');
 require('services/contextual/url.service.ts');
 
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('storyPreviewTab', {
   template: require('./story-preview-tab.component.html'),
   controller: [
     '$scope', 'AssetsBackendApiService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UrlService',
-    'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
     function(
         $scope, AssetsBackendApiService, StoryEditorNavigationService,
-        StoryEditorStateService, UrlService,
-        EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+        StoryEditorStateService, UrlService) {
       var ctrl = this;
-      var _initEditor = function() {
+      ctrl.directiveSubscriptions = new Subscription();
+      ctrl.initEditor = function() {
         ctrl.story = StoryEditorStateService.getStory();
         ctrl.storyId = StoryEditorStateService.getStory().getId();
         ctrl.storyContents = ctrl.story.getStoryContents();
@@ -51,21 +51,23 @@ angular.module('oppia').component('storyPreviewTab', {
       ctrl.generatePathIconParameters = function() {
         var storyNodes = ctrl.nodes;
         var iconParametersArray = [];
+        let thumbnailIconUrl = storyNodes[0].getThumbnailFilename() ? (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  'story', ctrl.storyId,
+                  storyNodes[0].getThumbnailFilename())) : null;
         iconParametersArray.push({
-          thumbnailIconUrl: (
-            AssetsBackendApiService.getThumbnailUrlForPreview(
-              'story', ctrl.storyId,
-              storyNodes[0].getThumbnailFilename())),
+          thumbnailIconUrl: thumbnailIconUrl,
           thumbnailBgColor: storyNodes[0].getThumbnailBgColor()
         });
 
         for (
           var i = 1; i < ctrl.nodes.length; i++) {
-          iconParametersArray.push({
-            thumbnailIconUrl: (
+          thumbnailIconUrl = storyNodes[i].getThumbnailFilename() ? (
               AssetsBackendApiService.getThumbnailUrlForPreview(
                 'story', ctrl.storyId,
-                storyNodes[i].getThumbnailFilename())),
+                storyNodes[i].getThumbnailFilename())) : null;
+          iconParametersArray.push({
+            thumbnailIconUrl: thumbnailIconUrl,
             thumbnailBgColor: storyNodes[i].getThumbnailBgColor()
           });
         }
@@ -82,9 +84,21 @@ angular.module('oppia').component('storyPreviewTab', {
       };
 
       ctrl.$onInit = function() {
-        $scope.$on(EVENT_STORY_INITIALIZED, _initEditor);
-        $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
-        _initEditor();
+        ctrl.directiveSubscriptions.add(
+          StoryEditorStateService.onStoryInitialized.subscribe(
+            () => ctrl.initEditor()
+          )
+        );
+        ctrl.directiveSubscriptions.add(
+          StoryEditorStateService.onStoryReinitialized.subscribe(
+            () => ctrl.initEditor()
+          )
+        );
+        ctrl.initEditor();
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]
