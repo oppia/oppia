@@ -91,7 +91,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
-    user_jobs_one_off.UserAuthModelOneOffJob,
+    user_jobs_one_off.PopulateUserAuthModelOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,

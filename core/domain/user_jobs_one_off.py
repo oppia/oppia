@@ -81,7 +81,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     edited_exploration_ids))
 
 
-class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserAuthModel for
     all registered users.
     """
@@ -95,27 +95,39 @@ class UserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         """Implements the map function for this job."""
 
-        # Assumption: We do not have any profile user in the UserSettingsModel,
-        # because we have no method of associating profile users with a full
-        # user.
+        # Assumptions:
+        # 1) We are only having full users in the database, and no
+        #    profile users.
+        # 2) For the same user_id, gae_id cannot be updated.
 
         user_auth_model = user_models.UserAuthModel.get_by_auth_id(
             feconf.AUTH_METHOD_GAE, item.gae_id)
-        if (user_auth_model is not None) and (user_auth_model.id != item.id):
-            yield ('GAE_ID %s already registered with user_id %s.' % (
-                item.gae_id, user_auth_model.id), 1
-                  )
+        if user_auth_model is not None:
+            if user_auth_model.id != item.id:
+                yield (
+                    'Error, gae_id already existing',
+                    {'user_id': item.id, 'gae_id': item.gae_id}
+                    )
+            else:
+                if (item.deleted is True) and (
+                        user_auth_model.deleted is not True):
+                    user_auth_model.deleted = item.deleted
+                    user_auth_model.put()
+                    yield (
+                        'Updated', {'user_id': item.id, 'gae_id': item.gae_id})
         else:
             user_models.UserAuthModel(
                 id=item.id,
                 gae_id=item.gae_id,
-                pin=None,
-                parent_user_id=None
+                deleted=item.deleted
             ).put()
+            yield ('Created', {'user_id': item.id, 'gae_id': item.gae_id})
 
     @staticmethod
-    def reduce(error_message, _):
-        yield error_message
+    def reduce(message_category, values):
+        users_list = [
+            ast.literal_eval(v) for v in values]
+        yield (message_category, users_list)
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):

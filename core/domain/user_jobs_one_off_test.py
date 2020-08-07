@@ -196,8 +196,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             ['exp_id'])
 
 
-class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for the one-off UserAuthModel migration job."""
+class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off PopulateUserAuthModel migration job."""
 
     USER_A_EMAIL = 'a@example.com'
     USER_A_ID = 'user_a_id'
@@ -208,20 +208,24 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = user_jobs_one_off.UserAuthModelOneOffJob.create_new()
-        user_jobs_one_off.UserAuthModelOneOffJob.enqueue(job_id)
+        job_id = user_jobs_one_off.PopulateUserAuthModelOneOffJob.create_new()
+        user_jobs_one_off.PopulateUserAuthModelOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        output = (
-            user_jobs_one_off.UserAuthModelOneOffJob.get_output(
+        stringified_output = (
+            user_jobs_one_off.PopulateUserAuthModelOneOffJob.get_output(
                 job_id))
+        output = {}
+        for stringified_distribution in stringified_output:
+            message_list = ast.literal_eval(stringified_distribution)
+            output[message_list[0]] = message_list[1]
         return output
 
     def setUp(self):
-        super(UserAuthModelOneOffJobTests, self).setUp()
+        super(PopulateUserAuthModelOneOffJobTests, self).setUp()
         self.user_a_model = user_models.UserSettingsModel(
             id=self.USER_A_ID,
             gae_id=self.USER_A_GAE_ID,
@@ -236,14 +240,27 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
 
     def test_before_migration_user_does_not_exist_in_user_auth_model(self):
         self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
-        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
 
-    def test_one_off_job_migrates_users_without_any_error(self):
+    def test_one_off_job_migrate_single_new_user_successfully(self):
+        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
+
+        output = self._run_one_off_job()
+
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_A_ID)
+
+        expected_output = {
+            'Created': [
+                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID}]
+        }
+        self.assertEqual(output, expected_output)
+
+    def test_one_off_job_migrate_multiple_new_users_successfully(self):
         self.user_b_model.put()
         self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_A_ID))
-        self.assertIsNone(user_models.UserAuthModel.get_by_id(self.USER_B_ID))
 
-        self._run_one_off_job()
+        output = self._run_one_off_job()
 
         user_auth_model = user_models.UserAuthModel.get_by_auth_id(
             feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
@@ -252,21 +269,70 @@ class UserAuthModelOneOffJobTests(test_utils.GenericTestBase):
             feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
         self.assertEqual(user_auth_model.id, self.USER_B_ID)
 
+        expected_output = [
+            {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID},
+            {'user_id': self.USER_B_ID, 'gae_id': self.USER_B_GAE_ID},
+            ]
+
+        # To ensure both lists have same elements.
+        for user in expected_output:
+            self.assertIn(user, output['Created'])
+        for user in output['Created']:
+            self.assertIn(user, expected_output)
+        self.assertEqual(['Created'], output.keys()) # pylint: disable=dict-keys-not-iterating
+
+    def test_one_off_job_existing_user_updated_successfully(self):
+        self._run_one_off_job()
+        self.user_a_model.deleted = True
+        self.user_a_model.put()
+
+        output = self._run_one_off_job()
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        self.assertEqual(user_auth_model.id, self.USER_A_ID)
+        self.assertTrue(user_auth_model.deleted)
+
+        expected_output = {
+            'Updated': [
+                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID}]
+        }
+        self.assertEqual(output, expected_output)
+
+
     def test_one_off_job_gae_id_registered_to_multiple_users_raises_error(self):
         self._run_one_off_job()
         self.user_b_model.gae_id = self.USER_A_GAE_ID
         self.user_b_model.put()
         output = self._run_one_off_job()
-        self.assertEqual(len(output), 1)
-        expected_error = python_utils.UNICODE(
-            'GAE_ID %s already registered with user_id %s.' % (
-                self.USER_A_GAE_ID, self.user_a_model.id))
-        self.assertEqual(expected_error, output[0])
+
+        expected_output = {
+            'Error, gae_id already existing': [
+                {'user_id': self.USER_B_ID, 'gae_id': self.USER_A_GAE_ID}]
+        }
+        self.assertEqual(
+            expected_output, output)
+
+    def test_one_off_job_with_create_and_update_entries_works_correctly(self):
+        self._run_one_off_job()
+        self.user_a_model.deleted = True
+        self.user_a_model.put()
+        self.user_b_model.put()
+        output = self._run_one_off_job()
+
+        expected_output = {
+            'Created': [
+                {'user_id': self.USER_B_ID, 'gae_id': self.USER_B_GAE_ID}],
+            'Updated': [
+                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID}]
+        }
+        self.assertEqual(
+            expected_output, output)
 
     def test_one_off_job_run_multiple_times_raises_no_error(self):
         self.user_b_model.put()
         self._run_one_off_job()
-        self._run_one_off_job()
+        output = self._run_one_off_job()
+        self.assertEqual(output, {})
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
@@ -293,7 +359,6 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         stringified_output = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
                 job_id))
-
         output = {}
         for stringified_distribution in stringified_output:
             value = re.findall(r'\d+', stringified_distribution)
