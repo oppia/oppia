@@ -54,15 +54,17 @@ class ClassroomDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         classroom_name_is_valid = False
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
+        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
             if classroom_dict['name'] == classroom_name:
                 classroom_name_is_valid = True
-                topic_ids = classroom_dict['topic_ids']
+                classroom_data = classroom_dict
                 break
 
         if not classroom_name_is_valid:
             raise self.PageNotFoundException
 
+        topic_ids = classroom_data['topic_ids']
+        del classroom_data['topic_ids']
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_services.get_multi_topic_rights(topic_ids)
         topic_summary_dicts = [
@@ -71,7 +73,10 @@ class ClassroomDataHandler(base.BaseHandler):
         ]
 
         self.values.update({
-            'topic_summary_dicts': topic_summary_dicts
+            'topic_summary_dicts': topic_summary_dicts,
+            'topic_list_intro': classroom_data['topic_list_intro'],
+            'course_details': classroom_data['course_details'],
+            'name': classroom_data['name']
         })
         self.render_json(self.values)
 

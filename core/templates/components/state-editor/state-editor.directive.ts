@@ -40,6 +40,9 @@ require(
   'state-name.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-param-changes.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -63,9 +66,10 @@ angular.module('oppia').directive('stateEditor', [
         navigateToState: '=',
         onSaveHints: '=',
         onSaveInteractionAnswerGroups: '=',
-        onSaveInteractionId: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveInteractionId: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
@@ -79,12 +83,14 @@ angular.module('oppia').directive('stateEditor', [
         '$rootScope', '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService', 'StateNameService',
+        'StateNextContentIdIndexService',
         'StateParamChangesService', 'StateSolicitAnswerDetailsService',
         'StateSolutionService', 'INTERACTION_SPECS',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService, StateNameService,
+            StateNextContentIdIndexService,
             StateParamChangesService, StateSolicitAnswerDetailsService,
             StateSolutionService, INTERACTION_SPECS) {
           var ctrl = this;
@@ -136,6 +142,8 @@ angular.module('oppia').directive('stateEditor', [
                     $scope.stateName, stateData.interaction.id);
                   StateCustomizationArgsService.init(
                     $scope.stateName, stateData.interaction.customizationArgs);
+                  StateNextContentIdIndexService.init(
+                    $scope.stateName, stateData.nextContentIdIndex);
                   StateNameService.init($scope.stateName, stateData.name);
                   StateParamChangesService.init(
                     $scope.stateName, stateData.paramChanges);

@@ -317,7 +317,10 @@ describe('Exploration Warnings Service', function() {
                 value: 1
               },
               buttonText: {
-                value: ''
+                value: {
+                  unicode_str: '',
+                  content_id: ''
+                }
               }
             },
             hints: [],
@@ -374,6 +377,7 @@ describe('Exploration Warnings Service', function() {
           },
           param_changes: [],
           interaction: {
+            id: null,
             answer_groups: [{
               outcome: {
                 dest: '',
@@ -926,7 +930,10 @@ describe('Exploration Warnings Service', function() {
                 value: 1
               },
               placeholder: {
-                value: 'placeholder value'
+                value: {
+                  unicode_str: 'placeholder value',
+                  content_id: ''
+                }
               }
             },
             hints: [],

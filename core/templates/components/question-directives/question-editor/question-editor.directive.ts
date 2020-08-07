@@ -162,6 +162,13 @@ angular.module('oppia').directive('questionEditor', [
             });
           };
 
+          ctrl.saveNextContentIdIndex = function(displayedValue) {
+            _updateQuestion(function() {
+              var stateData = ctrl.question.getStateData();
+              stateData.nextContentIdIndex = angular.copy(displayedValue);
+            });
+          };
+
           ctrl.saveSolution = function(displayedValue) {
             _updateQuestion(function() {
               StateEditorService.setInteractionSolution(
