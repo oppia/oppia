@@ -97,9 +97,9 @@ export class ExplorationDataService {
       this.explorationId, changeList, this.draftChangeListId);
     this.http.put(this.explorationDraftAutosaveUrl, {
       change_list: changeList,
-      version: this.data.version
+      version: this.data['version']
     }).toPromise().then((response) => {
-      this.draftChangeListId = response.body.draft_change_list_id;
+      this.draftChangeListId = response['body'].draft_change_list_id;
       // We can safely remove the locally saved draft copy if it was saved
       // to the backend.
       this.localStorageService.removeExplorationDraft(this.explorationId);
@@ -209,11 +209,11 @@ export class ExplorationDataService {
       successCallback,
       errorCallback): void {
     this.editableExplorationBackendApiService.updateExploration(
-      this.explorationId, this.data ? this.data.version : null,
+      this.explorationId, this.data ? this.data['version'] : null,
       commitMessage, changeList).then(
       (response) => {
         this.alertsService.clearWarnings();
-        this.explorationData.data = response;
+        this.data = response;
         if (successCallback) {
           successCallback(
             response.is_version_of_draft_valid,
