@@ -56,6 +56,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
       },
       markEditorTutorialFinished: function() {
         if (_currentlyInEditorFirstVisit) {
+          console.log('Emitted: openPostTutHelpPopover in STFTS: markEditorTutFinished');
           _openPostTutorialHelpPopoverEventEmitter.emit();
           EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
         }
@@ -85,6 +86,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
       },
       markTranslationTutorialFinished: function() {
         if (_currentlyInTranslationFirstVisit) {
+          console.log('Emitted: openPostTutHelpPopover in STFTS: markTranslationTutFinished');
           _openPostTutorialHelpPopoverEventEmitter.emit();
           EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
         }

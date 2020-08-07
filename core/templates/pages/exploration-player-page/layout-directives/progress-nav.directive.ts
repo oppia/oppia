@@ -123,6 +123,7 @@ angular.module('oppia').directive('progressNav', [
             if (index >= 0 && index < transcriptLength) {
               PlayerPositionService.recordNavigationButtonClick();
               PlayerPositionService.setDisplayedCardIndex(index);
+              console.log('Emitted: updateActiveStateIfInEditor in progress nav');
               ExplorationEngineService.onUpdateActiveStateIfInEditor.emit(
                 PlayerPositionService.getCurrentStateName());
               $rootScope.$broadcast('currentQuestionChanged', index);

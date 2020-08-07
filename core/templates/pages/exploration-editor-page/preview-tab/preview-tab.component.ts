@@ -158,7 +158,10 @@ angular.module('oppia').component('previewTab', {
         // change when toggling between editor and preview.
         ctrl.directiveSubscriptions.add(
           ExplorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
-            (stateName) => StateEditorService.setActiveStateName(stateName))
+            (stateName) => {
+              console.log('Caught: updateActiveStateIfInEditor in preview-tab');
+              StateEditorService.setActiveStateName(stateName);
+            })
         );
         $scope.$on('playerStateChange', function() {
           ctrl.allParams = LearnerParamsService.getAllParams();
