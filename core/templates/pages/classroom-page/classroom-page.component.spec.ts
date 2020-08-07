@@ -113,7 +113,7 @@ describe('Classroom page', () => {
 
       expect(loadingMessage).toBe('');
       expect(ctrl.bannerImageFileUrl).toBe('/assets/images/splash/books.svg');
-      expect(ctrl.classroomDisplayName).toBe('Mock');
+      expect(ctrl.classroomDisplayName).toBe('Math');
 
       expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
         'Mock Classroom | Oppia');
