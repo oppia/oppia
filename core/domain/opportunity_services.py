@@ -218,8 +218,13 @@ def update_opportunity_with_updated_exploration(exp_id):
         get_exploration_opportunity_summary_from_model(model))
     exploration_opportunity_summary.content_count = content_count
     exploration_opportunity_summary.translation_counts = translation_counts
-    exploration_opportunity_summary.complete_translation_languages = (
-        complete_translation_language_list)
+    exploration_opportunity_summary.incomplete_translation_language_codes = (
+        _compute_list_difference(
+            exploration_opportunity_summary
+            .incomplete_translation_language_codes,
+            complete_translation_language_list
+        )
+    )
 
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
         exploration_opportunity_summary.assigned_voice_artist_in_language_codes)
@@ -239,15 +244,21 @@ def update_opportunity_with_updated_exploration(exp_id):
 
     exploration_opportunity_summary.validate()
 
-    # After all available content has been translated, delete the opportunity.
-    if (
-            exploration_opportunity_summary.translation_counts >=
-            exploration_opportunity_summary.content_count
-    ):
-        delete_exploration_opportunities([exp_id])
-    else:
-        _save_multi_exploration_opportunity_summary(
-            [exploration_opportunity_summary])
+    _save_multi_exploration_opportunity_summary(
+        [exploration_opportunity_summary])
+
+
+def _compute_list_difference(list_a, list_b):
+    """Returns the set difference of two lists.
+
+    Args:
+        list_a: list. The first list.
+        list_b: list. The second list.
+
+    Returns:
+        list. List of the set difference of list_a - list_b.
+    """
+    return list(set(list_a) - set(list_b))
 
 
 def update_exploration_opportunities_with_story_changes(story, exp_ids):

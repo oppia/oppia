@@ -1050,12 +1050,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     }
                 },
-                'default_outcome': {
-                    'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
             }
         })
         exploration.states[
@@ -1175,8 +1169,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_content_count(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(
-            exploration.get_content_count(), 2)
+        self.assertEqual(exploration.get_content_count(), 1)
 
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
@@ -1224,7 +1217,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
 
-        self.assertEqual(exploration.get_content_count(), 7)
+        self.assertEqual(exploration.get_content_count(), 5)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
