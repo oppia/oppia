@@ -183,7 +183,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg):
-            """Mocks logging.error()."""
+            """Mocks logging.exception()."""
             observed_log_messages.append(msg)
 
         # The topic model created will be invalid due to invalid language code.
@@ -196,19 +196,91 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging, 'exception', _mock_logging_function):
             self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            observed_log_messages,
-            ['Topic topic_id failed validation: Invalid language code: '
-             'invalid_language_code'])
+        actual_output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(
+            job_id)
+        expected_message = (
+            'Topic topic_id failed validation after fetch: Invalid '
+            'language code: invalid_language_code')
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
-        expected = [[u'validation_error',
-                     [u'Topic topic_id failed validation: '
-                      'Invalid language code: invalid_language_code']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        expected_output = [
+            '[u\'VALIDATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_get_topic_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_get_topic_by_id(_):
+            """Raises an error when fetching exploration."""
+            raise Exception('Invalid Topic')
+
+
+        self.save_new_topic_with_subtopic_schema_v1(
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
+            'a name', 'description', 'Image.svg',
+            '#C6DCDA', [], [], [], 2, language_code='en')
+
+        job_id = topic_jobs_one_off.TopicMigrationOneOffJob.create_new()
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                topic_fetchers, 'get_topic_by_id',
+                _mock_get_topic_by_id):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Topic %s failed migration during GET: Invalid Topic'
+            % (self.TOPIC_ID))
+        expected_output = [
+            '[u\'MIGRATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_update_topic_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_update_topic(*_):
+            """Raises an error when updating exploration."""
+            raise Exception('Error when updating topic')
+
+        self.save_new_topic_with_subtopic_schema_v1(
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
+            'a name', 'description', 'Image.svg',
+            '#C6DCDA', [], [], [], 2, language_code='en')
+
+        job_id = topic_jobs_one_off.TopicMigrationOneOffJob.create_new()
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                topic_services, 'update_topic_and_subtopic_pages',
+                _mock_update_topic):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Topic %s failed final update, Error when updating topic'
+            % (self.TOPIC_ID))
+        expected_output = [
+            '[u\'UPDATE_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
 
 
 class RemoveDeletedSkillsFromTopicOneOffJobTests(

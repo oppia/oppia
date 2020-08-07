@@ -57,15 +57,21 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the story up to the newest version.
-        story = story_fetchers.get_story_by_id(item.id)
+        try:
+            story = story_fetchers.get_story_by_id(item.id)
+        except Exception as e:
+            error_message = (
+                'Story %s failed migration during GET: %s' %
+                (item.id, e))
+            logging.exception(error_message)
+            yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+            return
         try:
             story.validate()
         except Exception as e:
-            logging.error(
-                'Story %s failed validation: %s' % (item.id, e))
-            yield (
-                StoryMigrationOneOffJob._ERROR_KEY,
-                'Story %s failed validation: %s' % (item.id, e))
+            error_message = 'Story %s failed validation: %s' % (item.id, e)
+            logging.exception(error_message)
+            yield ('VALIDATION_ERROR', error_message.encode('utf-8'))
             return
 
         # Write the new story into the datastore if it's different from
@@ -77,10 +83,18 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'from_version': item.story_contents_schema_version,
                 'to_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
             })]
-            story_services.update_story(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update story contents schema version to %d.' % (
-                    feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION))
+            try:
+                story_services.update_story(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                    'Update story contents schema version to %d.' % (
+                        feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION))
+            except Exception as e:
+                error_message = (
+                    'Story %s failed final update, %s' %
+                    (item.id, e))
+                logging.exception(error_message)
+                yield ('UPDATE_ERROR', error_message.encode('utf-8'))
+                return
             yield (StoryMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod

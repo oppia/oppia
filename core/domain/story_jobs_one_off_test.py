@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import logging
 
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -31,6 +32,7 @@ from core.tests import test_utils
 import feconf
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
+memcache_services = models.Registry.import_memcache_services()
 
 
 class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
@@ -218,34 +220,114 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'1 stories successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
-    def test_migration_job_skips_updated_story_failing_validation(self):
+    def test_migration_job_fails_with_invalid_story(self):
+        observed_log_messages = []
 
-        def _mock_get_story_by_id(unused_story_id):
-            """Mocks get_story_by_id()."""
-            return 'invalid_story'
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', 'Description', self.TOPIC_ID)
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
-        get_story_by_id_swap = self.swap(
-            story_fetchers, 'get_story_by_id', _mock_get_story_by_id)
 
-        with get_story_by_id_swap:
-            job_id = (
-                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
-            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        story_model = story_models.StoryModel.get(self.STORY_ID)
+        story_model.language_code = 'invalid_language_code'
+        story_model.commit(
+            self.albert_id, 'Changed language_code.', [])
+        memcache_services.delete('story:%s' % self.STORY_ID)
+
+        job_id = story_jobs_one_off.StoryMigrationOneOffJob.create_new()
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
             self.process_and_flush_pending_tasks()
+        actual_output = (
+            story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id))
 
-        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(
-            job_id)
+        expected_message = (
+            'Story %s failed validation: '
+            'Invalid language code: invalid_language_code'
+            % (self.STORY_ID))
+        expected_output = [
+            '[u\'VALIDATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
 
-        # If the story had been successfully migrated, this would include a
-        # 'successfully migrated' message. Its absence means that the story
-        # could not be processed.
-        for x in output:
-            self.assertRegexpMatches(x, 'object has no attribute \'validate\'')
+    def test_migration_job_fails_when_get_story_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_get_story_by_id(_):
+            """Raises an error when fetching story."""
+            raise Exception('Invalid Story')
+
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID)
+        story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+
+        job_id = story_jobs_one_off.StoryMigrationOneOffJob.create_new()
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                story_fetchers, 'get_story_by_id',
+                _mock_get_story_by_id):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Story %s failed migration during GET: Invalid Story'
+            % (self.STORY_ID))
+        expected_output = [
+            '[u\'MIGRATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_update_story_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_update_story(*_):
+            """Raises an error when updating story."""
+            raise Exception('Error when updating story')
+
+        self.save_new_story_with_story_contents_schema_v1(
+            self.STORY_ID, 'image.svg', '#F8BF74', self.albert_id, 'A title',
+            'A description', 'A note', self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+
+        job_id = story_jobs_one_off.StoryMigrationOneOffJob.create_new()
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                story_services, 'update_story',
+                _mock_update_story):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Story %s failed final update, Error when updating story'
+            % (self.STORY_ID))
+        expected_output = [
+            '[u\'UPDATE_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
 
 
 class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):

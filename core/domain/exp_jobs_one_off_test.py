@@ -1096,7 +1096,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging.exception()."""
             observed_log_messages.append(msg % args)
 
 
@@ -1112,7 +1112,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging, 'exception', _mock_logging_function):
             self.process_and_flush_pending_tasks()
         actual_output = (
             exp_jobs_one_off.ExplorationMigrationJobManager.get_output(job_id))
@@ -1131,7 +1131,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging.exception()."""
             observed_log_messages.append(msg % args)
 
         def _mock_get_exploration_by_id(_):
@@ -1145,7 +1145,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging, 'exception', _mock_logging_function):
             with self.swap(
                 exp_fetchers, 'get_exploration_by_id',
                 _mock_get_exploration_by_id):
@@ -1166,7 +1166,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging.exception()."""
             observed_log_messages.append(msg % args)
 
         def _mock_update_exploration(*_):
@@ -1178,7 +1178,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging, 'exception', _mock_logging_function):
             with self.swap(
                 exp_services, 'update_exploration',
                 _mock_update_exploration):

@@ -60,15 +60,22 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the topic up to the newest version.
-        topic = topic_fetchers.get_topic_by_id(item.id)
+        try:
+            topic = topic_fetchers.get_topic_by_id(item.id)
+        except Exception as e:
+            error_message = (
+                'Topic %s failed migration during GET: %s' %
+                (item.id, e))
+            logging.exception(error_message)
+            yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+            return
         try:
             topic.validate()
         except Exception as e:
-            logging.error(
-                'Topic %s failed validation: %s' % (item.id, e))
-            yield (
-                TopicMigrationOneOffJob._ERROR_KEY,
-                'Topic %s failed validation: %s' % (item.id, e))
+            error_message = (
+                'Topic %s failed validation after fetch: %s' % (item.id, e))
+            logging.exception(error_message)
+            yield ('VALIDATION_ERROR', error_message.encode('utf-8'))
             return
 
         # Write the new topic into the datastore if it's different from
@@ -80,10 +87,17 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'from_version': item.subtopic_schema_version,
                 'to_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION
             })]
-            topic_services.update_topic_and_subtopic_pages(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update topic\'s subtopic schema version to %d.' % (
-                    feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION))
+            try:
+                topic_services.update_topic_and_subtopic_pages(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                    'Update topic\'s subtopic schema version to %d.' % (
+                        feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION))
+            except Exception as e:
+                error_message = (
+                    'Topic %s failed final update, %s' % (item.id, e))
+                logging.exception(error_message)
+                yield ('UPDATE_ERROR', error_message.encode('utf-8'))
+                return
             yield (TopicMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod

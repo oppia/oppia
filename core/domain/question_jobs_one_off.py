@@ -56,15 +56,21 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the question up to the newest version.
-        question = question_services.get_question_by_id(item.id)
+        try:
+            question = question_services.get_question_by_id(item.id)
+        except Exception as e:
+            error_message = (
+                'Question %s failed migration during GET: %s' %
+                (item.id, e))
+            logging.exception(error_message)
+            yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+            return
         try:
             question.validate()
         except Exception as e:
-            logging.error(
-                'Question %s failed validation: %s' % (item.id, e))
-            yield (
-                QuestionMigrationOneOffJob._ERROR_KEY,
-                'Question %s failed validation: %s' % (item.id, e))
+            error_message = 'Question %s failed validation: %s' % (item.id, e)
+            logging.exception(error_message)
+            yield ('VALIDATION_ERROR', error_message.encode('utf-8'))
             return
 
         # Write the new question into the datastore if it's different from
@@ -76,10 +82,18 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'from_version': item.question_state_data_schema_version,
                 'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
             })]
-            question_services.update_question(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update question state schema version to %d.' % (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION))
+            try:
+                question_services.update_question(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                    'Update question state schema version to %d.' % (
+                        feconf.CURRENT_STATE_SCHEMA_VERSION))
+            except Exception as e:
+                error_message = (
+                    'Question %s failed final update, %s' %
+                    (item.id, e))
+                logging.exception(error_message)
+                yield ('UPDATE_ERROR', error_message.encode('utf-8'))
+                return
             yield (QuestionMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod

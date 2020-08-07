@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import logging
 
 from constants import constants
 from core.domain import skill_domain
@@ -32,6 +33,7 @@ from core.tests import test_utils
 import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
+memcache_services = models.Registry.import_memcache_services()
 
 
 class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
@@ -199,36 +201,136 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'1 skills successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
-    def test_migration_job_skips_updated_skill_failing_validation(self):
+    def test_migration_job_fails_with_invalid_skill(self):
+        observed_log_messages = []
 
-        def _mock_get_skill_by_id(unused_skill_id):
-            """Mocks get_skill_by_id()."""
-            return 'invalid_skill'
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
 
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
-        get_skill_by_id_swap = self.swap(
-            skill_fetchers, 'get_skill_by_id', _mock_get_skill_by_id)
+        skill_model = skill_models.SkillModel.get(self.SKILL_ID)
+        skill_model.language_code = 'invalid_language_code'
+        skill_model.commit(
+            self.albert_id, 'Changed language_code.', [])
+        memcache_services.delete('skill:%s' % self.SKILL_ID)
 
-        with get_skill_by_id_swap:
-            job_id = (
-                skill_jobs_one_off.SkillMigrationOneOffJob.create_new())
-            skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+        job_id = skill_jobs_one_off.SkillMigrationOneOffJob.create_new()
+        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
             self.process_and_flush_pending_tasks()
+        actual_output = (
+            skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id))
 
-        output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(
-            job_id)
-
-        # If the skill had been successfully migrated, this would include a
-        # 'successfully migrated' message. Its absence means that the skill
-        # could not be processed.
-        expected = [[u'validation_error',
-                     [u'Skill %s failed validation: \'unicode\' object has '
-                      'no attribute \'validate\'' % (self.SKILL_ID)]]]
+        expected_message = (
+            'Skill %s failed validation: '
+            'Invalid language code: invalid_language_code'
+            % (self.SKILL_ID))
+        expected_output = [
+            '[u\'VALIDATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
         self.assertEqual(
-            expected, [ast.literal_eval(x) for x in output])
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_get_skill_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_get_skill_by_id(_):
+            """Raises an error when fetching skill."""
+            raise Exception('Invalid Skill')
+
+        skill = skill_domain.Skill.create_default_skill(
+            self.SKILL_ID, 'A description', self.rubrics)
+        skill_services.save_new_skill(self.albert_id, skill)
+
+        job_id = skill_jobs_one_off.SkillMigrationOneOffJob.create_new()
+        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                skill_fetchers, 'get_skill_by_id',
+                _mock_get_skill_by_id):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Skill %s failed migration during GET: Invalid Skill'
+            % (self.SKILL_ID))
+        expected_output = [
+            '[u\'MIGRATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_update_skill_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_update_skill(*_):
+            """Raises an error when updating skill."""
+            raise Exception('Error when updating skill')
+
+        skill_contents = {
+            'worked_examples': [],
+            'explanation': {
+                'content_id': 'explanation',
+                'html': feconf.DEFAULT_SKILL_EXPLANATION
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'explanation': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            }
+        }
+        rubrics = [{
+            'difficulty': 'Easy',
+            'explanation': 'easy explanation'
+        }, {
+            'difficulty': 'Medium',
+            'explanation': 'medium explanation'
+        }, {
+            'difficulty': 'Hard',
+            'explanation': 'hard explanation'
+        }]
+        self.save_new_skill_with_defined_schema_versions(
+            self.SKILL_ID, self.albert_id, 'A description', 0,
+            misconceptions=[], rubrics=rubrics, skill_contents=skill_contents,
+            misconceptions_schema_version=1, skill_contents_schema_version=1,
+            rubric_schema_version=1)
+
+        job_id = skill_jobs_one_off.SkillMigrationOneOffJob.create_new()
+        skill_jobs_one_off.SkillMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                skill_services, 'update_skill',
+                _mock_update_skill):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Skill %s failed final update, Error when updating skill'
+            % (self.SKILL_ID))
+        expected_output = [
+            '[u\'UPDATE_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
 
 
 class SkillMathRteAuditOneOffJobTests(test_utils.GenericTestBase):

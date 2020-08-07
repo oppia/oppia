@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import logging
 
 from core.domain import question_jobs_one_off
 from core.domain import question_services
@@ -30,6 +31,7 @@ import feconf
 
 taskqueue_services = models.Registry.import_taskqueue_services()
 (question_models,) = models.Registry.import_models([models.NAMES.question])
+memcache_services = models.Registry.import_memcache_services()
 
 
 class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
@@ -154,35 +156,103 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_fails_with_invalid_question(self):
-        question_services.delete_question(
-            self.albert_id, self.QUESTION_ID, force_deletion=True)
-        state = self._create_valid_question_data('ABC')
-        question_state_data = state.to_dict()
-        language_code = 'en'
-        version = 1
-        question_model = question_models.QuestionModel.create(
-            question_state_data, language_code, version, [])
-        question_model.question_state_data_schema_version = (
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-        question_model.commit(self.albert_id, 'invalid question created', [])
-        question_id = question_model.id
+        observed_log_messages = []
 
-        # Start migration job.
-        job_id = (
-            question_jobs_one_off.QuestionMigrationOneOffJob.create_new())
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        self.save_new_question_with_state_data_schema_v27(
+            self.QUESTION_ID, self.albert_id, [self.skill_id])
+
+        question_model = question_models.QuestionModel.get(self.QUESTION_ID)
+        question_model.language_code = 'invalid_language_code'
+        question_model.commit(
+            self.albert_id, 'Changed language_code.', [])
+        memcache_services.delete('question:%s' % self.QUESTION_ID)
+
+        job_id = question_jobs_one_off.QuestionMigrationOneOffJob.create_new()
         question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        self.process_and_flush_pending_tasks()
-
-        output = (
+        with self.swap(logging, 'exception', _mock_logging_function):
+            self.process_and_flush_pending_tasks()
+        actual_output = (
             question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
-        expected = [[u'validation_error',
-                     [u'Question %s failed validation: linked_skill_ids is '
-                      'either null or an empty list' % question_id]]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        expected_message = (
+            'Question %s failed validation: '
+            'Invalid language code: invalid_language_code'
+            % (self.QUESTION_ID))
+        expected_output = [
+            '[u\'VALIDATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_get_question_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_get_question_by_id(_):
+            """Raises an error when fetching question."""
+            raise Exception('Invalid Question')
+
+        self.save_new_question_with_state_data_schema_v27(
+            self.QUESTION_ID, self.albert_id, [self.skill_id])
+
+        job_id = question_jobs_one_off.QuestionMigrationOneOffJob.create_new()
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                question_services, 'get_question_by_id',
+                _mock_get_question_by_id):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Question %s failed migration during GET: Invalid Question'
+            % (self.QUESTION_ID))
+        expected_output = [
+            '[u\'MIGRATION_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
+
+    def test_migration_job_fails_when_update_question_fails(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg % args)
+
+        def _mock_update_question(*_):
+            """Raises an error when updating skill."""
+            raise Exception('Error when updating question')
+
+        self.save_new_question_with_state_data_schema_v27(
+            self.QUESTION_ID, self.albert_id, [self.skill_id])
+
+        job_id = question_jobs_one_off.QuestionMigrationOneOffJob.create_new()
+        question_jobs_one_off.QuestionMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'exception', _mock_logging_function):
+            with self.swap(
+                question_services, 'update_question',
+                _mock_update_question):
+                self.process_and_flush_pending_tasks()
+        actual_output = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
+
+        expected_message = (
+            'Question %s failed final update, Error when updating question'
+            % (self.QUESTION_ID))
+        expected_output = [
+            '[u\'UPDATE_ERROR\', [u\'%s\']]' % expected_message]
+        self.assertEqual(actual_output, expected_output)
+        self.assertEqual(
+            observed_log_messages, [expected_message])
 
 
 class QuestionsMathRteAuditOneOffJobTests(test_utils.GenericTestBase):

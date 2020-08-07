@@ -57,15 +57,21 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the skill up to the newest version.
-        skill = skill_fetchers.get_skill_by_id(item.id)
+        try:
+            skill = skill_fetchers.get_skill_by_id(item.id)
+        except Exception as e:
+            error_message = (
+                'Skill %s failed migration during GET: %s' %
+                (item.id, e))
+            logging.exception(error_message)
+            yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+            return
         try:
             skill.validate()
         except Exception as e:
-            logging.error(
-                'Skill %s failed validation: %s' % (item.id, e))
-            yield (
-                SkillMigrationOneOffJob._ERROR_KEY,
-                'Skill %s failed validation: %s' % (item.id, e))
+            error_message = 'Skill %s failed validation: %s' % (item.id, e)
+            logging.exception(error_message)
+            yield ('VALIDATION_ERROR', error_message.encode('utf-8'))
             return
 
         # Write the new skill into the datastore if it's different from
@@ -97,14 +103,22 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             }))
 
         if commit_cmds:
-            skill_services.update_skill(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update skill content schema version to %d and '
-                'skill misconceptions schema version to %d and '
-                'skill rubrics schema version to %d.' % (
-                    feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-                    feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-                    feconf.CURRENT_RUBRIC_SCHEMA_VERSION))
+            try:
+                skill_services.update_skill(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                    'Update skill content schema version to %d and '
+                    'skill misconceptions schema version to %d and '
+                    'skill rubrics schema version to %d.' % (
+                        feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+                        feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+                        feconf.CURRENT_RUBRIC_SCHEMA_VERSION))
+            except Exception as e:
+                error_message = (
+                    'Skill %s failed final update, %s' %
+                    (item.id, e))
+                logging.exception(error_message)
+                yield ('UPDATE_ERROR', error_message.encode('utf-8'))
+                return
             yield (SkillMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod
