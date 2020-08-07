@@ -127,7 +127,7 @@ def update_feature_flag_rules(
         feature_name, committer_id, commit_message, new_rule_dicts)
 
 
-# TODO(MegrezZhu): Currently Oppia runs in either of the two modes:
+# TODO(#10211): Currently Oppia runs in either of the two modes:
 # dev or prod. There should be another mode 'test' added for QA testing,
 # once it is added, this function needs to be updated to take that into
 # consideration.
