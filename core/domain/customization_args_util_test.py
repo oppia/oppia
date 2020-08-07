@@ -19,11 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
+import os
+import re
 
 from core.domain import customization_args_util
 from core.domain import interaction_registry
 from core.tests import test_utils
+import feconf
+import python_utils
 import utils
 
 
@@ -35,11 +38,21 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         ca_continue_specs = interaction_registry.Registry.get_interaction_by_id(
             'Continue').customization_arg_specs
         complete_customization_args = {
-            'buttonText': {'value': 'Please Continue'}
+            'buttonText': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': 'Please Continue'
+                }
+            }
         }
 
         complete_customization_args_with_extra_arg = {
-            'buttonText': {'value': 'Please Continue'},
+            'buttonText': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': 'Please Continue'
+                }
+            },
             'extraArg': {'value': ''}
         }
 
@@ -82,14 +95,24 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''}
+            'customPlaceholder': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': ''
+                }
+            }
         }
 
         expected_complete_customization_args_with_extra_arg = {
             'requireSimplestForm': {'value': False},
             'allowImproperFraction': {'value': True},
             'allowNonzeroIntegerPart': {'value': False},
-            'customPlaceholder': {'value': ''},
+            'customPlaceholder': {
+                'value': {
+                    'content_id': None,
+                    'unicode_str': ''
+                }
+            },
             'extraArg': {'value': ''}
         }
 
@@ -114,11 +137,6 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
     def test_validate_customization_args_and_values(self):
         """Test validate customization args and values method."""
-
-        observed_log_messages = []
-
-        def mock_logging_function(msg, *_):
-            observed_log_messages.append(msg)
 
         ca_item_selection_specs = (
             interaction_registry.Registry.get_interaction_by_id(
@@ -189,24 +207,18 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.swap(logging, 'warning', mock_logging_function):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            (
+                'Interaction ItemSelectionInput does not support '
+                'customization arg extraArg.'
+            )
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'ItemSelectionInput',
                 complete_customization_args_with_extra_arg,
                 ca_item_selection_specs
-            )
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                (
-                    'Interaction ItemSelectionInput does not support '
-                    'customization arg extraArg.'
-                )
-            )
-            self.assertEqual(
-                expected_customization_args_after_validation,
-                complete_customization_args_with_extra_arg
             )
 
         # Check if no error is produced when arg type is not valid.
@@ -237,16 +249,25 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             False: {'value': False},
         }
 
-        incomplete_customization_args_with_extra_arg = {
-            'requireSimplestForm': {'value': False},
-            'allowNonzeroIntegerPart': {'value': False},
-            'extraArg': {'value': ''}
-        }
-
         incomplete_customization_args_with_invalid_arg_type = {
             'requireSimplestForm': {'value': False},
             'allowNonzeroIntegerPart': {'value': False},
             'customPlaceholder': {'value': 12}
+        }
+
+        complete_customization_args_with_invalid_arg_type = {
+            'requireSimplestForm': {'value': False},
+            'allowImproperFraction': {'value': True},
+            'allowNonzeroIntegerPart': {'value': False},
+            'customPlaceholder': {'value': 12}
+        }
+
+        complete_customization_args_with_extra_arg = {
+            'requireSimplestForm': {'value': False},
+            'allowImproperFraction': {'value': True},
+            'allowNonzeroIntegerPart': {'value': False},
+            'customPlaceholder': {'value': ''},
+            'extraArg': {'value': ''}
         }
 
         expected_customization_args_after_validation = {
@@ -263,17 +284,17 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
         # The next four checks are for cases where customization args dict
         # does not contain some of the required specs.
 
-        # Check if no error is produced for valid customization args.
-        customization_args_util.validate_customization_args_and_values(
-            'interaction',
-            'FractionInput',
-            incomplete_customization_args,
-            ca_fraction_input_specs
-        )
-        self.assertEqual(
-            expected_customization_args_after_validation,
-            incomplete_customization_args
-        )
+        # Check if error is produced for missing customization args.
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Customization argument is missing key: allowImproperFraction'
+        ):
+            customization_args_util.validate_customization_args_and_values(
+                'interaction',
+                'FractionInput',
+                incomplete_customization_args,
+                ca_fraction_input_specs
+            )
 
         # Check if error is produced when arg name is invalid.
         with self.assertRaisesRegexp(
@@ -288,36 +309,35 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             )
 
         # Check if error is produced when extra args are present.
-        with self.swap(logging, 'warning', mock_logging_function):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            (
+                'Interaction FractionInput does not support customization '
+                'arg extraArg.'
+            )
+        ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',
                 'FractionInput',
-                incomplete_customization_args_with_extra_arg,
+                complete_customization_args_with_extra_arg,
                 ca_fraction_input_specs
-            )
-            self.assertEqual(len(observed_log_messages), 2)
-            self.assertEqual(
-                observed_log_messages[1],
-                (
-                    'Interaction FractionInput does not support customization '
-                    'arg extraArg.'
-                )
-            )
-            self.assertEqual(
-                expected_customization_args_after_validation,
-                incomplete_customization_args_with_extra_arg
             )
 
         # Check if no error is produced when arg type is not valid.
         customization_args_util.validate_customization_args_and_values(
             'interaction',
             'FractionInput',
-            incomplete_customization_args_with_invalid_arg_type,
+            complete_customization_args_with_invalid_arg_type,
             ca_fraction_input_specs
         )
         self.assertEqual(
-            expected_customization_args_after_validation_with_invalid_arg_type,
-            incomplete_customization_args_with_invalid_arg_type
+            complete_customization_args_with_invalid_arg_type,
+            {
+                'requireSimplestForm': {'value': False},
+                'allowImproperFraction': {'value': True},
+                'allowNonzeroIntegerPart': {'value': False},
+                'customPlaceholder': {'value': 12}
+            }
         )
 
         # A general check to see if error are produced when customization args
@@ -334,3 +354,99 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
                 customization_args_with_invalid_type,
                 ca_fraction_input_specs
             )
+
+    def test_frontend_customization_args_defs_coverage(self):
+        """Test to ensure that customization-args-defs.ts has frontend and
+        backend interfaces for customization arguments for each interaction. I.e
+        for each interaction with id 'X', there exists an interface in
+        customization-args-defs.ts named XCustomizationArgs and
+        XCustomizationArgsBackendDict.
+        """
+        filepath = os.path.join(
+            feconf.INTERACTIONS_DIR, 'customization-args-defs.ts')
+        with python_utils.open_file(filepath, 'r', newline='') as f:
+            lines = f.readlines()
+
+        all_interaction_ids = (
+            set(interaction_registry.Registry.get_all_interaction_ids()))
+        interaction_ids_with_ca_backend_interfaces = set()
+        interaction_ids_with_ca_frontend_interfaces = set()
+
+        for line in lines:
+            # Search for XCustomizationArgsBackendDict interfaces and extract X,
+            # where X is a interaction id.
+            # Group 1: The characters 'interface'.
+            # Group 2: The interaction id.
+            # Group 3: The characters 'CustomizationArgsBackendDict'.
+            ca_backend_interface_match = (
+                re.search(
+                    r'(interface )([a-zA-Z]+)(CustomizationArgsBackendDict)',
+                    line
+                ))
+            if ca_backend_interface_match:
+                interaction_ids_with_ca_backend_interfaces.add(
+                    ca_backend_interface_match.group(2))
+
+            # Search for XCustomizationArgs interfaces and extract X,
+            # where X is a interaction id.
+            # Group 1: The characters 'interface'.
+            # Group 2: The interaction id.
+            # Group 3: The characters 'CustomizationArgs'.
+            # Group 4: A space or an open bracket.
+            ca_frontend_interface_match = (
+                re.search(
+                    r'(interface )([a-zA-Z]+)(CustomizationArgs)( |{)',
+                    line
+                ))
+            if ca_frontend_interface_match:
+                interaction_ids_with_ca_frontend_interfaces.add(
+                    ca_frontend_interface_match.group(2))
+
+        self.assertGreater(len(interaction_ids_with_ca_backend_interfaces), 0)
+        self.assertEqual(
+            all_interaction_ids,
+            interaction_ids_with_ca_backend_interfaces)
+
+        self.assertGreater(len(interaction_ids_with_ca_frontend_interfaces), 0)
+        self.assertEqual(
+            all_interaction_ids,
+            interaction_ids_with_ca_frontend_interfaces)
+
+    def test_frontend_customization_args_constructor_coverage(self):
+        """Test to ensure that InteractionObjectFactory.ts covers constructing
+        customization arguments for each interaction. Uses regex to confirm
+        that that the CustomizationArgs or CustomizationArgsBackendDict
+        interface is used in the file to typecast customization arguments.
+        """
+        filepath = os.path.join(
+            'core', 'templates', 'domain', 'exploration',
+            'InteractionObjectFactory.ts')
+        with python_utils.open_file(filepath, 'r', newline='') as f:
+            lines = f.readlines()
+
+        all_interaction_ids = (
+            set(interaction_registry.Registry.get_all_interaction_ids()))
+        interaction_ids_with_used_ca_frontend_interfaces = set()
+
+        for line in lines:
+            # Checks that the customization args interfaces are being used
+            # to typecast the customization args. Matches patterns
+            # <XCustomizationArgs> or <XCustomizationArgsBackendDict> where
+            # X is a interaction id.
+            # Group 1: The character '<'.
+            # Group 2: The interaction id.
+            # Group 3: The characters 'CustomizationArgs'.
+            # Group 4: The characters 'BackendDict' (optional).
+            # Group 5: The character '>'.
+            used_match = (
+                re.search(
+                    r'(<)([a-zA-Z]+)(CustomizationArgs)(BackendDict)?(>)',
+                    line
+                ))
+            if used_match:
+                interaction_ids_with_used_ca_frontend_interfaces.add(
+                    used_match.group(2))
+
+        self.assertEqual(
+            all_interaction_ids,
+            interaction_ids_with_used_ca_frontend_interfaces)
