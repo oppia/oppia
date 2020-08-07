@@ -50,6 +50,23 @@
                 What does this story contain?
               </span>
             </div>
+            <div class="story-url-fragment">
+              <label for="storyUrlFragment" class="form-heading">Url Fragment*</label>
+              <input id="storyUrlFragment" type="text" class="form-control protractor-test-story-url-fragment-field"
+                     ng-model="editableUrlFragment" ng-blur="updateStoryUrlFragment(editableUrlFragment)"
+                     placeholder="Enter url fragment for the story." maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>" ng-trim="true"
+                     ng-class="{'is-invalid': storyUrlFragmentExists}">
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  The story URL fragment is used to uniquely access the story viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_STORY_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                </i>
+              </span>
+              <div ng-if="storyUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+                <i>
+                  This story URL fragment already exists.
+                </i>
+              </div>
+            </div>
             <div class="story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
               <thumbnail-uploader filename="story.getThumbnailFilename()"
@@ -282,15 +299,14 @@
     flex-wrap: wrap;
     justify-content: center;
     margin: 0 auto;
-    width: 90%;
+    width: 85%;
   }
   story-editor .content-container {
     margin-right: 3%;
-    width: 48%;
+    width: 50%;
   }
   story-editor .chapter-list-container {
-    margin-right: 4%;
-    width: 30%;
+    width: 35%;
   }
   story-editor .content-card {
     margin: 0;
@@ -324,6 +340,7 @@
   story-editor .add-chapter-btn {
     background-color: #008098;
     color: #FFF;
+    font-weight: bold;
     margin: 15px 0 15px;
     text-align: left;
   }
@@ -402,7 +419,7 @@
     }
 
     story-editor .chapter-list-container {
-      margin-top: 30px;
+      margin-top: 40px;
     }
 
     story-editor .story-notes {
