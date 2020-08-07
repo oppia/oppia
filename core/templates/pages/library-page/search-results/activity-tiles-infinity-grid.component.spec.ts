@@ -71,12 +71,12 @@ describe('Activity tiles infinity grid component', function() {
     });
   }));
 
-  it('should initialize correctly controller properties after its' +
-    ' initialization', function() {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(470);
-    ctrl.$onInit();
-    expect(ctrl.libraryWindowIsNarrow).toBe(true);
-  });
+  it('should initialize controller properties after its initialization',
+    function() {
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(470);
+      ctrl.$onInit();
+      expect(ctrl.libraryWindowIsNarrow).toBe(true);
+    });
 
   it('should change container view when resizing page to more than 530 pixels',
     function() {
@@ -108,8 +108,7 @@ describe('Activity tiles infinity grid component', function() {
     expect(searchService.loadMoreData).not.toHaveBeenCalled();
   });
 
-  it('should get more data from backend after waiting page to be loaded' +
-    ' completely ', function() {
+  it('should get more data from backend until reach end of page', function() {
     ctrl.$onInit();
     $rootScope.$broadcast('initialSearchResultsLoaded', [{}]);
     loadingMessageChangeEventEmitter.emit('Loading...');

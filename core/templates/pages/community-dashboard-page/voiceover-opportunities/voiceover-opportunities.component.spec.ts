@@ -80,7 +80,7 @@ describe('Voiceover opportunities component', function() {
     spyOn(contributionOpportunitiesService, 'getMoreVoiceoverOpportunities').and
       .callFake((languageCode, callback) => callback([
         explorationOpportunitySummaryObjectFactory.createFromBackendDict({
-          id: '1',
+          id: '3',
           topic_name: 'topic_3',
           story_title: 'Story title 3',
           chapter_title: 'Chapter title 3',
@@ -98,13 +98,13 @@ describe('Voiceover opportunities component', function() {
     ctrl.$onInit();
   }));
 
-  it('should initialize correctly controller properties after its' +
-    ' initialization and get data from backend', function() {
-    expect(ctrl.opportunities.length).toBe(2);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(true);
-    expect(ctrl.progressBarRequired).toBe(false);
-  });
+  it('sshould initialize controller properties after its initialization',
+    function() {
+      expect(ctrl.opportunities.length).toBe(2);
+      expect(ctrl.opportunitiesAreLoading).toBe(false);
+      expect(ctrl.moreOpportunitiesAvailable).toBe(true);
+      expect(ctrl.progressBarRequired).toBe(false);
+    });
 
   it('should load more opportunities when opportunities are available',
     function() {
@@ -118,15 +118,15 @@ describe('Voiceover opportunities component', function() {
       expect(ctrl.opportunities.length).toBe(2);
     });
 
-  it('should get opportunities from another language when changing language',
-    function() {
-      ctrl.onLoadMoreOpportunities();
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
-      expect(ctrl.opportunities.length).toBe(3);
+  it('should get opportunities from new language when active language is' +
+    ' changed', function() {
+    ctrl.onLoadMoreOpportunities();
+    expect(ctrl.opportunitiesAreLoading).toBe(false);
+    expect(ctrl.opportunities.length).toBe(3);
 
-      $rootScope.$broadcast('activeLanguageChanged');
+    $rootScope.$broadcast('activeLanguageChanged');
 
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
-      expect(ctrl.opportunities.length).toBe(2);
-    });
+    expect(ctrl.opportunitiesAreLoading).toBe(false);
+    expect(ctrl.opportunities.length).toBe(2);
+  });
 });

@@ -59,8 +59,8 @@ describe('Search Results component', function() {
     $scope.$apply();
   }));
 
-  it('should initialize correctly controller properties after its' +
-    ' initialization and get data from backend', function() {
+  it('should initialize controller properties after its initialization and' +
+    ' get data from backend', function() {
     expect(ctrl.someResultsExist).toBe(true);
     expect(ctrl.userIsLoggedIn).toBe(true);
   });
@@ -77,14 +77,14 @@ describe('Search Results component', function() {
       expect(ctrl.someResultsExist).toBe(false);
     });
 
-  it('should get static image url', function() {
+  it('should get url for static image resources', function() {
     var imagePath = '/path/to/image.png';
     expect(ctrl.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
   });
 
-  it('should redirect to url when trying to create a exploration question' +
-    ' and user is not logged', function() {
+  it('should redirect to login page when trying to create a exploration' +
+    ' question and user is not logged in', function() {
     spyOn(siteAnalyticsService, 'registerStartLoginEvent');
     ctrl.onRedirectToLogin('login-url');
     $flushPendingTasks();

@@ -70,12 +70,12 @@ describe('Practice tab component', function() {
     ctrl.$onInit();
   }));
 
-  it('should initialize correctly controller properties after its' +
-    ' initialization', function() {
-    expect(ctrl.selectedSubtopics).toEqual([]);
-    expect(ctrl.availableSubtopics.length).toBe(1);
-    expect(ctrl.selectedSubtopicIndices).toEqual([false]);
-  });
+  it('should initialize controller properties after its initilization',
+    function() {
+      expect(ctrl.selectedSubtopics).toEqual([]);
+      expect(ctrl.availableSubtopics.length).toBe(1);
+      expect(ctrl.selectedSubtopicIndices).toEqual([false]);
+    });
 
   it('should have start button enabled when a subtopic is selected',
     function() {
@@ -90,7 +90,7 @@ describe('Practice tab component', function() {
     });
 
   it('should open a new practice session containing the selected subtopic' +
-    ' when starting to practice', function() {
+    ' when start button is clicked', function() {
     ctrl.selectedSubtopicIndices[0] = true;
     ctrl.openNewPracticeSession();
 
