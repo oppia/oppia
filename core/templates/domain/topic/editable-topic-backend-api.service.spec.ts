@@ -258,8 +258,8 @@ describe('Editable topic backend API service', function() {
 
       EditableTopicBackendApiService.doesTopicWithNameExistAsync(
         'topic-name').then(topicNameExists => {
-          expect(topicNameExists).toBeTrue();
-        });
+        expect(topicNameExists).toBeTrue();
+      });
       $httpBackend.flush();
     }
   );
@@ -268,12 +268,12 @@ describe('Editable topic backend API service', function() {
     function() {
       $httpBackend.expect(
         'GET', '/topic_name_handler/topic-name').respond(
-          500, 'Error: Failed to check topic name.');
+        500, 'Error: Failed to check topic name.');
 
       EditableTopicBackendApiService.doesTopicWithNameExistAsync(
         'topic-name').then(() => {}, error => {
-          expect(error).toEqual('Error: Failed to check topic name.');
-        });
+        expect(error).toEqual('Error: Failed to check topic name.');
+      });
       $httpBackend.flush();
     }
   );
@@ -283,13 +283,13 @@ describe('Editable topic backend API service', function() {
       $httpBackend.expect(
         'GET',
         '/topic_url_fragment_handler/topic-url-fragment').respond({
-          topic_url_fragment_exists: true
-        });
+        topic_url_fragment_exists: true
+      });
 
       EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
         'topic-url-fragment').then(topicUrlFragmentExists => {
-          expect(topicUrlFragmentExists).toBeTrue();
-        });
+        expect(topicUrlFragmentExists).toBeTrue();
+      });
       $httpBackend.flush();
     }
   );
@@ -298,12 +298,12 @@ describe('Editable topic backend API service', function() {
     function() {
       $httpBackend.expect(
         'GET', '/topic_url_fragment_handler/topic-url-fragment').respond(
-          500, 'Error: Failed to check topic url fragment.');
+        500, 'Error: Failed to check topic url fragment.');
 
       EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
         'topic-url-fragment').then(() => {}, error => {
-          expect(error).toEqual('Error: Failed to check topic url fragment.');
-        });
+        expect(error).toEqual('Error: Failed to check topic url fragment.');
+      });
       $httpBackend.flush();
     }
   );

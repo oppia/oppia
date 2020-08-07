@@ -252,14 +252,15 @@ describe('Topic editor tab directive', function() {
       spyOn(
         TopicEditorStateService,
         'changeTopicWithUrlFragmentExists').and.callFake(
-          (newUrlFragment, successCallback) => successCallback());
+        (newUrlFragment, successCallback) => successCallback());
       $scope.updateTopicUrlFragment('topic');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
     });
 
   it('should not call changeTopicWithUrlFragmentExists for empty url fragment',
     function() {
-      var topicUrlFragmentSpy = spyOn(TopicUpdateService, 'setTopicUrlFragment');
+      var topicUrlFragmentSpy = spyOn(
+        TopicUpdateService, 'setTopicUrlFragment');
       spyOn(TopicEditorStateService, 'changeTopicWithUrlFragmentExists');
       $scope.updateTopicUrlFragment('');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();

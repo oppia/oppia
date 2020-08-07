@@ -5322,9 +5322,6 @@ export = {
     "floor", "if", "log", "or", "pow", "round", "then"
   ],
 
-  // A regular expression for allowed characters in URL fragment fields.
-  "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
-
   // Greek letters allowed in math interactions.
   "GREEK_LETTERS": [
     "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",

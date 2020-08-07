@@ -21,12 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
-from constants import constants
 from core.domain import email_manager
 from core.tests import test_utils
 import python_utils
 import schema_utils
-import logging
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
@@ -218,8 +216,6 @@ def _validate_validator(obj_type, validator):
 
     customization_keys = list(validator.keys())
     customization_keys.remove('id')
-    logging.error(set(customization_keys))
-    logging.error(reference_dict[validator['id']])
     assert (
         set(customization_keys) ==
         set(reference_dict[validator['id']].keys())), (
@@ -351,7 +347,6 @@ def validate_schema(schema):
             # TODO(sll): Check the arguments too.
 
     if SCHEMA_KEY_VALIDATORS in schema:
-        logging.error(schema)
         assert isinstance(schema[SCHEMA_KEY_VALIDATORS], list), (
             'Expected list, got %s' % schema[SCHEMA_KEY_VALIDATORS])
         for validator in schema[SCHEMA_KEY_VALIDATORS]:
