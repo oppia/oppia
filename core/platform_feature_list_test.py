@@ -84,7 +84,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             'not be used: %s.' % (found_deprecated_names)
         )
 
-    def test_all_entries_in_features_lists_are_featrues(self):
+    def test_all_entries_in_features_lists_are_features(self):
         non_feature_names = []
         for name in self.all_feature_names_set:
             feature_flag = registry.Registry.get_platform_parameter(name)

@@ -21,20 +21,35 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import platform_parameter_list as params
 
-# Names of feature objects defined in domain/platform_parameter_domain.py
-# should be added to one of the following lists, features flags not added
-# here won't be available to be enabled via the admin page.
+# Names of feature objects defined in domain/platform_parameter_list.py
+# should be added to one of the following lists:
+#   - DEV_FEATURES_LIST
+#   - TEST_FEATURES_LIST
+#   - PROD_FEATURES_LIST
+# based on the their stages. Features not added in the lists above won't be
+# available to be enabled via the admin page.
+#
+# The stage of features indicates the maturity of
+# features being developed. Features are in one of the three stages: 'dev',
+# 'test' or 'prod'. In general, 'dev' features are in develop and can only be
+# enabled in dev environment. 'test' features are completed in development but
+# still requires further testing or approvals, which can be enabled for QA
+# testers. 'prod' feature has been fully tested so that it can be enabled in the
+# production environment.
 
-# Features in dev stage.
+# Names of features in dev stage, the corresponding feature flag instances must
+# be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     params.PARAM_NAMES.dummy_feature
 ]
 
-# Features in test stage.
+# Names of features in test stage, the corresponding feature flag instances must
+# be in test stage otherwise it will cause a test error in the backend test.
 TEST_FEATURES_LIST = [
 ]
 
-# Features in prod stage.
+# Names of features in prod stage, the corresponding feature flag instances must
+# be in prod stage otherwise it will cause a test error in the backend test.
 PROD_FEATURES_LIST = [
 ]
 

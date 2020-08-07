@@ -20,15 +20,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core import features_registry
+from core import platform_feature_list
 from core.domain import platform_parameter_domain as param_domain
 from core.domain import platform_parameter_registry as registry
 
 
 ALL_FEATURES_LIST = (
-    features_registry.DEV_FEATURES_LIST +
-    features_registry.TEST_FEATURES_LIST +
-    features_registry.PROD_FEATURES_LIST
+    platform_feature_list.DEV_FEATURES_LIST +
+    platform_feature_list.TEST_FEATURES_LIST +
+    platform_feature_list.PROD_FEATURES_LIST
 )
 
 ALL_FEATURES_NAMES_SET = set(ALL_FEATURES_LIST)
@@ -47,25 +47,25 @@ def create_evaluation_context_for_client(client_context_dict):
     return param_domain.EvaluationContext.from_dict(
         client_context_dict,
         {
-            'server_mode': _get_running_mode()
+            'server_mode': _get_server_mode()
         }
     )
 
 
-def get_all_feature_flag_setting_dicts():
+def get_all_feature_flag_dicts():
     """Returns dict representations of all feature flags.
 
     Returns:
         dict. The keys are the feature names and the values are the dict
         mappings of all fields of the feature flags.
     """
-    return dict(
-        (name, registry.Registry.get_platform_parameter(name).to_dict())
+    return [
+        registry.Registry.get_platform_parameter(name).to_dict()
         for name in ALL_FEATURES_LIST
-    )
+    ]
 
 
-def get_all_feature_flag_values_for_context(context):
+def evaluate_all_feature_flag_value_for_client(context):
     """Evaluates and returns the values for all feature flags.
 
     Args:
@@ -75,10 +75,11 @@ def get_all_feature_flag_values_for_context(context):
         dict. The keys are the feature names and the values are boolean
         results of corresponding flags.
     """
-    return _get_feature_flag_values_for_context(ALL_FEATURES_LIST, context)
+    return _evaluate_feature_flag_values_for_context(
+        ALL_FEATURES_LIST, context)
 
 
-def get_feature_flag_value(feature_name):
+def evaluate_feature_flag_value_for_server(feature_name):
     """Evaluates and returns the values of the feature flag, using context
     from the server only.
 
@@ -90,7 +91,8 @@ def get_feature_flag_value(feature_name):
         bool. The value of the feature flag, True if it's enabled.
     """
     context = _create_evaluation_context_for_server()
-    values_dict = _get_feature_flag_values_for_context([feature_name], context)
+    values_dict = _evaluate_feature_flag_values_for_context(
+        [feature_name], context)
     return values_dict[feature_name]
 
 
@@ -116,7 +118,7 @@ def update_feature_flag_rules(
 # dev or prod. There should be another mode 'test' added for QA testing,
 # once it is added, this function needs to be updated to take that into
 # consideration.
-def _get_running_mode():
+def _get_server_mode():
     """Returns the running mode of Oppia.
 
     Returns:
@@ -130,8 +132,7 @@ def _get_running_mode():
 
 
 def _create_evaluation_context_for_server():
-    """Returns context instance for evaluation without client-side
-    informations.
+    """Returns evaluation context with information of the server.
 
     Returns:
         EvaluationContext. The context for evaluation.
@@ -144,12 +145,12 @@ def _create_evaluation_context_for_server():
             'user_locale': None,
         },
         {
-            'server_mode': _get_running_mode()
+            'server_mode': _get_server_mode()
         }
     )
 
 
-def _get_feature_flag_values_for_context(feature_names, context):
+def _evaluate_feature_flag_values_for_context(feature_names, context):
     """Evaluates and returns the values for specified feature flags.
 
     Args:
@@ -167,7 +168,7 @@ def _get_feature_flag_values_for_context(feature_names, context):
             unknown_feature_names.append(feature_name)
     if len(unknown_feature_names) > 0:
         raise Exception(
-            'Feature flag(s) not exist: %s.' % unknown_feature_names)
+            'Unknown feature flag(s): %s.' % unknown_feature_names)
 
     result_dict = {}
     for feature_name in feature_names:
