@@ -49,16 +49,8 @@ describe('Merge Skill Modal Controller', function() {
       expect($scope.selectedSkillId).toBe('');
     });
 
-  it('should close modal on save', function() {
+  it('should close modal on save skill merged', function() {
     $scope.save();
-    expect($uibModalInstance.close).toHaveBeenCalledWith({
-      skill: skill,
-      supersedingSkillId: ''
-    });
-  });
-
-  it('should close modal on confirm', function() {
-    $scope.confirm();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       skill: skill,
       supersedingSkillId: ''

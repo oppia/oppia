@@ -89,24 +89,24 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
         expect(ctrl.newCategory).toBe(collectionDict.category);
       });
 
-    it('should save a collection when it has title, objective and category',
-      function() {
-        ctrl.newTitle = 'New title';
-        ctrl.newObjective = 'New objective';
-        ctrl.newCategory = 'Algorithm';
-        expect(ctrl.isSavingAllowed()).toBe(true);
+    it('should allow saving a collection when it has a title, objective and' +
+      ' category', function() {
+      ctrl.newTitle = 'New title';
+      ctrl.newObjective = 'New objective';
+      ctrl.newCategory = 'Algorithm';
+      expect(ctrl.isSavingAllowed()).toBe(true);
 
-        ctrl.save();
+      ctrl.save();
 
-        expect(CollectionUpdateService.setCollectionTitle).toHaveBeenCalled();
-        expect(CollectionUpdateService.setCollectionObjective)
-          .toHaveBeenCalled();
-        expect(CollectionUpdateService.setCollectionCategory)
-          .toHaveBeenCalled();
+      expect(CollectionUpdateService.setCollectionTitle).toHaveBeenCalled();
+      expect(CollectionUpdateService.setCollectionObjective)
+        .toHaveBeenCalled();
+      expect(CollectionUpdateService.setCollectionCategory)
+        .toHaveBeenCalled();
 
-        expect($uibModalInstance.close).toHaveBeenCalledWith([
-          'title', 'objective', 'category']);
-      });
+      expect($uibModalInstance.close).toHaveBeenCalledWith([
+        'title', 'objective', 'category']);
+    });
 
     it('should cancel the modal on dismiss', function() {
       ctrl.cancel();
@@ -166,7 +166,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
         expect(ctrl.newCategory).toBe(collectionDict.category);
       });
 
-    it('should not save a collection when title is empty', function() {
+    it('should not allow saving a collection with an empty title', function() {
       ctrl.newTitle = '';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = 'Algorithm';
@@ -179,30 +179,32 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
 
-    it('should not save a collection when objective is empty', function() {
-      ctrl.newTitle = 'New title';
-      ctrl.newObjective = '';
-      ctrl.newCategory = 'Algorithm';
-      expect(ctrl.isSavingAllowed()).toBe(false);
+    it('should not allow saving a collection with an empty objective',
+      function() {
+        ctrl.newTitle = 'New title';
+        ctrl.newObjective = '';
+        ctrl.newCategory = 'Algorithm';
+        expect(ctrl.isSavingAllowed()).toBe(false);
 
-      ctrl.save();
+        ctrl.save();
 
-      expect(AlertsService.addWarning).toHaveBeenCalledWith(
-        'Please specify an objective');
-      expect($uibModalInstance.close).not.toHaveBeenCalled();
-    });
+        expect(AlertsService.addWarning).toHaveBeenCalledWith(
+          'Please specify an objective');
+        expect($uibModalInstance.close).not.toHaveBeenCalled();
+      });
 
-    it('should not save a collection when category is empty', function() {
-      ctrl.newTitle = 'New title';
-      ctrl.newObjective = 'New objective';
-      ctrl.newCategory = '';
-      expect(ctrl.isSavingAllowed()).toBe(false);
+    it('should not allow saving a collection with an empty category',
+      function() {
+        ctrl.newTitle = 'New title';
+        ctrl.newObjective = 'New objective';
+        ctrl.newCategory = '';
+        expect(ctrl.isSavingAllowed()).toBe(false);
 
-      ctrl.save();
+        ctrl.save();
 
-      expect(AlertsService.addWarning).toHaveBeenCalledWith(
-        'Please specify a category');
-      expect($uibModalInstance.close).not.toHaveBeenCalled();
-    });
+        expect(AlertsService.addWarning).toHaveBeenCalledWith(
+          'Please specify a category');
+        expect($uibModalInstance.close).not.toHaveBeenCalled();
+      });
   });
 });

@@ -51,7 +51,7 @@ describe('Questions List Select Skill Modal Controller', function() {
       expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
     });
 
-  it('should save selected skill and close modal when saving', function() {
+  it('should save selected skill when closing the modal', function() {
     $scope.selectedSkillId = '2';
     $scope.save();
     expect($scope.selectedSkillId).toBe('2');

@@ -66,7 +66,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     });
 
   it('should accept suggestion in suggestion modal service when clicking on' +
-    ' accept', function() {
+    ' accept suggestion button', function() {
     $scope.reviewMessage = 'Review message example';
     $scope.commitMessage = 'Commit message example';
     $scope.accept();
@@ -80,7 +80,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   });
 
   it('should reject suggestion in suggestion modal service when clicking on' +
-    ' reject', function() {
+    ' reject suggestion button', function() {
     $scope.reviewMessage = 'Review message example';
     $scope.reject();
 
@@ -92,7 +92,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
   });
 
   it('should cancel suggestion in suggestion modal service when clicking on' +
-  ' cancel', function() {
+  ' cancel suggestion button', function() {
     $scope.cancel();
 
     expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(

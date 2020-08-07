@@ -51,9 +51,9 @@ describe('Skill Mastery Modal Controller', function() {
       expect($scope.masteryChange).toEqual('mastery change');
     });
 
-  it('should open concept card when clicking button to open concept card',
-    function() {
-      $scope.openConceptCardModal();
-      expect(openConceptCardModal).toHaveBeenCalledWith([skillId]);
-    });
+  it('should open concept card with the skill id when clicking button to' +
+    ' open concept card', function() {
+    $scope.openConceptCardModal();
+    expect(openConceptCardModal).toHaveBeenCalledWith([skillId]);
+  });
 });

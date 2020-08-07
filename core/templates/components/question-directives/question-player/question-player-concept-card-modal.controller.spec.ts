@@ -118,8 +118,8 @@ describe('Question Player Concept Card Modal Controller', function() {
       expect($scope.isInTestMode).toBe(true);
     });
 
-  it('should change current skill concept card when going to next concept' +
-    ' card', function() {
+  it('should go to next concept card, and identify when it is the last' +
+    ' concept card.', function() {
     expect($scope.isLastConceptCard()).toBe(false);
     $scope.goToNextConceptCard();
     expect($scope.index).toBe(1);

@@ -266,14 +266,13 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.isQuestionValid()).toBe(false);
     });
 
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
-        $scope.done();
+    it('should not submit question', function() {
+      spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
+      $scope.done();
 
-        expect(QuestionSuggestionService.submitSuggestion).not
-          .toHaveBeenCalled();
-        expect($uibModalInstance.close).not.toHaveBeenCalled();
-      });
+      expect(QuestionSuggestionService.submitSuggestion).not
+        .toHaveBeenCalled();
+      expect($uibModalInstance.close).not.toHaveBeenCalled();
+    });
   });
 });

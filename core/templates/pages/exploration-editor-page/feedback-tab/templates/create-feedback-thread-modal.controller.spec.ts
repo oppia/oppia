@@ -42,7 +42,7 @@ describe('Create Feedback Thread Modal Controller', function() {
       expect($scope.newThreadText).toEqual('');
     });
 
-  it('should not close modal when new thread subject is false', function() {
+  it('should not close modal when new thread subject is emoty', function() {
     spyOn(AlertsService, 'addWarning').and.callThrough();
     var newThreadSubject = '';
     var newThreadText = 'text';
@@ -52,7 +52,7 @@ describe('Create Feedback Thread Modal Controller', function() {
     expect($uibModalInstance.close).not.toHaveBeenCalled();
   });
 
-  it('should not close modal when new thread text is false', function() {
+  it('should not close modal when new thread text is empty', function() {
     spyOn(AlertsService, 'addWarning').and.callThrough();
     var newThreadSubject = 'subject';
     var newThreadText = '';
@@ -63,7 +63,7 @@ describe('Create Feedback Thread Modal Controller', function() {
   });
 
   it('should close modal when both new thread subject and new thread text are' +
-    ' true', function() {
+    ' valid', function() {
     var newThreadSubject = 'subject';
     var newThreadText = 'text';
     $scope.create(newThreadSubject, newThreadText);

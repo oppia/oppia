@@ -147,7 +147,7 @@ describe('Question Suggestion Review Modal Controller', function() {
         expect($scope.skillRubricExplanations).toEqual(['explanation']);
       });
 
-    it('should reset validation error when user updates question',
+    it('should reset validation error message when user updates question',
       function() {
         $scope.validationError = 'This is an error message';
         $scope.questionChanged();
@@ -168,7 +168,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
 
     it('should reject suggestion in suggestion modal when clicking reject' +
-    ' suggestion', function() {
+    ' suggestion button', function() {
       $scope.reviewMessage = 'Review message example';
       $scope.reject();
 
@@ -180,7 +180,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     });
 
     it('should cancel suggestion in suggestion modal when clicking cancel' +
-    ' suggestion', function() {
+    ' suggestion button', function() {
       $scope.cancel();
 
       expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(

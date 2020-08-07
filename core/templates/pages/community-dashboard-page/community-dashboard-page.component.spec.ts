@@ -98,12 +98,13 @@ describe('Community dashboard page', function() {
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     });
 
-    it('should change active tab name when clicking on tab', function() {
-      var changedTab = 'translateTextTab';
-      expect(ctrl.activeTabName).toBe('myContributionTab');
-      ctrl.onTabClick(changedTab);
-      expect(ctrl.activeTabName).toBe(changedTab);
-    });
+    it('should change active tab name when clicking on translate text tab',
+      function() {
+        var changedTab = 'translateTextTab';
+        expect(ctrl.activeTabName).toBe('myContributionTab');
+        ctrl.onTabClick(changedTab);
+        expect(ctrl.activeTabName).toBe(changedTab);
+      });
 
     it('should change active language when clicking on language selector',
       function() {

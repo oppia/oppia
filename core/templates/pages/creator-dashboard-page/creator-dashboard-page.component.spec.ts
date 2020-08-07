@@ -139,14 +139,14 @@ describe('Creator dashboard controller', () => {
       '/collection_editor/create/' + collectionId);
   });
 
-  it('should show username popover event type according to its length',
+  it('should get username popover event type according to username length',
     function() {
       expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
       expect(ctrl.showUsernamePopover('abc')).toBe('none');
     });
 
-  it('should get complete thumbail icon path corresponding to a given short' +
-    ' path', function() {
+  it('should get complete thumbail icon path corresponding to a given' +
+    ' relative path', function() {
     expect(ctrl.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(
       '/assets/images/path/to/icon.png');
   });
@@ -332,8 +332,7 @@ describe('Creator dashboard controller', () => {
         $rootScope.$apply();
       });
 
-      it('should initialize $scope properties after controller is initialized' +
-        ' and get data from backend', function() {
+      it('should evaluate dashboard data get from backend', function() {
         var suggestionThreadObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
             dashboardData.threads_for_created_suggestions_list[0],
@@ -350,15 +349,15 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.relativeChangeInTotalPlays).toBe(5);
       });
 
-      it('should change active tab name when creator clicks on tab',
+      it('should change active tab name when creator clicks on a new tab',
         function() {
           expect(ctrl.activeTab).toBe('myExplorations');
           ctrl.setActiveTab('suggestions');
           expect(ctrl.activeTab).toBe('suggestions');
         });
 
-      it('should save in backend the exploration format view when creator' +
-        ' changes format view', function() {
+      it('should save the exploration format view in the backend when creator' +
+        ' changes the format view', function() {
         $httpBackend.expect('POST', '/creatordashboardhandler/data')
           .respond(200);
         ctrl.setMyExplorationsView('a');
@@ -395,7 +394,7 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.currentSubscribersSortType).toBe('new_subscriber');
       });
 
-      it('should sort subscription list given entity type', function() {
+      it('should sort subscription list by username', function() {
         var entity = {
           username: 'username'
         };
@@ -404,7 +403,7 @@ describe('Creator dashboard controller', () => {
           'username');
       });
 
-      it('should not sort subscription list by impact given empty entity type',
+      it('should not sort subscription list by impact given empty object',
         function() {
           ctrl.setSubscriptionSortingOptions('impact');
           expect(ctrl.currentSubscribersSortType).toBe('impact');
@@ -423,8 +422,8 @@ describe('Creator dashboard controller', () => {
         })).toBe('Untitled');
       });
 
-      it('should not sort exploration list by rating when rating is not' +
-        ' provided', function() {
+      it('should not sort exploration list by rating when providing' +
+        ' a empty object', function() {
         ctrl.setExplorationsSortingOptions('ratings');
         expect(ctrl.currentSortType).toBe('ratings');
 

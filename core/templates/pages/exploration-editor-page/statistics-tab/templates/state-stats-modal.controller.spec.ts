@@ -80,7 +80,7 @@ describe('State Stats Modal Controller', function() {
       expect($scope.visualizationsInfo).toEqual(visualizationsInfo);
     });
 
-  it('should navigate to state editor when changing router', function() {
+  it('should navigate to state editor', function() {
     spyOn(RouterService, 'navigateToMainTab').and.callThrough();
     $scope.navigateToStateEditor();
 

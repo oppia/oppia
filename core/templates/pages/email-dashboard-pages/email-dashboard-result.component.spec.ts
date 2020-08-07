@@ -77,29 +77,30 @@ describe('Email Dashboard Result Page', function() {
     expect(ctrl.testEmailSentSuccesfully).toBe(false);
   });
 
-  it('should send email when submitting email', function() {
-    ctrl.$onInit();
-    ctrl.emailSubject = 'Subject';
-    ctrl.emailBody = 'Body';
-    ctrl.emailOption = 'custom';
-    ctrl.maxRecipients = 10;
+  it('should submit an email when fields are populated with valid values.',
+    function() {
+      ctrl.$onInit();
+      ctrl.emailSubject = 'Subject';
+      ctrl.emailBody = 'Body';
+      ctrl.emailOption = 'custom';
+      ctrl.maxRecipients = 10;
 
-    $httpBackend.expect('POST', '/emaildashboardresult/0').respond(200);
-    ctrl.submitEmail();
+      $httpBackend.expect('POST', '/emaildashboardresult/0').respond(200);
+      ctrl.submitEmail();
 
-    expect(ctrl.submitIsInProgress).toBe(true);
-    expect(ctrl.emailSubmitted).toBe(false);
+      expect(ctrl.submitIsInProgress).toBe(true);
+      expect(ctrl.emailSubmitted).toBe(false);
 
-    $httpBackend.flush();
+      $httpBackend.flush();
 
-    expect(ctrl.emailSubmitted).toBe(true);
-    $timeout.flush(4000);
+      expect(ctrl.emailSubmitted).toBe(true);
+      $timeout.flush(4000);
 
-    expect(windowRef.nativeWindow.location.href).toBe('/emaildashboard');
-    expect(ctrl.invalid.subject).toBe(false);
-    expect(ctrl.invalid.body).toBe(false);
-    expect(ctrl.invalid.maxRecipients).toBe(false);
-  });
+      expect(windowRef.nativeWindow.location.href).toBe('/emaildashboard');
+      expect(ctrl.invalid.subject).toBe(false);
+      expect(ctrl.invalid.body).toBe(false);
+      expect(ctrl.invalid.maxRecipients).toBe(false);
+    });
 
   it('should use reject handler when submit email fails', function() {
     ctrl.$onInit();

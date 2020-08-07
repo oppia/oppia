@@ -70,14 +70,16 @@ describe('Create Activity Modal Controller', function() {
         '/assets/images/activity/collection.svg');
     });
 
-  it('should create new exploration when choosing exploration', function() {
+  it('should create new exploration when choosing exploration as the new' +
+    ' activity', function() {
     spyOn(ExplorationCreationService, 'createNewExploration').and.callThrough();
     $scope.chooseExploration();
     expect(ExplorationCreationService.createNewExploration).toHaveBeenCalled();
     expect($uibModalInstance.close).toHaveBeenCalled();
   });
 
-  it('should create new collection when choosing collection', function() {
+  it('should create new collection when choosing collection as the new' +
+    ' activity', function() {
     spyOn(CollectionCreationService, 'createNewCollection').and.callThrough();
     $scope.chooseCollection();
     expect(CollectionCreationService.createNewCollection).toHaveBeenCalled();

@@ -85,7 +85,7 @@ describe('Email Dashboard Page', function() {
     }
   });
 
-  it('should clear form when resetting form', function() {
+  it('should clear form when form is reset', function() {
     // Mock some values.
     ctrl.hasNotLoggedInForNDays = true;
     ctrl.inactiveInLastNDays = true;
@@ -133,7 +133,7 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.editedFewerThanNExps).toBe(null);
   });
 
-  it('should get next page of queries when going to next page', function() {
+  it('should get next page of queries', function() {
     spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
       function() {
         var deferred = $q.defer();
@@ -147,15 +147,14 @@ describe('Email Dashboard Page', function() {
     expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
   });
 
-  it('should get previous page of queries when going to previous page',
-    function() {
-      spyOn(EmailDashboardDataService, 'getPreviousQueries').and.returnValue(
-        firstPageQueries);
+  it('should get previous page of queries', function() {
+    spyOn(EmailDashboardDataService, 'getPreviousQueries').and.returnValue(
+      firstPageQueries);
 
-      ctrl.getPreviousPageOfQueries();
+    ctrl.getPreviousPageOfQueries();
 
-      expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
-    });
+    expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
+  });
 
   it('should evaluate when next button is displayed', function() {
     expect(ctrl.showNextButton()).toBe(true);
