@@ -30,6 +30,7 @@ import { StateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('State Interaction Stats Service', () => {
   beforeEach(() => {
@@ -241,7 +242,10 @@ describe('State Interaction Stats Service', () => {
         interaction: {
           id: 'MultipleChoiceInput',
           customizationArgs: {
-            choices: {value: ['<p>foo</p>', '<p>bar</p>']},
+            choices: {value: [
+              new SubtitledHtml('<p>foo</p>', ''),
+              new SubtitledHtml('<p>bar</p>', '')
+            ]},
           },
         }
       }).then(this.onSuccess, this.onFailure);

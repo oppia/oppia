@@ -64,7 +64,9 @@ describe('Admin backend api service', () => {
         description: '',
         id: 'VqgPTpt7JyJy',
         topic_model_last_updated: 1591196558882.2,
-        language_code: 'en'
+        language_code: 'en',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA'
       }
     ],
     one_off_job_status_summaries: [],
@@ -220,22 +222,13 @@ describe('Admin backend api service', () => {
 
     abas.sendMathSvgsToBackend(latexToSvgMapping);
     let req = httpTestingController.expectOne(
-      '/adminmathsvghandler');
+      '/explorationslatexsvghandler');
     var requestBody = req.request.body;
     expect(requestBody instanceof FormData).toBeTruthy();
     var rawImageSentToBackend = null;
-    var image1 = null;
-    var image2 = null;
-    var payLoadSentoBackend = null;
-    requestBody.forEach((value, key) => {
-      if (key === '3rmYki9MyZ') {
-        image1 = value;
-      } else if (key === '4rm6ki9MsZ') {
-        image2 = value;
-      } else if (key === 'payload') {
-        payLoadSentoBackend = value;
-      }
-    });
+    var image1 = requestBody.get('3rmYki9MyZ');
+    var image2 = requestBody.get('4rm6ki9MsZ');
+    var payLoadSentoBackend = requestBody.get('payload');
     expect(image1 instanceof File).toBeTruthy();
     expect(image2 instanceof File).toBeTruthy();
     expect(payLoadSentoBackend).toEqual(JSON.stringify(expectedPayload));

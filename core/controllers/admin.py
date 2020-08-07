@@ -287,11 +287,24 @@ class AdminHandler(base.BaseHandler):
         state = state_domain.State.create_default_state(
             'ABC', is_initial_state=True)
         state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        })
+
+        state.update_next_content_id_index(1)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
+        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
         recorded_voiceovers.add_content_id_for_voiceover('1')
         recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+        written_translations.add_content_id_for_translation('ca_placeholder_0')
         written_translations.add_content_id_for_translation('1')
         written_translations.add_content_id_for_translation('default_outcome')
 
@@ -308,10 +321,6 @@ class AdminHandler(base.BaseHandler):
 
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.update_interaction_customization_args({
-            'placeholder': 'Enter text here',
-            'rows': 1
-        })
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
@@ -419,7 +428,7 @@ class AdminHandler(base.BaseHandler):
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1)
+                topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
                 'exp_id': '15',
@@ -604,12 +613,25 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        latex_strings_to_exp_id_mapping = (
-            exp_services.get_batch_of_exps_for_latex_svg_generation())
-        self.render_json({
-            'latex_strings_to_exp_id_mapping': (
-                latex_strings_to_exp_id_mapping)
-        })
+        item_to_fetch = self.request.get('item_to_fetch')
+        if item_to_fetch == 'exp_id_to_latex_mapping':
+            latex_strings_to_exp_id_mapping = (
+                exp_services.get_batch_of_exps_for_latex_svg_generation())
+            self.render_json({
+                'latex_strings_to_exp_id_mapping': (
+                    latex_strings_to_exp_id_mapping)
+            })
+        elif item_to_fetch == 'number_of_explorations_left_to_update':
+            number_of_explorations_left_to_update = (
+                exp_services.
+                get_number_explorations_having_latex_strings_without_svgs())
+            self.render_json({
+                'number_of_explorations_left_to_update': '%d' % (
+                    number_of_explorations_left_to_update)
+            })
+        else:
+            raise self.InvalidInputException(
+                'Please specify a valid type of item to fetch.')
 
     @acl_decorators.can_access_admin_page
     def post(self):

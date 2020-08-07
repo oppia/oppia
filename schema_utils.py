@@ -54,6 +54,10 @@ SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
+SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
+
+SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
+SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
@@ -143,6 +147,17 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             obj = python_utils.UNICODE(obj)
         assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
+        normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
+        assert obj is None or isinstance(obj, python_utils.BASESTRING), (
+            'Expected unicode string or None, received %s' % obj)
+        if obj is not None:
+            if isinstance(obj, bytes):
+                obj = obj.decode('utf-8')
+            else:
+                obj = python_utils.UNICODE(obj)
+            assert isinstance(obj, python_utils.UNICODE), (
+                'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])

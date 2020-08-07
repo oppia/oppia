@@ -31,6 +31,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-create-story-button'));
   var newStoryTitleField = element(
     by.css('.protractor-test-new-story-title-field'));
+  var newStoryUrlFragmentField = element(
+    by.css('.protractor-test-new-story-url-fragment-field'));
   var confirmStoryCreationButton = element(
     by.css('.protractor-test-confirm-story-creation-button'));
   var storyListItems = element.all(
@@ -59,6 +61,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-add-subtopic-button'));
   var newSubtopicTitlefield = element(
     by.css('.protractor-test-new-subtopic-title-field'));
+  var newSubtopicUrlFragmentField = element(
+    by.css('.protractor-test-new-subtopic-url-fragment-field'));
   var confirmSubtopicCreationButton = element(by.css(
     '.protractor-test-confirm-subtopic-creation-button'));
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
@@ -247,10 +251,12 @@ var TopicEditorPage = function() {
     expect(await subtopics.count()).toEqual(count);
   };
 
-  this.addSubtopic = async function(title, imgPath, htmlContent) {
+  this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
     await addSubtopicButton.click();
     await newSubtopicTitlefield.sendKeys(title);
 
+    await action.sendKeys(
+      'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer, imgPath, false);
     var subtopicPageContentButton = element(by.css(
@@ -396,7 +402,8 @@ var TopicEditorPage = function() {
       storyListTable, 'Story list table too long to disappear.');
   };
 
-  this.createStory = async function(storyTitle, storyDescription, imgPath) {
+  this.createStory = async function(
+      storyTitle, storyUrlFragment, storyDescription, imgPath) {
     await waitFor.elementToBeClickable(
       createStoryButton,
       'Create Story button takes too long to be clickable');
@@ -407,6 +414,9 @@ var TopicEditorPage = function() {
     await action.sendKeys(
       'Create new story description', newStoryDescriptionField,
       storyDescription);
+    await action.sendKeys(
+      'Create new story url fragment', newStoryUrlFragmentField,
+      storyUrlFragment);
 
     await workflow.submitImage(
       storyThumbnailButton, thumbnailContainer, imgPath, false);

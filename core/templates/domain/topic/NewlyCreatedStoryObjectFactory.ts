@@ -20,22 +20,33 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+const constants = require('constants.ts');
+
 export class NewlyCreatedStory {
   title: string;
   description: string;
+  urlFragment: string;
   /**
    * @param {String} title - title of the story.
    * @param {String} description - description of the story.
+   * @param {String} urlFragment - url fragment of the story.
    */
-  constructor(title, description) {
+  constructor(title, description, urlFragment) {
     this.title = title;
     this.description = description;
+    this.urlFragment = urlFragment;
   }
   /**
    * @returns {Boolean} - A boolean indicating if the story is valid.
    */
   isValid(): boolean {
-    return Boolean(this.title && this.description);
+    const VALID_URL_FRAGMENT_REGEX = new RegExp(
+      constants.VALID_URL_FRAGMENT_REGEX);
+    return Boolean(
+      this.title &&
+      this.description &&
+      this.urlFragment &&
+      VALID_URL_FRAGMENT_REGEX.test(this.urlFragment));
   }
 }
 
@@ -47,7 +58,7 @@ export class NewlyCreatedStoryObjectFactory {
    * @returns {NewlyCreatedStory} - A new NewlyCreatedStory instance.
    */
   createDefault(): NewlyCreatedStory {
-    return new NewlyCreatedStory('', '');
+    return new NewlyCreatedStory('', '', '');
   }
 }
 

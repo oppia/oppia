@@ -22,17 +22,19 @@
 
 require('domain/utilities/browser-checker.service.ts');
 require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/MultipleChoiceInput/directives/' +
   'multiple-choice-input-rules.service.ts');
-require('services/html-escaper.service.ts');
+
 
 angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
-  'BrowserCheckerService', 'HtmlEscaperService',
+  'BrowserCheckerService', 'InteractionAttributesExtractorService',
   'MultipleChoiceInputRulesService',
   function(
-      BrowserCheckerService, HtmlEscaperService,
+      BrowserCheckerService, InteractionAttributesExtractorService,
       MultipleChoiceInputRulesService) {
     return {
       restrict: 'E',
@@ -77,15 +79,20 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
           };
 
           ctrl.$onInit = function() {
-            var showChoicesInShuffledOrder = (
-              $attrs.showChoicesInShuffledOrderWithValue === 'true');
-            var choicesWithValue = HtmlEscaperService.escapedJsonToObj(
-              $attrs.choicesWithValue);
-            var choicesWithIndex = choicesWithValue.map(
+            const {
+              showChoicesInShuffledOrder,
+              choices
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'MultipleChoiceInput',
+              $attrs
+            );
+
+            var choicesWithIndex = choices.map(
               function(value, originalIndex) {
-                return {originalIndex: originalIndex, value: value};
+                return {originalIndex: originalIndex, value: value.getHtml()};
               }
             );
+
             var shuffleChoices = function(choices) {
               for (var currentIndex = choices.length - 1;
                 currentIndex >= 0; currentIndex--) {
