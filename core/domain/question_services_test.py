@@ -837,12 +837,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'HasElementsIn': [{
                     'x': ['A', 'B', 'C']
-                },
-                'rule_type': 'HasElementsIn'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -924,12 +924,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': ['A']
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                'x': ['A']
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1018,12 +1018,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': ['A']
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'Equals': [{
+                'x': ['A']
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1120,17 +1120,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsMathematicallyEquivalentTo': [{
                     'x': 'x+y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }, {
-                'inputs': {
+                }, {
                     'x': 'x=y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1225,17 +1222,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsMathematicallyEquivalentTo': [{
                     'x': 'x+y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }, {
-                'inputs': {
+                }, {
                     'x': '1.2 + 3'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1331,12 +1325,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsMathematicallyEquivalentTo': [{
                     'x': '1.2 + 3'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1431,12 +1425,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'x+y'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsMathematicallyEquivalentTo': [{
+                'x': 'x+y'
+                }]
+            }
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
@@ -1451,12 +1445,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
+            'rule_input_translations_mapping': {},
+            'rule_inputs': {
+                'IsMathematicallyEquivalentTo': [{
                     'x': '1.2 + 3'
-                },
-                'rule_type': 'IsMathematicallyEquivalentTo'
-            }],
+                }]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
