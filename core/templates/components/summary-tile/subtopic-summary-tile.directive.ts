@@ -26,13 +26,12 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getTopicUrlFragment: '&topicUrlFragment',
-        getClassroomUrlFragment: '&classroomUrlFragment',
-        getSubtopic: '&subtopic',
-        getTopicId: '&topicId'
+        classroomUrlFragment: '<',
+        subtopic: '<',
+        topicId: '<',
+        topicUrlFragment: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/subtopic-summary-tile.directive.html'),
+      template: require('./subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$window', 'AssetsBackendApiService', 'ENTITY_TYPE',
@@ -45,20 +44,20 @@ angular.module('oppia').directive('subtopicSummaryTile', [
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 SUBTOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_url_fragment: ctrl.getTopicUrlFragment(),
-                  classroom_url_fragment: ctrl.getClassroomUrlFragment(),
-                  subtopic_url_fragment: ctrl.getSubtopic().getUrlFragment()
+                  classroom_url_fragment: ctrl.classroomUrlFragment,
+                  topic_url_fragment: ctrl.topicUrlFragment,
+                  subtopic_url_fragment: ctrl.subtopic.getUrlFragment()
                 }
               ), '_self'
             );
           };
 
           ctrl.$onInit = function() {
-            if (ctrl.getSubtopic().getThumbnailFilename()) {
+            if (ctrl.subtopic.getThumbnailFilename()) {
               ctrl.thumbnailUrl = (
                 AssetsBackendApiService.getThumbnailUrlForPreview(
-                  ENTITY_TYPE.TOPIC, ctrl.getTopicId(),
-                  ctrl.getSubtopic().getThumbnailFilename()));
+                  ENTITY_TYPE.TOPIC, ctrl.topicId,
+                  ctrl.subtopic.getThumbnailFilename()));
             } else {
               ctrl.thumbnailUrl = null;
             }
@@ -67,3 +66,19 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'subtopic-summary-tile'
+})
+export class SubtopicSummaryTileDirective extends UpgradeComponent {
+  @Input() classroomUrlFragment;
+  @Input() subtopic;
+  @Input() topicId;
+  @Input() topicUrlFragment;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('subtopicSummaryTile', elementRef, injector);
+  }
+}

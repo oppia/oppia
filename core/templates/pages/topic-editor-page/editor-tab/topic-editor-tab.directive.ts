@@ -95,6 +95,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
+            $scope.initialTopicName = $scope.topic.getName();
+            $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
@@ -213,7 +215,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicName = function(newName) {
-            if (newName === $scope.topic.getName()) {
+            if (newName === $scope.initialTopicName) {
               $scope.topicNameExists = false;
               return;
             }
@@ -233,7 +235,7 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.updateTopicUrlFragment = function(newTopicUrlFragment) {
-            if (newTopicUrlFragment === $scope.topic.getUrlFragment()) {
+            if (newTopicUrlFragment === $scope.initialTopicUrlFragment) {
               $scope.topicUrlFragmentExists = false;
               return;
             }
