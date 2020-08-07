@@ -81,7 +81,7 @@ describe('Answer Classification Service', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
@@ -269,7 +269,7 @@ describe('Answer Classification Service', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
@@ -393,7 +393,7 @@ describe('Answer Classification Service', () => {
           }
         },
         interaction: {
-          id: 'RuleTest',
+          id: null,
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',

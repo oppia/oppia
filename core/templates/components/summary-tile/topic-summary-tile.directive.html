@@ -1,45 +1,89 @@
-<a ng-href="<[$ctrl.getTopicLink()]>">
-  <div class="oppia-topic-image">
+<div class="topic-card" ng-click="$ctrl.openTopicPage()" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+  <div class="topic-thumbnail">
     <picture>
-      <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')]>">
-      <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>">
-      <img ng-src="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>" alt="" class="topic-thumbnail">
+      <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
     </picture>
   </div>
-  <div class="oppia-topic-details">
-    <div class="oppia-topic-name">
-      <[::$ctrl.getTopicSummary().getName()]>
-    </div>
-    <span translate="I18N_TOPIC_SUMMARY_TILE_LESSONS"
-          translate-values="{lessonCount: $ctrl.getTopicSummary().getCanonicalStoryCount()}"
-          translate-interpolation="messageformat">
+  <div class="topic-details" ng-style="{background: $ctrl.getDarkerThumbnailBgColor()}">
+    <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
+    <span class="topic-story-count">
+      <[$ctrl.getTopicSummary().getCanonicalStoryCount()]>
+      <span ng-if="topicSummary.getCanonicalStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
+      <span ng-if="topicSummary.getCanonicalStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
     </span>
   </div>
-</a>
+</div>
 <style>
-  topic-summary-tile .oppia-topic-image {
-    background-color: rgba(255, 255, 255, 0.5);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    padding: 0 34px 0 34px;
-    z-index: 1;
+  .topic-card {
+    border-radius: 1.5em;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    width: 100%;
   }
-  topic-summary-tile .topic-thumbnail {
-    height: 17vh;
-    margin-left: 12%;
-  }
-  topic-summary-tile .oppia-topic-details {
-    color: white;
-    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-    padding: 10px;
-  }
-  topic-summary-tile .oppia-topic-name {
+
+  .topic-card .topic-name {
     display: block;
-    font-size: 1.4em;
-    padding-bottom: 5px;
-    text-align: center;
+    font-size: 1.25em;
+    font-weight: 600;
   }
-  topic-summary-tile a:hover {
-    text-decoration: none;
+
+  .topic-card .topic-card:focus {
+    outline: 0;
+  }
+
+  .topic-card .topic-thumbnail {
+    height: 120px;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+  }
+
+  .topic-card .img-thumbnail {
+    border: none;
+    border-radius: 1.5em 1.5em 0 0;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  .topic-card .topic-details {
+    border-radius: 0 0 1.5em 1.5em;
+    color: #ffffff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.9em;
+    height: 100px;
+    letter-spacing: 0.5px;
+    padding: 10px 5px 5px 15px;
+  }
+
+  @media(max-width: 1150px) {
+    .topic-card .topic-name {
+      font-size: 1em;
+    }
+
+    .topic-card .topic-story-count {
+      font-size: 0.8em;
+    }
+
+    .topic-card .topic-details {
+      height: 85px;
+      padding-left: 10px;
+    }
+  }
+
+  @media(max-width: 680px) {
+    .topic-card .topic-nname {
+      font-size: 0.8em;
+      height: 85px;
+    }
+  }
+
+  @media(max-width: 500px) {
+    .topic-card .topic-title {
+      height: 75px;
+    }
+
+    .topic-card .topic-thumbnail {
+      height: 100px;
+    }
   }
 </style>
