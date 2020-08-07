@@ -43,7 +43,8 @@
   <div style="height: 30px; margin-top: 4px;">
     <button ng-show="!isOneLineInput || isAddItemButtonPresent || (localValue.length && localValue[localValue.length - 1].length)"
             ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
-            type="button" class="btn btn-secondary btn-sm protractor-test-add-list-entry" ng-click="addElement()"
+            type="button" class="btn btn-secondary btn-sm oppia-add-list-entry protractor-test-add-list-entry" 
+            ng-click="addElement()"
             ng-disabled="isDisabled()" style="margin-left: 0;">
       <[addElementText]>
     </button>

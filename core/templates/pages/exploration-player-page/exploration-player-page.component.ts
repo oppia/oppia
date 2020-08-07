@@ -47,8 +47,7 @@ angular.module('oppia').component('explorationPlayerPage', {
         CommandExecutorService, WindowRef, $rootScope) {
       var ctrl = this;
       ctrl.$onInit = function() {
-        $rootScope.$on('livePlayerStateChange', function(state, args) {
-          var id = args;
+        $rootScope.$on('newInteractionLoaded', function(state, id) {
           CommandExecutorService.sendStateToOuterFrame(id);
         });
         CommandExecutorService.getOuterFrameEvents(WindowRef);

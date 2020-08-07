@@ -48,7 +48,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
             DeviceInfoService) {
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
-            if (evt.keyCode === 13 || evt.code === 'Enter') {
+            if (evt.keyCode === 13) {
               $scope.$emit('submittedSchemaBasedUnicodeForm');
             }
           };

@@ -78,24 +78,18 @@ describe('Exploration player page', function() {
     ctrl = $componentController('explorationPlayerPage', {
       $scope: $scope
     });
+    spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
   }));
 
   it('should load skill based on its id on url when component is initialized' +
     ' and set angular element content property based on the exploration',
   function() {
-    spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(ReadOnlyExplorationBackendApiService, 'fetchExploration').and
       .returnValue($q.resolve({
         exploration: exploration
       }));
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
-    CommandExecutorService.getOuterFrameEvents =
-    jasmine.createSpy('outerFrameEvents spy');
-    CommandExecutorService.sendParentReadyState =
-    jasmine.createSpy('sendParentReadyState spy');
-    CommandExecutorService.sendStateToOuterFrame =
-    jasmine.createSpy('sendStateToOuterFrame spy');
     var angularElementSpy = spyOn(angular, 'element');
 
     var elementNameItemProp = $('<div>');
@@ -144,13 +138,44 @@ describe('Exploration player page', function() {
     expect(elementTitleProperty.attr('content')).toBe(exploration.title);
     expect(elementDescriptionProperty.attr('content')).toBe(
       exploration.objective);
+  });
+
+  it('should initialize command executor service with getOuterFrameEvents',
+  function() {
+    CommandExecutorService.getOuterFrameEvents = jasmine.createSpy(
+      'outerFrameEvents spy');
+
+    ctrl.$onInit();
+    $scope.$apply();
+
     expect(CommandExecutorService.getOuterFrameEvents)
       .toHaveBeenCalled();
-    expect(CommandExecutorService.sendParentReadyState)
-      .toHaveBeenCalled();
-    $rootScope.$broadcast('livePlayerStateChange', 'CONTINUE');
-    $rootScope.$apply();
-    $scope.$apply();
-    expect(CommandExecutorService.sendStateToOuterFrame).toHaveBeenCalled();
   });
+
+  it('should indicate readiness for parent to send host state' +
+    ' through command executor sendStateToOuterFrame method',
+  function() {
+    CommandExecutorService.sendParentReadyState = jasmine.createSpy(
+      'sendParentReadyState spy');
+
+    ctrl.$onInit();
+    $scope.$apply();
+
+    expect(CommandExecutorService.sendParentReadyState)
+    .toHaveBeenCalled();
 });
+
+  it('should broadcast player state when newInteractionLoaded' +
+    'is received', function() {
+      CommandExecutorService.sendStateToOuterFrame = jasmine.createSpy(
+        'sendStateToOuterFrame spy');
+
+      ctrl.$onInit();
+      $scope.$apply();
+
+      $rootScope.$broadcast('newInteractionLoaded', 'CONTINUE');
+      $rootScope.$apply();
+      $scope.$apply();
+      expect(CommandExecutorService.sendStateToOuterFrame).toHaveBeenCalled();
+    });
+  });

@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * @fileoverview Oppia interaction from outer iframe with messaging commands.
  */
 
+ //oppia-float-form-input, 
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
@@ -30,10 +32,11 @@ export class CommandExecutorService {
   private commandToFunctionMap = {
     CONTINUE: this.continueClick,
     ENTER_TEXT_NUMBER_UNITS: this.fillTextBox,
-    ADD_SET: this.addSet,
-    REMOVE_SET: this.removeSet,
+    ADD_SET: this.addToSet,
+    REMOVE_SET: this.removeFromSet,
     ENTER_FRACTION: this.enterFraction,
     SELECT_ITEM_BULLET: this.selectItemBullet,
+    SELECT_ITEM_CHECKBOX: this.selectItemCheckbox,
     SUBMIT: this.submit,
   };
   setElementsOnPage = 0;
@@ -63,8 +66,7 @@ export class CommandExecutorService {
           message = message + messageArray[i] + ' ';
         }
         message = message.substr(0, message.length - 1);
-        if ((command !== 'HOSTNAME' && this.hostname === '') ||
-        command === 'finishedProcessing') {
+        if ((command !== 'HOSTNAME' && this.hostname === '')) {
           return;
         } else if (command === 'CONTINUE' || command === 'SUBMIT') {
           this.commandToFunctionMap[command](windowRef);
@@ -88,7 +90,7 @@ export class CommandExecutorService {
     var stateToCommand = {
       Continue: 'CONTINUE',
       FractionInput: 'ENTER_FRACTION',
-      ItemSelectionInput: 'SELECT_ITEM_CHECKPOINT',
+      ItemSelectionInput: 'SELECT_ITEM_CHECKBOX',
       MultipleChoiceInput: 'SELECT_ITEM_BULLET',
       NumberWithUnits: 'ENTER_TEXT_NUMBER_UNITS',
       NumericExpressionInput: 'ENTER_TEXT_NUMBER_UNITS',
@@ -133,36 +135,34 @@ export class CommandExecutorService {
     button.click();
   }
 
-  addSet(windowRef, elements) {
+  addToSet(windowRef, message) {
+    var elements = message.split(' ');
     if (!this.setElementsOnPage) {
       this.setElementsOnPage = 0;
     }
     for (var i = 0; i < elements.length; i++) {
       if (this.setElementsOnPage === 0) {
-        var box = windowRef.nativeWindow.document.querySelector(
-          '.form-control') as HTMLInputElement;
+        var box = windowRef.nativeWindow.document.querySelectorAll(
+          '.form-control')[0] as HTMLInputElement;
         box.value = elements[i];
-        var evt = document.createEvent('HTMLEvents');
-        evt.initEvent('change', false, true);
-        box.dispatchEvent(evt);
         this.setElementsOnPage += 1;
       } else {
         var addButton = windowRef.nativeWindow.document.querySelectorAll(
-          '.btn-secondary'
+          '.oppia-add-list-entry'
         )[0] as HTMLElement;
         addButton.click();
         this.setElementsOnPage += 1;
         var box = windowRef.nativeWindow.document.querySelectorAll(
           '.form-control')[this.setElementsOnPage - 1] as HTMLInputElement;
         box.value = elements[i];
-        var evt = document.createEvent('HTMLEvents');
-        evt.initEvent('change', false, true);
-        box.dispatchEvent(evt);
       }
+      var evt = document.createEvent('HTMLEvents');
+      evt.initEvent('change', false, true);
+      box.dispatchEvent(evt);
     }
   }
 
-  removeSet(windowRef, element) {
+  removeFromSet(windowRef, element) {
     var boxes = windowRef.nativeWindow.document.querySelectorAll(
       '.form-control');
     for (var i = 0; i < boxes.length; i++) {
@@ -201,6 +201,13 @@ export class CommandExecutorService {
     message = Number(message);
     var button = windowRef.nativeWindow.document.getElementsByClassName(
       'multiple-choice-outer-radio-button')[message - 1] as HTMLElement;
+    button.click();
+  }
+
+  selectItemCheckbox(windowRef, message) {
+    message = Number(message);
+    var button = windowRef.nativeWindow.document.getElementsByClassName(
+      'item-selection-input-checkbox')[message - 1] as HTMLElement;
     button.click();
   }
 }

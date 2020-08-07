@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ import { CommandExecutorService } from
   'pages/exploration-player-page/services/command-executor.service';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 describe('Command executor service', () => {
-  let ces: CommandExecutorService, wrf: WindowRef;
-  var spy;
+  let ces: CommandExecutorService = null;
+  let wrf: WindowRef = null;
+  let spy = null;
   beforeEach((done) => {
     TestBed.configureTestingModule({
       providers: [CommandExecutorService, WindowRef]
@@ -35,17 +36,19 @@ describe('Command executor service', () => {
     done();
   });
 
+  afterEach((done) => {
+    var suite =
+    wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
+    suite.remove();
+    done()
+  });
+
   var continueBoolean = false;
   var addBoolean = false;
   var deleteBoolean = false;
   var mcBoolean = false;
   var secondaryContinueBoolean = false;
   var setupWindowRef = function(windowRef: WindowRef) {
-    var suite =
-        wrf.nativeWindow.document.getElementsByTagName('TESTING_SUITE')[0];
-    if (suite) {
-      suite.remove();
-    }
     continueBoolean = false;
     addBoolean = false;
     deleteBoolean = false;
@@ -71,16 +74,15 @@ describe('Command executor service', () => {
       'INPUT') as HTMLInputElement;
     textbox.classList.add(
       'form-control');
-    textbox.value = 'placeholder';
+    // textbox.value = 'placeholder';
     var secondaryTextbox = windowRef.nativeWindow.document.createElement(
       'INPUT') as HTMLInputElement;
     secondaryTextbox.classList.add(
       'form-control');
-    secondaryTextbox.value = 'placeholder';
+    // secondaryTextbox.value = 'placeholder';
     var addButton = windowRef.nativeWindow.document.createElement(
       'BUTTON');
-    addButton.classList.add('btn');
-    addButton.classList.add('btn-secondary');
+    addButton.classList.add('oppia-add-list-entry');
     addButton.onclick = function() {
       addBoolean = true;
     };
@@ -89,7 +91,7 @@ describe('Command executor service', () => {
     deleteButton.classList.add('oppia-delete-list-entry-button');
     deleteButton.onclick = function() {
       deleteBoolean = true;
-    };
+   };
     var fractionBox = windowRef.nativeWindow.document.createElement(
       'TEXT');
     fractionBox.classList.add('form-control');
@@ -151,7 +153,7 @@ describe('Command executor service', () => {
     expect(continueBoolean).toEqual(true);
   });
 
-  it('should enter text', () => {
+  it('should enter text and click submit button after', () => {
     expect(spy).toHaveBeenCalled();
     expect(spy.calls.mostRecent().args[0]).toEqual('message');
     var suite =
