@@ -1053,16 +1053,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     }
                 },
-<<<<<<< HEAD
-=======
-                'default_outcome': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                }
->>>>>>> upstream/develop
             }
         })
         exploration.states[
@@ -1246,11 +1236,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Adds 1 to content count to exploration (solution).
         init_state.update_interaction_solution(solution)
 
-<<<<<<< HEAD
         self.assertEqual(exploration.get_content_count(), 5)
-=======
-        self.assertEqual(exploration.get_content_count(), 8)
->>>>>>> upstream/develop
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')

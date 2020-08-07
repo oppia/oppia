@@ -313,11 +313,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-<<<<<<< HEAD
         self.assertEqual(translation_opportunities[0].content_count, 2)
-=======
-        self.assertEqual(translation_opportunities[0].content_count, 4)
->>>>>>> upstream/develop
 
         answer_group_dict = {
             'outcome': {
