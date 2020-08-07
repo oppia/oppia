@@ -48,6 +48,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -657,6 +658,62 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
                 len(latex_to_svg_mappings.keys())),
             'number_of_explorations_left_to_update': '%d' % (
                 number_of_explorations_left_to_update)
+        })
+
+
+class SuggestionsLatexSvgHandler(base.BaseHandler):
+    """Handler updating suggestions having math rich-text components with
+    math SVGs.
+
+    TODO(#10045): Remove this function once all the math-rich text components in
+    suggestions have a valid math SVG stored in the datastore.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        latex_strings_to_suggestion_ids_mapping = (
+            suggestion_services.
+            get_suggestions_with_latex_strings_having_no_svgs())
+        self.render_json({
+            'latex_strings_to_suggestion_ids_mapping': (
+                latex_strings_to_suggestion_ids_mapping)
+        })
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        latex_to_svg_mappings = self.payload.get('latexMapping')
+        for suggestion_id, latex_to_svg_mapping_dict in (
+                latex_to_svg_mappings.items()):
+            for latex_string in latex_to_svg_mapping_dict.keys():
+                svg_image = self.request.get(
+                    latex_to_svg_mappings[suggestion_id][latex_string][
+                        'latexId'])
+                if not svg_image:
+                    raise self.InvalidInputException(
+                        'SVG for LaTeX string %s in suggestion %s is not '
+                        'supplied.' % (latex_string, suggestion_id))
+
+                dimensions = (
+                    latex_to_svg_mappings[suggestion_id][latex_string][
+                        'dimensions'])
+                latex_string_svg_image_dimensions = (
+                    html_domain.LatexStringSvgImageDimensions(
+                        dimensions['encoded_height_string'],
+                        dimensions['encoded_width_string'],
+                        dimensions['encoded_vertical_padding_string']))
+                latex_string_svg_image_data = (
+                    html_domain.LatexStringSvgImageData(
+                        svg_image, latex_string_svg_image_dimensions))
+                latex_to_svg_mappings[suggestion_id][latex_string] = (
+                    latex_string_svg_image_data)
+
+        suggestion_services.update_suggestions_with_math_svgs(
+            latex_to_svg_mappings)
+        self.render_json({
+            'number_of_suggestions_updated': '%d' % (
+                len(latex_to_svg_mappings.keys()))
         })
 
 
