@@ -40,7 +40,7 @@ describe('Add Worked Example Modal Controller', function() {
       expect($scope.tmpWorkedExampleExplanationHtml).toBe('');
     });
 
-  it('should close modal when saving work example', function() {
+  it('should close modal when saving worked example', function() {
     $scope.saveWorkedExample();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       workedExampleQuestionHtml: '',

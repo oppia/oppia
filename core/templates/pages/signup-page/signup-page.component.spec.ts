@@ -114,23 +114,23 @@ describe('Signup page', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('should show warning when email preferences is null but user can send' +
-      ' emails and reset its value', function() {
-      expect(ctrl.emailPreferencesWarningText).toBe(undefined);
+    it('should show warning if email preference is not selected by the user',
+      function() {
+        expect(ctrl.emailPreferencesWarningText).toBe(undefined);
 
-      ctrl.submitPrerequisitesForm(true, '', null);
+        ctrl.submitPrerequisitesForm(true, '', null);
 
-      expect(ctrl.emailPreferencesWarningText).toBe(
-        'I18N_SIGNUP_FIELD_REQUIRED');
+        expect(ctrl.emailPreferencesWarningText).toBe(
+          'I18N_SIGNUP_FIELD_REQUIRED');
 
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
 
-      ctrl.onSelectEmailPreference();
-      expect(ctrl.emailPreferencesWarningText).toBe('');
-    });
+        ctrl.onSelectEmailPreference();
+        expect(ctrl.emailPreferencesWarningText).toBe('');
+      });
 
-    it('should send correct information when can receive email updates',
+    it('should successfully signup when user opts to receive email updates',
       function() {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
           return_url: '/expected_url'
@@ -151,7 +151,7 @@ describe('Signup page', function() {
         expect(mockWindow.location.href).toBe('/expected_url');
       });
 
-    it('should send correct information when cannot receive email updates',
+    it('should successfully signup when user opts to not receive email updates',
       function() {
         spyOn(UrlService, 'getUrlParams').and.returnValue({
           return_url: '/expected_url'
@@ -189,11 +189,12 @@ describe('Signup page', function() {
       ctrl.$onInit();
     });
 
-    it('should show a loading message until the data is retrieved', function() {
-      expect(loadingMessage).toBe('I18N_SIGNUP_LOADING');
-      $httpBackend.flush();
-      expect(loadingMessage).toBeFalsy();
-    });
+    it('should show a loading message until the user data is retrieved',
+      function() {
+        expect(loadingMessage).toBe('I18N_SIGNUP_LOADING');
+        $httpBackend.flush();
+        expect(loadingMessage).toBeFalsy();
+      });
 
     it('should show warning when user has not agreed to terms', function() {
       ctrl.submitPrerequisitesForm(false, null);
@@ -201,7 +202,7 @@ describe('Signup page', function() {
         'I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
     });
 
-    it('should get data correctly from backend', function() {
+    it('should get user data correctly from backend', function() {
       $httpBackend.flush();
       expect(ctrl.username).toBe('myUsername');
       expect(ctrl.hasAgreedToLatestTerms).toBe(false);
@@ -212,7 +213,7 @@ describe('Signup page', function() {
       expect(ctrl.isFormValid()).toBe(false);
     });
 
-    it('should not check username disponibility when user is already logged',
+    it('should not check username availability when user is already logged in',
       function() {
         $httpBackend.flush();
         ctrl.onUsernameInputFormBlur();
@@ -261,7 +262,7 @@ describe('Signup page', function() {
       expect(mockWindow.location.href).toBe('/another_url');
     });
 
-    it('should get data correctly from backend', function() {
+    it('should get user data correctly from backend', function() {
       $httpBackend.flush();
       expect(ctrl.username).toBe('myUsername');
       expect(ctrl.hasAgreedToLatestTerms).toBe(true);

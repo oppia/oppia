@@ -92,7 +92,7 @@ describe('Preferences Controller', function() {
       '/assets/images/path/to/image.png');
   });
 
-  it('should save user bio on backend when saving user bio', function() {
+  it('should send the updated user bio to the backend', function() {
     var userBio = 'User bio example';
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match('"update_type":"user_bio"');
@@ -107,8 +107,7 @@ describe('Preferences Controller', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should save subject interests after changing it on backend when' +
-    ' selecting subject interests', function() {
+  it('should send the updated subject interests to the backend', function() {
     var subjectInterests = 'Math';
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
@@ -128,8 +127,7 @@ describe('Preferences Controller', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should save preferred site language code after changing it on backend' +
-    ' when saving site language preferences', function() {
+  it('should send the preferred site language code to the backend', function() {
     var newLanguage = 'es';
     var isRequestTheExpectOne = function(queryParams) {
       return decodeURIComponent(queryParams).match(
@@ -149,22 +147,22 @@ describe('Preferences Controller', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should save preferred audio language code after changing it on backend' +
-    ' when saving chosen languages', function() {
-    var newLanguage = 'es';
-    var isRequestTheExpectOne = function(queryParams) {
-      return decodeURIComponent(queryParams).match(
-        '"update_type":"preferred_audio_language_code"');
-    };
+  it('should send the preferred audio language code to the backend',
+    function() {
+      var newLanguage = 'es';
+      var isRequestTheExpectOne = function(queryParams) {
+        return decodeURIComponent(queryParams).match(
+          '"update_type":"preferred_audio_language_code"');
+      };
 
-    $httpBackend.expect(
-      'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-    ctrl.savePreferredAudioLanguageCode(newLanguage);
-    $httpBackend.flush();
+      $httpBackend.expect(
+        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
+      ctrl.savePreferredAudioLanguageCode(newLanguage);
+      $httpBackend.flush();
 
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
 
   it('should show username popover based on its length', function() {
     expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
@@ -216,11 +214,12 @@ describe('Preferences Controller', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-  it('should export data when handling export data click', function() {
-    expect(ctrl.exportingData).toBe(false);
-    ctrl.handleExportDataClick();
-    expect(ctrl.exportingData).toBe(true);
-  });
+  it('should export account when handling export account data click',
+    function() {
+      expect(ctrl.exportingData).toBe(false);
+      ctrl.handleExportDataClick();
+      expect(ctrl.exportingData).toBe(true);
+    });
 
   it('should show that notifications checkbox is true by default',
     function() {

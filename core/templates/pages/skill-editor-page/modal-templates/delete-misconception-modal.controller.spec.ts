@@ -92,11 +92,11 @@ describe('Delete Misconception Modal Controller', function() {
       expect($scope.skill).toEqual(skillObject);
     });
 
-  it('should close the modal and get misconception when confirming',
-    function() {
-      $scope.confirm();
-      expect($uibModalInstance.close).toHaveBeenCalledWith({
-        id: '2'
-      });
+  it('should close the modal with misconception id when clicking on save' +
+    ' button', function() {
+    $scope.confirm();
+    expect($uibModalInstance.close).toHaveBeenCalledWith({
+      id: '2'
     });
+  });
 });

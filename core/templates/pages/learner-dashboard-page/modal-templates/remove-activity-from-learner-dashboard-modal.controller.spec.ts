@@ -65,7 +65,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
           expect($scope.activityTitle).toEqual(activity.title);
         });
 
-      it('should remove activity from backend when clicking remove',
+      it('should remove activity from backend when clicking remove button',
         function() {
           $httpBackend.expectDELETE(
             '/learnerplaylistactivityhandler/exploration/1').respond(200);
@@ -106,7 +106,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove activity from backend when clicking remove',
+      it('should remove activity from backend when clicking remove button',
         function() {
           $httpBackend.expectDELETE(
             '/learnerincompleteactivityhandler/collection/1').respond(200);
@@ -146,7 +146,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
           expect($scope.activityTitle).toEqual(activity.title);
         });
 
-      it('should not remove activity from backend when clicking remove',
+      it('should not remove activity from backend when clicking remove button',
         function() {
           expect(function() {
             $scope.remove();
@@ -176,7 +176,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should remove activity from backend when clicking remove',
+      it('should remove activity from backend when clicking remove button',
         function() {
           expect(function() {
             $scope.remove();

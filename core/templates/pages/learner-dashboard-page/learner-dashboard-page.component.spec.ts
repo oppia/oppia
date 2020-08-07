@@ -426,7 +426,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.getCollectionUrl()).toBe('/collection/undefined');
     });
 
-    it('should check when application is being used on a mobile', function() {
+    it('should detect when application is being used on a mobile', function() {
       // This approach was choosen because spyOn() doesn't work on properties
       // that doesn't have a get access type.
       // Without this approach the test will fail because it'll throw
@@ -450,7 +450,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.showUsernamePopover('abc')).toBe('none');
     });
 
-    it('should change page when going through pages of complete collections',
+    it('should change page when going through pages of incomplete explorations',
       function() {
         var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
         var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
@@ -603,42 +603,42 @@ describe('Learner dashboard page', function() {
       });
     });
 
-    it('should get thread messages from backend when thread is selected',
-      function() {
-        var threadStatus = 'open';
-        var explorationId = 'exp1';
-        var threadId = 'thread_1';
-        var explorationTitle = 'Exploration Title';
-        var threadMessages = [{
-          message_id: '1',
-          text: 'Feedback 1',
-          updated_status: 'open',
-          suggestion_html: 'An instead of a',
-          current_content_html: 'A orange',
-          description: 'Suggestion for english grammar',
-          author_username: 'username2',
-          author_picture_data_url: 'foo',
-          created_on_msecs: 1200
-        }];
+    it('should get messages in the thread from the backend when a thread is' +
+      ' selected', function() {
+      var threadStatus = 'open';
+      var explorationId = 'exp1';
+      var threadId = 'thread_1';
+      var explorationTitle = 'Exploration Title';
+      var threadMessages = [{
+        message_id: '1',
+        text: 'Feedback 1',
+        updated_status: 'open',
+        suggestion_html: 'An instead of a',
+        current_content_html: 'A orange',
+        description: 'Suggestion for english grammar',
+        author_username: 'username2',
+        author_picture_data_url: 'foo',
+        created_on_msecs: 1200
+      }];
 
-        expect(ctrl.numberOfUnreadThreads).toBe(10);
+      expect(ctrl.numberOfUnreadThreads).toBe(10);
 
-        $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-          .respond({
-            message_summary_list: threadMessages
-          });
-        ctrl.onClickThread(
-          threadStatus, explorationId, threadId, explorationTitle);
+      $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
+        .respond({
+          message_summary_list: threadMessages
+        });
+      ctrl.onClickThread(
+        threadStatus, explorationId, threadId, explorationTitle);
 
-        expect(ctrl.loadingFeedbacks).toBe(true);
-        expect(ctrl.feedbackThreadActive).toBe(true);
-        expect(ctrl.numberOfUnreadThreads).toBe(9);
-        $httpBackend.flush();
+      expect(ctrl.loadingFeedbacks).toBe(true);
+      expect(ctrl.feedbackThreadActive).toBe(true);
+      expect(ctrl.numberOfUnreadThreads).toBe(9);
+      $httpBackend.flush();
 
-        expect(ctrl.messageSummaries.length).toBe(1);
-      });
+      expect(ctrl.messageSummaries.length).toBe(1);
+    });
 
-    it('should show all threads when a thread is selected', function() {
+    it('should show all threads when a thread is not selected', function() {
       var threadStatus = 'open';
       var explorationId = 'exp1';
       var threadId = 'thread_1';
@@ -668,9 +668,11 @@ describe('Learner dashboard page', function() {
 
       ctrl.showAllThreads();
       expect(ctrl.feedbackThreadActive).toBe(false);
+
+      expect(ctrl.numberOfUnreadThreads).toBe(9);
     });
 
-    it('should add a new message in a thread when thread is selected',
+    it('should add a new message in a thread when there is a thread selected',
       function() {
         var threadStatus = 'open';
         var explorationId = 'exp1';
@@ -724,8 +726,7 @@ describe('Learner dashboard page', function() {
           });
       });
 
-    it('should open remove activity modal with $uibModal when removing' +
-      ' activity', function() {
+    it('should open remove activity modal when removing activity', function() {
       spyOn($uibModal, 'open').and.callThrough();
 
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
@@ -750,14 +751,13 @@ describe('Learner dashboard page', function() {
       var activity = learnerExplorationSummaryObjectFactory
         .createFromBackendDict(
           learnerDashboardData.incomplete_explorations_list[2]);
-      ctrl.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, activity);
+      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
       $scope.$apply();
 
       expect(ctrl.incompleteExplorationsList.length).toBe(11);
     });
 
-    it('should not remove an activity when its not present', function() {
+    it('should not remove an activity if its not present', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -856,14 +856,15 @@ describe('Learner dashboard page', function() {
         'Not Actionable');
     });
 
-    it('should date formatted when getting locale date string', function() {
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      var NOW_MILLIS = 1416563100000;
-      spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-        .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
-      expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-        '11/21/2014');
-    });
+    it('should formatted date string from the timestamp in milliseconds',
+      function() {
+        // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+        var NOW_MILLIS = 1416563100000;
+        spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+          .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
+        expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
+          '11/21/2014');
+      });
   });
 
   describe('when fetching dashboard data fails', function() {

@@ -141,7 +141,7 @@ describe('Create New Chapter Modal Controller', function() {
       expect(storyUpdateSpy).toHaveBeenCalled();
     });
 
-  it('should update the title when changing chapter title', function() {
+  it('should update the title', function() {
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNodeTitle');
     $scope.updateTitle();
     expect(storyUpdateSpy).toHaveBeenCalled();
@@ -180,7 +180,7 @@ describe('Create New Chapter Modal Controller', function() {
     expect($scope.invalidExpId).toEqual(true);
   });
 
-  it('should close the modal when saving a chapter wth a valid exploration id',
+  it('should close the modal when saving a chapter with a valid exploration id',
     function() {
       spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
       var deferred = $q.defer();
@@ -201,7 +201,7 @@ describe('Create New Chapter Modal Controller', function() {
       expect(storyUpdateSpy).toHaveBeenCalled();
     });
 
-  it('should not save when the chapter title is already set', function() {
+  it('should not save when the chapter title is already used', function() {
     $scope.title = nodeTitles[0];
     $scope.save();
     expect($scope.errorMsg).toBe('A chapter with this title already exists');

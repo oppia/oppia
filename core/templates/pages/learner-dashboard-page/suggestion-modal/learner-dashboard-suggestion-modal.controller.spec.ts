@@ -55,7 +55,7 @@ describe('Learner Dashboard Suggestion Modal Controller', function() {
       expect($scope.description).toBe(description);
     });
 
-  it('should dismiss the modal on canceling suggestion modal', function() {
+  it('should dismiss the modal on clicking cancel button', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });

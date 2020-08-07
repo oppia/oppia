@@ -97,13 +97,14 @@ describe('Profile page', function() {
     windowRefMock.nativeWindow.location.href = '';
   });
 
-  it('should date formatted when getting locale date string', function() {
-    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-    var NOW_MILLIS = 1416563100000;
-    spyOn(DateTimeFormatService, 'getLocaleDateString').withArgs(NOW_MILLIS)
-      .and.returnValue('11/21/2014');
-    expect(ctrl.getLocaleDateString(NOW_MILLIS)).toBe('11/21/2014');
-  });
+  it('should formatted date string from the timestamp in milliseconds',
+    function() {
+      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+      var NOW_MILLIS = 1416563100000;
+      spyOn(DateTimeFormatService, 'getLocaleDateString').withArgs(NOW_MILLIS)
+        .and.returnValue('11/21/2014');
+      expect(ctrl.getLocaleDateString(NOW_MILLIS)).toBe('11/21/2014');
+    });
 
   describe('when user has edited explorations', function() {
     var profileData = {

@@ -82,7 +82,7 @@ describe('Create new skill modal', function() {
     expect($scope.errorMsg).toEqual('');
   });
 
-  it('should dismiss modal when clicking on cancel', function() {
+  it('should dismiss modal when clicking on cancel button', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
