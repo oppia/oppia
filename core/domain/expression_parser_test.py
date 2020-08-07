@@ -248,6 +248,31 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Invalid token: ..'):
             expression_parser.tokenize('..5')
 
+    def test_get_variables(self):
+        """Tests for get_variables method."""
+        self.assertEqual(expression_parser.get_variables(
+            'a^2.3'), ['a'])
+        self.assertEqual(
+            expression_parser.get_variables('abs(alpha)'), ['alpha'])
+        self.assertEqual(
+            expression_parser.get_variables('alpha/gamma'), ['alpha', 'gamma'])
+        self.assertEqual(expression_parser.get_variables(
+            'A + 2/3'), ['A'])
+        self.assertEqual(expression_parser.get_variables(
+            'alphabetagamma'), ['alpha', 'beta', 'gamma'])
+        self.assertEqual(expression_parser.get_variables(
+            'betalphaa'), ['a', 'p', 'beta', 'l', 'h'])
+        self.assertEqual(expression_parser.get_variables(
+            'a+a*a/aa^a-a'), ['a'])
+        self.assertEqual(expression_parser.get_variables(
+            'sqrt(3+x^y)/abs(gamma)'), ['y', 'x', 'gamma'])
+        self.assertEqual(expression_parser.get_variables(
+            'a=3+4'), ['a'])
+        self.assertEqual(expression_parser.get_variables(
+            '(a-2)^beta = alpha/gamma'), ['a', 'alpha', 'beta', 'gamma'])
+        self.assertEqual(expression_parser.get_variables(
+            '4=abs(-4)'), [])
+
 
 class TokenUnitTests(test_utils.GenericTestBase):
     """Test the token module."""

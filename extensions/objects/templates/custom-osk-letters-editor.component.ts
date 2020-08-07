@@ -28,22 +28,26 @@ angular.module('oppia').component('customOskLettersEditor', {
   controller: [
     '$scope', '$window', 'ALLOWED_CUSTOM_LETTERS_LIMIT',
     'CUSTOM_LETTERS_GREEK_TAB', 'CUSTOM_LETTERS_LATIN_TAB',
-    'GREEK_SYMBOLS_LOWERCASE', 'GREEK_SYMBOLS_UPPERCASE',
+    'GREEK_LETTER_NAMES_TO_SYMBOLS',
     function(
         $scope, $window, ALLOWED_CUSTOM_LETTERS_LIMIT,
         CUSTOM_LETTERS_GREEK_TAB, CUSTOM_LETTERS_LATIN_TAB,
-        GREEK_SYMBOLS_LOWERCASE, GREEK_SYMBOLS_UPPERCASE) {
+        GREEK_LETTER_NAMES_TO_SYMBOLS) {
       const ctrl = this;
       ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
+      let greekSymbolsLowercase = Object.values(
+        GREEK_LETTER_NAMES_TO_SYMBOLS.slice(0, 23));
       ctrl.greekLowerCase = [
-        GREEK_SYMBOLS_LOWERCASE.slice(0, 8).join(''),
-        GREEK_SYMBOLS_LOWERCASE.slice(8, 16).join(''),
-        GREEK_SYMBOLS_LOWERCASE.slice(16, 23).join(''),
+        greekSymbolsLowercase.slice(0, 8).join(''),
+        greekSymbolsLowercase.slice(8, 16).join(''),
+        greekSymbolsLowercase.slice(16, 23).join(''),
       ];
+      let greekSymbolsUppercase = Object.values(
+        GREEK_LETTER_NAMES_TO_SYMBOLS.slice(23, 33));
       ctrl.greekUpperCase = [
-        GREEK_SYMBOLS_UPPERCASE.slice(0, 5).join(''),
-        GREEK_SYMBOLS_UPPERCASE.slice(5, 10).join('')
+        greekSymbolsUppercase.slice(0, 5).join(''),
+        greekSymbolsUppercase.slice(5, 10).join('')
       ];
 
       ctrl.latinTab = CUSTOM_LETTERS_LATIN_TAB;

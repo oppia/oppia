@@ -135,10 +135,10 @@ export class AlgebraicExpressionInputValidationService {
     // TODO(#7434): Use dot notation after we find a way to get
     // rid of the TS2339 error on AppConstants.
     /* eslint-disable dot-notation */
-    let greekLetters = AppConstants['GREEK_LETTERS'];
-    let greekSymbols = (
-      AppConstants['GREEK_SYMBOLS_LOWERCASE'].concat(AppConstants[
-        'GREEK_SYMBOLS_UPPERCASE']));
+    let greekLetters = Object.keys(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+    let greekSymbols = Object.values(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
     /* eslint-enable dot-notation */
     let missingVariables = [];
 

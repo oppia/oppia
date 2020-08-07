@@ -5306,22 +5306,42 @@ export = {
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
-  // NOTE: The GREEK_LETTERS array's values should correspond to the symbols
-  // array (lowercase + uppercase).
   // Greek letters allowed in math interactions.
-  "GREEK_LETTERS": [
-    "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
-    "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
-    "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
-    "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"
-  ],
-
-  // Greek symbols allowed in math interactions.
-  "GREEK_SYMBOLS_LOWERCASE": [
-    "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
-    "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω"
-  ],
-  "GREEK_SYMBOLS_UPPERCASE": ["Γ", "Δ", "Θ", "Λ", "Ξ", "Π", "Σ", "Φ", "Ψ", "Ω"],
+  "GREEK_LETTER_NAMES_TO_SYMBOLS": {
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "zeta": "ζ",
+    "eta": "η",
+    "theta": "θ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",
+    "xi": "ξ",
+    "pi": "π",
+    "rho": "ρ",
+    "sigma": "σ",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "Gamma": "Γ",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Xi": "Ξ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Phi": "Φ",
+    "Psi": "Ψ",
+    "Omega": "Ω"
+  },
 
   // Number of custom letters allowed in the on-screen keyboard for math
   // interactions.

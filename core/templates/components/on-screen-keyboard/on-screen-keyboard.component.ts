@@ -27,12 +27,12 @@ angular.module('oppia').component('onScreenKeyboard', {
     'DeviceInfoService', 'GuppyInitializationService',
     'UrlInterpolationService',
     'OSK_FUNCTIONS_TAB', 'OSK_LETTERS_TAB', 'OSK_MAIN_TAB',
-    'GREEK_SYMBOLS_LOWERCASE', 'GREEK_SYMBOLS_UPPERCASE', 'GREEK_LETTERS',
+    'GREEK_LETTER_NAMES_TO_SYMBOLS',
     function(
         DeviceInfoService, GuppyInitializationService,
         UrlInterpolationService,
         OSK_FUNCTIONS_TAB, OSK_LETTERS_TAB, OSK_MAIN_TAB,
-        GREEK_SYMBOLS_LOWERCASE, GREEK_SYMBOLS_UPPERCASE, GREEK_LETTERS) {
+        GREEK_LETTER_NAMES_TO_SYMBOLS) {
       const ctrl = this;
       let engine, guppyInstance;
 
@@ -40,9 +40,8 @@ angular.module('oppia').component('onScreenKeyboard', {
       ctrl.lettersTab = OSK_LETTERS_TAB;
       ctrl.mainTab = OSK_MAIN_TAB;
 
-      let greekSymbols = GREEK_SYMBOLS_LOWERCASE.concat(
-        GREEK_SYMBOLS_UPPERCASE);
-      let greekLetters = GREEK_LETTERS;
+      let greekSymbols = Object.values(GREEK_LETTER_NAMES_TO_SYMBOLS);
+      let greekLetters = Object.keys(GREEK_LETTER_NAMES_TO_SYMBOLS);
 
       ctrl.currentTab = ctrl.mainTab;
       ctrl.lettersInKeyboardLayout = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];

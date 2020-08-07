@@ -33,6 +33,7 @@ import string
 from constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
+from core.domain import expression_parser
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -2951,10 +2952,6 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        greek_symbols = constants.GREEK_SYMBOLS_LOWERCASE + (
-            constants.GREEK_SYMBOLS_UPPERCASE)
-        greek_letters = constants.GREEK_LETTERS
-
         for state_dict in states_dict.values():
             if state_dict['interaction']['id'] in (
                     'AlgebraicExpressionInput', 'MathEquationInput'):
@@ -2962,28 +2959,20 @@ class Exploration(python_utils.OBJECT):
                 for group in state_dict['interaction']['answer_groups']:
                     for rule_spec in group['rule_specs']:
                         rule_input = rule_spec['inputs']['x']
-
-                        # Removing all greek letters after adding the
-                        # corresponding symbol to the 'variables' set so that
-                        # the letters in them don't get considered individually.
-                        # For eg. if the expression is 'beta + x', we want the
-                        # variables to be ['β', 'x'] instead of
-                        # ['β', 'b', 'e', 't', 'a', 'x'].
-                        for ind, greek_letter in enumerate(greek_letters):
-                            if greek_letter in rule_input:
-                                rule_input = rule_input.replace(
-                                    greek_letter, '')
-                                variables.add(greek_symbols[ind])
-
-                        for character in rule_input:
-                            if character.isalpha():
-                                variables.add(character)
+                        for variable in expression_parser.get_variables(
+                                rule_input):
+                            # Replacing greek letter names with greek symbols.
+                            if len(variable) > 1:
+                                variable = (
+                                    constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
+                                        variable])
+                            variables.add(variable)
 
                 customization_args = state_dict[
                     'interaction']['customization_args']
                 customization_args.update({
                     'customOskLetters': {
-                        'value': list(variables)
+                        'value': sorted(variables)
                     }
                 })
 
