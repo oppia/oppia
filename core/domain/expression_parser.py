@@ -184,7 +184,7 @@ def get_variables(expression):
 
     Args:
         expression: str. A math expression.
-    
+
     Returns:
         list(str). A list containing all the variables present in the given
             expression.

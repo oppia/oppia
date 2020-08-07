@@ -25,8 +25,8 @@ import datetime
 from constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
-from core.domain import expression_parser
 from core.domain import exp_domain
+from core.domain import expression_parser
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
