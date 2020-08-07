@@ -95,7 +95,7 @@ export class StatsReportingService {
 
   private startStatsTimer(): void {
     if (!StatsReportingService.editorPreviewMode &&
-      !StatsReportingService.questionPlayerMode ) {
+      !StatsReportingService.questionPlayerMode) {
       setInterval(() => this.postStatsToBackend(), 300000);
     }
   }

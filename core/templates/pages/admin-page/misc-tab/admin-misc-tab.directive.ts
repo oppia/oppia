@@ -259,7 +259,7 @@ angular.module('oppia').directive('adminMiscTab', [
             for (var i = 0; i < latexStrings.length; i++) {
               LoggerService.info(
                 'Trying to generate SVG for Latex: ' +
-                latexStrings[i] + '  Exploration: ' + expId );
+                latexStrings[i] + '  Exploration: ' + expId);
               var svgFile = await convertLatexToSvgFile(latexStrings[i]);
               countOfSvgsGenerated++;
               LoggerService.info(

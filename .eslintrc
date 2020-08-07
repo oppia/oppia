@@ -218,6 +218,10 @@
       "error",
       "always"
     ],
+    "space-in-parens": [
+      "error",
+      "never"
+    ],
     "space-infix-ops": [
       "error"
     ],
