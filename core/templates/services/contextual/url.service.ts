@@ -34,10 +34,19 @@ interface UrlParamsType {
 export class UrlService {
   constructor(private windowRef: WindowRef) {}
 
+  /**
+   * This function is used to find the current location
+   * of the window.
+   * @return {boolean} the current location.
+   */
   getCurrentLocation(): Location {
     return this.windowRef.nativeWindow.location;
   }
 
+  /**
+   * This function is used to find the current query string.
+   * @return {boolean} the current query string.
+   */
   getCurrentQueryString(): string {
     return this.getCurrentLocation().search;
   }
@@ -59,16 +68,29 @@ export class UrlService {
     return params;
   }
 
+  /**
+   * This function is used to check whether the url is framed.
+   * @return {boolean} whether the url is framed.
+   */
   isIframed(): boolean {
     let pathname = this.getPathname();
     let urlParts = pathname.split('/');
     return urlParts[1] === 'embed';
   }
 
+  /**
+   * This function is used to find the current path name.
+   * @return {string} the current path name.
+   */
   getPathname(): string {
     return this.getCurrentLocation().pathname;
   }
 
+  /**
+   * This function is used to find the topic id from url.
+   * @return {string} the topic id.
+   * @throws Will throw an error if the url is invalid.
+   */
   getTopicIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/topic_editor\/(\w|-){12}/g)) {
@@ -77,6 +99,12 @@ export class UrlService {
     throw new Error('Invalid topic id url');
   }
 
+  /**
+   * This function is used to find the topic URL fragment
+   * from the learner's url.
+   * @return {string} the topic URL fragment.
+   * @throws Will throw an error if the url is invalid.
+   */
   getTopicUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
@@ -111,6 +139,11 @@ export class UrlService {
     throw new Error('Invalid URL for classroom');
   }
 
+  /**
+   * This function is used to find the subtopic name from the learner's URL.
+   * @return {string} the subtopic name.
+   * @throws Will throw an error if the url for practice session is invalid.
+   */
   getSelectedSubtopicsFromUrl(): string {
     let pathname = this.getPathname();
     let queryStrings = this.getCurrentQueryString().split('=');
@@ -121,6 +154,12 @@ export class UrlService {
   }
 
 
+  /**
+   * This function is used to find the classroom URL fragment from the learner's
+   * URL.
+   * @return {string} the classroom URL fragment.
+   * @throws Will throw an error if the URL is invalid.
+   */
   getClassroomUrlFragmentFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
@@ -130,6 +169,11 @@ export class UrlService {
     throw new Error('Invalid URL for classroom');
   }
 
+  /**
+   * This function is used to find the subtopic id from the learner's url.
+   * @return {string} the subtopic id.
+   * @throws Will throw an error if the url is invalid.
+   */
   getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
@@ -139,6 +183,11 @@ export class UrlService {
     throw new Error('Invalid URL for subtopic');
   }
 
+  /**
+   * This function is used to find the story id from the learner's url.
+   * @return {string} the story id.
+   * @throws Will Throw an error if the url is invalid.
+   */
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
     var matchedPath = pathname.match(
@@ -149,6 +198,11 @@ export class UrlService {
     throw new Error('Invalid story id url');
   }
 
+  /**
+   * This function is used to find the story id from the viewer's url.
+   * @return {string} the story id.
+   * @throws Will throw an error if the url is invalid.
+   */
   getStoryIdFromViewerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/story\/(\w|-){12}/g)) {
@@ -157,6 +211,11 @@ export class UrlService {
     throw new Error('Invalid story id url');
   }
 
+
+  /**
+   * This function is used to find the story id from the player.
+   * @return {string} the story id if the id exists.
+   */
   getStoryIdInPlayer(): string | null {
     let query = this.getCurrentQueryString();
     let queryItems = query.split('&');
@@ -169,6 +228,11 @@ export class UrlService {
     return null;
   }
 
+  /**
+   * This function is used to find the skill id from the url.
+   * @return {string} the skill id.
+   * @throws Will throw an error if the skill Id is invalid.
+   */
   getSkillIdFromUrl(): string {
     let pathname = this.getPathname();
     let skillId = pathname.split('/')[2];
@@ -178,6 +242,11 @@ export class UrlService {
     return skillId;
   }
 
+  /**
+   * This function is used to find the query values as a list.
+   * @param {string} fieldName - the name of the field.
+   * @return {Array<string>} the list of query field values.
+   */
   getQueryFieldValuesAsList(fieldName: string): Array<string> {
     let fieldValues = [];
     if (this.getCurrentQueryString().indexOf('?') > -1) {
@@ -197,6 +266,14 @@ export class UrlService {
     return fieldValues;
   }
 
+  /**
+   * This function is used to combine the url, the field name,
+   * and the field value together.
+   * @param {string} url - the url.
+   * @param {string} fieldName - the field name.
+   * @param {string} fieldValue - the field value.
+   * @return {Array<string>} the list of query field values.
+   */
   addField(url: string, fieldName: string, fieldValue: string): string {
     let encodedFieldValue = encodeURIComponent(fieldValue);
     let encodedFieldName = encodeURIComponent(fieldName);
@@ -204,14 +281,28 @@ export class UrlService {
         '=' + encodedFieldValue;
   }
 
+  /**
+   * This function is used to find the hashed value
+   * from the current location.
+   */
   getHash(): string {
     return this.getCurrentLocation().hash;
   }
 
+  /**
+   * This function is used to find the origin from the current location.
+   */
   getOrigin(): string {
     return this.getCurrentLocation().origin;
   }
 
+  /**
+   * This function is used to find the collection id from
+   * the exploration url.
+   * @return {string} a collection id if
+   * the url parameter doesn't have a 'parent' property
+   * but have a 'collection_id' property; @return {null} if otherwise.
+   */
   getCollectionIdFromExplorationUrl(): string | null {
     let urlParams: UrlParamsType = this.getUrlParams();
     if (urlParams.hasOwnProperty('parent')) {
@@ -223,6 +314,11 @@ export class UrlService {
     return null;
   }
 
+  /**
+   * This function is used to find the username from the profile url.
+   * @return {string} the username.
+   * @throws Will throw exception if the profile URL is invalid.
+   */
   getUsernameFromProfileUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(profile)/g)) {
@@ -231,6 +327,11 @@ export class UrlService {
     throw new Error('Invalid profile URL');
   }
 
+  /**
+   * This function is used to find the collection id from the url.
+   * @return {string} the collection id.
+   * @throws Will throw exception if the profile URL is invalid.
+   */
   getCollectionIdFromUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(collection)/g)) {
@@ -239,6 +340,12 @@ export class UrlService {
     throw new Error('Invalid collection URL');
   }
 
+  /**
+   * This function is used to find
+   * the collection id from the editor url.
+   * @return {string} the collection id.
+   * @throws Will throw exception if the editor URL is invalid.
+   */
   getCollectionIdFromEditorUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/(collection_editor\/create)/g)) {
@@ -247,6 +354,13 @@ export class UrlService {
     throw new Error('Invalid collection editor URL');
   }
 
+  /**
+   * This function is used to find the exploration
+   * version id from the url.
+   * @return {number} the exploration version from Url
+   * if an exploration version can be extracted;
+   * {null} if otherwise.
+   */
   getExplorationVersionFromUrl(): number | null {
     let urlParams: UrlParamsType = this.getUrlParams();
     if (urlParams.hasOwnProperty('v')) {

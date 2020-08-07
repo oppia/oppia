@@ -67,7 +67,9 @@ class ClassroomDataHandler(base.BaseHandler):
 
         self.values.update({
             'topic_summary_dicts': topic_summary_dicts,
-            'classroom_name': classroom.name
+            'topic_list_intro': classroom.topic_list_intro,
+            'course_details': classroom.course_details,
+            'name': classroom.name
         })
         self.render_json(self.values)
 

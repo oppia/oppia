@@ -26,7 +26,6 @@ require(
 require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('domain/classroom/classroom-backend-api.service.ts');
-require('domain/topic/TopicSummaryObjectFactory.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
@@ -62,10 +61,10 @@ angular.module('oppia').component('classroomPage', {
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.classroomBackendApiService.fetchClassroomData(
-          ctrl.classroomUrlFragment).then(function(response) {
-          ctrl.topicSummaries = response.topicSummaries;
+          ctrl.classroomUrlFragment).then(function(classroomData) {
+          ctrl.classroomData = classroomData;
           ctrl.classroomDisplayName = (
-            $filter('capitalize')(response.classroomName));
+            $filter('capitalize')(classroomData.getName()));
           PageTitleService.setPageTitle(
             ctrl.classroomDisplayName + ' Classroom | Oppia');
           LoaderService.hideLoadingScreen();

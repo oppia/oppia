@@ -56,7 +56,8 @@ describe('Topic object factory', () => {
         title: 'Title',
         skill_ids: ['skill_3'],
         thumbnail_filename: 'img.png',
-        thumbnail_bg_color: '#a33f40'
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'title'
       }],
       next_subtopic_id: 1,
       language_code: 'en'

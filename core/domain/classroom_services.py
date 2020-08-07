@@ -33,9 +33,7 @@ def get_classroom_url_fragment_for_topic_id(topic_id):
     Returns:
         str. Returns the classroom url fragment for a topic.
     """
-    topic_ids_for_classroom_pages = (
-        config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value)
-    for classroom_dict in topic_ids_for_classroom_pages:
+    for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
         if topic_id in classroom_dict['topic_ids']:
             return classroom_dict['url_fragment']
     return constants.DUMMY_CLASSROOM_URL_FRAGMENT
@@ -52,12 +50,12 @@ def get_classroom_by_url_fragment(classroom_url_fragment):
         Classroom|None. Returns the classroom domain object if found, else
         returns None.
     """
-    topic_ids_for_classroom_pages = (
-        config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value)
-    for classroom_dict in topic_ids_for_classroom_pages:
+    for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
         if classroom_url_fragment == classroom_dict['url_fragment']:
             return classroom_domain.Classroom(
                 classroom_dict['name'],
                 classroom_dict['url_fragment'],
-                classroom_dict['topic_ids'])
+                classroom_dict['topic_ids'],
+                classroom_dict['course_details'],
+                classroom_dict['topic_list_intro'])
     return None

@@ -31,6 +31,8 @@ export interface TopicSummaryBackendDict {
   'subtopic_count': number;
   'total_skill_count': number;
   'uncategorized_skill_count': number;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
   'topic_model_created_on': number;
   'topic_model_last_updated': number;
   // These properties are optional because they are only present in the
@@ -58,6 +60,8 @@ export class TopicSummary {
       public canEditTopic: boolean,
       public isPublished: boolean,
       public classroom: string,
+      public thumbnailFilename: string,
+      public thumbnailBgColor: string,
       public urlFragment: string) { }
 
   getId(): string {
@@ -115,6 +119,14 @@ export class TopicSummary {
   getUrlFragment(): string {
     return this.urlFragment;
   }
+
+  getThumbnailFilename(): string {
+    return this.thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this.thumbnailBgColor;
+  }
 }
 
 @Injectable({
@@ -139,6 +151,8 @@ export class TopicSummaryObjectFactory {
       topicSummaryBackendDict.can_edit_topic,
       topicSummaryBackendDict.is_published,
       topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.thumbnail_filename,
+      topicSummaryBackendDict.thumbnail_bg_color,
       topicSummaryBackendDict.url_fragment);
   }
 }

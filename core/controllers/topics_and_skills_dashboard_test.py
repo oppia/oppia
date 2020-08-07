@@ -86,11 +86,14 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         # Check that admins can access the topics and skills dashboard data.
         self.login(self.ADMIN_EMAIL)
         config_services.set_property(
-            self.admin_id, 'topic_ids_for_classroom_pages', [{
-                'name': 'math',
+            self.admin_id, 'classroom_pages_data', [{
                 'url_fragment': 'math',
-                'topic_ids': [self.topic_id]
-            }])
+                'name': 'math',
+                'topic_ids': [self.topic_id],
+                'topic_list_intro': 'Topics covered',
+                'course_details': 'Course details'
+            }]
+        )
         json_response = self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)

@@ -25,14 +25,20 @@ import python_utils
 class Classroom(python_utils.OBJECT):
     """Domain object for a classroom."""
 
-    def __init__(self, name, url_fragment, topic_ids):
+    def __init__(
+            self, name, url_fragment, topic_ids,
+            course_details, topic_list_intro):
         """Constructs a Classroom domain object.
 
         Args:
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
             topic_ids: list(str). List of topic ids attached to the classroom.
+            course_details: str. Course details for the classroom.
+            topic_list_intro: str. Topic list introduction for the classroom.
         """
         self.name = name
         self.url_fragment = url_fragment
         self.topic_ids = topic_ids
+        self.course_details = course_details
+        self.topic_list_intro = topic_list_intro

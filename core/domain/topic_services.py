@@ -112,9 +112,11 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.uncategorized_skill_count,
         topic_summary_model.subtopic_count,
         topic_summary_model.total_skill_count,
+        topic_summary_model.thumbnail_filename,
+        topic_summary_model.thumbnail_bg_color,
+        topic_summary_model.url_fragment,
         topic_summary_model.topic_model_created_on,
-        topic_summary_model.topic_model_last_updated,
-        topic_summary_model.url_fragment
+        topic_summary_model.topic_model_last_updated
     )
 
 
@@ -162,7 +164,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
     topic.validate()
     if does_topic_with_name_exist(topic.name):
         raise utils.ValidationError(
-            'Topic with name \'%s\' already exists' % topic_name)
+            'Topic with name \'%s\' already exists' % topic.name)
     if does_topic_with_url_fragment_exist(topic.url_fragment):
         raise utils.ValidationError(
             'Topic with URL Fragment \'%s\' already exists'
@@ -461,6 +463,10 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
+    if not topic.are_subtopic_url_fragments_unique():
+        raise Exception(
+            'Subtopic url fragments are not unique across '
+            'subtopics in the topic')
 
     # Topic model cannot be None as topic is passed as parameter here and that
     # is only possible if a topic model with that topic id exists. Also this is
@@ -540,7 +546,7 @@ def update_topic_and_subtopic_pages(
             old_topic.name != updated_topic.name and
             does_topic_with_name_exist(updated_topic.name)):
         raise utils.ValidationError(
-            'Topic with name \'%s\' already exists' % topic_name)
+            'Topic with name \'%s\' already exists' % updated_topic.name)
 
     _save_topic(
         committer_id, updated_topic, commit_message, change_list
@@ -875,8 +881,8 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic.created_on, topic.last_updated,
-        topic.url_fragment
+        total_skill_count, topic.thumbnail_filename, topic.thumbnail_bg_color,
+        topic.url_fragment, topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -901,6 +907,8 @@ def save_topic_summary(topic_summary):
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
+        'thumbnail_filename': topic_summary.thumbnail_filename,
+        'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on,
         'url_fragment': topic_summary.url_fragment

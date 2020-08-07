@@ -1497,8 +1497,8 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
-            topic_model_created_on, topic_model_last_updated,
-            url_fragment):
+            thumbnail_filename, thumbnail_bg_color, url_fragment,
+            topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -1517,11 +1517,13 @@ class TopicSummary(python_utils.OBJECT):
             subtopic_count: int. The number of subtopics in the topic.
             total_skill_count: int. The total number of skills in the topic
                 (including those that are uncategorized).
+            thumbnail_filename: str. The filename for the topic thumbnail.
+            thumbnail_bg_color: str. The background color for the thumbnail.
+            url_fragment: str. The url fragment of the topic.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
                 when the topic model was last updated.
-            url_fragment: str. The url fragment of the topic.
         """
         self.id = topic_id
         self.name = name
@@ -1534,6 +1536,8 @@ class TopicSummary(python_utils.OBJECT):
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
         self.total_skill_count = total_skill_count
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
         self.url_fragment = url_fragment
@@ -1566,6 +1570,21 @@ class TopicSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        utils.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if (
+                self.thumbnail_bg_color is not None and not (
+                    Topic.require_valid_thumbnail_bg_color(
+                        self.thumbnail_bg_color))):
+            raise utils.ValidationError(
+                'Topic thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Topic thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Topic thumbnail background color is not specified.')
 
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
@@ -1655,6 +1674,8 @@ class TopicSummary(python_utils.OBJECT):
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
             'total_skill_count': self.total_skill_count,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
             'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
             'topic_model_last_updated': utils.get_time_in_millisecs(

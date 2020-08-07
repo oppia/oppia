@@ -262,6 +262,10 @@ class TopicSummaryModel(base_models.BaseModel):
     uncategorized_skill_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of subtopics of the topic.
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The thumbnail filename of the topic.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the topic.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
 
     @staticmethod

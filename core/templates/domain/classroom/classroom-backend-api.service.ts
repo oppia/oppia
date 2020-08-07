@@ -23,60 +23,52 @@ import { Injectable } from '@angular/core';
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
 import {
-  TopicSummaryBackendDict,
-  TopicSummary,
-  TopicSummaryObjectFactory
-} from 'domain/topic/TopicSummaryObjectFactory';
+  ClassroomData,
+  ClassroomDataObjectFactory
+} from 'domain/classroom/ClassroomDataObjectFactory';
+import { TopicSummaryBackendDict } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface ClassroomBackendDict {
-  'classroom_name': string;
-  'topic_summary_dicts': TopicSummaryBackendDict[];
-}
-
-interface ClassroomBackendResponse {
-  classroomName: string;
-  topicSummaries: TopicSummary[];
-}
-
 interface ClassroomStatusBackendDict {
   'classroom_page_is_shown': boolean;
+}
+
+interface ClassroomDataBackendDict {
+  'name': string,
+  'topic_summary_dicts': TopicSummaryBackendDict[],
+  'course_details': string,
+  'topic_list_intro': string
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassroomBackendApiService {
-  topicSummaryObjects: TopicSummary[] = null;
-  classroomUrlFragment: string = null;
+  classroomData: ClassroomData = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private topicSummaryObjectFactory: TopicSummaryObjectFactory
+    private classroomDataObjectFactory: ClassroomDataObjectFactory
   ) {}
 
   _fetchClassroomData(classroomUrlFragment: string,
-      successCallback: (value: ClassroomBackendResponse) => void,
+      successCallback: (value: ClassroomData) => void,
       errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
         classroom_url_fragment: classroomUrlFragment
       });
 
-    this.http.get<ClassroomBackendDict>(
-      classroomDataUrl).toPromise().then(data => {
-      this.topicSummaryObjects = data.topic_summary_dicts.map(
-        (summaryDict) => {
-          return this.topicSummaryObjectFactory.createFromBackendDict(
-            summaryDict);
-        }
-      );
+    this.http.get<ClassroomDataBackendDict>(
+      classroomDataUrl).toPromise().then(response => {
+      this.classroomData = (
+        this.classroomDataObjectFactory.createFromBackendData(
+          response.name, response.topic_summary_dicts, response.course_details,
+          response.topic_list_intro));
       if (successCallback) {
-        successCallback({
-          classroomName: data.classroom_name,
-          topicSummaries: this.topicSummaryObjects
-        });
+        successCallback(this.classroomData);
       }
     }, errorResponse => {
       if (errorCallback) {
@@ -104,7 +96,7 @@ export class ClassroomBackendApiService {
 
   fetchClassroomData(
       classroomUrlFragment: string
-  ): Promise<ClassroomBackendResponse> {
+  ): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomUrlFragment, resolve, reject);
     });
