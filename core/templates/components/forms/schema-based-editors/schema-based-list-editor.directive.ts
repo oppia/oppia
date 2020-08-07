@@ -96,7 +96,6 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           }
         };
         ctrl.$onInit = function() {
-          console.log('checker');
           $scope.isAddItemButtonPresent = true;
           $scope.addElementText = 'Add element';
           if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
@@ -213,13 +212,9 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               }
               evt.stopPropagation();
             };
-            console.log('Subscribed');
             ctrl.directiveSubscriptions.add(
               SchemaSubmittedService.onSubmittedSchemaBasedForm.subscribe(
-                () => {
-                  console.log('Caught: submittedSchemaBasedForm in SBListEditor');
-                  $scope._onChildFormSubmit;
-                }
+                () => $scope._onChildFormSubmit
               )
             );
 

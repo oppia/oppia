@@ -41,7 +41,6 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
-              console.log('Emitted: submittedSchemaBasedForm in SBIntEditor');
               SchemaSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };
