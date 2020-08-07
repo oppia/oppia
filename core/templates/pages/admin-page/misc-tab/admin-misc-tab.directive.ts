@@ -168,6 +168,9 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
+        // TODO(#10197): Upgrade to MathJax 3, after proper investigation
+        // and testing. MathJax 3 provides a faster and more cleaner way to
+        // convert a LaTeX string to an SVG.
         // TODO(#10045): Remove this function once all the math-rich text
         // components in explorations have a valid math SVG stored in the
         // datastore.
