@@ -46,6 +46,27 @@
               <em>The maximum length of subtopic title is 80 characters.</em>
             </span>
           </div>
+          <div class="subtopic-url-fragment">
+            <p>
+              <strong>Url Fragment*</strong>
+            </p>
+            <form class="form-horizontal" role="form">
+              <input class="form-control protractor-test-subtopic-url-fragment-field"
+                     ng-class="{'is-invalid': $ctrl.subtopicUrlFragmentExists || !$ctrl.subtopicUrlFragmentIsValid}"
+                     type="text"
+                     ng-blur="$ctrl.updateSubtopicUrlFragment($ctrl.editableUrlFragment)"
+                     ng-model="$ctrl.editableUrlFragment"
+                     maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
+              <span class="oppia-input-box-subtitle">
+                <i>
+                  The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                </i>
+              </span>
+            </form>
+            <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
+              <em>The subtopic url fragment is not unique.</em>
+            </span>
+          </div>
           <div class="subtopic-html">
             <div  ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">
               <p>
@@ -193,6 +214,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    margin: 0 auto;
+    width: 85%;
   }
   .subtopic-content .show-subtopic-preview-button {
     border-top: 1px solid #c1c1c1;
@@ -254,9 +277,11 @@
     border-bottom: none;
   }
   .subtopic-content .subtopic-left-box {
-    width: 45%;
+    margin-right: 3%;
+    width: 50%;
   }
-  .subtopic-content .subtopic-thumbnail {
+  .subtopic-content .subtopic-thumbnail,
+  .subtopic-content, .subtopic-url-fragment {
     margin: 20px 0;
   }
   .subtopic-content .subtopic-html {
@@ -269,7 +294,7 @@
     margin: 15px 0;
   }
   .subtopic-content .subtopic-right-box {
-    width: 30%;
+    width: 35%;
   }
   .subtopic-content .subtopics-list-item {
     display: flex;
@@ -280,7 +305,8 @@
     display: none;
   }
   .subtopic-content .subtopic-header-text {
-    margin-bottom: 15px;
+    font-size: 15px;
+    margin-bottom: 35px;
     margin-left: 4%;
   }
   .subtopic-content .topic-name {
@@ -335,6 +361,7 @@
   }
   .subtopic-content .subtopic-item-container {
       border-radius: 4px;
+      margin: 0;
       padding-top: 45px;
   }
   .subtopic-content .subtopic-html-content {
@@ -360,6 +387,12 @@
     }
   }
   @media screen and (max-width: 768px) {
+    .subtopic-content .subtopic-content-box {
+      width: 100%;
+    }
+    .subtopic-content .subtopic-left-box {
+      margin-right: 0;
+    }
     .subtopic-content .entity-count,
     .subtopic-content .subtopic-header-text {
       display: none;
@@ -383,6 +416,7 @@
     }
     .subtopic-content .subtopic-skill-card {
       display: block;
+      margin-top: 40px;
       padding: 0;
     }
     .subtopic-content .skill-card-header i {

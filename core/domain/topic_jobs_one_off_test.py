@@ -51,7 +51,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         'skill_ids': ['skill_1'],
         'thumbnail_bg_color': None,
         'thumbnail_filename': None,
-        'title': 'A subtitle'
+        'title': 'A subtitle',
+        'url_fragment': 'subtitle'
     }
 
     def setUp(self):
@@ -149,7 +150,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'title': 'A subtitle'
             })
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(topic.subtopic_schema_version, 3)
         self.assertEqual(
             topic.subtopics[0].to_dict(),
             self.MIGRATED_SUBTOPIC_DICT)
@@ -345,6 +346,151 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
 
+class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    def setUp(self):
+        super(RegenerateTopicSummaryOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.process_and_flush_pending_tasks()
+
+    def test_job_skips_deleted_topic(self):
+        """Tests that the regenerate summary job skips deleted topic."""
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A title', 'Abbrev title', 'description')
+        topic_services.save_new_topic(self.albert_id, topic)
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+        # Ensure the topic is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
+        topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the deleted topic is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
+
+        # Ensure the topic is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
+            job_id)
+        expected = [[u'topic_deleted',
+                     [u'Encountered 1 deleted topics.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_converts_old_topic_summary(self):
+        """Tests that the one off job creates the new summary correctly."""
+        topic_model = topic_models.TopicModel(
+            id=self.TOPIC_ID,
+            name='Topic name',
+            abbreviated_name='Topic',
+            thumbnail_bg_color='#C6DCDA',
+            thumbnail_filename='topic.svg',
+            canonical_name='topic name',
+            description='Topic description',
+            language_code='en',
+            canonical_story_references=[],
+            additional_story_references=[],
+            uncategorized_skill_ids=[],
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            next_subtopic_id=1,
+            subtopics=[]
+        )
+        commit_message = (
+            'New topic created with name \'Topic name\'.')
+
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_ID,
+            manager_ids=[self.albert_id],
+            topic_is_published=True
+        ).commit(
+            self.albert_id, 'Created new topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+        topic_model.commit(
+            self.albert_id, commit_message, [{
+                'cmd': topic_domain.CMD_CREATE_NEW,
+                'name': 'Topic name'
+            }])
+
+        # The topic summary model isn't created yet.
+        topic_summary_model = (
+            topic_models.TopicSummaryModel.get(self.TOPIC_ID, strict=False))
+        self.assertIsNone(topic_summary_model)
+
+        # Start migration job.
+        job_id = (
+            topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
+        topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the topic summary is created correctly.
+        topic_summary_model = (
+            topic_models.TopicSummaryModel.get(self.TOPIC_ID, strict=False))
+        self.assertEqual(
+            topic_summary_model.thumbnail_filename, 'topic.svg')
+        self.assertEqual(
+            topic_summary_model.thumbnail_bg_color, '#C6DCDA')
+
+        output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
+            job_id)
+        expected = [[u'topic_processed',
+                     [u'Successfully processed 1 topics.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_regeneration_job_skips_invalid_topic(self):
+        observed_log_messages = []
+
+        def _mock_get_topic_by_id(unused_topic_id):
+            """Mocks get_topic_by_id()."""
+            return 'invalid_topic'
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A title', 'Abbrev title', 'description')
+        topic_services.save_new_topic(self.albert_id, topic)
+
+        get_topic_by_id_swap = self.swap(
+            topic_fetchers, 'get_topic_by_id', _mock_get_topic_by_id)
+        logging_exception_swap = self.swap(
+            logging, 'exception', _mock_logging_function)
+
+        with get_topic_by_id_swap, logging_exception_swap:
+            job_id = (
+                topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
+            topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+        output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
+            job_id)
+
+        self.assertEqual(
+            observed_log_messages,
+            [u'Failed to create topic summary %s: \'unicode\' '
+             'object has no attribute \'canonical_story_references\''
+             % topic.id])
+        for message in output:
+            self.assertRegexpMatches(
+                message,
+                'object has no attribute \'canonical_story_references\'')
+
+
 class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -384,7 +530,8 @@ class SubTopicPageMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': valid_html_2,
+                        'data_format': 'html',
+                        'translation': valid_html_2,
                         'needs_update': False
                     }
                 }

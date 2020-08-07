@@ -77,7 +77,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'description', self.TOPIC_ID,
+            'story-one')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -312,7 +313,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
+<<<<<<< HEAD
         self.assertEqual(translation_opportunities[0].content_count, 2)
+=======
+        self.assertEqual(translation_opportunities[0].content_count, 4)
+>>>>>>> upstream/develop
 
         answer_group_dict = {
             'outcome': {
@@ -359,6 +364,21 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'Introduction',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'Introduction',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -641,7 +661,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
+            'story-two')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
