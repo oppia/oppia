@@ -19,6 +19,10 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/ng-animate.import';
+import 'third-party-imports/ng-sanitize.import';
+import 'third-party-imports/ng-toastr.import';
+import 'third-party-imports/ng-touch.import';
 import 'third-party-imports/translation-libs.import';
 
 angular.module('oppia', [

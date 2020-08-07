@@ -145,8 +145,7 @@
         ],
         "bundle": {
           "js": [
-            "angular-animate.js", "angular-sanitize.js",
-            "angular-touch.js", "angular-aria.js"
+            "angular-aria.js"
           ]
         }
       },
@@ -224,8 +223,7 @@
         "rootDirPrefix": "angular-toastr-",
         "targetDirPrefix": "angular-toastr-",
         "bundle": {
-          "css": ["dist/angular-toastr.min.css"],
-          "js": ["dist/angular-toastr.tpls.min.js"]
+          "css": ["dist/angular-toastr.min.css"]
         }
       },
       "popperJs": {
