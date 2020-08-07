@@ -465,7 +465,6 @@ angular.module('oppia').component('explorationEditorPage', {
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
             () => {
-              console.log('Caught: openEditorTut in explorationeditorpagecomp');
               ctrl.startTutorial();
             }));
         ctrl.EditabilityService = EditabilityService;

@@ -159,7 +159,6 @@ angular.module('oppia').component('previewTab', {
         ctrl.directiveSubscriptions.add(
           ExplorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
             (stateName) => {
-              console.log('Caught: updateActiveStateIfInEditor in preview-tab');
               StateEditorService.setActiveStateName(stateName);
             })
         );

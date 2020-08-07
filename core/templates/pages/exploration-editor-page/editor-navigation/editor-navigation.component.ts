@@ -67,10 +67,8 @@ angular.module('oppia').component('editorNavigation', {
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
-            console.log('Emitted: onOpenEditorTut in editornavigationcomp');
             StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-            console.log('Emitted: onOpenTranslationTut in editornavigationcomp');
             StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
         }, () => {
@@ -114,7 +112,6 @@ angular.module('oppia').component('editorNavigation', {
         this.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenPostTutorialHelpPopover.subscribe(
             () => {
-              console.log('Caught: openPostTutHelpPop in editornavigationcomp');
               if (this.screenIsLarge) {
                 this.postTutorialHelpPopoverIsShown = true;
                 $timeout(() => {

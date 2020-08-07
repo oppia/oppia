@@ -325,7 +325,6 @@ angular.module('oppia').directive('translationTab', [
             ctrl.directiveSubscriptions.add(
               StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
                 () => {
-                  console.log('Caught: opentranslationtut in translationtab');
                   $scope.onStartTutorial();
                 }
               )
