@@ -23,6 +23,10 @@ export interface FeatureFlagResultsBackendDict {
   [featureName: string]: boolean;
 }
 
+/**
+ * Represents the evaluation result of all feature flags received from the
+ * server.
+ */
 export class FeatureFlagResults {
   data: Map<string, boolean>;
 
@@ -45,8 +49,7 @@ export class FeatureFlagResults {
   }
 
   /**
-   * Parse an expression. Returns a node tree, which can be evaluated by
-   * invoking node.eval().
+   * Gets the value of a feature flag in the result.
    *
    * @param {string} featureName - The name of the feature.
    *
@@ -57,7 +60,7 @@ export class FeatureFlagResults {
     if (this.data.has(featureName)) {
       return this.data.get(featureName);
     } else {
-      throw new Error(`Feature '${featureName}' not exists.`);
+      throw new Error(`Feature '${featureName}' does not exist.`);
     }
   }
 }

@@ -71,22 +71,6 @@ describe('PlatformParameterRuleObjectFactory', () => {
     expect(instance.toBackendDict()).toEqual(backendDict);
   });
 
-  describe('.validate', () => {
-    it('should not report any rule-specific issue.', () => {
-      const instance = factory.createFromBackendDict({
-        filters: [
-          {
-            type: PlatformParameterFilterType.ServerMode,
-            conditions: [['=', ServerMode.Dev.toString()]]
-          }
-        ],
-        value_when_matched: true
-      });
-
-      expect(instance.validate()).toEqual([]);
-    });
-  });
-
   describe('.hasServerModeFilter', () => {
     it('should be true if the rule has server mode filter', () => {
       const instance = factory.createFromBackendDict({
@@ -106,7 +90,7 @@ describe('PlatformParameterRuleObjectFactory', () => {
       expect(instance.hasServerModeFilter()).toBeTrue();
     });
 
-    it('should be false if the rule doesn\' have server mode filter', () => {
+    it('should be false if the rule doesn\'t have server mode filter', () => {
       const instance = factory.createFromBackendDict({
         filters: [
           {

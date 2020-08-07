@@ -56,7 +56,7 @@ describe('FeatureFlagResultsObjectFactory', () => {
       expect(result.isFeatureEnabled('feature_name_b')).toBeFalse();
     });
 
-    it('should throws if the feature does not exist.', () => {
+    it('should throw if the feature does not exist.', () => {
       const result = factory.createFromBackendDict({
         feature_name_a: true,
         feature_name_b: false
@@ -64,7 +64,7 @@ describe('FeatureFlagResultsObjectFactory', () => {
 
       expect(
         () => result.isFeatureEnabled('invalid_name')
-      ).toThrowError('Feature \'invalid_name\' not exists.');
+      ).toThrowError('Feature \'invalid_name\' does not exist.');
     });
   });
 });
