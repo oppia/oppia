@@ -88,7 +88,7 @@ describe('Admin misc tab', function() {
       await adminPage.expectRegenerationOutcome(false, '0');
       await adminPage.regenerateContributionsForTopic(topicId);
       await adminPage.expectRegenerationOutcome(true);
-      allowedErrors.push('500', 'id 0', 'Entity');
+      allowedErrors.push('500', 'id 0', 'Entity', 'Object');
     });
 
   it('should send a test mail to admin', async function() {
