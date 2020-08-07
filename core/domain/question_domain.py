@@ -652,8 +652,8 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v36_dict_to_v37_dict(cls, question_state_dict):
-        """Converts from version 36 to 37. Version 37 changes all rule with type
-        CaseSensitiveEquals to Equals.
+        """Converts from version 36 to 37. Version 37 changes all rules with
+        type CaseSensitiveEquals to Equals.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
@@ -663,9 +663,11 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        answer_groups = question_state_dict['interaction']['answer_groups']
-        for answer_group in answer_groups:
-            for rule_spec_dict in answer_group['rule_specs']:
+        if question_state_dict['interaction']['id'] != 'TextInput':
+            continue
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
                 if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
                     rule_spec_dict['rule_type'] = 'Equals'
 

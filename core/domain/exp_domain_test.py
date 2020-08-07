@@ -7776,10 +7776,9 @@ title: Title
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    def test_load_from_v41_special_cases(self):
-        """Test to cover some special cases that occurs in the migration from
-        v41 to v42 exploration schema. This includes containing an AnswerGroup
-        that has a CaseSensitiveEquals rule.
+    def test_load_from_v41_with_text_inputs_case_sensitive_equals_rule(self):
+        """Test to cover some the case where a TextInput interactions contains
+        an AnswerGroup that has a CaseSensitiveEquals rule.
         """
         sample_yaml_content = (
             """author_notes: ''

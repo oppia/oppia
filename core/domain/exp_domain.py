@@ -2947,8 +2947,8 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
-        """Converts from version 36 to 37. Version 37 changes all rule with type
-        CaseSensitiveEquals to Equals.
+        """Converts from version 36 to 37. Version 37 changes all rules with
+        type CaseSensitiveEquals to Equals.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2959,9 +2959,11 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            answer_groups = state_dict['interaction']['answer_groups']
-            for answer_group in answer_groups:
-                for rule_spec_dict in answer_group['rule_specs']:
+            if state_dict['interaction']['id'] != 'TextInput':
+                continue
+            answer_group_dicts = state_dict['interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
                     if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
                         rule_spec_dict['rule_type'] = 'Equals'
 
