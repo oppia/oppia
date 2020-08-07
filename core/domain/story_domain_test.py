@@ -326,7 +326,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', 'Description', topic_id, 'story-frag-default')
+            self.STORY_ID, 'Title', 'Description', topic_id,
+            'story-frag-default')
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
