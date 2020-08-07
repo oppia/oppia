@@ -37,14 +37,14 @@ angular.module('oppia').component('customOskLettersEditor', {
       ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());
       let greekSymbolsLowercase = Object.values(
-        GREEK_LETTER_NAMES_TO_SYMBOLS.slice(0, 23));
+        GREEK_LETTER_NAMES_TO_SYMBOLS).slice(0, 23);
       ctrl.greekLowerCase = [
         greekSymbolsLowercase.slice(0, 8).join(''),
         greekSymbolsLowercase.slice(8, 16).join(''),
         greekSymbolsLowercase.slice(16, 23).join(''),
       ];
       let greekSymbolsUppercase = Object.values(
-        GREEK_LETTER_NAMES_TO_SYMBOLS.slice(23, 33));
+        GREEK_LETTER_NAMES_TO_SYMBOLS).slice(23, 33);
       ctrl.greekUpperCase = [
         greekSymbolsUppercase.slice(0, 5).join(''),
         greekSymbolsUppercase.slice(5, 10).join('')
