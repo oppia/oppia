@@ -659,8 +659,8 @@ class MathExpressionValidationOneOffJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v34(
-            self.VALID_EXP_ID, 'user_id', states_dict)
+        self.save_new_exp_with_custom_states_schema_version(
+            self.VALID_EXP_ID, 'user_id', states_dict, 34)
 
         job_id = (
             exp_jobs_one_off.MathExpressionValidationOneOffJob.create_new())
@@ -1071,10 +1071,10 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v35(
+        self.save_new_exp_with_custom_states_schema_version(
             self.NEW_EXP_ID, self.albert_id, {
                 'Introduction': states_dict
-            })
+            }, feconf.CURRENT_STATE_SCHEMA_VERSION - 1)
 
         job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
         exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
@@ -1085,7 +1085,107 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
                 job_id)
         )
 
-        expected_output = ['[u\'SUCCESS\', 1]']
+        expected_output = ['[u\'SUCCESS\', [u\'None\']]']
+        self.assertEqual(actual_output, expected_output)
+
+    def test_migration_job_audit_success_with_math_output(self):
+        """Test that the audit job runs correctly on explorations of the
+        state schema version 36 that use math interactions.
+        """
+        states_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'content_2': {}
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content_1': {},
+                    'feedback_2': {},
+                    'hint_1': {},
+                    'content_2': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [{
+                    'outcome': {
+                        'dest': 'abc',
+                        'feedback': {
+                            'content_id': 'feedback_1',
+                            'html': '<p>Feedback</p>'
+                        },
+                        'labelled_as_correct': True,
+                        'param_changes': [],
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'rule_specs': [{
+                        'inputs': {
+                            'x': 'a^2 + betaalpha/2a'
+                        },
+                        'rule_type': 'MatchesExactlyWith'
+                    }, {
+                        'inputs': {
+                            'x': '(xyz)^2 - a'
+                        },
+                        'rule_type': 'MatchesExactlyWith'
+                    }],
+                    'training_data': [],
+                    'tagged_misconception_id': None
+                }],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': 'Introduction',
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': None,
+                'id': 'AlgebraicExpressionInput'
+            },
+            'next_content_id_index': 0,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+
+        self.save_new_exp_with_custom_states_schema_version(
+            self.NEW_EXP_ID, self.albert_id, {
+                'Introduction': states_dict
+            }, 36)
+
+        job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
+        exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationAuditJob.get_output(
+                job_id)
+        )
+
+        expected_output = [
+            u'[u\'SUCCESS\', [u"Exp ID: exp_id1: [u\'State Name: '
+            u'Introduction, Rule Inputs: a^2 + betaalpha/2a, (xyz)^2 - a, '
+            u'Variables: a, x, y, z, \\\\u03b1, \\\\u03b2\']"]]']
         self.assertEqual(actual_output, expected_output)
 
     def test_migration_job_audit_failure(self):
@@ -1154,10 +1254,10 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v35(
+        self.save_new_exp_with_custom_states_schema_version(
             self.NEW_EXP_ID, self.albert_id, {
                 'Introduction': states_dict
-            })
+            }, feconf.CURRENT_STATE_SCHEMA_VERSION - 1)
 
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
@@ -1185,7 +1285,8 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
             expected_output = [
                 u'[u\'MIGRATION_ERROR\', [u"Exploration exp_id1 failed migratio'
-                'n to v41: u\'property_that_dne\'"]]'
+                'n to v%s: u\'property_that_dne\'"]]' %
+                current_exp_schema_version
             ]
             self.assertEqual(actual_output, expected_output)
 

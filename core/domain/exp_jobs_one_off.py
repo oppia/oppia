@@ -283,10 +283,13 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                         current_exp_schema_version - 1,
                         current_exp_schema_version)
                 )
-                converted_states_dict = conversion_fn(item.to_dict())
+                converted_dict = conversion_fn(item.to_dict())
 
-                extracted_variables = []
-                for state_dict in converted_states_dict.values():
+                # TODO(iamprayush): Revert these changes (special-casing the
+                # SUCCESS output for math interactions) after the migration job
+                # for math interactions has been successfully run.
+                extracted_variables_output = []
+                for state_name, state_dict in converted_dict['states'].items():
                     if state_dict['interaction']['id'] in (
                             'AlgebraicExpressionInput', 'MathEquationInput'):
                         rule_inputs = []
@@ -295,12 +298,14 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                                 rule_inputs.append(rule_spec['inputs']['x'])
                         customization_args = state_dict['interaction'][
                             'customization_args']['customOskLetters']['value']
-                        extracted_variables.append(
-                            [rule_inputs, customization_args])
-                
-                if len(extracted_variables):
-                    output_values = 'Exp ID: %s\n%s' % (
-                        item.id, extracted_variables)
+                        extracted_variables_output.append(
+                            'State Name: %s, Rule Inputs: %s, Variables: %s' %
+                            (state_name, ', '.join(rule_inputs), ', '.join(
+                                customization_args)))
+
+                if len(extracted_variables_output):
+                    output_values = 'Exp ID: %s: %s' % (
+                        item.id, extracted_variables_output)
                     yield ('SUCCESS', output_values.encode('utf-8'))
                 else:
                     yield ('SUCCESS', None)
@@ -319,10 +324,10 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        # if key == 'SUCCESS':
-        #     yield (key, len(values))
-        # else:
-        yield (key, values)
+        if key == 'SUCCESS':
+            yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
+        else:
+            yield (key, values)
 
 
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
