@@ -1,28 +1,28 @@
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 1050px">
+<div class="oppia-page-card oppia-long-text" style="max-width: 1050px">
   <h3>Configuration properties</h3>
-  <div class="container" ng-if="$ctrl.isNonemptyObject($ctrl.configProperties)" style="margin-left: 0;">
-    <div ng-repeat="(configPropertyId, configPropertyData) in $ctrl.configProperties">
+  <div class="container" *ngIf="isNonemptyObject(configProperties)" style="margin-left: 0;">
+    <div *ngFor="let o of configProperties">
       <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
         <span class="col-lg-2 col-md-2 col-sm-2">
-          <em class="protractor-test-config-title"><[configPropertyData.description]></em>
+          <em class="protractor-test-config-title">{{o.value.description}}></em>
         </span>
         <span class="col-lg-6 col-md-6 col-sm-6">
-          <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
-          </schema-based-editor>
+          <!-- <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
+          </schema-based-editor> -->
         </span>
         <span class="col-lg-2 col-md-2 col-sm-2">
-          <button type="button" class="btn btn-secondary oppia-revert-button" ng-click="$ctrl.revertToDefaultConfigPropertyValue(configPropertyId)">
+          <button type="button" class="btn btn-secondary oppia-revert-button" (click)="revertToDefaultConfigPropertyValue(o.key)">
             Revert to default
           </button>
         </span>
       </div>
     </div>
 
-    <button ng-click="$ctrl.saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
-    <button ng-click="$ctrl.reloadConfigProperties()">Undo changes</button>
+    <button (click)="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
+    <button (click)="reloadConfigProperties()">Undo changes</button>
   </div>
 
-  <div ng-if="!$ctrl.isNonemptyObject($ctrl.configProperties)">
+  <div *ngIf="!isNonemptyObject(configProperties)">
     No configuration properties are available.
   </div>
-</md-card>
+</div>

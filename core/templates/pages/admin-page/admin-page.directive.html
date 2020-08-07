@@ -24,7 +24,7 @@
   </admin-config-tab>
 
   <admin-features-tab ng-if="$ctrl.isFeaturesTabOpen()"
-                      set-status-message="$ctrl.setStatusMessage">
+                      [set-status-message]="$ctrl.setStatusMessage">
   </admin-features-tab>
 
   <admin-roles-tab ng-if="$ctrl.isRolesTabOpen()"

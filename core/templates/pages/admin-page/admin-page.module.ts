@@ -33,6 +33,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { AdminFeaturesTabComponent } from
+  'pages/admin-page/features-tab/admin-features-tab.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
@@ -51,10 +53,12 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    AdminFeaturesTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    AdminFeaturesTabComponent
   ],
   providers: [
     AppConstants,
