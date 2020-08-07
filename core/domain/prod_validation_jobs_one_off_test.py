@@ -13091,11 +13091,10 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
-        user_models.UserAuthModel(
-            id=self.user_id,
-            gae_id=self.gae_id,
-            pin=self.USER_PIN
-        ).put()
+
+        # Note: There will a total of 2 UserSettingsModel (hence 2
+        # UserAuthModel too) even though only one user signs up in the test
+        # since superadmin signup is also done in test_utils.GenericTestBase.
         self.model_instance = user_models.UserAuthModel.get_by_id(
             self.user_id)
         self.job_class = (
@@ -13103,7 +13102,7 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
 
     def test_audit_standard_operation_passes(self):
         expected_output = [
-            u'[u\'fully-validated UserAuthModel\', 1]']
+            u'[u\'fully-validated UserAuthModel\', 2]']
         run_job_and_check_output(self, expected_output)
 
     def test_audit_with_created_on_greater_than_last_updated_fails(self):
@@ -13118,10 +13117,12 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
             '%s of last_updated field\']]') % (
                 self.user_id, self.model_instance.created_on,
                 self.model_instance.last_updated
-            )]
-        run_job_and_check_output(self, expected_output)
+            ), u'[u\'fully-validated UserAuthModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_audit_with_last_updated_greater_than_current_time_fails(self):
+        user_models.UserAuthModel.get_by_id(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'UserAuthModel\', '
@@ -13144,8 +13145,9 @@ class UserAuthModelValidatorTests(test_utils.GenericTestBase):
                 'field user_settings_ids having value '
                 '%s, expect model UserSettingsModel '
                 'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+                    self.user_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserAuthModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class UserEmailPreferencesModelValidatorTests(test_utils.GenericTestBase):
