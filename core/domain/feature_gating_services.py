@@ -14,7 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Services for platform parameters."""
+"""The service for gating features.
+
+This service provides two interfaces to access the feature flag values for
+clients and servers respectively.
+
+For clients, please use 'evaluate_all_feature_flag_value_for_client' from
+request handlers with client context.
+
+For servers, please directly call 'evaluate_feature_flag_value_for_server' with
+the name of the feature.
+
+For more details of the usage of these two method, please refer their docstrings
+in this file.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
