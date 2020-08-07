@@ -953,6 +953,64 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
+    def create_exploration_with_states_schema_version(
+            self, state_schema_version, exp_id, user_id, states_dict):
+        """Saves a new default exploration with the given states dictionary in
+        the given state schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            state_schema_version: int. The state schema version.
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=state_schema_version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
     def test_migration_audit_job_skips_deleted_explorations(self):
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
@@ -1071,10 +1129,12 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v36(
-            self.NEW_EXP_ID, self.albert_id, {
-                'Introduction': states_dict
-            })
+        self.create_exploration_with_states_schema_version(
+            feconf.CURRENT_STATE_SCHEMA_VERSION - 1,
+            self.NEW_EXP_ID,
+            self.albert_id,
+            {'Introduction': states_dict}
+        )
 
         job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
         exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
@@ -1154,10 +1214,12 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             'classifier_model_id': None
         }).to_dict()
 
-        self.save_new_exp_with_states_schema_v36(
-            self.NEW_EXP_ID, self.albert_id, {
-                'Introduction': states_dict
-            })
+        self.create_exploration_with_states_schema_version(
+            feconf.CURRENT_STATE_SCHEMA_VERSION - 1,
+            self.NEW_EXP_ID,
+            self.albert_id,
+            {'Introduction': states_dict}
+        )
 
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)

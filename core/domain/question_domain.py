@@ -664,7 +664,7 @@ class Question(python_utils.OBJECT):
             dict. The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] != 'TextInput':
-            continue
+            return question_state_dict
         answer_group_dicts = question_state_dict['interaction']['answer_groups']
         for answer_group_dict in answer_group_dicts:
             for rule_spec_dict in answer_group_dict['rule_specs']:

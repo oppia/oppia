@@ -98,132 +98,132 @@ interface RuleDescription {
 
 interface RuleTemplates {
   AlgebraicExpressionInput: {
-    MatchesExactlyWith: IRuleDescription;
-    IsEquivalentTo: IRuleDescription;
+    MatchesExactlyWith: RuleDescription;
+    IsEquivalentTo: RuleDescription;
   };
   CodeRepl: {
-    CodeEquals: IRuleDescription;
-    CodeContains: IRuleDescription;
-    CodeDoesNotContain: IRuleDescription;
-    OutputEquals: IRuleDescription;
-    OutputContains: IRuleDescription;
-    ResultsInError: IRuleDescription;
-    ErrorContains: IRuleDescription;
+    CodeEquals: RuleDescription;
+    CodeContains: RuleDescription;
+    CodeDoesNotContain: RuleDescription;
+    OutputEquals: RuleDescription;
+    OutputContains: RuleDescription;
+    ResultsInError: RuleDescription;
+    ErrorContains: RuleDescription;
   };
   Continue: {};
   DragAndDropSortInput: {
-    IsEqualToOrdering: IRuleDescription;
-    IsEqualToOrderingWithOneItemAtIncorrectPosition: IRuleDescription;
-    HasElementXAtPositionY: IRuleDescription;
-    HasElementXBeforeElementY: IRuleDescription;
+    IsEqualToOrdering: RuleDescription;
+    IsEqualToOrderingWithOneItemAtIncorrectPosition: RuleDescription;
+    HasElementXAtPositionY: RuleDescription;
+    HasElementXBeforeElementY: RuleDescription;
   };
   EndExploration: {};
   FractionInput: {
-    IsExactlyEqualTo: IRuleDescription;
-    IsEquivalentTo: IRuleDescription;
-    IsEquivalentToAndInSimplestForm: IRuleDescription;
-    IsLessThan: IRuleDescription;
-    IsGreaterThan: IRuleDescription;
-    HasNumeratorEqualTo: IRuleDescription;
-    HasDenominatorEqualTo: IRuleDescription;
-    HasIntegerPartEqualTo: IRuleDescription;
-    HasNoFractionalPart: IRuleDescription;
-    HasFractionalPartExactlyEqualTo: IRuleDescription;
+    IsExactlyEqualTo: RuleDescription;
+    IsEquivalentTo: RuleDescription;
+    IsEquivalentToAndInSimplestForm: RuleDescription;
+    IsLessThan: RuleDescription;
+    IsGreaterThan: RuleDescription;
+    HasNumeratorEqualTo: RuleDescription;
+    HasDenominatorEqualTo: RuleDescription;
+    HasIntegerPartEqualTo: RuleDescription;
+    HasNoFractionalPart: RuleDescription;
+    HasFractionalPartExactlyEqualTo: RuleDescription;
   };
   GraphInput: {
-    IsIsomorphicTo: IRuleDescription;
+    IsIsomorphicTo: RuleDescription;
   };
   ImageClickInput: {
-    IsInRegion: IRuleDescription;
+    IsInRegion: RuleDescription;
   };
   InteractiveMap: {
-    Within: IRuleDescription;
-    NotWithin: IRuleDescription;
+    Within: RuleDescription;
+    NotWithin: RuleDescription;
   };
   ItemSelectionInput: {
-    Equals: IRuleDescription;
-    ContainsAtLeastOneOf: IRuleDescription;
-    DoesNotContainAtLeastOneOf: IRuleDescription;
-    IsProperSubsetOf: IRuleDescription;
+    Equals: RuleDescription;
+    ContainsAtLeastOneOf: RuleDescription;
+    DoesNotContainAtLeastOneOf: RuleDescription;
+    IsProperSubsetOf: RuleDescription;
   };
   LogicProof: {
-    Correct: IRuleDescription;
-    NotCorrect: IRuleDescription;
-    NotCorrectByCategory: IRuleDescription;
+    Correct: RuleDescription;
+    NotCorrect: RuleDescription;
+    NotCorrectByCategory: RuleDescription;
   };
   MathEquationInput: {
-    MatchesExactlyWith: IRuleDescription;
-    IsEquivalentTo: IRuleDescription;
+    MatchesExactlyWith: RuleDescription;
+    IsEquivalentTo: RuleDescription;
   };
   MathExpressionInput: {
-    IsMathematicallyEquivalentTo: IRuleDescription;
+    IsMathematicallyEquivalentTo: RuleDescription;
   };
   MultipleChoiceInput: {
-    Equals: IRuleDescription;
+    Equals: RuleDescription;
   };
   MusicNotesInput: {
-    Equals: IRuleDescription;
-    IsLongerThan: IRuleDescription;
-    HasLengthInclusivelyBetween: IRuleDescription;
-    IsEqualToExceptFor: IRuleDescription;
-    IsTranspositionOf: IRuleDescription;
-    IsTranspositionOfExceptFor: IRuleDescription;
+    Equals: RuleDescription;
+    IsLongerThan: RuleDescription;
+    HasLengthInclusivelyBetween: RuleDescription;
+    IsEqualToExceptFor: RuleDescription;
+    IsTranspositionOf: RuleDescription;
+    IsTranspositionOfExceptFor: RuleDescription;
   };
   NumberWithUnits: {
-    IsEqualTo: IRuleDescription;
-    IsEquivalentTo: IRuleDescription;
+    IsEqualTo: RuleDescription;
+    IsEquivalentTo: RuleDescription;
   };
   NumericExpressionInput: {
-    MatchesExactlyWith: IRuleDescription;
-    IsEquivalentTo: IRuleDescription;
-    ContainsSomeOf: IRuleDescription;
-    OmitsSomeOf: IRuleDescription;
+    MatchesExactlyWith: RuleDescription;
+    IsEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
   };
   NumericInput: {
-    Equals: IRuleDescription;
-    IsLessThan: IRuleDescription;
-    IsGreaterThan: IRuleDescription;
-    IsLessThanOrEqualTo: IRuleDescription;
-    IsGreaterThanOrEqualTo: IRuleDescription;
-    IsInclusivelyBetween: IRuleDescription;
-    IsWithinTolerance: IRuleDescription;
+    Equals: RuleDescription;
+    IsLessThan: RuleDescription;
+    IsGreaterThan: RuleDescription;
+    IsLessThanOrEqualTo: RuleDescription;
+    IsGreaterThanOrEqualTo: RuleDescription;
+    IsInclusivelyBetween: RuleDescription;
+    IsWithinTolerance: RuleDescription;
   };
   PencilCodeEditor: {
-    CodeEquals: IRuleDescription;
-    CodeContains: IRuleDescription;
-    CodeDoesNotContain: IRuleDescription;
-    OutputEquals: IRuleDescription;
-    OutputRoughlyEquals: IRuleDescription;
-    ResultsInError: IRuleDescription;
-    ErrorContains: IRuleDescription;
+    CodeEquals: RuleDescription;
+    CodeContains: RuleDescription;
+    CodeDoesNotContain: RuleDescription;
+    OutputEquals: RuleDescription;
+    OutputRoughlyEquals: RuleDescription;
+    ResultsInError: RuleDescription;
+    ErrorContains: RuleDescription;
   };
   SetInput: {
-    Equals: IRuleDescription;
-    IsSubsetOf: IRuleDescription;
-    IsSupersetOf: IRuleDescription;
-    IsSupersetOf: IRuleDescription;
-    HasElementsNotIn: IRuleDescription;
-    OmitsElementsIn: IRuleDescription;
-    IsDisjointFrom: IRuleDescription;
+    Equals: RuleDescription;
+    IsSubsetOf: RuleDescription;
+    IsSupersetOf: RuleDescription;
+    IsSupersetOf: RuleDescription;
+    HasElementsNotIn: RuleDescription;
+    OmitsElementsIn: RuleDescription;
+    IsDisjointFrom: RuleDescription;
   };
   TextInput: {
-    Equals: IRuleDescription;
-    StartsWith: IRuleDescription;
-    Contains: IRuleDescription;
-    FuzzyEquals: IRuleDescription;
+    Equals: RuleDescription;
+    StartsWith: RuleDescription;
+    Contains: RuleDescription;
+    FuzzyEquals: RuleDescription;
   }
 }
 
 interface KarmaFixtures {
   'extensions/interactions/rule_templates': RuleTemplates;
   'core/tests/data/code_classifier_data': ClassifierData;
-  'core/tests/data/code_classifier_accuracy_test': IClassifierAccuracyTest;
-  'core/tests/data/code_classifier_test_knn': IClassifierAccuracyTest;
-  'core/tests/data/code_classifier_test_svm': IClassifierAccuracyTest;
-  'core/tests/data/hashes': IHashes;
-  'core/tests/data/inplace_replace_test': IInplaceReplaceTest;
-  'core/tests/data/test_cases_for_rte': ITestCasesRTE;
-  'core/tests/data/text_classifier_results': ITextClassifierResults;
+  'core/tests/data/code_classifier_accuracy_test': ClassifierAccuracyTest;
+  'core/tests/data/code_classifier_test_knn': ClassifierAccuracyTest;
+  'core/tests/data/code_classifier_test_svm': ClassifierAccuracyTest;
+  'core/tests/data/hashes': Hashes;
+  'core/tests/data/inplace_replace_test': InplaceReplaceTest;
+  'core/tests/data/test_cases_for_rte': TestCasesRTE;
+  'core/tests/data/text_classifier_results': TextClassifierResults;
   'core/tests/data/text_input_classifier_data': TextInputClassifierData;
-  'core/tests/data/text_input_training_data': ITextClassifierResults;
+  'core/tests/data/text_input_training_data': TextClassifierResults;
 }
