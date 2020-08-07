@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the ui.tree library.
+ * @fileoverview This file imports the ui.bootstrap library.
  */
 
-require('static/ui-tree-2.22.6/dist/angular-ui-tree.min.js');
+require('static/popperJs-1.15.0/dist/umd/popper.min.js');
+require('static/bootstrap-4.3.1/js/bootstrap.min.js');
+require('static/ui-bootstrap-2.5.0/ui-bootstrap-tpls-2.5.0.min.js');

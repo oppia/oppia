@@ -16,4 +16,4 @@
  * @fileoverview This file imports the ngTouch library.
  */
 
-require('static/angularjs-1.7.9/angular-touch.js');
+require('static/angularjs-1.7.9/angular-touch.min.js');

@@ -16,4 +16,4 @@
  * @fileoverview This file imports the ngAnimate library.
  */
 
-require('static/angularjs-1.7.9/angular-animate.js');
+require('static/angularjs-1.7.9/angular-animate.min.js');

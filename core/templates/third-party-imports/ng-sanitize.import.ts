@@ -16,4 +16,4 @@
  * @fileoverview This file imports the ngSanitize library.
  */
 
-require('static/angularjs-1.7.9/angular-sanitize.js');
+require('static/angularjs-1.7.9/angular-sanitize.min.js');

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the ui.tree library.
+ * @fileoverview This file imports the ngAria library.
  */
 
-require('static/ui-tree-2.22.6/dist/angular-ui-tree.min.js');
+require('static/angularjs-1.7.9/angular-aria.min.js');

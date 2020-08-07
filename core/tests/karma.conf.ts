@@ -159,7 +159,8 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
         alias: {
-          messageformat: 'static/messageformat-2.0.5/messageformat.js'
+          messageformat: 'static/messageformat-2.0.5/messageformat.js',
+          'popper.js': 'static/popperJs-1.15.0/dist/umd/popper.js'
         }
       },
       devtool: 'inline-cheap-source-map',

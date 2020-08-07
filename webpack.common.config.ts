@@ -49,7 +49,8 @@ module.exports = {
     alias: {
       '@angular/upgrade/static': (
         '@angular/upgrade/bundles/upgrade-static.umd.js'),
-      messageformat: 'static/messageformat-2.0.5/messageformat.js'
+      messageformat: 'static/messageformat-2.0.5/messageformat.js',
+      'popper.js': 'static/popperJs-1.15.0/dist/umd/popper.js'
     }
   },
   entry: {

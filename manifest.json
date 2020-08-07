@@ -142,12 +142,7 @@
           "angular-sanitize.min.js", "angular-sanitize.min.js.map", "angular-aria.js",
           "angular-aria.min.js", "angular-aria.min.js.map", "angular-touch.js",
           "angular-touch.min.js", "angular-touch.min.js.map"
-        ],
-        "bundle": {
-          "js": [
-            "angular-aria.js"
-          ]
-        }
+        ]
       },
       "angularAudio": {
         "version": "1.7.4",
@@ -231,10 +226,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/popperjs/popper-core/archive/v1.15.0.zip",
         "rootDirPrefix": "popper-core-",
-        "targetDirPrefix": "popperJs-",
-        "bundle": {
-          "js": ["dist/umd/popper.js"]
-        }
+        "targetDirPrefix": "popperJs-"
       },
       "bootstrap": {
         "version": "4.3.1",
@@ -243,8 +235,7 @@
         "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
-          "css": ["css/bootstrap.css"],
-          "js": ["js/bootstrap.js"]
+          "css": ["css/bootstrap.css"]
         }
       },
       "bowerAngularTranslateLoaderPartial": {
@@ -263,8 +254,7 @@
         "targetDirPrefix": "bower-material-",
         "files": ["angular-material.css", "angular-material.js"],
         "bundle": {
-          "css": ["angular-material.css"],
-          "js": ["angular-material.js"]
+          "css": ["angular-material.css"]
         }
       },
       "codemirror": {
@@ -424,10 +414,7 @@
         "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
         "rootDirPrefix": "ui-bootstrap-",
         "targetDirPrefix": "ui-bootstrap-",
-        "files": ["ui-bootstrap-tpls-2.5.0.js", "ui-bootstrap-tpls-2.5.0.min.js"],
-        "bundle": {
-          "js": ["ui-bootstrap-tpls-2.5.0.js"]
-        }
+        "files": ["ui-bootstrap-tpls-2.5.0.js", "ui-bootstrap-tpls-2.5.0.min.js"]
       },
       "skulpt-dist": {
         "version": "1.1.0",
