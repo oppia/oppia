@@ -269,10 +269,10 @@
   },
   "RatioInput": {
     "Equals": {
-      "description": "is equal to {{x|Ratio}}"
+      "description": "is equal to {{x|RatioExpression}}"
     },
     "HasNumberOfTermsEqualTo": {
-      "description": "is equal to length {{x|Ratio}}"
+      "description": "is equal to length {{x|RatioExpression}}"
     }
   }
 }

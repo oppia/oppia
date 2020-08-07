@@ -68,6 +68,9 @@ import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 
 @Injectable({providedIn: 'root'})
 export class InteractionRulesRegistryService {
@@ -96,6 +99,7 @@ export class InteractionRulesRegistryService {
         NumericExpressionInputRulesService,
       private numericInputRulesService: NumericInputRulesService,
       private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
+      private ratioExpressionRulesService: RatioExpressionInputRulesService,
       private setInputRulesService: SetInputRulesService,
       private textInputRulesService: TextInputRulesService) {
     this.rulesServiceRegistry = new Map(Object.entries({
@@ -120,6 +124,7 @@ export class InteractionRulesRegistryService {
         this.numericExpressionInputRulesService,
       NumericInputRulesService: this.numericInputRulesService,
       PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
+      RatioExpressionRulesService: this.ratioExpressionRulesService,
       SetInputRulesService: this.setInputRulesService,
       TextInputRulesService: this.textInputRulesService,
     }));
