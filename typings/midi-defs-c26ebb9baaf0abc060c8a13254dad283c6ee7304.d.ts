@@ -1,4 +1,10 @@
-// Code - third_party/static/midi-js-a8a842/build/MIDI.js
+// Code - third_party/static/midi-js-c26ebb/build/MIDI.js
+
+interface Base64Binary {
+  _keyStr: string;
+  decodeArrayBuffer: (input: string) => ArrayBuffer;
+  decode: (input: string, arrayBuffer: ArrayBuffer) => Uint8Array;
+}
 
 interface MidiPlayer {
   BPM: number;

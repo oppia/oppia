@@ -403,11 +403,11 @@
         "targetDirPrefix": "MathJax-"
       },
       "midiJs": {
-        "version": "a8a84257afa70721ae462448048a87301fc1554a",
+        "version": "c26ebb9baaf0abc060c8a13254dad283c6ee7304",
         "downloadFormat": "zip",
-        "url": "https://github.com/mudcube/MIDI.js/archive/a8a84257afa70721ae462448048a87301fc1554a.zip",
+        "url": "https://github.com/oppia/MIDI.js/archive/c26ebb9baaf0abc060c8a13254dad283c6ee7304.zip",
         "rootDirPrefix": "MIDI.js-",
-        "targetDir": "midi-js-a8a842"
+        "targetDir": "midi-js-c26ebb"
       },
       "ngJoyride": {
         "version": "b117e019582433995393f81e2006a6bc36ca1cf2",
