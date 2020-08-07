@@ -76,25 +76,6 @@ export class PlatformParameter {
   }
 
   /**
-   * Validates the PlatformParameter instance.
-   *
-   * @returns {string[]} The messages of issues found during validation,
-   * if any.
-   */
-  validate(): string[] {
-    let issues = [];
-    for (const [index, rule] of this.rules.entries()) {
-      if (!rule.hasServerModeFilter()) {
-        issues.push(
-          `All rules must have a server_mode filter, but the ${index + 1}-th` +
-          ' rule doesn\'t.');
-      }
-    }
-
-    return issues;
-  }
-
-  /**
    * Creates a list of dict representations of rules in the parameter instance.
    *
    * @returns {PlatformParameterRuleBackendDict[]} - Array of dict
