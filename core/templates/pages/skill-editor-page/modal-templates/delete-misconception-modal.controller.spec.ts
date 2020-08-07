@@ -87,10 +87,10 @@ describe('Delete Misconception Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.skill).toEqual(skillObject);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skill).toEqual(skillObject);
+    });
 
   it('should close the modal and get misconception when confirming',
     function() {

@@ -68,19 +68,19 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      expect($scope.isNotHandled).toEqual(false);
-      expect($scope.canEdit).toBe(true);
-      expect($scope.commitMessage).toBe('');
-      expect($scope.reviewMessage).toBe('');
-      expect($scope.canReject).toBe(false);
-      expect($scope.canAccept).toBe(false);
-      expect($scope.currentContent).toBe(currentContent);
-      expect($scope.newContent).toBe(newContent);
-      expect($scope.errorMessage).toBe(
-        'This suggestion has already been rejected.');
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.isNotHandled).toEqual(false);
+        expect($scope.canEdit).toBe(true);
+        expect($scope.commitMessage).toBe('');
+        expect($scope.reviewMessage).toBe('');
+        expect($scope.canReject).toBe(false);
+        expect($scope.canAccept).toBe(false);
+        expect($scope.currentContent).toBe(currentContent);
+        expect($scope.newContent).toBe(newContent);
+        expect($scope.errorMessage).toBe(
+          'This suggestion has already been rejected.');
+      });
 
     it('should accept suggestion from suggestion modal service', function() {
       spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();
@@ -136,21 +136,20 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
         });
       }));
 
-      it('should initialize correctly $scope properties after controller' +
-        ' initialization',
-      function() {
-        expect($scope.isNotHandled).toEqual(true);
-        expect($scope.canEdit).toBe(true);
-        expect($scope.commitMessage).toBe('');
-        expect($scope.reviewMessage).toBe('');
-        expect($scope.canReject).toBe(true);
-        expect($scope.canAccept).toBe(false);
-        expect($scope.currentContent).toBe(currentContent);
-        expect($scope.newContent).toBe(newContent);
-        expect($scope.errorMessage).toBe(
-          'This suggestion was made for a state that no longer exists.' +
-          ' It cannot be accepted.');
-      });
+      it('should initialize $scope properties after controller is initialized',
+        function() {
+          expect($scope.isNotHandled).toEqual(true);
+          expect($scope.canEdit).toBe(true);
+          expect($scope.commitMessage).toBe('');
+          expect($scope.reviewMessage).toBe('');
+          expect($scope.canReject).toBe(true);
+          expect($scope.canAccept).toBe(false);
+          expect($scope.currentContent).toBe(currentContent);
+          expect($scope.newContent).toBe(newContent);
+          expect($scope.errorMessage).toBe(
+            'This suggestion was made for a state that no longer exists.' +
+            ' It cannot be accepted.');
+        });
     });
 
   describe('when exploration has unsaved changes', function() {
@@ -182,20 +181,20 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      expect($scope.isNotHandled).toEqual(true);
-      expect($scope.canEdit).toBe(true);
-      expect($scope.commitMessage).toBe('');
-      expect($scope.reviewMessage).toBe('');
-      expect($scope.canReject).toBe(true);
-      expect($scope.canAccept).toBe(false);
-      expect($scope.currentContent).toBe(currentContent);
-      expect($scope.newContent).toBe(newContent);
-      expect($scope.errorMessage).toEqual(
-        'You have unsaved changes to this exploration. Please save/discard' +
-        ' your unsaved changes if you wish to accept.');
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.isNotHandled).toEqual(true);
+        expect($scope.canEdit).toBe(true);
+        expect($scope.commitMessage).toBe('');
+        expect($scope.reviewMessage).toBe('');
+        expect($scope.canReject).toBe(true);
+        expect($scope.canAccept).toBe(false);
+        expect($scope.currentContent).toBe(currentContent);
+        expect($scope.newContent).toBe(newContent);
+        expect($scope.errorMessage).toEqual(
+          'You have unsaved changes to this exploration. Please save/discard' +
+          ' your unsaved changes if you wish to accept.');
+      });
   });
 
   describe('when suggestion is valid but not handled and no exist changes' +
@@ -232,19 +231,18 @@ describe('Exploration Editor Suggestion Modal Controller', function() {
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization',
-    function() {
-      expect($scope.isNotHandled).toEqual(true);
-      expect($scope.canEdit).toBe(true);
-      expect($scope.commitMessage).toBe('');
-      expect($scope.reviewMessage).toBe('');
-      expect($scope.canReject).toBe(true);
-      expect($scope.canAccept).toBe(true);
-      expect($scope.currentContent).toBe(currentContent);
-      expect($scope.newContent).toBe(newContent);
-      expect($scope.errorMessage).toBe('');
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.isNotHandled).toEqual(true);
+        expect($scope.canEdit).toBe(true);
+        expect($scope.commitMessage).toBe('');
+        expect($scope.reviewMessage).toBe('');
+        expect($scope.canReject).toBe(true);
+        expect($scope.canAccept).toBe(true);
+        expect($scope.currentContent).toBe(currentContent);
+        expect($scope.newContent).toBe(newContent);
+        expect($scope.errorMessage).toBe('');
+      });
 
     it('should accept suggestion from suggestion modal service', function() {
       spyOn(SuggestionModalService, 'acceptSuggestion').and.callThrough();

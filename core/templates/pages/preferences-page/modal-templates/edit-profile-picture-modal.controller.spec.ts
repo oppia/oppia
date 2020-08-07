@@ -39,12 +39,12 @@ describe('EditProfilePictureModalController', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.uploadedImage).toBe(null);
-    expect($scope.croppedImageDataUrl).toBe('');
-    expect($scope.invalidImageWarningIsShown).toBe(false);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.uploadedImage).toBe(null);
+      expect($scope.croppedImageDataUrl).toBe('');
+      expect($scope.invalidImageWarningIsShown).toBe(false);
+    });
 
   it('should save file when triggering onchange event', function(done) {
     spyOn(document, 'getElementById').and.callFake(function() {

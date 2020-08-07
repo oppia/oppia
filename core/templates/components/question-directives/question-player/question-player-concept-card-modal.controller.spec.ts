@@ -109,14 +109,14 @@ describe('Question Player Concept Card Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.skillIds).toEqual(skillIds);
-    expect($scope.skills).toEqual(skillsObject);
-    expect($scope.index).toBe(0);
-    expect($scope.modalHeader).toEqual(skillsObject[0]);
-    expect($scope.isInTestMode).toBe(true);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skillIds).toEqual(skillIds);
+      expect($scope.skills).toEqual(skillsObject);
+      expect($scope.index).toBe(0);
+      expect($scope.modalHeader).toEqual(skillsObject[0]);
+      expect($scope.isInTestMode).toBe(true);
+    });
 
   it('should change current skill concept card when going to next concept' +
     ' card', function() {

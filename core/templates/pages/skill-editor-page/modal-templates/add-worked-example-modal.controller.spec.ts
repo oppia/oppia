@@ -34,11 +34,11 @@ describe('Add Worked Example Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.tmpWorkedExampleQuestionHtml).toEqual('');
-    expect($scope.tmpWorkedExampleExplanationHtml).toBe('');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.tmpWorkedExampleQuestionHtml).toEqual('');
+      expect($scope.tmpWorkedExampleExplanationHtml).toBe('');
+    });
 
   it('should close modal when saving work example', function() {
     $scope.saveWorkedExample();

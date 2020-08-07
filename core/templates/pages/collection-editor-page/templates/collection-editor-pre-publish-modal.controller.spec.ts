@@ -78,16 +78,16 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      expect(ctrl.requireTitleToBeSpecified).toBe(false);
-      expect(ctrl.requireObjectiveToBeSpecified).toBe(false);
-      expect(ctrl.requireCategoryToBeSpecified).toBe(false);
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect(ctrl.requireTitleToBeSpecified).toBe(false);
+        expect(ctrl.requireObjectiveToBeSpecified).toBe(false);
+        expect(ctrl.requireCategoryToBeSpecified).toBe(false);
 
-      expect(ctrl.newTitle).toBe(collectionDict.title);
-      expect(ctrl.newObjective).toBe(collectionDict.objective);
-      expect(ctrl.newCategory).toBe(collectionDict.category);
-    });
+        expect(ctrl.newTitle).toBe(collectionDict.title);
+        expect(ctrl.newObjective).toBe(collectionDict.objective);
+        expect(ctrl.newCategory).toBe(collectionDict.category);
+      });
 
     it('should save a collection when it has title, objective and category',
       function() {
@@ -155,16 +155,16 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      expect(ctrl.requireTitleToBeSpecified).toBe(true);
-      expect(ctrl.requireObjectiveToBeSpecified).toBe(true);
-      expect(ctrl.requireCategoryToBeSpecified).toBe(true);
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect(ctrl.requireTitleToBeSpecified).toBe(true);
+        expect(ctrl.requireObjectiveToBeSpecified).toBe(true);
+        expect(ctrl.requireCategoryToBeSpecified).toBe(true);
 
-      expect(ctrl.newTitle).toBe(collectionDict.title);
-      expect(ctrl.newObjective).toBe(collectionDict.objective);
-      expect(ctrl.newCategory).toBe(collectionDict.category);
-    });
+        expect(ctrl.newTitle).toBe(collectionDict.title);
+        expect(ctrl.newObjective).toBe(collectionDict.objective);
+        expect(ctrl.newCategory).toBe(collectionDict.category);
+      });
 
     it('should not save a collection when title is empty', function() {
       ctrl.newTitle = '';

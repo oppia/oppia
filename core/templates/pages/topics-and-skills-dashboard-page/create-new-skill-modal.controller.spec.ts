@@ -49,22 +49,22 @@ describe('Create new skill modal', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    var rubrics = [
-      RubricObjectFactory.create(skillDifficulties[0], []),
-      RubricObjectFactory.create(skillDifficulties[1], ['']),
-      RubricObjectFactory.create(skillDifficulties[2], [])];
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      var rubrics = [
+        RubricObjectFactory.create(skillDifficulties[0], []),
+        RubricObjectFactory.create(skillDifficulties[1], ['']),
+        RubricObjectFactory.create(skillDifficulties[2], [])];
 
-    expect($scope.newSkillDescription).toEqual('');
-    expect($scope.errorMsg).toEqual('');
-    expect($scope.conceptCardExplanationEditorIsShown).toEqual(false);
-    expect($scope.bindableDict.displayedConceptCardExplanation).toEqual('');
-    expect($scope.HTML_SCHEMA).toEqual({type: 'html'});
-    expect($scope.MAX_CHARS_IN_SKILL_DESCRIPTION).toEqual(100);
-    expect($scope.newExplanationObject).toEqual(null);
-    expect($scope.rubrics).toEqual(rubrics);
-  });
+      expect($scope.newSkillDescription).toEqual('');
+      expect($scope.errorMsg).toEqual('');
+      expect($scope.conceptCardExplanationEditorIsShown).toEqual(false);
+      expect($scope.bindableDict.displayedConceptCardExplanation).toEqual('');
+      expect($scope.HTML_SCHEMA).toEqual({type: 'html'});
+      expect($scope.MAX_CHARS_IN_SKILL_DESCRIPTION).toEqual(100);
+      expect($scope.newExplanationObject).toEqual(null);
+      expect($scope.rubrics).toEqual(rubrics);
+    });
 
   it('should open the concept card editor when clicking on open concept card' +
     ' explanation editor', function() {

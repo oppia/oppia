@@ -58,12 +58,12 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should initialize correctly $scope properties after controller' +
-        ' initialization', function() {
-        expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
-        expect($scope.subsectionName).toEqual(subsectionName);
-        expect($scope.activityTitle).toEqual(activity.title);
-      });
+      it('should initialize $scope properties after controller is initialized',
+        function() {
+          expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
+          expect($scope.subsectionName).toEqual(subsectionName);
+          expect($scope.activityTitle).toEqual(activity.title);
+        });
 
       it('should remove activity from backend when clicking remove',
         function() {
@@ -139,12 +139,12 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
         });
       }));
 
-      it('should initialize correctly $scope properties after controller' +
-        ' initialization', function() {
-        expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
-        expect($scope.subsectionName).toEqual(subsectionName);
-        expect($scope.activityTitle).toEqual(activity.title);
-      });
+      it('should initialize $scope properties after controller is initialized',
+        function() {
+          expect($scope.sectionNameI18nId).toEqual(sectionNameI18nId);
+          expect($scope.subsectionName).toEqual(subsectionName);
+          expect($scope.activityTitle).toEqual(activity.title);
+        });
 
       it('should not remove activity from backend when clicking remove',
         function() {

@@ -48,12 +48,12 @@ describe('Learner Dashboard Suggestion Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.newContent).toBe(newContent);
-    expect($scope.oldContent).toBe(oldContent);
-    expect($scope.description).toBe(description);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.newContent).toBe(newContent);
+      expect($scope.oldContent).toBe(oldContent);
+      expect($scope.description).toBe(description);
+    });
 
   it('should dismiss the modal on canceling suggestion modal', function() {
     $scope.cancel();

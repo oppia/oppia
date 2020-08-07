@@ -34,8 +34,8 @@ describe('License Explanation Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.siteName).toBe('Oppia.org');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.siteName).toBe('Oppia.org');
+    });
 });

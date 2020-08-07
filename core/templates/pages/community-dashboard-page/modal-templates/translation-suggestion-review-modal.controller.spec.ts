@@ -56,14 +56,14 @@ describe('Translation Suggestion Review Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.contentHtml).toBe(contentHtml);
-    expect($scope.contentHtml).toBe(contentHtml);
-    expect($scope.reviewable).toBe(reviewable);
-    expect($scope.commitMessage).toBe('');
-    expect($scope.reviewMessage).toBe('');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.contentHtml).toBe(contentHtml);
+      expect($scope.contentHtml).toBe(contentHtml);
+      expect($scope.reviewable).toBe(reviewable);
+      expect($scope.commitMessage).toBe('');
+      expect($scope.reviewMessage).toBe('');
+    });
 
   it('should accept suggestion in suggestion modal service when clicking on' +
     ' accept', function() {

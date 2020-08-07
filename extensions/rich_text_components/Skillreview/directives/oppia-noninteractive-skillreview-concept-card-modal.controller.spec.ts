@@ -39,11 +39,11 @@ describe('Oppia Noninteractive Skillreview Concept Card Modal Controller',
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      expect($scope.skillIds).toEqual([skillId]);
-      expect($scope.index).toBe(0);
-      expect($scope.modalHeader).toBe('Concept Card');
-      expect($scope.isInTestMode).toBe(false);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.skillIds).toEqual([skillId]);
+        expect($scope.index).toBe(0);
+        expect($scope.modalHeader).toBe('Concept Card');
+        expect($scope.isInTestMode).toBe(false);
+      });
   });

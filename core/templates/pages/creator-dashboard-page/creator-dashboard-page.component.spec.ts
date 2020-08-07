@@ -332,8 +332,8 @@ describe('Creator dashboard controller', () => {
         $rootScope.$apply();
       });
 
-      it('should initialize correctly $scope properties after controller' +
-        ' initialization and get data from backend', function() {
+      it('should initialize $scope properties after controller is initialized' +
+        ' and get data from backend', function() {
         var suggestionThreadObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
             dashboardData.threads_for_created_suggestions_list[0],

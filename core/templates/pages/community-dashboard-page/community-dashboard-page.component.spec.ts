@@ -85,8 +85,8 @@ describe('Community dashboard page', function() {
         '/assets/images/avatar/oppia_avatar_100px.svg');
     });
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization and get data from backend', function() {
+    it('should initialize $scope properties after controller is initialized' +
+      ' and get data from backend', function() {
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.username).toBe('username1');
       expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([

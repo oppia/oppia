@@ -59,9 +59,9 @@ describe('Assign Skill To Topic Modal', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.topicSummaries).toEqual([topicSummaryDict]);
-    expect($scope.selectedTopicIds).toEqual([]);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.topicSummaries).toEqual([topicSummaryDict]);
+      expect($scope.selectedTopicIds).toEqual([]);
+    });
 });

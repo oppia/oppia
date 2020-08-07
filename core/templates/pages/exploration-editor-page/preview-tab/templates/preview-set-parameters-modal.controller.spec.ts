@@ -36,8 +36,8 @@ describe('Preview Set Parameters Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.manualParamChanges).toEqual(manualParamChanges);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.manualParamChanges).toEqual(manualParamChanges);
+    });
 });

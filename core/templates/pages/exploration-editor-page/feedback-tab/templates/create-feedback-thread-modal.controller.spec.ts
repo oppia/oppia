@@ -36,11 +36,11 @@ describe('Create Feedback Thread Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller ' +
-    ' initialization', function() {
-    expect($scope.newThreadSubject).toEqual('');
-    expect($scope.newThreadText).toEqual('');
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.newThreadSubject).toEqual('');
+      expect($scope.newThreadText).toEqual('');
+    });
 
   it('should not close modal when new thread subject is false', function() {
     spyOn(AlertsService, 'addWarning').and.callThrough();

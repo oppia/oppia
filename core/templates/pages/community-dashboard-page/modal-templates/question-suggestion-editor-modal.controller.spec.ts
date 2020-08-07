@@ -157,17 +157,17 @@ describe('Question Suggestion Editor Modal Controller', function() {
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      expect($scope.canEditQuestion).toBe(true);
-      expect($scope.newQuestionIsBeingCreated).toBe(true);
-      expect($scope.question).toEqual(question);
-      expect($scope.questionId).toBe(questionId);
-      expect($scope.questionStateData).toEqual(questionStateData);
-      expect($scope.skillDifficulty).toBe(skillDifficulty);
-      expect($scope.skillDifficultyString).toBe('Easy');
-      expect($scope.skill).toEqual(skill);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.canEditQuestion).toBe(true);
+        expect($scope.newQuestionIsBeingCreated).toBe(true);
+        expect($scope.question).toEqual(question);
+        expect($scope.questionId).toBe(questionId);
+        expect($scope.questionStateData).toEqual(questionStateData);
+        expect($scope.skillDifficulty).toBe(skillDifficulty);
+        expect($scope.skillDifficultyString).toBe('Easy');
+        expect($scope.skill).toEqual(skill);
+      });
 
     it('should evaluate question validity', function() {
       expect($scope.isQuestionValid()).toBe(true);
@@ -266,13 +266,14 @@ describe('Question Suggestion Editor Modal Controller', function() {
       expect($scope.isQuestionValid()).toBe(false);
     });
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
-      $scope.done();
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
+        $scope.done();
 
-      expect(QuestionSuggestionService.submitSuggestion).not.toHaveBeenCalled();
-      expect($uibModalInstance.close).not.toHaveBeenCalled();
-    });
+        expect(QuestionSuggestionService.submitSuggestion).not
+          .toHaveBeenCalled();
+        expect($uibModalInstance.close).not.toHaveBeenCalled();
+      });
   });
 });

@@ -94,14 +94,14 @@ describe('Add Misconception Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.skill).toEqual(skillObject);
-    expect($scope.misconceptionName).toBe('');
-    expect($scope.misconceptionNotes).toBe('');
-    expect($scope.misconceptionFeedback).toBe('');
-    expect($scope.misconceptionMustBeAddressed).toBe(true);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skill).toEqual(skillObject);
+      expect($scope.misconceptionName).toBe('');
+      expect($scope.misconceptionNotes).toBe('');
+      expect($scope.misconceptionFeedback).toBe('');
+      expect($scope.misconceptionMustBeAddressed).toBe(true);
+    });
 
   it('should close modal when saving misconception', function() {
     $scope.saveMisconception();

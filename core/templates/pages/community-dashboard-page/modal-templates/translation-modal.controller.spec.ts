@@ -78,25 +78,25 @@ describe('Translation Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.userIsLoggedIn).toBe(userIsLoggedIn);
-    expect($scope.uploadingTranslation).toBe(false);
-    expect($scope.activeWrittenTranslation).toEqual({
-      html: ''
-    });
-    expect($scope.subheading).toBe('Subheading');
-    expect($scope.heading).toBe('Heading');
-    expect($scope.loadingData).toBe(true);
-    expect($scope.moreAvailable).toBe(false);
-    expect($scope.textToTranslate).toBe('');
-    expect($scope.languageDescription).toBe('English');
-    $httpBackend.flush();
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.userIsLoggedIn).toBe(userIsLoggedIn);
+      expect($scope.uploadingTranslation).toBe(false);
+      expect($scope.activeWrittenTranslation).toEqual({
+        html: ''
+      });
+      expect($scope.subheading).toBe('Subheading');
+      expect($scope.heading).toBe('Heading');
+      expect($scope.loadingData).toBe(true);
+      expect($scope.moreAvailable).toBe(false);
+      expect($scope.textToTranslate).toBe('');
+      expect($scope.languageDescription).toBe('English');
+      $httpBackend.flush();
 
-    expect($scope.textToTranslate).toBe('Texto a traducir');
-    expect($scope.moreAvailable).toBe(true);
-    expect($scope.loadingData).toBe(false);
-  });
+      expect($scope.textToTranslate).toBe('Texto a traducir');
+      expect($scope.moreAvailable).toBe(true);
+      expect($scope.loadingData).toBe(false);
+    });
 
   it('should suggest more text to be translated when contributor finish' +
     ' translating text and they would like to continue translating',

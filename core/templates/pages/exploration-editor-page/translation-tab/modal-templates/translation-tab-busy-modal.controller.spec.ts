@@ -36,8 +36,8 @@ describe('Translation Tab Busy Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.busyMessage).toBe(message);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.busyMessage).toBe(message);
+    });
 });

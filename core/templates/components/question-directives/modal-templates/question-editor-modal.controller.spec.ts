@@ -164,18 +164,20 @@ describe('Question Editor Modal Controller', function() {
       });
     }));
 
-    it('should initialize correctly $scope properties after controller' +
-      ' initialization', function() {
-      expect($scope.question).toEqual(question);
-      expect($scope.questionStateData).toBe(questionStateData);
-      expect($scope.associatedSkillSummaries).toEqual(associatedSkillSummaries);
-      expect($scope.questionId).toBe(questionId);
-      expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
-      expect($scope.canEditQuestion).toBe(canEditQuestion);
-      expect($scope.newQuestionIsBeingCreated).toBe(newQuestionIsBeingCreated);
-      expect($scope.rubrics).toEqual(rubrics);
-      expect($scope.skillNames).toEqual(skillNames);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.question).toEqual(question);
+        expect($scope.questionStateData).toBe(questionStateData);
+        expect($scope.associatedSkillSummaries).toEqual(
+          associatedSkillSummaries);
+        expect($scope.questionId).toBe(questionId);
+        expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
+        expect($scope.canEditQuestion).toBe(canEditQuestion);
+        expect($scope.newQuestionIsBeingCreated).toBe(
+          newQuestionIsBeingCreated);
+        expect($scope.rubrics).toEqual(rubrics);
+        expect($scope.skillNames).toEqual(skillNames);
+      });
 
     it('should get skill editor url based on the skill id', function() {
       expect($scope.getSkillEditorUrl('1')).toBe('/skill_editor/1');

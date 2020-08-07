@@ -110,11 +110,11 @@ describe('Create New Chapter Modal Controller', function() {
     $scope.init();
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.nodeTitles).toEqual(nodeTitles);
-    expect($scope.errorMsg).toBe(null);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.nodeTitles).toEqual(nodeTitles);
+      expect($scope.errorMsg).toBe(null);
+    });
 
   it('should update thumbnail filename when changing thumbnail file',
     function() {

@@ -59,14 +59,14 @@ describe('Add Audio Translation Modal Controller', function() {
     });
   }));
 
-  it('should initialize correctly $scope properties after controller' +
-    ' initialization', function() {
-    expect($scope.errorMessage).toBe(null);
-    expect($scope.saveButtonText).toBe('Save');
-    expect($scope.saveInProgress).toBe(false);
-    expect($scope.isAudioAvailable).toBe(isAudioAvailable);
-    expect($scope.droppedFile).toBe(audioFile);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.errorMessage).toBe(null);
+      expect($scope.saveButtonText).toBe('Save');
+      expect($scope.saveInProgress).toBe(false);
+      expect($scope.isAudioAvailable).toBe(isAudioAvailable);
+      expect($scope.droppedFile).toBe(audioFile);
+    });
 
   it('should save audio successfully then close the modal', function() {
     var file = {
