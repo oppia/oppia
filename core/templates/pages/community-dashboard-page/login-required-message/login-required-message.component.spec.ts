@@ -46,12 +46,13 @@ describe('Login required message component', function() {
     ctrl.$onInit();
   }));
 
-  it('should close modal with the correct value', function() {
-    expect(ctrl.OPPIA_AVATAR_IMAGE_URL).toBe(
-      '/assets/images/avatar/oppia_avatar_100px.svg');
-  });
+  it('should initialize controller properties after its initialization',
+    function() {
+      expect(ctrl.OPPIA_AVATAR_IMAGE_URL).toBe(
+        '/assets/images/avatar/oppia_avatar_100px.svg');
+    });
 
-  it('should close modal with the correct value', function() {
+  it('should go to login url when login button is clicked', function() {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       $q.resolve('login-url'));
 
@@ -62,7 +63,8 @@ describe('Login required message component', function() {
     expect(mockWindow.location).toBe('login-url');
   });
 
-  it('should close modal with the correct value', function() {
+  it('should refresh page if login url is not provided when login button is' +
+    ' clicked', function() {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue($q.resolve(null));
 
     ctrl.onLoginButtonClicked();

@@ -43,18 +43,19 @@ describe('Opportunities List Item Component', function() {
       ctrl.$onInit();
     }));
 
-    it('should close modal with the correct value', function() {
-      expect(ctrl.opportunityDataIsLoading).toBe(false);
-      expect(ctrl.labelText).toBe('Label text');
-      expect(ctrl.labelStyle).toEqual({
-        'background-color': '#fff'
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect(ctrl.opportunityDataIsLoading).toBe(false);
+        expect(ctrl.labelText).toBe('Label text');
+        expect(ctrl.labelStyle).toEqual({
+          'background-color': '#fff'
+        });
+        expect(ctrl.opportunityHeadingTruncationLength).toBe(35);
+        expect(ctrl.progressPercentage).toBe('50%');
+        expect(ctrl.progressBarStyle).toEqual({
+          width: '50%'
+        });
       });
-      expect(ctrl.opportunityHeadingTruncationLength).toBe(35);
-      expect(ctrl.progressPercentage).toBe('50%');
-      expect(ctrl.progressBarStyle).toEqual({
-        width: '50%'
-      });
-    });
   });
 
   describe('when opportunity is not provided', function() {
@@ -74,11 +75,12 @@ describe('Opportunities List Item Component', function() {
       ctrl.$onInit();
     }));
 
-    it('should close modal with the correct value', function() {
-      expect(ctrl.opportunityDataIsLoading).toBe(true);
-      expect(ctrl.labelText).toBe(undefined);
-      expect(ctrl.labelStyle).toBe(undefined);
-      expect(ctrl.opportunityHeadingTruncationLength).toBe(35);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect(ctrl.opportunityDataIsLoading).toBe(true);
+        expect(ctrl.labelText).toBe(undefined);
+        expect(ctrl.labelStyle).toBe(undefined);
+        expect(ctrl.opportunityHeadingTruncationLength).toBe(35);
+      });
   });
 });

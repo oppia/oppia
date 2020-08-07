@@ -88,7 +88,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
     fixture.detectChanges();
   });
 
-  it('should get subtopic title when component is initialized',
+  it('should set subtopic title when component is initialized',
     fakeAsync(() => {
       component.ngOnInit();
       expect(component.topicName).toBe('topic_1');
@@ -96,7 +96,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
       expect(component.subtopicTitle).toBe('Subtopic Title');
     }));
 
-  it('should get topic url when component is initialized', (() => {
+  it('should get topic url after component is initialized', (() => {
     component.ngOnInit();
     expect(component.getTopicUrl()).toBe('/topic/topic_1');
   }));
