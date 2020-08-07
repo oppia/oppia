@@ -85,13 +85,15 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         new_config_value = [{
             'name': 'math',
             'url_fragment': 'math',
-            'topic_ids': [self.topic_id]
+            'topic_ids': [self.topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
         }]
 
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.name: (
+                config_domain.CLASSROOM_PAGES_DATA.name: (
                     new_config_value),
             }
         }

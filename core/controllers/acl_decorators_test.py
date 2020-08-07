@@ -2149,8 +2149,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         @acl_decorators.can_access_story_viewer_page
-        def get(self, story_id):
-            self.render_json({'story_id': story_id})
+        def get(self, story_url_fragment):
+            self.render_json({'story_url_fragment': story_url_fragment})
 
     class MockPageHandler(base.BaseHandler):
         @acl_decorators.can_access_story_viewer_page
@@ -2168,10 +2168,10 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.set_banned_users([self.banned_user])
         story_data_url = (
             '/mock_story_data/<classroom_url_fragment>/'
-            '<topic_url_fragment>/<story_id>')
+            '<topic_url_fragment>/<story_url_fragment>')
         story_page_url = (
             '/mock_story_page/<classroom_url_fragment>/'
-            '<topic_url_fragment>/story/<story_id>')
+            '<topic_url_fragment>/story/<story_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(story_data_url, self.MockDataHandler),
@@ -2182,7 +2182,10 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_services.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
-        self.save_new_story(self.story_id, self.admin_id, self.topic_id)
+        self.story_url_fragment = 'story-frag'
+        self.save_new_story(
+            self.story_id, self.admin_id, self.topic_id,
+            url_fragment=self.story_url_fragment)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[self.story_id],
@@ -2192,20 +2195,22 @@ class StoryViewerTests(test_utils.GenericTestBase):
     def test_cannot_access_non_existent_story(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/story_id',
+                '/mock_story_data/staging/topic/non-existent-frag',
                 expected_status_int=404)
 
     def test_cannot_access_story_when_topic_is_not_published(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/%s' % self.story_id,
+                '/mock_story_data/staging/topic/%s'
+                % self.story_url_fragment,
                 expected_status_int=404)
 
     def test_cannot_access_story_when_story_is_not_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/%s' % self.story_id,
+                '/mock_story_data/staging/topic/%s'
+                % self.story_url_fragment,
                 expected_status_int=404)
 
     def test_can_access_story_when_story_and_topic_are_published(self):
@@ -2214,7 +2219,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.topic_id, self.story_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/%s' % self.story_id,
+                '/mock_story_data/staging/topic/%s'
+                % self.story_url_fragment,
                 expected_status_int=200)
 
     def test_can_access_story_when_all_url_fragments_are_valid(self):
@@ -2223,10 +2229,11 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.topic_id, self.story_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_html_response(
-                '/mock_story_page/staging/topic/story/%s' % self.story_id,
+                '/mock_story_page/staging/topic/story/%s'
+                % self.story_url_fragment,
                 expected_status_int=200)
 
-    def test_redirect_to_story_page_if_story_id_is_invalid(self):
+    def test_redirect_to_story_page_if_story_url_fragment_is_invalid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id)
@@ -2245,11 +2252,11 @@ class StoryViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/invalid-topic/story/%s'
-                % self.story_id,
+                % self.story_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic/story/%s'
-                % self.story_id,
+                % self.story_url_fragment,
                 response.headers['location'])
 
     def test_redirect_with_correct_classroom_name_in_url(self):
@@ -2259,11 +2266,11 @@ class StoryViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/math/topic/story/%s'
-                % self.story_id,
+                % self.story_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic/story/%s'
-                % self.story_id,
+                % self.story_url_fragment,
                 response.headers['location'])
 
 
@@ -2312,9 +2319,11 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1')
         subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
             2, 'Subtopic Title 2')
         subtopic_2.skill_ids = ['skill_id_2']
+        subtopic_2.url_fragment = 'sub-two-frag'
         self.subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, self.topic_id))
@@ -2327,38 +2336,39 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             })]
         )
         self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name',
+            self.topic_id, self.admin_id, name='topic name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic_1, subtopic_2], next_subtopic_id=3)
+            subtopics=[subtopic_1, subtopic_2], next_subtopic_id=3,
+            url_fragment='topic-frag')
 
     def test_cannot_access_non_existent_subtopic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/staging/topic/50',
+                '/mock_subtopic_data/staging/topic/revision/non-existent-frag',
                 expected_status_int=404)
 
     def test_cannot_access_subtopic_when_topic_is_not_published(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/staging/topic/1',
+                '/mock_subtopic_data/staging/topic/revision/sub-one-frag',
                 expected_status_int=404)
 
     def test_can_access_subtopic_when_topic_is_published(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_subtopic_data/staging/topic/1',
+                '/mock_subtopic_data/staging/topic/revision/sub-one-frag',
                 expected_status_int=200)
 
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_html_response(
-                '/mock_subtopic_page/staging/topic/revision/1',
+                '/mock_subtopic_page/staging/topic/revision/sub-one-frag',
                 expected_status_int=200)
 
-    def test_fall_back_to_revision_page_if_subtopic_id_is_invalid(self):
+    def test_fall_back_to_revision_page_if_subtopic_url_frag_is_invalid(self):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
@@ -2372,7 +2382,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/invalid-topic/revision/1',
+                '/mock_subtopic_page/math/invalid-topic/revision/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/math',
@@ -2382,10 +2392,10 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/topic/revision/1',
+                '/mock_subtopic_page/math/topic/revision/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic/revision/1',
+                'http://localhost/learn/staging/topic/revision/sub-one-frag',
                 response.headers['location'])
 
 

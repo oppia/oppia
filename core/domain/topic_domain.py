@@ -849,10 +849,6 @@ class Topic(python_utils.OBJECT):
         """
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
-        if not self.are_subtopic_url_fragments_unique():
-            raise utils.ValidationError(
-                'Subtopic url fragments are not unique across '
-                'subtopics in the topic')
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
@@ -926,6 +922,11 @@ class Topic(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
+
+        if not self.are_subtopic_url_fragments_unique():
+            raise utils.ValidationError(
+                'Subtopic url fragments are not unique across '
+                'subtopics in the topic')
 
         if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1092,6 +1093,8 @@ class Topic(python_utils.OBJECT):
         Raises:
             ValidationError. Name should be a string.
         """
+        if not isinstance(new_name, python_utils.BASESTRING):
+            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
         self.canonical_name = new_name.lower()
 

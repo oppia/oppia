@@ -1360,7 +1360,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_id, self.user_id, name='topic-with-duplicate-subtopic',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[], next_subtopic_id=1, url_fragment='frag-dup-subtopic')
         with self.assertRaisesRegexp(
             Exception,
             'Subtopic url fragments are not unique across subtopics '

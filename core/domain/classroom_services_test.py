@@ -36,10 +36,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
     def test_can_get_classroom_by_url_fragment(self):
         topic_id = topic_services.get_new_topic_id()
         config_services.set_property(
-            self.user_id_admin, 'topic_ids_for_classroom_pages', [{
+            self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
                 'url_fragment': 'math',
-                'topic_ids': [topic_id]
+                'topic_ids': [topic_id],
+                'course_details': '',
+                'topic_list_intro': ''
             }])
         classroom = classroom_services.get_classroom_by_url_fragment('math')
         self.assertEqual(classroom.name, 'math')
@@ -53,10 +55,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
     def test_get_classroom_url_fragment_for_topic_id(self):
         topic_id = topic_services.get_new_topic_id()
         config_services.set_property(
-            self.user_id_admin, 'topic_ids_for_classroom_pages', [{
+            self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
                 'url_fragment': 'math-one',
-                'topic_ids': [topic_id]
+                'topic_ids': [topic_id],
+                'course_details': '',
+                'topic_list_intro': ''
             }])
         classroom_url_fragment = (
             classroom_services.get_classroom_url_fragment_for_topic_id(
@@ -66,10 +70,12 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
     def test_return_default_if_associated_classroom_is_not_found(self):
         topic_id = topic_services.get_new_topic_id()
         config_services.set_property(
-            self.user_id_admin, 'topic_ids_for_classroom_pages', [{
+            self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
                 'url_fragment': 'math-two',
-                'topic_ids': []
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
             }])
         classroom_url_fragment = (
             classroom_services.get_classroom_url_fragment_for_topic_id(

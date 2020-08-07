@@ -1194,7 +1194,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
-            'url_fragment': 'abbrev',
+            'url_fragment': 'url-frag',
             'id': 'topic_id',
             'name': 'name',
             'description': 'topic description',
@@ -1213,7 +1213,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'topic', current_time,
+            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', current_time,
             current_time)
 
     def _assert_validation_error(self, expected_error_substring):

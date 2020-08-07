@@ -222,7 +222,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, self.TOPIC_ID)
+            self.STORY_ID, self.USER_ID, self.TOPIC_ID,
+            url_fragment='story-frag')
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.story.add_node(self.NODE_ID_2, 'Node title 2')
         self.story.update_node_destination_node_ids(
@@ -313,7 +314,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'description': 'Description',
             'node_titles': [],
             'thumbnail_bg_color': None,
-            'thumbnail_filename': None
+            'thumbnail_filename': None,
+            'url_fragment': 'story-frag'
         }
 
         self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
@@ -324,7 +326,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', 'Description', topic_id, 'title')
+            self.STORY_ID, 'Title', 'Description', topic_id, 'story-frag-default')
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
@@ -342,7 +344,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'corresponding_topic_id': topic_id,
             'version': 0,
-            'url_fragment': 'title'
+            'url_fragment': 'story-frag-default'
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
 
@@ -1171,7 +1173,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.rearrange_node_in_story(0, -1)
 
     def test_update_url_fragment(self):
-        self.assertEqual(self.story.url_fragment, 'title')
+        self.assertEqual(self.story.url_fragment, 'story-frag')
         self.story.update_url_fragment('updated-title')
         self.assertEqual(self.story.url_fragment, 'updated-title')
 
@@ -1315,7 +1317,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         curr_time = datetime.datetime.utcnow()
         story_summary = story_domain.StorySummary(
             'story_id', 'title', 'description', 'en', 1, ['Title 1'], '#F8BF74',
-            'image.svg', 'title', curr_time, curr_time)
+            'image.svg', 'story-frag-two', curr_time, curr_time)
 
         expected_dict = {
             'id': 'story_id',
@@ -1326,7 +1328,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'node_titles': ['Title 1'],
             'thumbnail_bg_color': '#F8BF74',
             'thumbnail_filename': 'image.svg',
-            'url_fragment': 'title',
+            'url_fragment': 'story-frag-two',
             'story_model_created_on': utils.get_time_in_millisecs(curr_time),
             'story_model_last_updated': utils.get_time_in_millisecs(curr_time),
         }
@@ -1351,12 +1353,13 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'language_code': 'en',
             'id': 'story_id',
-            'url_fragment': 'title'
+            'url_fragment': 'story-summary-frag'
         }
 
         self.story_summary = story_domain.StorySummary(
             'story_id', 'title', 'description', 'en', 1, ['Title 1', 'Title 2'],
-            '#F8BF74', 'image.svg', 'title', current_time, current_time)
+            '#F8BF74', 'image.svg', 'story-summary-frag',
+            current_time, current_time)
 
     def test_story_summary_gets_created(self):
         self.assertEqual(

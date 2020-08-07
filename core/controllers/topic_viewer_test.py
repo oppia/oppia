@@ -52,13 +52,13 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.story_1 = story_domain.Story.create_default_story(
             self.story_id_1, 'story_title', 'description', self.topic_id_1,
-            'story-one')
+            'story-frag-one')
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
             self.story_id_2, 'story_title', 'description', self.topic_id_2,
-            'story-two')
+            'story-frag-two')
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
 
@@ -151,7 +151,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
-                    'completed_node_titles': []
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-one'
                 }],
                 'additional_story_dicts': [{
                     'id': self.story_2.id,
@@ -161,7 +162,8 @@ class TopicPageDataHandlerTests(
                     'thumbnail_filename': None,
                     'thumbnail_bg_color': None,
                     'story_is_published': True,
-                    'completed_node_titles': []
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-two'
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
@@ -214,7 +216,8 @@ class TopicPageDataHandlerTests(
                         'thumbnail_filename': None,
                         'thumbnail_bg_color': None,
                         'story_is_published': True,
-                        'completed_node_titles': []
+                        'completed_node_titles': [],
+                        'url_fragment': 'story-frag-one'
                     }],
                     'additional_story_dicts': [{
                         'id': self.story_2.id,
@@ -224,7 +227,8 @@ class TopicPageDataHandlerTests(
                         'thumbnail_filename': None,
                         'thumbnail_bg_color': None,
                         'story_is_published': True,
-                        'completed_node_titles': []
+                        'completed_node_titles': [],
+                        'url_fragment': 'story-frag-two'
                     }],
                     'uncategorized_skill_ids': [self.skill_id_1],
                     'subtopics': [{

@@ -362,7 +362,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
     def test_job_skips_deleted_topic(self):
         """Tests that the regenerate summary job skips deleted topic."""
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A title', 'Abbrev title', 'description')
+            self.TOPIC_ID, 'A title', 'url-frag-one', 'description')
         topic_services.save_new_topic(self.albert_id, topic)
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
@@ -463,7 +463,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A title', 'Abbrev title', 'description')
+            self.TOPIC_ID, 'A title', 'url-frag-two', 'description')
         topic_services.save_new_topic(self.albert_id, topic)
 
         get_topic_by_id_swap = self.swap(
