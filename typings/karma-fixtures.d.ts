@@ -197,6 +197,10 @@ interface RuleTemplates {
     ResultsInError: IRuleDescription;
     ErrorContains: IRuleDescription;
   };
+  RatioInput: {
+    Equals: IRuleDescription;
+    HasNumberOfTermsEqualTo: IRuleDescription;
+  };
   SetInput: {
     Equals: IRuleDescription;
     IsSubsetOf: IRuleDescription;

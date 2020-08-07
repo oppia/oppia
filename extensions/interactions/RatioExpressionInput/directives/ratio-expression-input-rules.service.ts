@@ -13,31 +13,33 @@
 // limitations under the License.
 
 /**
- * @fileoverview Rules service for the interaction.
+ * @fileoverview Rules service for the RatioExpressionInput interaction.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { RatioInputAnswer } from 'interactions/answer-defs';
 import {
-  RatioInputEqualRulesInputs
+  RatioInputRulesInputs
 } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class RatioInputRulesService {
-  constructor(private nws: NormalizeWhitespacePipe) {}
-  Equals(answer: RatioInputAnswer, inputs: RatioInputEqualRulesInputs):
+export class RatioExpressionInputRulesService {
+  Equals(answer: RatioInputAnswer, inputs: RatioInputRulesInputs):
   boolean {
-    var normalizedAnswer = this.nws.transform(answer);
-    var normalizedInput = this.nws.transform(inputs.x);
-    return normalizedAnswer === normalizedInput;
+    return answer === inputs.x;
+  }
+
+  HasNumberOfTermsEqualTo(
+      answer: RatioInputAnswer,
+      inputs: RatioInputRulesInputs): boolean {
+    return answer.split(':').length === inputs.x.split(':').length;
   }
 }
 
 angular.module('oppia').factory(
-  'RatioInputRulesService', downgradeInjectable(RatioInputRulesService));
+  'RatioInputRulesService',
+  downgradeInjectable(RatioExpressionInputRulesService));

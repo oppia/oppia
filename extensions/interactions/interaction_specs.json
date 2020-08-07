@@ -952,19 +952,19 @@
       "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
     }
   },
-  "RatioInput": {
+  "RatioExpressionInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,
-    "description": "Allows learners to enter ratios.",
+    "description": "Allows learners to enter ratio's.",
     "needs_summary": false,
-    "name": "Ratio Input",
-    "answer_type": "Ratio",
+    "name": "Ratio Expression Input",
+    "answer_type": "RatioExpression",
     "is_linear": false,
     "display_mode": "inline",
-    "id": "RatioInput",
+    "id": "RatioExpressionInput",
     "customization_arg_specs": [
       {
         "description": "Custom placeholder text (optional)",
@@ -978,7 +978,8 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "Equals": "is equals to {{r|RatioExpression}}"
+      "Equals": "is equals to {{x|RatioExpression}}",
+      "HasNumberOfTermsEqualTo": "is equal to length {{x|RatioExpression}}"
     }
   }
 }

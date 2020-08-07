@@ -161,7 +161,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           varType === 'CodeString' || varType === 'UnicodeString' ||
           varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
           varType === 'AlgebraicExpression' || varType === 'MathEquation' ||
-          varType === 'NumericExpression') {
+          varType === 'NumericExpression' || varType === 'RatioExpression') {
           replacementText = inputs[varName];
         } else if (varType === 'PositionOfTerms') {
           for (var i = 0; i < POSITION_OF_TERMS_MAPPING.length; i++) {

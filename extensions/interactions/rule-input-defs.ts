@@ -196,19 +196,9 @@ export interface PencilCodeEditorRuleInputs {
   x: string;
 }
 
-// RatioInput interaction has multiple types of inputs based on
-// rule type.
-export interface RatioInputEqualRulesInputs {
+export interface RatioInputRulesInputs {
   x: string;
 }
-
-export interface RatioInputHasNumberOfTermsEqualToRulesInputs {
-  x: number;
-}
-
-export type RatioInputRulesInputs = (
-  RatioInputEqualRulesInputs |
-  RatioInputHasNumberOfTermsEqualToRulesInputs);
 
 export interface SetInputRuleInputs {
   x: string[];

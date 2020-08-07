@@ -266,5 +266,13 @@
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     }
+  },
+  "RatioInput": {
+    "Equals": {
+      "description": "is equal to {{x|Ratio}}"
+    },
+    "HasNumberOfTermsEqualTo": {
+      "description": "is equal to length {{x|Ratio}}"
+    }
   }
 }

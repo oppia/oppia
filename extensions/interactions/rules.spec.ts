@@ -54,6 +54,8 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
+import { RatioExpressionInputRulesService } from
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { ImageClickAnswer, MathExpressionAnswer } from './answer-defs';
@@ -77,6 +79,8 @@ describe('Rule spec services', function() {
     $provide.value('SetInputRulesService', new SetInputRulesService());
     $provide.value('AlgebraicExpressionInputRulesService',
       new AlgebraicExpressionInputRulesService());
+    $provide.value('RatioExpressionInputRulesService',
+      new RatioExpressionInputRulesService());
     $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());

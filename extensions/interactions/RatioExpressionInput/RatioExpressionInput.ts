@@ -13,18 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for RatioInput interaction.
+ * @fileoverview Requires for RatioExpressionInput interaction.
  */
 
 require(
   'interactions/RatioInput/directives/' +
-    'ratio-input-rules.service.ts');
+    'ratio-expression-input-rules.service.ts');
 require(
   'interactions/RatioInput/directives/' +
-    'oppia-interactive-ratio-input.directive.ts');
-require(
-  'interactions/RatioInput/directives/' +
-    'oppia-response-ratio-input.directive.ts');
-require(
-  'interactions/RatioInput/directives/' +
-    'oppia-short-response-ratio-input.directive.ts');
+    'ratio-expression-input-validation.service.ts');

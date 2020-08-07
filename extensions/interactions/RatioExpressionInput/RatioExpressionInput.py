@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python configuration for RatioInput interaction."""
+"""Python configuration for RatioExpressionInput interaction."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from extensions.interactions import base
 
 
-class RatioInput(base.BaseInteraction):
+class RatioExpreeesionInput(base.BaseInteraction):
     """Interaction for ratio input."""
 
     name = 'Ratio Input'
