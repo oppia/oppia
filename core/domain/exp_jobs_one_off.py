@@ -283,8 +283,27 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                         current_exp_schema_version - 1,
                         current_exp_schema_version)
                 )
-                conversion_fn(item.to_dict())
-                yield ('SUCCESS', None)
+                converted_states_dict = conversion_fn(item.to_dict())
+
+                extracted_variables = []
+                for state_dict in converted_states_dict.values():
+                    if state_dict['interaction']['id'] in (
+                            'AlgebraicExpressionInput', 'MathEquationInput'):
+                        rule_inputs = []
+                        for group in state_dict['interaction']['answer_groups']:
+                            for rule_spec in group['rule_specs']:
+                                rule_inputs.append(rule_spec['inputs']['x'])
+                        customization_args = state_dict['interaction'][
+                            'customization_args']['customOskLetters']['value']
+                        extracted_variables.append(
+                            [rule_inputs, customization_args])
+                
+                if len(extracted_variables):
+                    output_values = 'Exp ID: %s\n%s' % (
+                        item.id, extracted_variables)
+                    yield ('SUCCESS', output_values.encode('utf-8'))
+                else:
+                    yield ('SUCCESS', None)
             except Exception as e:
                 error_message = (
                     'Exploration %s failed migration to v%s: %s' %
@@ -300,10 +319,10 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key == 'SUCCESS':
-            yield (key, len(values))
-        else:
-            yield (key, values)
+        # if key == 'SUCCESS':
+        #     yield (key, len(values))
+        # else:
+        yield (key, values)
 
 
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
