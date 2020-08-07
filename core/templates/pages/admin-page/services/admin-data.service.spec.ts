@@ -67,7 +67,9 @@ describe('Admin Data Service', () => {
         description: '',
         id: 'VqgPTpt7JyJy',
         topic_model_last_updated: 1591196558882.2,
-        language_code: 'en'
+        language_code: 'en',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA'
       }
     ],
     one_off_job_status_summaries: [],
@@ -164,6 +166,46 @@ describe('Admin Data Service', () => {
       '/adminhandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleAdminData);
+
+    flushMicrotasks();
+  }));
+
+  it('should send the math SVGs to the admin backend service', fakeAsync(() => {
+    var expectedResponse = {
+      result: 'success'
+    };
+    var latexToSvgMapping = {
+      exp_id1: {
+        latex_string1: {
+          file: new Blob(),
+          dimensions: {
+            encoded_height_string: '4d456',
+            encoded_width_string: '3d467',
+            encoded_vertical_padding_string: '0d234'
+          },
+          latexId: '3rmYki9MyZ'
+        }
+      },
+      exp_id2: {
+        latex_string2: {
+          file: new Blob(),
+          dimensions: {
+            encoded_height_string: '3d456',
+            encoded_width_string: '5d467',
+            encoded_vertical_padding_string: '0d234'
+          },
+          latexId: '4rm6ki9MsZ'
+        }
+      }
+    };
+    adminDataService.sendMathSvgsToBackendAsync(
+      latexToSvgMapping).then(function(response) {
+      expect(response).toEqual(expectedResponse);
+    });
+    var req = httpTestingController.expectOne(
+      '/adminmathsvghandler');
+    expect(req.request.method).toEqual('POST');
+    req.flush(expectedResponse);
 
     flushMicrotasks();
   }));

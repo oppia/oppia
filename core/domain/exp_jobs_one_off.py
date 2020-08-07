@@ -142,7 +142,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for state_name, state in exploration.states.items():
             if state.interaction.id == 'MultipleChoiceInput':
                 choices_length = len(
-                    state.interaction.customization_args['choices']['value'])
+                    state.interaction.customization_args['choices'].value)
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
                     for rule_index, rule_spec in enumerate(
@@ -252,6 +252,60 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
+class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
+    """A reusbale one-off job for testing exploration migration from the
+    previous exploration schema version to the latest. This job runs the state
+    migration, but does not commit the new exploration to the store.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationMigrationAuditJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        if item.states_schema_version == current_state_schema_version - 1:
+            try:
+                current_exp_schema_version = (
+                    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
+                conversion_fn = getattr(
+                    exp_domain.Exploration,
+                    '_convert_v%i_dict_to_v%i_dict' % (
+                        current_exp_schema_version - 1,
+                        current_exp_schema_version)
+                )
+                conversion_fn(item.to_dict())
+                yield ('SUCCESS', None)
+            except Exception as e:
+                error_message = (
+                    'Exploration %s failed migration to v%s: %s' %
+                    (item.id, current_exp_schema_version, e))
+                logging.error(error_message)
+                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
+        else:
+            error_message = (
+                'Exploration %s was not migrated because its states '
+                'schema verison is %i' %
+                (item.id, item.states_schema_version))
+            yield ('WRONG_STATE_VERSION', error_message.encode('utf-8'))
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate exploration schema
     versions. This job will load all existing explorations from the data store
@@ -332,8 +386,12 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration = exp_fetchers.get_exploration_from_model(item)
         for state_name, state in exploration.states.items():
             if state.interaction.id == 'ItemSelectionInput':
-                choices = (
-                    state.interaction.customization_args['choices']['value'])
+                choices = [
+                    choice.html
+                    for choice in state.interaction.customization_args[
+                        'choices'].value
+                ]
+
                 for group in state.interaction.answer_groups:
                     for rule_spec in group.rule_specs:
                         for rule_item in rule_spec.inputs['x']:
@@ -349,9 +407,10 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks the html content of an exploration and validates all the
-    Math tags in the HTML.
+class ExplorationMathSvgFilenameValidationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates the
+    svg_filename fields in each math rich-text components.
     """
 
     @classmethod
@@ -364,27 +423,41 @@ class ExplorationMathTagValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        exploration_status = (
-            rights_manager.get_exploration_rights(
-                item.id).status)
+        invalid_tags_info_in_exp = []
         for state_name, state in exploration.states.items():
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
-                html_validation_service.validate_math_tags_in_html(html_string))
+                html_validation_service.
+                validate_svg_filenames_in_math_rich_text(
+                    feconf.ENTITY_TYPE_EXPLORATION, item.id, html_string))
             if len(error_list) > 0:
-                key = (
-                    'exp_id: %s, exp_status: %s failed validation.' % (
-                        item.id, exploration_status))
-                value_dict = {
+                invalid_tags_info_in_state = {
                     'state_name': state_name,
                     'error_list': error_list,
                     'no_of_invalid_tags': len(error_list)
                 }
-                yield (key, value_dict)
+                invalid_tags_info_in_exp.append(invalid_tags_info_in_state)
+        if len(invalid_tags_info_in_exp) > 0:
+            yield ('Found invalid tags', (item.id, invalid_tags_info_in_exp))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        no_of_invalid_tags = 0
+        invalid_tags_info = {}
+        for exp_id, invalid_tags_info_in_exp in final_values:
+            invalid_tags_info[exp_id] = []
+            for value in invalid_tags_info_in_exp:
+                no_of_invalid_tags += value['no_of_invalid_tags']
+                del value['no_of_invalid_tags']
+                invalid_tags_info[exp_id].append(value)
+
+        final_value_dict = {
+            'no_of_explorations_with_no_svgs': len(final_values),
+            'no_of_invalid_tags': no_of_invalid_tags,
+        }
+        yield ('Overall result.', final_value_dict)
+        yield ('Detailed information on invalid tags. ', invalid_tags_info)
 
 
 class ExplorationMockMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

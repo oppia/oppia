@@ -106,7 +106,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'drag-and-drop-positive-int-editor.directive.ts',
     'editable-collection-backend-api.service.ts',
     'editable-story-backend-api.service.ts',
-    'editor-navigation.component.ts',
     'email-dashboard-data.service.ts',
     'entity-creation.service.ts',
     'exploration-creation.service.ts',
@@ -257,13 +256,12 @@ NOT_FULLY_COVERED_FILENAMES = [
     'parameterize-rule-description.filter.ts',
     'pencil-code-editor-validation.service.ts',
     'player-correctness-feedback-enabled.service.ts',
-    'player-position.service.ts',
     'player-transcript.service.ts',
     'Polyfills.ts',
     'practice-tab.directive.ts',
     'pretest-question-backend-api.service.ts',
-    'profile-link-image.directive.ts',
-    'profile-link-text.directive.ts',
+    'profile-link-image.component.ts',
+    'profile-link-text.component.ts',
     'profile-page-navbar.component.ts',
     'progress-nav.directive.ts',
     'promo-bar.directive.ts',
@@ -367,6 +365,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'StoryContentsObjectFactory.ts',
     'StoryNodeObjectFactory.ts',
     'student.ts',
+    'subtitled-html-editor.directive.ts',
+    'subtitled-unicode-editor.directive.ts',
     'subtopic-preview-tab.component.ts',
     'subtopic-summary-tile.directive.ts',
     'subtopic-viewer-navbar-breadcrumb.component.ts',
@@ -430,9 +430,9 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
             stanza: list(str). Contains all the lines from a lcov stanza.
 
         Raises:
-            Exception: file_path is empty.
-            Exception: Total lines number is not found.
-            Exception: Covered lines number is not found.
+            Exception. The file_path is empty.
+            Exception. Total lines number is not found.
+            Exception. Covered lines number is not found.
         """
 
         match = re.search('SF:(.+)\n', stanza)
@@ -504,7 +504,7 @@ def check_coverage_changes():
     - File deletion
 
     Raises:
-        Exception: LCOV_FILE_PATH doesn't exist.
+        Exception. LCOV_FILE_PATH doesn't exist.
     """
     if not os.path.exists(LCOV_FILE_PATH):
         raise Exception(

@@ -102,6 +102,15 @@ DEFAULT_SUGGESTION_ACCEPT_MESSAGE = (
 # deleted skill.
 DELETED_SKILL_REJECT_MESSAGE = 'The associated skill no longer exists.'
 
+# The message to be shown when rejecting a translation suggestion that is
+# associated with an exploration that no longer corresponds to the story.
+# The story could have been deleted or the exploration could have been removed
+# from the story.
+INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG = (
+    'This text snippet has been removed from the story, and no longer needs '
+    'translation. Sorry about that!'
+)
+
 # The amount to increase the score of the author by after successfuly getting an
 # accepted suggestion.
 INCREMENT_SCORE_OF_AUTHOR_BY = 1
@@ -114,7 +123,7 @@ ACTION_TYPE_REJECT = 'reject'
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
 
-    The ID of the suggestions are created is the same as the ID of the thread
+    The ID of the suggestions created is the same as the ID of the thread
     linked to the suggestion.
     """
 
@@ -193,7 +202,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 suggestion.
 
         Raises:
-            Exception: There is already a suggestion with the given id.
+            Exception. There is already a suggestion with the given id.
         """
         instance_id = thread_id
 
@@ -233,6 +242,34 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_translation_suggestions_with_exp_ids(cls, exp_ids):
+        """Gets all translation suggestions corresponding to explorations with
+        the given exploration ids.
+
+        Args:
+            exp_ids: list(str). List of exploration ids to query for.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions that
+            correspond to the given exploration ids. Note: it is not
+            guaranteed that the suggestions returned are ordered by the
+            exploration ids in exp_ids.
+        """
+        query = (
+            cls.get_all()
+            .order(cls.key)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.target_id.IN(exp_ids))
+        )
+        suggestion_models = []
+        cursor, more = (None, True)
+        while more:
+            results, cursor, more = query.fetch_page(
+                feconf.DEFAULT_QUERY_LIMIT, start_cursor=cursor)
+            suggestion_models.extend(results)
+        return suggestion_models
+
+    @classmethod
     def get_all_stale_suggestions(cls):
         """Gets all suggestions which were last updated before the threshold
         time.
@@ -253,7 +290,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         score_categories.
 
         Args:
-            score_categories: list(str). list of score categories to query for.
+            score_categories: list(str). List of score categories to query for.
             user_id: list(str). The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.

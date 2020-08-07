@@ -32,10 +32,13 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('pages/topic-editor-page/modal-templates/' +
     'preview-thumbnail.component.ts');
+
+import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -51,17 +54,22 @@ angular.module('oppia').directive('storyEditor', [
       controller: [
         '$scope', '$window', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'StoryEditorNavigationService',
+        'WindowDimensionsService',
         'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
-        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_CHAPTER_TITLE',
+        'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
+        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $scope, $window, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, StoryEditorNavigationService,
+            WindowDimensionsService,
             EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
-            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_CHAPTER_TITLE) {
+            AlertsService, MAX_CHARS_IN_STORY_TITLE,
+            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
+          $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
+            MAX_CHARS_IN_STORY_URL_FRAGMENT);
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
@@ -90,11 +98,13 @@ angular.module('oppia').directive('storyEditor', [
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
+            $scope.editableUrlFragment = $scope.story.getUrlFragment();
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.storyDescriptionChanged = false;
+            $scope.storyUrlFragmentExists = false;
           };
 
           $scope.setNodeToEdit = function(nodeId) {
@@ -231,6 +241,20 @@ angular.module('oppia').directive('storyEditor', [
             StoryUpdateService.setStoryTitle($scope.story, newTitle);
           };
 
+          $scope.updateStoryUrlFragment = function(newUrlFragment) {
+            if (newUrlFragment === $scope.story.getUrlFragment()) {
+              $scope.storyUrlFragmentExists = false;
+              return;
+            }
+            StoryEditorStateService.changeStoryWithUrlFragmentExists(
+              newUrlFragment, function() {
+                $scope.storyUrlFragmentExists = (
+                  StoryEditorStateService.getStoryWithUrlFragmentExists());
+                StoryUpdateService.setStoryUrlFragment(
+                  $scope.story, newUrlFragment);
+              });
+          };
+
           $scope.updateStoryThumbnailFilename = function(
               newThumbnailFilename) {
             if (newThumbnailFilename === $scope.story.getThumbnailFilename()) {
@@ -265,8 +289,25 @@ angular.module('oppia').directive('storyEditor', [
               $scope.selectedChapterIndex === chapterIndex) ? -1 : chapterIndex;
           };
 
+          $scope.toggleChapterLists = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
+          };
+
+          $scope.toggleStoryEditorCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.storyPreviewCardIsShown = false;
+            $scope.mainStoryCardIsShown = true;
+            $scope.chaptersListIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.NOTES_SCHEMA = {
               type: 'html',
               ui_config: {
@@ -281,11 +322,21 @@ angular.module('oppia').directive('storyEditor', [
               _initEditor();
             });
 
-            $scope.$on(EVENT_STORY_INITIALIZED, _init);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryInitialized.subscribe(
+                () => _init()
+              ));
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
+                () => _initEditor()
+              ));
 
             _init();
             _initEditor();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
