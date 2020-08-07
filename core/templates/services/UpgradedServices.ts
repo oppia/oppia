@@ -1269,6 +1269,7 @@ export class UpgradedServices {
         upgradedServices['MusicNotesInputRulesService'],
         upgradedServices['NumberWithUnitsRulesService'],
         upgradedServices['NumericExpressionInputRulesService'],
+        upgradedServices['NumericInputRulesService'],
         upgradedServices['PencilCodeEditorRulesService'],
         upgradedServices['RatioExpressionInputRulesService'],
         upgradedServices['SetInputRulesService'],
