@@ -162,12 +162,11 @@ module.exports = function(config) {
             test: /\.ts$/,
             use: [
               'cache-loader',
-              'thread-loader',
               {
                 loader: 'ts-loader',
                 options: {
-                  // This is needed for thread-loader to work correctly.
-                  happyPackMode: true
+                  // Typescript checks do the type checking.
+                  transpileOnly: true
                 }
               },
               {

@@ -191,9 +191,14 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               !$scope.workedExamplesListIsShown);
           };
 
+          $scope.toggleSkillEditorCard = function() {
+            $scope.skillEditorCardIsShown = !$scope.skillEditorCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             initBindableFieldsDict();
+            $scope.skillEditorCardIsShown = true;
             $scope.workedExamplesListIsShown = (
               !WindowDimensionsService.isWindowNarrow());
             ctrl.directiveSubscriptions.add(

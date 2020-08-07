@@ -227,15 +227,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Then, create a new message in that thread.
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
+        response_dict = self.post_json(
             thread_url, {
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1'
             }, csrf_token=csrf_token)
 
-        # The resulting thread should contain two messages.
-        response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 2)
         self.assertEqual(
             set(response_dict['messages'][0].keys()),
