@@ -88,6 +88,15 @@ describe('FeatureGatingService', () => {
     );
   });
 
+  afterEach(() => {
+    // TODO(#9154): Remove the following resetting code when migration is
+    // complete.
+    // Currently these two properties are static, which are not after each
+    // test, so we need to manually clear the state of FeatureGatingService.
+    FeatureGatingService.featureFlagResults = null;
+    FeatureGatingService._initializedWithError = false;
+  });
+
   describe('.initialize', () => {
     it('should load from server when storage is clean.', fakeAsync(() => {
       featureGatingService = TestBed.get(FeatureGatingService);

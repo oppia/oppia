@@ -50,8 +50,11 @@ export class FeatureGatingService {
   private static COOKIE_NAME_FOR_SESSION_ID = 'SACSID';
   private static COOKIE_NAME_FOR_SESSION_ID_IN_DEV = 'dev_appserver_login';
 
-  private featureFlagResults: FeatureFlagResults = null;
-  private _initializedWithError = false;
+  // TODO(#9154): Remove static when migration is complete.
+  static featureFlagResults: FeatureFlagResults = null;
+
+  // TODO(#9154): Remove static when migration is complete.
+  static _initializedWithError = false;
 
   constructor(
       private clientContextObjectFactory: ClientContextObjectFactory,
@@ -64,27 +67,28 @@ export class FeatureGatingService {
     try {
       const item = this.loadSavedResults();
       if (item && this.validateSavedResults(item)) {
-        this.featureFlagResults = item.featureFlagResults;
-        this.saveResults(this.featureFlagResults);
+        FeatureGatingService.featureFlagResults = item.featureFlagResults;
+        this.saveResults();
       } else {
         this.clearSavedResults();
       }
 
-      if (!this.featureFlagResults) {
-        this.featureFlagResults = await this.loadFeatureFlagsFromServer();
-        this.saveResults(this.featureFlagResults);
+      if (!FeatureGatingService.featureFlagResults) {
+        FeatureGatingService.featureFlagResults = await this
+          .loadFeatureFlagsFromServer();
+        this.saveResults();
       }
     } catch (err) {
       // If any error, just disable all features.
-      this._initializedWithError = true;
+      FeatureGatingService._initializedWithError = true;
       this.clearSavedResults();
     }
   }
 
   isFeatureEnabled(name: FeatureNames): boolean {
-    if (this.featureFlagResults) {
-      return this.featureFlagResults.isFeatureEnabled(name);
-    } else if (this._initializedWithError) {
+    if (FeatureGatingService.featureFlagResults) {
+      return FeatureGatingService.featureFlagResults.isFeatureEnabled(name);
+    } else if (FeatureGatingService._initializedWithError) {
       return false;
     } else {
       throw new Error('The feature gating service has not been initialized.');
@@ -92,7 +96,7 @@ export class FeatureGatingService {
   }
 
   get initialzedWithError(): boolean {
-    return this._initializedWithError;
+    return FeatureGatingService._initializedWithError;
   }
 
   detectBrowserType(): string {
@@ -119,11 +123,12 @@ export class FeatureGatingService {
     return this.featureGatingBackendApiService.fetchFeatureFlags(context);
   }
 
-  private saveResults(results: FeatureFlagResults): void {
+  private saveResults(): void {
     const item = {
       timestamp: this.getCurrentTimestamp(),
       sessionId: this.getSessionIdFromCookie(),
-      featureFlagResults: results.toBackendDict(),
+      featureFlagResults: FeatureGatingService.featureFlagResults
+        .toBackendDict(),
     };
     this.windowRef.nativeWindow.sessionStorage.setItem(
       FeatureGatingService.SESSION_STORAGE_KEY, JSON.stringify(item));
