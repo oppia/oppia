@@ -82,7 +82,7 @@ describe('IsUrlFragment Filter', function() {
       expect(filter('special.chars', args)).toBe(false);
       expect(filter('special?chars', args)).toBe(false);
       expect(filter('special/chars', args)).toBe(false);
-      expect(filter('special\chars', args)).toBe(false);
+      expect(filter('special\\chars', args)).toBe(false);
     }));
 
   it('should fail when there are spaces',
