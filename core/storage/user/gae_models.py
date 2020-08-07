@@ -47,8 +47,9 @@ class UserSettingsModel(base_models.BaseModel):
 
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
-    # TODO(#10178): gae_id will be deprecated for UserSettingsModel when
-    # feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
+    # TODO(#10178): gae_id will be deprecated for UserSettingsModel because
+    # at that time we would be sure that UserAuthModel exists for every user.
+    # Hence no need to duplicate the auth detail.
     gae_id = ndb.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)

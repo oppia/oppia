@@ -221,7 +221,7 @@ class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
         output = {}
         for stringified_distribution in stringified_output:
             message_list = ast.literal_eval(stringified_distribution)
-            output[message_list[0]] = message_list[1]
+            output[message_list[0]] = sorted(message_list[1])
         return output
 
     def setUp(self):
@@ -269,17 +269,13 @@ class PopulateUserAuthModelOneOffJobTests(test_utils.GenericTestBase):
             feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
         self.assertEqual(user_auth_model.id, self.USER_B_ID)
 
-        expected_output = [
-            {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID},
-            {'user_id': self.USER_B_ID, 'gae_id': self.USER_B_GAE_ID},
+        expected_output = {
+            'Created': [
+                {'user_id': self.USER_A_ID, 'gae_id': self.USER_A_GAE_ID},
+                {'user_id': self.USER_B_ID, 'gae_id': self.USER_B_GAE_ID}
             ]
-
-        # To ensure both lists have same elements.
-        for user in expected_output:
-            self.assertIn(user, output['Created'])
-        for user in output['Created']:
-            self.assertIn(user, expected_output)
-        self.assertEqual(['Created'], output.keys()) # pylint: disable=dict-keys-not-iterating
+        }
+        self.assertEqual(expected_output, output)
 
     def test_one_off_job_existing_user_updated_successfully(self):
         self._run_one_off_job()

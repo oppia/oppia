@@ -87,6 +87,12 @@ class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        """Marks a job as queued and adds it to a queue for processing."""
+        super(PopulateUserAuthModelOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
@@ -97,8 +103,11 @@ class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Assumptions:
         # 1) We are only having full users in the database, and no
-        #    profile users.
-        # 2) For the same user_id, gae_id cannot be updated.
+        #    profile users. For profiles we need to do a role check and ensure
+        #    the gae_id attribute is None for them.
+        # 2) This migration works correctly only if gae_id cannot be updated
+        #   in any way for a user. If a gae_id is mapped to some other user by
+        #   deleing it, an error will be raised while migration (see below).
 
         user_auth_model = user_models.UserAuthModel.get_by_auth_id(
             feconf.AUTH_METHOD_GAE, item.gae_id)
@@ -107,9 +116,9 @@ class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 yield (
                     'Error, gae_id already existing',
                     {'user_id': item.id, 'gae_id': item.gae_id}
-                    )
+                )
             else:
-                if (item.deleted is True) and (
+                if (item.deleted is True and
                         user_auth_model.deleted is not True):
                     user_auth_model.deleted = item.deleted
                     user_auth_model.put()
