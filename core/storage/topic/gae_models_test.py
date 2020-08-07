@@ -97,7 +97,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_name(self):
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, 'abbrev', 'description')
+            self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(
             topic_models.TopicModel.get_by_name(self.TOPIC_NAME).name,
@@ -108,16 +108,16 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID
         )
 
-    def test_get_by_abbreviated_name(self):
+    def test_get_by_url_fragment(self):
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, 'abbrev-two', 'description')
+            self.TOPIC_ID, self.TOPIC_NAME, 'name-two', 'description')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(
-            topic_models.TopicModel.get_by_abbreviated_name('abbrev-two').name,
+            topic_models.TopicModel.get_by_url_fragment('name-two').name,
             self.TOPIC_NAME
         )
         self.assertEqual(
-            topic_models.TopicModel.get_by_abbreviated_name('abbrev-two').id,
+            topic_models.TopicModel.get_by_url_fragment('name-two').id,
             self.TOPIC_ID
         )
 

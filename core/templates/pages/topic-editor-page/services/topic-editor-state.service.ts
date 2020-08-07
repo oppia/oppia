@@ -62,6 +62,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
+    var _topicWithNameExists = false;
+    var _topicWithUrlFragmentExists = false;
     var _canonicalStorySummaries = [];
     var _skillIdToRubricsObject = {};
     var _skillQuestionCountDict = {};
@@ -158,6 +160,15 @@ angular.module('oppia').factory('TopicEditorStateService', [
         });
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
+
+    var _setTopicWithNameExists = function(topicWithNameExists) {
+      _topicWithNameExists = topicWithNameExists;
+    };
+
+    var _setTopicWithUrlFragmentExists = function(topicWithUrlFragmentExists) {
+      _topicWithUrlFragmentExists = topicWithUrlFragmentExists;
+    };
+
     return {
       /**
        * Loads, or reloads, the topic stored by this service given a
@@ -212,6 +223,15 @@ angular.module('oppia').factory('TopicEditorStateService', [
       getSkillQuestionCountDict: function() {
         return _skillQuestionCountDict;
       },
+
+      getTopicWithNameExists: function() {
+        return _topicWithNameExists;
+      },
+
+      getTopicWithUrlFragmentExists: function() {
+        return _topicWithUrlFragmentExists;
+      },
+
       /**
        * Loads, or reloads, the subtopic page stored by this service given a
        * specified topic ID and subtopic ID.
@@ -442,6 +462,39 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       getClassroomUrlFragment: function() {
         return _classroomUrlFragment;
+      },
+
+      changeTopicWithNameExists: function(topicName, successCallback) {
+        EditableTopicBackendApiService.doesTopicWithNameExistAsync(
+          topicName).then(
+          function(topicNameExists) {
+            _setTopicWithNameExists(topicNameExists);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when checking if the topic name ' +
+              'exists for another topic.');
+          });
+      },
+
+      changeTopicWithUrlFragmentExists: function(
+          topicUrlFragment, successCallback) {
+        EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
+          topicUrlFragment).then(
+          function(topicUrlFragmentExists) {
+            _setTopicWithUrlFragmentExists(topicUrlFragmentExists);
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when checking if the topic url fragment ' +
+              'exists for another topic.');
+          });
       }
     };
   }

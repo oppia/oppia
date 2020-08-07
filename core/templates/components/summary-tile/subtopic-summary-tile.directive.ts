@@ -47,7 +47,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
                 SUBTOPIC_VIEWER_URL_TEMPLATE, {
                   topic_url_fragment: ctrl.getTopicUrlFragment(),
                   classroom_url_fragment: ctrl.getClassroomUrlFragment(),
-                  subtopic_id: ctrl.getSubtopic().getId().toString()
+                  subtopic_url_fragment: ctrl.getSubtopic().getUrlFragment()
                 }
               ), '_self'
             );

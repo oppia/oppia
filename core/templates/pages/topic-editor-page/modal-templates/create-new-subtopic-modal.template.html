@@ -25,7 +25,7 @@
       <strong>Enter the url fragment for the subtopic</strong>
     </div>
     <input class="form-control protractor-test-new-subtopic-url-fragment-field" style="font-size: 12px;"
-           ng-class="{'is-invalid': $ctrl.editableUrlFragment && !$ctrl.isUrlFragmentValid()}"
+           ng-class="{'is-invalid': $ctrl.editableUrlFragment && (!$ctrl.isUrlFragmentValid() || $ctrl.subtopicUrlFragmentExists)}"
            placeholder="Enter a url fragment for the subtopic."
            ng-model="$ctrl.editableUrlFragment" ng-change="$ctrl.checkSubtopicExistence()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
     <span class="oppia-input-box-subtitle">
@@ -33,9 +33,9 @@
         The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
       </i>
     </span>
-    <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
-      <em>The subtopic url fragment is not unique.</em>
-    </span>
+    <div class="oppia-input-box-subtitle text-danger" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
+      <i>The subtopic url fragment is not unique.</i>
+    </div>
 
     <div class="create-new-subtopic-input-field create-new-subtopic-content">
       <div>

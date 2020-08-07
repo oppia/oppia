@@ -47,6 +47,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         self.TOPIC_ID = 'topic_id'
         self.STORY_ID = 'story_id'
+        self.STORY_URL_FRAGMENT = 'title-one'
         self.NODE_ID_1 = 'node_1'
         self.NODE_ID_2 = 'node_2'
         self.NODE_ID_3 = 'node_3'
@@ -65,7 +66,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.publish_exploration(self.admin_id, self.EXP_ID_7)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', 'Description', self.TOPIC_ID, 'title-one')
+            self.STORY_ID, 'Title', 'Description', self.TOPIC_ID,
+            self.STORY_URL_FRAGMENT)
 
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -146,35 +148,35 @@ class StoryPageTests(BaseStoryViewerControllerTests):
     def test_any_user_can_access_story_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_ID)
+                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
 
     def test_accessibility_of_unpublished_story_viewer_page(self):
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_ID,
+                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
                 expected_status_int=404)
             self.login(self.ADMIN_EMAIL)
             self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_ID)
+                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
             self.logout()
 
     def test_accessibility_of_story_viewer_in_unpublished_topic(self):
         topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_ID,
+                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
                 expected_status_int=404)
             self.login(self.ADMIN_EMAIL)
             self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_ID)
+                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
             self.logout()
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '/learn/staging/topic/story/%s' % self.STORY_ID,
+                '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
                 expected_status_int=404)
 
 
@@ -182,17 +184,20 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
     def test_can_not_access_story_viewer_page_with_unpublished_story(self):
         new_story_id = 'new_story_id'
+        new_story_url_fragment = 'title-two'
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', 'Description', self.TOPIC_ID, 'title-two')
+            new_story_id, 'Title', 'Description', self.TOPIC_ID,
+            new_story_url_fragment)
         story_services.save_new_story(self.admin_id, story)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, new_story_id),
+                % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
                 expected_status_int=404)
 
     def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
         new_story_id = 'new_story_id'
+        new_story_url_fragment = 'title-three'
         self.save_new_topic(
             'topic_id_1', 'user', name='Topic 2',
             abbreviated_name='topics', url_fragment='topics',
@@ -200,21 +205,22 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', 'Description', 'topic_id_1', 'title-three')
+            new_story_id, 'Title', 'Description', 'topic_id_1',
+            new_story_url_fragment)
         story_services.save_new_story(self.admin_id, story)
         topic_services.publish_story(
             'topic_id_1', new_story_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/staging/topics/%s'
-                % (feconf.STORY_DATA_HANDLER, new_story_id),
+                % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
                 expected_status_int=404)
 
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, 'story_id'))
+                % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
             expected_dict = {
                 'story_title': 'Title',
                 'story_description': 'Description',
@@ -227,7 +233,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
                 '%s/staging/topic/%s'
-                % (feconf.STORY_DATA_HANDLER, 'story_id'),
+                % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT),
                 expected_status_int=404)
 
 
@@ -238,7 +244,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -248,7 +254,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_1
                 ), {}, csrf_token=csrf_token
             )
@@ -262,7 +268,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token
             )
@@ -276,7 +282,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, 'invalid_story',
+                    feconf.STORY_PROGRESS_URL_PREFIX, 'invalid-story',
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -286,7 +292,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     'invalid_node'
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -299,7 +305,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -313,7 +319,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_3
                 ), {}, csrf_token=csrf_token
             )
@@ -351,7 +357,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/staging/topic/%s/%s' % (
-                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_3
                 ), {}, csrf_token=csrf_token
             )

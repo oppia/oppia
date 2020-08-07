@@ -89,6 +89,14 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();
+            if (TopicEditorStateService.getTopicWithNameExists()) {
+              $scope.validationIssues.push(
+                'A topic with this name already exists.');
+            }
+            if (TopicEditorStateService.getTopicWithUrlFragmentExists()) {
+              $scope.validationIssues.push(
+                'Topic URL fragment already exists.');
+            }
             var prepublishTopicValidationIssues = (
               $scope.topic.prepublishValidate());
             var subtopicPrepublishValidationIssues = (

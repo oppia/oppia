@@ -35,6 +35,7 @@ describe('Create new topic modal', function() {
   var $uibModalInstance = null;
   var NewlyCreatedTopicObjectFactory = null;
   var ImageLocalStorageService = null;
+  var TopicEditorStateService = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 
@@ -44,6 +45,7 @@ describe('Create new topic modal', function() {
         $injector.get('NewlyCreatedTopicObjectFactory');
     $scope = $rootScope.$new();
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
+    TopicEditorStateService = $injector.get('TopicEditorStateService');
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
       [{filename: 'a', image: 'faf'}]);
@@ -84,4 +86,52 @@ describe('Create new topic modal', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
+
+  it('should check if url fragment already exists', function() {
+    spyOn(
+      TopicEditorStateService,
+      'changeTopicWithUrlFragmentExists').and.callFake(
+      (urlFragment, callback) => callback());
+    spyOn(
+      TopicEditorStateService,
+      'getTopicWithUrlFragmentExists').and.returnValue(true);
+    expect($scope.topicUrlFragmentExists).toBeFalse();
+    $scope.newlyCreatedTopic.urlFragment = 'test-url';
+    $scope.onTopicUrlFragmentChange();
+    expect($scope.topicUrlFragmentExists).toBeTrue();
+  });
+
+  it('should not call changeTopicWithUrlFragmentExists for empty url fragment',
+    function() {
+      spyOn(TopicEditorStateService, 'changeTopicWithUrlFragmentExists');
+      $scope.newlyCreatedTopic.urlFragment = '';
+      $scope.onTopicUrlFragmentChange();
+      expect(
+        TopicEditorStateService.changeTopicWithUrlFragmentExists
+      ).not.toHaveBeenCalled();
+    });
+
+  it('should check if topic name already exists', function() {
+    spyOn(
+      TopicEditorStateService,
+      'changeTopicWithNameExists').and.callFake(
+      (urlFragment, callback) => callback());
+    spyOn(
+      TopicEditorStateService,
+      'getTopicWithNameExists').and.returnValue(true);
+    expect($scope.topicNameExists).toBeFalse();
+    $scope.newlyCreatedTopic.name = 'test';
+    $scope.onTopicNameChange();
+    expect($scope.topicNameExists).toBeTrue();
+  });
+
+  it('should not call changeTopicWithNameExists for empty url fragment',
+    function() {
+      spyOn(TopicEditorStateService, 'changeTopicWithNameExists');
+      $scope.newlyCreatedTopic.name = '';
+      $scope.onTopicNameChange();
+      expect(
+        TopicEditorStateService.changeTopicWithNameExists
+      ).not.toHaveBeenCalled();
+    });
 });

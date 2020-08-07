@@ -62,14 +62,14 @@ export class StoryViewerBackendApiService {
   _fetchStoryData(
       topicUrlFragment: string,
       classroomUrlFragment: string,
-      storyId: string,
+      storyUrlFragment: string,
       successCallback: (value: StoryPlaythrough) => void,
       errorCallback: (reason: string) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
-        story_id: storyId
+        story_url_fragment: storyUrlFragment
       });
 
     this.http.get<StoryPlaythroughBackendDict>(
@@ -88,14 +88,14 @@ export class StoryViewerBackendApiService {
 
   _recordChapterCompletion(
       topicUrlFragment: string, classroomUrlFragment: string,
-      storyId: string, nodeId: string,
+      storyUrlFragment: string, nodeId: string,
       successCallback: (value: StoryChapterCompletionResponse) => void,
       errorCallback: (reason: string) => void): void {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
-        story_id: storyId,
+        story_url_fragment: storyUrlFragment,
         node_id: nodeId
       });
     this.http.post<StoryChapterCompletionBackendResponse>(
@@ -115,21 +115,22 @@ export class StoryViewerBackendApiService {
   fetchStoryData(
       topicUrlFragment:string,
       classroomUrlFragment: string,
-      storyId: string): Promise<StoryPlaythrough> {
+      storyUrlFragment: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
       this._fetchStoryData(
-        topicUrlFragment, classroomUrlFragment, storyId, resolve, reject);
+        topicUrlFragment, classroomUrlFragment, storyUrlFragment,
+        resolve, reject);
     });
   }
 
   recordChapterCompletion(
       topicUrlFragment: string,
       classroomUrlFragment: string,
-      storyId: string,
+      storyUrlFragment: string,
       nodeId: string): Promise<StoryChapterCompletionResponse> {
     return new Promise((resolve, reject) => {
       this._recordChapterCompletion(
-        topicUrlFragment, classroomUrlFragment, storyId,
+        topicUrlFragment, classroomUrlFragment, storyUrlFragment,
         nodeId, resolve, reject);
     });
   }

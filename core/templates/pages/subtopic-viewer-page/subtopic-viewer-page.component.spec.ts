@@ -40,6 +40,7 @@ describe('Subtopic viewer page', function() {
   var topicId = '1';
   var subtopicId = '1';
   var subtopicTitle = 'Subtopic Title';
+  var subtopicUrlFragment = 'subtopic-title';
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -72,7 +73,8 @@ describe('Subtopic viewer page', function() {
       abbreviatedTopicName);
     spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-    spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
+    spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+      subtopicUrlFragment);
     var subtopicDataObject = (
       ReadOnlySubtopicPageObjectFactory.createFromBackendDict({
         topic_id: topicId,
@@ -92,7 +94,8 @@ describe('Subtopic viewer page', function() {
           title: '',
           skill_ids: [],
           thumbnail_filename: '',
-          thumbnail_bg_color: ''
+          thumbnail_bg_color: '',
+          url_fragment: subtopicUrlFragment
         }
       }));
     spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and.returnValue(
@@ -128,7 +131,8 @@ describe('Subtopic viewer page', function() {
       spyOn(
         UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
         'math');
-      spyOn(UrlService, 'getSubtopicIdFromUrl').and.returnValue(subtopicId);
+      spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
+        subtopicUrlFragment);
       spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and
         .returnValue(
           $q.reject({

@@ -39,6 +39,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   classroomUrlFragment: string;
   subtopicTitle: string;
   topicName: string;
+  subtopicUrlFragment: string;
   constructor(
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -49,10 +50,12 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.classroomUrlFragment = (
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    this.subtopicUrlFragment = (
+      this.urlService.getSubtopicUrlFragmentFromLearnerUrl());
     this.subtopicViewerBackendApiService.fetchSubtopicData(
       this.topicUrlFragment,
       this.classroomUrlFragment,
-      this.urlService.getSubtopicIdFromUrl()).then(
+      this.subtopicUrlFragment).then(
       (subtopicDataObject: ReadOnlySubtopicPageData) => {
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
         this.topicName = subtopicDataObject.getParentTopicName();

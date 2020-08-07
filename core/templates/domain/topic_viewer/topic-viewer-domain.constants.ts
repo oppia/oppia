@@ -21,11 +21,11 @@ export class TopicViewerDomainConstants {
     '/topic_data_handler/<classroom_url_fragment>/<topic_url_fragment>');
   public static STORY_VIEWER_URL_TEMPLATE = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/story/' +
-    '<story_id>');
+    '<story_url_fragment>');
   public static SUBTOPIC_VIEWER_URL_TEMPLATE = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/' +
-    '<subtopic_id>');
+    '<subtopic_url_fragment>');
   public static REVIEW_TESTS_URL_TEMPLATE = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/review-test/' +
-    '<story_id>');
+    '<story_url_fragment>');
 }

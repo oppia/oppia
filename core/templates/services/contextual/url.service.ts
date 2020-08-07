@@ -85,6 +85,24 @@ export class UrlService {
     throw new Error('Invalid URL for topic');
   }
 
+  getStoryUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (
+      pathname.startsWith('/learn') &&
+      pathname.match(/\/story\/|\/review-test\//g)) {
+      return decodeURIComponent(pathname.split('/')[5]);
+    }
+    throw new Error('Invalid URL for story');
+  }
+
+  getSubtopicUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (pathname.startsWith('/learn') && pathname.includes('/revision')) {
+      return decodeURIComponent(pathname.split('/')[5]);
+    }
+    throw new Error('Invalid URL for subtopic');
+  }
+
   getClassroomUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {

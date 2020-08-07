@@ -106,7 +106,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
             expected_dict = {
                 'topic_summary_dicts': [topic_summary_dict],
-                'classroom_url_fragment': 'math'
+                'classroom_name': 'math'
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 

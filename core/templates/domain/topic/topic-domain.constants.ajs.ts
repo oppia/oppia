@@ -25,6 +25,14 @@ angular.module('oppia').constant(
   TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE);
 
 angular.module('oppia').constant(
+  'TOPIC_NAME_HANDLER_URL_TEMPLATE',
+  TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
+  TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
   'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
   TopicDomainConstants.TOPIC_EDITOR_QUESTION_URL_TEMPLATE);
 

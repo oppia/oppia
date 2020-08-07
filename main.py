@@ -300,32 +300,39 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<story_id>' %
-        feconf.REVIEW_TEST_DATA_URL_PREFIX,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<story_url_fragment>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
         review_tests.ReviewTestsPageDataHandler),
     get_redirect_route(
-        r'%s/review-test/<story_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        r'%s/review-test/<story_url_fragment>'
+        % feconf.TOPIC_VIEWER_URL_PREFIX,
         review_tests.ReviewTestsPage),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<story_id>'
-        % feconf.STORY_DATA_HANDLER,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<story_url_fragment>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
         r'%s/<story_url_fragment>' % feconf.STORY_URL_FRAGMENT_HANDLER,
         story_editor.StoryUrlFragmentHandler),
     get_redirect_route(
-        r'%s/story/<story_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        r'%s/<topic_name>' % feconf.TOPIC_NAME_HANDLER,
+        topic_editor.TopicNameHandler),
+    get_redirect_route(
+        r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
+        topic_editor.TopicUrlFragmentHandler),
+    get_redirect_route(
+        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<story_id>'
-        r'/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
         story_viewer.StoryProgressHandler),
     get_redirect_route(
-        r'%s/<classroom_url_fragment>/<topic_url_fragment>/<subtopic_id>' %
-        feconf.SUBTOPIC_DATA_HANDLER,
+        r'%s/<classroom_url_fragment>/<topic_url_fragment>'
+        r'/<subtopic_url_fragment>' % feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
-        r'%s/revision/<subtopic_id>' %
+        r'%s/revision/<subtopic_url_fragment>' %
         feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,

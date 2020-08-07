@@ -73,6 +73,16 @@ describe('Create New Story Modal Controller', function() {
     expect($scope.storyUrlFragmentExists).toBeTrue();
   });
 
+  it('should not call changeStoryWithUrlFragmentExists for empty url fragment',
+    function() {
+      spyOn(StoryEditorStateService, 'changeStoryWithUrlFragmentExists');
+      $scope.story.urlFragment = '';
+      $scope.onStoryUrlFragmentChange();
+      expect(
+        StoryEditorStateService.changeStoryWithUrlFragmentExists
+      ).not.toHaveBeenCalled();
+    });
+
   it('should check if the story is valid', function() {
     expect($scope.isValid()).toBe(false);
 

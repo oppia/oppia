@@ -112,6 +112,8 @@ describe('Topic editor tab directive', function() {
     story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
     story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
+    topic.setName('New Name');
+    topic.setUrlFragment('topic-url-fragment');
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl.$onInit();
   }));
@@ -212,12 +214,24 @@ describe('Topic editor tab directive', function() {
 
   it('should call the TopicUpdateService if name is updated', function() {
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
-    $scope.updateTopicName('New Name');
+    spyOn(TopicEditorStateService, 'changeTopicWithNameExists').and.callFake(
+      (newName, successCallback) => successCallback());
+    $scope.updateTopicName('Different Name');
     expect(topicNameSpy).toHaveBeenCalled();
   });
 
+  it('should not call changeTopicWithNameExists if name is empty',
+    function() {
+      var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
+      spyOn(TopicEditorStateService, 'changeTopicWithNameExists');
+      $scope.updateTopicName('');
+      expect(topicNameSpy).toHaveBeenCalled();
+      expect(
+        TopicEditorStateService.changeTopicWithNameExists
+      ).not.toHaveBeenCalled();
+    });
+
   it('should not call the TopicUpdateService if name is same', function() {
-    $scope.updateTopicName('New Name');
     var topicNameSpy = spyOn(TopicUpdateService, 'setTopicName');
     $scope.updateTopicName('New Name');
     expect(topicNameSpy).not.toHaveBeenCalled();
@@ -225,10 +239,9 @@ describe('Topic editor tab directive', function() {
 
   it('should not call the TopicUpdateService if url fragment is same',
     function() {
-      $scope.updateTopicUrlFragment('topic');
       var topicUrlFragmentSpy = spyOn(
         TopicUpdateService, 'setTopicUrlFragment');
-      $scope.updateTopicUrlFragment('topic');
+      $scope.updateTopicUrlFragment('topic-url-fragment');
       expect(topicUrlFragmentSpy).not.toHaveBeenCalled();
     });
 
@@ -236,8 +249,23 @@ describe('Topic editor tab directive', function() {
     function() {
       var topicUrlFragmentSpy = spyOn(
         TopicUpdateService, 'setTopicUrlFragment');
+      spyOn(
+        TopicEditorStateService,
+        'changeTopicWithUrlFragmentExists').and.callFake(
+          (newUrlFragment, successCallback) => successCallback());
       $scope.updateTopicUrlFragment('topic');
       expect(topicUrlFragmentSpy).toHaveBeenCalled();
+    });
+
+  it('should not call changeTopicWithUrlFragmentExists for empty url fragment',
+    function() {
+      var topicUrlFragmentSpy = spyOn(TopicUpdateService, 'setTopicUrlFragment');
+      spyOn(TopicEditorStateService, 'changeTopicWithUrlFragmentExists');
+      $scope.updateTopicUrlFragment('');
+      expect(topicUrlFragmentSpy).toHaveBeenCalled();
+      expect(
+        TopicEditorStateService.changeTopicWithUrlFragmentExists
+      ).not.toHaveBeenCalled();
     });
 
   it('should call the TopicUpdateService if thumbnail is updated', function() {

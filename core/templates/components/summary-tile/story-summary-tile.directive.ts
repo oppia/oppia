@@ -46,7 +46,7 @@ angular.module('oppia').directive('storySummaryTile', [
               STORY_VIEWER_URL_TEMPLATE, {
                 topic_url_fragment: ctrl.getTopicUrlFragment(),
                 classroom_url_fragment: ctrl.getClassroomUrlFragment(),
-                story_id: ctrl.getStorySummary().getId()
+                story_url_fragment: ctrl.getStorySummary().getUrlFragment()
               });
           };
 

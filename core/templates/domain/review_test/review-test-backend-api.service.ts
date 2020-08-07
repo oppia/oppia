@@ -40,7 +40,7 @@ export class ReviewTestBackendApiService {
     private urlService: UrlService
   ) {}
 
-  _fetchReviewTestData(storyId: string): Promise<ReviewTest> {
+  _fetchReviewTestData(storyUrlFragment: string): Promise<ReviewTest> {
     return this.http.get<ReviewTestBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
@@ -49,7 +49,7 @@ export class ReviewTestBackendApiService {
             this.urlService.getTopicUrlFragmentFromLearnerUrl()),
           classroom_url_fragment: (
             this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
-          story_id: storyId
+          story_url_fragment: storyUrlFragment
         }
       )
     ).toPromise().then(backendResponse => {
@@ -60,8 +60,8 @@ export class ReviewTestBackendApiService {
     });
   }
 
-  fetchReviewTestData(storyId: string): Promise<ReviewTest> {
-    return this._fetchReviewTestData(storyId);
+  fetchReviewTestData(storyUrlFragment: string): Promise<ReviewTest> {
+    return this._fetchReviewTestData(storyUrlFragment);
   }
 }
 

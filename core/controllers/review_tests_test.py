@@ -53,6 +53,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.node_id = 'node_1'
         self.node_id_2 = 'node_2'
         self.exp_id = 'exp_id'
+        self.story_url_fragment_1 = 'public-story-title'
+        self.story_url_fragment_2 = 'private-story-title'
 
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
         self.publish_exploration(self.owner_id, self.exp_id)
@@ -77,7 +79,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
         self.story = story_domain.Story.create_default_story(
             self.story_id_1, 'Public Story Title', 'Description', self.topic_id,
-            'public-story-title')
+            self.story_url_fragment_1)
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1)
         ]
@@ -87,7 +89,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
         self.story_2 = story_domain.Story.create_default_story(
             self.story_id_2, 'Private Story Title', 'Description',
-            self.topic_id, 'private-story-title')
+            self.topic_id, self.story_url_fragment_2)
         story_services.save_new_story(self.admin_id, self.story_2)
         self.save_new_topic(
             self.topic_id, 'user', name='Topic',
@@ -107,24 +109,28 @@ class ReviewTestsPageTests(BaseReviewTestsControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '/learn/staging/topic/review-test/%s' % self.story_id_1,
+                '/learn/staging/topic/review-test/%s'
+                % self.story_url_fragment_1,
                 expected_status_int=404)
 
     def test_any_user_can_access_review_tests_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '/learn/staging/topic/review-test/%s' % self.story_id_1)
+                '/learn/staging/topic/review-test/%s'
+                % self.story_url_fragment_1)
 
     def test_no_user_can_access_unpublished_story_review_sessions_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '/learn/staging/topic/review-test/%s' % self.story_id_2,
+                '/learn/staging/topic/review-test/%s'
+                % self.story_url_fragment_2,
                 expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '/learn/staging/topic/review-test/%s' % 'story_id_3',
+                '/learn/staging/topic/review-test/%s'
+                % 'non-existent-story-url-fragment',
                 expected_status_int=302)
 
 
@@ -135,7 +141,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             self.get_json(
                 '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    self.story_id_1),
+                    self.story_url_fragment_1),
                 expected_status_int=404)
 
     def test_any_user_can_access_review_tests_data(self):
@@ -145,7 +151,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             json_response = self.get_json(
                 '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    self.story_id_1))
+                    self.story_url_fragment_1))
             self.assertEqual(len(json_response['skill_descriptions']), 2)
             self.assertEqual(
                 json_response['skill_descriptions']['skill_id_1'],
@@ -158,7 +164,8 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/staging/topic/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_2),
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                    self.story_url_fragment_2),
                 expected_status_int=404)
 
     def test_get_fails_when_acquired_skills_dont_exist(self):
@@ -195,7 +202,8 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 self.viewer_id, self.story_id_3, node_id)
             self.get_json(
                 '%s/staging/topic/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_3),
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                    'non-existent-story-url-fragment'),
                 expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
@@ -203,7 +211,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             self.get_json(
                 '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    'story_id_3'),
+                    'non-existent-story-url-fragment'),
                 expected_status_int=404)
 
     def test_get_fails_when_no_completed_story_node(self):
@@ -211,5 +219,5 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             self.get_json(
                 '%s/staging/topic/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    self.story_id_1),
+                    self.story_url_fragment_1),
                 expected_status_int=404)

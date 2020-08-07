@@ -5233,9 +5233,16 @@ export = {
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
+
+  // This represents the maximum number of characters in the URL fragment for
+  // classroom in the classroom page URL. E.g. in /learn/math/...,
+  // 'math' is the 'classroom URL fragment'.
   "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 20,
+  // This represents the maximum number of characters in the URL fragment for
+  // topic in the topic page URL. E.g. in /learn/math/fractions/...,
+  // 'fractions' is the 'topic URL fragment'.
   "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,

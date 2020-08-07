@@ -63,9 +63,9 @@
                 </i>
               </span>
             </form>
-            <span class="form-text error-msg" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
-              <em>The subtopic url fragment is not unique.</em>
-            </span>
+            <div class="oppia-input-box-subtitle text-danger" ng-if="$ctrl.editableUrlFragment && $ctrl.subtopicUrlFragmentExists">
+              <i>The subtopic url fragment is not unique.</i>
+            </div>
           </div>
           <div class="subtopic-html">
             <div  ng-click="$ctrl.showSchemaEditor()" class="protractor-test-edit-html-content">

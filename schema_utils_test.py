@@ -26,6 +26,7 @@ from core.domain import email_manager
 from core.tests import test_utils
 import python_utils
 import schema_utils
+import logging
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
@@ -186,12 +187,11 @@ VALIDATOR_SPECS = {
         'is_valid_numeric_expression': {},
         'is_valid_math_equation': {},
         'is_supported_audio_language_code': {},
-        'is_url_fragment': {
-            'type': SCHEMA_TYPE_UNICODE,
-            'validators': [{
-                'id': 'has_length_at_most',
-                'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
-            }]
+        'is_url_fragment': {},
+        'has_length_at_most': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT
+            }
         }
     },
 }
@@ -218,6 +218,8 @@ def _validate_validator(obj_type, validator):
 
     customization_keys = list(validator.keys())
     customization_keys.remove('id')
+    logging.error(set(customization_keys))
+    logging.error(reference_dict[validator['id']])
     assert (
         set(customization_keys) ==
         set(reference_dict[validator['id']].keys())), (
@@ -349,6 +351,7 @@ def validate_schema(schema):
             # TODO(sll): Check the arguments too.
 
     if SCHEMA_KEY_VALIDATORS in schema:
+        logging.error(schema)
         assert isinstance(schema[SCHEMA_KEY_VALIDATORS], list), (
             'Expected list, got %s' % schema[SCHEMA_KEY_VALIDATORS])
         for validator in schema[SCHEMA_KEY_VALIDATORS]:

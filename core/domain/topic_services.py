@@ -160,8 +160,13 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
             represent change commands made to the given topic.
     """
     topic.validate()
-    does_topic_with_name_exist(topic.name)
-    does_topic_with_url_fragment_exist(topic.url_fragment)
+    if does_topic_with_name_exist(topic.name):
+        raise utils.ValidationError(
+            'Topic with name \'%s\' already exists' % topic_name)
+    if does_topic_with_url_fragment_exist(topic.url_fragment):
+        raise utils.ValidationError(
+            'Topic with URL Fragment \'%s\' already exists'
+            % topic.url_fragment)
     create_new_topic_rights(topic.id, committer_id)
     model = topic_models.TopicModel(
         id=topic.id,
@@ -197,15 +202,16 @@ def does_topic_with_name_exist(topic_name):
     Args:
         topic_name: str. The topic name.
 
+    Returns:
+        bool. Whether the the topic name exists.
+
     Raises:
-        Exception. Topic with same name already exists.
+        Exception. Topic name is not a string.
     """
     if not isinstance(topic_name, python_utils.BASESTRING):
         raise utils.ValidationError('Name should be a string.')
     existing_topic = topic_fetchers.get_topic_by_name(topic_name)
-    if existing_topic is not None:
-        raise utils.ValidationError(
-            'Topic with name \'%s\' already exists' % topic_name)
+    return existing_topic is not None
 
 
 def does_topic_with_url_fragment_exist(url_fragment):
@@ -214,17 +220,17 @@ def does_topic_with_url_fragment_exist(url_fragment):
     Args:
         url_fragment: str. The url fragment for the topic.
 
+    Returns:
+        bool. Whether the the url fragment for the topic exists.
+
     Raises:
-        Exception. Topic with the same url fragment already exists.
+        Exception. Topic URL fragment is not a string.
     """
     if not isinstance(url_fragment, python_utils.BASESTRING):
-        raise utils.ValidationError('Topic URL Fragment should be a string.')
+        raise utils.ValidationError('Topic URL fragment should be a string.')
     existing_topic = (
         topic_fetchers.get_topic_by_url_fragment(url_fragment))
-    if existing_topic is not None:
-        raise utils.ValidationError(
-            'Topic with URL Fragment \'%s\' already exists'
-            % url_fragment)
+    return existing_topic is not None
 
 
 def save_new_topic(committer_id, topic):
@@ -346,14 +352,12 @@ def apply_change_list(topic_id, change_list):
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
-                    does_topic_with_name_exist(change.new_value)
                     topic.update_name(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
                     topic.update_abbreviated_name(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_URL_FRAGMENT):
-                    does_topic_with_url_fragment_exist(change.new_value)
                     topic.update_url_fragment(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
@@ -457,10 +461,6 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
-    if not topic.are_subtopic_url_fragments_unique():
-        raise Exception(
-            'Subtopic url fragments are not unique across '
-            'subtopics in the topic')
 
     # Topic model cannot be None as topic is passed as parameter here and that
     # is only possible if a topic model with that topic id exists. Also this is
@@ -529,6 +529,18 @@ def update_topic_and_subtopic_pages(
         deleted_subtopic_ids, newly_created_subtopic_ids,
         updated_subtopic_pages_change_cmds_dict
     ) = apply_change_list(topic_id, change_list)
+
+    if (
+            old_topic.url_fragment != updated_topic.url_fragment and
+            does_topic_with_url_fragment_exist(updated_topic.url_fragment)):
+        raise utils.ValidationError(
+            'Topic with URL Fragment \'%s\' already exists'
+            % updated_topic.url_fragment)
+    if (
+            old_topic.name != updated_topic.name and
+            does_topic_with_name_exist(updated_topic.name)):
+        raise utils.ValidationError(
+            'Topic with name \'%s\' already exists' % topic_name)
 
     _save_topic(
         committer_id, updated_topic, commit_message, change_list

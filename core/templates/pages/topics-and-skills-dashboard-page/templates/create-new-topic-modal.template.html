@@ -8,20 +8,40 @@
   <div class="modal-body create-new-topic-form">
     <div class="create-new-topic-input-field" ng-class="{'has-error': !isTopicNameValid()}">
       <div><span class="create-new-topic-input-label">Name</span></div>
-      <input class="protractor-test-new-topic-name-field" ng-model="newlyCreatedTopic.name" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" autofocus>
+      <input class="protractor-test-new-topic-name-field"
+             ng-model="newlyCreatedTopic.name"
+             maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>"
+             ng-class="{'is-invalid': topicNameExists}"
+             ng-change="onTopicNameChange()" autofocus>
       <div class="oppia-input-box-subtitle">
         <i>
           Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
         </i>
       </div>
+      <div ng-if="topicNameExists" class="oppia-input-box-subtitle text-danger">
+        <i>
+          A topic with this name already exists.
+        </i>
+      </div>
     </div>
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Topic URL Fragment</span></div>
-      <input class="protractor-test-new-topic-url-fragment-field" ng-model="newlyCreatedTopic.urlFragment" maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>">
-      <div class="oppia-input-box-subtitle">
-        <i>
-          The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]> characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
-        </i>
+      <input class="protractor-test-new-topic-url-fragment-field"
+             ng-model="newlyCreatedTopic.urlFragment"
+             maxlength="<[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]>"
+             ng-class="{'is-invalid': topicUrlFragmentExists}"
+             ng-change="onTopicUrlFragmentChange()">
+      <div>
+        <span class="oppia-input-box-subtitle">
+          <i>
+            The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_TOPIC_URL_FRAGMENT]> characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+          </i>
+        </span>
+        <div ng-if="topicUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
+          <i>
+            This topic URL fragment already exists.
+          </i>
+        </div>
       </div>
     </div>
     <div class="create-new-topic-input-field">

@@ -535,7 +535,7 @@ angular.module('oppia').directive('conversationSkin', [
                     .parentExplorationIds);
 
                 var collectionIdToAdd = $scope.collectionId;
-                var storyIdToAdd = null;
+                var storyUrlFragmentToAdd = null;
                 var storyNodeIdToAdd = null;
                 var topicUrlFragment = null;
                 var classroomName = null;
@@ -547,20 +547,21 @@ angular.module('oppia').directive('conversationSkin', [
                 } else if (
                   UrlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
                     $scope.recommendedExplorationSummaries[0].nextNodeId) {
-                  storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
+                  storyUrlFragmentToAdd = (
+                    UrlService.getStoryUrlFragmentFromLearnerUrl());
                   storyNodeIdToAdd = $scope.storyNodeIdToAdd;
                   topicUrlFragment = (
                     UrlService.getTopicUrlFragmentFromLearnerUrl());
                   classroomName = (
                     UrlService.getClassroomUrlFragmentFromLearnerUrl());
                 } else if (
-                  urlParams.hasOwnProperty('story_id') &&
+                  urlParams.hasOwnProperty('story_url_fragment') &&
                     urlParams.hasOwnProperty('node_id') &&
                     urlParams.hasOwnProperty('topic_url_fragment') &&
                     urlParams.hasOwnProperty('classroom_name')) {
                   topicUrlFragment = urlParams.topic_url_fragment;
                   classroomName = urlParams.classroom_name;
-                  storyIdToAdd = urlParams.story_id;
+                  storyUrlFragmentToAdd = urlParams.story_url_fragment;
                   storyNodeIdToAdd = (
                     $scope.recommendedExplorationSummaries[0].des);
                 }
@@ -575,13 +576,13 @@ angular.module('oppia').directive('conversationSkin', [
                       result, 'parent', parentExplorationIds[i]);
                   }
                 }
-                if (storyIdToAdd && $scope.storyNodeIdToAdd) {
+                if (storyUrlFragmentToAdd && $scope.storyNodeIdToAdd) {
                   result = UrlService.addField(
                     result, 'topic_url_fragment', topicUrlFragment);
                   result = UrlService.addField(
                     result, 'classroom_name', classroomName);
                   result = UrlService.addField(
-                    result, 'story_id', storyIdToAdd);
+                    result, 'story_url_fragment', storyUrlFragmentToAdd);
                   result = UrlService.addField(
                     result, 'node_id', $scope.storyNodeIdToAdd);
                 }
@@ -748,17 +749,19 @@ angular.module('oppia').directive('conversationSkin', [
                   UrlService.getUrlParams().topic_url_fragment);
                 var classroomUrlFragment = (
                   UrlService.getUrlParams().classroom_url_fragment);
-                var storyId = UrlService.getUrlParams().story_id;
+                var storyUrlFragment = (
+                  UrlService.getUrlParams().story_url_fragment);
                 var nodeId = UrlService.getUrlParams().node_id;
                 $scope.inStoryMode = true;
                 $scope.storyViewerUrl = UrlInterpolationService.interpolateUrl(
                   STORY_VIEWER_URL_TEMPLATE, {
                     topic_url_fragment: topicUrlFragment,
                     classroom_url_fragment: classroomUrlFragment,
-                    story_id: storyId
+                    story_url_fragment: storyUrlFragment
                   });
                 StoryViewerBackendApiService.fetchStoryData(
-                  topicUrlFragment, classroomUrlFragment, storyId).then(
+                  topicUrlFragment, classroomUrlFragment,
+                  storyUrlFragment).then(
                   function(res) {
                     var nextStoryNode = [];
                     for (var i = 0; i < res.nodes.length; i++) {
@@ -777,7 +780,8 @@ angular.module('oppia').directive('conversationSkin', [
                     $rootScope.$apply();
                   });
                 StoryViewerBackendApiService.recordChapterCompletion(
-                  topicUrlFragment, classroomUrlFragment, storyId, nodeId
+                  topicUrlFragment, classroomUrlFragment,
+                  storyUrlFragment, nodeId
                 ).then(function(returnObject) {
                   if (returnObject.readyForReviewTest) {
                     $window.location =
@@ -785,7 +789,7 @@ angular.module('oppia').directive('conversationSkin', [
                         REVIEW_TESTS_URL_TEMPLATE, {
                           topic_url_fragment: topicUrlFragment,
                           classroom_url_fragment: classroomUrlFragment,
-                          story_id: storyId
+                          story_url_fragment: storyUrlFragment
                         });
                   }
                   // TODO(#8521): Remove the use of $rootScope.$apply()

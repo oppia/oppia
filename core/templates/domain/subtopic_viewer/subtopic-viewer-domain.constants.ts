@@ -19,7 +19,7 @@
 export class SubtopicViewerDomainConstants {
   public static SUBTOPIC_DATA_URL_TEMPLATE = (
     '/subtopic_data_handler/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/<subtopic_id>');
+    '<topic_url_fragment>/<subtopic_url_fragment>');
   public static TOPIC_VIEWER_URL_TEMPLATE = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>');
 }

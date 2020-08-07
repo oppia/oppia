@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -608,8 +607,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_lenghty_url_fragment(self):
         self.topic.url_fragment = 'a' * 25
-        url_fragment_char_limit = (
-            android_validation_constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
         validation_message = (
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (
@@ -1250,8 +1248,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_lenghty_url_fragment(self):
         self.topic_summary.url_fragment = 'a' * 25
-        url_fragment_char_limit = (
-            android_validation_constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
         validation_message = (
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (

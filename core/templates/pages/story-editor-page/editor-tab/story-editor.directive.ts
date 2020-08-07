@@ -246,13 +246,18 @@ angular.module('oppia').directive('storyEditor', [
               $scope.storyUrlFragmentExists = false;
               return;
             }
-            StoryEditorStateService.changeStoryWithUrlFragmentExists(
-              newUrlFragment, function() {
-                $scope.storyUrlFragmentExists = (
-                  StoryEditorStateService.getStoryWithUrlFragmentExists());
-                StoryUpdateService.setStoryUrlFragment(
-                  $scope.story, newUrlFragment);
-              });
+            if (newUrlFragment) {
+              StoryEditorStateService.changeStoryWithUrlFragmentExists(
+                newUrlFragment, function() {
+                  $scope.storyUrlFragmentExists = (
+                    StoryEditorStateService.getStoryWithUrlFragmentExists());
+                  StoryUpdateService.setStoryUrlFragment(
+                    $scope.story, newUrlFragment);
+                });
+            } else {
+              StoryUpdateService.setStoryUrlFragment(
+                $scope.story, newUrlFragment);
+            }
           };
 
           $scope.updateStoryThumbnailFilename = function(

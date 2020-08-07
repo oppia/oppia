@@ -63,7 +63,7 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        '$rootScope' ,'$scope', '$uibModal', 'AlertsService', 'ContextService',
         'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
         'PageTitleService', 'SkillCreationService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
@@ -73,7 +73,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, AlertsService, ContextService,
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
             CsrfTokenService, EntityCreationService, ImageUploadHelperService,
             PageTitleService, SkillCreationService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
@@ -99,6 +99,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+            $scope.topicNameExists = false;
+            $scope.topicUrlFragmentExists = false;
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -212,18 +214,42 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.updateTopicName = function(newName) {
             if (newName === $scope.topic.getName()) {
+              $scope.topicNameExists = false;
               return;
             }
-            TopicUpdateService.setTopicName($scope.topic, newName);
-            $scope.topicNameEditorIsShown = false;
+            if (newName) {
+              TopicEditorStateService.changeTopicWithNameExists(
+                newName, function() {
+                  $scope.topicNameExists = (
+                    TopicEditorStateService.getTopicWithNameExists());
+                  TopicUpdateService.setTopicName($scope.topic, newName);
+                  $scope.topicNameEditorIsShown = false;
+                  $rootScope.$applyAsync();
+                });
+            } else {
+              TopicUpdateService.setTopicName($scope.topic, newName);
+              $scope.topicNameEditorIsShown = false;
+            }
           };
 
           $scope.updateTopicUrlFragment = function(newTopicUrlFragment) {
             if (newTopicUrlFragment === $scope.topic.getUrlFragment()) {
+              $scope.topicUrlFragmentExists = false;
               return;
             }
-            TopicUpdateService.setTopicUrlFragment(
-              $scope.topic, newTopicUrlFragment);
+            if (newTopicUrlFragment) {
+              TopicEditorStateService.changeTopicWithUrlFragmentExists(
+                newTopicUrlFragment, function() {
+                  $scope.topicUrlFragmentExists = (
+                    TopicEditorStateService.getTopicWithUrlFragmentExists());
+                  TopicUpdateService.setTopicUrlFragment(
+                    $scope.topic, newTopicUrlFragment);
+                  $rootScope.$applyAsync();
+                });
+            } else {
+              TopicUpdateService.setTopicUrlFragment(
+                $scope.topic, newTopicUrlFragment);
+            }
           };
 
           $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {

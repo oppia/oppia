@@ -501,6 +501,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'test_svg.svg',
             'thumbnailBgColor': '#C6DCDA',
+            'url_fragment': 'name-one'
         }
 
         with python_utils.open_file(
@@ -537,6 +538,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Topic description',
             'filename': 'cafe.flac',
             'thumbnailBgColor': '#C6DCDA',
+            'url_fragment': 'name-three'
         }
 
         with python_utils.open_file(

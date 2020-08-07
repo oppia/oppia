@@ -411,3 +411,39 @@ class TopicPublishHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(e)
 
         self.render_json(self.values)
+
+
+class TopicUrlFragmentHandler(base.BaseHandler):
+    """A data handler for checking if a topic with given url fragment exists.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, topic_url_fragment):
+        """Handler that receives a topic url fragment and checks whether
+        a topic with the same url fragment exists.
+        """
+        self.values.update({
+            'topic_url_fragment_exists': (
+                topic_services.does_topic_with_url_fragment_exist(
+                    topic_url_fragment))
+        })
+        self.render_json(self.values)
+
+
+class TopicNameHandler(base.BaseHandler):
+    """A data handler for checking if a topic with given name exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, topic_name):
+        """Handler that receives a topic name and checks whether
+        a topic with the same name exists.
+        """
+        self.values.update({
+            'topic_name_exists': (
+                topic_services.does_topic_with_name_exist(topic_name))
+        })
+        self.render_json(self.values)

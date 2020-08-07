@@ -601,7 +601,7 @@ class Topic(python_utils.OBJECT):
         """
         utils.require_valid_url_fragment(
             url_fragment, 'Topic URL Fragment',
-            android_validation_constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
+            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -849,6 +849,10 @@ class Topic(python_utils.OBJECT):
         """
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
+        if not self.are_subtopic_url_fragments_unique():
+            raise utils.ValidationError(
+                'Subtopic url fragments are not unique across '
+                'subtopics in the topic')
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
@@ -1543,7 +1547,7 @@ class TopicSummary(python_utils.OBJECT):
         """
         utils.require_valid_url_fragment(
             url_fragment, 'Topic URL Fragment',
-            android_validation_constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
+            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT)
 
     def validate(self):
         """Validates all properties of this topic summary.
