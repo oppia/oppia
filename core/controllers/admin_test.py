@@ -276,7 +276,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     skill_summaries[0].id, skill_summaries[1].id,
                     skill_summaries[2].id], '')
         )
-        self.assertEqual(len(questions), 5)
+        self.assertEqual(len(questions), 3)
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations
@@ -932,7 +932,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, user_id, name='Name',
-            abbreviated_name='name', url_fragment='name',
+            abbreviated_name='abbrev', url_fragment='url-fragment',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

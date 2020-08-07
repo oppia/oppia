@@ -167,6 +167,7 @@ class TopicModel(base_models.VersionedModel):
             TopicModel|None. The topic model of the topic or None if not
             found.
         """
+        # TODO(#10210): Make fetching by URL fragment faster.
         return TopicModel.query().filter(
             cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
@@ -241,6 +242,7 @@ class TopicSummaryModel(base_models.BaseModel):
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
     # The url fragment of the topic.
+    # TODO(#10140): TopicSummary url_fragment should be a required field.
     url_fragment = ndb.StringProperty(indexed=True)
 
     # Time when the topic model was last updated (not to be

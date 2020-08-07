@@ -21,7 +21,9 @@ export = {
   // in the URL for topics that are not yet attached to a classroom.
   "DUMMY_CLASSROOM_URL_FRAGMENT": "staging",
 
-  "DEFAULT_CLASSROOM": "math",
+  // The default classroom URL fragment to use when the provided classroom URL
+  // fragment in the controller is invalid.
+  "DEFAULT_CLASSROOM_NAME": "math",
 
   "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
     "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
@@ -5239,7 +5241,7 @@ export = {
   // 'math' is the 'classroom URL fragment'.
   "MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_NAME": 39,
-  "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 20,
+  "MAX_CHARS_IN_ABBREV_TOPIC_NAME": 12,
   // This represents the maximum number of characters in the URL fragment for
   // topic in the topic page URL. E.g. in /learn/math/fractions/...,
   // 'fractions' is the 'topic URL fragment'.

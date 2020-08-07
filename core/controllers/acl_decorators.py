@@ -46,7 +46,7 @@ current_user_services = models.Registry.import_current_user_services()
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-def redirect_based_on_return_type(
+def _redirect_based_on_return_type(
         handler, redirection_url, expected_return_type):
     """Redirects to the provided URL if the handler type is not JSON.
 
@@ -117,9 +117,10 @@ def does_classroom_exist(handler):
             classroom_url_fragment)
 
         if not classroom:
-            redirect_based_on_return_type(
-                self, '/learn/%s' % constants.DEFAULT_CLASSROOM,
+            _redirect_based_on_return_type(
+                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_NAME,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True
@@ -2379,7 +2380,7 @@ def can_access_topic_viewer_page(handler):
             topic_url_fragment)
 
         if topic is None:
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return
@@ -2389,7 +2390,7 @@ def can_access_topic_viewer_page(handler):
                 topic.id))
         if classroom_url_fragment != verified_classroom_url_fragment:
             url_substring = topic_url_fragment
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self, '/learn/%s/%s' % (
                     verified_classroom_url_fragment,
                     url_substring),
@@ -2446,7 +2447,7 @@ def can_access_story_viewer_page(handler):
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
 
         if story is None:
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self,
                 '/learn/%s/%s/story' %
                 (classroom_url_fragment, topic_url_fragment),
@@ -2461,7 +2462,7 @@ def can_access_story_viewer_page(handler):
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
             if topic.url_fragment != topic_url_fragment:
-                redirect_based_on_return_type(
+                _redirect_based_on_return_type(
                     self,
                     '/learn/%s/%s/story/%s' % (
                         classroom_url_fragment,
@@ -2476,7 +2477,7 @@ def can_access_story_viewer_page(handler):
             if classroom_url_fragment != verified_classroom_url_fragment:
                 url_substring = '%s/story/%s' % (
                     topic_url_fragment, story_url_fragment)
-                redirect_based_on_return_type(
+                _redirect_based_on_return_type(
                     self, '/learn/%s/%s' % (
                         verified_classroom_url_fragment,
                         url_substring),
@@ -2534,7 +2535,7 @@ def can_access_subtopic_viewer_page(handler):
         subtopic_id = None
 
         if topic is None:
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return
@@ -2546,7 +2547,7 @@ def can_access_subtopic_viewer_page(handler):
                 (topic_rights is None or not topic_rights.topic_is_published)
                 and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
                 user_actions_info.actions):
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return
@@ -2556,7 +2557,7 @@ def can_access_subtopic_viewer_page(handler):
                 subtopic_id = subtopic.id
 
         if not subtopic_id:
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self,
                 '/learn/%s/%s/revision' %
                 (classroom_url_fragment, topic_url_fragment),
@@ -2569,7 +2570,7 @@ def can_access_subtopic_viewer_page(handler):
         if classroom_url_fragment != verified_classroom_url_fragment:
             url_substring = '%s/revision/%s' % (
                 topic_url_fragment, subtopic_url_fragment)
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self, '/learn/%s/%s' % (
                     verified_classroom_url_fragment,
                     url_substring),
@@ -2579,7 +2580,7 @@ def can_access_subtopic_viewer_page(handler):
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic.id, subtopic_id, strict=False)
         if subtopic_page is None:
-            redirect_based_on_return_type(
+            _redirect_based_on_return_type(
                 self,
                 '/learn/%s/%s/revision' % (
                     classroom_url_fragment, topic_url_fragment),

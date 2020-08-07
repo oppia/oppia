@@ -52,15 +52,45 @@ describe('IsUrlFragment Filter', function() {
   it('should fail when there are special characters other than hyphen',
     angular.mock.inject(function($filter) {
       var filter = $filter(filterName);
-      expect(filter('special%$^chars', args)).toBe(false);
-      expect(filter('abc*()_+', args)).toBe(false);
+      expect(filter('special~chars', args)).toBe(false);
+      expect(filter('special`chars', args)).toBe(false);
+      expect(filter('special!chars', args)).toBe(false);
+      expect(filter('special@chars', args)).toBe(false);
+      expect(filter('special#chars', args)).toBe(false);
+      expect(filter('special$chars', args)).toBe(false);
+      expect(filter('special%chars', args)).toBe(false);
+      expect(filter('special^chars', args)).toBe(false);
+      expect(filter('special&chars', args)).toBe(false);
+      expect(filter('special*chars', args)).toBe(false);
+      expect(filter('special(chars', args)).toBe(false);
+      expect(filter('special)chars', args)).toBe(false);
+      expect(filter('special-chars', args)).toBe(false);
+      expect(filter('special_chars', args)).toBe(false);
+      expect(filter('special+chars', args)).toBe(false);
+      expect(filter('special=chars', args)).toBe(false);
+      expect(filter('special{chars', args)).toBe(false);
+      expect(filter('special}chars', args)).toBe(false);
+      expect(filter('special[chars', args)).toBe(false);
+      expect(filter('special]chars', args)).toBe(false);
+      expect(filter('special:chars', args)).toBe(false);
+      expect(filter('special;chars', args)).toBe(false);
+      expect(filter('special"chars', args)).toBe(false);
+      expect(filter('special\'chars', args)).toBe(false);
+      expect(filter('special|chars', args)).toBe(false);
+      expect(filter('special<chars', args)).toBe(false);
+      expect(filter('special,chars', args)).toBe(false);
+      expect(filter('special>chars', args)).toBe(false);
+      expect(filter('special.chars', args)).toBe(false);
+      expect(filter('special?chars', args)).toBe(false);
+      expect(filter('special/chars', args)).toBe(false);
+      expect(filter('special\chars', args)).toBe(false);
     }));
 
   it('should fail when there are spaces',
     angular.mock.inject(function($filter) {
       var filter = $filter(filterName);
       expect(filter('url with spaces', args)).toBe(false);
-      expect(filter(' tailing space ', args)).toBe(false);
+      expect(filter(' trailing space ', args)).toBe(false);
     }));
 
   it('should fail when the length of the input is greater than the char limit',

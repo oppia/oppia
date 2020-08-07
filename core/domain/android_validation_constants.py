@@ -36,7 +36,7 @@ VALID_RTE_COMPONENTS = ['image', 'link', 'skillreview']
 # If any of the following values are changed, edit the corresponding value in
 # app.constants.ts as well.
 MAX_CHARS_IN_TOPIC_NAME = 39
-MAX_CHARS_IN_ABBREV_TOPIC_NAME = 20
+MAX_CHARS_IN_ABBREV_TOPIC_NAME = 12
 MAX_CHARS_IN_TOPIC_DESCRIPTION = 240
 MAX_CHARS_IN_SUBTOPIC_TITLE = 64
 MAX_CHARS_IN_SKILL_DESCRIPTION = 100
