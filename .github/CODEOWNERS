@@ -353,9 +353,9 @@
 
 # Readme
 /core/README.md @ankita240796
+/core/templates/css/README.md @srijanreddy98 @bansalnitish
 /extensions/README.md @ankita240796
 /scripts/README.md @ankita240796
-/core/templates/css/README.md @srijanreddy98 @bansalnitish
 
 # Skill project.
 /core/controllers/concept_card_viewer*.py @aks681
