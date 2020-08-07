@@ -419,4 +419,11 @@ MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
     INT_SCHEMA,
     'The maximum number of Math SVGs that can be send in a batch of math rich '
     'text svgs.',
-    20)
+    25)
+
+MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
+    'max_number_of_explorations_in_math_svgs_batch',
+    INT_SCHEMA,
+    'The maximum number of explorations that can be send in a batch of math '
+    'rich text svgs.',
+    2)

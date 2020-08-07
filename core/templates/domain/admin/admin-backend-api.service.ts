@@ -161,7 +161,7 @@ export class AdminBackendApiService {
     }
     body.append(
       'payload', JSON.stringify({latexMapping: latexToSvgMapping}));
-    return this.http.post('/adminmathsvghandler', body).toPromise();
+    return this.http.post('/explorationslatexsvghandler', body).toPromise();
   }
 
   // TODO(#10045): Remove this function once all the math-rich text
