@@ -1,4 +1,5 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" ng-if="!isLoadingSkill()">
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" id="skill-editor-navbar-desktop"
+    ng-if="!isLoadingSkill()">
   <li style="margin-right: 5px; margin-top: 8px;">
     <div uib-dropdown>
       <button class="btn btn-light  oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
@@ -33,34 +34,143 @@
       </ul>
     </div>
   </li>
-  <li style="width: 40px;"
-      ng-class="{'uib-dropdown': getWarningsCount(), 'active': getActiveTabName() === 'main'}"
-      ng-attr-uib-dropdown="<[getWarningsCount()]>"
-      ng-click="selectMainTab()"
-      class="nav-item">
-    <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link protractor-test-main-tab">
-      <i class="material-icons">&#xE254;</i>
-    </a>
-    <div ng-show="getWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
-      <span class="oppia-editor-warnings-count">
-        <[getWarningsCount()]>
-      </span>
-    </div>
-    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
-      <span class="oppia-editor-warnings-header">Warnings</span>
-      <li class="oppia-editor-warnings-text"
-          ng-repeat="issue in validationIssues track by $index">
-        <hr class="oppia-editor-warnings-separator">
-        <[issue]>
-      </li>
-    </ul>
-  </li>
-  <li class="nav-item icon protractor-test-questions-tab"
-      ng-class="{'active': getActiveTabName() === 'questions'}"
-      ng-click="selectQuestionsTab()">
-    <a uib-tooltip="Questions" tooltip-placement="bottom" class="nav-link">
-      <i class="material-icons">library_books</i>
-    </a>
-  </li>
 </ul>
+
+<div class="skill-editor-nav-mobile">
+  <div class="skill-nav-mobile">
+    <div class="skill-navbar-mobile-tabs">
+      <div class="skill-nav-dropdown-container">
+        <div class="skill-nav-skill-nav-dropdown-options" ng-if="showNavigationOptions">
+          <div class="skill-nav-dropdown-option" ng-click="selectMainTab()">
+            <i class="material-icons">&#xE254;</i><span>Editor</span>
+          </div>
+          <div class="skill-nav-dropdown-option" ng-click="selectQuestionsTab()">
+            <i class="material-icons">&#xE254;</i><span>Questions</span>
+          </div>
+          <div class="skill-nav-dropdown-option" ng-click="selectPreviewTab()">
+            <i class="material-icons">&#xE037;</i><span>Preview</span>
+          </div>
+        </div>
+        <div class="skill-nav-dropdown-content">
+          <div class="skill-nav-dropdown-text" ng-click="toggleWarningText()">
+            <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
+            <span><[activeTab]></span>
+          </div>
+          <div class="skill-nav-dropdown-icon" ng-click="toggleNavigationOptions()">
+            <i class="fa fa-caret-down"></i>
+          </div>
+        </div>
+      </div>
+      <div class="skill-nav-dropdown-container save-options-dropdown">
+        <div class="skill-nav-skill-nav-dropdown-options" ng-if="showSkillEditOptions">
+          <div class="skill-nav-dropdown-option" ng-click="saveChanges()">
+            <i class="material-icons">&#xE254;</i>
+            <span>Save Changes</span>
+          </div>
+        </div>
+        <div class="skill-nav-dropdown-content right-container">
+          <div class="skill-nav-dropdown-text" ng-click="discardChanges()">
+            Discard Changes
+            <span ng-if="getChangeListCount() > 0">
+              (<[getChangeListCount()]>)
+            </span>
+          </div>
+          <div class="skill-nav-dropdown-icon" ng-click="toggleSkillEditOptions()">
+            <i class="fa fa-caret-down"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+  skill-editor-navbar .skill-editor-nav-mobile {
+    display: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-editor-navbar #skill-editor-navbar-desktop {
+      display: none;
+    }
+    skill-editor-navbar .skill-editor-nav-mobile {
+      display: block;
+    }
+    skill-editor-navbar .skill-editor-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    skill-editor-navbar .discard-changes-btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+    }
+    skill-editor-navbar .discard-changes-btn {
+      background-color: #008098;
+      color: #FFFFFF;
+      font-weight: bold;
+      width: 100%;
+    }
+    skill-editor-navbar .publish-skill-btn {
+      background-color: #FFFFFF;
+      border: 2px solid #008098;
+      color: #008098;
+      font-weight: bold;
+    }
+    .skill-navbar-mobile-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      padding: 10px 0;
+    }
+    .skill-nav-dropdown-container {
+      position: relative;
+      text-align: left;
+      width: 45%;
+    }
+     .skill-nav-skill-nav-dropdown-options {
+      background-color: #FFF;
+      border: 1px solid #000;
+      bottom: 100%;
+      position: absolute;
+      width: 100%;
+    }
+     .skill-nav-dropdown-content {
+      background-color: #FFF;
+      border: 1.5px solid #6d6969;
+      border-radius: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+     .right-container {
+      background-color: #419889;
+      color: #FFF;
+    }
+
+     .skill-nav-dropdown-option {
+      padding: 5px 0;
+    }
+     .skill-nav-dropdown-icon {
+      align-items: center;
+      background-color: #e6e6e6;
+      border-left: 1.5px solid #6d6969;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      width: 20%;
+    }
+     .skill-nav-dropdown-text {
+      padding: 5px 10px;
+    }
+     .save-options-dropdown {
+      width: 52%;
+    }
+  }
+</style>

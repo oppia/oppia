@@ -122,7 +122,7 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
 
     Returns:
         list(str). State names which don't have classifier model for previous
-            version of exploration.
+        version of exploration.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
@@ -186,7 +186,7 @@ def convert_strings_to_float_numbers_in_classifier_data(
 
     Returns:
         dict|list|string|int|float. Original classifier data dict with
-            float values converted back from string to float.
+        float values converted back from string to float.
     """
     if isinstance(classifier_data_with_floats_stringified, dict):
         classifier_data = {}
@@ -227,7 +227,7 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
 
     Returns:
         classifier_training_job: ClassifierTrainingJob. Domain object for the
-            classifier training job.
+        classifier training job.
     """
     classifier_data = fs_services.read_classifier_data(
         classifier_training_job_model.exp_id, classifier_training_job_model.id)
@@ -253,10 +253,10 @@ def get_classifier_training_job_by_id(job_id):
 
     Returns:
         classifier_training_job: ClassifierTrainingJob. Domain object for the
-            classifier training job.
+        classifier training job.
 
     Raises:
-        Exception: Entity for class ClassifierTrainingJobModel with id not
+        Exception. Entity for class ClassifierTrainingJobModel with id not
             found.
     """
     classifier_training_job_model = (
@@ -270,7 +270,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_ids: list(str). list of ID of the ClassifierTrainingJob domain
+        job_ids: list(str). List of ID of the ClassifierTrainingJob domain
             objects.
         status: str. The status to which the job needs to be updated.
 
@@ -312,7 +312,7 @@ def mark_training_jobs_failed(job_ids):
     """Updates the training job's status to failed.
 
     Args:
-        job_ids: list(str). list of ID of the ClassifierTrainingJobs.
+        job_ids: list(str). List of ID of the ClassifierTrainingJobs.
     """
     _update_classifier_training_jobs_status(
         job_ids, feconf.TRAINING_JOB_STATUS_FAILED)
@@ -434,7 +434,7 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
 
     Returns:
         list(ClassifierTrainingJob). Domain objects for the Classifier training
-            job model.
+        job model.
     """
     training_job_exploration_mapping_models = (
         classifier_models.TrainingJobExplorationMappingModel.get_models(

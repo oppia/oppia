@@ -26,7 +26,13 @@
             <img ng-if="$ctrl.profilePictureDataUrl"
                  ng-src="<[$ctrl.profilePictureDataUrl]>"
                  class="img-thumbnail protractor-test-custom-photo">
-            <img ng-if="!$ctrl.profilePictureDataUrl" ng-src="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
+            <picture ng-if="!$ctrl.profilePictureDataUrl">
+              <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.webp')]>">
+              <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>">
+              <img ng-src="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>"
+                   class="img-thumbnail"
+                   alt="Empty profile picture">
+            </picture>
           </div>
         </div>
       </div>
@@ -223,6 +229,25 @@
       </div>
     </div>
 
+    <hr ng-if="$ctrl.userCanExportAccount">
+
+    <div ng-if="$ctrl.userCanExportAccount" role="form" class="form-group row">
+      <label class="col-lg-2 col-md-2 col-sm-2">Export Account</label>
+      <div class="col-lg-10 col-md-10 col-sm-10" ng-if="!$ctrl.exportingData">
+        <a href="/export-account-handler">
+          <button type="button" class="btn btn-primary" title="Export account" ng-click="$ctrl.handleExportDataClick()">
+            Export account
+          </button>
+        </a>
+        <span class="form-text" style="font-size: smaller">This will download your Oppia account data as a JSON formatted text file.</span>
+      </div>
+      <div class="col-lg-10 col-md-10 col-sm-10" ng-if="$ctrl.exportingData">
+        <span class="form-text" style="font-size: smaller">Please do not leave this page. Your data is currently being loaded and will be downloaded as a
+            JSON formatted text file upon completion. If something goes wrong, please contact <a href="mailto:support@oppia.org">support@oppia.org</a>.
+        </span>
+      </div>
+    </div>
+
   </md-card>
 </div>
 <style>
@@ -233,8 +258,8 @@
     color: #01645c;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 3em;
-    margin-top: 0;
     margin-bottom: 10px;
+    margin-top: 0;
     padding-top: 45px;
     position: relative;
     text-align: center;
@@ -249,7 +274,7 @@
   }
 
   .oppia-bio-border {
-    border-width: 0.01em;
     border-color: rgb(156,156,156);
+    border-width: 0.01em;
   }
 </style>

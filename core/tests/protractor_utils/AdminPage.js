@@ -17,6 +17,7 @@
  * tests.
  */
 
+var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
@@ -34,7 +35,7 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
-  // Viewing roles can be done by two methods: 1. By roles 2. By username
+  // Viewing roles can be done by two methods: 1. By roles 2. By username.
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
   var roleUsernameOption = element(by.css(
@@ -45,6 +46,24 @@ var AdminPage = function() {
     '.protractor-test-unfinished-one-off-jobs-rows'));
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
+
+  // Adding a new community reviewer.
+  var addReviewerName = element(by.css(
+    '.protractor-test-add-reviewer-username'));
+  var selectReviewerRole = element(by.css(
+    '.protractor-test-select-reviewer-role'));
+  var addReviewerFormSubmitButton = element(by.css(
+    '.protractor-test-add-reviewer-form-submit-button'));
+
+  // Viewing community reviewers by role.
+  var reviewerMethodDropdown = element(by.css(
+    '.protractor-test-reviewer-role-method'));
+  var reviewerRoleValueOption = element(by.css(
+    '.protractor-test-reviewer-role-value'));
+  var viewReviewerRoleButton = element(by.css(
+    '.protractor-test-view-reviewer-role-button'));
+  var reviewerUsernamesResult = element(by.css(
+    '.protractor-test-reviewer-roles-result'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -94,7 +113,7 @@ var AdminPage = function() {
         var title = await getExplorationTitleElement(explorationElement)
           .getText();
 
-        // We use match here in case there is whitespace around the name
+        // We use match here in case there is whitespace around the name.
         if (title.match(name)) {
           await getExplorationElementReloadButton(explorationElement).click();
           await general.acceptAlert();
@@ -140,10 +159,14 @@ var AdminPage = function() {
     await this.get();
     await configTab.click();
     await waitFor.elementToBeClickable(saveAllConfigs);
-    var results = await configProperties.map(async function(x) {
-      return await saveConfigProperty(
-        x, propertyName, objectType, editingInstructions);
-    });
+
+    const results = [];
+    for (let configProperty of (await configProperties)) {
+      results.push(
+        await saveConfigProperty(
+          configProperty, propertyName, objectType, editingInstructions)
+      );
+    }
     var success = null;
     for (var i = 0; i < results.length; i++) {
       success = success || results[i];
@@ -267,6 +290,38 @@ var AdminPage = function() {
       var name = foundUsersArray[j];
       expect(name).toEqual(expectedUsernamesArray[j]);
     }
+  };
+
+  this.addReviewer = async function(name, newRole) {
+    await action.click('Admin Roles Tab', adminRolesTab);
+    // Change values for "add reviewer for community" form, and submit it.
+    await action.sendKeys('Add reviewer name', addReviewerName, name);
+    await action.sendKeys('Select reviewer role', selectReviewerRole, newRole);
+    await action.click('Add Reviewer button', addReviewerFormSubmitButton);
+    await waitFor.visibilityOf(
+      statusMessage, 'Confirmation message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, 'Successfully added ',
+      'Could not add reviewer successfully');
+  };
+
+  this.showReviewersAssignedToRole = async function(role) {
+    await action.sendKeys(
+      'Reviewer method dropdown', reviewerMethodDropdown, 'By Role');
+    await action.sendKeys(
+      'Reviewer role dropdown', reviewerRoleValueOption, role);
+    await action.click('View reviewer role button', viewReviewerRoleButton);
+  };
+
+  this.expectReviewerUsernamesStrToMatch = async function(
+      expectedUsernamesArrayStr) {
+    // The reviewer usernames that are shown after a user views reviewers by
+    // role in the 'view community reviewers' section. The result is displayed
+    // as a 'Usernames: ["username1", "username2"]' string.
+    await waitFor.visibilityOf(
+      reviewerUsernamesResult, 'Reviewer usernames result not visible.');
+    var reviewerUsernamesArrayStr = await reviewerUsernamesResult.getText();
+    expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
   };
 };
 

@@ -21,30 +21,31 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ITranslationBackendDict,
+  TranslationBackendDict,
   WrittenTranslation,
-  WrittenTranslationObjectFactory
+  WrittenTranslationObjectFactory,
+  WRITTEN_TRANSLATION_TYPE_HTML
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 
-interface IWrittenTranslationsBackendDict {
+export interface WrittenTranslationsBackendDict {
   'translations_mapping': {
     [contentId: string]: {
-      [langCode: string]: ITranslationBackendDict
+      [langCode: string]: TranslationBackendDict
     }
   }
 }
 
-interface IWrittenTranslationsMapping {
+interface WrittenTranslationsMapping {
   [contentId: string]: {
     [langCode: string]: WrittenTranslation
   }
 }
 
 export class WrittenTranslations {
-  translationsMapping: IWrittenTranslationsMapping;
+  translationsMapping: WrittenTranslationsMapping;
   _writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
   constructor(
-      translationsMapping: IWrittenTranslationsMapping,
+      translationsMapping: WrittenTranslationsMapping,
       writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {
     this.translationsMapping = translationsMapping;
     this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
@@ -108,8 +109,8 @@ export class WrittenTranslations {
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
-    writtenTranslations[languageCode] = (
-      this._writtenTranslationObjectFactory.createNew(html));
+    writtenTranslations[languageCode] = this._writtenTranslationObjectFactory
+      .createNew(WRITTEN_TRANSLATION_TYPE_HTML, html);
   }
 
   updateWrittenTranslationHtml(
@@ -118,7 +119,7 @@ export class WrittenTranslations {
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Unable to find the given language code.');
     }
-    writtenTranslations[languageCode].setHtml(html);
+    writtenTranslations[languageCode].translation = html;
     // Marking translation updated.
     writtenTranslations[languageCode].needsUpdate = false;
   }
@@ -128,7 +129,7 @@ export class WrittenTranslations {
     writtenTranslations[languageCode].toggleNeedsUpdateAttribute();
   }
 
-  toBackendDict(): IWrittenTranslationsBackendDict {
+  toBackendDict(): WrittenTranslationsBackendDict {
     var translationsMappingDict = {};
     for (var contentId in this.translationsMapping) {
       var languageToWrittenTranslation = this.translationsMapping[contentId];
@@ -152,7 +153,7 @@ export class WrittenTranslationsObjectFactory {
     private writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {}
 
   createFromBackendDict(
-      writtenTranslationsDict: IWrittenTranslationsBackendDict):
+      writtenTranslationsDict: WrittenTranslationsBackendDict):
       WrittenTranslations {
     var translationsMapping = {};
     Object.keys(writtenTranslationsDict.translations_mapping).forEach(

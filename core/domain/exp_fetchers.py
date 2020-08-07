@@ -59,7 +59,7 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
         exploration_id: str. ID of the exploration.
 
     Raises:
-        Exception: The given states_schema_version is invalid.
+        Exception. The given states_schema_version is invalid.
     """
     states_schema_version = versioned_exploration_states[
         'states_schema_version']
@@ -161,8 +161,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
             states_schema_version if necessary.
 
     Returns:
-       Exploration. The exploration domain object corresponding to the given
-       exploration model.
+        Exploration. The exploration domain object corresponding to the given
+        exploration model.
     """
 
     # Ensure the original exploration model does not get altered.
@@ -346,8 +346,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         objects. Any invalid exploration ids are omitted.
 
     Raises:
-        ValueError: When strict is True and at least one of the given exp_ids
-        is invalid.
+        ValueError. When strict is True and at least one of the given exp_ids
+            is invalid.
     """
     exp_ids = set(exp_ids)
     result = {}
@@ -371,8 +371,9 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             exploration = get_exploration_from_model(model)
             db_results_dict[eid] = exploration
         else:
-            logging.info('Tried to fetch exploration with id %s, but no such '
-                         'exploration exists in the datastore' % eid)
+            logging.info(
+                'Tried to fetch exploration with id %s, but no such '
+                'exploration exists in the datastore' % eid)
             not_found.append(eid)
 
     if strict and not_found:

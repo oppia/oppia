@@ -289,7 +289,7 @@ def _handle_exp_issues_after_state_rename(
             renamed versions. This mapping contains state names only if it is
             actually renamed.
         playthrough_ids_by_state_name: dict. The dict mapping old state names to
-            their new ones
+            their new ones.
 
     Returns:
         ExplorationIssue. The exploration issue domain object.
@@ -299,7 +299,7 @@ def _handle_exp_issues_after_state_rename(
 
     old_state_name = state_name
     new_state_name = old_to_new_state_names[old_state_name]
-    if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+    if stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
             exp_issue.issue_type] == 'state_names':
         state_names = exp_issue.issue_customization_args['state_names'][
             'value']
@@ -350,7 +350,8 @@ def update_exp_issues_for_new_exp_version(
     playthrough_ids_by_state_name = collections.defaultdict(list)
 
     for i_idx, exp_issue in enumerate(exp_issues.unresolved_issues):
-        keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
+        keyname = stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+            exp_issue.issue_type]
         if keyname == 'state_names':
             state_names = exp_issue.issue_customization_args[keyname]['value']
             for state_name in state_names:
@@ -394,7 +395,7 @@ def update_exp_issues_for_new_exp_version(
 
         playthroughs = get_playthroughs_multi(playthrough_ids)
         for p_idx, playthrough in enumerate(playthroughs):
-            if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+            if stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
                     playthrough.issue_type] == 'state_names':
                 state_names = playthrough.issue_customization_args[
                     'state_names']['value']
@@ -430,8 +431,8 @@ def get_exp_issues(exp_id, exp_version):
         exp_version: int. Version of the exploration.
 
     Returns:
-        ExplorationIssues|None: The domain object for exploration issues or
-            None if the exp_id is invalid.
+        ExplorationIssues|None. The domain object for exploration issues or
+        None if the exp_id is invalid.
     """
     exp_issues = None
     exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
@@ -448,8 +449,8 @@ def get_playthrough_by_id(playthrough_id):
         playthrough_id: str. ID of the playthrough.
 
     Returns:
-        Playthrough|None: The domain object for the playthrough or None if the
-            playthrough_id is invalid.
+        Playthrough|None. The domain object for the playthrough or None if the
+        playthrough_id is invalid.
     """
     playthrough = None
     playthrough_model = stats_models.PlaythroughModel.get(
@@ -507,7 +508,7 @@ def get_exploration_stats_by_id(exp_id, exp_version):
         ExplorationStats. The domain object for exploration statistics.
 
     Raises:
-        Exception: Entity for class ExplorationStatsModel with id not found.
+        Exception. Entity for class ExplorationStatsModel with id not found.
     """
     exploration_stats = None
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
@@ -528,7 +529,7 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
 
     Returns:
         list(ExplorationStats|None). List of ExplorationStats domain class
-            instances.
+        instances.
     """
     exploration_stats = []
     exploration_stats_models = (
@@ -782,9 +783,11 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         - 'options': dict. The visualization options.
 
         An example of the returned value may be:
-        [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
-        'id': 'BarChart',
-        'data': [{u'frequency': 1, u'answer': 0}]}]
+        [{
+            'options': {'header': 'Pretty Tiles!', 'use_percentages': True},
+            'id': 'SortedTiles',
+            'data': [{'frequency': 1, 'answer': 0}]
+        }]
     """
     if interaction_id is None:
         return []
@@ -994,7 +997,7 @@ def get_top_state_answer_stats_multi(exploration_id, state_names):
 
     Returns:
         dict(str: list(*)). Dict mapping each state name to the list of its top
-            (at most) 10 answers, sorted by decreasing frequency.
+        (at most) 10 answers, sorted by decreasing frequency.
     """
     return {
         state_name: get_top_state_answer_stats(exploration_id, state_name)
@@ -1016,7 +1019,7 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
 
     Returns:
         StateAnswersCalcOutput|None. The state answers calculation output
-            domain object or None.
+        domain object or None.
     """
     calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
         exploration_id, VERSION_ALL, state_name, calculation_id)
@@ -1084,8 +1087,8 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
             answer details model loaded from the datastore.
 
     Returns:
-        LearnerAnswerDetails. A LearnerAnswerDetails domain object
-            corresponding to the given model.
+        LearnerAnswerDetails|None. A LearnerAnswerDetails domain object
+        corresponding to the given model.
     """
     return stats_domain.LearnerAnswerDetails(
         learner_answer_details_model.state_reference,
@@ -1114,7 +1117,7 @@ def get_learner_answer_details(entity_type, state_reference):
 
     Returns:
         LearnerAnswerDetails. The learner answer domain object
-            or None if the model does not exist.
+        or None if the model does not exist.
     """
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
@@ -1176,7 +1179,7 @@ def save_learner_answer_details(
                  in learner_answer_details.learner_answer_info_list])
             learner_answer_details_model.learner_answer_info_schema_version = (
                 learner_answer_details.learner_answer_info_schema_version)
-            learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( #pylint: disable=line-too-long
+            learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( # pylint: disable=line-too-long
                 learner_answer_details.accumulated_answer_info_json_size_bytes)
             learner_answer_details_model.put()
         else:
@@ -1283,7 +1286,8 @@ def delete_learner_answer_details_for_exploration_state(
         state_name: str. The name of the state.
     """
     state_reference = (
-        stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+        stats_models.LearnerAnswerDetailsModel.
+        get_state_reference_for_exploration(
             exp_id, state_name))
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(

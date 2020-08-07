@@ -92,12 +92,12 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/concept-card/concept-card.directive.ts');
-require('components/skill-mastery/skill-mastery.directive.ts');
+require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -117,6 +117,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
+require(
+  'pages/exploration-player-page/services/exploration-player-state.service.ts');
+
+import { Subscription } from 'rxjs';
 
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -138,7 +142,7 @@ angular.module('oppia').directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$uibModal', '$window',
-        'AlertsService', 'HtmlEscaperService',
+        'AlertsService', 'ExplorationPlayerStateService', 'HtmlEscaperService',
         'QuestionBackendApiService', 'SkillMasteryBackendApiService',
         'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
@@ -149,7 +153,7 @@ angular.module('oppia').directive('questionPlayer', [
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $uibModal, $window,
-            AlertsService, HtmlEscaperService,
+            AlertsService, ExplorationPlayerStateService, HtmlEscaperService,
             QuestionBackendApiService, SkillMasteryBackendApiService,
             UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
@@ -157,6 +161,7 @@ angular.module('oppia').directive('questionPlayer', [
             VIEW_HINT_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var initResults = function() {
             $scope.resultsLoaded = false;
             ctrl.currentQuestion = 0;
@@ -189,8 +194,15 @@ angular.module('oppia').directive('questionPlayer', [
           ctrl.getActionButtonIconHtml = function(actionButtonType) {
             var iconHtml = '';
             if (actionButtonType === 'BOOST_SCORE') {
-              iconHtml = '<img class="action-button-icon" src="' +
-              getStaticImageUrl('/icons/rocket@2x.png') + '"/>';
+              iconHtml = `<picture>
+              <source type="image/webp" 
+              srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
+              <source type="image/png" 
+              srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
+              <img alt=""
+                   class="action-button-icon" 
+                   src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
+              </picture>`;
             } else if (actionButtonType === 'RETRY_SESSION') {
               iconHtml = '<i class="material-icons md-36 ' +
               'action-button-icon">&#xE5D5</i>';
@@ -363,14 +375,14 @@ angular.module('oppia').directive('questionPlayer', [
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {
-                // If questionScore goes negative, set it to 0
+                // If questionScore goes negative, set it to 0.
                 questionScore = Math.max(
                   0, questionScore - totalHintsPenalty - wrongAnswerPenalty);
               }
-              // Calculate total score
+              // Calculate total score.
               ctrl.totalScore += questionScore;
 
-              // Calculate scores per skill
+              // Calculate scores per skill.
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }
@@ -530,9 +542,13 @@ angular.module('oppia').directive('questionPlayer', [
               updateCurrentQuestion(result + 1);
             });
 
-            $rootScope.$on('totalQuestionsReceived', function(event, result) {
-              updateTotalQuestions(result);
-            });
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+                (result) => {
+                  updateTotalQuestions(result);
+                }
+              )
+            );
 
             $rootScope.$on('questionSessionCompleted', function(event, result) {
               $location.hash(HASH_PARAM +
@@ -566,6 +582,10 @@ angular.module('oppia').directive('questionPlayer', [
             // called in $scope.$on when some external events are triggered.
             initResults();
             ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

@@ -142,6 +142,23 @@ describe('Url Service', () => {
     }).toThrowError('Invalid URL for topic');
   });
 
+  it('should correctly retrieve selected subtopics from url', () => {
+    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
+    expect(
+      urlService.getSelectedSubtopicsFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topic/abcdefgijklm';
+    expect(function() {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
+    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
+    expect(function() {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
+  });
+
   it('should correctly retrieve classroom name from url', () => {
     mockLocation.pathname = '/abcdefgijklm';
     expect(

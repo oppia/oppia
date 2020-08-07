@@ -40,6 +40,9 @@ require(
   'state-interaction-id.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('services/alerts.service.ts');
@@ -53,6 +56,7 @@ angular.module('oppia').directive('stateHintsEditor', [
       restrict: 'E',
       scope: {
         onSaveHints: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
@@ -62,23 +66,16 @@ angular.module('oppia').directive('stateHintsEditor', [
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'AlertsService',
         'EditabilityService', 'StateEditorService', 'StateHintsService',
-        'StateInteractionIdService', 'StateSolutionService',
+        'StateInteractionIdService', 'StateNextContentIdIndexService',
+        'StateSolutionService',
         'UrlInterpolationService', 'INTERACTION_SPECS',
         function(
             $scope, $rootScope, $uibModal, $filter, AlertsService,
             EditabilityService, StateEditorService, StateHintsService,
-            StateInteractionIdService, StateSolutionService,
+            StateInteractionIdService, StateNextContentIdIndexService,
+            StateSolutionService,
             UrlInterpolationService, INTERACTION_SPECS) {
           var ctrl = this;
-          var _getExistingHintsContentIds = function() {
-            var existingContentIds = [];
-            StateHintsService.displayed.forEach(function(hint) {
-              var contentId = hint.hintContent.getContentId();
-              existingContentIds.push(contentId);
-            });
-            return existingContentIds;
-          };
-
           $scope.getHintButtonText = function() {
             var hintButtonText = '+ Add Hint';
             if ($scope.StateHintsService.displayed) {
@@ -129,7 +126,6 @@ angular.module('oppia').directive('stateHintsEditor', [
             if ($scope.StateHintsService.displayed.length === 5) {
               return;
             }
-            var existingHintsContentIds = _getExistingHintsContentIds();
             AlertsService.clearWarnings();
             $rootScope.$broadcast('externalSave');
 
@@ -138,14 +134,15 @@ angular.module('oppia').directive('stateHintsEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
-              resolve: {
-                existingHintsContentIds: () => existingHintsContentIds
-              },
+              resolve: {},
               controller: 'AddHintModalController'
             }).result.then(function(result) {
               StateHintsService.displayed.push(result.hint);
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
+              StateNextContentIdIndexService.saveDisplayedValue();
+              $scope.onSaveNextContentIdIndex(
+                StateNextContentIdIndexService.displayed);
             }, function() {
               AlertsService.clearWarnings();
             });
@@ -213,14 +210,15 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
             $scope.StateHintsService = StateHintsService;
             StateHintsService.setActiveHintIndex(null);
             $scope.canEdit = EditabilityService.isEditable();
-
-            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
+            $scope.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
             // the helper. This is a bug in jQueryUI that has not been fixed

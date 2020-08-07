@@ -44,8 +44,8 @@ def _get_skip_files_list():
         list. The list of files which are to be skipped.
 
     Raises:
-        yaml.YAMLError if failed to parse app_dev.yaml.
-        IOError if failed to open app_dev.yaml in read mode.
+        yaml.YAMLError. If failed to parse app_dev.yaml.
+        IOError. If failed to open app_dev.yaml in read mode.
     """
     try:
         with python_utils.open_file('./app_dev.yaml', 'r') as app_dev_yaml:
@@ -70,9 +70,9 @@ def _check_size_in_dir(dir_path, skip_files_list):
     directory.
 
     Args:
-         dir_path: str. The directory which files will be counted.
-         skip_files_list: list. The list of files which are to be skipped
-         from the file count.
+        dir_path: str. The directory which files will be counted.
+        skip_files_list: list. The list of files which are to be skipped
+            from the file count.
 
     Returns:
         int. The number of files inside the given directory.

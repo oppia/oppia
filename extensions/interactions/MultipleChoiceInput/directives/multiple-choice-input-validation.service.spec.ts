@@ -18,12 +18,19 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { MultipleChoiceInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 /* eslint-disable max-len */
 import { MultipleChoiceInputValidationService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 /* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
@@ -32,14 +39,12 @@ describe('MultipleChoiceInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
   let currentState: string;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
-  // to be researched thoroughly.
-  let badOutcome: Outcome, goodAnswerGroups: any,
+  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
   let validatorService: MultipleChoiceInputValidationService,
-    customizationArguments: any;
-  let oof: OutcomeObjectFactory;
+    customizationArguments: MultipleChoiceInputCustomizationArgs;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,13 +54,15 @@ describe('MultipleChoiceInputValidationService', () => {
     validatorService = TestBed.get(MultipleChoiceInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
 
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -67,7 +74,7 @@ describe('MultipleChoiceInputValidationService', () => {
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -77,24 +84,28 @@ describe('MultipleChoiceInputValidationService', () => {
 
     customizationArguments = {
       choices: {
-        value: ['Option 1', 'Option 2']
+        value: [
+          new SubtitledHtml('Option 1', ''),
+          new SubtitledHtml('Option 2', '')
+        ]
       }
     };
 
-    goodAnswerGroups = [{
-      rules: [{
-        type: 'Equals',
+    goodAnswerGroups = [agof.createNew(
+      [{
+        rule_type: 'Equals',
         inputs: {
           x: 0
         }
       }, {
-        type: 'Equals',
+        rule_type: 'Equals',
         inputs: {
           x: 1
         }
-      }],
-      outcome: goodDefaultOutcome
-    }];
+      }].map(rof.createFromBackendDict),
+      goodDefaultOutcome,
+      null,
+      null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -113,7 +124,7 @@ describe('MultipleChoiceInputValidationService', () => {
   });
 
   it('should expect non-empty and unique choices', () => {
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0].setHtml('');
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -122,7 +133,7 @@ describe('MultipleChoiceInputValidationService', () => {
       message: 'Please ensure the choices are nonempty.'
     }]);
 
-    customizationArguments.choices.value[0] = 'Option 2';
+    customizationArguments.choices.value[0].setHtml('Option 2');
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

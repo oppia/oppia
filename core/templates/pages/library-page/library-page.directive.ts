@@ -15,10 +15,11 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
+import 'mousetrap';
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'loading-dots.directive.ts');
+  'loading-dots.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.directive.ts');
@@ -73,7 +74,7 @@ angular.module('oppia').directive('libraryPage', [
           // If the value below is changed, the following CSS values in
           // oppia.css must be changed:
           // - .oppia-exp-summary-tiles-container: max-width
-          // - .oppia-library-carousel: max-width
+          // - .oppia-library-carousel: max-width.
           var MAX_NUM_TILES_PER_ROW = 4;
           var isAnyCarouselCurrentlyScrolling = false;
 
@@ -111,7 +112,7 @@ angular.module('oppia').directive('libraryPage', [
             for (var i = 0; i < ctrl.libraryGroups.length; i++) {
               var carouselJQuerySelector = (
                 '.oppia-library-carousel-tiles:eq(n)'.replace(
-                  'n', <string><any>i));
+                  'n', String(i)));
               var carouselScrollPositionPx = $(
                 carouselJQuerySelector).scrollLeft();
               var index = Math.ceil(
@@ -193,6 +194,25 @@ angular.module('oppia').directive('libraryPage', [
             }
           };
 
+          var bindLibraryPageShortcuts = function() {
+            Mousetrap.bind('/', function() {
+              var searchBar = <HTMLElement>document.querySelector(
+                '.protractor-test-search-input');
+              searchBar.focus();
+              return false;
+            });
+
+            Mousetrap.bind('c', function() {
+              document.getElementById('categoryBar').focus();
+              return false;
+            });
+
+            Mousetrap.bind('s', function() {
+              document.getElementById('skipToMainContentId').focus();
+              return false;
+            });
+          };
+
           // The following loads explorations belonging to a particular group.
           // If fullResultsUrl is given it loads the page corresponding to
           // the url. Otherwise, it will initiate a search query for the
@@ -233,7 +253,7 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
             ctrl.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
-            var title = 'Exploration Library - Oppia';
+            var title = 'Community Library Lessons | Oppia';
             if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP ||
                 ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
               title = 'Find explorations to learn from - Oppia';
@@ -330,6 +350,7 @@ angular.module('oppia').directive('libraryPage', [
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
                 $timeout(initCarousels, 390);
+                bindLibraryPageShortcuts();
 
 
                 // Check if actual and expected widths are the same.
@@ -345,7 +366,7 @@ angular.module('oppia').directive('libraryPage', [
                 }, 3000);
                 // The following initializes the tracker to have all
                 // elements flush left.
-                // Transforms the group names into translation ids
+                // Transforms the group names into translation ids.
                 ctrl.leftmostCardIndices = [];
                 for (var i = 0; i < ctrl.libraryGroups.length; i++) {
                   ctrl.leftmostCardIndices.push(0);
@@ -368,11 +389,17 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              ctrl.libraryWindowIsNarrow = (
-                WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-              $scope.$applyAsync();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                ctrl.libraryWindowIsNarrow = (
+                  WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+                $scope.$applyAsync();
+              });
+          };
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]

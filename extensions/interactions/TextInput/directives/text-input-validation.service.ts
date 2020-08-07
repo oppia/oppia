@@ -19,12 +19,20 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { TextInputCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
-interface IWarning {
+interface Warning {
   type: string,
   message: string
 }
@@ -34,15 +42,19 @@ interface IWarning {
 })
 export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
-  // TODO(#7165): Replace 'any' with the exact type.
-  getCustomizationArgsWarnings(customizationArgs: any): Array<IWarning> {
+  getCustomizationArgsWarnings(
+      customizationArgs: TextInputCustomizationArgs): Warning[] {
     var warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
       ['placeholder', 'rows']);
 
     var placeholder = customizationArgs.placeholder.value;
-    if (!angular.isString(placeholder)) {
+
+    if (
+      !(placeholder instanceof SubtitledUnicode) ||
+      !angular.isString(placeholder.getUnicode())
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
@@ -78,10 +90,11 @@ export class TextInputValidationService {
     }
     return warningsList;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
+
   getAllWarnings(
-      stateName: any, customizationArgs: any, answerGroups: any,
-      defaultOutcome: any): Array<IWarning> {
+      stateName: string,
+      customizationArgs: TextInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.bivs.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));

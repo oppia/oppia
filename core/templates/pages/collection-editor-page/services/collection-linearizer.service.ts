@@ -137,7 +137,7 @@ angular.module('oppia').factory('CollectionLinearizerService', [
           return false;
         }
 
-        // Delete the node
+        // Delete the node.
         CollectionUpdateService.deleteCollectionNode(collection, explorationId);
         return true;
       },

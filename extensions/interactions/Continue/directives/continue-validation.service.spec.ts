@@ -24,9 +24,13 @@ import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { ContinueCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('ContinueValidationService', () => {
   let validatorService: ContinueValidationService;
@@ -34,7 +38,7 @@ describe('ContinueValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let customizationArguments: any;
+  let customizationArguments: ContinueCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
@@ -51,7 +55,7 @@ describe('ContinueValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -59,10 +63,10 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
     customizationArguments = {
       buttonText: {
-        value: 'Some Button Text'
+        value: new SubtitledUnicode('Some Button Text', 'ca_buttonText')
       }
     };
   });
@@ -73,7 +77,8 @@ describe('ContinueValidationService', () => {
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([]);
 
-      customizationArguments.buttonText.value = '';
+      customizationArguments.buttonText.value = (
+        new SubtitledUnicode('', 'ca_buttonText'));
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([{

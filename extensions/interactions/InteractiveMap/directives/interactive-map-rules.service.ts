@@ -19,6 +19,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { InteractiveMapAnswer } from 'interactions/answer-defs';
+import { InteractiveMapRuleInputs } from 'interactions/rule-input-defs';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,7 +40,7 @@ export class InteractiveMapRulesService {
     var longitudeDifference: number = (
       InteractiveMapRulesService.degreesToRadians(point2[1] - point1[1]));
 
-    // Use the haversine formula
+    // Use the haversine formula.
     var haversineOfCentralAngle: number = (
       Math.pow(Math.sin(latitudeDifference / 2), 2) +
       Math.cos(latitude1) * Math.cos(latitude2) *
@@ -47,12 +50,16 @@ export class InteractiveMapRulesService {
       2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
   }
 
-  Within(answer: number[], inputs: {p: number[], d: number}) {
+  Within(
+      answer: InteractiveMapAnswer,
+      inputs: InteractiveMapRuleInputs) {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(
       inputs.p, answer);
     return actualDistance <= inputs.d;
   }
-  NotWithin(answer: number[], inputs: {p: number[], d: number}) {
+  NotWithin(
+      answer: InteractiveMapAnswer,
+      inputs: InteractiveMapRuleInputs) {
     var actualDistance = InteractiveMapRulesService.getDistanceInKm(
       inputs.p, answer);
     return actualDistance > inputs.d;

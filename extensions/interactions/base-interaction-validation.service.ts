@@ -19,12 +19,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { AnswerGroup } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
 
-export interface IWarning {
+export interface Warning {
   type: string;
   message: string
 }
@@ -39,6 +41,7 @@ export class baseInteractionValidationService {
   requireCustomizationArguments(
       customizationArguments: {}, argNames: string[]): void {
     var missingArgs = [];
+
     for (var i = 0; i < argNames.length; i++) {
       if (!customizationArguments.hasOwnProperty(argNames[i])) {
         missingArgs.push(argNames[i]);
@@ -57,11 +60,8 @@ export class baseInteractionValidationService {
     }
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'answerGroups' is an answer group domain object and can be
-  // typed after AnswerGroupObjectFactory.ts is upgraded.
   getAnswerGroupWarnings(
-      answerGroups: any, stateName: string): IWarning[] {
+      answerGroups: AnswerGroup[], stateName: string): Warning[] {
     var partialWarningsList = [];
 
     // This does not check the default outcome.
@@ -88,7 +88,7 @@ export class baseInteractionValidationService {
   }
 
   getDefaultOutcomeWarnings(
-      defaultOutcome: Outcome, stateName: string): IWarning[] {
+      defaultOutcome: Outcome, stateName: string): Warning[] {
     var partialWarningsList = [];
     if (defaultOutcome && defaultOutcome.isConfusing(stateName)) {
       partialWarningsList.push({
@@ -110,11 +110,8 @@ export class baseInteractionValidationService {
     return partialWarningsList;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'answerGroups' is an answer group domain object and can be
-  // typed after AnswerGroupObjectFactory.ts is upgraded.
   getAllOutcomeWarnings(
-      answerGroups: any, defaultOutcome: Outcome, stateName: string) {
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome, stateName: string) {
     return (
       this.getAnswerGroupWarnings(answerGroups, stateName).concat(
         this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));

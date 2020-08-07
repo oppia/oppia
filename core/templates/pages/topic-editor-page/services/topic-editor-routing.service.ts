@@ -15,14 +15,22 @@
 /**
  * @fileoverview Service that handles routing for the topic editor page.
  */
+require('domain/utilities/url-interpolation.service.ts');
+require('services/page-title.service.ts');
+
 
 angular.module('oppia').factory('TopicEditorRoutingService', [
-  '$location', '$rootScope',
+  '$location', '$rootScope', '$window', 'PageTitleService',
+  'UrlInterpolationService',
   function(
-      $location, $rootScope) {
+      $location, $rootScope, $window, PageTitleService,
+      UrlInterpolationService) {
     var MAIN_TAB = 'main';
-    var SUBTOPICS_TAB = 'subtopics';
+    var SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
+    var SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
     var QUESTIONS_TAB = 'questions';
+    var lastTabVisited = 'main';
+    var lastSubtopicId = null;
 
     var activeTabName = MAIN_TAB;
 
@@ -42,10 +50,12 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
 
       if (newPath === '/') {
         activeTabName = MAIN_TAB;
-      } else if (newPath === '/subtopics') {
-        activeTabName = SUBTOPICS_TAB;
       } else if (newPath === '/questions') {
         activeTabName = QUESTIONS_TAB;
+      } else if (newPath.startsWith('/subtopic_editor')) {
+        activeTabName = SUBTOPIC_EDITOR_TAB;
+      } else if (newPath.startsWith('/subtopic_preview')) {
+        activeTabName = SUBTOPIC_PREVIEW_TAB;
       }
     });
 
@@ -53,14 +63,43 @@ angular.module('oppia').factory('TopicEditorRoutingService', [
       getActiveTabName: function() {
         return activeTabName;
       },
+      getLastTabVisited: function() {
+        return lastTabVisited;
+      },
+      getLastSubtopicIdVisited: function() {
+        return lastSubtopicId;
+      },
       navigateToMainTab: function() {
+        lastTabVisited = 'topic';
+        PageTitleService.setPageTitleForMobileView('Topic Editor');
         $location.path('');
       },
-      navigateToSubtopicsTab: function() {
-        $location.path('/subtopics');
+      navigateToSubtopicPreviewTab: function(subtopicId) {
+        lastTabVisited = 'subtopic';
+        PageTitleService.setPageTitleForMobileView('Subtopic Preview');
+        $location.path('/subtopic_preview/' + subtopicId);
+      },
+      navigateToSubtopicEditorWithId: function(subtopicId) {
+        lastTabVisited = 'subtopic';
+        PageTitleService.setPageTitleForMobileView('Subtopic Editor');
+        $location.path('/subtopic_editor/' + subtopicId);
       },
       navigateToQuestionsTab: function() {
+        lastSubtopicId = this.getSubtopicIdFromUrl();
+        PageTitleService.setPageTitleForMobileView('Question Editor');
         $location.path('/questions');
+      },
+      getSubtopicIdFromUrl: function() {
+        return parseInt($location.path().split('/')[2]);
+      },
+      navigateToSkillEditorWithId: function(skillId) {
+        var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
+
+        var skillEditorUrl = UrlInterpolationService.interpolateUrl(
+          SKILL_EDITOR_URL_TEMPLATE, {
+            skill_id: skillId
+          });
+        $window.open(skillEditorUrl);
       }
     };
 

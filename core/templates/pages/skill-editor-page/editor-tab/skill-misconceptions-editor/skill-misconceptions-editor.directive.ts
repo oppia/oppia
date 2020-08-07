@@ -17,14 +17,17 @@
  */
 
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
   'components/state-directives/answer-group-editor/' +
   'summary-list-header.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
   'misconception-editor.directive.ts');
+require(
+  'pages/skill-editor-page/modal-templates/' +
+  'add-misconception-modal.controller.ts');
+require(
+  'pages/skill-editor-page/modal-templates/' +
+  'delete-misconception-modal.controller.ts');
 
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
@@ -32,6 +35,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -46,13 +50,9 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'MisconceptionObjectFactory',
-        'MAX_CHARS_IN_MISCONCEPTION_NAME',
+        '$scope', '$filter', '$uibModal', 'WindowDimensionsService',
         function(
-            $scope, $filter, $uibModal, $rootScope,
-            MisconceptionObjectFactory,
-            MAX_CHARS_IN_MISCONCEPTION_NAME) {
+            $scope, $filter, $uibModal, WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.isEditable = function() {
@@ -77,22 +77,10 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                 '/pages/skill-editor-page/modal-templates/' +
                 'delete-misconception-modal.directive.html'),
               backdrop: 'static',
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.skill = SkillEditorStateService.getSkill();
-
-                  $scope.confirm = function() {
-                    $uibModalInstance.close({
-                      id: $scope.skill.getMisconceptionAtIndex(index).getId()
-                    });
-                  };
-                }]
+              resolve: {
+                index: () => index
+              },
+              controller: 'DeleteMisconceptionModalController'
             }).result.then(function(result) {
               SkillUpdateService.deleteMisconception($scope.skill, result.id);
               $scope.misconceptions = $scope.skill.getMisconceptions();
@@ -110,52 +98,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                 '/pages/skill-editor-page/modal-templates/' +
                 'add-misconception-modal.directive.html'),
               backdrop: 'static',
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                'MAX_CHARS_IN_MISCONCEPTION_NAME',
-                function(
-                    $controller, $scope, $uibModalInstance,
-                    MAX_CHARS_IN_MISCONCEPTION_NAME) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-                  $scope.skill = SkillEditorStateService.getSkill();
-                  $scope.MAX_CHARS_IN_MISCONCEPTION_NAME =
-                    MAX_CHARS_IN_MISCONCEPTION_NAME;
-                  $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      startupFocusEnabled: false
-                    }
-                  };
-
-                  $scope.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {
-                      hide_complex_extensions: true,
-                      startupFocusEnabled: false
-                    }
-                  };
-
-                  $scope.misconceptionName = '';
-                  $scope.misconceptionNotes = '';
-                  $scope.misconceptionFeedback = '';
-                  $scope.misconceptionMustBeAddressed = true;
-
-                  $scope.saveMisconception = function() {
-                    var newMisconceptionId =
-                      $scope.skill.getNextMisconceptionId();
-                    $uibModalInstance.close({
-                      misconception: MisconceptionObjectFactory.create(
-                        newMisconceptionId,
-                        $scope.misconceptionName,
-                        $scope.misconceptionNotes,
-                        $scope.misconceptionFeedback,
-                        $scope.misconceptionMustBeAddressed)
-                    });
-                  };
-                }]
+              controller: 'AddMisconceptionModalController'
             }).result.then(function(result) {
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
@@ -166,11 +109,19 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               // No further action is needed.
             });
           };
+
+          $scope.toggleMisconceptionLists = function() {
+            $scope.misconceptionsListIsShown = (
+              !$scope.misconceptionsListIsShown);
+          };
+
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
+            $scope.misconceptionsListIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.misconceptions = $scope.skill.getMisconceptions();
             ctrl.directiveSubscriptions.add(
-              SkillEditorStateService.getSkillChangedSubject().subscribe(
+              SkillEditorStateService.onSkillChange.subscribe(
                 () => $scope.misconceptions = $scope.skill.getMisconceptions())
             );
           };

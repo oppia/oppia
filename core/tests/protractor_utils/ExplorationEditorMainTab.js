@@ -23,6 +23,7 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 var waitFor = require('../protractor_utils/waitFor.js');
+var action = require('./action.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -87,10 +88,10 @@ var ExplorationEditorMainTab = function() {
   };
   var responseTab = element.all(by.css('.protractor-test-response-tab'));
   var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
-  var stateEditContent = element(
-    by.css('.protractor-test-edit-content'));
   var stateContentDisplay = element(
     by.css('.protractor-test-state-content-display'));
+  var stateEditButton = element(
+    by.css('.protractor-test-edit-content-pencil-button'));
   var stateNameContainer = element(
     by.css('.protractor-test-state-name-container'));
   var stateNameInput = element(
@@ -160,7 +161,7 @@ var ExplorationEditorMainTab = function() {
    * Actions
    */
 
-  // TUTORIAL
+  // ---- TUTORIAL ----
 
   this.exitTutorial = async function() {
     // If the editor welcome modal shows up, exit it.
@@ -209,7 +210,7 @@ var ExplorationEditorMainTab = function() {
       'Save',
     ];
     for (const heading of tutorialTabHeadings) {
-    // await tutorialTabHeadings.forEach(async function(heading) {
+    // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
         '.popover-title', heading));
       await waitFor.visibilityOf(
@@ -239,7 +240,7 @@ var ExplorationEditorMainTab = function() {
       'Tutorial modal takes too long to appear');
   };
 
-  // RESPONSE EDITOR
+  // ---- RESPONSE EDITOR ----
 
   /**
    * This clicks the "add new response" button and then selects the rule type
@@ -280,6 +281,8 @@ var ExplorationEditorMainTab = function() {
     // Open the feedback entry form if it is not already open.
     var isVisible = await feedbackEditor.isPresent();
     if (isVisible) {
+      await waitFor.elementToBeClickable(
+        feedbackEditor, 'Feedback editor takes too long to be clickable.');
       await feedbackEditor.click();
     }
 
@@ -485,7 +488,7 @@ var ExplorationEditorMainTab = function() {
     }
   };
 
-  // CONTENT
+  // ---- CONTENT ----
 
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
   // can then use to alter the state content, for example by calling
@@ -494,12 +497,10 @@ var ExplorationEditorMainTab = function() {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
-
-    await waitFor.elementToBeClickable(
-      stateEditContent,
-      'stateEditContent taking too long to appear to set content');
-    await stateEditContent.click();
+    await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
+    await waitFor.visibilityOf(
+      stateEditorTag, 'State editor tag not showing up');
     var stateContentEditor = stateEditorTag.element(
       by.css('.protractor-test-state-content-editor'));
     await waitFor.visibilityOf(
@@ -531,7 +532,7 @@ var ExplorationEditorMainTab = function() {
       richTextInstructions);
   };
 
-  // HINT
+  // ---- HINT ----
 
   this.addHint = async function(hint) {
     await addHintButton.click();
@@ -549,45 +550,6 @@ var ExplorationEditorMainTab = function() {
     await saveHintButton.click();
     await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
-  };
-
-  // Hints are zero-indexed.
-  this.getHintEditor = function(hintNum) {
-    var confirmDeteletHintButton = element(
-      by.css('.protractor-test-confirm-delete-hint'));
-    var headerElem = element.all(by.css('.protractor-test-hint-tab')).get(
-      hintNum);
-    var deleteHintIcon = headerElem.element(
-      by.css('.protractor-test-delete-response'));
-    var hintBodyElem = element(
-      by.css('.protractor-test-hint-body-' + hintNum));
-    hintBodyElem.isPresent().then(function(isVisible) {
-      if (!isVisible) {
-        headerElem.click();
-      }
-    });
-    return {
-      setHint: function(hint) {
-        var editHintIcon = element(
-          by.css('.protractor-test-open-hint-editor'));
-        editHintIcon.click();
-        browser.switchTo().activeElement().clear();
-        browser.switchTo().activeElement().sendKeys(hint);
-        waitFor.elementToBeClickable(
-          saveHintEditButton,
-          'Save Hint button takes too long to be clickable');
-        saveHintEditButton.click();
-        waitFor.visibilityOf(
-          editHintIcon, 'Add Hint modal takes too long to close');
-      },
-      deleteHint: function() {
-        deleteHintIcon.click();
-        confirmDeteletHintButton.click();
-      },
-      expectCannotDeleteHint: function() {
-        expect(deleteHintIcon.isPresent()).toBeFalsy();
-      }
-    };
   };
 
   this.addSolution = async function(interactionId, solution) {
@@ -615,7 +577,7 @@ var ExplorationEditorMainTab = function() {
       'Add/Update Solution modal takes too long to close');
   };
 
-  // INTERACTIONS
+  // ---- INTERACTIONS ----
 
   this.deleteInteraction = async function() {
     await waitFor.elementToBeClickable(
@@ -675,7 +637,9 @@ var ExplorationEditorMainTab = function() {
       LogicProof: 'Math',
       NumericInput: 'Math',
       SetInput: 'Math',
-      MathExpressionInput: 'Math',
+      AlgebraicExpressionInput: 'Math',
+      MathEquationInput: 'Math',
+      NumericExpressionInput: 'Math',
       NumberWithUnits: 'Math',
       CodeRepl: 'Programming',
       PencilCodeEditor: 'Programming',
@@ -755,88 +719,15 @@ var ExplorationEditorMainTab = function() {
   };
 
   var _setOutcomeFeedback = async function(richTextInstructions) {
+    await waitFor.visibilityOf(
+      feedbackBubble, 'Feedback bubble takes too long to be visible.');
     var feedbackEditor = await forms.RichTextEditor(
       feedbackBubble);
     await feedbackEditor.clear();
     await richTextInstructions(feedbackEditor);
   };
 
-  // PARAMETERS
-
-  // This function adds a multiple-choice parameter change, creating the
-  // parameter if necessary.
-  this.addMultipleChoiceParameterChange = function(paramName, paramValues) {
-    waitFor.elementToBeClickable(
-      editParamChanges, 'Edit Param Changes is not clickable');
-    editParamChanges.click();
-
-    waitFor.elementToBeClickable(
-      addParamButton, 'Add Param button is not clickable');
-    addParamButton.click();
-
-    var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
-
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
-
-    var editorRowOption = editorRowElem.element(
-      by.cssContainingText('option', 'to one of'));
-    waitFor.elementToBeClickable(
-      editorRowOption, 'Param Options are not clickable');
-    editorRowOption.click();
-    paramValues.forEach(function(paramValue) {
-      var item = editorRowElem.all(by.tagName('input')).last();
-      item.clear();
-      item.sendKeys(paramValue);
-    });
-
-    waitFor.elementToBeClickable(
-      saveParamChangesButton, 'Save Param Changes button is not clickable');
-    saveParamChangesButton.click();
-
-    waitFor.invisibilityOf(
-      saveParamChangesButton,
-      'Param Changes editor takes too long to disappear');
-  };
-
-  // This function adds a parameter change, creating the parameter if necessary.
-  this.addParameterChange = function(paramName, paramValue) {
-    waitFor.elementToBeClickable(
-      editParamChanges, 'Param Changes editor is not clickable');
-    editParamChanges.click();
-
-    waitFor.elementToBeClickable(
-      addParamButton, 'Add Param button is not clickable');
-    addParamButton.click();
-
-    var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
-
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
-
-    var item = editorRowElem.all(by.tagName('input')).last();
-    waitFor.elementToBeClickable(item, 'Param Options are not clickable');
-    // Setting parameter value is difficult via css since input fields
-    // are dynamically generated. We isolate it as the last input in the
-    // current parameter changes UI.
-    item.click();
-    item.clear();
-    item.sendKeys(paramValue);
-
-    waitFor.elementToBeClickable(
-      saveParamChangesButton, 'Save Param Changes button is not clickable');
-    saveParamChangesButton.click();
-
-    waitFor.invisibilityOf(
-      saveParamChangesButton,
-      'Param Changes editor takes too long to disappear');
-  };
-
-  // RULES
-  this.selectRuleInAddResponseModal = function(interactionId, ruleName) {
-    _selectRule(addResponseDetails, interactionId, ruleName);
-  };
-
+  // ---- RULES ----
   var _getRuleDescription = function(interactionId, ruleName) {
     if (ruleTemplates.hasOwnProperty(interactionId)) {
       if (ruleTemplates[interactionId].hasOwnProperty(ruleName)) {
@@ -858,7 +749,7 @@ var ExplorationEditorMainTab = function() {
     // (from NumericInput).
     var parameterTypes = [];
     var re = /\|(.*?)\}/ig;
-    // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}]
+    // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}].
     var angularSelectors = ruleDescription.match(re);
     // Slicing first and last letter.
     if (angularSelectors) {
@@ -866,7 +757,7 @@ var ExplorationEditorMainTab = function() {
         parameterTypes.push(elem.toString().slice(1, -1));
       });
     }
-    // Expected sample output = Array[NonnegativeInt, NonnegativeInt]
+    // Expected sample output = Array[NonnegativeInt, NonnegativeInt].
     return parameterTypes;
   };
 
@@ -916,7 +807,7 @@ var ExplorationEditorMainTab = function() {
     // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
     // (from NumericInput).
     var re = /{{[a-z]+[\|](.*?)}}/ig;
-    // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
+    // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}].
     var placeholders = ruleDescription.match(re);
     var textArray = [];
     // Return as-is if string does not contain placeholders.
@@ -958,7 +849,7 @@ var ExplorationEditorMainTab = function() {
     await ruleDropdownElement.click();
   };
 
-  // STATE GRAPH
+  // ---- STATE GRAPH ----
 
   this.deleteState = async function(stateName) {
     await general.scrollToTop();
@@ -1031,13 +922,6 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Current state name is:' + await stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
-  };
-
-  this.setSolicitAnswerDetailsFeature = function() {
-    waitFor.elementToBeClickable(
-      solicitAnswerDetailsCheckbox,
-      'Solicit answer details checkbox takes too long to be clickable');
-    solicitAnswerDetailsCheckbox.click();
   };
 
   this.expectCurrentStateToBe = async function(name) {

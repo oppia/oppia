@@ -22,13 +22,13 @@ import { Injectable } from '@angular/core';
 
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
-import { IStoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
+import { StoryNodeBackendDict, StoryNode, StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 
-interface IStoryContentsBackendDict {
+export interface StoryContentsBackendDict {
   'initial_node_id': string;
   'next_node_id': string;
-  'nodes': IStoryNodeBackendDict[];
+  'nodes': StoryNodeBackendDict[];
 }
 
 export class StoryContents {
@@ -45,8 +45,6 @@ export class StoryContents {
     this._storyNodeObjectFactoryInstance = storyNodeObjectFactoryInstance;
   }
 
-  _disconnectedNodes: StoryNode[] = [];
-
   getIncrementedNodeId(nodeId: string): string {
     var index = parseInt(
       nodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
@@ -59,22 +57,7 @@ export class StoryContents {
   }
 
   getLinearNodesList(): StoryNode[] {
-    var linearList = [];
-    var currentIndex = this.getNodeIndex(this._initialNodeId);
-    while (true) {
-      var node = this._nodes[currentIndex];
-      linearList.push(node);
-      if (node.getDestinationNodeIds().length === 0) {
-        break;
-      } else {
-        currentIndex = this.getNodeIndex(node.getDestinationNodeIds()[0]);
-      }
-    }
-    return linearList;
-  }
-
-  getDisconnectedNodes(): StoryNode[] {
-    return this._disconnectedNodes;
+    return this._nodes.slice();
   }
 
   getNextNodeId(): string {
@@ -93,6 +76,12 @@ export class StoryContents {
       }
     }
     return null;
+  }
+
+  rearrangeNodeInStory(fromIndex, toIndex) {
+    const nodeToMove = this._nodes[fromIndex];
+    this._nodes.splice(fromIndex, 1);
+    this._nodes.splice(toIndex, 0, nodeToMove);
   }
 
   getNodeIdsToTitleMap(nodeIds: string[]): {} {
@@ -129,7 +118,6 @@ export class StoryContents {
   }
 
   validate(): string[] {
-    this._disconnectedNodes = [];
     var issues: string[] = [];
     var nodes = this._nodes;
     for (var i = 0; i < nodes.length; i++) {
@@ -190,7 +178,7 @@ export class StoryContents {
         return issues;
       }
 
-      // nodesQueue stores the pending nodes to visit in a queue form.
+      // Variable nodesQueue stores the pending nodes to visit in a queue form.
       var nodesQueue = [];
       var nodeIsVisited = new Array(nodeIds.length).fill(false);
       var startingNode = nodes[this.getNodeIndex(this._initialNodeId)];
@@ -237,14 +225,6 @@ export class StoryContents {
             }
           );
           nodesQueue.push(nodeId);
-        }
-      }
-      for (var i = 0; i < nodeIsVisited.length; i++) {
-        if (!nodeIsVisited[i]) {
-          this._disconnectedNodes.push(nodes[i]);
-          issues.push(
-            'There is no way to get to the chapter with title ' +
-            nodeTitles[i] + ' from any other chapter');
         }
       }
     }
@@ -404,7 +384,7 @@ export class StoryContents {
 export class StoryContentsObjectFactory {
   constructor(private storyNodeObjectFactory: StoryNodeObjectFactory) {}
   createFromBackendDict(
-      storyContentsBackendObject: IStoryContentsBackendDict): StoryContents {
+      storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
       nodes.push(

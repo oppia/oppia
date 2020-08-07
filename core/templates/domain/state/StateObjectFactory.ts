@@ -19,34 +19,56 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { InteractionObjectFactory } from
+import { InteractionBackendDict, Interaction, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { ParamChangeBackendDict, ParamChange } from
+  'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+import {
+  RecordedVoiceOverBackendDict,
+  RecordedVoiceovers,
+  RecordedVoiceoversObjectFactory
+} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import {
+  SubtitledHtmlBackendDict,
+  SubtitledHtml,
+  SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  WrittenTranslationsBackendDict,
+  WrittenTranslations,
+  WrittenTranslationsObjectFactory
+} from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 const constants = require('constants.ts');
 
+export interface StateBackendDict {
+  'classifier_model_id': string;
+  'content': SubtitledHtmlBackendDict;
+  'interaction': InteractionBackendDict;
+  'param_changes': ParamChangeBackendDict[];
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
+  'solicit_answer_details': boolean;
+  'written_translations': WrittenTranslationsBackendDict;
+  'next_content_id_index': number;
+}
+
 export class State {
-  name;
-  classifierModelId;
-  content;
-  interaction;
-  paramChanges;
-  recordedVoiceovers;
-  solicitAnswerDetails;
-  writtenTranslations;
-  // TODO(#7165): Replace any with exact type.
+  name: string;
+  classifierModelId: string;
+  content: SubtitledHtml;
+  interaction: Interaction;
+  paramChanges: ParamChange[];
+  recordedVoiceovers: RecordedVoiceovers;
+  solicitAnswerDetails: boolean;
+  writtenTranslations: WrittenTranslations;
+  nextContentIdIndex: number;
   constructor(
-      name: string, classifierModelId: any, content: any, interaction: any,
-      paramChanges: any, recordedVoiceovers: any, solicitAnswerDetails: any,
-      writtenTranslations: any) {
+      name: string, classifierModelId: string, content: SubtitledHtml,
+      interaction: Interaction, paramChanges: ParamChange[],
+      recordedVoiceovers: RecordedVoiceovers, solicitAnswerDetails: boolean,
+      writtenTranslations: WrittenTranslations, nextContentIdIndex: number) {
     this.name = name;
     this.classifierModelId = classifierModelId;
     this.content = content;
@@ -55,13 +77,13 @@ export class State {
     this.recordedVoiceovers = recordedVoiceovers;
     this.solicitAnswerDetails = solicitAnswerDetails;
     this.writtenTranslations = writtenTranslations;
+    this.nextContentIdIndex = nextContentIdIndex;
   }
   setName(newName: string): void {
     this.name = newName;
   }
 
-  // TODO(#7165): Replace any with exact type.
-  toBackendDict(): any {
+  toBackendDict(): StateBackendDict {
     return {
       content: this.content.toBackendDict(),
       classifier_model_id: this.classifierModelId,
@@ -71,12 +93,12 @@ export class State {
       }),
       recorded_voiceovers: this.recordedVoiceovers.toBackendDict(),
       solicit_answer_details: this.solicitAnswerDetails,
-      written_translations: this.writtenTranslations.toBackendDict()
+      written_translations: this.writtenTranslations.toBackendDict(),
+      next_content_id_index: this.nextContentIdIndex
     };
   }
 
-  // TODO(#7165): Replace any with exact type.
-  copy(otherState: any): void {
+  copy(otherState: State): void {
     this.name = otherState.name;
     this.classifierModelId = otherState.classifierModelId;
     this.content = otherState.content;
@@ -85,6 +107,7 @@ export class State {
     this.recordedVoiceovers = otherState.recordedVoiceovers;
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
     this.writtenTranslations = otherState.writtenTranslations;
+    this.nextContentIdIndex = otherState.nextContentIdIndex;
   }
 }
 
@@ -108,13 +131,15 @@ export class StateObjectFactory {
       param_changes: newStateTemplate.param_changes,
       recorded_voiceovers: newStateTemplate.recorded_voiceovers,
       solicit_answer_details: newStateTemplate.solicit_answer_details,
-      written_translations: newStateTemplate.written_translations
+      written_translations: newStateTemplate.written_translations,
+      next_content_id_index: newStateTemplate.next_content_id_index
     });
     newState.interaction.defaultOutcome.dest = newStateName;
     return newState;
   }
-  // TODO(#7165): Replace any with exact type.
-  createFromBackendDict(stateName: string, stateDict: any): State {
+
+  createFromBackendDict(
+      stateName: string, stateDict: StateBackendDict): State {
     return new State(
       stateName,
       stateDict.classifier_model_id,
@@ -126,7 +151,8 @@ export class StateObjectFactory {
         stateDict.recorded_voiceovers),
       stateDict.solicit_answer_details,
       this.writtenTranslationsObject.createFromBackendDict(
-        stateDict.written_translations));
+        stateDict.written_translations),
+      stateDict.next_content_id_index);
   }
 }
 

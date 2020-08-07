@@ -20,8 +20,27 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { StoryContents, StoryContentsObjectFactory } from
-  'domain/story/StoryContentsObjectFactory';
+const constants = require('constants.ts');
+
+import {
+  StoryContentsBackendDict,
+  StoryContents,
+  StoryContentsObjectFactory
+} from 'domain/story/StoryContentsObjectFactory';
+
+interface StoryBackendDict {
+  'id': string;
+  'title': string;
+  'description': string;
+  'notes': string;
+  'story_contents': StoryContentsBackendDict;
+  'language_code': string;
+  'version': number;
+  'corresponding_topic_id': string;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+  'url_fragment': string;
+}
 
 export class Story {
   _id: string;
@@ -34,11 +53,12 @@ export class Story {
   _correspondingTopicId: string;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
+  _urlFragment: string;
   constructor(
       id: string, title: string, description: string, notes: string,
       storyContents: StoryContents, languageCode: string, version: number,
       correspondingTopicId: string, thumbnailBgColor: string,
-      thumbnailFilename: string) {
+      thumbnailFilename: string, urlFragment: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -49,6 +69,7 @@ export class Story {
     this._correspondingTopicId = correspondingTopicId;
     this._thumbnailBgColor = thumbnailBgColor;
     this._thumbnailFilename = thumbnailFilename;
+    this._urlFragment = urlFragment;
   }
 
   getId(): string {
@@ -115,18 +136,44 @@ export class Story {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  validate(): any {
+  getUrlFragment(): string {
+    return this._urlFragment;
+  }
+
+  setUrlFragment(urlFragment: string): void {
+    this._urlFragment = urlFragment;
+  }
+
+  validate(): string[] {
     var issues = [];
     if (this._title === '') {
       issues.push('Story title should not be empty');
     }
+    const VALID_URL_FRAGMENT_REGEX = new RegExp(
+      constants.VALID_URL_FRAGMENT_REGEX);
+    if (!this._urlFragment) {
+      issues.push(
+        'Url Fragment should not be empty.');
+    } else {
+      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
+        issues.push(
+          'Url Fragment contains invalid characters. ' +
+          'Only lowercase words separated by hyphens are allowed.');
+      }
+      if (
+        this._urlFragment.length >
+        constants.MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+        issues.push(
+          'Url Fragment should not be greater than ' +
+          `${constants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
+      }
+    }
+
     issues = issues.concat(this._storyContents.validate());
     return issues;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Story should have a thumbnail.');
@@ -148,6 +195,7 @@ export class Story {
     this._correspondingTopicId = otherStory.getCorrespondingTopicId();
     this._thumbnailFilename = otherStory.getThumbnailFilename();
     this._thumbnailBgColor = otherStory.getThumbnailBgColor();
+    this._urlFragment = otherStory.getUrlFragment();
   }
 }
 
@@ -156,7 +204,7 @@ export class Story {
 })
 export class StoryObjectFactory {
   constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
-  createFromBackendDict(storyBackendDict: any): Story {
+  createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,
       storyBackendDict.description, storyBackendDict.notes,
@@ -165,7 +213,8 @@ export class StoryObjectFactory {
       storyBackendDict.language_code,
       storyBackendDict.version, storyBackendDict.corresponding_topic_id,
       storyBackendDict.thumbnail_bg_color,
-      storyBackendDict.thumbnail_filename
+      storyBackendDict.thumbnail_filename,
+      storyBackendDict.url_fragment
     );
   }
 
@@ -174,7 +223,7 @@ export class StoryObjectFactory {
   createInterstitialStory() {
     return new Story(
       null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null, null, null);
+      'Story notes loading', null, 'en', 1, null, null, null, null);
   }
 }
 

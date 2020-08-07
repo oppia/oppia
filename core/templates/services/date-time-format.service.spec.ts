@@ -19,7 +19,7 @@
 import { DateTimeFormatService } from 'services/date-time-format.service';
 
 // Needed because MockDateContructor should be of same type as
-// DateConstructor to be used in callFake
+// DateConstructor to be used in callFake.
 interface MockDateContructorType {
   parse: (s: string) => number;
   UTC: (
@@ -46,12 +46,15 @@ describe('datetimeformatter', () => {
       } else {
         return new OldDate(millisSinceEpoch);
       }
-    // Need as any here because DateContructor has some properties on the
-    // function and this function doesn't really have those properties.
-    } as any as MockDateContructorType;
+    };
 
     // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
-    // doesn't seem to be a good way to set the timezone locale directly.)
+    // doesn't seem to be a good way to set the timezone locale directly).
+    // This throws "Argument of type '(millisSinceEpoch?: number) => Date' is
+    // not assignable to parameter of type 'DateConstructor'." This is because
+    // the actual 'Date' has more properties than 'MockDateContructor'. We have
+    // only defined the properties we need in 'MockDateContructor'.
+    // @ts-expect-error
     spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
 

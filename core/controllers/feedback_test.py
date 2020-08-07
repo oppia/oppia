@@ -52,6 +52,7 @@ class MockFeedbackAnalyticsAggregator(
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
@@ -226,15 +227,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Then, create a new message in that thread.
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
+        response_dict = self.post_json(
             thread_url, {
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1'
             }, csrf_token=csrf_token)
 
-        # The resulting thread should contain two messages.
-        response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 2)
         self.assertEqual(
             set(response_dict['messages'][0].keys()),
@@ -530,7 +529,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
-            self.user_id, change_cmd, 'sample description', None)
+            self.user_id, change_cmd, 'sample description')
 
         response = self.get_json(
             '%s/%s' % (
@@ -599,7 +598,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
-            self.owner_id_1, change, 'sample description', None)
+            self.owner_id_1, change, 'sample description')
 
         thread_id = suggestion_services.query_suggestions(
             [('author_id', self.owner_id_1),

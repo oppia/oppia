@@ -23,6 +23,14 @@ import { Injectable } from '@angular/core';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import {
+  InteractionCustomizationArgs,
+  InteractionCustomizationArgsBackendDict
+} from
+  'interactions/customization-args-defs';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 // Service for assembling extension tags (for interactions).
 @Injectable({
@@ -31,14 +39,57 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 export class ExtensionTagAssemblerService {
   constructor(private htmlEscaperService: HtmlEscaperService,
               private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
-  // TODO(#7176): Replace 'any' with the exact type.
+  _convertCustomizationArgsToBackendDict(
+      customizationArgs: InteractionCustomizationArgs
+  ): InteractionCustomizationArgsBackendDict {
+    // Because of issues with circular dependencies, we cannot import
+    // Interaction from InteractionObjectFactory in this file.
+    // The convertCustomizationArgsToBackendDict function is repeated
+    // here to avoid the circular dependency.
+
+    const traverseSchemaAndConvertSubtitledToDicts = (
+        value: Object[] | Object
+    ): Object[] | Object => {
+      let result: Object[] | Object;
+
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
+        result = value.toBackendDict();
+      } else if (value instanceof Array) {
+        result = value.map(element =>
+          traverseSchemaAndConvertSubtitledToDicts(element));
+      } else if (value instanceof Object) {
+        result = {};
+        Object.keys(value).forEach(key => {
+          result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
+        });
+      }
+
+      return result || value;
+    };
+
+    const customizationArgsBackendDict:
+      InteractionCustomizationArgsBackendDict = {};
+    Object.keys(customizationArgs).forEach(caName => {
+      customizationArgsBackendDict[caName] = {
+        value: traverseSchemaAndConvertSubtitledToDicts(
+          customizationArgs[caName].value)
+      };
+    });
+
+    return customizationArgsBackendDict;
+  }
+
   formatCustomizationArgAttrs(
-      element: JQuery, customizationArgSpecs: Object): any {
-    for (let caSpecName in customizationArgSpecs) {
-      let caSpecValue = customizationArgSpecs[caSpecName].value;
+      element: JQuery,
+      customizationArgs: InteractionCustomizationArgs
+  ): JQuery {
+    for (const caName in customizationArgs) {
+      const caBackendDict = (
+        this._convertCustomizationArgsToBackendDict(customizationArgs));
+      let caBackendDictValue = caBackendDict[caName].value;
       element.attr(
-        this.camelCaseToHyphens.transform(caSpecName) + '-with-value',
-        this.htmlEscaperService.objToEscapedJson(caSpecValue));
+        this.camelCaseToHyphens.transform(caName) + '-with-value',
+        this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
     }
     return element;
   }

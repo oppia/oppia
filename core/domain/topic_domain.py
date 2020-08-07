@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import re
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -54,11 +55,13 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
+SUBTOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_CANONICAL_STORY = 'add_canonical_story'
 CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story'
+CMD_REARRANGE_CANONICAL_STORY = 'rearrange_canonical_story'
 CMD_ADD_ADDITIONAL_STORY = 'add_additional_story'
 CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
 CMD_PUBLISH_STORY = 'publish_story'
@@ -66,6 +69,8 @@ CMD_UNPUBLISH_STORY = 'unpublish_story'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
+CMD_REARRANGE_SKILL_IN_SUBTOPIC = 'rearrange_skill_in_subtopic'
+CMD_REARRANGE_SUBTOPIC = 'rearrange_subtopic'
 CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -113,7 +118,8 @@ class TopicChange(change_domain.BaseChange):
     SUBTOPIC_PROPERTIES = (
         SUBTOPIC_PROPERTY_TITLE,
         SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
-        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR)
+        SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+        SUBTOPIC_PROPERTY_URL_FRAGMENT)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -134,6 +140,10 @@ class TopicChange(change_domain.BaseChange):
     }, {
         'name': CMD_DELETE_CANONICAL_STORY,
         'required_attribute_names': ['story_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_REARRANGE_CANONICAL_STORY,
+        'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': []
     }, {
         'name': CMD_ADD_ADDITIONAL_STORY,
@@ -163,6 +173,14 @@ class TopicChange(change_domain.BaseChange):
         'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
         'required_attribute_names': [
             'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_REARRANGE_SKILL_IN_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id', 'from_index', 'to_index'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_REARRANGE_SUBTOPIC,
+        'required_attribute_names': ['from_index', 'to_index'],
         'optional_attribute_names': [],
     }, {
         'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
@@ -240,7 +258,7 @@ class StoryReference(python_utils.OBJECT):
         """Returns a dict representing this StoryReference domain object.
 
         Returns:
-            A dict, mapping all fields of StoryReference instance.
+            dict. A dict, mapping all fields of StoryReference instance.
         """
         return {
             'story_id': self.story_id,
@@ -272,7 +290,7 @@ class StoryReference(python_utils.OBJECT):
 
         Returns:
             StoryReference. A story reference object with given story_id and
-                'not published' status.
+            'not published' status.
         """
         return cls(story_id, False)
 
@@ -280,7 +298,7 @@ class StoryReference(python_utils.OBJECT):
         """Validates various properties of the StoryReference object.
 
         Raises:
-            ValidationError: One or more attributes of the StoryReference are
+            ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
         if not isinstance(self.story_id, python_utils.BASESTRING):
@@ -298,7 +316,7 @@ class Subtopic(python_utils.OBJECT):
 
     def __init__(
             self, subtopic_id, title, skill_ids, thumbnail_filename,
-            thumbnail_bg_color):
+            thumbnail_bg_color, url_fragment):
         """Constructs a Subtopic domain object.
 
         Args:
@@ -310,25 +328,29 @@ class Subtopic(python_utils.OBJECT):
                 subtopic.
             thumbnail_bg_color: str|None. The thumbnail background color for
                 the subtopic.
+            url_fragment: str. The url fragment for the subtopic.
         """
         self.id = subtopic_id
         self.title = title
         self.skill_ids = skill_ids
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.url_fragment = url_fragment
+
 
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
 
         Returns:
-            A dict, mapping all fields of Subtopic instance.
+            dict. A dict, mapping all fields of Subtopic instance.
         """
         return {
             'id': self.id,
             'title': self.title,
             'skill_ids': self.skill_ids,
             'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'url_fragment': self.url_fragment
         }
 
     @classmethod
@@ -344,7 +366,7 @@ class Subtopic(python_utils.OBJECT):
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
             subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'],
-            subtopic_dict['thumbnail_bg_color'])
+            subtopic_dict['thumbnail_bg_color'], subtopic_dict['url_fragment'])
         return subtopic
 
     @classmethod
@@ -357,9 +379,9 @@ class Subtopic(python_utils.OBJECT):
 
         Returns:
             Subtopic. A subtopic object with given id, title and empty skill ids
-                list.
+            list.
         """
-        return cls(subtopic_id, title, [], None, None)
+        return cls(subtopic_id, title, [], None, None, '')
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -378,7 +400,7 @@ class Subtopic(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -390,7 +412,7 @@ class Subtopic(python_utils.OBJECT):
         """Validates various properties of the Subtopic object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic are
+            ValidationError. One or more attributes of the subtopic are
                 invalid.
         """
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
@@ -503,7 +525,7 @@ class Topic(python_utils.OBJECT):
         """Returns a dict representing this Topic domain object.
 
         Returns:
-            A dict, mapping all fields of Topic instance.
+            dict. A dict, mapping all fields of Topic instance.
         """
         return {
             'id': self.id,
@@ -582,7 +604,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
-            validate.
+                validate.
 
         Returns:
             bool. Whether the thumbnail background color is valid or not.
@@ -708,6 +730,45 @@ class Topic(python_utils.OBJECT):
                 'The story_id %s is not present in the canonical '
                 'story references list of the topic.' % story_id)
 
+    def rearrange_canonical_story(self, from_index, to_index):
+        """Rearranges or moves a canonical story to another position.
+
+        Args:
+            from_index: int. The index of canonical story to move.
+            to_index: int. The index at which to insert the moved canonical
+                story.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
+
+        if (from_index >= len(self.canonical_story_references) or
+                from_index < 0):
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if (to_index >= len(self.canonical_story_references) or
+                to_index < 0):
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        canonical_story_reference_to_move = copy.deepcopy(
+            self.canonical_story_references[from_index])
+        del self.canonical_story_references[from_index]
+        self.canonical_story_references.insert(
+            to_index, canonical_story_reference_to_move)
+
     def add_canonical_story(self, story_id):
         """Adds a story to the canonical_story_references list.
 
@@ -767,7 +828,7 @@ class Topic(python_utils.OBJECT):
                 published or is going to be published.
 
         Raises:
-            ValidationError: One or more attributes of the Topic are not
+            ValidationError. One or more attributes of the Topic are not
                 valid.
         """
         self.require_valid_name(self.name)
@@ -889,7 +950,8 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id, name, abbreviated_name):
+    def create_default_topic(
+            cls, topic_id, name, abbreviated_name, description):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -898,16 +960,34 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
             abbreviated_name: str. The abbreviated name for the topic.
+            description: str. The description for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
             topic_id, name, abbreviated_name, None, None,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+
+    @classmethod
+    def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
+        """Converts old Subtopic schema to the modern v3 schema. v3 schema
+        introduces the url_fragment field.
+
+        Args:
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        subtopic_title = re.sub('[^a-z]+', '', subtopic_dict['title'])
+        subtopic_dict['url_fragment'] = (
+            subtopic_title[:constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT])
+        return subtopic_dict
 
     @classmethod
     def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic_dict):
@@ -931,6 +1011,7 @@ class Topic(python_utils.OBJECT):
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
         passed in is modified in-place.
+
         Args:
             versioned_subtopics: dict. A dict with two keys:
                 - schema_version: str. The schema version for the
@@ -988,7 +1069,7 @@ class Topic(python_utils.OBJECT):
             new_name: str. The updated name for the topic.
 
         Raises:
-            ValidationError: Name should be a string.
+            ValidationError. Name should be a string.
         """
         if not isinstance(new_name, python_utils.BASESTRING):
             raise utils.ValidationError('Name should be a string.')
@@ -1000,7 +1081,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_abbreviated_name: str. The updated abbreviated_name
-            for the topic.
+                for the topic.
         """
         self.abbreviated_name = new_abbreviated_name
 
@@ -1009,7 +1090,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
-            for the topic.
+                for the topic.
         """
         self.thumbnail_filename = new_thumbnail_filename
 
@@ -1018,7 +1099,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_bg_color: str|None. The updated thumbnail background
-            color for the topic.
+                color for the topic.
         """
         self.thumbnail_bg_color = new_thumbnail_bg_color
 
@@ -1083,7 +1164,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             list(dict). The list of all subtopics present
-                in topic.
+            in topic.
         """
         subtopics = []
         for _, subtopic in enumerate(self.subtopics):
@@ -1100,7 +1181,7 @@ class Topic(python_utils.OBJECT):
 
         Returns:
             int or None. Returns the index of the subtopic if it exists or else
-                None.
+            None.
         """
         for ind, subtopic in enumerate(self.subtopics):
             if subtopic.id == subtopic_id:
@@ -1117,6 +1198,7 @@ class Topic(python_utils.OBJECT):
         Raises:
             Exception. The new_subtopic_id and the expected next subtopic id
                 differs.
+
         Returns:
             int. The id of the newly created subtopic.
         """
@@ -1182,6 +1264,22 @@ class Topic(python_utils.OBJECT):
         self.subtopics[subtopic_index].thumbnail_filename = (
             new_thumbnail_filename)
 
+    def update_subtopic_url_fragment(self, subtopic_id, new_url_fragment):
+        """Updates the url fragment of the subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_url_fragment: str. The new url fragment of the subtopic.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        utils.require_valid_url_fragment(
+            new_url_fragment, 'Subtopic Url Fragment',
+            constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+        self.subtopics[subtopic_index].url_fragment = new_url_fragment
+
     def update_subtopic_thumbnail_bg_color(
             self, subtopic_id, new_thumbnail_bg_color):
         """Updates the thumbnail background color property of the new subtopic.
@@ -1200,6 +1298,82 @@ class Topic(python_utils.OBJECT):
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].thumbnail_bg_color = (
             new_thumbnail_bg_color)
+
+    def rearrange_skill_in_subtopic(self, subtopic_id, from_index, to_index):
+        """Rearranges the skills in the subtopic with the given id.
+
+        Args:
+            subtopic_id: int. The id of subtopic.
+            from_index: int. The index of skill to move.
+            to_index: int. The index at which to insert the moved skill.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
+
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+
+        if (from_index >= len(self.subtopics[subtopic_index].skill_ids) or
+                from_index < 0):
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if (to_index >= len(self.subtopics[subtopic_index].skill_ids) or
+                to_index < 0):
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        skill_to_move = copy.deepcopy(
+            self.subtopics[subtopic_index].skill_ids[from_index])
+        del self.subtopics[subtopic_index].skill_ids[from_index]
+        self.subtopics[subtopic_index].skill_ids.insert(
+            to_index, skill_to_move)
+
+    def rearrange_subtopic(self, from_index, to_index):
+        """Rearranges the subtopic in the topic.
+
+        Args:
+            from_index: int. The index of subtopic to move.
+            to_index: int. The index at which to insert the moved subtopic.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
+
+        if from_index >= len(self.subtopics) or from_index < 0:
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if to_index >= len(self.subtopics) or to_index < 0:
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        skill_to_move = copy.deepcopy(
+            self.subtopics[from_index])
+        del self.subtopics[from_index]
+        self.subtopics.insert(to_index, skill_to_move)
 
     def move_skill_id_to_subtopic(
             self, old_subtopic_id, new_subtopic_id, skill_id):
@@ -1276,6 +1450,18 @@ class Topic(python_utils.OBJECT):
         self.subtopics[subtopic_index].skill_ids.remove(skill_id)
         self.uncategorized_skill_ids.append(skill_id)
 
+    def are_subtopic_url_fragments_unique(self):
+        """Checks if all the subtopic url fragments are unique across the
+        topic.
+
+        Returns:
+            bool. Whether the subtopic url fragments are unique in the topic.
+        """
+        url_fragments_list = [
+            subtopic.url_fragment for subtopic in self.subtopics]
+        url_fragments_set = set(url_fragments_list)
+        return len(url_fragments_list) == len(url_fragments_set)
+
 
 class TopicSummary(python_utils.OBJECT):
     """Domain object for Topic Summary."""
@@ -1284,6 +1470,7 @@ class TopicSummary(python_utils.OBJECT):
             self, topic_id, name, canonical_name, language_code, description,
             version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
+            thumbnail_filename, thumbnail_bg_color,
             topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
@@ -1303,6 +1490,8 @@ class TopicSummary(python_utils.OBJECT):
             subtopic_count: int. The number of subtopics in the topic.
             total_skill_count: int. The total number of skills in the topic
                 (including those that are uncategorized).
+            thumbnail_filename: str. The filename for the topic thumbnail.
+            thumbnail_bg_color: str. The background color for the thumbnail.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -1319,6 +1508,8 @@ class TopicSummary(python_utils.OBJECT):
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
         self.total_skill_count = total_skill_count
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
 
@@ -1326,7 +1517,7 @@ class TopicSummary(python_utils.OBJECT):
         """Validates all properties of this topic summary.
 
         Raises:
-            ValidationError: One or more attributes of the Topic summary
+            ValidationError. One or more attributes of the Topic summary
                 are not valid.
         """
         if not isinstance(self.name, python_utils.BASESTRING):
@@ -1338,6 +1529,21 @@ class TopicSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        utils.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if (
+                self.thumbnail_bg_color is not None and not (
+                    Topic.require_valid_thumbnail_bg_color(
+                        self.thumbnail_bg_color))):
+            raise utils.ValidationError(
+                'Topic thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Topic thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Topic thumbnail background color is not specified.')
 
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
@@ -1426,6 +1632,8 @@ class TopicSummary(python_utils.OBJECT):
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
             'total_skill_count': self.total_skill_count,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
             'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
             'topic_model_last_updated': utils.get_time_in_millisecs(
@@ -1455,7 +1663,7 @@ class TopicRights(python_utils.OBJECT):
 
         Returns:
             dict. A dict version of TopicRights suitable for use by the
-                frontend.
+            frontend.
         """
         return {
             'topic_id': self.id,

@@ -20,38 +20,46 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SkillSummary, SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
+import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
 
-export interface ISubtopicBackendDict {
+const constants = require('constants.ts');
+
+export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
+  'url_fragment': string;
 }
 
-export interface ISkillIdToDescriptionMap {
+export interface SkillIdToDescriptionMap {
   [skillId: string]: string;
 }
 
 export class Subtopic {
   _id: number;
   _title: string;
-  _skillSummaries: SkillSummary[];
-  _skillSummaryObjectFactory: SkillSummaryObjectFactory;
+  _skillSummaries: ShortSkillSummary[];
+  _skillIds: string[];
+  _skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
+  _urlFragment: string;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap,
-      skillSummaryObjectFactory: SkillSummaryObjectFactory,
-      thumbnailFilename: string, thumbnailBgColor: string) {
+      skillIdToDescriptionMap: SkillIdToDescriptionMap,
+      skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
+      thumbnailFilename: string, thumbnailBgColor: string,
+      urlFragment: string) {
     this._id = subtopicId;
     this._title = title;
+    this._skillIds = skillIds;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
+    this._urlFragment = urlFragment;
     this._skillSummaries = skillIds.map(
       (skillId) => {
         return this._skillSummaryObjectFactory.create(
@@ -80,8 +88,21 @@ export class Subtopic {
     this._title = title;
   }
 
+  getUrlFragment(): string {
+    return this._urlFragment;
+  }
+
+  setUrlFragment(urlFragment): void {
+    this._urlFragment = urlFragment;
+  }
+
   validate(): string[] {
     var issues = [];
+    const VALID_URL_FRAGMENT_REGEX = new RegExp(
+      constants.VALID_URL_FRAGMENT_REGEX);
+    if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
+      issues.push('Subtopic url fragment is invalid.');
+    }
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
     }
@@ -108,8 +129,12 @@ export class Subtopic {
   }
 
   // Returns the summaries of the skills in the subtopic.
-  getSkillSummaries(): SkillSummary[] {
+  getSkillSummaries(): ShortSkillSummary[] {
     return this._skillSummaries.slice();
+  }
+
+  getSkillIds(): Array<string> {
+    return this._skillIds.slice();
   }
 
   hasSkill(skillId: string): boolean {
@@ -159,16 +184,18 @@ export class Subtopic {
   providedIn: 'root'
 })
 export class SubtopicObjectFactory {
-  constructor(private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
+  constructor(
+    private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
 
   create(
-      subtopicBackendDict: ISubtopicBackendDict,
-      skillIdToDescriptionMap: ISkillIdToDescriptionMap) {
+      subtopicBackendDict: SubtopicBackendDict,
+      skillIdToDescriptionMap: SkillIdToDescriptionMap) {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
       this.skillSummaryObjectFactory, subtopicBackendDict.thumbnail_filename,
-      subtopicBackendDict.thumbnail_bg_color);
+      subtopicBackendDict.thumbnail_bg_color,
+      subtopicBackendDict.url_fragment);
   }
 
   createFromTitle(subtopicId: number, title: string): Subtopic {
@@ -177,7 +204,8 @@ export class SubtopicObjectFactory {
       title: title,
       skill_ids: [],
       thumbnail_filename: null,
-      thumbnail_bg_color: null
+      thumbnail_bg_color: null,
+      url_fragment: null
     }, {});
   }
 }

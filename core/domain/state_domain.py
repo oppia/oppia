@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
+import itertools
+import json
 import logging
 
 from constants import constants
@@ -31,6 +33,7 @@ from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 
@@ -110,9 +113,9 @@ class AnswerGroup(python_utils.OBJECT):
                 value objects with an object type property (obj_type).
 
         Raises:
-            ValidationError: One or more attributes of the AnswerGroup are
+            ValidationError. One or more attributes of the AnswerGroup are
                 invalid.
-            ValidationError: The AnswerGroup contains more than one classifier
+            ValidationError. The AnswerGroup contains more than one classifier
                 rule.
         """
         if not isinstance(self.rule_specs, list):
@@ -149,6 +152,100 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the AnswerGroup.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+        """
+        html_list = []
+
+        outcome_html = self.outcome.feedback.html
+        html_list = html_list + [outcome_html]
+        # TODO(#9413): Find a way to include a reference to the interaction
+        # type in the Draft change lists.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
+        # the interaction-id from the rules_index_dict until issue-9413 has
+        # been fixed, because this method has no reference to the interaction
+        # type and draft changes use this method. The rules_index_dict below
+        # is used to figure out the assembly of the html in the rulespecs.
+
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+        for rule_spec in self.rule_specs:
+            for interaction_and_rule_details in (
+                    html_field_types_to_rule_specs_dict.values()):
+                rule_type_has_html = (
+                    rule_spec.rule_type in
+                    interaction_and_rule_details['ruleTypes'].keys())
+                if rule_type_has_html:
+                    html_type_format = interaction_and_rule_details['format']
+                    input_variables_from_html_mapping = (
+                        interaction_and_rule_details['ruleTypes'][
+                            rule_spec.rule_type][
+                                'htmlInputVariables'])
+                    input_variable_match_found = False
+                    for input_variable in rule_spec.inputs.keys():
+                        if input_variable in input_variables_from_html_mapping:
+                            input_variable_match_found = True
+                            rule_input_variable = (
+                                rule_spec.inputs[input_variable])
+                            if (html_type_format ==
+                                    feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
+                                html_list = html_list + [rule_input_variable]
+                            elif (html_type_format ==
+                                  feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                                # Here we are checking the type of the
+                                # rule_specs.inputs because the rule type
+                                # 'Equals' is used by other interactions as
+                                # well which don't have HTML and we don't have
+                                # a reference to the interaction ID.
+                                if isinstance(rule_input_variable, list):
+                                    for value in rule_input_variable:
+                                        if isinstance(
+                                                value, python_utils.BASESTRING):
+                                            html_list = html_list + [value]
+                            elif (html_type_format ==
+                                  feconf.
+                                  HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                                for rule_spec_html in rule_input_variable:
+                                    html_list = html_list + rule_spec_html
+                            else:
+                                raise Exception(
+                                    'The rule spec does not belong to a valid'
+                                    ' format.')
+                    if not input_variable_match_found:
+                        raise Exception(
+                            'Rule spec should have at least one valid input '
+                            'variable with Html in it.')
+
+        return html_list
+
+    @staticmethod
+    def convert_html_in_answer_group(answer_group_dict, conversion_fn):
+        """Checks for HTML fields in an answer group dict and converts it
+        according to the conversion function.
+
+        Args:
+            answer_group_dict: dict. The answer group dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted answer group dict.
+        """
+        answer_group_dict['outcome']['feedback']['html'] = conversion_fn(
+            answer_group_dict['outcome']['feedback']['html'])
+        for rule_spec_index, rule_spec in enumerate(
+                answer_group_dict['rule_specs']):
+            answer_group_dict['rule_specs'][rule_spec_index] = (
+                RuleSpec.convert_html_in_rule_spec(
+                    rule_spec, conversion_fn))
+        return answer_group_dict
+
+
 
 class Hint(python_utils.OBJECT):
     """Value object representing a hint."""
@@ -182,11 +279,30 @@ class Hint(python_utils.OBJECT):
         Returns:
             Hint. The corresponding Hint domain object.
         """
-        return cls(SubtitledHtml.from_dict(hint_dict['hint_content']))
+        hint_content = SubtitledHtml.from_dict(hint_dict['hint_content'])
+        hint_content.validate()
+        return cls(hint_content)
 
     def validate(self):
         """Validates all properties of Hint."""
         self.hint_content.validate()
+
+    @staticmethod
+    def convert_html_in_hint(hint_dict, conversion_fn):
+        """Checks for HTML fields in the hints and converts it
+        according to the conversion function.
+
+        Args:
+            hint_dict: dict. The hints dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted hints dict.
+        """
+        hint_dict['hint_content']['html'] = (
+            conversion_fn(hint_dict['hint_content']['html']))
+        return hint_dict
 
 
 class Solution(python_utils.OBJECT):
@@ -209,8 +325,11 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
             answer_is_exclusive: bool. True if is the only correct answer;
                 False if is one of possible answer.
-            correct_answer: str. The correct answer; this answer enables the
-                learner to progress to the next card.
+            correct_answer: *. The correct answer; this answer
+                enables the learner to progress to the next card. The type of
+                correct_answer is determined by the value of
+                BaseInteraction.answer_type. Some examples for the types are
+                list(set(str)), list(str), str, dict(str, str), etc.
             explanation: SubtitledHtml. Contains text and text id to link audio
                 translations for the solution's explanation.
         """
@@ -243,13 +362,15 @@ class Solution(python_utils.OBJECT):
         Returns:
             Solution. The corresponding Solution domain object.
         """
+        explanation = SubtitledHtml.from_dict(solution_dict['explanation'])
+        explanation.validate()
         return cls(
             interaction_id,
             solution_dict['answer_is_exclusive'],
             interaction_registry.Registry.get_interaction_by_id(
                 interaction_id).normalize_answer(
                     solution_dict['correct_answer']),
-            SubtitledHtml.from_dict(solution_dict['explanation']))
+            explanation)
 
     def validate(self, interaction_id):
         """Validates all properties of Solution.
@@ -258,8 +379,8 @@ class Solution(python_utils.OBJECT):
             interaction_id: str. The interaction id.
 
         Raises:
-            ValidationError: One or more attributes of the Solution are not
-            valid.
+            ValidationError. One or more attributes of the Solution are not
+                valid.
         """
         if not isinstance(self.answer_is_exclusive, bool):
             raise utils.ValidationError(
@@ -268,6 +389,62 @@ class Solution(python_utils.OBJECT):
         interaction_registry.Registry.get_interaction_by_id(
             interaction_id).normalize_answer(self.correct_answer)
         self.explanation.validate()
+
+    @staticmethod
+    def convert_html_in_solution(interaction_id, solution_dict, conversion_fn):
+        """Checks for HTML fields in a solution and convert it according
+        to the conversion function.
+
+        Args:
+            interaction_id: str. The interaction id.
+            solution_dict: dict. The Solution dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted Solution dict.
+        """
+        if interaction_id is None:
+            return solution_dict
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                interaction_id))
+
+        solution_dict['explanation']['html'] = (
+            conversion_fn(solution_dict['explanation']['html']))
+
+        if interaction.can_have_solution:
+            html_field_types_to_rule_specs_dict = json.loads(
+                utils.get_file_contents(
+                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+            if solution_dict['correct_answer']:
+                for html_type in html_field_types_to_rule_specs_dict.keys():
+                    if html_type == interaction.answer_type:
+
+                        if (
+                                html_type ==
+                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+
+                            for list_index, html_list in enumerate(
+                                    solution_dict['correct_answer']):
+                                for answer_html_index, answer_html in enumerate(
+                                        html_list):
+                                    solution_dict['correct_answer'][list_index][
+                                        answer_html_index] = (
+                                            conversion_fn(answer_html))
+                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            for answer_html_index, answer_html in enumerate(
+                                    solution_dict['correct_answer']):
+                                solution_dict['correct_answer'][
+                                    answer_html_index] = (
+                                        conversion_fn(answer_html))
+                        else:
+                            raise Exception(
+                                'The solution does not have a valid '
+                                'correct_answer type.')
+
+        return solution_dict
 
 
 class InteractionInstance(python_utils.OBJECT):
@@ -282,14 +459,25 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             dict. A dict mapping all fields of InteractionInstance instance.
         """
+
+        # customization_args_dict here indicates a dict that maps customization
+        # argument names to a customization argument dict, the dict
+        # representation of InteractionCustomizationArg.
+        customization_args_dict = {}
+        if self.id:
+            for ca_name in self.customization_args:
+                customization_args_dict[ca_name] = (
+                    self.customization_args[
+                        ca_name].to_customization_arg_dict()
+                )
+
+        # Consistent with other usages of to_dict() across the codebase, all
+        # values below are plain Python data structures and not domain objects,
+        # despite the names of the keys. This applies to customization_args_dict
+        # below.
         return {
             'id': self.id,
-            'customization_args': (
-                {} if self.id is None else
-                customization_args_util.get_full_customization_args(
-                    self.customization_args,
-                    interaction_registry.Registry.get_interaction_by_id(
-                        self.id).customization_arg_specs)),
+            'customization_args': customization_args_dict,
             'answer_groups': [group.to_dict() for group in self.answer_groups],
             'default_outcome': (
                 self.default_outcome.to_dict()
@@ -322,9 +510,17 @@ class InteractionInstance(python_utils.OBJECT):
             if (interaction_dict['solution'] and interaction_dict['id'])
             else None)
 
+        customization_args = (
+            InteractionInstance
+            .convert_customization_args_dict_to_customization_args(
+                interaction_dict['id'],
+                interaction_dict['customization_args']
+            )
+        )
+
         return cls(
             interaction_dict['id'],
-            interaction_dict['customization_args'],
+            customization_args,
             [AnswerGroup.from_dict(h)
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
@@ -451,8 +647,8 @@ class InteractionInstance(python_utils.OBJECT):
                 Is used to validate AnswerGroup objects.
 
         Raises:
-            ValidationError: One or more attributes of the InteractionInstance
-            are invalid.
+            ValidationError. One or more attributes of the InteractionInstance
+                are invalid.
         """
         if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -525,33 +721,16 @@ class InteractionInstance(python_utils.OBJECT):
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
-
     def get_all_html_content_strings(self):
         """Get all html content strings in the interaction.
 
         Returns:
-            list(str): The list of all html content strings in the interaction.
+            list(str). The list of all html content strings in the interaction.
         """
         html_list = []
 
         for answer_group in self.answer_groups:
-            outcome_html = answer_group.outcome.feedback.html
-            html_list = html_list + [outcome_html]
-
-        # Note that ItemSelectionInput replicates the customization arg HTML
-        # in its answer groups.
-        if self.id == 'ItemSelectionInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_html = rule_spec.inputs['x']
-                    html_list = html_list + rule_spec_html
-
-        if self.id == 'DragAndDropSortInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    rule_spec_html_list = rule_spec.inputs['x']
-                    for rule_spec_html in rule_spec_html_list:
-                        html_list = html_list + rule_spec_html
+            html_list = html_list + answer_group.get_all_html_content_strings()
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -561,18 +740,391 @@ class InteractionInstance(python_utils.OBJECT):
             hint_html = hint.hint_content.html
             html_list = html_list + [hint_html]
 
-        if self.solution:
+        if self.id is None:
+            return html_list
+
+        interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.id))
+
+        if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
+            html_field_types_to_rule_specs_dict = json.loads(
+                utils.get_file_contents(
+                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
 
-        if self.id in (
-                'ItemSelectionInput', 'MultipleChoiceInput',
-                'DragAndDropSortInput'):
-            customization_args_html_list = (
-                self.customization_args['choices']['value'])
-            html_list = html_list + customization_args_html_list
+            if self.solution.correct_answer:
+                for html_type in html_field_types_to_rule_specs_dict.keys():
+                    if html_type == interaction.answer_type:
+                        if (
+                                html_type ==
+                                feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + value
+                        elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            for value in self.solution.correct_answer:
+                                html_list = html_list + [value]
+                        else:
+                            raise Exception(
+                                'The solution does not have a valid '
+                                'correct_answer type.')
+
+        for ca_name in self.customization_args:
+            html_list += self.customization_args[ca_name].get_html()
 
         return html_list
+
+    @staticmethod
+    def convert_html_in_interaction(interaction_dict, conversion_fn):
+        """Checks for HTML fields in the interaction and converts it
+        according to the conversion function.
+
+        Args:
+            interaction_dict: dict. The interaction dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted interaction dict.
+        """
+        def wrapped_conversion_fn(value, schema_obj_type):
+            """Applies the conversion function to the SubtitledHtml values.
+
+            Args:
+                value: SubtitledHtml|SubtitledUnicode. The value in the
+                    customization argument value to be converted.
+                schema_obj_type: str. The schema obj_type for the customization
+                    argument value, which is one of 'SubtitledUnicode' or
+                    'SubtitledHtml'.
+
+            Returns:
+                SubtitledHtml|SubtitledUnicode. The converted SubtitledHtml
+                object, if schema_type is 'SubititledHtml', otherwise the
+                unmodified SubtitledUnicode object.
+            """
+            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
+                value.html = conversion_fn(value.html)
+            return value
+
+        interaction_id = interaction_dict['id']
+
+        # Convert the customization_args to a dictionary of customization arg
+        # name to InteractionCustomizationArg, so that we can utilize
+        # InteractionCustomizationArg helper functions.
+        # Then, convert back to original dict format afterwards, at the end.
+        customization_args = (
+            InteractionInstance
+            .convert_customization_args_dict_to_customization_args(
+                interaction_id,
+                interaction_dict['customization_args'])
+        )
+        ca_specs = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).customization_arg_specs
+
+        for ca_spec in ca_specs:
+            ca_spec_name = ca_spec.name
+            customization_args[ca_spec_name].value = (
+                InteractionCustomizationArg.traverse_by_schema_and_convert(
+                    ca_spec.schema,
+                    customization_args[ca_spec_name].value,
+                    wrapped_conversion_fn
+                )
+            )
+
+        # customization_args_dict here indicates a dict that maps customization
+        # argument names to a customization argument dict, the dict
+        # representation of InteractionCustomizationArg.
+        customization_args_dict = {}
+        for ca_name in customization_args:
+            customization_args_dict[ca_name] = (
+                customization_args[ca_name].to_customization_arg_dict())
+
+        interaction_dict['customization_args'] = customization_args_dict
+        return interaction_dict
+
+    @staticmethod
+    def convert_customization_args_dict_to_customization_args(
+            interaction_id, customization_args_dict):
+        """Converts customization arguments dictionary to customization
+        arguments. This is done by converting each customization argument to a
+        InteractionCustomizationArg domain object.
+
+        Args:
+            interaction_id: str. The interaction id.
+            customization_args_dict: dict. A dictionary of customization
+                argument name to a customization argument dict, which is a dict
+                of the single key 'value' to the value of the customization
+                argument.
+
+        Returns:
+            dict. A dictionary of customization argument names to the
+            InteractionCustomizationArg domain object's.
+        """
+        if interaction_id is None:
+            return {}
+
+        ca_specs = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id).customization_arg_specs
+        customization_args = {
+            spec.name: InteractionCustomizationArg.from_customization_arg_dict(
+                customization_args_dict[spec.name],
+                spec.schema
+            ) for spec in ca_specs
+        }
+
+        return customization_args
+
+
+class InteractionCustomizationArg(python_utils.OBJECT):
+    """Object representing an interaction's customization argument.
+    Any SubtitledHtml or SubtitledUnicode values in the customization argument
+    value are represented as their respective domain objects here, rather than a
+    SubtitledHtml dict or SubtitledUnicode dict.
+    """
+
+    def __init__(self, value, schema):
+        """Initializes a InteractionCustomizationArg domain object.
+
+        Args:
+            value: *. The value of the interaction customization argument.
+            schema: dict. The schema defining the specification of the value.
+        """
+        self.value = value
+        self.schema = schema
+
+    def to_customization_arg_dict(self):
+        """Converts a InteractionCustomizationArgument domain object to a
+        customization argument dictionary. This is done by
+        traversing the customization argument schema, and converting
+        SubtitledUnicode to unicode and SubtitledHtml to html where appropriate.
+        """
+        def convert_content_to_dict(ca_value, unused_schema_obj_type):
+            """Conversion function used to convert SubtitledHtml to
+            SubtitledHtml dicts and SubtitledUnicode to SubtitledUnicode dicts.
+
+            Args:
+                ca_value: SubtitledHtml|SubtitledUnicode. A SubtitledUnicode or
+                    SubtitledHtml value found inside the customization
+                    argument value.
+                unused_schema_obj_type: str. The schema obj_type for the
+                    customization argument value, which is one
+                    of 'SubtitledUnicode' or 'SubtitledHtml'.
+
+            Returns:
+                dict. The customization argument value converted to a dict.
+            """
+            return ca_value.to_dict()
+
+        return {
+            'value': InteractionCustomizationArg.traverse_by_schema_and_convert(
+                self.schema,
+                copy.deepcopy(self.value),
+                convert_content_to_dict
+            )
+        }
+
+    @classmethod
+    def from_customization_arg_dict(cls, ca_dict, ca_schema):
+        """Converts a customization argument dictionary to an
+        InteractionCustomizationArgument domain object. This is done by
+        traversing the customization argument schema, and converting
+        unicode to SubtitledUnicode and html to SubtitledHtml where appropriate.
+
+        Args:
+            ca_dict: dict. The customization argument dictionary. A dict of the
+                single key 'value' to the value of the customization argument.
+            ca_schema: dict. The schema that defines the customization argument
+                value.
+
+        Returns:
+            InteractionCustomizationArg. The customization argument domain
+            object.
+        """
+        def convert_content_to_domain_obj(ca_value, schema_obj_type):
+            """Conversion function used to convert SubtitledHtml dicts to
+            SubtitledHtml and SubtitledUnicode dicts to SubtitledUnicode.
+
+            Args:
+                ca_value: dict. Value of customization argument.
+                schema_obj_type: str. The schema obj_type for the customization
+                    argument value, which is one of 'SubtitledUnicode' or
+                    'SubtitledHtml'.
+
+            Returns:
+                dict. The unmodified customization argument value.
+            """
+            if (
+                    schema_obj_type ==
+                    schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+            ):
+                return SubtitledUnicode(
+                    ca_value['content_id'], ca_value['unicode_str'])
+
+            if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
+                return SubtitledHtml(
+                    ca_value['content_id'], ca_value['html'])
+
+        ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
+            ca_schema,
+            copy.deepcopy(ca_dict['value']),
+            convert_content_to_domain_obj
+        )
+
+        return cls(ca_value, ca_schema)
+
+    def get_content_ids(self):
+        """Get all content_ids from SubtitledHtml and SubtitledUnicode in the
+        customization argument.
+
+        Returns:
+            list(str). A list of content_ids.
+        """
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE,
+             schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            lambda x: x.content_id
+        )
+
+    def get_html(self):
+        """Get all html from SubtitledHtml in the customization argument.
+
+        Returns:
+            list(str). All html strings in the customization argument.
+        """
+
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            lambda x: x.html
+        )
+
+    def validate_subtitled_html(self):
+        """Calls the validate method on all SubtitledHtml domain objects in
+        the customization arguments.
+        """
+        def validate_html(subtitled_html):
+            """A dummy value extractor that calls the validate method on
+            the passed SubtitledHtml domain object.
+            """
+            subtitled_html.validate()
+
+        InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            validate_html
+        )
+
+    @staticmethod
+    def traverse_by_schema_and_convert(schema, value, conversion_fn):
+        """Helper function that recursively traverses an interaction
+        customization argument spec to locate any SubtitledHtml or
+        SubtitledUnicode objects, and applies a conversion function to the
+        customization argument value.
+
+        Args:
+            schema: dict. The customization dict to be modified: dict
+                with a single key, 'value', whose corresponding value is the
+                value of the customization arg.
+            value: dict. The current nested customization argument value to be
+                modified.
+            conversion_fn: function. The function to be used for converting the
+                content. It is passed the customization argument value and
+                schema obj_type, which is one of 'SubtitledUnicode' or
+                'SubtitledHtml'.
+
+        Returns:
+            dict. The converted customization dict.
+        """
+        is_subtitled_html_spec = (
+            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+            schema['obj_type'] ==
+            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+        is_subtitled_unicode_spec = (
+            schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+            schema['obj_type'] ==
+            schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+
+        if is_subtitled_html_spec or is_subtitled_unicode_spec:
+            value = conversion_fn(value, schema['obj_type'])
+        elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
+            value = [
+                InteractionCustomizationArg.traverse_by_schema_and_convert(
+                    schema['items'],
+                    value_element,
+                    conversion_fn
+                ) for value_element in value
+            ]
+        elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+            for property_spec in schema['properties']:
+                name = property_spec['name']
+                value[name] = (
+                    InteractionCustomizationArg.traverse_by_schema_and_convert(
+                        property_spec['schema'],
+                        value[name],
+                        conversion_fn)
+                )
+
+        return value
+
+    @staticmethod
+    def traverse_by_schema_and_get(
+            schema, value, obj_types_to_search_for, value_extractor):
+        """Recursively traverses an interaction customization argument spec to
+        locate values with schema obj_type in obj_types_to_search_for, and
+        extracting the value using a value_extractor function.
+
+        Args:
+            schema: dict. The customization dict to be modified: dict
+                with a single key, 'value', whose corresponding value is the
+                value of the customization arg.
+            value: dict. The current nested customization argument value to be
+                modified.
+            obj_types_to_search_for: list(str). The obj types to search for. If
+                this list contains the current obj type, the value is passed to
+                value_extractor and the results are collected.
+            value_extractor: function. The function that extracts the wanted
+                computed value from each value that matches the obj_types. It
+                accepts one parameter, the value that matches the search object
+                type, and returns a desired computed value.
+
+        Returns:
+            list(*). A list of the extracted values returned from
+            value_extractor, which is run on any values that have a schema type
+            equal to 'custom' and have a obj_type in obj_types_to_search_for.
+            Because value_extractor can return any type, the result is a list of
+            any type.
+        """
+        result = []
+        schema_type = schema['type']
+
+        if (
+                schema_type == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] in obj_types_to_search_for
+        ):
+            result.append(value_extractor(value))
+        elif schema_type == schema_utils.SCHEMA_TYPE_LIST:
+            result = list(itertools.chain.from_iterable([
+                InteractionCustomizationArg.traverse_by_schema_and_get(
+                    schema['items'],
+                    value_element,
+                    obj_types_to_search_for,
+                    value_extractor
+                ) for value_element in value]))
+        elif schema_type == schema_utils.SCHEMA_TYPE_DICT:
+            result = list(itertools.chain.from_iterable([
+                InteractionCustomizationArg.traverse_by_schema_and_get(
+                    property_spec['schema'],
+                    value[property_spec['name']],
+                    obj_types_to_search_for,
+                    value_extractor
+                ) for property_spec in schema['properties']]))
+
+        return result
 
 
 class Outcome(python_utils.OBJECT):
@@ -607,9 +1159,11 @@ class Outcome(python_utils.OBJECT):
         Returns:
             Outcome. The corresponding Outcome domain object.
         """
+        feedback = SubtitledHtml.from_dict(outcome_dict['feedback'])
+        feedback.validate()
         return cls(
             outcome_dict['dest'],
-            SubtitledHtml.from_dict(outcome_dict['feedback']),
+            feedback,
             outcome_dict['labelled_as_correct'],
             [param_domain.ParamChange(
                 param_change['name'], param_change['generator_id'],
@@ -664,7 +1218,7 @@ class Outcome(python_utils.OBJECT):
         """Validates various properties of the Outcome.
 
         Raises:
-            ValidationError: One or more attributes of the Outcome are invalid.
+            ValidationError. One or more attributes of the Outcome are invalid.
         """
         self.feedback.validate()
 
@@ -694,6 +1248,23 @@ class Outcome(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected outcome refresher_exploration_id to be a string, '
                     'received %s' % self.refresher_exploration_id)
+
+    @staticmethod
+    def convert_html_in_outcome(outcome_dict, conversion_fn):
+        """Checks for HTML fields in the outcome and converts it
+        according to the conversion function.
+
+        Args:
+            outcome_dict: dict. The outcome dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted outcome dict.
+        """
+        outcome_dict['feedback']['html'] = (
+            conversion_fn(outcome_dict['feedback']['html']))
+        return outcome_dict
 
 
 class Voiceover(python_utils.OBJECT):
@@ -756,8 +1327,8 @@ class Voiceover(python_utils.OBJECT):
         """Validates properties of the Voiceover.
 
         Raises:
-            ValidationError: One or more attributes of the Voiceover are
-            invalid.
+            ValidationError. One or more attributes of the Voiceover are
+                invalid.
         """
         if not isinstance(self.filename, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -771,9 +1342,9 @@ class Voiceover(python_utils.OBJECT):
         if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
-                'the following extensions: %s. Received: %s'
-                % (list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
-                   self.filename))
+                'the following extensions: %s. Received: %s' % (
+                    list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()),
+                    self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
@@ -801,16 +1372,27 @@ class Voiceover(python_utils.OBJECT):
 class WrittenTranslation(python_utils.OBJECT):
     """Value object representing a written translation for a content."""
 
-    def __init__(self, html, needs_update):
+    DATA_FORMAT_HTML = 'html'
+    DATA_FORMAT_UNICODE = 'unicode'
+
+    def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            html: str. A piece of user submitted HTML. This is cleaned in such
-                a way as to contain a restricted set of HTML tags.
-            needs_update: bool. Whether html is marked for needing review.
+            data_format: str. 'unicode' or 'html'. Indicates if translation
+                field is html or unicode.
+            translation: str. A piece of user-submitted HTML or unicode. If
+                html, this is cleaned in such a way as to contain a restricted
+                set of HTML tags.
+            needs_update: bool. Whether translation is marked as needing
+                review.
         """
-        self.html = html_cleaner.clean(html)
+        self.data_format = data_format
+        self.translation = translation
         self.needs_update = needs_update
+
+        if data_format == self.DATA_FORMAT_HTML:
+            self.translation = html_cleaner.clean(self.translation)
 
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
@@ -819,7 +1401,8 @@ class WrittenTranslation(python_utils.OBJECT):
             dict. A dict, mapping all fields of WrittenTranslation instance.
         """
         return {
-            'html': self.html,
+            'data_format': self.data_format,
+            'translation': self.translation,
             'needs_update': self.needs_update,
         }
 
@@ -836,19 +1419,29 @@ class WrittenTranslation(python_utils.OBJECT):
             object.
         """
         return cls(
-            written_translation_dict['html'],
+            written_translation_dict['data_format'],
+            written_translation_dict['translation'],
             written_translation_dict['needs_update'])
 
     def validate(self):
         """Validates properties of the WrittenTranslation.
 
         Raises:
-            ValidationError: One or more attributes of the WrittenTranslation
-            are invalid.
+            ValidationError. One or more attributes of the WrittenTranslation
+                are invalid.
         """
-        if not isinstance(self.html, python_utils.BASESTRING):
+        if not isinstance(self.data_format, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid content HTML: %s' % self.html)
+                'Invalid data_format: %s' % self.data_format)
+
+        if not (self.data_format == self.DATA_FORMAT_UNICODE or
+                self.data_format == self.DATA_FORMAT_HTML):
+            raise utils.ValidationError(
+                'Invalid data_format: %s' % self.data_format)
+
+        if not isinstance(self.translation, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Invalid translation: %s' % self.translation)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
@@ -922,9 +1515,9 @@ class WrittenTranslations(python_utils.OBJECT):
         Args:
             language_code: str. The abbreviated code of the language.
 
-        Return:
+        Returns:
             list(str). A list of content ids in which the translations are
-                available in the given language.
+            available in the given language.
         """
         correctly_translated_content_ids = []
         for content_id, translations in self.translations_mapping.items():
@@ -942,7 +1535,8 @@ class WrittenTranslations(python_utils.OBJECT):
             language_code: str. The language code of the translated html.
             html: str. The translated html.
         """
-        written_translation = WrittenTranslation(html, False)
+        written_translation = WrittenTranslation(
+            WrittenTranslation.DATA_FORMAT_HTML, html, False)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 
@@ -950,12 +1544,12 @@ class WrittenTranslations(python_utils.OBJECT):
         """Validates properties of the WrittenTranslations.
 
         Args:
-            expected_content_id_list: A list of content id which are expected to
-            be inside they WrittenTranslations.
+            expected_content_id_list: list(str). A list of content id which are
+                expected to be inside they WrittenTranslations.
 
         Raises:
-            ValidationError: One or more attributes of the WrittenTranslations
-            are invalid.
+            ValidationError. One or more attributes of the WrittenTranslations
+                are invalid.
         """
         if expected_content_id_list is not None:
             if not set(self.translations_mapping.keys()) == (
@@ -1014,12 +1608,13 @@ class WrittenTranslations(python_utils.OBJECT):
             str. The translated content for a given content id in a language.
 
         Raises:
-            Exception: Translation doesn't exist in the given language.
-            Exception: The given content id doesn't exist.
+            Exception. Translation doesn't exist in the given language.
+            Exception. The given content id doesn't exist.
         """
         if content_id in self.translations_mapping:
             if language_code in self.translations_mapping[content_id]:
-                return self.translations_mapping[content_id][language_code].html
+                return self.translations_mapping[
+                    content_id][language_code].translation
             else:
                 raise Exception(
                     'Translation for the given content_id %s does not exist in '
@@ -1035,7 +1630,7 @@ class WrittenTranslations(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
+            Exception. The content id isn't a string.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
@@ -1053,7 +1648,7 @@ class WrittenTranslations(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
+            Exception. The content id isn't a string.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
             raise Exception(
@@ -1081,6 +1676,49 @@ class WrittenTranslations(python_utils.OBJECT):
 
         return translation_counts
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in the WrittenTranslations.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_string_list = []
+        for translations in self.translations_mapping.values():
+            for written_translation in translations.values():
+                if (written_translation.data_format ==
+                        WrittenTranslation.DATA_FORMAT_HTML):
+                    html_string_list.append(written_translation.translation)
+        return html_string_list
+
+    @staticmethod
+    def convert_html_in_written_translations(
+            written_translations_dict, conversion_fn):
+        """Checks for HTML fields in the written translations and converts it
+        according to the conversion function.
+
+        Args:
+            written_translations_dict: dict. The written translations dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted written translations dict.
+        """
+        for content_id, language_code_to_written_translation in (
+                written_translations_dict['translations_mapping'].items()):
+            for language_code in (
+                    language_code_to_written_translation.keys()):
+                if (written_translations_dict['translations_mapping'][
+                        content_id][language_code]['data_format'] ==
+                        WrittenTranslation.DATA_FORMAT_HTML):
+                    written_translations_dict['translations_mapping'][
+                        content_id][language_code]['translation'] = (
+                            conversion_fn(written_translations_dict[
+                                'translations_mapping'][content_id][
+                                    language_code]['translation'])
+                        )
+        return written_translations_dict
+
 
 class RecordedVoiceovers(python_utils.OBJECT):
     """Value object representing a recorded voiceovers which stores voiceover of
@@ -1091,7 +1729,7 @@ class RecordedVoiceovers(python_utils.OBJECT):
     def __init__(self, voiceovers_mapping):
         """Initializes a RecordedVoiceovers domain object.
 
-          Args:
+        Args:
             voiceovers_mapping: dict. A dict mapping the content Ids
                 to the dicts which is the map of abbreviated code of the
                 languages to the Voiceover objects.
@@ -1145,12 +1783,12 @@ class RecordedVoiceovers(python_utils.OBJECT):
         """Validates properties of the RecordedVoiceovers.
 
         Args:
-            expected_content_id_list: A list of content id which are expected to
-            be inside they RecordedVoiceovers.
+            expected_content_id_list: list(str). A list of content id which are
+                expected to be inside the RecordedVoiceovers.
 
         Raises:
-            ValidationError: One or more attributes of the RecordedVoiceovers
-            are invalid.
+            ValidationError. One or more attributes of the RecordedVoiceovers
+                are invalid.
         """
         if expected_content_id_list is not None:
             if not set(self.voiceovers_mapping.keys()) == (
@@ -1207,8 +1845,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
-            Exception: The content id already exist in the voiceovers_mapping
+            Exception. The content id isn't a string.
+            Exception. The content id already exist in the voiceovers_mapping
                 dict.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
@@ -1227,8 +1865,8 @@ class RecordedVoiceovers(python_utils.OBJECT):
             content_id: str. The id representing a subtitled html.
 
         Raises:
-            Exception: The content id isn't a string.
-            Exception: The content id does not exist in the voiceovers_mapping
+            Exception. The content id isn't a string.
+            Exception. The content id does not exist in the voiceovers_mapping
                 dict.
         """
         if not isinstance(content_id, python_utils.BASESTRING):
@@ -1292,22 +1930,22 @@ class RuleSpec(python_utils.OBJECT):
         for all the parameters the rule expects.
 
         Args:
-            rule_params_list: A list of parameters used by the rule represented
-                by this RuleSpec instance, to be used to validate the inputs of
-                this RuleSpec. Each element of the list represents a single
-                parameter and is a tuple with two elements:
+            rule_params_list: list(str, object(*)). A list of parameters used by
+                the rule represented by this RuleSpec instance, to be used to
+                validate the inputs of this RuleSpec. Each element of the list
+                represents a single parameter and is a tuple with two elements:
                     0: The name (string) of the parameter.
                     1: The typed object instance for that
                         parameter (e.g. Real).
-            exp_param_specs_dict: A dict of specified parameters used in this
-                exploration. Keys are parameter names and values are ParamSpec
-                value objects with an object type property (obj_type). RuleSpec
-                inputs may have a parameter value which refers to one of these
-                exploration parameters.
+            exp_param_specs_dict: dict. A dict of specified parameters used in
+                this exploration. Keys are parameter names and values are
+                ParamSpec value objects with an object type property (obj_type).
+                RuleSpec inputs may have a parameter value which refers to one
+                of these exploration parameters.
 
         Raises:
-            ValidationError: One or more attributes of the RuleSpec are
-            invalid.
+            ValidationError. One or more attributes of the RuleSpec are
+                invalid.
         """
         if not isinstance(self.inputs, dict):
             raise utils.ValidationError(
@@ -1357,22 +1995,112 @@ class RuleSpec(python_utils.OBJECT):
                 # by the parameter object in order to be valid.
                 param_obj.normalize(param_value)
 
+    @staticmethod
+    def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
+        """Checks for HTML fields in a Rule Spec and converts it according
+        to the conversion function.
+
+        Args:
+            rule_spec_dict: dict. The Rule Spec dict.
+            conversion_fn: function. The function to be used for converting the
+                HTML.
+
+        Returns:
+            dict. The converted Rule Spec dict.
+        """
+        html_field_types_to_rule_specs_dict = json.loads(
+            utils.get_file_contents(
+                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+        # TODO(#9413): Find a way to include a reference to the interaction
+        # type in the Draft change lists.
+        # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
+        # the interaction-id from the rules_index_dict until issue-9413 has
+        # been fixed, because this method has no reference to the interaction
+        # type and draft changes use this method. The rules_index_dict below
+        # is used to figure out the assembly of the html in the rulespecs.
+        for interaction_and_rule_details in (
+                html_field_types_to_rule_specs_dict.values()):
+            rule_type_has_html = (
+                rule_spec_dict['rule_type'] in
+                interaction_and_rule_details['ruleTypes'].keys())
+            if rule_type_has_html:
+                html_type_format = interaction_and_rule_details['format']
+                input_variables_from_html_mapping = (
+                    interaction_and_rule_details['ruleTypes'][
+                        rule_spec_dict['rule_type']][
+                            'htmlInputVariables'])
+                input_variable_match_found = False
+                for input_variable in rule_spec_dict['inputs'].keys():
+                    if input_variable in input_variables_from_html_mapping:
+                        input_variable_match_found = True
+                        rule_input_variable = (
+                            rule_spec_dict['inputs'][input_variable])
+                        if (html_type_format ==
+                                feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
+                            rule_spec_dict['inputs'][input_variable] = (
+                                conversion_fn(
+                                    rule_spec_dict['inputs'][input_variable]))
+                        elif (html_type_format ==
+                              feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                            # Here we are checking the type of the
+                            # rule_specs.inputs because the rule type
+                            # 'Equals' is used by other interactions as
+                            # well which don't have HTML and we don't have
+                            # a reference to the interaction ID.
+                            if isinstance(rule_input_variable, list):
+                                for value_index, value in enumerate(
+                                        rule_input_variable):
+                                    if isinstance(
+                                            value, python_utils.BASESTRING):
+                                        rule_spec_dict['inputs'][
+                                            input_variable][value_index] = (
+                                                conversion_fn(value))
+                        elif (html_type_format ==
+                              feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                            for list_index, html_list in enumerate(
+                                    rule_spec_dict['inputs'][input_variable]):
+                                for rule_html_index, rule_html in enumerate(
+                                        html_list):
+                                    rule_spec_dict['inputs'][input_variable][
+                                        list_index][rule_html_index] = (
+                                            conversion_fn(rule_html))
+                        else:
+                            raise Exception(
+                                'The rule spec does not belong to a valid'
+                                ' format.')
+                if not input_variable_match_found:
+                    raise Exception(
+                        'Rule spec should have at least one valid input '
+                        'variable with Html in it.')
+
+
+        return rule_spec_dict
+
 
 class SubtitledHtml(python_utils.OBJECT):
     """Value object representing subtitled HTML."""
 
     def __init__(self, content_id, html):
-        """Initializes a SubtitledHtml domain object.
+        """Initializes a SubtitledHtml domain object. Note that initializing
+        the SubtitledHtml object does not clean the html. This is because we
+        sometimes need to initialize SubtitledHtml and migrate the contained
+        html from an old schema, but the cleaner would remove invalid tags
+        and attributes before having a chance to migrate it. An example where
+        this functionality is required is
+        InteractionInstance.convert_html_in_interaction. Before saving the
+        SubtitledHtml object, validate() should be called for validation and
+        cleaning of the html.
 
         Args:
             content_id: str. A unique id referring to the other assets for this
                 content.
-            html: str. A piece of user submitted HTML. This is cleaned in such
-                a way as to contain a restricted set of HTML tags.
+            html: str. A piece of user-submitted HTML. Note that this is NOT
+                cleaned in such a way as to contain a restricted set of HTML
+                tags. To clean it, the validate() method must be called.
         """
         self.content_id = content_id
-        self.html = html_cleaner.clean(html)
-        self.validate()
+        self.html = html
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
@@ -1400,11 +2128,11 @@ class SubtitledHtml(python_utils.OBJECT):
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
     def validate(self):
-        """Validates properties of the SubtitledHtml.
+        """Validates properties of the SubtitledHtml, and cleans the html.
 
         Raises:
-            ValidationError: One or more attributes of the SubtitledHtml are
-            invalid.
+            ValidationError. One or more attributes of the SubtitledHtml are
+                invalid.
         """
         if not isinstance(self.content_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -1415,16 +2143,89 @@ class SubtitledHtml(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
+        self.html = html_cleaner.clean(self.html)
+
     @classmethod
     def create_default_subtitled_html(cls, content_id):
         """Create a default SubtitledHtml domain object.
 
         Args:
-            content_id: str. the id of the content.
+            content_id: str. The id of the content.
 
         Returns:
             SubtitledHtml. A default SubtitledHtml domain object, some
             attribute of that object will be ''.
+        """
+        return cls(content_id, '')
+
+
+class SubtitledUnicode(python_utils.OBJECT):
+    """Value object representing subtitled unicode."""
+
+    def __init__(self, content_id, unicode_str):
+        """Initializes a SubtitledUnicode domain object.
+
+        Args:
+            content_id: str. A unique id referring to the other assets for this
+                content.
+            unicode_str: str. A piece of user-submitted unicode.
+        """
+        self.content_id = content_id
+        self.unicode_str = unicode_str
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this SubtitledUnicode domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of SubtitledUnicode instance.
+        """
+        return {
+            'content_id': self.content_id,
+            'unicode_str': self.unicode_str
+        }
+
+    @classmethod
+    def from_dict(cls, subtitled_unicode_dict):
+        """Return a SubtitledUnicode domain object from a dict.
+
+        Args:
+            subtitled_unicode_dict: dict. The dict representation of
+                SubtitledUnicode object.
+
+        Returns:
+            SubtitledUnicode. The corresponding SubtitledUnicode domain object.
+        """
+        return cls(
+            subtitled_unicode_dict['content_id'],
+            subtitled_unicode_dict['unicode_str']
+        )
+
+    def validate(self):
+        """Validates properties of the SubtitledUnicode.
+
+        Raises:
+            ValidationError. One or more attributes of the SubtitledUnicode are
+                invalid.
+        """
+        if not isinstance(self.content_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                self.content_id)
+
+        if not isinstance(self.unicode_str, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Invalid content unicode: %s' % self.unicode_str)
+
+    @classmethod
+    def create_default_subtitled_unicode(cls, content_id):
+        """Create a default SubtitledUnicode domain object.
+
+        Args:
+            content_id: str. The id of the content.
+
+        Returns:
+            SubtitledUnicode. A default SubtitledUnicode domain object.
         """
         return cls(content_id, '')
 
@@ -1435,7 +2236,7 @@ class State(python_utils.OBJECT):
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
             written_translations, solicit_answer_details,
-            classifier_model_id=None):
+            next_content_id_index, classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1452,6 +2253,8 @@ class State(python_utils.OBJECT):
             solicit_answer_details: bool. Whether the creator wants to ask
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
+            next_content_id_index: int. The next content_id index to use for
+                generation of new content_ids.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -1472,6 +2275,7 @@ class State(python_utils.OBJECT):
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
         self.solicit_answer_details = solicit_answer_details
+        self.next_content_id_index = next_content_id_index
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -1486,7 +2290,7 @@ class State(python_utils.OBJECT):
                 allowed to be unspecified.
 
         Raises:
-            ValidationError: One or more attributes of the State are invalid.
+            ValidationError. One or more attributes of the State are invalid.
         """
         self.content.validate()
 
@@ -1533,6 +2337,33 @@ class State(python_utils.OBJECT):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
+        if self.interaction.id is not None:
+            for ca_name in self.interaction.customization_args:
+                content_id_list.extend(
+                    self.interaction.customization_args[ca_name]
+                    .get_content_ids()
+                )
+
+        if len(set(content_id_list)) != len(content_id_list):
+            raise utils.ValidationError(
+                'Expected all content_ids to be unique, '
+                'received %s' % content_id_list)
+
+        for content_id in content_id_list:
+            content_id_suffix = content_id.split('_')[-1]
+
+            # Possible values of content_id_suffix are a digit, or from
+            # a 'outcome' (from 'default_outcome'). If the content_id_suffix
+            # is not a digit, we disregard it here.
+            if (
+                    content_id_suffix.isdigit() and
+                    int(content_id_suffix) > self.next_content_id_index
+            ):
+                raise utils.ValidationError(
+                    'Expected all content id indexes to be less than the "next '
+                    'content id index", but received content id %s' % content_id
+                )
+
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
                 'Expected solicit_answer_details to be a boolean, '
@@ -1557,7 +2388,7 @@ class State(python_utils.OBJECT):
             str. The html content corresponding to the given content id.
 
         Raises:
-            ValueError: The given content_id does not exist.
+            ValueError. The given content_id does not exist.
         """
         content_id_to_html = self._get_all_translatable_content()
         if content_id not in content_id_to_html:
@@ -1601,9 +2432,9 @@ class State(python_utils.OBJECT):
 
         Returns:
             list(dict). A list of dicts, each of which has two key-value pairs.
-                One pair maps 'answer_group_index' to the index of the answer
-                group and the other maps 'answers' to the answer group's
-                training data.
+            One pair maps 'answer_group_index' to the index of the answer
+            group and the other maps 'answers' to the answer group's
+            training data.
         """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
@@ -1621,7 +2452,7 @@ class State(python_utils.OBJECT):
         for a ML model to be trained.
 
         Returns:
-            bool: True, if the conditions are satisfied.
+            bool. True, if the conditions are satisfied.
         """
         training_examples_count = 0
         labels_count = 0
@@ -1630,8 +2461,8 @@ class State(python_utils.OBJECT):
         for answer_group in self.interaction.answer_groups:
             training_examples_count += len(answer_group.training_data)
             labels_count += 1
-        if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
-                (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
+        if (training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES
+                and (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
             return True
         return False
 
@@ -1648,7 +2479,7 @@ class State(python_utils.OBJECT):
             str. The YAML version of the state_dict.
 
         Raises:
-            Exception: The state_dict does not represent a valid state.
+            Exception. The state_dict does not represent a valid state.
         """
         try:
             # Check if the state_dict can be converted to a State.
@@ -1754,7 +2585,7 @@ class State(python_utils.OBJECT):
 
         Args:
             param_changes: list(ParamChange). List of param_change domain
-            objects that represents ParamChange domain object.
+                objects that represents ParamChange domain object.
         """
         self.param_changes = param_changes
 
@@ -1765,18 +2596,51 @@ class State(python_utils.OBJECT):
             interaction_id: str. The new interaction id to set.
         """
         self.interaction.id = interaction_id
+
         # TODO(sll): This should also clear interaction.answer_groups (except
         # for the default rule). This is somewhat mitigated because the client
         # updates interaction_answer_groups directly after this, but we should
         # fix it.
 
-    def update_interaction_customization_args(self, customization_args):
+    def update_next_content_id_index(self, next_content_id_index):
+        """Update the interaction next content id index attribute.
+
+        Args:
+            next_content_id_index: int. The new next content id index to set.
+        """
+        self.next_content_id_index = next_content_id_index
+
+    def update_interaction_customization_args(self, customization_args_dict):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args: dict. The new customization_args to set.
+            customization_args_dict: dict. The new customization_args to set.
         """
+        customization_args = (
+            InteractionInstance.
+            convert_customization_args_dict_to_customization_args(
+                self.interaction.id,
+                customization_args_dict)
+        )
+        for ca_name in customization_args:
+            customization_args[ca_name].validate_subtitled_html()
+
+        old_content_id_list = list(itertools.chain.from_iterable([
+            self.interaction.customization_args[ca_name].get_content_ids()
+            for ca_name in self.interaction.customization_args]))
+
         self.interaction.customization_args = customization_args
+        new_content_id_list = list(itertools.chain.from_iterable([
+            self.interaction.customization_args[ca_name].get_content_ids()
+            for ca_name in self.interaction.customization_args]))
+
+        if len(new_content_id_list) != len(set(new_content_id_list)):
+            raise Exception(
+                'All customization argument content_ids should be unique. '
+                'Content ids received: %s' % new_content_id_list)
+
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(self, answer_groups_list):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
@@ -1879,7 +2743,7 @@ class State(python_utils.OBJECT):
                 default outcome.
 
         Raises:
-            Exception: 'confirmed_unclassified_answers' is not a list.
+            Exception. The 'confirmed_unclassified_answers' is not a list.
         """
         if not isinstance(confirmed_unclassified_answers, list):
             raise Exception(
@@ -1895,7 +2759,7 @@ class State(python_utils.OBJECT):
             hints_list: list(Hint). A list of Hint objects.
 
         Raises:
-            Exception: 'hints_list' is not a list.
+            Exception. The 'hints_list' is not a list.
         """
         if not isinstance(hints_list, list):
             raise Exception(
@@ -1910,15 +2774,14 @@ class State(python_utils.OBJECT):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, solution_dict):
+    def update_interaction_solution(self, solution):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict or None. The dict representation of
-                Solution object.
+            solution: Solution. Object of class Solution.
 
         Raises:
-            Exception: 'solution_dict' is not a dict.
+            Exception. The 'solution' is not a domain object.
         """
         old_content_id_list = []
         new_content_id_list = []
@@ -1926,13 +2789,12 @@ class State(python_utils.OBJECT):
             old_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
 
-        if solution_dict is not None:
-            if not isinstance(solution_dict, dict):
+        if solution is not None:
+            if not isinstance(solution, Solution):
                 raise Exception(
-                    'Expected solution to be a dict, received %s'
-                    % solution_dict)
-            self.interaction.solution = Solution.from_dict(
-                self.interaction.id, solution_dict)
+                    'Expected solution to be a Solution object,received %s'
+                    % solution)
+            self.interaction.solution = solution
             new_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
         else:
@@ -2045,7 +2907,8 @@ class State(python_utils.OBJECT):
             'classifier_model_id': self.classifier_model_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict(),
-            'solicit_answer_details': self.solicit_answer_details
+            'solicit_answer_details': self.solicit_answer_details,
+            'next_content_id_index': self.next_content_id_index
         }
 
     @classmethod
@@ -2058,14 +2921,17 @@ class State(python_utils.OBJECT):
         Returns:
             State. The corresponding State domain object.
         """
+        content = SubtitledHtml.from_dict(state_dict['content'])
+        content.validate()
         return cls(
-            SubtitledHtml.from_dict(state_dict['content']),
+            content,
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
+            state_dict['next_content_id_index'],
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -2093,10 +2959,12 @@ class State(python_utils.OBJECT):
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
-            False)
+            False, 0)
 
     @classmethod
-    def convert_html_fields_in_state(cls, state_dict, conversion_fn):
+    def convert_html_fields_in_state(
+            cls, state_dict, conversion_fn,
+            state_uses_old_interaction_cust_args_schema=False):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -2104,6 +2972,10 @@ class State(python_utils.OBJECT):
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
+            state_uses_old_interaction_cust_args_schema: bool. Whether the
+                interaction customization arguments contain SubtitledHtml
+                and SubtitledUnicode dicts (should be True if prior to state
+                schema v40).
 
         Returns:
             dict. The converted state_dict.
@@ -2111,43 +2983,84 @@ class State(python_utils.OBJECT):
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html']))
         if state_dict['interaction']['default_outcome']:
-            interaction_feedback_html = state_dict[
-                'interaction']['default_outcome']['feedback']['html']
-            state_dict['interaction']['default_outcome']['feedback'][
-                'html'] = conversion_fn(interaction_feedback_html)
+            state_dict['interaction']['default_outcome'] = (
+                Outcome.convert_html_in_outcome(
+                    state_dict['interaction']['default_outcome'],
+                    conversion_fn))
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
-            answer_group_html = answer_group['outcome']['feedback']['html']
-            state_dict['interaction']['answer_groups'][
-                answer_group_index]['outcome']['feedback']['html'] = (
-                    conversion_fn(answer_group_html))
-            if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                for rule_spec_index, rule_spec in enumerate(
-                        answer_group['rule_specs']):
-                    for x_index, x in enumerate(rule_spec['inputs']['x']):
-                        state_dict['interaction']['answer_groups'][
-                            answer_group_index]['rule_specs'][
-                                rule_spec_index]['inputs']['x'][x_index] = (
-                                    conversion_fn(x))
-        for hint_index, hint in enumerate(
-                state_dict['interaction']['hints']):
-            hint_html = hint['hint_content']['html']
-            state_dict['interaction']['hints'][hint_index][
-                'hint_content']['html'] = conversion_fn(hint_html)
+            state_dict['interaction']['answer_groups'][answer_group_index] = (
+                AnswerGroup.convert_html_in_answer_group(
+                    answer_group, conversion_fn))
+
+        if 'written_translations' in state_dict.keys():
+            state_dict['written_translations'] = (
+                WrittenTranslations.
+                convert_html_in_written_translations(
+                    state_dict['written_translations'], conversion_fn))
+
+        for hint_index, hint in enumerate(state_dict['interaction']['hints']):
+            state_dict['interaction']['hints'][hint_index] = (
+                Hint.convert_html_in_hint(hint, conversion_fn))
+
+        interaction_id = state_dict['interaction']['id']
+        if interaction_id is None:
+            return state_dict
 
         if state_dict['interaction']['solution']:
-            solution_html = state_dict[
-                'interaction']['solution']['explanation']['html']
-            state_dict['interaction']['solution']['explanation']['html'] = (
-                conversion_fn(solution_html))
+            state_dict['interaction']['solution'] = (
+                Solution.convert_html_in_solution(
+                    state_dict['interaction']['id'],
+                    state_dict['interaction']['solution'], conversion_fn))
 
-        if state_dict['interaction']['id'] in (
-                'ItemSelectionInput', 'MultipleChoiceInput'):
-            for value_index, value in enumerate(
+
+        if state_uses_old_interaction_cust_args_schema:
+            # We need to retrieve an older version of interaction_specs to
+            # properly convert html, since past state schema v35,
+            # some html and unicode customization arguments were replaced with
+            # SubtitledHtml and SubtitledUnicode.
+            ca_specs = (
+                interaction_registry.Registry
+                .get_all_specs_for_state_schema_version(35)[
+                    interaction_id]['customization_arg_specs']
+            )
+
+            interaction_customization_arg_has_html = False
+            for customization_arg_spec in ca_specs:
+                schema = customization_arg_spec['schema']
+                if (schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                        schema['items']['type'] ==
+                        schema_utils.SCHEMA_TYPE_HTML):
+                    interaction_customization_arg_has_html = True
+
+            if interaction_customization_arg_has_html:
+                if 'choices' in (
+                        state_dict['interaction']['customization_args'].keys()):
                     state_dict['interaction']['customization_args'][
-                        'choices']['value']):
-                state_dict['interaction']['customization_args'][
-                    'choices']['value'][value_index] = conversion_fn(value)
+                        'choices']['value'] = ([
+                            conversion_fn(html)
+                            for html in state_dict[
+                                'interaction']['customization_args'][
+                                    'choices']['value']
+                        ])
+        else:
+            state_dict['interaction'] = (
+                InteractionInstance.convert_html_in_interaction(
+                    state_dict['interaction'],
+                    conversion_fn
+                ))
 
         return state_dict
+
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the state.
+
+        Returns:
+            list(str). The list of all html content strings in the interaction.
+        """
+        html_list = (
+            self.written_translations.get_all_html_content_strings() +
+            self.interaction.get_all_html_content_strings() + [
+                self.content.html])
+        return html_list

@@ -26,6 +26,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 
 import python_utils
 import release_constants
@@ -74,10 +75,16 @@ YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
+USER_PREFERENCES = {'open_new_tab_in_browser': None}
+
+FECONF_PATH = os.path.join('.', 'feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 
 
 def is_windows_os():
@@ -150,6 +157,15 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
+    if USER_PREFERENCES['open_new_tab_in_browser'] is None:
+        python_utils.PRINT(
+            '\nDo you want the url to be opened in the browser? '
+            'Confirm by entering y/ye/yes.')
+        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+    if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
+        python_utils.PRINT(
+            'Please open the following link in browser: %s' % url)
+        return
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
@@ -239,6 +255,17 @@ def get_current_release_version_number(release_branch_name):
         raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
+def is_current_branch_a_hotfix_branch():
+    """Checks if the current branch is a hotfix branch.
+
+    Returns:
+        bool. Whether the current branch is hotfix branch.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+
+
 def is_current_branch_a_release_branch():
     """Returns whether the current branch is a release branch.
 
@@ -313,7 +340,7 @@ def is_port_open(port):
     Args:
         port: int. The port number.
 
-    Return:
+    Returns:
         bool. True if port is open else False.
     """
     with contextlib.closing(
@@ -403,7 +430,7 @@ def get_personal_access_token():
         str. The personal access token for the GitHub id of user.
 
     Raises:
-        Exception: Personal access token is None.
+        Exception. Personal access token is None.
     """
     personal_access_token = getpass.getpass(
         prompt=(
@@ -425,8 +452,8 @@ def check_blocking_bug_issue_count(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Number of unresolved blocking bugs is not zero.
-        Exception: The blocking bug milestone is closed.
+        Exception. Number of unresolved blocking bugs is not zero.
+        Exception. The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
         number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
@@ -450,8 +477,8 @@ def check_prs_for_current_release_are_released(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Some pull requests for current release do not have a
-            PR: released label.
+        Exception. Some pull requests for current release do not have a
+            "PR: released" label.
     """
     current_release_label = repo.get_label(
         release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
@@ -552,6 +579,26 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         os.remove(filename)
         shutil.move(backup_filename, filename)
         raise
+
+
+def wait_for_port_to_be_open(port_number):
+    """Wait until the port is open and exit if port isn't open after
+    1000 seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+    """
+    waited_seconds = 0
+    while (not is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+            and not is_port_open(port_number)):
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' %
+            port_number)
+        sys.exit(1)
 
 
 class CD(python_utils.OBJECT):

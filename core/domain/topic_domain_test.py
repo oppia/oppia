@@ -31,6 +31,7 @@ import utils
 
 class TopicDomainUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
+
     topic_id = 'topic_id'
 
     def setUp(self):
@@ -38,11 +39,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev')
+            self.topic_id, 'Name', 'abbrev', 'description')
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -54,14 +56,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev')
+            self.topic_id, 'Name', 'abbrev', 'description')
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
             'abbreviated_name': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
+            'description': 'description',
             'canonical_story_references': [],
             'additional_story_references': [],
             'uncategorized_skill_ids': [],
@@ -88,9 +90,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             ['skill_id_1', 'skill_id_2'])
 
     def test_get_all_subtopics(self):
-        self.topic.subtopics = [topic_domain.Subtopic(
-            1, 'Title', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
             subtopics, [{
@@ -98,7 +97,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
                 'thumbnail_bg_color': '#FFFFFF',
-                'title': 'Title'}])
+                'title': 'Title',
+                'url_fragment': 'dummy-subtopic-url'}])
 
     def test_delete_canonical_story(self):
         self.topic.canonical_story_references = [
@@ -117,6 +117,234 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'The story_id story_id_5 is not present in the canonical'
             ' story references list of the topic.'):
             self.topic.delete_canonical_story('story_id_5')
+
+    def test_rearrange_canonical_story_fail_with_invalid_from_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_canonical_story(None, 2)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_canonical_story('a', 2)
+
+    def test_rearrange_canonical_story_fail_with_invalid_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_canonical_story(1, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_canonical_story(1, 'a')
+
+    def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(10, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(-1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(0, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_canonical_story(0, -1)
+
+    def test_rearrange_canonical_story_fail_with_identical_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index and to_index values to be '
+                       'different.'):
+            self.topic.rearrange_canonical_story(1, 1)
+
+    def test_rearrange_canonical_story(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_3')
+        ]
+        canonical_story_ids = self.topic.get_canonical_story_ids()
+
+        self.assertEqual(canonical_story_ids[0], 'story_id_1')
+        self.assertEqual(canonical_story_ids[1], 'story_id_2')
+        self.assertEqual(canonical_story_ids[2], 'story_id_3')
+
+        self.topic.rearrange_canonical_story(1, 0)
+        canonical_story_ids = self.topic.get_canonical_story_ids()
+        self.assertEqual(canonical_story_ids[0], 'story_id_2')
+        self.assertEqual(canonical_story_ids[1], 'story_id_1')
+        self.assertEqual(canonical_story_ids[2], 'story_id_3')
+
+        self.topic.rearrange_canonical_story(2, 1)
+        canonical_story_ids = self.topic.get_canonical_story_ids()
+        self.assertEqual(canonical_story_ids[0], 'story_id_2')
+        self.assertEqual(canonical_story_ids[1], 'story_id_3')
+        self.assertEqual(canonical_story_ids[2], 'story_id_1')
+
+        self.topic.rearrange_canonical_story(2, 0)
+        canonical_story_ids = self.topic.get_canonical_story_ids()
+        self.assertEqual(canonical_story_ids[0], 'story_id_1')
+        self.assertEqual(canonical_story_ids[1], 'story_id_2')
+        self.assertEqual(canonical_story_ids[2], 'story_id_3')
+
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_from_index(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_skill_in_subtopic(1, None, 2)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_skill_in_subtopic(1, 'a', 2)
+
+    def test_rearrange_skill_in_subtopic_fail_with_invalid_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_skill_in_subtopic(1, 1, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_skill_in_subtopic(1, 1, 'a')
+
+    def test_rearrange_skill_in_subtopic_fail_with_out_of_bound_indexes(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, 10, 1)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, -1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, 0, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_skill_in_subtopic(1, 0, -10)
+
+    def test_rearrange_skill_in_subtopic_fail_with_identical_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index and to_index values to be '
+                       'different.'):
+            self.topic.rearrange_skill_in_subtopic(1, 1, 1)
+
+    def test_rearrange_skill_in_subtopic(self):
+        self.topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+
+        skill_ids = self.topic.subtopics[0].skill_ids
+
+        self.assertEqual(skill_ids[0], 'skill_id_1')
+        self.assertEqual(skill_ids[1], 'skill_id_2')
+        self.assertEqual(skill_ids[2], 'skill_id_3')
+
+        self.topic.rearrange_skill_in_subtopic(1, 1, 0)
+        self.assertEqual(skill_ids[0], 'skill_id_2')
+        self.assertEqual(skill_ids[1], 'skill_id_1')
+        self.assertEqual(skill_ids[2], 'skill_id_3')
+
+        self.topic.rearrange_skill_in_subtopic(1, 2, 1)
+        self.assertEqual(skill_ids[0], 'skill_id_2')
+        self.assertEqual(skill_ids[1], 'skill_id_3')
+        self.assertEqual(skill_ids[2], 'skill_id_1')
+
+        self.topic.rearrange_skill_in_subtopic(1, 2, 0)
+        self.assertEqual(skill_ids[0], 'skill_id_1')
+        self.assertEqual(skill_ids[1], 'skill_id_2')
+        self.assertEqual(skill_ids[2], 'skill_id_3')
+
+    def test_rearrange_subtopic_fail_with_invalid_from_index(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_subtopic(None, 2)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_subtopic('a', 2)
+
+    def test_rearrange_subtopic_fail_with_invalid_to_index_value(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received None'):
+            self.topic.rearrange_subtopic(1, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be a number, '
+                       'received a'):
+            self.topic.rearrange_subtopic(1, 'a')
+
+    def test_rearrange_subtopic_fail_with_out_of_bound_indexes(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_subtopic(10, 1)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index value to be with-in bounds.'):
+            self.topic.rearrange_subtopic(-1, 0)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_subtopic(0, 10)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected to_index value to be with-in bounds.'):
+            self.topic.rearrange_subtopic(0, -10)
+
+    def test_rearrange_subtopic_fail_with_identical_index_values(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected from_index and to_index values to be '
+                       'different.'):
+            self.topic.rearrange_subtopic(1, 1)
+
+    def test_rearrange_subtopic(self):
+        self.topic.subtopics = [
+            topic_domain.Subtopic(1, 'Title1', [], None, None, 'title-one'),
+            topic_domain.Subtopic(2, 'Title2', [], None, None, 'title-two'),
+            topic_domain.Subtopic(3, 'Title3', [], None, None, 'title-three')]
+
+        subtopics = self.topic.subtopics
+
+        self.assertEqual(subtopics[0].id, 1)
+        self.assertEqual(subtopics[1].id, 2)
+        self.assertEqual(subtopics[2].id, 3)
+
+        self.topic.rearrange_subtopic(1, 0)
+        self.assertEqual(subtopics[0].id, 2)
+        self.assertEqual(subtopics[1].id, 1)
+        self.assertEqual(subtopics[2].id, 3)
+
+        self.topic.rearrange_subtopic(2, 1)
+        self.assertEqual(subtopics[0].id, 2)
+        self.assertEqual(subtopics[1].id, 3)
+        self.assertEqual(subtopics[2].id, 1)
+
+        self.topic.rearrange_subtopic(2, 0)
+        self.assertEqual(subtopics[0].id, 1)
+        self.assertEqual(subtopics[1].id, 2)
+        self.assertEqual(subtopics[2].id, 3)
 
     def test_get_all_story_references(self):
         self.topic.canonical_story_references = [
@@ -137,7 +365,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(all_story_references[1].story_id, 'story_id_1')
         self.assertEqual(all_story_references[2].story_id, 'story_id_2')
         self.assertEqual(all_story_references[3].story_id, 'story_id_3')
-
 
     def test_add_canonical_story(self):
         self.topic.canonical_story_references = [
@@ -468,7 +695,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-title-two'))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -601,6 +829,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.update_subtopic_thumbnail_filename(
                 'invalid_id', 'new title')
 
+    def test_update_subtopic_url_fragment(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.assertEqual(
+            self.topic.subtopics[0].url_fragment, 'dummy-subtopic-url')
+        self.topic.update_subtopic_url_fragment(1, 'new-subtopic-url')
+        self.assertEqual(
+            self.topic.subtopics[0].url_fragment, 'new-subtopic-url')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_url_fragment('invalid_id', 'new-url')
+
     def test_update_subtopic_thumbnail_bg_color(self):
         self.assertEqual(len(self.topic.subtopics), 1)
         self.topic.subtopics[0].thumbnail_bg_color = None
@@ -631,10 +871,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]),
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-one'),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-two')]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
@@ -936,13 +1178,27 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'uncategorized_skill_count': 1,
             'subtopic_count': 1,
             'total_skill_count': 1,
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
             'topic_model_last_updated': time_in_millisecs
         }
 
         self.topic_summary = topic_domain.TopicSummary(
-            'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1,
-            1, 1, current_time, current_time)
+            'topic_id', 'name', 'name', 'en', 'topic description',
+            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', current_time,
+            current_time)
+
+    def _assert_validation_error(self, expected_error_substring):
+        """Checks that the topic summary passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.topic_summary.validate()
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(
@@ -953,133 +1209,115 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_name(self):
         self.topic_summary.name = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Name should be a string.'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Name should be a string.')
+
+    def test_thumbnail_filename_validation(self):
+        self.topic_summary.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string')
+
+    def test_thumbnail_bg_validation(self):
+        self.topic_summary.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Topic thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.topic_summary.thumbnail_bg_color = '#C6DCDA'
+        self.topic_summary.thumbnail_filename = None
+        self._assert_validation_error(
+            'Topic thumbnail image is not provided.')
+        self.topic_summary.thumbnail_bg_color = None
+        self.topic_summary.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Topic thumbnail background color is not specified.')
 
     def test_validation_fails_with_empty_name(self):
         self.topic_summary.name = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Name field should not be empty'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Name field should not be empty')
 
     def test_validation_fails_with_invalid_description(self):
         self.topic_summary.description = 3
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected description to be a string, received 3'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected description to be a string, received 3')
 
     def test_validation_fails_with_invalid_canonical_name(self):
         self.topic_summary.canonical_name = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Canonical name should be a string.'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Canonical name should be a string.')
 
     def test_validation_fails_with_empty_canonical_name(self):
         self.topic_summary.canonical_name = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Canonical name field should not be empty'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Canonical name field should not be empty')
 
     def test_validation_fails_with_invalid_language_code(self):
         self.topic_summary.language_code = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected language code to be a string, received 0'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected language code to be a string, received 0')
 
     def test_validation_fails_with_unallowed_language_code(self):
         self.topic_summary.language_code = 'invalid'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid language code: invalid'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Invalid language code: invalid')
 
     def test_validation_fails_with_invalid_canonical_story_count(self):
         self.topic_summary.canonical_story_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected canonical story count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected canonical story count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_canonical_story_count(self):
         self.topic_summary.canonical_story_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected canonical_story_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected canonical_story_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_additional_story_count(self):
         self.topic_summary.additional_story_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected additional story count to be an '
-                'integer, received \'10\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected additional story count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_additional_story_count(self):
         self.topic_summary.additional_story_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected additional_story_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected additional_story_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_uncategorized_skill_count(self):
         self.topic_summary.uncategorized_skill_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected uncategorized skill count to be an integer, '
-                'received \'10\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected uncategorized skill count to be an integer, '
+            'received \'10\'')
 
     def test_validation_fails_with_negative_uncategorized_skill_count(self):
         self.topic_summary.uncategorized_skill_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected uncategorized_skill_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected uncategorized_skill_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_total_skill_count(self):
         self.topic_summary.total_skill_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected total skill count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total skill count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_total_skill_count(self):
         self.topic_summary.total_skill_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected total_skill_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total_skill_count to be non-negative, received \'-1\'')
 
     def test_validation_fails_with_invalid_total_skill_count_value(self):
         self.topic_summary.total_skill_count = 5
         self.topic_summary.uncategorized_skill_count = 10
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected total_skill_count to be greater than or equal to '
-                'uncategorized_skill_count 10, received \'5\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total_skill_count to be greater than or equal to '
+            'uncategorized_skill_count 10, received \'5\'')
 
     def test_validation_fails_with_invalid_subtopic_count(self):
         self.topic_summary.subtopic_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected subtopic count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected subtopic count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_subtopic_count(self):
         self.topic_summary.subtopic_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected subtopic_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected subtopic_count to be non-negative, received \'-1\'')
 
 
 class TopicRightsTests(test_utils.GenericTestBase):

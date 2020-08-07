@@ -71,7 +71,8 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Installation script for Oppia third-party libraries.
 """)
 
@@ -82,14 +83,15 @@ def download_files(source_url_root, target_dir, source_filenames):
     Each file is downloaded only if it does not already exist.
 
     Args:
-      source_url_root: the URL to prepend to all the filenames.
-      target_dir: the directory to save the files to.
-      source_filenames: a list of filenames. Each filename is appended to the
-        end of the source_url_root in order to give the URL from which to
-        download the file. The downloaded file is then placed in target_dir,
-        and retains the same filename.
+        source_url_root: str. The URL to prepend to all the filenames.
+        target_dir: str. The directory to save the files to.
+        source_filenames: list(str). Each filename is appended to the
+            end of the source_url_root in order to give the URL from which to
+            download the file. The downloaded file is then placed in target_dir,
+            and retains the same filename.
     """
-    assert isinstance(source_filenames, list)
+    assert isinstance(source_filenames, list), (
+        'Expected list of filenames, got \'%s\'' % source_filenames)
     common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
@@ -113,11 +115,13 @@ def download_and_unzip_files(
     one folder.
 
     Args:
-      source_url: the URL from which to download the zip file.
-      target_parent_dir: the directory to save the contents of the zip file to.
-      zip_root_name: the name of the top-level folder in the zip directory.
-      target_root_name: the name that the top-level folder should be renamed to
-        in the local directory.
+        source_url: str. The URL from which to download the zip file.
+        target_parent_dir: str. The directory to save the contents of the zip
+            file to.
+        zip_root_name: str. The name of the top-level folder in the zip
+            directory.
+        target_root_name: str. The name that the top-level folder should be
+            renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
         python_utils.PRINT('Downloading and unzipping file %s to %s ...' % (
@@ -163,11 +167,13 @@ def download_and_untar_files(
     one folder.
 
     Args:
-      source_url: the URL from which to download the tar file.
-      target_parent_dir: the directory to save the contents of the tar file to.
-      tar_root_name: the name of the top-level folder in the tar directory.
-      target_root_name: the name that the top-level folder should be renamed to
-        in the local directory.
+        source_url: str. The URL from which to download the tar file.
+        target_parent_dir: str. The directory to save the contents of the tar
+            file to.
+        tar_root_name: str. The name of the top-level folder in the tar
+            directory.
+        target_root_name: str. The name that the top-level folder should be
+            renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
         python_utils.PRINT('Downloading and untarring file %s to %s ...' % (
@@ -196,10 +202,14 @@ def get_file_contents(filepath, mode='r'):
 
 def return_json(filepath):
     """Return json object when provided url
+
     Args:
-        filepath: the path to the json file.
-    Return:
-        a parsed json objects.
+        filepath: str. The path to the json file.
+
+    Returns:
+        *. A parsed json object. Actual conversion is different based on input
+        to json.loads. More details can be found here:
+            https://docs.python.org/3/library/json.html#encoders-and-decoders.
     """
     response = get_file_contents(filepath)
     return json.loads(response)
@@ -207,11 +217,11 @@ def return_json(filepath):
 
 def test_manifest_syntax(dependency_type, dependency_dict):
     """This checks syntax of the manifest.json dependencies.
-
     Display warning message when there is an error and terminate the program.
+
     Args:
-      dependency_type: str. Dependency download format.
-      dependency_dict: dict. manifest.json dependency dict.
+        dependency_type: str. Dependency download format.
+        dependency_dict: dict. A manifest.json dependency dict.
     """
     keys = list(dependency_dict.keys())
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
@@ -263,8 +273,9 @@ def test_manifest_syntax(dependency_type, dependency_dict):
 
 def validate_manifest(filepath):
     """This validates syntax of the manifest.json
+
     Args:
-      filepath: the path to the json file.
+        filepath: str. The path to the json file.
     """
     manifest_data = return_json(filepath)
     dependencies = manifest_data['dependencies']
@@ -280,8 +291,9 @@ def validate_manifest(filepath):
 
 def download_manifest_files(filepath):
     """This download all files to the required folders
+
     Args:
-      filepath: the path to the json file.
+        filepath: str. The path to the json file.
     """
     validate_manifest(filepath)
     manifest_data = return_json(filepath)

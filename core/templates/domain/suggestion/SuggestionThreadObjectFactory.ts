@@ -20,12 +20,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Suggestion, SuggestionObjectFactory } from
+import { SuggestionBackendDict, Suggestion, SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+import { FeedbackThreadBackendDict } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory';
 
 export class SuggestionThread {
   status: string;
@@ -111,7 +113,7 @@ export class SuggestionThreadObjectFactory {
       ThreadMessageSummaryObjectFactory) {}
 
   private createEditExplorationStateContentSuggestionFromBackendDict(
-      suggestionBackendDict: any): Suggestion {
+      suggestionBackendDict: SuggestionBackendDict): Suggestion {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
       return null;
@@ -120,20 +122,19 @@ export class SuggestionThreadObjectFactory {
       suggestionBackendDict);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type.
   createFromBackendDicts(
-      suggestionThreadBackendDict: any,
-      suggestionBackendDict: any): SuggestionThread {
+      feedbackThreadBackendDict: FeedbackThreadBackendDict,
+      suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
     return new SuggestionThread(
-      suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
-      suggestionThreadBackendDict.summary,
-      suggestionThreadBackendDict.original_author_username,
-      suggestionThreadBackendDict.last_updated_msecs,
-      suggestionThreadBackendDict.message_count,
-      suggestionThreadBackendDict.thread_id,
+      feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+      feedbackThreadBackendDict.summary,
+      feedbackThreadBackendDict.original_author_username,
+      feedbackThreadBackendDict.last_updated_msecs,
+      feedbackThreadBackendDict.message_count,
+      feedbackThreadBackendDict.thread_id,
       this.threadMessageSummaryObjectFactory.createNew(
-        suggestionThreadBackendDict.last_nonempty_message_author,
-        suggestionThreadBackendDict.last_nonempty_message_text),
+        feedbackThreadBackendDict.last_nonempty_message_author,
+        feedbackThreadBackendDict.last_nonempty_message_text),
       this.createEditExplorationStateContentSuggestionFromBackendDict(
         suggestionBackendDict));
   }

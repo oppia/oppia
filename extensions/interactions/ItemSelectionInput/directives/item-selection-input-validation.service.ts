@@ -21,8 +21,10 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { ItemSelectionInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -36,11 +38,8 @@ export class ItemSelectionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: ItemSelectionInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -53,7 +52,7 @@ export class ItemSelectionInputValidationService {
     var numChoices = customizationArgs.choices.value.length;
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i];
+      var choice = customizationArgs.choices.value[i].getHtml();
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -111,8 +110,9 @@ export class ItemSelectionInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string, customizationArgs:
+      ItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
+      defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -136,7 +136,7 @@ export class ItemSelectionInputValidationService {
     if (maxAllowedCount === 1) {
       var answerChoiceToIndex = {};
       seenChoices.forEach((seenChoice, choiceIndex) => {
-        answerChoiceToIndex[seenChoice] = choiceIndex;
+        answerChoiceToIndex[seenChoice.getHtml()] = choiceIndex;
       });
 
       answerGroups.forEach((answerGroup, answerIndex) => {

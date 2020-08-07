@@ -18,11 +18,13 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup } from
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
+import { EndExplorationCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
-import { Outcome } from
+import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
@@ -33,11 +35,9 @@ describe('EndExplorationValidationService', () => {
   let validatorService: EndExplorationValidationService;
 
   let currentState: string;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'badOutcome' is a dict with underscore_cased keys which give
-  // tslint errors against underscore_casing in favor of camelCasing.
-  let badOutcome: any, goodAnswerGroups: any;
-  let customizationArguments: any;
+  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
+  let customizationArguments: EndExplorationCustomizationArgs;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,20 +46,22 @@ describe('EndExplorationValidationService', () => {
 
     validatorService = TestBed.get(EndExplorationValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
-    badOutcome = {
+    badOutcome = oof.createFromBackendDict({
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
-    };
+    });
 
     customizationArguments = {
       recommendedExplorationIds: {
@@ -67,20 +69,22 @@ describe('EndExplorationValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [{
-      rules: [],
-      outcome: {
+    goodAnswerGroups = [agof.createNew(
+      [],
+      oof.createFromBackendDict({
         dest: 'Second State',
         feedback: {
           html: '',
-          audio_translations: {}
+          content_id: ''
         },
         labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null
-      }
-    }];
+      }),
+      null,
+      null
+    )];
   });
 
   it('should not have warnings for no answer groups or no default outcome',
@@ -132,6 +136,10 @@ describe('EndExplorationValidationService', () => {
 
   it('should catch non-string value for recommended exploration ID',
     () => {
+      // This throws "Type 'number' is not assignable to type 'string'."
+      // Here we are assigning the wrong type of value to
+      // "customizationArguments" in order to test validations.
+      // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);
@@ -143,6 +151,10 @@ describe('EndExplorationValidationService', () => {
 
   it('should have warnings for non-list format of recommended exploration IDs',
     () => {
+      // This throws "Type '"ExpID0"' is not assignable to type 'string[]'."
+      // Here we are assigning the wrong type of value to
+      // "customizationArguments" in order to test validations.
+      // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, [], null);

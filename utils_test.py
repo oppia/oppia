@@ -40,7 +40,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(enum.first, 'first')
         self.assertEqual(enum.second, 'second')
         self.assertEqual(enum.third, 'third')
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesRegexp(
+            AttributeError,
+            'type object \'Enum\' has no attribute \'fourth\''):
             enum.fourth  # pylint: disable=pointless-statement
 
     def test_get_comma_sep_string_from_list(self):
@@ -77,7 +79,10 @@ class UtilsTests(test_utils.GenericTestBase):
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaises(utils.InvalidInputException):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'while parsing a flow node\n'
+            'expected the node content, but found \'<stream end>\'\n'):
             yaml_str = utils.dict_from_yaml('{')
 
     def test_recursively_remove_key(self):
@@ -267,6 +272,57 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, '0 must be a string.'):
             utils.require_valid_name(name, 'name_type')
 
+    def test_require_valid_url_fragment(self):
+        name = 'name'
+        utils.require_valid_url_fragment(name, 'name-type', 20)
+
+        name_with_spaces = 'name with spaces'
+        name_with_spaces_expected_error = (
+            'name-type field contains invalid characters. Only '
+            'lowercase words separated by hyphens are allowed. '
+            'Received name with spaces.')
+        with self.assertRaisesRegexp(
+            Exception, name_with_spaces_expected_error):
+            utils.require_valid_url_fragment(
+                name_with_spaces, 'name-type', 20)
+
+        name_in_caps = 'NAME'
+        name_in_caps_expected_error = (
+            'name-type field contains invalid characters. Only '
+            'lowercase words separated by hyphens are allowed. Received NAME.')
+        with self.assertRaisesRegexp(Exception, name_in_caps_expected_error):
+            utils.require_valid_url_fragment(
+                name_in_caps, 'name-type', 20)
+
+        name_with_numbers = 'nam3'
+        name_with_numbers_expected_error = (
+            'name-type field contains invalid characters. Only '
+            'lowercase words separated by hyphens are allowed. Received nam3.')
+        with self.assertRaisesRegexp(
+            Exception, name_with_numbers_expected_error):
+            utils.require_valid_url_fragment(
+                name_with_numbers, 'name-type', 20)
+
+        long_name = 'a-really-really-really-lengthy-name'
+        long_name_expected_error = (
+            'name-type field should not exceed 10 characters, '
+            'received %s' % long_name)
+        with self.assertRaisesRegexp(Exception, long_name_expected_error):
+            utils.require_valid_url_fragment(
+                long_name, 'name-type', 10)
+
+        empty_name = ''
+        empty_name_expected_error = 'name-type field should not be empty.'
+        with self.assertRaisesRegexp(Exception, empty_name_expected_error):
+            utils.require_valid_url_fragment(empty_name, 'name-type', 20)
+
+        non_string_name = 0
+        non_string_name_expected_error = (
+            'name-type field must be a string. Received 0.')
+        with self.assertRaisesRegexp(
+            Exception, non_string_name_expected_error):
+            utils.require_valid_url_fragment(non_string_name, 'name-type', 20)
+
     def test_validate_convert_to_hash(self):
         with self.assertRaisesRegexp(
             Exception, 'Expected string, received 1 of type %s' % type(1)):
@@ -363,3 +419,17 @@ class UtilsTests(test_utils.GenericTestBase):
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
         filename = 'filename.svg'
         utils.require_valid_thumbnail_filename(filename)
+
+    def test_get_time_in_millisecs(self):
+        dt = datetime.datetime(2020, 6, 15)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_get_time_in_millisecs_with_complicated_time(self):
+        dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))

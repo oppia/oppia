@@ -1,40 +1,48 @@
-<md-card class="oppia-editor-card-with-avatar">
-  <div class="oppia-editor-card-body">
-    <div class="oppia-editor-card-section">
-      <strong style="font-size: 1.4em;">Skill Description</strong>
-      <div class="description-subtitle">
-        This is the name of the skill as visible to learners and other creators.
-      </div>
-      <p ng-class="{'has-error': !tmpSkillDescription.length > 0}">
-        <input type="text" class="form-control protractor-test-skill-description-field" ng-if="canEditSkillDescription()"
-               ng-model="tmpSkillDescription" ng-change="resetErrorMsg()" ng-blur="saveSkillDescription(tmpSkillDescription)"
-               maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>" ng-trim="false">
-        <span class="oppia-input-box-subtitle">
-          <i>
-            Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
-          </i>
-        </span>
-        <span ng-if="errorMsg" class="skill-description-error-message">
-          <i>
-            <[errorMsg]>
-          </i>
-        </span>
-        <span ng-if="!canEditSkillDescription()"><[tmpSkillDescription]></span>
-      </p>
+<div class="oppia-editor-card-body">
+  <div class="oppia-editor-card-section skill-description-container">
+    <strong class="heading-text">Skill Description</strong>
+    <div class="description-subtitle">
+      This is the name of the skill as visible to learners and other creators.
     </div>
+    <p ng-class="{'has-error': !tmpSkillDescription.length > 0}">
+      <input type="text" class="form-control protractor-test-skill-description-field" ng-if="canEditSkillDescription()"
+             ng-model="tmpSkillDescription" ng-change="resetErrorMsg()" ng-blur="saveSkillDescription(tmpSkillDescription)"
+             maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>" ng-trim="false">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
+        </i>
+      </span>
+      <span ng-if="errorMsg" class="skill-description-error-message">
+        <i>
+          <[errorMsg]>
+        </i>
+      </span>
+      <span ng-if="!canEditSkillDescription()"><[tmpSkillDescription]></span>
+    </p>
   </div>
-</md-card>
+</div>
 <style>
   skill-description-editor .description-subtitle {
-    padding-bottom: 20px;
     color: #595959;
     font-size: 0.8em;
     font-style: italic;
+    padding-bottom: 20px;
   }
 
   skill-description-editor .skill-description-error-message {
-    color: red;
+    color: #FF0000;
     display: block;
     font-size: 0.8em;
+  }
+
+  skill-description-editor .heading-text {
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-description-editor .skill-description-container {
+      padding: 0;
+    }
   }
 </style>

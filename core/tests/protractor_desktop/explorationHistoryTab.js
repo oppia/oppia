@@ -48,6 +48,22 @@ describe('Exploration history', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
+  it('should correctly display the dates of the commits', async function() {
+    await users.createUser('userTestDate@historyTab.com', 'testDateUsername');
+    await users.login('userTestDate@historyTab.com');
+
+    // Creating an exploration creates the first commit. Therefore, there
+    // should be a date associated with it.
+    await workflow.createExploration();
+
+    // Switch to the history tab because that is where the commit history
+    // is displayed.
+    await explorationEditorPage.navigateToHistoryTab();
+    await explorationEditorHistoryTab.expectCommitDatesToBeDisplayed();
+
+    await users.logout();
+  });
+
   it('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
@@ -216,54 +232,58 @@ describe('Exploration history', function() {
         highlighted: false
       },
       36: {
+        text: 'next_content_id_index: 2',
+        highlighted: true
+      },
+      37: {
         text: 'param_changes: []',
         highlighted: false
       },
-      37: {
+      38: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      38: {
+      39: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      39: {
-        text: '    content: {}',
-        highlighted: false
-      },
       40: {
-        text: '    default_outcome: {}',
+        text: '    content: {}',
         highlighted: false
       },
       41: {
+        text: '    default_outcome: {}',
+        highlighted: false
+      },
+      42: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      42: {
+      43: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      43: {
+      44: {
         text: 'written_translations:',
         highlighted: false
       },
-      44: {
+      45: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      45: {
+      46: {
         text: '    content: {}',
         highlighted: false
       },
-      46: {
+      47: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      47: {
+      48: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      48: {
+      49: {
         text: '',
         highlighted: false
       }
@@ -353,46 +373,50 @@ describe('Exploration history', function() {
         highlighted: false
       },
       21: {
+        text: 'next_content_id_index: 0',
+        highlighted: true
+      },
+      22: {
         text: 'param_changes: []',
         highlighted: false
       },
-      22: {
+      23: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      23: {
+      24: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      24: {
+      25: {
         text: '    content: {}',
         highlighted: false
       },
-      25: {
+      26: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      26: {
+      27: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      27: {
+      28: {
         text: 'written_translations:',
         highlighted: false
       },
-      28: {
+      29: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      29: {
+      30: {
         text: '    content: {}',
         highlighted: false
       },
-      30: {
+      31: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      31: {
+      32: {
         text: '',
         highlighted: false
       }
@@ -408,7 +432,9 @@ describe('Exploration history', function() {
       '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
-      '      value: Continue\n' +
+      '      value:\n' +
+      '        content_id: ca_buttonText_0\n' +
+      '        unicode_str: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    feedback:\n' +
@@ -421,14 +447,17 @@ describe('Exploration history', function() {
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
+      'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
       '  voiceovers_mapping:\n' +
+      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
       'solicit_answer_details: false\n' +
       'written_translations:\n' +
       '  translations_mapping:\n' +
+      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
       '';

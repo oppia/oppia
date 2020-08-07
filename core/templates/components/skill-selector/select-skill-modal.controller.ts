@@ -20,28 +20,26 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('SelectSkillModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'skillsInSameTopicCount',
-  'sortedSkillSummaries',
-  function($controller, $scope, $uibModalInstance, skillsInSameTopicCount,
-      sortedSkillSummaries) {
+  '$controller', '$scope', '$uibModalInstance', 'allowSkillsFromOtherTopics',
+  'categorizedSkills', 'skillsInSameTopicCount', 'sortedSkillSummaries',
+  'untriagedSkillSummaries',
+  function($controller, $scope, $uibModalInstance, allowSkillsFromOtherTopics,
+      categorizedSkills, skillsInSameTopicCount, sortedSkillSummaries,
+      untriagedSkillSummaries) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
     $scope.skillSummaries = sortedSkillSummaries;
+    $scope.untriagedSkillSummaries = untriagedSkillSummaries;
+    $scope.categorizedSkills = categorizedSkills;
+    $scope.allowSkillsFromOtherTopics = allowSkillsFromOtherTopics;
     $scope.selectedSkillId = null;
     $scope.countOfSkillsToPrioritize =
       skillsInSameTopicCount;
     $scope.save = function() {
-      for (var idx in sortedSkillSummaries) {
-        if (
-          $scope.selectedSkillId ===
-          sortedSkillSummaries[idx].id) {
-          $uibModalInstance.close(
-            sortedSkillSummaries[idx]);
-        }
-      }
-      $scope.confirm($scope.selectedSkillId);
+      $scope.confirm($scope.skillSummaries.find(
+        summary => summary.id === $scope.selectedSkillId));
     };
   }
 ]);

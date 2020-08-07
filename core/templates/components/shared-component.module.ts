@@ -23,13 +23,51 @@ import { CommonModule } from '@angular/common';
 
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
+import { AttributionGuideComponent } from
+  './common-layout-directives/common-elements/attribution-guide.component';
+import { LazyLoadingComponent } from
+  './common-layout-directives/common-elements/lazy-loading.component';
+import { LoadingDotsComponent } from
+  './common-layout-directives/common-elements/loading-dots.component';
+import { MaterialModule } from './material.module';
+import { TranslatePipe } from 'filters/translate.pipe';
+import { SafePipe } from 'filters/safe-pipe';
+import { SkillMasteryViewerComponent } from
+  './skill-mastery/skill-mastery.component';
+import { SharingLinksComponent } from
+  './common-layout-directives/common-elements/sharing-links.component';
+import { ExplorationEmbedButtonModalComponent } from
+  './button-directives/exploration-embed-button-modal.component';
+import { SocialButtonsComponent } from
+  'components/button-directives/social-buttons.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationSummaryTileDirective } from
+  './summary-tile/exploration-summary-tile.directive';
+import { ProfileLinkImageComponent } from
+  'components/profile-link-directives/profile-link-image.component';
+import { ProfileLinkTextComponent } from
+  'components/profile-link-directives/profile-link-text.component';
 
 
 @NgModule({
-  imports: [CommonModule],
-  declarations: [BackgroundBannerComponent],
-  entryComponents: [BackgroundBannerComponent],
-  exports: [BackgroundBannerComponent]
+  imports: [CommonModule, MaterialModule, NgbModalModule],
+  declarations: [BackgroundBannerComponent, TranslatePipe,
+    SafePipe, SharingLinksComponent, ExplorationEmbedButtonModalComponent,
+    SkillMasteryViewerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    ExplorationSummaryTileDirective],
+  entryComponents: [BackgroundBannerComponent, SharingLinksComponent,
+    SkillMasteryViewerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    // These elements will remain here even after migration.
+    ExplorationEmbedButtonModalComponent,
+  ],
+  exports: [
+    BackgroundBannerComponent, TranslatePipe, SafePipe,
+    SharingLinksComponent, MaterialModule, ExplorationSummaryTileDirective
+  ],
 })
 
 export class SharedComponentsModule { }

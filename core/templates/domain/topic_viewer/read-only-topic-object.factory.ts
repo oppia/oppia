@@ -20,42 +20,58 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SkillSummary, SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
-import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
-import { ISubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
+import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
+import { StorySummaryBackendDict, StorySummary } from
+  'domain/story/StorySummaryObjectFactory';
+import {
+  SkillIdToDescriptionMap,
+  SubtopicBackendDict,
+  Subtopic,
+  SubtopicObjectFactory
+} from 'domain/topic/SubtopicObjectFactory';
 
-export interface ISkillDescriptions {
-  [skillId: string]: string | null;
+export interface DegreesOfMastery {
+  [skillId: string]: number | null;
 }
 
-export interface IDegreesOfMastery {
-  [skillId: string]: number | null;
+export interface ReadOnlyTopicBackendDict {
+  'subtopics': SubtopicBackendDict[];
+  'skill_descriptions': SkillIdToDescriptionMap;
+  'uncategorized_skill_ids': string[];
+  'degrees_of_mastery': DegreesOfMastery;
+  'canonical_story_dicts': StorySummaryBackendDict[];
+  'additional_story_dicts': StorySummaryBackendDict[];
+  'topic_name': string;
+  'topic_id': string;
+  'topic_description': string;
+  'train_tab_should_be_displayed': boolean;
 }
 
 export class ReadOnlyTopic {
   _topicName: string;
   _topicId: string;
-  _canonicalStorySummaries: Array<StorySummary>;
-  _additionalStorySummaries: Array<StorySummary>;
-  _uncategorizedSkillSummaries: Array<SkillSummary>;
-  _subtopics: Array<Subtopic>;
-  _degreesOfMastery: IDegreesOfMastery;
-  _skillDescriptions: ISkillDescriptions;
+  _topicDescription: string;
+  _canonicalStorySummaries: StorySummary[];
+  _additionalStorySummaries: StorySummary[];
+  _uncategorizedSkillSummaries: ShortSkillSummary[];
+  _subtopics: Subtopic[];
+  _degreesOfMastery: DegreesOfMastery;
+  _skillDescriptions: SkillIdToDescriptionMap;
   _trainTabShouldBeDisplayed: boolean;
 
   constructor(
-      topicName: string, topicId: string,
-      canonicalStorySummaries: Array<StorySummary>,
-      additionalStorySummaries: Array<StorySummary>,
-      uncategorizedSkillSummaries: Array<SkillSummary>,
-      subtopics: Array<Subtopic>,
-      degreesOfMastery: IDegreesOfMastery,
-      skillDescriptions: ISkillDescriptions,
+      topicName: string, topicId: string, topicDescription: string,
+      canonicalStorySummaries: StorySummary[],
+      additionalStorySummaries: StorySummary[],
+      uncategorizedSkillSummaries: ShortSkillSummary[],
+      subtopics: Subtopic[],
+      degreesOfMastery: DegreesOfMastery,
+      skillDescriptions: SkillIdToDescriptionMap,
       trainTabShouldBeDisplayed: boolean) {
     this._topicName = topicName;
     this._topicId = topicId;
+    this._topicDescription = topicDescription;
     this._canonicalStorySummaries = canonicalStorySummaries;
     this._additionalStorySummaries = additionalStorySummaries;
     this._uncategorizedSkillSummaries = uncategorizedSkillSummaries;
@@ -69,31 +85,35 @@ export class ReadOnlyTopic {
     return this._topicName;
   }
 
+  getTopicDescription(): string {
+    return this._topicDescription;
+  }
+
   getTopicId(): string {
     return this._topicId;
   }
 
-  getCanonicalStorySummaries(): Array<StorySummary> {
+  getCanonicalStorySummaries(): StorySummary[] {
     return this._canonicalStorySummaries.slice();
   }
 
-  getAdditionalStorySummaries(): Array<StorySummary> {
+  getAdditionalStorySummaries(): StorySummary[] {
     return this._additionalStorySummaries.slice();
   }
 
-  getUncategorizedSkillsSummaries(): Array<SkillSummary> {
+  getUncategorizedSkillsSummaries(): ShortSkillSummary[] {
     return this._uncategorizedSkillSummaries.slice();
   }
 
-  getSubtopics(): Array<Subtopic> {
+  getSubtopics(): Subtopic[] {
     return this._subtopics.slice();
   }
 
-  getDegreesOfMastery(): IDegreesOfMastery {
+  getDegreesOfMastery(): DegreesOfMastery {
     return this._degreesOfMastery;
   }
 
-  getSkillDescriptions(): ISkillDescriptions {
+  getSkillDescriptions(): SkillIdToDescriptionMap {
     return this._skillDescriptions;
   }
 
@@ -106,49 +126,41 @@ export class ReadOnlyTopic {
   providedIn: 'root'
 })
 export class ReadOnlyTopicObjectFactory {
-  _subtopicObjectFactory: SubtopicObjectFactory;
-  _skillSummaryObjectFactory: SkillSummaryObjectFactory;
-
   constructor(
     private subtopicObjectFactory: SubtopicObjectFactory,
-    private skillSummaryObjectFactory: SkillSummaryObjectFactory) {
-    this._subtopicObjectFactory = subtopicObjectFactory;
-    this._skillSummaryObjectFactory = skillSummaryObjectFactory;
-  }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'topicDataDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
-    let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(
-      (subtopic: ISubtopicBackendDict) => {
-        return this._subtopicObjectFactory.create(
-          subtopic, topicDataDict.skill_descriptions);
-      });
-    let uncategorizedSkills: Array<SkillSummary> =
-        topicDataDict.uncategorized_skill_ids.map(
-          (skillId: string) => {
-            return this._skillSummaryObjectFactory.create(
-              skillId, topicDataDict.skill_descriptions[skillId]);
-          });
-    let degreesOfMastery: IDegreesOfMastery = topicDataDict.degrees_of_mastery;
-    let skillDescriptions: ISkillDescriptions =
+    private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
+
+  createFromBackendDict(
+      topicDataDict: ReadOnlyTopicBackendDict): ReadOnlyTopic {
+    let subtopics = topicDataDict.subtopics.map(subtopic => {
+      return this.subtopicObjectFactory.create(
+        subtopic, topicDataDict.skill_descriptions);
+    });
+    let uncategorizedSkills =
+        topicDataDict.uncategorized_skill_ids.map(skillId => {
+          return this.skillSummaryObjectFactory.create(
+            skillId, topicDataDict.skill_descriptions[skillId]);
+        });
+    let degreesOfMastery: DegreesOfMastery = topicDataDict.degrees_of_mastery;
+    let skillDescriptions: SkillIdToDescriptionMap =
         topicDataDict.skill_descriptions;
-    let canonicalStories: Array<StorySummary> =
-        topicDataDict.canonical_story_dicts.map(
-          (storyDict: any) => {
-            return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_count,
-              storyDict.description, true);
-          });
-    let additionalStories: Array<StorySummary> =
-        topicDataDict.additional_story_dicts.map(
-          (storyDict: any) => {
-            return new StorySummary(
-              storyDict.id, storyDict.title, storyDict.node_count,
-              storyDict.description, true);
-          });
+    let canonicalStories =
+        topicDataDict.canonical_story_dicts.map(storyDict => {
+          return new StorySummary(
+            storyDict.id, storyDict.title, storyDict.node_titles,
+            storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
+            storyDict.description, true, storyDict.completed_node_titles);
+        });
+    let additionalStories =
+        topicDataDict.additional_story_dicts.map(storyDict => {
+          return new StorySummary(
+            storyDict.id, storyDict.title, storyDict.node_titles,
+            storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
+            storyDict.description, true, storyDict.completed_node_titles);
+        });
     return new ReadOnlyTopic(
-      topicDataDict.topic_name, topicDataDict.topic_id, canonicalStories,
+      topicDataDict.topic_name, topicDataDict.topic_id,
+      topicDataDict.topic_description, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
       skillDescriptions, topicDataDict.train_tab_should_be_displayed);
   }

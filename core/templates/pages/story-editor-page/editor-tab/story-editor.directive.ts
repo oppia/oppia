@@ -24,13 +24,21 @@ require(
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
+require(
+  'pages/story-editor-page/modal-templates/' +
+  'new-chapter-title-modal.controller.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+require('pages/topic-editor-page/modal-templates/' +
+    'preview-thumbnail.component.ts');
+
+import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
@@ -44,17 +52,25 @@ angular.module('oppia').directive('storyEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
-        '$scope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
-        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
-        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_CHAPTER_TITLE',
+        '$scope', '$window', 'StoryEditorStateService', 'StoryUpdateService',
+        'UndoRedoService', 'StoryEditorNavigationService',
+        'WindowDimensionsService',
+        'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
+        'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
+        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
-            $scope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
-            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_CHAPTER_TITLE) {
+            $scope, $window, StoryEditorStateService, StoryUpdateService,
+            UndoRedoService, StoryEditorNavigationService,
+            WindowDimensionsService,
+            EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
+            AlertsService, MAX_CHARS_IN_STORY_TITLE,
+            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
+          $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
+            MAX_CHARS_IN_STORY_URL_FRAGMENT);
+          var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
@@ -78,17 +94,17 @@ angular.module('oppia').directive('storyEditor', [
               $scope.initialNodeId = $scope.storyContents.getInitialNodeId();
               $scope.linearNodesList =
                 $scope.storyContents.getLinearNodesList();
-              $scope.disconnectedNodes =
-                $scope.storyContents.getDisconnectedNodes();
             }
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
+            $scope.editableUrlFragment = $scope.story.getUrlFragment();
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.storyDescriptionChanged = false;
+            $scope.storyUrlFragmentExists = false;
           };
 
           $scope.setNodeToEdit = function(nodeId) {
@@ -108,20 +124,15 @@ angular.module('oppia').directive('storyEditor', [
               $scope.story.getStoryContents().getInitialNodeId() === nodeId);
           };
 
-          $scope.markAsInitialNode = function(nodeId) {
-            if ($scope.isInitialNode(nodeId)) {
-              return;
-            }
-            StoryUpdateService.setInitialNodeId($scope.story, nodeId);
-            var nodes = this.storyContents.getNodes();
-            for (var i = 0; i < nodes.length; i++) {
-              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
-                StoryUpdateService.removeDestinationNodeIdFromNode(
-                  $scope.story, nodes[i].getId(), nodeId);
-              }
-            }
+          $scope.onMoveChapterStart = function(index, node) {
+            $scope.dragStartIndex = index;
+            $scope.nodeBeingDragged = node;
+          };
+
+          $scope.rearrangeNodeInStory = function(toIndex) {
+            StoryUpdateService.rearrangeNodeInStory(
+              $scope.story, $scope.dragStartIndex, toIndex);
             _initEditor();
-            $scope.$broadcast('recalculateAvailableNodes');
           };
 
           $scope.deleteNode = function(nodeId) {
@@ -156,38 +167,12 @@ angular.module('oppia').directive('storyEditor', [
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$controller', '$scope', '$uibModalInstance',
-                function($controller, $scope, $uibModalInstance) {
-                  $controller('ConfirmOrCancelModalController', {
-                    $scope: $scope,
-                    $uibModalInstance: $uibModalInstance
-                  });
-
-                  $scope.nodeTitle = '';
-                  $scope.nodeTitles = nodeTitles;
-                  $scope.errorMsg = null;
-                  $scope.MAX_CHARS_IN_CHAPTER_TITLE =
-                    MAX_CHARS_IN_CHAPTER_TITLE;
-
-                  $scope.resetErrorMsg = function() {
-                    $scope.errorMsg = null;
-                  };
-                  $scope.isNodeTitleEmpty = function(nodeTitle) {
-                    return (nodeTitle === '');
-                  };
-                  $scope.save = function(title) {
-                    if ($scope.nodeTitles.indexOf(title) !== -1) {
-                      $scope.errorMsg =
-                        'A chapter with this title already exists';
-                      return;
-                    }
-                    $uibModalInstance.close(title);
-                  };
-                }
-              ]
-            }).result.then(function(title) {
-              StoryUpdateService.addStoryNode($scope.story, title);
+              resolve: {
+                nodeTitles: () => nodeTitles
+              },
+              windowClass: 'create-new-chapter',
+              controller: 'CreateNewChapterModalController'
+            }).result.then(function() {
               _initEditor();
               // If the first node is added, open it just after creation.
               if ($scope.story.getStoryContents().getNodes().length === 1) {
@@ -210,9 +195,43 @@ angular.module('oppia').directive('storyEditor', [
             _initEditor();
           };
 
+          $scope.navigateToChapterWithId = function(id, index) {
+            StoryEditorNavigationService.navigateToChapterEditorWithId(
+              id, index);
+          };
+
           $scope.updateStoryDescriptionStatus = function(description) {
             $scope.editableDescriptionIsEmpty = (description === '');
             $scope.storyDescriptionChanged = true;
+          };
+
+          $scope.returnToTopicEditorPage = function() {
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/story-editor-page/modal-templates/' +
+                    'story-save-pending-changes-modal.template.html'),
+                backdrop: true,
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
+            } else {
+              const topicId = (
+                StoryEditorStateService.getStory().getCorrespondingTopicId());
+              $window.open(
+                UrlInterpolationService.interpolateUrl(
+                  TOPIC_EDITOR_URL_TEMPLATE, {
+                    topic_id: topicId
+                  }
+                ), '_self');
+            }
+          };
+
+          $scope.getTopicName = function() {
+            return StoryEditorStateService.getTopicName();
           };
 
           $scope.updateStoryTitle = function(newTitle) {
@@ -220,6 +239,20 @@ angular.module('oppia').directive('storyEditor', [
               return;
             }
             StoryUpdateService.setStoryTitle($scope.story, newTitle);
+          };
+
+          $scope.updateStoryUrlFragment = function(newUrlFragment) {
+            if (newUrlFragment === $scope.story.getUrlFragment()) {
+              $scope.storyUrlFragmentExists = false;
+              return;
+            }
+            StoryEditorStateService.changeStoryWithUrlFragmentExists(
+              newUrlFragment, function() {
+                $scope.storyUrlFragmentExists = (
+                  StoryEditorStateService.getStoryWithUrlFragmentExists());
+                StoryUpdateService.setStoryUrlFragment(
+                  $scope.story, newUrlFragment);
+              });
           };
 
           $scope.updateStoryThumbnailFilename = function(
@@ -247,7 +280,34 @@ angular.module('oppia').directive('storyEditor', [
             }
           };
 
+          $scope.togglePreview = function() {
+            $scope.storyPreviewCardIsShown = !($scope.storyPreviewCardIsShown);
+          };
+
+          $scope.toggleChapterEditOptions = function(chapterIndex) {
+            $scope.selectedChapterIndex = (
+              $scope.selectedChapterIndex === chapterIndex) ? -1 : chapterIndex;
+          };
+
+          $scope.toggleChapterLists = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
+          };
+
+          $scope.toggleStoryEditorCard = function() {
+            if (!WindowDimensionsService.isWindowNarrow()) {
+              return;
+            }
+            $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
+          };
+
           ctrl.$onInit = function() {
+            $scope.storyPreviewCardIsShown = false;
+            $scope.mainStoryCardIsShown = true;
+            $scope.chaptersListIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.NOTES_SCHEMA = {
               type: 'html',
               ui_config: {
@@ -262,11 +322,21 @@ angular.module('oppia').directive('storyEditor', [
               _initEditor();
             });
 
-            $scope.$on(EVENT_STORY_INITIALIZED, _init);
-            $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryInitialized.subscribe(
+                () => _init()
+              ));
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onStoryReinitialized.subscribe(
+                () => _initEditor()
+              ));
 
             _init();
             _initEditor();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

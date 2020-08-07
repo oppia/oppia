@@ -20,42 +20,62 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ReadOnlyStoryNodeObjectFactory, ReadOnlyStoryNode } from
-  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import {
+  StoryNodeBackendDict,
+  ReadOnlyStoryNodeObjectFactory,
+  ReadOnlyStoryNode
+} from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+
+export interface StoryPlaythroughBackendDict {
+  'story_nodes': StoryNodeBackendDict[];
+  'story_title': string;
+  'story_description': string;
+  'topic_name': string;
+}
 
 export class StoryPlaythrough {
-  _nodes: Array<ReadOnlyStoryNode>;
+  nodes: ReadOnlyStoryNode[];
+  title: string;
+  description: string;
+  topicName: string;
 
-  constructor(nodes: Array<ReadOnlyStoryNode>) {
-    this._nodes = nodes;
+  constructor(
+      nodes: ReadOnlyStoryNode[],
+      title: string,
+      description: string,
+      topicName: string) {
+    this.nodes = nodes;
+    this.title = title;
+    this.description = description;
+    this.topicName = topicName;
   }
 
   getInitialNode(): ReadOnlyStoryNode {
-    return this._nodes[0];
+    return this.nodes[0];
   }
 
   getStoryNodeCount(): Number {
-    return this._nodes.length;
+    return this.nodes.length;
   }
 
-  getStoryNodes(): Array<ReadOnlyStoryNode> {
-    return this._nodes;
+  getStoryNodes(): ReadOnlyStoryNode[] {
+    return this.nodes;
   }
 
   hasFinishedStory(): boolean {
-    return this._nodes.slice(-1)[0].isCompleted();
+    return this.nodes.slice(-1)[0].isCompleted();
   }
 
   getNextPendingNodeId(): string {
-    for (var i = 0; i < this._nodes.length; i++) {
-      if (!this._nodes[i].isCompleted()) {
-        return this._nodes[i].getId();
+    for (var i = 0; i < this.nodes.length; i++) {
+      if (!this.nodes[i].isCompleted()) {
+        return this.nodes[i].getId();
       }
     }
   }
 
   hasStartedStory(): boolean {
-    return this._nodes[0].isCompleted();
+    return this.nodes[0].isCompleted();
   }
 }
 
@@ -66,21 +86,18 @@ export class StoryPlaythroughObjectFactory {
   constructor(private readOnlyStoryNodeObjectFactory:
       ReadOnlyStoryNodeObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyPlaythroughBackendDict: any): StoryPlaythrough {
-    var nodeObjects = [];
-    var readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;
+  createFromBackendDict(
+      storyPlaythroughBackendDict:
+      StoryPlaythroughBackendDict): StoryPlaythrough {
+    var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
+      storyNodeDict => this.readOnlyStoryNodeObjectFactory
+        .createFromBackendDict(storyNodeDict));
 
-    nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
-      function(node) {
-        return readOnlyStoryNodeObjectFactory.createFromBackendDict(node);
-      }
-    );
-
-    return new StoryPlaythrough(nodeObjects);
+    return new StoryPlaythrough(
+      nodeObjects,
+      storyPlaythroughBackendDict.story_title,
+      storyPlaythroughBackendDict.story_description,
+      storyPlaythroughBackendDict.topic_name);
   }
 }
 

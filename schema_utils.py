@@ -30,8 +30,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import numbers
 import re
 
+from core.domain import expression_parser
 from core.domain import html_cleaner
 import python_utils
+import utils
 
 SCHEMA_KEY_ITEMS = 'items'
 SCHEMA_KEY_LEN = 'len'
@@ -52,6 +54,10 @@ SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
+SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
+
+SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
+SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
@@ -62,13 +68,13 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         schema: dict(str, *). The schema to validate and normalize the value
             against.
         apply_custom_validators: bool. Whether to validate the normalized
-             object using the validators defined in the schema.
+            object using the validators defined in the schema.
 
     Returns:
         *. The normalized object.
 
     Raises:
-        AssertionError: The object fails to validate against the schema.
+        AssertionError. The object fails to validate against the schema.
     """
     normalized_obj = None
 
@@ -126,7 +132,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
         if SCHEMA_KEY_LEN in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LEN]
+            assert len(obj) == schema[SCHEMA_KEY_LEN], (
+                'Expected length of %s got %s' % (
+                    schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
             normalize_against_schema(item, item_schema) for item in obj
         ]
@@ -139,6 +147,17 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             obj = python_utils.UNICODE(obj)
         assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
+        normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
+        assert obj is None or isinstance(obj, python_utils.BASESTRING), (
+            'Expected unicode string or None, received %s' % obj)
+        if obj is not None:
+            if isinstance(obj, bytes):
+                obj = obj.decode('utf-8')
+            else:
+                obj = python_utils.UNICODE(obj)
+            assert isinstance(obj, python_utils.UNICODE), (
+                'Expected unicode, received %s' % obj)
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
@@ -180,7 +199,7 @@ def get_validator(validator_id):
 
     Returns:
         function. The validator method corresponding to the given
-            validator_id.
+        validator_id.
     """
     return _Validators.get(validator_id)
 
@@ -211,34 +230,30 @@ class Normalizers(python_utils.OBJECT):
 
         Returns:
             function. The normalizer method corresponding to the given
-                normalizer_id.
+            normalizer_id.
 
         Raises:
-            Exception: The normalizer_id is not valid.
+            Exception. The normalizer_id is not valid.
         """
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-# TODO(ankita240796): The disable comment is required since the lint tests
-# fail on circleci with the multiple-statements error on the line even though
-# the line is empty. This is a temporary fix to unblock PRs.
-# Relevant issue: https://github.com/oppia/oppia/issues/7307.
-# pylint: disable=multiple-statements
+
     @staticmethod
     def sanitize_url(obj):
         """Takes a string representing a URL and sanitizes it.
 
         Args:
-            obj: a string representing a URL.
+            obj: str. A string representing a URL.
 
         Returns:
-            An empty string if the URL does not start with http:// or https://
-            except when the string is empty. Otherwise, returns the original
-            URL.
+            str. An empty string if the URL does not start with http:// or
+            https:// except when the string is empty. Otherwise, returns the
+            original URL.
 
         Raises:
-            AssertionError: The string is non-empty and does not start with
-            http:// or https://
+            AssertionError. The string is non-empty and does not start with
+                http:// or https://.
         """
         if obj == '':
             return obj
@@ -258,10 +273,10 @@ class Normalizers(python_utils.OBJECT):
         """Collapses multiple spaces into single spaces.
 
         Args:
-            obj: a string.
+            obj: str. String to be processed for multiple spaces.
 
         Returns:
-            A string that is the same as `obj`, except that each block of
+            str. A string that is the same as `obj`, except that each block of
             whitespace is collapsed into a single space character. If the
             block of whitespace is at the front or end of obj, then it
             is simply removed.
@@ -279,6 +294,7 @@ class _Validators(python_utils.OBJECT):
     schema_utils.py and schema_utils_test.py, since these methods do
     preliminary checks on the arguments passed to the validator.
     """
+
     @classmethod
     def get(cls, validator_id):
         """Returns the validator method corresponding to the specified
@@ -290,7 +306,7 @@ class _Validators(python_utils.OBJECT):
 
         Returns:
             function. The validator method corresponding to the specified
-                validator_id.
+            validator_id.
         """
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
@@ -387,3 +403,104 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid email.
         """
         return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
+
+    @staticmethod
+    def is_valid_math_expression(obj, algebraic):
+        """Checks if the given obj (a string) represents a valid algebraic or
+        numeric expression. Note that purely-numeric expressions are NOT
+        considered valid algebraic expressions.
+
+        Args:
+            obj: str. The given math expression string.
+            algebraic: bool. True if the given expression is algebraic
+                else numeric.
+
+        Returns:
+            bool. Whether the given object is a valid expression.
+        """
+        if len(obj) == 0:
+            return True
+
+        if not expression_parser.is_valid_expression(obj):
+            return False
+
+        expression_is_algebraic = expression_parser.is_algebraic(obj)
+        # If the algebraic flag is true, expression_is_algebraic should
+        # also be true, otherwise both should be false which would imply
+        # that the expression is numeric.
+        return not algebraic ^ expression_is_algebraic
+
+    @staticmethod
+    def is_valid_algebraic_expression(obj):
+        """Checks if the given obj (a string) represents a valid algebraic
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid algebraic expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=True)
+
+    @staticmethod
+    def is_valid_numeric_expression(obj):
+        """Checks if the given obj (a string) represents a valid numeric
+        expression.
+
+        Args:
+            obj: str. The given math expression string.
+
+        Returns:
+            bool. Whether the given object is a valid numeric expression.
+        """
+        return get_validator('is_valid_math_expression')(obj, algebraic=False)
+
+    @staticmethod
+    def is_valid_math_equation(obj):
+        """Checks if the given obj (a string) represents a valid math equation.
+
+        Args:
+            obj: str. The given math equation string.
+
+        Returns:
+            bool. Whether the given object is a valid math equation.
+        """
+        if len(obj) == 0:
+            return True
+        if obj.count('=') != 1:
+            return False
+
+        is_valid_algebraic_expression = get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = get_validator(
+            'is_valid_numeric_expression')
+        lhs, rhs = obj.split('=')
+
+        # Both sides have to be valid expressions and at least one of them has
+        # to be a valid algebraic expression.
+        lhs_is_algebraically_valid = is_valid_algebraic_expression(lhs)
+        rhs_is_algebraically_valid = is_valid_algebraic_expression(rhs)
+
+        lhs_is_numerically_valid = is_valid_numeric_expression(lhs)
+        rhs_is_numerically_valid = is_valid_numeric_expression(rhs)
+
+        if lhs_is_algebraically_valid and rhs_is_algebraically_valid:
+            return True
+        if lhs_is_algebraically_valid and rhs_is_numerically_valid:
+            return True
+        if lhs_is_numerically_valid and rhs_is_algebraically_valid:
+            return True
+        return False
+
+    @staticmethod
+    def is_supported_audio_language_code(obj):
+        """Checks if the given obj (a string) represents a valid language code.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid audio language code.
+        """
+        return utils.is_supported_audio_language_code(obj)

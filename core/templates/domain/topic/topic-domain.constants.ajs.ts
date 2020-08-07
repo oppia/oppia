@@ -44,10 +44,19 @@ angular.module('oppia').constant(
   'CMD_DELETE_CANONICAL_STORY',
   TopicDomainConstants.CMD_DELETE_CANONICAL_STORY);
 angular.module('oppia').constant(
+  'CMD_REARRANGE_CANONICAL_STORY',
+  TopicDomainConstants.CMD_REARRANGE_CANONICAL_STORY);
+angular.module('oppia').constant(
   'CMD_DELETE_SUBTOPIC', TopicDomainConstants.CMD_DELETE_SUBTOPIC);
 angular.module('oppia').constant(
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
   TopicDomainConstants.CMD_REMOVE_UNCATEGORIZED_SKILL_ID);
+angular.module('oppia').constant(
+  'CMD_REARRANGE_SKILL_IN_SUBTOPIC',
+  TopicDomainConstants.CMD_REARRANGE_SKILL_IN_SUBTOPIC);
+angular.module('oppia').constant(
+  'CMD_REARRANGE_SUBTOPIC',
+  TopicDomainConstants.CMD_REARRANGE_SUBTOPIC);
 angular.module('oppia').constant(
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
   TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC);
@@ -93,6 +102,9 @@ angular.module('oppia').constant(
   TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR);
 angular.module('oppia').constant(
   'SUBTOPIC_PROPERTY_TITLE', TopicDomainConstants.SUBTOPIC_PROPERTY_TITLE);
+angular.module('oppia').constant(
+  'SUBTOPIC_PROPERTY_URL_FRAGMENT',
+  TopicDomainConstants.SUBTOPIC_PROPERTY_URL_FRAGMENT);
 
 angular.module('oppia').constant(
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML',

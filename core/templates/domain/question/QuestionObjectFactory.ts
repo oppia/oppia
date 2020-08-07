@@ -19,6 +19,17 @@
 
 require('domain/state/StateObjectFactory.ts');
 
+import { StateBackendDict } from 'domain/state/StateObjectFactory';
+
+export interface QuestionBackendDict {
+  'id': string;
+  'question_state_data': StateBackendDict,
+  'question_state_data_schema_version': number;
+  'language_code': string;
+  'version': number;
+  'linked_skill_ids': string[];
+}
+
 angular.module('oppia').factory('QuestionObjectFactory', [
   'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
   function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
@@ -31,7 +42,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       this._linkedSkillIds = linkedSkillIds;
     };
 
-    // Instance methods
+    // ---- Instance methods ----
 
     Question.prototype.getId = function() {
       return this._id;
@@ -74,13 +85,13 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         DEFAULT_LANGUAGE_CODE, 1, skillIds);
     };
 
-    Question.prototype.validate = function(misconceptionsBySkill) {
+    Question.prototype.getValidationErrorMessage = function() {
       var interaction = this._stateData.interaction;
       if (interaction.id === null) {
         return 'An interaction must be specified';
       }
       if (interaction.hints.length === 0) {
-        return 'At least 1 hint should be specfied';
+        return 'At least 1 hint should be specified';
       }
       if (
         !interaction.solution &&
@@ -88,48 +99,46 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         return 'A solution must be specified';
       }
       var answerGroups = this._stateData.interaction.answerGroups;
-      var taggedSkillMisconceptionIds = {};
       var atLeastOneAnswerCorrect = false;
       for (var i = 0; i < answerGroups.length; i++) {
         if (answerGroups[i].outcome.labelledAsCorrect) {
           atLeastOneAnswerCorrect = true;
           continue;
         }
-        if (answerGroups[i].taggedSkillMisconceptionId !== null) {
-          taggedSkillMisconceptionIds[
-            answerGroups[i].taggedSkillMisconceptionId] = true;
-        }
       }
       if (!atLeastOneAnswerCorrect) {
         return 'At least one answer should be marked correct';
       }
-      var pendingMisconceptionNamesToTag = [];
+      return null;
+    };
+
+    Question.prototype.getUnaddressedMisconceptionNames = function(
+        misconceptionsBySkill) {
+      var answerGroups = this._stateData.interaction.answerGroups;
+      var taggedSkillMisconceptionIds = {};
+      for (var i = 0; i < answerGroups.length; i++) {
+        if (!answerGroups[i].outcome.labelledAsCorrect &&
+            answerGroups[i].taggedSkillMisconceptionId !== null) {
+          taggedSkillMisconceptionIds[
+            answerGroups[i].taggedSkillMisconceptionId] = true;
+        }
+      }
+      var unaddressedMisconceptionNames = [];
       Object.keys(misconceptionsBySkill).forEach(function(skillId) {
         for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
           if (!misconceptionsBySkill[skillId][i].isMandatory()) {
             continue;
           }
-          var skillMisconceptionId =
-            skillId + '-' + misconceptionsBySkill[skillId][i].getId();
-          if (
-            !taggedSkillMisconceptionIds.hasOwnProperty(skillMisconceptionId)) {
-            pendingMisconceptionNamesToTag.push(
+          var skillMisconceptionId = (
+            skillId + '-' + misconceptionsBySkill[skillId][i].getId());
+          if (!taggedSkillMisconceptionIds.hasOwnProperty(
+            skillMisconceptionId)) {
+            unaddressedMisconceptionNames.push(
               misconceptionsBySkill[skillId][i].getName());
           }
         }
       });
-      if (pendingMisconceptionNamesToTag.length > 0) {
-        var returnString = 'Click on (or create) an answer ' +
-          'that is neither marked correct nor is a default answer (marked ' +
-          'above as [All other answers]) and tag the following misconceptions' +
-          ' to that answer group:';
-        pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
-          returnString = returnString + ' ' + misconceptionName + ',';
-        });
-        returnString = returnString.slice(0, -1);
-        return returnString;
-      }
-      return false;
+      return unaddressedMisconceptionNames;
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.

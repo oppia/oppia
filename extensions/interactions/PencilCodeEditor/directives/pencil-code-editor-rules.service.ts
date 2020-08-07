@@ -25,6 +25,8 @@ import { NormalizeWhitespacePipe } from
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 /* eslint-enable max-len */
+import { PencilCodeEditorAnswer } from 'interactions/answer-defs';
+import { PencilCodeEditorRuleInputs } from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -35,42 +37,54 @@ export class PencilCodeEditorRulesService {
     private nwpac: NormalizeWhitespacePunctuationAndCasePipe,
     private cn: CodeNormalizerService) {}
 
-  CodeEquals(answer: {code: string}, inputs: {x: string}): boolean {
+  CodeEquals(
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
       this.cn.getNormalizedCode(answer.code);
     var normalizedExpectedCode =
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode === normalizedExpectedCode;
   }
-  CodeContains(answer: {code: string}, inputs: {x: string}): boolean {
+  CodeContains(
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
       this.cn.getNormalizedCode(answer.code);
     var normalizedSnippet =
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
-  CodeDoesNotContain(answer: {code: string}, inputs: {x: string}): boolean {
+  CodeDoesNotContain(
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedCode =
       this.cn.getNormalizedCode(answer.code);
     var normalizedSnippet =
       this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
-  OutputEquals(answer: {output: string}, inputs: {x: string}): boolean {
+  OutputEquals(
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedOutput = this.nwp.transform(answer.output);
     var normalizedExpectedOutput =
       this.nwp.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
-  OutputRoughlyEquals(answer: {output: string}, inputs: {x: string}): boolean {
+  OutputRoughlyEquals(
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedOutput = this.nwpac.transform(answer.output);
     var normalizedExpectedOutput = this.nwpac.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
-  ResultsInError(answer: {error: string}): boolean {
+  ResultsInError(answer: PencilCodeEditorAnswer): boolean {
     return !!(answer.error.trim());
   }
-  ErrorContains(answer: {error: string}, inputs: {x: string}): boolean {
+  ErrorContains(
+      answer: PencilCodeEditorAnswer,
+      inputs: PencilCodeEditorRuleInputs): boolean {
     var normalizedError = this.nwp.transform(answer.error);
     var normalizedSnippet = this.nwp.transform(inputs.x);
     return normalizedError.indexOf(normalizedSnippet) !== -1;

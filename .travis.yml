@@ -16,21 +16,16 @@ env:
   jobs:
     # TODO(sll): Reinstate this when the load tests are more reliable.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true EXCLUDE_LOAD_TESTS=false
-    - RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES=true
-    - RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES=true
+    - RUN_E2E_TESTS_ADDITIONAL_EDITOR_PLAYER_FEATURES=true
     - RUN_E2E_TESTS_COMMUNITY_DASHBOARD=true
     - RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES=true
     - RUN_E2E_TESTS_CREATOR_DASHBOARD=true
-    - RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB=true
-    - RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB=true
-    - RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB=true
-    - RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB=true
+    - RUN_E2E_TESTS_EXPLORATION_FEEDBACK_AND_HISTORY_TAB=true
+    - RUN_E2E_TESTS_EXPLORATION_STATISTICS_AND_TRANSLATION_TAB=true
     - RUN_E2E_TESTS_EXTENSIONS=true
-    - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
     - RUN_E2E_TESTS_LEARNER=true
     - RUN_E2E_TESTS_SKILL_EDITOR=true
-    - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
-    - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
+    - RUN_E2E_TESTS_EMBEDDING=true
 
 jobs:
   allow_failures: []
@@ -44,11 +39,6 @@ notifications:
       # travis encrypt -r oppia/oppia "oppia-ci-notifications@googlegroups.com"
       secure: uMMzsG4ZAB9ofJR/m+KUlTmsYj7oahtCIzUVCZl9BX0qxgMgiwHDTEzHqvyAcyFOaYsKpFyWFKRBfakOizPXP8DZw8/yXi9YtieSUUzxXFZxsGahcVatJBRVKGPw1L4C+V59N9+DdeMLpAd/knQ88uEffOHCCLuoWrsfC/Tz/35yD7zCrLmsnFjcjkufaXh9qCEUjkzq/SgpsvqJRHHP8hrKh3QetmCWhzTD/ZoPxKgpkd5LiFN0AYjRmUN538NAP9Us8WLeQigcM2UyX7WJakmGHgLMm9ieAQRJwcd1bX3Nf+WQNymidGrZnoWSrFiyLmbO8+fiMDZHVRgVC7jeGXGt0hHP9FiNWCjyW4B66ll4RT8iN/IfYJ1RF7fcgzs6cU6jZFUUZBeIdf1Wiv1zNproEAKJKFZVrxlImJeg9Js9vC+TB/Talxj9mnvm/yWZVnSCW6FN/Q/n8dkuIR/VmVkoUwmL/8A0hsZzi31JpZCqv+/8K2hEv9b3zl3lKr6h/o1WHPhU6K5i/XzIV5LhjiM6O6AwEn97bjsEnZqNeZ8O/W7Q+aifG1yX+bfN3qflFE1A/xiruhRFxxSdYfbrF1PvX92IwAwvhBEjDm9Cw/a0QNRY7S92SBNgUaQqEb0MrgbmFyEapf4pzo9Sp9UyQwisLCpL9xZr0cC4vhWTE5A=
     on_success: change
-    on_failure: change
-  irc:
-    channels:
-    - chat.freenode.net#oppia
-    on_success: never
     on_failure: always
   webhooks:
     urls:
@@ -68,23 +58,20 @@ install:
 - python -m scripts.install_third_party_libs
 
 script:
-# Run the e2e tests in the production environment (using --prod_env).
-- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_COMMUNITY_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="communityDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationHistoryTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LEARNER_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learnerDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learner" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicAndStoryEditor" --prod_env; fi
+- RUN_TESTS=true
+- if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_PULL_REQUEST_BRANCH" == update-changelog-for-release* ]]; then RUN_TESTS=false; fi
 
+# Run the e2e tests in the production environment (using --prod_env).
+- if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_COMMUNITY_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="communityDashboard"  --community_dashboard_enabled --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_AND_HISTORY_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationHistoryTab" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_AND_TRANSLATION_TAB" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="learner" --prod_env && python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ] && [ "$RUN_TESTS" == 'true' ]; then python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
 
 cache:
   # Cache Oppia's dependencies.
@@ -94,10 +81,6 @@ cache:
     - third_party/
     - $HOME/.cache/pip
     - $HOME/.cache/TravisChrome/
-    - backend_prod_files/templates/
-    - build/templates/
-    - backend_prod_files/extensions/
-    - build/extensions/
 
 before_cache:
   # Delete python bytecode to prevent cache rebuild.

@@ -31,12 +31,11 @@ import release_constants
 from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github # isort:skip  pylint: disable=wrong-import-position
 
 GIT_CMD_GET_STATUS = 'git status'
 GIT_CMD_TEMPLATE_GET_NEW_COMMITS = 'git cherry %s -v'
@@ -65,7 +64,7 @@ def get_current_version_tag(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Returns:
-        github.Tag.Tag: The most recent version tag.
+        github.Tag.Tag. The most recent version tag.
     """
     # In case of hotfix, the first version tag will be the version of the
     # release for which the hotfix branch is. So, if we require generation
@@ -113,11 +112,11 @@ def gather_logs(start, stop='HEAD'):
     """Gathers the logs between the start and endpoint.
 
     Args:
-        start: str. Tag, Branch or SHA1 of start point
-        stop: str.  Tag, Branch or SHA1 of end point, defaults to HEAD
+        start: str. Tag, Branch or SHA1 of start point.
+        stop: str. Tag, Branch or SHA1 of end point, defaults to HEAD.
 
     Returns:
-        list(Log): List of Logs.
+        list(Log). List of Logs.
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
@@ -136,10 +135,10 @@ def extract_issues(logs):
     """Extract references to issues out of a list of Logs
 
     Args:
-        logs: list(Log). List of Logs to parse
+        logs: list(Log). List of Logs to parse.
 
     Returns:
-        set(str): Set of found issues as links to Github.
+        set(str). Set of found issues as links to Github.
     """
     issues = ISSUE_REGEX.findall(' '.join([log.message for log in logs]))
     links = {ISSUE_URL_FORMAT_STRING % issue for issue in issues}
@@ -153,7 +152,7 @@ def extract_pr_numbers(logs):
         logs: list(Log). List of Logs to parse.
 
     Returns:
-        set(int): Set of PR numbers extracted from the log.
+        set(int). Set of PR numbers extracted from the log.
     """
     pr_numbers = []
     for log in logs:
@@ -187,8 +186,8 @@ def get_changelog_categories(pulls):
 
     Returns:
         dict(str, list(str)). A list where the keys are the various changelog
-            labels, and the values are the titles of the PRs that fall under
-            that category.
+        labels, and the values are the titles of the PRs that fall under
+        that category.
     """
     result = collections.defaultdict(list)
     for pull in pulls:
@@ -215,7 +214,7 @@ def check_versions(current_release):
         current_release: str. The current release tag to diff against.
 
     Returns:
-        List of variable names that changed.
+        list(str). List of variable names that changed.
     """
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
@@ -223,10 +222,10 @@ def check_versions(current_release):
     with python_utils.open_file(FECONF_FILEPATH, 'r') as feconf_file:
         new_feconf = feconf_file.read()
     for variable in FECONF_VAR_NAMES:
-        old_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 old_feconf)[0]
-        new_version = re.findall(VERSION_RE_FORMAT_STRING % variable,
-                                 new_feconf)[0]
+        old_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, old_feconf)[0]
+        new_version = re.findall(
+            VERSION_RE_FORMAT_STRING % variable, new_feconf)[0]
         if old_version != new_version:
             feconf_changed_version.append(variable)
     return feconf_changed_version
@@ -237,10 +236,10 @@ def _git_diff_names_only(left, right='HEAD'):
 
     Args:
         left: str. Lefthand timepoint.
-        right: str. rightand timepoint.
+        right: str. Rightand timepoint.
 
     Returns:
-        list(str): List of files that are different between the two points.
+        list(str). List of files that are different between the two points.
     """
     diff_cmd = (GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING % (left, right))
     return common.run_cmd(diff_cmd.split(' ')).splitlines()
@@ -255,8 +254,8 @@ def check_setup_scripts(base_release_tag, changed_only=True):
             instead of just the changed ones.
 
     Returns:
-        dict consisting of script --> boolean indicating whether or not it has
-            changed (filtered by default to those that are modified).
+        dict. Dict consisting of script or boolean indicating whether or not it
+        has changed (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
                      ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',
@@ -275,10 +274,10 @@ def check_storage_models(current_release):
     """Check if files in core/storage have changed and returns them.
 
     Args:
-        current_release: The current release version.
+        current_release: str. The current release version.
 
     Returns:
-        list(str): The changed files (if any).
+        list(str). The changed files (if any).
     """
     diff_list = _git_diff_names_only(current_release)
     return [item for item in diff_list if item.startswith('core/storage')]
@@ -324,8 +323,9 @@ def main(personal_access_token):
         out.write('## Collected release information\n')
 
         if feconf_version_changes:
-            out.write('\n### Feconf version changes:\nThis indicates that a '
-                      'migration may be needed\n\n')
+            out.write(
+                '\n### Feconf version changes:\nThis indicates that a '
+                'migration may be needed\n\n')
             for var in feconf_version_changes:
                 out.write('* %s\n' % var)
 
@@ -353,7 +353,7 @@ def main(personal_access_token):
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
-        # TODO(apb7): duplicate author handling due to email changes.
+        # TODO(apb7): Duplicate author handling due to email changes.
         out.write('\n%s' % release_constants.NEW_AUTHORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))

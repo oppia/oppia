@@ -117,7 +117,7 @@ class FeedbackThread(python_utils.OBJECT):
 
         Returns:
             list(str|None). The ids of the last two messages of the thread. If
-                the message does not exist, None is returned.
+            the message does not exist, None is returned.
         """
         return [
             self._get_full_message_id(i) if i >= 0 else None
@@ -197,6 +197,20 @@ class FeedbackMessage(python_utils.OBJECT):
             'updated_status': self.updated_status,
             'updated_subject': self.updated_subject
         }
+
+
+class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
+    """Domain object representing the full identifier of a message in a
+    feedback thread.
+
+    Attributes:
+        thread_id: str. The ID of the thread.
+        message_id: str. The ID of a message beloning to the thread.
+    """
+
+    def __init__(self, thread_id, message_id):
+        self.thread_id = thread_id
+        self.message_id = message_id
 
 
 class FeedbackAnalytics(python_utils.OBJECT):

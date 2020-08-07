@@ -35,6 +35,9 @@ export class TopicDomainConstants {
   public static CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story';
   public static CMD_DELETE_CANONICAL_STORY = 'delete_canonical_story';
   public static CMD_DELETE_SUBTOPIC = 'delete_subtopic';
+  public static CMD_REARRANGE_CANONICAL_STORY = 'rearrange_canonical_story';
+  public static CMD_REARRANGE_SKILL_IN_SUBTOPIC = 'rearrange_skill_in_subtopic';
+  public static CMD_REARRANGE_SUBTOPIC = 'rearrange_subtopic';
   public static
     CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id';
   public static CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic';
@@ -56,6 +59,7 @@ export class TopicDomainConstants {
   public static SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static SUBTOPIC_PROPERTY_TITLE = 'title';
+  public static SUBTOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment';
 
   public static
     SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html';

@@ -18,64 +18,188 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import {
+  AssignedSkill,
+  AssignedSkillBackendDict,
+  AssignedSkillObjectFactory
+} from 'domain/skill/assigned-skill-object.factory';
+import {
+  AugmentedSkillSummary,
+  AugmentedSkillSummaryBackendDict,
+  AugmentedSkillSummaryObjectFactory
+} from 'domain/skill/augmented-skill-summary-object.factory';
+import {
+  ShortSkillSummary,
+  ShortSkillSummaryBackendDict,
+  ShortSkillSummaryObjectFactory
+} from 'domain/skill/ShortSkillSummaryObjectFactory';
+import { SkillSummary, SkillSummaryBackendDict, SkillSummaryObjectFactory } from
+  'domain/skill/skill-summary-object.factory';
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
-  '../topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
+import {
+  TopicsAndSkillsDashboardFilter
+// eslint-disable-next-line max-len
+} from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+import { TopicSummary, TopicSummaryBackendDict, TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-  interface ITopicSummaryBackendDict {
-    /* eslint-disable camelcase */
-    id: string;
-    name: string;
-    language_code: string;
-    description: string;
-    version: number;
-    canonical_story_count: number;
-    additional_story_count: number;
-    uncategorized_skill_count: number;
-    subtopic_count: number;
-    total_skill_count: number;
-    topic_model_created_on: number;
-    topic_model_last_updated: number;
-    /* eslint-enable camelcase */
-  }
+interface CategorizedSkillsBackendDict {
+  [topicName: string]: {
+    uncategorized: ShortSkillSummaryBackendDict[];
+    [subtopicName: string]: ShortSkillSummaryBackendDict[];
+  };
+}
 
-  interface ISkillSummaryBackendDict {
-    /* eslint-disable camelcase */
-    id: string;
-    description: string;
-    language_code: string;
-    version: number;
-    misconception_count: number;
-    worked_examples_count: number;
-    skill_model_created_on: number;
-    skill_model_last_updated: number;
-    /* eslint-enable camelcase */
-  }
+interface CategorizedSkills {
+  [topicName: string]: {
+    uncategorized: ShortSkillSummary[];
+    [subtopicName: string]: ShortSkillSummary[];
+  };
+}
 
-  interface ITopicsAndSkillsDashboardDataBackendDict {
-    /* eslint-disable camelcase */
-    untriaged_skill_summary_dicts: ISkillSummaryBackendDict[];
-    mergeable_skill_summary_dicts: ISkillSummaryBackendDict[];
-    topic_summary_dicts: ITopicSummaryBackendDict[];
-    can_delete_topic: boolean;
-    can_create_topic: boolean;
-    can_delete_skill: boolean;
-    can_create_Skill: boolean;
-    /* eslint-enable camelcase */
-  }
+interface TopicsAndSkillsDashboardDataBackendDict {
+  'all_classroom_names': string[];
+  'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
+  'mergeable_skill_summary_dicts': SkillSummaryBackendDict[];
+  'topic_summary_dicts': TopicSummaryBackendDict[];
+  'can_delete_topic': boolean;
+  'can_create_topic': boolean;
+  'can_delete_skill': boolean;
+  'can_create_skill': boolean;
+  'total_skill_count': number;
+  'categorized_skills_dict': CategorizedSkillsBackendDict;
+}
+
+interface TopicsAndSkillDashboardData {
+  allClassroomNames: string[];
+  canDeleteTopic: boolean;
+  canCreateTopic: boolean;
+  canDeleteSkill: boolean;
+  canCreateSkill: boolean;
+  untriagedSkillSummaries: SkillSummary[];
+  mergeableSkillSummaries: SkillSummary[];
+  totalSkillCount: number;
+  topicSummaries: TopicSummary[];
+  categorizedSkillsDict: CategorizedSkills;
+}
+
+interface SkillsDashboardDataBackendDict {
+  'skill_summary_dicts': AugmentedSkillSummaryBackendDict[];
+  'next_cursor': string;
+  'more': boolean;
+}
+
+interface SkillsDashboardData {
+  skillSummaries: AugmentedSkillSummary[];
+  nextCursor: string;
+  more: boolean;
+}
+
+interface AssignedSkillDataBackendDict {
+  'topic_assignment_dicts': AssignedSkillBackendDict[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class TopicsAndSkillsDashboardBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private assignedSkillObjectFactory: AssignedSkillObjectFactory,
+    private augmentedSkillSummaryObjectFactory:
+    AugmentedSkillSummaryObjectFactory,
+    private http: HttpClient,
+    private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
+    private skillSummaryObjectFactory: SkillSummaryObjectFactory,
+    private topicSummaryObjectFactory: TopicSummaryObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchDashboardData(): Promise<ITopicsAndSkillsDashboardDataBackendDict> {
-    return this.http.get<ITopicsAndSkillsDashboardDataBackendDict>(
-      '/topics_and_skills_dashboard/data').toPromise();
+  fetchDashboardData(): Promise<TopicsAndSkillDashboardData> {
+    return this.http.get<TopicsAndSkillsDashboardDataBackendDict>(
+      '/topics_and_skills_dashboard/data').toPromise().then(response => {
+      let categorizedSkills = {};
+      for (let topic in response.categorized_skills_dict) {
+        let subtopicSkillsDict = response.categorized_skills_dict[topic];
+        let subtopicSkills = {};
+        for (let subtopic in subtopicSkillsDict) {
+          subtopicSkills[subtopic] = (
+            subtopicSkillsDict[subtopic].map(
+              backendDict => this.shortSkillSummaryObjectFactory
+                .createFromBackendDict(backendDict)));
+        }
+        categorizedSkills[topic] = subtopicSkills;
+      }
+
+      return {
+        allClassroomNames: response.all_classroom_names,
+        canCreateSkill: response.can_create_skill,
+        canCreateTopic: response.can_create_topic,
+        canDeleteSkill: response.can_delete_skill,
+        canDeleteTopic: response.can_delete_topic,
+        untriagedSkillSummaries: (
+          response.untriaged_skill_summary_dicts.map(
+            backendDict => this.skillSummaryObjectFactory
+              .createFromBackendDict(backendDict))),
+        mergeableSkillSummaries: (
+          response.mergeable_skill_summary_dicts.map(
+            backendDict => this.skillSummaryObjectFactory
+              .createFromBackendDict(backendDict))),
+        totalSkillCount: response.total_skill_count,
+        topicSummaries: (
+          response.topic_summary_dicts.map(
+            backendDict => this.topicSummaryObjectFactory
+              .createFromBackendDict(backendDict))),
+        categorizedSkillsDict: categorizedSkills
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  fetchTopicAssignmentsForSkill(skillId: string): Promise<AssignedSkill[]> {
+    const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+      '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
+        skill_id: skillId
+      });
+    return this.http.get<AssignedSkillDataBackendDict>(
+      assignSkillDataUrl).toPromise().then(dict => {
+      return dict.topic_assignment_dicts.map(
+        backendDict => this.assignedSkillObjectFactory
+          .createFromBackendDict(backendDict));
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  fetchSkillsDashboardData(
+      filter: TopicsAndSkillsDashboardFilter,
+      itemsPerPage, nextCursor): Promise<SkillsDashboardData> {
+    return this.http.post<SkillsDashboardDataBackendDict>(
+      TopicsAndSkillsDashboardDomainConstants.SKILL_DASHBOARD_DATA_URL, {
+        classroom_name: filter.classroom,
+        status: filter.status,
+        sort: filter.sort,
+        keywords: filter.keywords,
+        num_skills_to_fetch: itemsPerPage,
+        next_cursor: nextCursor
+      }).toPromise().then(response => {
+      return {
+        skillSummaries: response.skill_summary_dicts.map(
+          backendDict => this.augmentedSkillSummaryObjectFactory
+            .createFromBackendDict(backendDict)),
+        nextCursor: response.next_cursor,
+        more: response.more
+      };
+    }, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
   }
 
   mergeSkills(oldSkillId:string, newSkillId:string): Promise<void> {
@@ -85,7 +209,9 @@ export class TopicsAndSkillsDashboardBackendApiService {
     };
     return this.http.post<void>(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
-      mergeSkillsData).toPromise();
+      mergeSkillsData).toPromise().then(() => {}, errorResponse => {
+      throw new Error(errorResponse.error.error);
+    });
   }
 }
 angular.module('oppia').factory(

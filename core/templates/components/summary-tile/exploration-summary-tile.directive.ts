@@ -210,13 +210,31 @@ angular.module('oppia').directive('explorationSummaryTile', [
             $scope.isWindowLarge = (
               WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              $scope.isWindowLarge = (
-                WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-              $scope.$apply();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                $scope.isWindowLarge = (
+                  WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+                $scope.$applyAsync();
+              });
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+@Directive({
+  selector: 'exploration-summary-tile'
+})
+export class ExplorationSummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('explorationSummaryTile', elementRef, injector);
+  }
+}

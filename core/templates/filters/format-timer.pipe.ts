@@ -16,8 +16,11 @@
  * @fileoverview FormatTime filter for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform} from '@angular/core';
 
+@Injectable({
+  providedIn: 'root'
+})
 @Pipe({name: 'formatTime'})
 export class FormatTimePipe implements PipeTransform {
   transform(input: number): string {

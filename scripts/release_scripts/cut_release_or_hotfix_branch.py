@@ -59,7 +59,7 @@ def require_release_version_to_have_correct_format(
             match.
 
     Raises:
-        argparse.ArgumentTypeError: The release version name does not match
+        argparse.ArgumentTypeError. The release version name does not match
             the pattern.
 
     Returns:
@@ -94,8 +94,8 @@ def verify_target_branch_does_not_already_exist(remote_alias, new_branch_name):
         new_branch_name: str. The name of the new branch to cut.
 
     Raises:
-        Exception: The target branch name already exists locally.
-        Exception: The target branch name already exists on the remote
+        Exception. The target branch name already exists locally.
+        Exception. The target branch name already exists on the remote
             oppia repository.
     """
 
@@ -121,16 +121,16 @@ def verify_target_version_compatible_with_latest_release(
         target_version: str. The release version.
 
     Raises:
-        Exception: Failed to fetch latest release info from GitHub.
-        Exception: Could not parse version number of latest GitHub release.
-        AssertionError: The previous and the current major version are not the
+        Exception. Failed to fetch latest release info from GitHub.
+        Exception. Could not parse version number of latest GitHub release.
+        AssertionError. The previous and the current major version are not the
             same.
-        AssertionError: The current patch version is not equal to previous patch
+        AssertionError. The current patch version is not equal to previous patch
             version plus one.
-        AssertionError: The current patch version is greater or equal to 10.
-        AssertionError: The current minor version is not equal to previous
+        AssertionError. The current patch version is greater or equal to 10.
+        AssertionError. The current minor version is not equal to previous
             minor version plus one.
-        AssertionError: The current patch version is different than 0.
+        AssertionError. The current patch version is different than 0.
     """
     response = python_utils.url_open(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
@@ -153,10 +153,15 @@ def verify_target_version_compatible_with_latest_release(
     # This will need to be overridden if the major version changes.
     assert prev_major == curr_major, 'Unexpected major version change.'
     if prev_minor == curr_minor:
-        assert int(curr_patch) == int(prev_patch) + 1
+        assert int(curr_patch) == int(prev_patch) + 1, (
+            'The current patch version is not equal to previous patch '
+            'version plus one.')
     else:
-        assert int(curr_minor) == int(prev_minor) + 1
-        assert int(curr_patch) == 0
+        assert int(curr_minor) == int(prev_minor) + 1, (
+            'The current minor version is not equal to previous '
+            'minor version plus one.')
+        assert int(curr_patch) == 0, (
+            'The current patch version is different than 0.')
 
 
 def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
@@ -174,8 +179,8 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
         hotfix_number: int. The number for the hotfix branch.
 
     Raises:
-        Exception: The difference between two continuous hotfix numbers
-             is not one.
+        Exception. The difference between two continuous hotfix numbers
+            is not one.
     """
     all_branches = subprocess.check_output([
         'git', 'branch', '-a'])[:-1].split('\n')
@@ -194,8 +199,9 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             if branch_hotfix_number > last_hotfix_number:
                 last_hotfix_number = branch_hotfix_number
 
-    assert release_branch_exists
-    assert hotfix_number == last_hotfix_number + 1
+    assert release_branch_exists, 'Release branch is missing.'
+    assert hotfix_number == last_hotfix_number + 1, (
+        'The difference between two continuous hotfix numbers is not one.')
 
 
 def _get_release_branch_type_and_name(target_version):
@@ -234,7 +240,7 @@ def execute_branch_cut(target_version, hotfix_number):
         hotfix_number: int. The number for the hotfix branch.
 
     Raises:
-        Exception: Travis tests are failing on the branch from which
+        Exception. Travis tests are failing on the branch from which
             the new branch is cut.
     """
 
@@ -257,28 +263,25 @@ def execute_branch_cut(target_version, hotfix_number):
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
 
-    # The release coordinator should verify that tests are passing on the parent
-    # branch before checking out the new branch.
+    if not hotfix_number:
+        branch_to_check = 'develop'
+    elif hotfix_number == 1:
+        branch_to_check = 'release-%s' % target_version
+    else:
+        branch_to_check = 'release-%s-hotfix-%s' % (
+            target_version, hotfix_number - 1)
+    # The release coordinator should verify that tests are passing on
+    # the parent branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://travis-ci.org/oppia/oppia/branches')
-    while True:
-        if not hotfix_number:
-            branch_to_check = 'develop'
-        elif hotfix_number == 1:
-            branch_to_check = 'release-%s' % target_version
-        else:
-            branch_to_check = 'release-%s-hotfix-%s' % (
-                target_version, hotfix_number - 1)
-        python_utils.PRINT(
-            'Please confirm: are Travis checks passing on %s? (y/n) ' % (
+        'https://travis-ci.com/oppia/oppia/branches')
+    python_utils.PRINT(
+        'Please confirm: are Travis checks passing on %s? (y/n) ' % (
+            branch_to_check))
+    answer = python_utils.INPUT().lower()
+    if answer not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        raise Exception(
+            'Tests should pass on %s before this script is run.' % (
                 branch_to_check))
-        answer = python_utils.INPUT().lower()
-        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
-            break
-        elif answer:
-            raise Exception(
-                'Tests should pass on %s before this script is run.' % (
-                    branch_to_check))
 
     # Cut a new release or hotfix branch.
     if new_branch_type == release_constants.BRANCH_TYPE_HOTFIX:
@@ -299,14 +302,13 @@ def execute_branch_cut(target_version, hotfix_number):
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
     # Push the new release branch to GitHub.
-    python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
-    subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
-
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'New %s branch successfully cut. You are now on branch %s' % (
-            new_branch_type, new_branch_name))
-    python_utils.PRINT('Done!')
+    if new_branch_type == release_constants.BRANCH_TYPE_RELEASE:
+        python_utils.PRINT('Pushing new %s branch to GitHub.' % new_branch_type)
+        subprocess.check_call(['git', 'push', remote_alias, new_branch_name])
+    else:
+        python_utils.PRINT(
+            'Please cherrypick the required PRs and push the branch '
+            'to Github once this script is done.')
 
     common.ask_user_to_confirm(
         'Ask Sean (or Ben, if Sean isn\'t available) to create '
@@ -317,6 +319,12 @@ def execute_branch_cut(target_version, hotfix_number):
         '3. Checking the box: Restrict who can push to matching '
         'branches (then add the oppia/release-coordinators team)\n' % (
             new_branch_name))
+
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'New %s branch successfully cut. You are now on branch %s' % (
+            new_branch_type, new_branch_name))
+    python_utils.PRINT('Done!')
 
 
 def main(args=None):

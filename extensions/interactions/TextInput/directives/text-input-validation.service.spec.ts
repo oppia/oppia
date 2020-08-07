@@ -24,6 +24,8 @@ import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 
@@ -61,14 +63,14 @@ describe('TextInputValidationService', () => {
 
     customizationArguments = {
       placeholder: {
-        value: ''
+        value: new SubtitledUnicode('', '')
       },
       rows: {
         value: 1
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -80,6 +82,18 @@ describe('TextInputValidationService', () => {
 
   it('should catch non-string value for placeholder', () => {
     customizationArguments.placeholder.value = 1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Placeholder text must be a string.')
+    }]);
+  });
+
+  it('should catch non-string value for placeholder', () => {
+    customizationArguments.placeholder.value = (
+      new SubtitledUnicode(undefined, undefined));
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

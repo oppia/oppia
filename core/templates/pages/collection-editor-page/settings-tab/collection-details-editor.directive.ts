@@ -30,14 +30,12 @@ require(
 require('services/alerts.service.ts');
 
 angular.module('oppia').directive('collectionDetailsEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/settings-tab/' +
-        'collection-details-editor.directive.html'),
+      template: require('./collection-details-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
@@ -99,7 +97,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
               ctrl.collection, ctrl.displayedCollectionLanguage);
           };
 
-          // Normalize the tags for the collection
+          // Normalize the tags for the collection.
           var normalizeTags = function(tags) {
             for (var i = 0; i < tags.length; i++) {
               tags[i] = tags[i].trim().replace(/\s+/g, ' ');
@@ -144,3 +142,14 @@ angular.module('oppia').directive('collectionDetailsEditor', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+@Directive({
+  selector: 'collection-details-editor'
+})
+export class CollectionDetailsEditor extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('collectionDetailsEditor', elementRef, injector);
+  }
+}

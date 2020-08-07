@@ -146,7 +146,15 @@ describe('Question object factory', function() {
             }],
           }],
           confirmed_unclassified_answers: [],
-          customization_args: {},
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: null,
             feedback: {
@@ -234,7 +242,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
-  it('should correctly validate question', function() {
+  it('should correctly report unaddressed misconceptions', function() {
     var interaction = sampleQuestion.getStateData().interaction;
     var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback', true);
@@ -246,30 +254,31 @@ describe('Question object factory', function() {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]
     };
+    interaction.answerGroups[0].outcome.labelledAsCorrect = false;
+    interaction.answerGroups[0].taggedSkillMisconceptionId = 'skillId1-id';
+    expect(sampleQuestion.getUnaddressedMisconceptionNames(
+      misconceptionsDict)).toEqual(['name_2']);
+  });
 
-    expect(sampleQuestion.validate([])).toBe(false);
+  it('should correctly validate question', function() {
+    var interaction = sampleQuestion.getStateData().interaction;
 
-    expect(
-      sampleQuestion.validate(misconceptionsDict)).toEqual(
-      'Click on (or create) an answer ' +
-      'that is neither marked correct nor is a default answer (marked ' +
-      'above as [All other answers]) and tag the following misconceptions ' +
-      'to that answer group: name, name_2');
+    expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
-    expect(sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'At least one answer should be marked correct');
 
     interaction.solution = null;
-    expect(sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'A solution must be specified');
 
     interaction.hints = [];
-    expect(sampleQuestion.validate([])).toEqual(
-      'At least 1 hint should be specfied');
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'At least 1 hint should be specified');
 
     interaction.id = null;
-    expect(sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'An interaction must be specified');
   });
 

@@ -27,15 +27,19 @@ angular.module('oppia').factory('TranslateTextService', [
     var activeExpId = null;
     var activeExpVersion = null;
 
-    var getNextContentId = function() {
+    const getNextContentId = function() {
       return stateWiseContentIds[activeStateName].pop();
     };
-    var getNextState = function() {
-      var currentIndex = stateNamesList.indexOf(activeStateName);
+
+    const getNextState = function() {
+      const currentIndex = stateNamesList.indexOf(activeStateName);
       return stateNamesList[currentIndex + 1];
     };
 
-    var getNextText = function() {
+    const getNextText = function() {
+      if (stateNamesList.length === 0) {
+        return null;
+      }
       activeContentId = getNextContentId();
       if (!activeContentId) {
         activeStateName = getNextState();
@@ -47,7 +51,10 @@ angular.module('oppia').factory('TranslateTextService', [
       return stateWiseContents[activeStateName][activeContentId];
     };
 
-    var isMoreTextAvailableForTranslation = function() {
+    const isMoreTextAvailableForTranslation = function() {
+      if (stateNamesList.length === 0) {
+        return false;
+      }
       return !(
         stateNamesList.indexOf(activeStateName) + 1 === stateNamesList.length &&
           stateWiseContentIds[activeStateName].length === 0);
@@ -62,27 +69,37 @@ angular.module('oppia').factory('TranslateTextService', [
         stateNamesList = [];
         activeExpId = expId;
         activeExpVersion = null;
-        $http.get(
-          '/gettranslatabletexthandler', {
-            params: {
-              exp_id: expId,
-              language_code: languageCode
-            }
-          }).then(
-          function(response) {
-            stateWiseContents = response.data.state_names_to_content_id_mapping;
-            activeExpVersion = response.data.version;
-            for (var stateName in stateWiseContents) {
-              stateNamesList.push(stateName);
-              var contentIds = [];
-              for (var contentId in stateWiseContents[stateName]) {
+
+        $http.get('/gettranslatabletexthandler', {
+          params: {
+            exp_id: expId,
+            language_code: languageCode
+          }
+        }).then(function(response) {
+          stateWiseContents = response.data.state_names_to_content_id_mapping;
+          activeExpVersion = response.data.version;
+          for (const stateName in stateWiseContents) {
+            let stateHasText = false;
+            const contentIds = [];
+            for (const [contentId, text] of Object.entries(
+              stateWiseContents[stateName])) {
+              if (text !== '') {
                 contentIds.push(contentId);
+                stateHasText = true;
               }
+            }
+            // If none of the state's texts are non-empty, then don't consider
+            // the state for processing.
+            if (stateHasText) {
+              stateNamesList.push(stateName);
               stateWiseContentIds[stateName] = contentIds;
             }
+          }
+          if (stateNamesList.length > 0) {
             activeStateName = stateNamesList[0];
-            successCallback();
-          });
+          }
+          successCallback();
+        });
       },
       getTextToTranslate: function() {
         return {
@@ -92,15 +109,13 @@ angular.module('oppia').factory('TranslateTextService', [
       },
       suggestTranslatedText: function(
           translationHtml, languageCode, successCallback) {
-        var url = '/suggestionhandler/';
-        var data = {
+        const url = '/suggestionhandler/';
+        const data = {
           suggestion_type: 'translate_content',
           target_type: 'exploration',
           description: 'Adds translation',
           target_id: activeExpId,
           target_version_at_submission: activeExpVersion,
-          assigned_reviewer_id: null,
-          final_reviewer_id: null,
           change: {
             cmd: 'add_translation',
             content_id: activeContentId,

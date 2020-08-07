@@ -9,19 +9,14 @@
   <section class="oppia-suggestion-review-container">
     <div class="oppia-question-suggestion">
       <div>
-        <div class="oppia-question-suggestion-rubric">
-          <span>
-            <strong>Skill Difficulty: </strong><[skillDifficultyLabel]>
-          </span>
-        </div>
-        <div>
-          <strong>Skill Difficulty Explanation:</strong>
-          <angular-html-bind html-data="skillRubricExplanation">
-          </angular-html-bind>
-          <span ng-if="!skillRubricExplanation"
-                class="oppia-placeholder">
-            This rubric has not yet been specified
-          </span>
+        <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
+        <div ng-if="skillRubricExplanations.length > 0">
+          <strong>Difficulty Explanations</strong>
+          <ul>
+            <li ng-repeat="explanation in skillRubricExplanations">
+              <span ng-bind-html="explanation"></span>
+            </li>
+          </ul>
         </div>
       </div>
       <question-editor question-id="questionId"

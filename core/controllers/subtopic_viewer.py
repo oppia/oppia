@@ -42,6 +42,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_subtopic_viewer_page
@@ -59,9 +60,17 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
         subtopic_id = int(subtopic_id)
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        for subtopic in topic.subtopics:
+        next_subtopic_dict = None
+        for index, subtopic in enumerate(topic.subtopics):
             if subtopic.id == subtopic_id:
                 subtopic_title = subtopic.title
+                if index != len(topic.subtopics) - 1:
+                    next_subtopic_dict = topic.subtopics[index + 1].to_dict()
+                # Checking greater than 1 here, since otherwise the only
+                # subtopic page of the topic would always link to itself at the
+                # bottom of the subtopic page which isn't expected.
+                elif len(topic.subtopics) > 1:
+                    next_subtopic_dict = topic.subtopics[0].to_dict()
                 break
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
@@ -69,7 +78,9 @@ class SubtopicPageDataHandler(base.BaseHandler):
         subtopic_page_contents_dict = subtopic_page_contents.to_dict()
 
         self.values.update({
+            'topic_id': topic.id,
             'page_contents': subtopic_page_contents_dict,
-            'subtopic_title': subtopic_title
+            'subtopic_title': subtopic_title,
+            'next_subtopic_dict': next_subtopic_dict
         })
         self.render_json(self.values)

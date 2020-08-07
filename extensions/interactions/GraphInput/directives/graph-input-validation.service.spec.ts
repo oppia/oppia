@@ -27,16 +27,18 @@ import { GraphInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { IGraphBackendDict } from
-  'extensions/interactions/GraphInput/directives/graph-detail.service';
+import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { GraphInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('GraphInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
   let validatorService: GraphInputValidationService;
-  let currentState: string, customizationArguments: any;
+  let currentState: string;
+  let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
@@ -56,7 +58,7 @@ describe('GraphInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -69,13 +71,30 @@ describe('GraphInputValidationService', () => {
         value: {
           vertices: new Array(10),
           isWeighted: false,
-          isLabeled: false
+          isLabeled: false,
+          isDirected: false,
+          edges: []
         }
       },
       canEditEdgeWeight: {
         value: false
       },
       canEditVertexLabel: {
+        value: false
+      },
+      canMoveVertex: {
+        value: false
+      },
+      canDeleteVertex: {
+        value: false
+      },
+      canDeleteEdge: {
+        value: false
+      },
+      canAddVertex: {
+        value: false
+      },
+      canAddEdge: {
         value: false
       }
     };
@@ -97,7 +116,7 @@ describe('GraphInputValidationService', () => {
         rule_type: 'IsIsomorphicTo'
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null
     );
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
@@ -113,6 +132,11 @@ describe('GraphInputValidationService', () => {
   it('should expect graph and edit customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'GraphInputCustomizationArgs'." We did not
+        // assign the correct type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrowError(
       'Expected customization arguments to have properties: ' +
@@ -136,11 +160,11 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    (<IGraphBackendDict>
+    (<GraphAnswer>
       answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
-    (<IGraphBackendDict>
+    (<GraphAnswer>
       answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
-    (<IGraphBackendDict>
+    (<GraphAnswer>
       answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,

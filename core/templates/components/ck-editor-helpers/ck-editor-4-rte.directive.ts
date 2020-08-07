@@ -17,14 +17,15 @@
  */
 
 require('third-party-imports/ckeditor.import.ts');
+
+require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
 interface UiConfig {
   (): UiConfig;
-  // eslint-disable-next-line camelcase
-  hide_complex_extensions: boolean;
-  startupFocusEnabled?: boolean;
+  'hide_complex_extensions': boolean;
+  'startupFocusEnabled'?: boolean;
 }
 
 interface CkeditorCustomScope extends ng.IScope {
@@ -32,8 +33,8 @@ interface CkeditorCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService', 'ENABLE_LITERALLY_CANVAS_EDITOR',
-  function(ContextService, RteHelperService, ENABLE_LITERALLY_CANVAS_EDITOR) {
+  'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
+  function(CkEditorCopyContentService, ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {
@@ -52,13 +53,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          // TODO(#9358): Remove the if condition once the svgeditor is
-          // available for the users.
-          if (componentDefn.id === 'svgeditor') {
-            if (!ENABLE_LITERALLY_CANVAS_EDITOR) {
-              return;
-            }
-          }
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
@@ -107,7 +101,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
                                        inlineWrapperRule +
                                        blockWrapperRule +
                                        blockOverlayRule;
-
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
         }).join(',');
@@ -277,6 +270,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
           // Clean up CKEditor instance when directive is removed.
           ck.destroy();
         });
+
+        CkEditorCopyContentService.bindPasteHandler(ck);
       }
     };
   }

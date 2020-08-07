@@ -20,23 +20,37 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
-/* eslint-disable max-len */
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {
+  DragAndDropSortInputCustomizationArgs,
+  ImageClickInputCustomizationArgs,
+  InteractionCustomizationArgs,
+  ItemSelectionInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgs
+} from 'extensions/interactions/customization-args-defs';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
+
+interface AnswerChoice {
+  val: string | number;
+  label: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateEditorService {
   constructor(private solutionValidityService: SolutionValidityService) {}
+
+  private _stateEditorInitializedEventEmitter = new EventEmitter();
+  private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -46,10 +60,7 @@ export class StateEditorService {
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
   // interaction.
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a interaction domain object which can be
-  // typed once InteractionObjectFactory is upgraded.
-  interaction: any = null;
+  interaction: Interaction = null;
   misconceptionsBySkill: {} = {};
   explorationIsWhitelisted: boolean = false;
   solicitAnswerDetails: boolean = null;
@@ -135,17 +146,12 @@ export class StateEditorService {
     this.interaction.setDefaultOutcome(newOutcome);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'newArgs' is a dict with underscore_cased keys which
-  // give tslint errors against underscore_casing in favor of camelCasing.
-  setInteractionCustomizationArgs(newArgs: any): void {
+  setInteractionCustomizationArgs(
+      newArgs: InteractionCustomizationArgs): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'solution' is a solution domain object which can be typed
-  // once SolutionObjectFactory is upgraded.
-  setInteractionSolution(solution: any): void {
+  setInteractionSolution(solution: Solution): void {
     this.interaction.setSolution(solution);
   }
 
@@ -153,34 +159,25 @@ export class StateEditorService {
     this.interaction.setHints(hints);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a interaction domain object which can be
-  // typed once InteractionObjectFactory is upgraded.
-  getInteraction(): any {
+  getInteraction(): Interaction {
     return cloneDeep(this.interaction);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  getAnswerChoices(interactionId: string, customizationArgs: any): any {
+  getAnswerChoices(
+      interactionId: string,
+      customizationArgs: InteractionCustomizationArgs): AnswerChoice[] {
     if (!interactionId) {
       return null;
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
-      return customizationArgs.choices.value.map(
-        function(val, ind) {
-          return {
-            val: ind,
-            label: val
-          };
-        }
-      );
+      return (<MultipleChoiceInputCustomizationArgs> customizationArgs)
+        .choices.value.map((val, ind) => ({ val: ind, label: val.getHtml() }));
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
-      var imageWithRegions =
-        customizationArgs.imageAndRegions.value;
+      var imageWithRegions = (
+        <ImageClickInputCustomizationArgs> customizationArgs)
+        .imageAndRegions.value;
       for (
         var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
         _answerChoices.push({
@@ -189,14 +186,18 @@ export class StateEditorService {
         });
       }
       return _answerChoices;
-    } else if (interactionId === 'ItemSelectionInput' ||
-        interactionId === 'DragAndDropSortInput') {
-      return customizationArgs.choices.value.map(function(val) {
-        return {
-          val: val,
-          label: val
-        };
-      });
+    } else if (interactionId === 'ItemSelectionInput') {
+      return (
+        <ItemSelectionInputCustomizationArgs> customizationArgs)
+        .choices.value.map(val => (
+          { val: val.getHtml(), label: val.getHtml() }
+        ));
+    } else if (interactionId === 'DragAndDropSortInput') {
+      return (
+        <DragAndDropSortInputCustomizationArgs> customizationArgs)
+        .choices.value.map(val => (
+          { val: val.getHtml(), label: val.getHtml() }
+        ));
     } else {
       return null;
     }
@@ -240,6 +241,14 @@ export class StateEditorService {
 
   deleteCurrentSolutionValidity(): void {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
+  }
+
+  get onStateEditorInitialized() {
+    return this._stateEditorInitializedEventEmitter;
+  }
+
+  get onStateEditorDirectiveInitialized() {
+    return this._stateEditorDirectiveInitializedEventEmitter;
   }
 }
 

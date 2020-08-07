@@ -38,18 +38,14 @@ describe('Profile menu flow', function() {
   it('should land on the learner dashboard after successful login',
     async function() {
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner_dashboard');
+        'http://localhost:9001/learner-dashboard');
     });
 
   describe('profile dropdown menu', function() {
     beforeEach(async function() {
       await users.login('desktopAndMobileVisitor@profileMenuFlow.com');
       await learnerDashboardPage.get();
-      var profileDropdown = element(by.css(
-        '.protractor-test-profile-dropdown'));
-      await waitFor.elementToBeClickable(
-        profileDropdown, 'Could not click profile dropdown');
-      await profileDropdown.click();
+      await general.openProfileDropdown();
     });
 
     it('should visit the profile page from the profile dropdown menu',
@@ -74,7 +70,7 @@ describe('Profile menu flow', function() {
         await creatorDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/creator_dashboard');
+          'http://localhost:9001/creator-dashboard');
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',
@@ -87,7 +83,7 @@ describe('Profile menu flow', function() {
         await learnerDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/learner_dashboard');
+          'http://localhost:9001/learner-dashboard');
       });
 
     it('should not show the topics and skills dashboard link in the profile ' +
@@ -103,21 +99,10 @@ describe('Profile menu flow', function() {
 
       await users.login('desktopAndMobileAdm@profileMenuFlow.com');
       await learnerDashboardPage.get();
-      var profileDropdown = element(by.css(
-        '.protractor-test-profile-dropdown'));
-      await waitFor.elementToBeClickable(
-        profileDropdown, 'Could not click profile dropdown');
-      await profileDropdown.click();
-
-      var topicsAndSkillsDashboardLink = element(by.css(
-        '.protractor-test-topics-and-skills-dashboard-link'));
-      await waitFor.elementToBeClickable(
-        topicsAndSkillsDashboardLink,
-        'Could not click on the topics and skills dashboard link');
-      await topicsAndSkillsDashboardLink.click();
+      await general.navigateToTopicsAndSkillsDashboardPage();
       await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/topics_and_skills_dashboard');
+        'http://localhost:9001/topics-and-skills-dashboard');
     });
 
     it('should visit the notifications page from the profile dropdown menu',
@@ -130,7 +115,7 @@ describe('Profile menu flow', function() {
         await notificationsDashboardLink.click();
         await waitFor.pageToFullyLoad();
         expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/notifications_dashboard');
+          'http://localhost:9001/notifications');
       });
 
     it('should visit the preferences page from the profile dropdown menu',

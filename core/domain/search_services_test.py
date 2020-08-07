@@ -35,6 +35,7 @@ gae_search_services = models.Registry.import_search_services()
 
 class SearchServicesUnitTests(test_utils.GenericTestBase):
     """Test the search services module."""
+
     EXP_ID = 'An_exploration_id'
     COLLECTION_ID = 'A_collection_id'
 
@@ -123,8 +124,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
+        def mock_search(
+                query_string, index, cursor=None, limit=20, sort='',
+                ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(cursor, expected_cursor)
@@ -154,8 +156,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
-        def mock_search(query_string, index, cursor=None, limit=20, sort='',
-                        ids_only=False, retries=3):
+        def mock_search(
+                query_string, index, cursor=None, limit=20, sort='',
+                ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)

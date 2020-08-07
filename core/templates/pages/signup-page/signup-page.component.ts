@@ -13,13 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia profile page.
+ * @fileoverview Component for the Oppia profile page.
  */
 
 require('base-components/base-content.directive.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+  'pages/signup-page/modal-templates/license-explanation-modal.controller.ts');
+require(
+  'pages/signup-page/modal-templates/' +
+  'registration-session-expired-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/id-generation.service.ts');
@@ -31,12 +34,12 @@ require('services/stateful/focus-manager.service.ts');
 angular.module('oppia').component('signupPage', {
   template: require('./signup-page.component.html'),
   controller: [
-    '$http', '$timeout', '$uibModal', 'AlertsService',
+    '$http', '$uibModal', '$window', 'AlertsService',
     'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
     'DASHBOARD_TYPE_LEARNER', 'SITE_NAME', 'MAX_USERNAME_LENGTH',
     function(
-        $http, $timeout, $uibModal, AlertsService,
+        $http, $uibModal, $window, AlertsService,
         FocusManagerService, LoaderService, SiteAnalyticsService,
         UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
         DASHBOARD_TYPE_LEARNER, SITE_NAME, MAX_USERNAME_LENGTH) {
@@ -46,7 +49,7 @@ angular.module('oppia').component('signupPage', {
       ctrl.isFormValid = function() {
         return (
           ctrl.hasAgreedToLatestTerms &&
-          (ctrl.hasUsername || !ctrl.getWarningText(ctrl.username))
+          (ctrl.hasUsername || !ctrl.warningI18nCode)
         );
       };
 
@@ -54,19 +57,9 @@ angular.module('oppia').component('signupPage', {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/signup-page/modal-templates/' +
-            'licence-explanation-modal.template.directive.html'),
+            'license-explanation-modal.template.directive.html'),
           backdrop: true,
-          resolve: {},
-          controller: [
-            '$controller', '$scope', '$uibModalInstance', 'SITE_NAME',
-            function($controller, $scope, $uibModalInstance, SITE_NAME) {
-              $controller('ConfirmOrCancelModalController', {
-                $scope: $scope,
-                $uibModalInstance: $uibModalInstance
-              });
-              $scope.siteName = SITE_NAME;
-            }
-          ]
+          controller: 'LicenseExplanationModalController'
         }).result.then(function() {}, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -83,7 +76,7 @@ angular.module('oppia').component('signupPage', {
         ctrl.updateWarningText(username);
         if (!ctrl.warningI18nCode) {
           $http.post('usernamehandler/data', {
-            username: ctrl.username
+            username: username
           }).then(function(response) {
             if (response.data.username_is_taken) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
@@ -95,9 +88,9 @@ angular.module('oppia').component('signupPage', {
       // Returns the warning text corresponding to the validation error for
       // the given username, or an empty string if the username is valid.
       ctrl.updateWarningText = function(username) {
-        var alphanumeric = /^[A-Za-z0-9]+$/;
-        var admin = /admin/i;
-        var oppia = /oppia/i;
+        var alphanumericRegex = /^[A-Za-z0-9]+$/;
+        var adminRegex = /admin/i;
+        var oppiaRegex = /oppia/i;
 
         if (!username) {
           ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
@@ -105,11 +98,11 @@ angular.module('oppia').component('signupPage', {
           ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
         } else if (username.length > ctrl.MAX_USERNAME_LENGTH) {
           ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG';
-        } else if (!alphanumeric.test(username)) {
+        } else if (!alphanumericRegex.test(username)) {
           ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
-        } else if (admin.test(username)) {
+        } else if (adminRegex.test(username)) {
           ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN';
-        } else if (oppia.test(username)) {
+        } else if (oppiaRegex.test(username)) {
           ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE';
         } else {
           ctrl.warningI18nCode = '';
@@ -132,10 +125,10 @@ angular.module('oppia').component('signupPage', {
         }
 
         var defaultDashboard = DASHBOARD_TYPE_LEARNER;
-        var returnUrl = window.decodeURIComponent(
+        var returnUrl = decodeURIComponent(
           UrlService.getUrlParams().return_url);
 
-        if (returnUrl.indexOf('creator_dashboard') !== -1) {
+        if (returnUrl.indexOf('creator-dashboard') !== -1) {
           defaultDashboard = DASHBOARD_TYPE_CREATOR;
         } else {
           defaultDashboard = DASHBOARD_TYPE_LEARNER;
@@ -173,7 +166,7 @@ angular.module('oppia').component('signupPage', {
 
         ctrl.submissionInProcess = true;
         $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-          window.location.href = window.decodeURIComponent(
+          $window.location.href = decodeURIComponent(
             UrlService.getUrlParams().return_url);
         }, function(rejection) {
           if (
@@ -191,28 +184,11 @@ angular.module('oppia').component('signupPage', {
             'registration-session-expired-modal.template.html'),
           backdrop: 'static',
           keyboard: false,
-          resolve: {},
-          controller: [
-            '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-            'UserService', '$window',
-            function($scope, $uibModalInstance, SiteAnalyticsService,
-                UserService, $window) {
-              $scope.continueRegistration = function() {
-                UserService.getLoginUrlAsync().then(
-                  function(loginUrl) {
-                    if (loginUrl) {
-                      $timeout(function() {
-                        $window.location = loginUrl;
-                      }, 150);
-                    } else {
-                      $window.location.reload();
-                    }
-                  }
-                );
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
+          controller: 'RegistrationSessionExpiredModalController'
+        }).result.then(function() {}, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       };
       ctrl.$onInit = function() {

@@ -69,6 +69,7 @@ class GeneralFileSystem(python_utils.OBJECT):
         entity_name: str. The name of the entity (eg: exploration, topic etc).
         entity_id: str. The ID of the corresponding entity.
     """
+
     def __init__(self, entity_name, entity_id):
         """Constructs a GeneralFileSystem object.
 
@@ -146,8 +147,8 @@ class GcsFileSystem(GeneralFileSystem):
                 assets folder.
 
         Returns:
-            FileStream or None. It returns FileStream
-                domain object if the file exists. Otherwise, it returns None.
+            FileStream or None. It returns FileStream domain object if the file
+            exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
             bucket_name = app_identity_services.get_gcs_resource_bucket_name()
@@ -162,7 +163,9 @@ class GcsFileSystem(GeneralFileSystem):
             return None
 
     def commit(self, filepath, raw_bytes, mimetype):
-        """Args:
+        """Commit raw_bytes to the relevant file in the entity's assets folder.
+
+        Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
@@ -258,7 +261,7 @@ class AbstractFileSystem(python_utils.OBJECT):
                 assets folder.
 
         Raises:
-            IOError: Invalid filepath.
+            IOError. Invalid filepath.
         """
         base_dir = utils.vfs_construct_path(
             '/', self.impl.assets_path, 'assets')
@@ -306,7 +309,7 @@ class AbstractFileSystem(python_utils.OBJECT):
             FileStream. The file stream domain object.
 
         Raises:
-            IOError: The given file stream does not exist.
+            IOError. The given file stream does not exist.
         """
         file_stream = self.open(filepath)
         if file_stream is None:

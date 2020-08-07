@@ -45,7 +45,7 @@ def get_all_topic_summaries():
 
     Returns:
         list(TopicSummary). The list of summaries of all topics present in the
-            datastore.
+        datastore.
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_all()
     topic_summaries = [
@@ -63,7 +63,7 @@ def get_multi_topic_summaries(topic_ids):
 
     Returns:
         list(TopicSummary). The list of summaries of all given topics present in
-            the datastore.
+        the datastore.
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
     topic_summaries = [
@@ -93,10 +93,11 @@ def get_topic_summary_from_model(topic_summary_model):
     topic summary model.
 
     Args:
-        topic_summary_model: TopicSummaryModel.
+        topic_summary_model: TopicSummaryModel. The topic summary model object
+            to get the corresponding domain object.
 
     Returns:
-        TopicSummary.
+        TopicSummary. The domain object corresponding to the given model object.
     """
     return topic_domain.TopicSummary(
         topic_summary_model.id, topic_summary_model.name,
@@ -109,6 +110,8 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.uncategorized_skill_count,
         topic_summary_model.subtopic_count,
         topic_summary_model.total_skill_count,
+        topic_summary_model.thumbnail_filename,
+        topic_summary_model.thumbnail_bg_color,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -150,7 +153,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
 
     Args:
         committer_id: str. ID of the committer.
-        topic: Topic. topic domain object.
+        topic: Topic. Topic domain object.
         commit_message: str. A description of changes made to the topic.
         commit_cmds: list(TopicChange). A list of TopicChange objects that
             represent change commands made to the given topic.
@@ -220,13 +223,14 @@ def apply_change_list(topic_id, change_list):
     Raises:
         Exception. The incoming changelist had simultaneuous creation and
             deletion of subtopics.
+
     Returns:
-        Topic, dict, list(int), list(int), list(SubtopicPageChange).
-            The modified topic object, the modified subtopic pages dict keyed
-            by subtopic page id containing the updated domain objects of
-            each subtopic page, a list of ids of the deleted subtopics,
-            a list of ids of the newly created subtopics and a list of changes
-            applied to modified subtopic pages.
+        tuple(Topic, dict, list(int), list(int), list(SubtopicPageChange)). The
+        modified topic object, the modified subtopic pages dict keyed
+        by subtopic page id containing the updated domain objects of
+        each subtopic page, a list of ids of the deleted subtopics,
+        a list of ids of the newly created subtopics and a list of changes
+        applied to modified subtopic pages.
     """
     topic = topic_fetchers.get_topic_by_id(topic_id)
     newly_created_subtopic_ids = []
@@ -260,7 +264,7 @@ def apply_change_list(topic_id, change_list):
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.subtopic_id))
                 modified_subtopic_pages[subtopic_page_id] = (
-                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( #pylint: disable=line-too-long
+                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
                         change.subtopic_id, topic_id)
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
@@ -281,6 +285,9 @@ def apply_change_list(topic_id, change_list):
                 topic.add_canonical_story(change.story_id)
             elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
                 topic.delete_canonical_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
+                topic.rearrange_canonical_story(
+                    change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
                 topic.add_additional_story(change.story_id)
             elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
@@ -295,6 +302,11 @@ def apply_change_list(topic_id, change_list):
                 topic.move_skill_id_to_subtopic(
                     change.old_subtopic_id, change.new_subtopic_id,
                     change.skill_id)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
+                topic.rearrange_skill_in_subtopic(
+                    change.subtopic_id, change.from_index, change.to_index)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
+                topic.rearrange_subtopic(change.from_index, change.to_index)
             elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
                 topic.remove_skill_id_from_subtopic(
                     change.subtopic_id, change.skill_id)
@@ -331,10 +343,12 @@ def apply_change_list(topic_id, change_list):
                 if (change.property_name ==
                         subtopic_page_domain.
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
+                    page_contents = state_domain.SubtitledHtml.from_dict(
+                        change.new_value)
+                    page_contents.validate()
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
-                            state_domain.SubtitledHtml.from_dict(
-                                change.new_value))
+                            page_contents)
 
                 elif (change.property_name ==
                       subtopic_page_domain.
@@ -355,6 +369,10 @@ def apply_change_list(topic_id, change_list):
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_subtopic_thumbnail_bg_color(
+                        change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT):
+                    topic.update_subtopic_url_fragment(
                         change.subtopic_id, change.new_value)
 
             elif (
@@ -389,8 +407,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         change_list: list(TopicChange). List of changes applied to a topic.
 
     Raises:
-        Exception: Received invalid change list.
-        Exception: The topic model and the incoming topic domain
+        Exception. Received invalid change list.
+        Exception. The topic model and the incoming topic domain
             object have different version numbers.
     """
     if not change_list:
@@ -401,6 +419,10 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
+    if not topic.are_subtopic_url_fragments_unique():
+        raise Exception(
+            'Subtopic url fragments are not unique across '
+            'subtopics in the topic')
 
     # Topic model cannot be None as topic is passed as parameter here and that
     # is only possible if a topic model with that topic id exists. Also this is
@@ -456,7 +478,7 @@ def update_topic_and_subtopic_pages(
             topic.
 
     Raises:
-        ValueError: Current user does not have enough rights to edit a topic.
+        ValueError. Current user does not have enough rights to edit a topic.
     """
     if not commit_message:
         raise ValueError(
@@ -553,7 +575,7 @@ def publish_story(topic_id, story_id, committer_id):
             story_nodes: list(dict(str, *)). The list of story nodes dicts.
 
         Raises:
-            Exception: The story node doesn't contain any exploration id or the
+            Exception. The story node doesn't contain any exploration id or the
                 exploration id is invalid or isn't published yet.
         """
         exploration_id_list = []
@@ -713,7 +735,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
             one.
 
     Raises:
-        ValueError: User does not have enough rights to delete a topic.
+        ValueError. User does not have enough rights to delete a topic.
     """
     topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
     topic_rights_model.delete(
@@ -802,7 +824,8 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic.created_on, topic.last_updated
+        total_skill_count, topic.thumbnail_filename, topic.thumbnail_bg_color,
+        topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -813,8 +836,8 @@ def save_topic_summary(topic_summary):
     entity in the datastore.
 
     Args:
-        topic_summary: The topic summary object to be saved in the
-            datastore.
+        topic_summary: TopicSummaryModel. The topic summary object to be saved
+            in the datastore.
     """
     topic_summary_dict = {
         'name': topic_summary.name,
@@ -827,6 +850,8 @@ def save_topic_summary(topic_summary):
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
+        'thumbnail_filename': topic_summary.thumbnail_filename,
+        'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on
     }
@@ -991,7 +1016,7 @@ def get_multi_topic_rights(topic_ids):
 
     Returns:
         list(TopicRights). The list of rights of all given topics present in
-            the datastore.
+        the datastore.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
     topic_rights = [
@@ -1008,7 +1033,7 @@ def get_topic_rights_with_user(user_id):
 
     Returns:
         list(TopicRights). The rights objects associated with the topics
-            assigned to given user.
+        assigned to given user.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
     return [
@@ -1020,8 +1045,8 @@ def get_all_topic_rights():
     """Returns the rights object of all topics present in the datastore.
 
     Returns:
-        dict. The dict of rights objects of all topics present in
-            the datastore keyed by topic id.
+        dict. The dict of rights objects of all topics present in the datastore
+        keyed by topic id.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_all()
     topic_rights = {}
@@ -1040,7 +1065,7 @@ def filter_published_topic_ids(topic_ids):
 
     Returns:
         list(str). The topic IDs in the passed in list corresponding to
-            published topics.
+        published topics.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
     published_topic_ids = []
@@ -1108,7 +1133,7 @@ def assign_role(committer, assignee, new_role, topic_id):
         assignee: UserActionsInfo. UserActionsInfo object for the user
             whose role is being changed.
         new_role: str. The name of the new role. Possible values are:
-            ROLE_MANAGER
+            ROLE_MANAGER.
         topic_id: str. ID of the topic.
 
     Raises:

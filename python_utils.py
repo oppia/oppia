@@ -30,16 +30,12 @@ sys.path.insert(0, _FUTURE_PATH)
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import yaml  # isort:skip
+import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-import builtins  # isort:skip
-import future.utils  # isort:skip
-import past.builtins  # isort:skip
-import past.utils  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
+import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 BASESTRING = past.builtins.basestring
@@ -74,7 +70,7 @@ def get_args_of_function(function_node, args_to_ignore):
     Args:
         function_node: ast.FunctionDef. Represents a function.
         args_to_ignore: list(str). Ignore these arguments in a function
-        definition.
+            definition.
 
     Returns:
         list(str). The args for a function as listed in the function
@@ -89,19 +85,20 @@ def get_args_of_function(function_node, args_to_ignore):
             a.id for a in function_node.args.args if a.id not in args_to_ignore]
 
 
-def open_file(filename, mode, encoding='utf-8'):
+def open_file(filename, mode, encoding='utf-8', newline=None):
     """Open file and return a corresponding file object.
 
     Args:
         filename: str. The file to be opened.
         mode: str. Mode in which the file is opened.
         encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
 
     Returns:
         _io.TextIOWrapper. The file object.
     """
     try:
-        return io.open(filename, mode, encoding=encoding)
+        return io.open(filename, mode, encoding=encoding, newline=newline)
     except:
         raise IOError('Unable to open file: %s' % filename)
 
@@ -189,7 +186,7 @@ def parse_query_string(query_string):
 
     Returns:
         dict. The keys are the unique query variable names and the values are
-            lists of values for each name.
+        lists of values for each name.
     """
     try:
         import urlparse
@@ -273,7 +270,7 @@ def url_encode(query, doseq=False):
     return urlparse_urlencode.urlencode(query, doseq)
 
 
-def url_retrieve(source_url, filename):
+def url_retrieve(source_url, filename=None):
     """Copy a network object denoted by a URL to a local file using
     urllib.urlretrieve if run under Python 2 and urllib.request.urlretrieve if
     run under Python 3.
@@ -376,7 +373,8 @@ def convert_to_bytes(string_to_convert):
     """Converts the string to bytes.
 
     Args:
-        string_to_convert: unicode|str.
+        string_to_convert: unicode|str. Required string to be converted into
+            bytes.
 
     Returns:
         bytes. The encoded string.

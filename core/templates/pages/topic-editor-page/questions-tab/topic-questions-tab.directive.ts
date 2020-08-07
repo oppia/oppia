@@ -20,7 +20,6 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.directive.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
@@ -28,6 +27,9 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -46,8 +48,9 @@ angular.module('oppia').directive('questionsTab', [
         'topic-questions-tab.directive.html'),
       controller: [
         '$scope', '$q', '$uibModal', '$window',
-        'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',
+        'AlertsService', 'TopicEditorStateService',
         'UrlService', 'EditableQuestionBackendApiService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionsListService',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
@@ -55,8 +58,9 @@ angular.module('oppia').directive('questionsTab', [
         'NUM_QUESTIONS_PER_PAGE', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED', function(
             $scope, $q, $uibModal, $window,
-            AlertsService, TopicEditorStateService, QuestionCreationService,
+            AlertsService, TopicEditorStateService,
             UrlService, EditableQuestionBackendApiService,
+            TopicsAndSkillsDashboardBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionsListService,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
@@ -68,6 +72,7 @@ angular.module('oppia').directive('questionsTab', [
             QuestionsListService.getQuestionSummariesAsync;
           $scope.getGroupedSkillSummaries =
             TopicEditorStateService.getGroupedSkillSummaries;
+          $scope.getSkillsCategorizedByTopics = null;
           $scope.isLastQuestionBatch =
             QuestionsListService.isLastQuestionBatch;
           var _initTab = function() {
@@ -85,6 +90,13 @@ angular.module('oppia').directive('questionsTab', [
               $scope.allSkillSummaries = $scope.allSkillSummaries.concat(
                 subtopic.getSkillSummaries());
             }
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+              function(response) {
+                $scope.getSkillsCategorizedByTopics = (
+                  response.categorizedSkillsDict);
+                $scope.getUntriagedSkillSummaries = (
+                  response.untriagedSkillSummaries);
+              });
             $scope.canEditQuestion = $scope.topicRights.canEditTopic();
             $scope.misconceptions = [];
             $scope.questionIsBeingUpdated = false;

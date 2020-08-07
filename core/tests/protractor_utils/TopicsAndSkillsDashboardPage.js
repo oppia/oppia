@@ -17,29 +17,52 @@
  * in Protractor tests.
  */
 
-var forms = require('./forms.js');
+var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 var SkillEditorPage = require('./SkillEditorPage.js');
+var workflow = require('./workflow.js');
+var general = require('../protractor_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
-  var DASHBOARD_URL = '/topics_and_skills_dashboard';
+  var DASHBOARD_URL = '/topics-and-skills-dashboard';
   var skillEditorPage = new SkillEditorPage.SkillEditorPage();
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
   var skillDescriptions = element.all(
     by.css('.protractor-test-skill-description'));
   var createTopicButton = element(
     by.css('.protractor-test-create-topic-button'));
-  var deleteTopicButtons = element.all(
-    by.css('.protractor-test-delete-topic-button'));
   var createSkillButton = element(
     by.css('.protractor-test-create-skill-button'));
-  var deleteSkillButtons = element.all(
+  var createSkillButtonSecondary = element(
+    by.css('.protractor-test-create-skill-button-circle'));
+  var deleteSkillButton = element(
     by.css('.protractor-test-delete-skill-button'));
+  var topicsTable = element(by.css('.protractor-test-topics-table'));
+  var skillsTable = element(by.css('.protractor-test-skills-table'));
   var topicsListItems = element.all(
     by.css('.protractor-test-topics-list-item'));
   var skillsListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
-  var topicNameField = element(by.css('.protractor-test-new-topic-name-field'));
+  var topicNameField = element(by.css(
+    '.protractor-test-new-topic-name-field'));
+  var topicDescriptionField = element(by.css(
+    '.protractor-test-new-topic-description-field'));
+  var topicFilterKeywordField = element(by.css(
+    '.protractor-test-select-keyword-dropdown'));
+  var topicFilterClassroomField = element(by.css(
+    '.protractor-test-select-classroom-dropdown'));
+  var topicEditOptions = element.all(
+    by.css('.protractor-test-topic-edit-box'));
+  var skillEditOptions = element.all(
+    by.css('.protractor-test-skill-edit-box'));
+  var topicResetFilters = element(by.css(
+    '.protractor-test-topic-filter-reset'));
+  var deleteTopicButton = element(
+    by.css('.protractor-test-delete-topic-button'));
+  var editTopicButton = element(
+    by.css('.protractor-test-edit-topic-button'));
+  var unassignSkillButon = element(
+    by.css('.protractor-test-unassign-skill-button'));
   var skillNameField = element(
     by.css('.protractor-test-new-skill-description-field')
   );
@@ -55,34 +78,45 @@ var TopicsAndSkillsDashboardPage = function() {
   var confirmSkillDeletionButton = element(
     by.css('.protractor-test-confirm-skill-deletion-button')
   );
-  var unusedSkillsTabButton = element(
-    by.css('.protractor-test-unused-skills-tab')
+  var skillsTabButton = element(
+    by.css('.protractor-test-skills-tab')
   );
   var assignSkillToTopicButtons = element.all(
     by.css('.protractor-test-assign-skill-to-topic-button'));
   var confirmMoveButton = element(
     by.css('.protractor-test-confirm-move-button'));
-  var mergeSkillsButtons = element.all(
+  var mergeSkillsButton = element(
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
     by.css('.protractor-test-confirm-skill-selection-button'));
-  var searchSkillInput = element(by.css('.protractor-test-search-skill-input'));
-  var editConceptCardExplanationButton = element(
-    by.css('.protractor-test-edit-concept-card'));
+  var openConceptCardExplanationButton = element(
+    by.css('.protractor-test-open-concept-card'));
   var saveConceptCardExplanationButton = element(
     by.css('.protractor-test-save-concept-card'));
   var topicNamesInTopicSelectModal = element.all(
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
   var topicsTabButton = element(
-    by.css('.protractor-test-topics-tab')
-  );
+    by.css('.protractor-test-topics-tab'));
+  var topicThumbnailButton = element(
+    by.css('.protractor-test-photo-button'));
+  var thumbnailContainer = element(
+    by.css('.protractor-test-thumbnail-container'));
+  var skillStatusFilterDropdown = element(
+    by.css('.protractor-test-select-skill-status-dropdown'));
+  var confirmUnassignSkillButton =
+    element(by.css('.protractor-test-confirm-unassign-skill-button'));
+  var noSkillsPresentMessage = element(
+    by.css('.protractor-test-no-skills-present-message'));
+  var assignedTopicNamesInput = element.all(
+    by.css('.protractor-test-unassign-topic'));
+
 
   // Returns a promise of all topics with the given name.
   var _getTopicElements = async function(topicName) {
     var topicsListElems = [];
     var topicsListItemsCount = await topicsListItems.count();
     for (var i = 0; i < topicsListItemsCount; i++) {
-      var topic = await topicsListItems.get(i);
+      var topic = topicsListItems.get(i);
       var name = await topic.element(
         by.css('.protractor-test-topic-name')).getText();
       if (name === topicName) {
@@ -94,45 +128,61 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.get = async function() {
     await browser.get('/');
-    var profileDropdown = element(
-      by.css('.protractor-test-profile-dropdown'));
-    await waitFor.elementToBeClickable(
-      profileDropdown, 'Could not click profile dropdown');
-    await profileDropdown.click();
-    var topicsAndSkillsDashboardLink = element(by.css(
-      '.protractor-test-topics-and-skills-dashboard-link'));
-    await waitFor.elementToBeClickable(
-      topicsAndSkillsDashboardLink,
-      'Could not click on the topics and skills dashboard link');
-    await topicsAndSkillsDashboardLink.click();
     await waitFor.pageToFullyLoad();
+    await general.navigateToTopicsAndSkillsDashboardPage();
     expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/topics_and_skills_dashboard');
+      'http://localhost:9001/topics-and-skills-dashboard');
+  };
+
+  // Only use this if the skills count is not zero. This is supposed to be used
+  // for actions being performed on the skills like deleting, assigning etc.
+  this.waitForSkillsToLoad = async function() {
+    await waitFor.visibilityOf(skillsTable,
+      'Skills table taking too long to appear.');
+    await waitFor.invisibilityOf(noSkillsPresentMessage,
+      'Skills list taking too long to appear.');
+  };
+
+  // Only use this if the topics count is not zero. This is supposed to be used
+  // for actions being performed on the topics like editing, deleting etc.
+  this.waitForTopicsToLoad = async function() {
+    await waitFor.visibilityOf(topicsTable,
+      'Topics table taking too long to appear');
+    await waitFor.visibilityOf(topicsListItems.first(),
+      'Topics list taking too long to appear');
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(
       oldSkillIndex, newSkillIndex) {
-    var elems = await mergeSkillsButtons;
-    await elems[oldSkillIndex].click();
+    await this.waitForSkillsToLoad();
+    await action.click(
+      'Skill edit options', skillEditOptions.get(oldSkillIndex));
+    await action.click(
+      'Merge skill button', mergeSkillsButton);
+
     var skills = await skillsListItems;
     await skills[newSkillIndex].click();
     await confirmSkillsMergeButton.click();
   };
 
   this.navigateToTopicWithIndex = async function(index) {
-    var elem = await topicsListItems.get(index);
-    await waitFor.elementToBeClickable(
-      elem, 'Topic taking too long to be clickable');
-    await elem.click();
+    await this.waitForTopicsToLoad();
+    await action.click(
+      'Topic edit option', topicEditOptions.get(index));
+    await action.click(
+      'Edit topic button', editTopicButton);
+    await waitFor.pageToFullyLoad();
   };
 
   this.assignSkillWithIndexToTopic = async function(index, topicIndex) {
-    var assignSkillButton = await assignSkillToTopicButtons.get(index);
-    await waitFor.elementToBeClickable(
-      assignSkillButton,
-      'Assign skill button taking too long to be clickable');
-    await assignSkillButton.click();
-    var topic = await topicsListItems.get(topicIndex);
+    await this.waitForSkillsToLoad();
+    await waitFor.visibilityOf(
+      assignSkillToTopicButtons.first(),
+      'Assign button taking too long to appear.');
+    await action.click(
+      'Assign skill to topic button', assignSkillToTopicButtons.get(index));
+
+    var topic = topicsListItems.get(topicIndex);
     await waitFor.elementToBeClickable(
       topic, 'Topic list item taking too long to be clickable');
     await topic.click();
@@ -144,6 +194,10 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.assignSkillWithIndexToTopicByTopicName = async function(
       skillIndex, topicName) {
+    await this.waitForSkillsToLoad();
+    await waitFor.visibilityOf(
+      assignSkillToTopicButtons.first(),
+      'Assign button taking too long to appear.');
     var assignSkillButton = await assignSkillToTopicButtons.get(skillIndex);
     await waitFor.elementToBeClickable(
       assignSkillButton,
@@ -164,7 +218,8 @@ var TopicsAndSkillsDashboardPage = function() {
     }
   };
 
-  this.createTopic = async function(topicName, shouldCloseTopicEditor) {
+  this.createTopic = async function(
+      topicName, description, shouldCloseTopicEditor) {
     var initialHandles = [];
     var handles = await browser.getAllWindowHandles();
     initialHandles = handles;
@@ -177,6 +232,11 @@ var TopicsAndSkillsDashboardPage = function() {
       topicNameField,
       'Create Topic modal takes too long to appear.');
     await topicNameField.sendKeys(topicName);
+    await topicDescriptionField.sendKeys(description);
+    await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer,
+      ('../data/test_svg.svg'), false);
+
     await confirmTopicCreationButton.click();
 
     await waitFor.newTabToBeCreated(
@@ -205,30 +265,68 @@ var TopicsAndSkillsDashboardPage = function() {
     return await waitFor.pageToFullyLoad();
   };
 
-  this.deleteTopicWithIndex = async function(index) {
-    var elems = await deleteTopicButtons;
-    await waitFor.elementToBeClickable(
-      elems[0],
-      'Delete Topic button takes too long to be clickable');
-    await elems[0].click();
+  this.filterSkillsByStatus = async function(status) {
+    await waitFor.visibilityOf(
+      skillStatusFilterDropdown,
+      'Skill Dashboard status filter taking too long to appear.');
 
-    await waitFor.elementToBeClickable(
-      confirmTopicDeletionButton,
-      'Confirm Delete Topic button takes too long to be clickable');
-    await confirmTopicDeletionButton.click();
-    await waitFor.pageToFullyLoad();
+    await skillStatusFilterDropdown.click();
+    await (
+      await browser.driver.switchTo().activeElement()
+    ).sendKeys(status + '\n');
+  };
+
+  this.filterTopicsByKeyword = async function(keyword) {
+    await waitFor.visibilityOf(
+      topicFilterKeywordField,
+      'Topic Dashboard keyword filter parent taking too long to appear.');
+    var filterKeywordInput = topicFilterKeywordField.element(
+      by.css('.select2-search__field'));
+    await waitFor.visibilityOf(
+      filterKeywordInput,
+      'Topic Dashboard keyword filter taking too long to appear.');
+
+    await filterKeywordInput.click();
+    await filterKeywordInput.sendKeys(keyword);
+    await filterKeywordInput.sendKeys(protractor.Key.RETURN);
+  };
+
+  this.filterTopicsByClassroom = async function(keyword) {
+    await waitFor.visibilityOf(
+      topicFilterClassroomField,
+      'Topic Dashboard classroom filter taking too long to appear.');
+
+    await topicFilterClassroomField.click();
+    await (
+      await browser.driver.switchTo().activeElement()
+    ).sendKeys(keyword + '\n');
+  };
+
+  this.resetTopicFilters = async function() {
+    await waitFor.visibilityOf(
+      topicResetFilters, 'Reset button taking too long to be clickable');
+    await topicResetFilters.click();
+  };
+
+  this.deleteTopicWithIndex = async function(index) {
+    await this.waitForTopicsToLoad();
+
+    await action.click(
+      'Topic edit option', topicEditOptions.get(index));
+    await action.click('Delete topic button', deleteTopicButton);
+    await action.click(
+      'Confirm Delete Topic button', confirmTopicDeletionButton);
+    await this.get();
   };
 
   this.deleteSkillWithIndex = async function(index) {
-    var elems = await deleteSkillButtons;
-    await waitFor.elementToBeClickable(
-      elems[0],
-      'Delete skill button takes too long to be clickable');
-    await elems[0].click();
-    await waitFor.elementToBeClickable(
-      confirmSkillDeletionButton,
-      'Confirm Delete Skill button takes too long to be clickable');
-    await confirmSkillDeletionButton.click();
+    await this.waitForSkillsToLoad();
+    await action.click(
+      'Skill edit option', skillEditOptions.get(index));
+    await action.click(
+      'Delete skill button', deleteSkillButton);
+    await action.click(
+      'Confirm delete skill button', confirmSkillDeletionButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -238,36 +336,30 @@ var TopicsAndSkillsDashboardPage = function() {
     var handles = await browser.getAllWindowHandles();
     initialHandles = handles;
     var parentHandle = await browser.getWindowHandle();
-    await waitFor.elementToBeClickable(
-      createSkillButton,
-      'Create Skill button takes too long to be clickable');
-    await createSkillButton.click();
+    try {
+      await waitFor.elementToBeClickable(
+        createSkillButton,
+        'Create Skill button takes too long to be clickable');
+      await createSkillButton.click();
+    } catch (e) {
+      await this.navigateToSkillsTab();
+      await waitFor.elementToBeClickable(
+        createSkillButtonSecondary,
+        'Create Skill button takes too long to be clickable');
+      await createSkillButtonSecondary.click();
+    }
+
     await waitFor.visibilityOf(
       skillNameField,
       'Create Skill modal takes too long to appear.');
     await skillNameField.sendKeys(description);
-    await editConceptCardExplanationButton.click();
+    await openConceptCardExplanationButton.click();
 
     var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
 
     await (await browser.switchTo().activeElement()).sendKeys(reviewMaterial);
-
-    await waitFor.elementToBeClickable(
-      saveConceptCardExplanationButton,
-      'Save Concept Card Explanation button takes too long to be clickable');
-    await saveConceptCardExplanationButton.click();
-    await waitFor.invisibilityOf(
-      saveConceptCardExplanationButton,
-      'Explanation Editor takes too long to close');
-
-    await skillEditorPage.addRubricExplanationForDifficulty(
-      'Easy', 'Explanation for easy difficulty.');
-    await skillEditorPage.addRubricExplanationForDifficulty(
-      'Medium', 'Explanation for medium difficulty.');
-    await skillEditorPage.addRubricExplanationForDifficulty(
-      'Hard', 'Explanation for hard difficulty.');
 
     await waitFor.elementToBeClickable(
       confirmSkillCreationButton,
@@ -299,11 +391,48 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToUnusedSkillsTab = async function() {
+  this.unassignSkillFromTopicWithIndex = async function(
+      skillDescription, topicIndex) {
+    await this.waitForSkillsToLoad();
+    var skillIndex = -1;
+    for (var i = 0; i < await skillDescriptions.count(); i++) {
+      var skillDescriptionText = (
+        await (await skillDescriptions.get(i)).getText());
+      if (skillDescriptionText === skillDescription) {
+        skillIndex = i;
+        break;
+      }
+    }
+    expect(skillIndex).not.toEqual(-1);
+    var skillEditOptionBox = skillEditOptions.get(skillIndex);
+    await skillEditOptionBox.click();
     await waitFor.elementToBeClickable(
-      unusedSkillsTabButton,
-      'Unused skills tab button taking too long to be clickable');
-    await unusedSkillsTabButton.click();
+      unassignSkillButon,
+      'Unassign Skill button takes too long to be clickable');
+    await unassignSkillButon.click();
+
+    await waitFor.modalPopupToAppear();
+    await waitFor.visibilityOf(
+      assignedTopicNamesInput.first(),
+      'Topic names in unassign skill from topics modal taking' +
+      ' too long to appear.');
+    var assignedTopicInput = assignedTopicNamesInput.get(topicIndex);
+    await waitFor.elementToBeClickable(
+      assignedTopicInput,
+      'Assigned topic checkbox takes too long to be clickable');
+    await assignedTopicInput.click();
+
+    await waitFor.elementToBeClickable(
+      confirmUnassignSkillButton,
+      'Confirm Unassign skill button takes too long to be clickable');
+    await confirmUnassignSkillButton.click();
+  };
+
+  this.navigateToSkillsTab = async function() {
+    await waitFor.elementToBeClickable(
+      skillsTabButton,
+      'Skills tab button taking too long to be clickable');
+    await skillsTabButton.click();
   };
 
   this.expectNumberOfTopicsToBe = async function(number) {
@@ -311,39 +440,39 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.expectTopicNameToBe = async function(topicName, index) {
+    await this.waitForTopicsToLoad();
     expect(await topicNames.get(index).getText()).toEqual(topicName);
   };
 
   this.editTopic = async function(topicName) {
-    await waitFor.elementToBeClickable(
-      topicsTabButton, 'Unable to click on topics tab.');
-    var topicElements = await _getTopicElements(topicName);
-    if (topicElements.length === 0) {
-      throw new Error('Could not find topic tile with name ' + topicName);
-    }
-    await waitFor.elementToBeClickable(
-      topicElements[0], 'Unable to click on topic: ' + topicName);
-    await topicElements[0].click();
-    await waitFor.pageToFullyLoad();
-    await waitFor.invisibilityOf(
-      topicElements[0], 'Topic editor page takes too long to load.');
+    await this.waitForTopicsToLoad();
+    await topicNames.map(async(topic, index) => {
+      var name = await topic.getText();
+      if (name === topicName) {
+        await this.navigateToTopicWithIndex(index);
+      }
+    });
   };
 
   this.expectSkillDescriptionToBe = async function(description, index) {
+    await this.waitForSkillsToLoad();
     var elems = await skillDescriptions;
     expect(await elems[index].getText()).toEqual(description);
   };
 
   this.expectNumberOfSkillsToBe = async function(number) {
-    var elems = await skillsListItems;
-    expect(elems.length).toBe(number);
+    if (!number) {
+      await waitFor.visibilityOf(
+        noSkillsPresentMessage,
+        'No skills present message taking to long to appear.');
+      expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
+      return;
+    }
+    expect(await skillsListItems.count()).toEqual(number);
   };
 
   this.searchSkillByName = async function(name) {
-    await waitFor.visibilityOf(
-      searchSkillInput,
-      'searchSkillInput takes too long to be visible.');
-    await searchSkillInput.sendKeys(name);
+    return await this.filterTopicsByKeyword(name);
   };
 };
 

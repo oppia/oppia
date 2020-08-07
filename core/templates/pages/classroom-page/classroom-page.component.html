@@ -1,0 +1,157 @@
+<background-banner></background-banner>
+<div class="oppia-classroom-viewer-container" style="position: relative;">
+  <div class="oppia-classroom-header">
+    <div class="classroom-header" translate="I18N_CLASSROOM_PAGE_HEADING"></div>
+    <div class="classroom-name"><[$ctrl.classroomDisplayName]></div>
+  </div>
+  <div class="oppia-classroom-banner">
+    <img ng-src="<[$ctrl.bannerImageFileUrl]>" align="center" width="100%" alt="">
+  </div>
+  <div class="oppia-classroom-details">
+    <h2 translate="I18N_CLASSROOM_PAGE_COURSE_DETAILS"></h2>
+    <p class="course-details"> <[$ctrl.classroomData.getCourseDetails()]> </p>
+    <h2 translate="I18N_CLASSROOM_PAGE_TOPICS_COVERED"></h2>
+    <p> <[$ctrl.classroomData.getTopicListIntro()]> </p>
+  </div>
+  <div class="oppia-topic-summary-tiles">
+    <div ng-repeat="topicSummary in $ctrl.classroomData.getTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
+      <topic-summary-tile topic-summary="topicSummary">
+      </topic-summary-tile>
+    </div>
+  </div>
+</div>
+<div class="oppia-classroom-search-section">
+  <div class="classroom-page-help-text initial-help-text" translate="I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING"></div>
+  <div class="classroom-page-help-text" style="font-size: 1em;" translate="I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING"></div>
+  <div>
+    <search-bar enable-dropup="true"></search-bar>
+  </div>
+</div>
+<style>
+  .oppia-classroom-search-section {
+    background-color: #d7d7d7;
+    bottom: 0;
+    padding-bottom: 10px;
+    padding-left: 15vw;
+    position: fixed;
+    width: 100vw;
+  }
+
+  .oppia-classroom-details {
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 0.95em;
+  }
+
+  .oppia-classroom-details .course-details {
+    margin-bottom: 7vh;
+  }
+
+  .oppia-classroom-details h2 {
+    color: #545454;
+  }
+
+  .oppia-classroom-details p {
+    line-height: 2;
+  }
+
+  .oppia-classroom-viewer-container {
+    margin-left: 15vw;
+    margin-right: 10vw;
+  }
+
+  .oppia-classroom-search-section .initial-help-text {
+    padding-top: 2.5vh;
+  }
+
+  .classroom-page-help-text {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 1.2em;
+  }
+
+  .oppia-classroom-viewer-container .oppia-classroom-header {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    margin-bottom: 25px;
+    margin-top: 0;
+    padding-top: 66.5px;
+    text-align: left;
+  }
+
+  .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
+    display: grid;
+    grid-row-gap: 2vh;
+    grid-template-columns: 210px 210px 210px 210px;
+    justify-content: space-between;
+    margin-top: 40px;
+    overflow-y: auto;
+    padding-bottom: 200px;
+  }
+
+  .oppia-classroom-viewer-container .classroom-name {
+    font-size: 3em;
+  }
+  .oppia-classroom-viewer-container .classroom-header {
+    font-size: 1.2em;
+  }
+  .oppia-classroom-viewer-container .oppia-classroom-banner {
+    margin-left: 50vw;
+    margin-top: -10vw;
+    width: 25vw;
+  }
+
+  @media(max-width: 1150px) {
+    .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
+      grid-template-columns: 180px 180px 180px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .oppia-classroom-viewer-container .classroom-header {
+      margin-top: -3vh;
+    }
+    .oppia-classroom-search-section .initial-help-text {
+      padding-top: 0.5vh;
+    }
+
+    .oppia-classroom-viewer-container {
+      margin-left: 10vw;
+      margin-right: 10vw;
+    }
+
+    .classroom-page-help-text {
+      font-size: 1em;
+    }
+    .oppia-classroom-search-section {
+      height: 100px;
+    }
+
+    .oppia-classroom-viewer-container .oppia-classroom-banner {
+      margin-left: 15vw;
+      margin-top: -7vh;
+      width: 50vw;
+    }
+    .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
+      grid-template-columns: 150px 150px 150px;
+      margin-top: 5vh;
+      padding-bottom: 120px;
+    }
+  }
+
+  @media(max-width: 500px) {
+    .oppia-classroom-viewer-container {
+      margin-left: 5vw;
+      margin-right: 5vw;
+    }
+
+    .oppia-classroom-details {
+      font-size: 0.8em;
+    }
+
+    .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
+      display: grid;
+      grid-template-columns: 150px 150px;
+      justify-content: space-between;
+    }
+  }
+</style>

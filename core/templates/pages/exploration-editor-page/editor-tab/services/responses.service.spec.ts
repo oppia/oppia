@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ResponsesService.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Responses Service', function() {
@@ -320,14 +322,14 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'ItemSelectionInput');
 
-    // Set _answerChoices variable
+    // Set _answerChoices variable.
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }]);
     ResponsesService.changeActiveAnswerGroupIndex(0);
 
     var newAnswerChoices = [{
@@ -338,7 +340,7 @@ describe('Responses Service', function() {
       val: 'a'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedRules = ['c'];
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
@@ -362,7 +364,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }]);
 
     var newAnswerChoices = [{
       val: 'd'
@@ -372,7 +374,7 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = ['f', 'd', 'e'];
@@ -388,9 +390,10 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXAtPositionY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    interactionDataWithRules.answerGroups[0].rules[0].type =
-      'HasElementXAtPositionY';
-    interactionDataWithRules.answerGroups[0].rules[0].inputs.y = [];
+    interactionDataWithRules.answerGroups[0].rules[0].type = (
+      'HasElementXAtPositionY');
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.x = 'b';
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.y = 3;
 
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
@@ -402,7 +405,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }]);
 
     var newAnswerChoices = [{
       val: 'c'
@@ -410,10 +413,10 @@ describe('Responses Service', function() {
       val: 'b'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].rules[0].inputs.x = '';
+    expectedAnswerGroup[0].rules[0].inputs.x = 'c';
     expectedAnswerGroup[0].rules[0].inputs.y = 1;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
@@ -424,8 +427,10 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXBeforeElementY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    interactionDataWithRules.answerGroups[0].rules[0].type =
-      'HasElementXBeforeElementY';
+    interactionDataWithRules.answerGroups[0].rules[0].type = (
+      'HasElementXBeforeElementY');
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.x = 'a';
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.y = 'b';
 
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
@@ -438,21 +443,21 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }]);
 
     var newAnswerChoices = [{
+      val: 'a'
+    }, {
       val: 'd'
     }, {
       val: 'e'
-    }, {
-      val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].rules[0].inputs.x = '';
-    expectedAnswerGroup[0].rules[0].inputs.y = '';
+    expectedAnswerGroup[0].rules[0].inputs.x = 'a';
+    expectedAnswerGroup[0].rules[0].inputs.y = 'd';
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -462,20 +467,21 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and choices had changed', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
     // Any other method from DragAndDropSortInputRulesService.
-    interactionDataWithRules.answerGroups[0].rules[0].type =
-      'IsEqualToOrderingWithOneItemAtIncorrectPosition';
-
+    interactionDataWithRules.answerGroups[0].rules[0].type = (
+      'IsEqualToOrderingWithOneItemAtIncorrectPosition');
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.x = [
+      ['a'], ['b'], ['c']];
+    delete interactionDataWithRules.answerGroups[0].rules[0].inputs.y;
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'DragAndDropSortInput');
-
-    ResponsesService.updateAnswerChoices([{
+    ResponsesService.updateAnswerChoices({
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    });
 
     var newAnswerChoices = [{
       val: 'd'
@@ -485,11 +491,10 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].rules[0].inputs.x = [];
-    expectedAnswerGroup[0].rules[0].inputs.y = [];
+    expectedAnswerGroup[0].rules[0].inputs.x = [['d'], ['e'], ['f']];
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -684,5 +689,14 @@ describe('Responses Service', function() {
     expect(ResponsesService.getAnswerGroup(0)).toEqual(updatedAnswerGroups[0]);
     expect(callbackSpy).toHaveBeenCalledWith(
       updatedAnswerGroups, updatedDefaultOutcome);
+  });
+
+  it('should fetch EventEmitters', function() {
+    let answerGroupsChangedEventEmitter = new EventEmitter();
+    let initializeAnswerGroupsEventEmitter = new EventEmitter();
+    expect(ResponsesService.onAnswerGroupsChanged).toEqual(
+      answerGroupsChangedEventEmitter);
+    expect(ResponsesService.onInitializeAnswerGroups).toEqual(
+      initializeAnswerGroupsEventEmitter);
   });
 });

@@ -63,7 +63,7 @@ describe('Editable question backend API service', function() {
       return deferred.promise;
     });
 
-    // Sample question object returnable from the backend
+    // Sample question object returnable from the backend.
     sampleDataResults = {
       question_dict: {
         id: '0',
@@ -77,7 +77,15 @@ describe('Editable question backend API service', function() {
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {
@@ -131,6 +139,12 @@ describe('Editable question backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
+    let imageBlob = new Blob(
+      ['data:image/png;base64,xyz'], {type: 'image/png'});
+    let imageData = {
+      filename: 'image.png',
+      imageBlob: imageBlob
+    };
     var skillsId = ['0', '01', '02'];
     var skillDifficulties = [1, 1, 2];
     var questionObject = sampleDataResultsObjects.questionObject;
@@ -138,7 +152,7 @@ describe('Editable question backend API service', function() {
     $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
       200, {question_id: '0'});
     EditableQuestionBackendApiService.createQuestion(
-      skillsId, skillDifficulties, questionObject).then(
+      skillsId, skillDifficulties, questionObject, [imageData]).then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -154,11 +168,17 @@ describe('Editable question backend API service', function() {
       var skillsId = ['0', '01', '02'];
       var skillDifficulties = [1, 1, 2];
       var questionObject = sampleDataResultsObjects.questionObject;
+      let imageBlob = new Blob(
+        ['data:image/png;base64,xyz'], {type: 'image/png'});
+      let imageData = {
+        filename: 'image.png',
+        imageBlob: imageBlob
+      };
 
       $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
         500, 'Error creating a new question.');
       EditableQuestionBackendApiService.createQuestion(
-        skillsId, skillDifficulties, questionObject).then(
+        skillsId, skillDifficulties, questionObject, [imageData]).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -224,7 +244,7 @@ describe('Editable question backend API service', function() {
       $httpBackend.expect('PUT', '/question_editor_handler/data/0').respond(
         questionWrapper);
 
-      // Send a request to update question
+      // Send a request to update question.
       EditableQuestionBackendApiService.updateQuestion(
         question.id, question.version, 'Question Data is updated', []
       ).then(successHandler, failHandler);

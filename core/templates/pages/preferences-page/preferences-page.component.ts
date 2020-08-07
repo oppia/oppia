@@ -13,17 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
+ * @fileoverview Component for the Oppia 'edit preferences' page.
  */
-
-import Cropper from 'cropperjs';
 
 require('cropperjs/dist/cropper.min.css');
 
 require('base-components/base-content.directive.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
@@ -31,6 +26,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
+require(
+  'pages/preferences-page/modal-templates/' +
+  'edit-profile-picture-modal.controller.ts');
 
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -48,18 +46,18 @@ angular.module('oppia').component('preferencesPage', {
   template: require('./preferences-page.component.html'),
   controller: [
     '$http', '$q', '$translate', '$timeout', '$window',
-    '$uibModal', 'AlertsService', 'LanguageUtilService', 'LoaderService',
-    'UrlInterpolationService', 'UserService',
-    'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
-    'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
-    'SUPPORTED_SITE_LANGUAGES',
+    '$uibModal', 'AlertsService', 'I18nLanguageCodeService',
+    'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
+    'UserService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
+    'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
+    'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
     function(
         $http, $q, $translate, $timeout, $window,
-        $uibModal, AlertsService, LanguageUtilService, LoaderService,
-        UrlInterpolationService, UserService,
-        DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-        ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
-        SUPPORTED_SITE_LANGUAGES) {
+        $uibModal, AlertsService, I18nLanguageCodeService,
+        LanguageUtilService, LoaderService, UrlInterpolationService,
+        UserService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
+        ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
+        SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
       var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -70,13 +68,13 @@ angular.module('oppia').component('preferencesPage', {
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
-        });
+        }).then(() => AlertsService.addInfoMessage('Saved!', 1000));
       };
 
       // Select2 dropdown cannot automatically refresh its display
       // after being translated.
       // Use ctrl.select2DropdownIsShown in its ng-if attribute
-      // and this function to force it to reload
+      // and this function to force it to reload.
       var _forceSelect2Refresh = function() {
         ctrl.select2DropdownIsShown = false;
         $timeout(function() {
@@ -97,6 +95,8 @@ angular.module('oppia').component('preferencesPage', {
       ctrl.savePreferredSiteLanguageCodes = function(
           preferredSiteLanguageCode) {
         $translate.use(preferredSiteLanguageCode);
+        I18nLanguageCodeService.setI18nLanguageCode(
+          preferredSiteLanguageCode);
         _forceSelect2Refresh();
         _saveDataItem(
           'preferred_site_language_code', preferredSiteLanguageCode);
@@ -140,76 +140,21 @@ angular.module('oppia').component('preferencesPage', {
         _saveDataItem('default_dashboard', defaultDashboard);
       };
 
+      ctrl.exportingData = false;
+
+      ctrl.handleExportDataClick = function() {
+        if (!ctrl.exportingData) {
+          ctrl.exportingData = true;
+        }
+      };
+
       ctrl.showEditProfilePictureModal = function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/preferences-page/modal-templates/' +
             'edit-profile-picture-modal.directive.html'),
           backdrop: 'static',
-          controller: [
-            '$controller', '$scope', '$uibModalInstance', function(
-                $controller, $scope, $uibModalInstance) {
-              $controller('ConfirmOrCancelModalController', {
-                $scope: $scope,
-                $uibModalInstance: $uibModalInstance
-              });
-
-              $scope.uploadedImage = null;
-              $scope.croppedImageDataUrl = '';
-              $scope.invalidImageWarningIsShown = false;
-              let cropper = null;
-
-              $scope.initialiseCropper = function() {
-                let profilePicture = (
-                  <HTMLImageElement>document.getElementById(
-                    'croppable-image'));
-                cropper = new Cropper(profilePicture, {
-                  minContainerWidth: 500,
-                  minContainerHeight: 350,
-                  aspectRatio: 1
-                });
-              };
-
-              $scope.onFileChanged = function(file) {
-                $('.oppia-profile-image-uploader').fadeOut(function() {
-                  $scope.invalidImageWarningIsShown = false;
-
-                  var reader = new FileReader();
-                  reader.onload = function(e) {
-                    $scope.$apply(function() {
-                      $scope.uploadedImage = (<FileReader>e.target).result;
-                    });
-                    $scope.initialiseCropper();
-                  };
-                  reader.readAsDataURL(file);
-
-                  $timeout(function() {
-                    $('.oppia-profile-image-uploader').fadeIn();
-                  }, 100);
-                });
-              };
-
-              $scope.reset = function() {
-                $scope.uploadedImage = null;
-                $scope.croppedImageDataUrl = '';
-              };
-
-              $scope.onInvalidImageLoaded = function() {
-                $scope.uploadedImage = null;
-                $scope.croppedImageDataUrl = '';
-                $scope.invalidImageWarningIsShown = true;
-              };
-
-              $scope.confirm = function() {
-                $scope.croppedImageDataUrl = (
-                  cropper.getCroppedCanvas({
-                    height: 150,
-                    width: 150
-                  }).toDataURL());
-                $uibModalInstance.close($scope.croppedImageDataUrl);
-              };
-            }
-          ]
+          controller: 'EditProfilePictureModalController'
         }).result.then(function(newProfilePictureDataUrl) {
           UserService.setProfileImageDataUrlAsync(
             newProfilePictureDataUrl)
@@ -269,13 +214,13 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.subscriptionList = data.subscription_list;
           ctrl.hasPageLoaded = true;
           _forceSelect2Refresh();
-        }).then(null, function onError(response) {
         });
 
         $q.all([userInfoPromise, preferencesPromise]).then(function() {
           LoaderService.hideLoadingScreen();
         });
         ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
+        ctrl.userCanExportAccount = ENABLE_ACCOUNT_EXPORT;
         ctrl.subjectInterestsChangedAtLeastOnce = false;
         ctrl.TAG_REGEX_STRING = '^[a-z ]+$';
         ctrl.LANGUAGE_CHOICES =

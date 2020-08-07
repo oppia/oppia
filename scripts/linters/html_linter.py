@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import html.parser
 import os
 import subprocess
 import sys
@@ -28,16 +29,10 @@ import python_utils
 from . import linter_utils
 from .. import common
 
-# pylint: disable=wrong-import-position
-import html.parser # isort:skip
-# pylint: enable=wrong-import-position
-
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
-
 
 class TagMismatchException(Exception):
     """Error class for mismatch between start and end tags."""
+
     pass
 
 
@@ -48,12 +43,13 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Define various variables to parse HTML.
 
         Args:
-            filepath: str. path of the file.
-            file_lines: list(str). list of the lines in the file.
-            debug: bool. if true prints tag_stack for the file.
-            failed: bool. true if the HTML indentation check fails.
+            filepath: str. Path of the file.
+            file_lines: list(str). List of the lines in the file.
+            debug: bool. If true prints tag_stack for the file.
+            failed: bool. True if the HTML indentation check fails.
         """
         html.parser.HTMLParser.__init__(self)
+        self.summary_messages = []
         self.tag_stack = []
         self.debug = debug
         self.failed = failed
@@ -70,8 +66,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Handle start tag of a HTML line.
 
         Args:
-            tag: str. start tag of a HTML line.
-            attrs: list(str). list of attributes in the start tag.
+            tag: str. Start tag of a HTML line.
+            attrs: list(str). List of attributes in the start tag.
         """
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
@@ -88,23 +84,27 @@ class CustomHTMLParser(html.parser.HTMLParser):
             next_line_column_number = len(next_line) - len(next_line.lstrip())
 
             if next_line_column_number != next_line_expected_indentation:
-                python_utils.PRINT(
+                summary_message = (
                     '%s --> Expected indentation '
                     'of %s, found indentation of %s '
                     'for content of %s tag on line %s ' % (
                         self.filepath, next_line_expected_indentation,
                         next_line_column_number, tag, line_number + 1))
+                self.summary_messages.append(summary_message)
+                python_utils.PRINT(summary_message)
                 python_utils.PRINT('')
                 self.failed = True
 
         if tag_line.startswith(opening_tag) and (
                 column_number != expected_indentation):
-            python_utils.PRINT(
+            summary_message = (
                 '%s --> Expected indentation '
                 'of %s, found indentation of %s '
                 'for %s tag on line %s ' % (
                     self.filepath, expected_indentation,
                     column_number, tag, line_number))
+            self.summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
             python_utils.PRINT('')
             self.failed = True
 
@@ -128,22 +128,24 @@ class CustomHTMLParser(html.parser.HTMLParser):
             # Therefore the check should run only for those
             # attributes which have a value.
             if value:
-                expected_value = '"' + value + '"'
-
                 # &quot; is rendered as a double quote by the parser.
                 if '&quot;' in starttag_text:
+                    expected_value = value
                     rendered_text = starttag_text.replace('&quot;', '"')
                 else:
+                    expected_value = '"' + value + '"'
                     rendered_text = starttag_text
 
                 if not expected_value in rendered_text:
                     self.failed = True
-                    python_utils.PRINT(
+                    summary_message = (
                         '%s --> The value %s of attribute '
                         '%s for the tag %s on line %s should '
                         'be enclosed within double quotes.' % (
                             self.filepath, value, attr,
                             tag, line_number))
+                    self.summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
 
         for line_num, line in enumerate(starttag_text.splitlines()):
@@ -160,12 +162,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 continue
             if indentation_of_first_attribute != leading_spaces_count:
                 line_num_of_error = line_number + line_num
-                python_utils.PRINT(
+                summary_message = (
                     '%s --> Attribute for tag %s on line '
                     '%s should align with the leftmost '
                     'attribute on line %s ' % (
                         self.filepath, tag,
                         line_num_of_error, line_number))
+                self.summary_messages.append(summary_message)
+                python_utils.PRINT(summary_message)
                 python_utils.PRINT('')
                 self.failed = True
 
@@ -173,7 +177,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Handle end tag of a HTML line.
 
         Args:
-            tag: str. end tag of a HTML line.
+            tag: str. End tag of a HTML line.
         """
         line_number, _ = self.getpos()
         tag_line = self.file_lines[line_number - 1]
@@ -192,12 +196,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         if leading_spaces_count != last_starttag_col_num and (
                 last_starttag_line_num != line_number):
-            python_utils.PRINT(
+            summary_message = (
                 '%s --> Indentation for end tag %s on line '
                 '%s does not match the indentation of the '
                 'start tag %s on line %s ' % (
                     self.filepath, tag, line_number,
                     last_starttag, last_starttag_line_num))
+            self.summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
             python_utils.PRINT('')
             self.failed = True
 
@@ -211,7 +217,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """Handle indentation level.
 
         Args:
-            data: str. contents of HTML file to be parsed.
+            data: str. Contents of HTML file to be parsed.
         """
         data_lines = data.split('\n')
         opening_block = tuple(
@@ -232,16 +238,22 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
-            self, files_to_lint, verbose_mode_enabled):
+            self, files_to_lint, file_cache, verbose_mode_enabled, debug=False):
         """Constructs a HTMLLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
+            file_cache: object(FileCache). Provides thread-safe access to cached
+                file content.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
+            debug: bool. Print tag_stack if set to True.
         """
         self.files_to_lint = files_to_lint
+        self.file_cache = file_cache
         self.verbose_mode_enabled = verbose_mode_enabled
+        self.debug = debug
 
     @property
     def html_filepaths(self):
@@ -253,7 +265,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.html_filepaths
 
-    def _check_html_tags_and_attributes(self, debug=False):
+    def _check_html_tags_and_attributes(self):
         """This function checks the indentation of lines in HTML files."""
 
         if self.verbose_mode_enabled:
@@ -268,9 +280,9 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
         with linter_utils.redirect_stdout(stdout):
             for filepath in html_files_to_lint:
-                file_content = FILE_CACHE.read(filepath)
-                file_lines = FILE_CACHE.readlines(filepath)
-                parser = CustomHTMLParser(filepath, file_lines, debug)
+                file_content = self.file_cache.read(filepath)
+                file_lines = self.file_cache.readlines(filepath)
+                parser = CustomHTMLParser(filepath, file_lines, self.debug)
                 parser.feed(file_content)
 
                 if len(parser.tag_stack) != 0:
@@ -281,13 +293,15 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s   HTML tag and attribute check failed, fix the HTML '
-                    'files listed above.' % _MESSAGE_TYPE_FAILED)
+                    '%s HTML tag and attribute check failed, fix the HTML '
+                    'files listed above.' % linter_utils.FAILED_MESSAGE_PREFIX)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
+                summary_messages.extend(parser.summary_messages)
             else:
-                summary_message = '%s  HTML tag and attribute check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                summary_message = (
+                    '%s HTML tag and attribute check passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
 
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
@@ -321,6 +335,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         files_to_lint: list(str). A list of filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(
             self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyHTMLLintChecksManager object.
@@ -342,6 +357,34 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
     def all_filepaths(self):
         """Return all filepaths."""
         return self.html_filepaths
+
+    @staticmethod
+    def _get_trimmed_error_output(html_lint_output):
+        """Remove extra bits from htmllint error messages.
+
+        Args:
+            html_lint_output: str. Output returned by the html linter.
+
+        Returns:
+            str. A string with the trimmed error messages.
+        """
+        trimmed_error_messages = []
+        # Extracting messages by removing number of files linted and number of
+        # error messages from the end of message. Becuase we have second last
+        # line containing error and file count.
+        # Example: [htmllint] found 1 errors out of 1 files
+        # and last line is an empty string. Hence removing last two lines from
+        # the message.
+        html_output_lines = html_lint_output.split('\n')
+        empty_string_present = html_output_lines[-1] == ''
+        htmllint_present = html_output_lines[-2].startswith('[htmllint]')
+
+        if empty_string_present and htmllint_present:
+            html_output_lines = html_output_lines[:-2]
+
+        for line in html_output_lines:
+            trimmed_error_messages.append(line)
+        return '\n'.join(trimmed_error_messages) + '\n'
 
     def _lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
@@ -379,6 +422,8 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 if error_count:
                     error_summary.append(error_count)
                     python_utils.PRINT(linter_stdout)
+                    summary_messages.append(
+                        self._get_trimmed_error_output(linter_stdout))
 
         with linter_utils.redirect_stdout(stdout):
             if self.verbose_mode_enabled:
@@ -390,12 +435,13 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
                 summary_message = (
-                    '%s   HTML linting failed, '
-                    'fix the HTML files listed above.' % _MESSAGE_TYPE_FAILED)
+                    '%s HTML linting failed, fix the HTML files listed above'
+                    '.' % linter_utils.FAILED_MESSAGE_PREFIX)
                 summary_messages.append(summary_message)
             else:
-                summary_message = '%s   HTML linting passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
+                summary_message = (
+                    '%s HTML linting passed' % (
+                        linter_utils.SUCCESS_MESSAGE_PREFIX))
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
@@ -421,12 +467,14 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         return self._lint_html_files()
 
 
-def get_linters(files_to_lint, verbose_mode_enabled=False):
+def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
     """Creates HTMLLintChecksManager and ThirdPartyHTMLLintChecksManager
         objects and returns them.
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
+        file_cache: object(FileCache). Provides thread-safe access to cached
+            file content.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -434,7 +482,7 @@ def get_linters(files_to_lint, verbose_mode_enabled=False):
         of custom and third_party linter objects.
     """
     custom_linter = HTMLLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
+        files_to_lint, file_cache, verbose_mode_enabled)
 
     third_party_linter = ThirdPartyHTMLLintChecksManager(
         files_to_lint, verbose_mode_enabled)

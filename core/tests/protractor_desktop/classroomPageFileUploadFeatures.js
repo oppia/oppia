@@ -59,18 +59,19 @@ describe('Classroom page functionality', function() {
     async function() {
       var handle = await browser.getWindowHandle();
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
-      await topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+      await topicsAndSkillsDashboardPage.createTopic('Topic 1',
+        'Description', false);
+      await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
       await topicEditorPage.saveTopic('Added thumbnail.');
       var url = await browser.getCurrentUrl();
       var topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
       await adminPage.editConfigProperty(
-        'The set of topic IDs for each classroom page.',
+        'The details for each classroom page.',
         'List',
         async function(elem) {
           elem = await elem.editItem(0, 'Dictionary');
-          elem = await elem.editEntry(1, 'List');
+          elem = await elem.editEntry(3, 'List');
           elem = await elem.addItem('Unicode');
           await elem.setValue(topicId);
         });

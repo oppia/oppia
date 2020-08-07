@@ -1,0 +1,61 @@
+<div class="oppia-thumbnail-container protractor-test-thumbnail-container"
+     ng-style="{width: $ctrl.getAspectRatio() === '4:3' ? '248px' : '320px' }">
+  <img class="oppia-thumbnail-image"
+       ng-src="<[$ctrl.editableThumbnailDataUrl]>"
+       ng-style="{background: $ctrl.getThumbnailBgColor()}"
+       height="<[$ctrl.getAspectRatio() === '4:3' ? '186px' : '180px']>" width="<[$ctrl.getAspectRatio() === '4:3' ? '248px' : '320px']>">
+  <div class="oppia-thumbnail-preview-title">
+      <[$ctrl.getName()]>
+  </div>
+  <div class="oppia-thumbnail-preview-footer">
+    <[$ctrl.getPreviewFooter()]>
+  </div>
+  <div class="oppia-thumbnail-preview-description">
+    <[$ctrl.getDescription()]>
+  </div>
+</div>
+<style>
+  .oppia-thumbnail-container {
+    background: #2F6687;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
+    color: #FFFFFF;
+    height: 260px;
+    margin: 0 auto 15px auto;
+    max-width: 100%;
+    position: relative;
+    width: 186px;
+  }
+
+  .oppia-thumbnail-container img {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .oppia-thumbnail-preview-description {
+    font-size: 16px;
+    line-height: 1.2;
+    overflow: hidden;
+    padding: 0 16px 0 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .oppia-thumbnail-preview-footer {
+    bottom: 10px;
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.2;
+    padding: 0 16px 0 16px;
+    position: absolute;
+  }
+
+  .oppia-thumbnail-preview-title {
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    padding: 10px 16px 10px 16px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>

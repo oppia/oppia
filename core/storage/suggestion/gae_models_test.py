@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (base_models, suggestion_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.suggestion, models.NAMES.user])
@@ -110,45 +109,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel
             .has_reference_to_user_id('id_x')
         )
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            suggestion_models.GeneralSuggestionModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_REJECTED, 'author_old_id',
-            'reviewer_old_id', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_6')
-
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_REJECTED, 'author_old_id',
-            None, self.change_cmd, self.score_category,
-            'exploration.exp1.thread_7')
-
-        suggestion_models.GeneralSuggestionModel.migrate_model(
-            'author_old_id', 'author_new_id')
-        suggestion_models.GeneralSuggestionModel.migrate_model(
-            'reviewer_old_id', 'reviewer_new_id')
-
-        suggestion_model_1 = suggestion_models.GeneralSuggestionModel.get_by_id(
-            'exploration.exp1.thread_6')
-        self.assertEqual(suggestion_model_1.author_id, 'author_new_id')
-        self.assertEqual(
-            suggestion_model_1.final_reviewer_id, 'reviewer_new_id')
-
-        suggestion_model_2 = suggestion_models.GeneralSuggestionModel.get_by_id(
-            'exploration.exp1.thread_7')
-        self.assertEqual(suggestion_model_2.author_id, 'author_new_id')
-        self.assertIsNone(suggestion_model_2.final_reviewer_id)
 
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
@@ -334,6 +294,55 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
                 queries)), 1)
 
+    def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6')
+
+        # Assert that there is one translation suggestion with the given
+        # exploration id found.
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['exp1'])), 1)
+
+    def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp3', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_8')
+
+        # Assert that there are two translation suggestions with the given
+        # exploration ids found.
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['exp2', 'exp3'])), 2)
+
+    def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
+            self):
+        # Assert that there are no translation suggestions with an invalid
+        # exploration id found.
+        self.assertEqual(len(
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_with_exp_ids(
+                ['invalid_exp'])), 0)
+
     def test_get_all_stale_suggestions(self):
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
@@ -487,44 +496,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(user_data, test_data)
 
-    def test_verify_model_user_ids_exist(self):
-        user_models.UserSettingsModel(
-            id='author_1',
-            gae_id='gae_1_id',
-            email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        user_models.UserSettingsModel(
-            id='reviewer_1',
-            gae_id='gae_2_id',
-            email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            suggestion_models.STATUS_IN_REVIEW, 'author_1',
-            'reviewer_1', self.change_cmd, 'category1',
-            'exploration.exp1.thread_11')
-        model = suggestion_models.GeneralSuggestionModel.get_by_id(
-            'exploration.exp1.thread_11')
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.author_id = feconf.SYSTEM_COMMITTER_ID
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.author_id = feconf.MIGRATION_BOT_USER_ID
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.author_id = feconf.SUGGESTION_BOT_USER_ID
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.author_id = 'user_non_id'
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.author_id = 'author_1'
-        model.final_reviewer_id = 'user_non_id'
-        self.assertFalse(model.verify_model_user_ids_exist())
-
 
 class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
     """Tests for the GeneralVoiceoverApplicationModel class."""
@@ -557,53 +528,6 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             suggestion_models.GeneralVoiceoverApplicationModel
             .has_reference_to_user_id('author_2'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            suggestion_models.GeneralVoiceoverApplicationModel
-            .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
-
-    def test_migrate_model(self):
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_1_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id='author_old_id',
-            final_reviewer_id='reviewer_old_id',
-            language_code='en',
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
-        suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_2_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id='author_old_id',
-            final_reviewer_id=None,
-            language_code='en',
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None).put()
-
-        suggestion_models.GeneralVoiceoverApplicationModel.migrate_model(
-            'author_old_id', 'author_new_id')
-        suggestion_models.GeneralVoiceoverApplicationModel.migrate_model(
-            'reviewer_old_id', 'reviewer_new_id')
-
-        voiceover_model_1 = (suggestion_models.GeneralVoiceoverApplicationModel
-                             .get_by_id('application_1_id'))
-        self.assertEqual(voiceover_model_1.author_id, 'author_new_id')
-        self.assertEqual(
-            voiceover_model_1.final_reviewer_id, 'reviewer_new_id')
-
-        voiceover_model_1 = (suggestion_models.GeneralVoiceoverApplicationModel
-                             .get_by_id('application_2_id'))
-        self.assertEqual(voiceover_model_1.author_id, 'author_new_id')
-        self.assertIsNone(voiceover_model_1.final_reviewer_id)
 
     def test_get_user_voiceover_applications(self):
         author_id = 'author'
@@ -718,46 +642,6 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel
             .get_voiceover_applications('exploration', 'exp_id', 'hi'))
         self.assertEqual(len(applicant_models), 0)
-
-    def test_verify_model_user_ids_exist(self):
-        user_models.UserSettingsModel(
-            id='author_1',
-            gae_id='gae_1_id',
-            email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        user_models.UserSettingsModel(
-            id='reviewer_1',
-            gae_id='gae_2_id',
-            email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-        model = suggestion_models.GeneralVoiceoverApplicationModel(
-            id='application_id',
-            target_type='exploration',
-            target_id='exp_id',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            author_id='author_1',
-            final_reviewer_id='reviewer_1',
-            language_code='en',
-            filename='application_audio.mp3',
-            content='<p>Some content</p>',
-            rejection_message=None)
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.author_id = feconf.SYSTEM_COMMITTER_ID
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.author_id = feconf.MIGRATION_BOT_USER_ID
-        self.assertTrue(model.verify_model_user_ids_exist())
-        model.author_id = feconf.SUGGESTION_BOT_USER_ID
-        self.assertTrue(model.verify_model_user_ids_exist())
-
-        model.author_id = 'user_non_id'
-        self.assertFalse(model.verify_model_user_ids_exist())
-
-        model.author_id = 'author_1'
-        model.final_reviewer_id = 'user_non_id'
-        self.assertFalse(model.verify_model_user_ids_exist())
 
     def test_export_data_trivial(self):
         user_data = (

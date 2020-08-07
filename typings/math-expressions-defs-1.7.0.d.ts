@@ -9,16 +9,15 @@ interface Expression {
 }
 
 interface MathExpression {
-  fromAst: (ast: boolean | string | string[]) => Expression;
-  fromLatex: (latex: string) => Expression;
-  fromLaTeX: (latex: string) => Expression;
-  fromMml: (mml: string) => Expression;
-  fromTex: (latex: string) => Expression;
-  fromTeX: (latex: string) => Expression;
-  fromText: (text: string) => Expression;
-  parse: (text: string) => Expression;
-  // eslint-disable-next-line camelcase
-  parse_tex: (latex: string) => Expression;
+  'fromAst': (ast: boolean | string | string[]) => Expression;
+  'fromLatex': (latex: string) => Expression;
+  'fromLaTeX': (latex: string) => Expression;
+  'fromMml': (mml: string) => Expression;
+  'fromTex': (latex: string) => Expression;
+  'fromTeX': (latex: string) => Expression;
+  'fromText': (text: string) => Expression;
+  'parse': (text: string) => Expression;
+  'parse_tex': (latex: string) => Expression;
 }
 
 declare var MathExpression: MathExpression;

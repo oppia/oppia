@@ -27,9 +27,12 @@ import { ItemSelectionInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { ItemSelectionInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('ItemSelectionInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
@@ -38,7 +41,7 @@ describe('ItemSelectionInputValidationService', () => {
   let currentState: string = null;
   let goodAnswerGroups: AnswerGroup[] = null,
     goodDefaultOutcome: Outcome = null;
-  let customizationArguments: any = null;
+  let customizationArguments: ItemSelectionInputCustomizationArgs = null;
   let IsProperSubsetValidOption: AnswerGroup[] = null;
   let oof: OutcomeObjectFactory = null,
     agof: AnswerGroupObjectFactory = null,
@@ -65,7 +68,7 @@ describe('ItemSelectionInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -75,7 +78,11 @@ describe('ItemSelectionInputValidationService', () => {
 
     customizationArguments = {
       choices: {
-        value: ['Selection 1', 'Selection 2', 'Selection 3']
+        value: [
+          new SubtitledHtml('Selection 1', ''),
+          new SubtitledHtml('Selection 2', ''),
+          new SubtitledHtml('Selection 3', '')
+        ]
       },
       maxAllowableSelectionCount: {
         value: 2
@@ -92,7 +99,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     ThreeInputsAnswerGroups = [agof.createNew(
@@ -103,7 +110,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     OneInputAnswerGroups = [agof.createNew(
@@ -114,7 +121,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     NoInputAnswerGroups = [agof.createNew(
@@ -125,7 +132,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     IsProperSubsetValidOption = [agof.createNew(
@@ -136,7 +143,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       })],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
   });
@@ -214,7 +221,8 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0] = (
+      new SubtitledHtml('', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -227,7 +235,8 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
-    customizationArguments.choices.value.push('Selection 3');
+    customizationArguments.choices.value.push(
+      new SubtitledHtml('Selection 3', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

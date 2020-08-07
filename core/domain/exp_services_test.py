@@ -26,11 +26,15 @@ import re
 import zipfile
 
 from core.domain import classifier_services
+from core.domain import config_domain
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import html_domain
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -46,11 +50,10 @@ import utils
 
 (exp_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
-gae_image_services = models.Registry.import_gae_image_services()
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
-# TODO(msl): test ExpSummaryModel changes if explorations are updated,
+# TODO(msl): Test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed.
 
 
@@ -62,7 +65,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
     Returns:
         int. The number of exploration summaries that are at least editable
-            by the given user.
+        by the given user.
     """
     return len(exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(
@@ -71,6 +74,7 @@ def count_at_least_editable_exploration_summaries(user_id):
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
+
     EXP_0_ID = 'An_exploration_0_id'
     EXP_1_ID = 'An_exploration_1_id'
 
@@ -186,7 +190,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -195,25 +199,25 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'B']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA',
                 },
                 'B': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleB',
                 },
             })
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A', 'C']), {
                 'A': {
-                    'category': 'A category',
+                    'category': 'Algebra',
                     'title': 'TitleA'
                 }
             })
@@ -224,9 +228,33 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp.has_state_name('Introduction'), True)
         self.assertEqual(exp.has_state_name('Fake state name'), False)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
+            self.owner_id,
+            self.EXP_0_ID,
+            _get_change_list(
                 'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput') +
+            _get_change_list(
+                'Introduction',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }) +
+            _get_change_list(
+                'Introduction',
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                2
+            ),
+            ''
+        )
         self.assertEqual(exp_services.get_interaction_id_for_state(
             self.EXP_0_ID, 'Introduction'), 'MultipleChoiceInput')
         with self.assertRaisesRegexp(
@@ -239,6 +267,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests exploration query methods which operate on ExplorationSummary
     objects.
     """
+
     EXP_ID_0 = '0_en_arch_bridges_in_england'
     EXP_ID_1 = '1_fi_arch_sillat_suomi'
     EXP_ID_2 = '2_en_welcome_introduce_oppia'
@@ -523,7 +552,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -577,9 +609,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -647,7 +685,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration does not show up in any queries.
@@ -668,9 +709,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_1_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
 
         # The deleted explorations does not show up in any queries.
@@ -697,7 +744,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Entity for class ExplorationModel with id An_exploration_0_id '
+            'not found'):
             exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # The deleted exploration summary does not show up in any queries.
@@ -999,6 +1049,47 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_fetchers.get_multiple_explorations_by_version('exp_id_1', [1])
 
 
+    def test_save_multi_exploration_math_rich_text_info_model(self):
+        multiple_explorations_math_rich_text_info = []
+
+        math_rich_text_info1 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc1', 'xyz1']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
+        math_rich_text_info2 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id2', True, ['abc2', 'xyz2']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
+        math_rich_text_info3 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id3', True, ['abc3', 'xyz3']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
+
+        exp_services.save_multi_exploration_math_rich_text_info_model(
+            multiple_explorations_math_rich_text_info)
+
+        self.assertEqual(
+            exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 3)
+
+        exp1_math_image_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
+        self.assertEqual(
+            sorted(exp1_math_image_model.latex_strings_without_svg),
+            sorted(['abc1', 'xyz1']))
+
+        exp2_math_image_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id2'))
+        self.assertEqual(
+            sorted(exp2_math_image_model.latex_strings_without_svg),
+            sorted(['abc2', 'xyz2']))
+
+        exp3_math_image_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id3'))
+        self.assertEqual(
+            sorted(exp3_math_image_model.latex_strings_without_svg),
+            sorted(['abc3', 'xyz3']))
+
+
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
@@ -1047,6 +1138,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     """Tests for loading explorations using imported YAML."""
+
     EXP_ID = 'exp_id0'
     DEMO_EXP_ID = '0'
     TEST_ASSET_PATH = 'test_asset.file'
@@ -1058,7 +1150,8 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     HINT_AUDIO_FILE = 'answer_hint.mp3'
     SOLUTION_AUDIO_FILE = 'answer_solution.mp3'
 
-    YAML_WITH_AUDIO_TRANSLATIONS = ("""author_notes: ''
+    YAML_WITH_AUDIO_TRANSLATIONS = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -1264,7 +1357,8 @@ title: Title
         self.assertEqual(solution_voiceovers, {})
 
     def test_cannot_load_yaml_with_no_schema_version(self):
-        yaml_with_no_schema_version = ("""
+        yaml_with_no_schema_version = (
+            """
         author_notes: ''
         auto_tts_enabled: true
         blurb: ''
@@ -1408,9 +1502,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_content(
             state_domain.SubtitledHtml.from_dict(content3_dict))
 
-        state1.update_interaction_id('ImageClickInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-        state3.update_interaction_id('ItemSelectionInput')
+        self.set_interaction_for_state(state1, 'ImageClickInput')
+        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
+        self.set_interaction_for_state(state3, 'ItemSelectionInput')
 
         customization_args_dict1 = {
             'highlightRegionsOnHover': {'value': True},
@@ -1431,47 +1525,58 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             }
         }
         customization_args_dict2 = {
-            'choices': {'value': [
-                (
+            'choices': {'value': [{
+                'content_id': 'ca_choices_0',
+                'html': (
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
-                ),
-                (
+                )
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
-            ]}
+            }]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
-            'choices': {'value': [
-                (
+            'choices': {'value': [{
+                'content_id': 'ca_choices_0',
+                'html': (
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
+                    '</p>')
+            }, {
+                'content_id': 'ca_choices_1',
+                'html': (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
+                    '</p>')
+            }, {
+                'content_id': 'ca_choices_2',
+                'html': (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p>')
-            ]}
+            }]},
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 5}
         }
         state1.update_interaction_customization_args(customization_args_dict1)
         state2.update_interaction_customization_args(customization_args_dict2)
@@ -1602,11 +1707,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             self.assertIn(filename, filenames)
 
 
-# pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -1628,7 +1733,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1643,14 +1750,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
   New state:
@@ -1663,7 +1773,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1678,14 +1790,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
 states_schema_version: %d
@@ -1698,7 +1813,8 @@ title: A title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
-    UPDATED_YAML_CONTENT = ("""author_notes: ''
+    UPDATED_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: A category
@@ -1720,7 +1836,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1735,14 +1853,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
   Renamed state:
@@ -1755,7 +1876,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -1770,14 +1893,17 @@ states:
       hints: []
       id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
 states_schema_version: %d
@@ -1815,6 +1941,28 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
@@ -1861,6 +2009,28 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         with python_utils.open_file(
@@ -1870,16 +2040,23 @@ title: A title
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
-        fs.commit('abc.png', raw_image)
+        fs.commit('image/abc.png', raw_image)
+        # Audio files should not be included in asset downloads.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'),
+            'rb', encoding=None) as f:
+            raw_audio = f.read()
+        fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
         zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
 
-        self.assertEqual(zf.namelist(), ['A title.yaml', 'assets/abc.png'])
+        self.assertEqual(
+            zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
-        self.assertEqual(zf.open('assets/abc.png').read(), raw_image)
+        self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image)
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
@@ -1904,6 +2081,26 @@ title: A title
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+            'state_name': 'New state',
+            'new_value': 1
         })]
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -1950,7 +2147,9 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents.
     """
-    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+
+    _SAMPLE_INIT_STATE_CONTENT = (
+        """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1959,7 +2158,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -1974,21 +2175,25 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""classifier_model_id: null
+        'New state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1997,7 +2202,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -2012,14 +2219,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """)
@@ -2027,7 +2237,8 @@ written_translations:
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""classifier_model_id: null
+        'Renamed state': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2036,7 +2247,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -2051,14 +2264,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """)
@@ -2089,6 +2305,28 @@ written_translations:
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'New state',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'New state',
+                    'new_value': 1
                 })], 'Add state name')
 
         dict_output = exp_services.export_states_to_yaml(
@@ -2098,6 +2336,7 @@ written_translations:
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
+        self.maxDiff = None
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
         self.assertEqual(exploration.version, 1)
@@ -2119,6 +2358,26 @@ written_translations:
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+            'state_name': 'New state',
+            'new_value': 1
         })]
         exploration.objective = 'The objective'
         with python_utils.open_file(
@@ -2293,17 +2552,17 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         param_changes = exploration.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_update_invalid_param_changes(self):
@@ -2339,7 +2598,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services._save_exploration(self.owner_id, exploration, '', [])  # pylint: disable=protected-access
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegexp(
@@ -2354,9 +2613,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
+            self.owner_id,
+            self.EXP_0_ID,
+            _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }),
+            '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
@@ -2372,13 +2649,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                {'choices': {'value': ['Option A', 'Option B']}}),
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }),
             '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.init_state.interaction.customization_args[
-                'choices']['value'], ['Option A', 'Option B'])
+        choices = exploration.init_state.interaction.customization_args[
+            'choices'].value
+        self.assertEqual(choices[0].html, '<p>Option A</p>')
+        self.assertEqual(choices[0].content_id, 'ca_choices_0')
+        self.assertEqual(choices[1].html, '<p>Option B</p>')
+        self.assertEqual(choices[1].content_id, 'ca_choices_1')
 
     def test_update_interaction_handlers_fails(self):
         """Test legacy interaction handler updating."""
@@ -2387,10 +2678,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
-            })] + _get_change_list(
+            })] +
+            _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'TextInput'),
+                'TextInput') +
+            _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                }),
             'Add state name')
 
         self.interaction_default_outcome['dest'] = 'State 2'
@@ -2419,10 +2723,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State 2',
-            })] + _get_change_list(
+            })] +
+            _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'TextInput'),
+                'TextInput') +
+            _get_change_list(
+                'State 2',
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                }),
             'Add state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -2432,6 +2749,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Option A</p>'
+                        }, {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>Option B</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': False}
+                }) +
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -2466,6 +2798,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'MultipleChoiceInput') +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    {
+                        'choices': {
+                            'value': [{
+                                'content_id': 'ca_choices_0',
+                                'html': '<p>Option A</p>'
+                            }, {
+                                'content_id': 'ca_choices_1',
+                                'html': '<p>Option B</p>'
+                            }]
+                        },
+                        'showChoicesInShuffledOrder': {'value': False}
+                    }) +
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -2613,11 +2960,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'translations_mapping': {
                 'content': {
                     'hi': {
-                        'html': '<p>Test!</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Test!</p>',
                         'needs_update': True
                     }
                 },
-                'default_outcome': {}
+                'default_outcome': {},
+                'ca_placeholder_0': {}
             }
         }
         exp_services.update_exploration(
@@ -2637,6 +2986,49 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.owner_id, self.EXP_0_ID, _get_change_list(
                     self.init_state_name, 'written_translations',
                     [1, 2]), 'Added fake text translations.')
+
+    def test_migrate_exp_to_latest_version_migrates_to_version(self):
+        """Test migrate exploration state schema to the latest version."""
+        latest_schema_version = python_utils.UNICODE(
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': latest_schema_version
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, migration_change_list,
+            'Ran Exploration Migration job.')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(exploration.version, 2)
+        self.assertEqual(
+            python_utils.UNICODE(
+                exploration.states_schema_version),
+            latest_schema_version)
+
+    def test_migrate_exp_to_earlier_version_raises_exception(self):
+        """Test migrate state schema to earlier version raises exception."""
+        latest_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        not_latest_schema_version = python_utils.UNICODE(
+            latest_schema_version - 1)
+        migration_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': '0',
+                'to_version': not_latest_schema_version
+            })
+        ]
+        exception_string = (
+            'Expected to migrate to the latest state schema '
+            'version %s, received %s' % (
+                latest_schema_version, not_latest_schema_version)
+        )
+        with self.assertRaisesRegexp(Exception, exception_string):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID, migration_change_list,
+                'Ran Exploration Migration job.')
 
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
@@ -2700,6 +3092,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to exploration snapshots."""
+
     SECOND_USERNAME = 'abc123'
     SECOND_EMAIL = 'abc123@gmail.com'
 
@@ -2810,7 +3203,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 second_committer_id, v1_exploration, '', [])
 
         # Another person modifies the exploration.
@@ -2864,7 +3257,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, self.owner_id)
 
         exploration.title = 'First title'
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.owner_id, exploration, 'Changed title.', [])
         commit_dict_2 = {
             'committer_id': self.owner_id,
@@ -2884,6 +3277,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
         })]
         exp_services.update_exploration(
             'second_committer_id', exploration.id, change_list,
@@ -2946,7 +3353,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # In version 1, the title was 'A title'.
         # In version 2, the title becomes 'V2 title'.
         exploration.title = 'V2 title'
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.owner_id, exploration, 'Changed title.', [])
 
         # In version 3, a new state is added.
@@ -2959,6 +3366,20 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
         })]
         exp_services.update_exploration(
             'committer_id_v3', exploration.id, change_list, 'Added new state')
@@ -2999,6 +3420,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to the exploration commit log."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3008,7 +3430,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     EXP_ID_2 = 'eid2'
 
     COMMIT_ALBERT_CREATE_EXP_1 = {
-        'username': ALBERT_NAME,
         'version': 1,
         'exploration_id': EXP_ID_1,
         'commit_type': 'create',
@@ -3019,7 +3440,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_BOB_EDIT_EXP_1 = {
-        'username': BOB_NAME,
         'version': 2,
         'exploration_id': EXP_ID_1,
         'commit_type': 'edit',
@@ -3030,7 +3450,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_CREATE_EXP_2 = {
-        'username': ALBERT_NAME,
         'version': 1,
         'exploration_id': 'eid2',
         'commit_type': 'create',
@@ -3041,7 +3460,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_EDIT_EXP_1 = {
-        'username': 'albert',
         'version': 3,
         'exploration_id': 'eid1',
         'commit_type': 'edit',
@@ -3052,7 +3470,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_EDIT_EXP_2 = {
-        'username': 'albert',
         'version': 2,
         'exploration_id': 'eid2',
         'commit_type': 'edit',
@@ -3074,7 +3491,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_DELETE_EXP_1 = {
-        'username': 'albert',
         'version': 5,
         'exploration_id': 'eid1',
         'commit_type': 'delete',
@@ -3085,7 +3501,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     }
 
     COMMIT_ALBERT_PUBLISH_EXP_2 = {
-        'username': 'albert',
         'version': None,
         'exploration_id': 'eid2',
         'commit_type': 'edit',
@@ -3127,19 +3542,19 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, self.albert_id)
 
             exploration_1.title = 'Exploration 1 title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.bob_id, exploration_1, 'Changed title.', [])
 
             exploration_2 = self.save_new_valid_exploration(
                 self.EXP_ID_2, self.albert_id)
 
             exploration_1.title = 'Exploration 1 Albert title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.albert_id, exploration_1,
                 'Changed title to Albert1 title.', [])
 
             exploration_2.title = 'Exploration 2 Albert title'
-            exp_services._save_exploration(
+            exp_services._save_exploration(  # pylint: disable=protected-access
                 self.albert_id, exploration_2, 'Changed title to Albert2.', [])
 
             exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
@@ -3172,11 +3587,12 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
-        # TODO(frederikcreemers@gmail.com): test max_age here.
+        # TODO(frederikcreemers@gmail.com): Test max_age here.
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
+
     USER_ID_1 = 'user_1'
     USER_ID_2 = 'user_2'
 
@@ -3358,6 +3774,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
     """Test exploration summaries."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3431,7 +3848,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             expected: dict(unicode, int). Expected summary.
 
         Raises:
-            AssertionError: Contributors summary of the given exp is not same
+            AssertionError. Contributors summary of the given exp is not same
                 as expected.
         """
         contributors_summary = exp_fetchers.get_exploration_summary_by_id(
@@ -3491,6 +3908,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
+
     ALBERT_EMAIL = 'albert@example.com'
     BOB_EMAIL = 'bob@example.com'
     ALBERT_NAME = 'albert'
@@ -3585,8 +4003,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 )}
 
         # Check actual summaries equal expected summaries.
-        self.assertEqual(list(actual_summaries.keys()),
-                         list(expected_summaries.keys()))
+        self.assertEqual(
+            list(actual_summaries.keys()),
+            list(expected_summaries.keys()))
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
@@ -3597,8 +4016,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'exploration_model_last_updated']
         for exp_id in actual_summaries:
             for prop in simple_props:
-                self.assertEqual(getattr(actual_summaries[exp_id], prop),
-                                 getattr(expected_summaries[exp_id], prop))
+                self.assertEqual(
+                    getattr(actual_summaries[exp_id], prop),
+                    getattr(expected_summaries[exp_id], prop))
 
     def test_get_all_exploration_summaries(self):
         actual_summaries = exp_services.get_all_exploration_summaries()
@@ -3634,10 +4054,12 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
 class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     """Tests the exploration model -> exploration conversion pipeline."""
+
     OLD_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
 
-    UPGRADED_EXP_YAML = ("""author_notes: ''
+    UPGRADED_EXP_YAML = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3664,6 +4086,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -3682,7 +4105,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         buttonText:
-          value: Continue
+          value:
+            content_id: ca_buttonText
+            unicode_str: Continue
       default_outcome:
         dest: END
         feedback:
@@ -3695,14 +4120,17 @@ states:
       hints: []
       id: Continue
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_buttonText: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_buttonText: {}
         content: {}
         default_outcome: {}
 states_schema_version: %d
@@ -3764,7 +4192,7 @@ title: Old Title
         exploration = self.save_new_default_exploration('exp_id', 'user_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -3775,7 +4203,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
         self.assertEqual(exploration.title, 'A title')
-        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(exploration.category, 'Algebra')
         self.assertEqual(
             exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
         self.assertEqual(exploration.language_code, 'en')
@@ -3886,7 +4314,7 @@ title: Old Title
 
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.albert_id, exploration, '', [])
+        exp_services._save_exploration(self.albert_id, exploration, '', [])  # pylint: disable=protected-access
 
         param_changes = [{
             'customization_args': {
@@ -4028,8 +4456,8 @@ title: Old Title
             }
         }
 
-        with self.assertRaisesRegexp(Exception,
-                                     'Expected hints_list to be a list.*'):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected hints_list to be a list.*'):
             hints_update = exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
@@ -4087,6 +4515,18 @@ title: Old Title
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution)
+        solution = None
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'state_name': exploration.init_state_name,
+                'new_value': solution
+            })], 'Changed interaction_solutions.')
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.solution,
+            None)
 
     def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -4117,6 +4557,7 @@ title: Old Title
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
+
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     EXP_ID3 = 'exp_id3'
@@ -4145,7 +4586,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.USER_ID, exploration, '', [])
+        exp_services._save_exploration(self.USER_ID, exploration, '', [])  # pylint: disable=protected-access
         self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
         self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
         self.init_state_name = exploration.init_state_name
@@ -4256,10 +4697,10 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
         param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
 
     def test_get_exp_with_draft_applied_when_draft_does_not_exist(self):
@@ -4308,6 +4749,96 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
 
+    def test_get_exp_with_draft_applied_when_draft_has_invalid_math_tags(self):
+        """Test the method get_exp_with_draft_applied when the draft_changes
+        have invalid math-tags in them.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_customization_args_dict = {
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>state customization arg html 1</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>state customization arg html 2</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>state customization arg html 3</p>'
+                    },
+                    {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>state customization arg html 4</p>'
+                    }
+                ]
+            },
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            }
+        }
+        state.update_interaction_id('ItemSelectionInput')
+        state.update_next_content_id_index(4)
+        state.update_interaction_customization_args(
+            state_customization_args_dict)
+        exp_services.save_new_exploration(self.USER_ID, exploration)
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'State1',
+            'property_name': 'widget_customization_args',
+            'new_value': {
+                'choices': {
+                    'value': [
+                        {
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>1</p>'
+                        },
+                        {
+                            'content_id': 'ca_choices_1',
+                            'html': '<p>2</p>'
+                        },
+                        {
+                            'content_id': 'ca_choices_2',
+                            'html': (
+                                '<oppia-noninteractive-math raw_latex-with'
+                                '-value="&amp;quot;(x - a_1)(x - a_2)(x - a_3).'
+                                '..(x - a_n)&amp;quot;"></oppia-noninteractive-'
+                                'math>'
+                            )
+                        },
+                        {
+                            'content_id': 'ca_choices_3',
+                            'html': '<p>4</p>'
+                        }
+                    ]
+                },
+                'maxAllowableSelectionCount': {
+                    'value': 1
+                },
+                'minAllowableSelectionCount': {
+                    'value': 1
+                }
+            }
+        }).to_dict()]
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID, 'exp_id'), user_id=self.USER_ID,
+            exploration_id='exp_id',
+            draft_change_list=change_list,
+            draft_change_list_last_updated=self.DATETIME,
+            draft_change_list_exp_version=1,
+            draft_change_list_id=2).put()
+        updated_exploration = exp_services.get_exp_with_draft_applied(
+            'exp_id', self.USER_ID)
+        self.assertIsNone(updated_exploration)
+
 
 class ApplyDraftUnitTests(test_utils.GenericTestBase):
     """Test apply draft functions in exp_services."""
@@ -4352,21 +4883,720 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             'from_version': '0',
             'to_version': '1'
         })]
-        exp_services._save_exploration(
+        exp_services._save_exploration(  # pylint: disable=protected-access
             self.USER_ID, exploration, 'Migrate state schema.',
             migration_change_list)
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
-        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long
+        draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=line-too-long, protected-access
             classmethod(lambda cls, changelist: changelist))
         updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         self.assertIsNotNone(updated_exp)
         param_changes = updated_exp.init_state.param_changes[0]
-        self.assertEqual(param_changes._name, 'myParam')
-        self.assertEqual(param_changes._generator_id, 'RandomSelector')
+        self.assertEqual(param_changes._name, 'myParam')  # pylint: disable=protected-access
+        self.assertEqual(param_changes._generator_id, 'RandomSelector')  # pylint: disable=protected-access
         self.assertEqual(
-            param_changes._customization_args,
+            param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
+
+
+class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
+    """Unit tests for function used in generation of SVGs for math rich-text
+    components in explorations.
+    """
+
+    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+
+    def setUp(self):
+        super(ExplorationUpdationWithMathSvgsUnitTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.set_admins([self.ADMIN_USERNAME])
+
+    def test_get_batch_of_exps_for_latex_svg_generation(self):
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id2',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,-,-,+', '\\sqrt{x}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id3',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['(x-a)(x-b)', '\\frac{x^2}{y^3}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id4',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['(x-a1)(x-b1)', '\\frac{x^3}{y^2}'],
+            estimated_max_size_of_images_in_bytes=30000).put()
+
+        expected_output = {
+            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
+            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
+            'exp_id3': ['(x-a)(x-b)', '\\frac{x^2}{y^3}']
+        }
+        self.set_config_property((
+            config_domain
+            .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 6)
+        self.assertEqual(
+            exp_services.get_batch_of_exps_for_latex_svg_generation(),
+            expected_output)
+
+        expected_output_when_batch_is_limited = {
+            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
+            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
+        }
+        with self.swap(feconf, 'MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH', 2):
+            self.assertEqual(
+                exp_services.get_batch_of_exps_for_latex_svg_generation(),
+                expected_output_when_batch_is_limited)
+        expected_output_when_number_of_svgs_is_limited = {
+            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
+            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
+            'exp_id3': ['(x-a)(x-b)']
+        }
+        self.set_config_property((
+            config_domain
+            .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 5)
+        self.assertEqual(
+            exp_services.get_batch_of_exps_for_latex_svg_generation(),
+            expected_output_when_number_of_svgs_is_limited)
+
+    def test_get_number_explorations_having_latex_strings_without_svgs(self):
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id2',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,-,-,+', '\\sqrt{x}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id3',
+            math_images_generation_required=False,
+            latex_strings_without_svg=['(x-a)(x-b)', '\\frac{x^2}{y^3}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id4',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['(x-a1)(x-b1)', '\\frac{x^3}{y^2}'],
+            estimated_max_size_of_images_in_bytes=30000).put()
+        self.assertEqual(
+            exp_services.
+            get_number_explorations_having_latex_strings_without_svgs(), 3)
+
+    def test_generate_html_change_list_for_state(self):
+        old_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        new_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;file1.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        old_written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': old_html,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': old_html,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        new_written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'html': new_html,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'html': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'html': new_html,
+                        'needs_update': False
+                    },
+                    'en': {
+                        'html': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        old_answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': old_html
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        new_answer_group_dict = {
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': new_html
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        old_state_dict = {
+            'content': {
+                'content_id': 'content', 'html': old_html
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [old_answer_group_dict],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': old_html
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            old_html,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': old_html
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': old_html
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [old_html],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': old_html
+                    }
+                }
+
+            },
+            'written_translations': (
+                old_written_translations_dict)
+        }
+        new_state_dict = {
+            'content': {
+                'content_id': 'content', 'html': new_html
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
+            'classifier_model_id': None,
+            'interaction': {
+                'answer_groups': [new_answer_group_dict],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': new_html
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'choices': {
+                        'value': [
+                            new_html,
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
+                        ]
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'DragAndDropSortInput',
+                'hints': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': new_html
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': new_html
+                        }
+                    }
+                ],
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [
+                        [new_html],
+                        ['<p>2</p>'],
+                        ['<p>3</p>'],
+                        ['<p>4</p>']
+                    ],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': new_html
+                    }
+                }
+
+            },
+            'written_translations': (
+                new_written_translations_dict)
+        }
+        state_name = 'state1'
+        expected_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+                'new_value': new_written_translations_dict
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                'new_value': new_state_dict['interaction']['default_outcome']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'new_value': new_state_dict['interaction']['hints']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'new_value': new_state_dict['interaction']['solution']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                'new_value': new_state_dict['interaction']['answer_groups']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': new_state_dict['content']
+            }).to_dict(),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'new_value': new_state_dict['interaction']['customization_args']
+            }).to_dict()]
+        change_lists = exp_services.generate_html_change_list_for_state(
+            state_name, new_state_dict, old_state_dict)
+        change_dict_lists = [
+            change_list.to_dict() for change_list in change_lists]
+        self.assertEqual(
+            sorted(change_dict_lists), sorted(expected_change_list))
+
+    def test_exploration_is_updated_with_math_svgs_when_image_data_is_valid(
+            self):
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [{
+                    'content_id': 'ca_choices_0',
+                    'html': valid_html_content1
+                }, {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>2</p>'
+                }, {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>3</p>'
+                }, {
+                    'content_id': 'ca_choices_3',
+                    'html': valid_html_content2
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+        exploration1_state.update_next_content_id_index(4)
+
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_1, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_2, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
+        image_data = {
+            '+,+,+,+': latex_string_svg_image_data1,
+            '\\frac{x}{y}': latex_string_svg_image_data2
+        }
+        exp_services.update_exploration_with_math_svgs(
+            'exp_id1', image_data)
+        update_exploration = exp_fetchers.get_exploration_by_id('exp_id1')
+        updated_html_string = ''
+        for state in update_exploration.states.values():
+            updated_html_string += (
+                ''.join(state.get_all_html_content_strings()))
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(updated_html_string))
+
+        self.assertEqual(len(filenames), 3)
+        for filename in filenames:
+            file_system_class = (
+                fs_services.get_entity_file_system_class())
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+            filepath = 'image/%s' % filename
+            self.assertTrue(fs.isfile(filepath))
+        exploration_math_rich_text_info_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
+        self.assertFalse(
+            exploration_math_rich_text_info_model.
+            math_images_generation_required)
+
+    def test_exploration_is_updated_with_math_svgs_when_num_of_svgs_is_limited(
+            self):
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        valid_html_content3 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;-,+,+,-&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [{
+                    'content_id': 'ca_choices_0',
+                    'html': valid_html_content2
+                }, {
+                    'content_id': 'ca_choices_1',
+                    'html': valid_html_content2
+                }, {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>3</p>'
+                }, {
+                    'content_id': 'ca_choices_3',
+                    'html': valid_html_content3
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+        exploration1_state.update_next_content_id_index(4)
+
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+        exp_models.ExplorationMathRichTextInfoModel(
+            id='exp_id1',
+            math_images_generation_required=True,
+            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}', '-,+,+,-'],
+            estimated_max_size_of_images_in_bytes=20000).put()
+
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        svg_file_2 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_1, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_2, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
+        image_data = {
+            '+,+,+,+': latex_string_svg_image_data1,
+            '\\frac{x}{y}': latex_string_svg_image_data2
+        }
+        exp_services.update_exploration_with_math_svgs(
+            'exp_id1', image_data)
+        update_exploration = exp_fetchers.get_exploration_by_id('exp_id1')
+        updated_html_string = ''
+        for state in update_exploration.states.values():
+            updated_html_string += (
+                ''.join(state.get_all_html_content_strings()))
+        filenames = (
+            html_validation_service.
+            extract_svg_filenames_in_math_rte_components(updated_html_string))
+
+        self.assertEqual(len(filenames), 3)
+        for filename in filenames:
+            file_system_class = (
+                fs_services.get_entity_file_system_class())
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
+            filepath = 'image/%s' % filename
+            self.assertTrue(fs.isfile(filepath))
+        exploration_math_rich_text_info_model = (
+            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
+        self.assertTrue(
+            exploration_math_rich_text_info_model.
+            math_images_generation_required)
+
+    def test_updation_fails_when_svg_file_is_invalid(self):
+        exploration1 = exp_domain.Exploration.create_default_exploration(
+            'exp_id1', title='title1', category='category')
+        exploration1.add_states(['FirstState'])
+        exploration1_state = exploration1.states['FirstState']
+
+        valid_html_content1 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
+            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
+            '></oppia-noninteractive-math>'
+        )
+        valid_html_content2 = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;'
+            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
+            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>'
+        )
+        content_dict = {
+            'content_id': 'content',
+            'html': valid_html_content1
+        }
+        customization_args_dict = {
+            'choices': {
+                'value': [{
+                    'content_id': 'ca_choices_0',
+                    'html': valid_html_content1
+                }, {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>2</p>'
+                }, {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>3</p>'
+                }, {
+                    'content_id': 'ca_choices_3',
+                    'html': valid_html_content2
+                }]
+            },
+            'allowMultipleItemsInSamePosition': {'value': True}
+        }
+
+        exploration1_state.update_content(
+            state_domain.SubtitledHtml.from_dict(content_dict))
+        exploration1_state.update_interaction_id('DragAndDropSortInput')
+        exploration1_state.update_interaction_customization_args(
+            customization_args_dict)
+        exploration1_state.update_next_content_id_index(4)
+
+        exp_services.save_new_exploration(self.admin_id, exploration1)
+        svg_file_1 = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
+            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
+            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
+            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
+            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
+            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
+            ' 52 289Z"/></g></svg>'
+        )
+        invalid_svg_file = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
+            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
+            'ical-align: -0.241ex;"><invalid tag stroke="currentColor" fill="c'
+            'urrentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">'
+            '<path stroke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442'
+            ' 2864Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 3'
+            '8T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 15'
+            '3 504 145284 52 289Z"/></g></svg>'
+        )
+
+        latex_string_svg_image_data1 = (
+            html_domain.LatexStringSvgImageData(
+                svg_file_1, html_domain.LatexStringSvgImageDimensions(
+                    '1d429', '1d33', '0d241')))
+        latex_string_svg_image_data2 = (
+            html_domain.LatexStringSvgImageData(
+                invalid_svg_file, html_domain.LatexStringSvgImageDimensions(
+                    '1d525', '3d33', '0d241')))
+
+        image_data = {
+            '+,+,+,+': latex_string_svg_image_data1,
+            '\\frac{x}{y}': latex_string_svg_image_data2
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'Image not recognized SVG image provided for latex \\\\frac{x}{y}'
+            ' failed validation'):
+            exp_services.update_exploration_with_math_svgs(
+                'exp_id1', image_data)

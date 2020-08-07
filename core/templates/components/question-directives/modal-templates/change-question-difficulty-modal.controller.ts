@@ -30,11 +30,7 @@ angular.module('oppia').controller('ChangeQuestionDifficultyModalController', [
       $uibModalInstance: $uibModalInstance
     });
 
-    var init = function() {
-      $scope.linkedSkillsWithDifficulty =
-        linkedSkillsWithDifficulty;
-      $scope.skillIdToRubricsObject = skillIdToRubricsObject;
-    };
-    init();
+    $scope.linkedSkillsWithDifficulty = linkedSkillsWithDifficulty;
+    $scope.skillIdToRubricsObject = skillIdToRubricsObject;
   }
 ]);

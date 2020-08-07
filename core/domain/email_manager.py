@@ -24,6 +24,7 @@ import logging
 
 from constants import constants
 from core.domain import config_domain
+from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -35,7 +36,6 @@ import utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
-email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -261,8 +261,8 @@ def require_sender_id_is_valid(intent, sender_id):
         sender_id: str. The ID of the user sending the email.
 
     Raises:
-        Exception: The email intent is invalid.
-        Exception: The sender_id is not appropriate for the given intent.
+        Exception. The email intent is invalid.
+        Exception. The sender_id is not appropriate for the given intent.
     """
 
     if intent not in SENDER_VALIDATORS:
@@ -341,7 +341,7 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin,
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
             reply_to_id=reply_to_id)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
@@ -502,8 +502,8 @@ def get_moderator_unpublish_exploration_email():
 
     Returns:
         str. Draft of the email body for an email sent after the moderator
-            unpublishes an exploration, or an empty string if no email should
-            be sent.
+        unpublishes an exploration, or an empty string if no email should
+        be sent.
     """
 
     try:
@@ -518,8 +518,8 @@ def require_moderator_email_prereqs_are_satisfied():
     """Raises an exception if, for any reason, moderator emails cannot be sent.
 
     Raises:
-        Exception: feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
-        Exception: feconf.CAN_SEND_EMAILS is False.
+        Exception. The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
+        Exception. The feconf.CAN_SEND_EMAILS is False.
     """
 
     if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
@@ -591,7 +591,7 @@ def send_role_notification_email(
             has been given the new role.
 
     Raises:
-        Exception: The role is invalid (i.e. not defined in
+        Exception. The role is invalid (i.e. not defined in
             EDITOR_ROLE_EMAIL_HTML_ROLES).
     """
 
@@ -728,7 +728,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'You\'ve received %s new message%s on your Oppia explorations:<br>'
         '<ul>%s</ul>'
         'You can view and reply to your messages from your '
-        '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
+        '<a href="https://www.oppia.org/creator-dashboard">dashboard</a>.'
         '<br>'
         '<br>Thanks, and happy teaching!<br>'
         '<br>'
@@ -1090,7 +1090,7 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
         'edits made to lessons preserve the lessons\' quality and are '
         'beneficial for students.<br><br>'
         'If you\'d like to help out as a reviewer, please visit your '
-        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
+        '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a>. '
         'and set your review preferences accordingly. Note that, if you accept,'
         'you will receive occasional emails inviting you to review incoming '
         'suggestions by others.<br><br>'
@@ -1135,7 +1135,7 @@ def send_mail_to_notify_users_to_review(user_id, category):
         'review in %s, which you are registered as a reviewer for.'
         '<br><br>Please take a look at and accept/reject these suggestions at'
         ' your earliest convenience. You can visit your '
-        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a> '
+        '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a> '
         'to view the list of suggestions that need a review.<br><br>'
         'Thank you for helping improve Oppia\'s lessons!'
         '- The Oppia Team<br>'
@@ -1230,7 +1230,7 @@ def send_rejected_voiceover_application_email(
         ' and the reviewer has left a message.'
         '<br><br>Review message: %s<br><br>'
         'You can create a new voiceover application through the'
-        '<a href="https://oppia.org/community_dashboard">'
+        '<a href="https://oppia.org/community-dashboard">'
         'community dashboard</a> page.<br><br>'
         '- The Oppia Team<br>'
         '<br>%s')
@@ -1321,7 +1321,7 @@ def send_email_to_new_community_reviewer(
         'This is to let you know that the Oppia team has added you as a '
         'reviewer for %s. This allows you to %s.<br><br>'
         'You can check the %s waiting for review in the '
-        '<a href="https://www.oppia.org/community_dashboard">'
+        '<a href="https://www.oppia.org/community-dashboard">'
         'Community Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'
@@ -1383,7 +1383,7 @@ def send_email_to_removed_community_reviewer(
         'Hi %s,<br><br>'
         'The Oppia team has removed you from the %s. You won\'t be able to %s '
         'any more, but you can still contribute %s through the '
-        '<a href="https://www.oppia.org/community_dashboard">'
+        '<a href="https://www.oppia.org/community-dashboard">'
         'Community Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'

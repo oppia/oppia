@@ -39,8 +39,10 @@ require('services/context.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('ResponsesService', [
-  '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
+  'AlertsService', 'AnswerGroupsCacheService',
   'LoggerService', 'OutcomeObjectFactory',
   'SolutionValidityService', 'SolutionVerificationService',
   'StateEditorService', 'StateInteractionIdService',
@@ -49,7 +51,7 @@ angular.module('oppia').factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
-      $rootScope, AlertsService, AnswerGroupsCacheService,
+      AlertsService, AnswerGroupsCacheService,
       LoggerService, OutcomeObjectFactory,
       SolutionValidityService, SolutionVerificationService,
       StateEditorService, StateInteractionIdService,
@@ -69,6 +71,8 @@ angular.module('oppia').factory('ResponsesService', [
     var _defaultOutcome = null;
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
+    var _answerGroupsChangedEventEmitter = new EventEmitter();
+    var _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
     var _verifySolution = function() {
       // This checks if the solution is valid once a rule has been changed or
@@ -114,7 +118,7 @@ angular.module('oppia').factory('ResponsesService', [
       if (newAnswerGroups && oldAnswerGroups &&
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
-        $rootScope.$broadcast('answerGroupChanged', newAnswerGroups);
+        _answerGroupsChangedEventEmitter.emit();
         _verifySolution();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
       }
@@ -181,6 +185,12 @@ angular.module('oppia').factory('ResponsesService', [
         _confirmedUnclassifiedAnswersMemento = angular.copy(
           newConfirmedUnclassifiedAnswers);
       }
+    };
+
+    var _updateAnswerChoices = function(newAnswerChoices) {
+      var oldAnswerChoices = angular.copy(_answerChoices);
+      _answerChoices = newAnswerChoices;
+      return oldAnswerChoices;
     };
 
     return {
@@ -320,13 +330,16 @@ angular.module('oppia').factory('ResponsesService', [
           confirmedUnclassifiedAnswers) {
         _saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
       },
-      // Updates answer choices when the interaction requires it -- for
-      // example, the rules for multiple choice need to refer to the multiple
-      // choice interaction's customization arguments.
-      updateAnswerChoices: function(newAnswerChoices, callback) {
-        var oldAnswerChoices = angular.copy(_answerChoices);
-        _answerChoices = newAnswerChoices;
-
+      // Updates answer choices when the interaction is initialized or deleted.
+      // For example, the rules for multiple choice need to refer to the
+      // multiple choice interaction's customization arguments.
+      updateAnswerChoices: function(newAnswerChoices) {
+        _updateAnswerChoices(newAnswerChoices);
+      },
+      // Handles changes to custom args by updating the answer choices
+      // accordingly.
+      handleCustomArgsUpdate: function(newAnswerChoices, callback) {
+        var oldAnswerChoices = _updateAnswerChoices(newAnswerChoices);
         // If the interaction is ItemSelectionInput, update the answer groups
         // to refer to the new answer options.
         if (StateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
@@ -430,23 +443,13 @@ angular.module('oppia').factory('ResponsesService', [
               var newRules = angular.copy(answerGroup.rules);
               newRules.forEach(function(rule) {
                 if (rule.type === 'HasElementXAtPositionY') {
-                  for (key in rule.inputs) {
-                    newInputValue = '';
-                    if (key === 'y') {
-                      newInputValue = 1;
-                    }
-                    rule.inputs[key] = newInputValue;
-                  }
+                  rule.inputs.x = newAnswerChoices[0].val;
+                  rule.inputs.y = 1;
                 } else if (rule.type === 'HasElementXBeforeElementY') {
-                  for (key in rule.inputs) {
-                    newInputValue = '';
-                    rule.inputs[key] = newInputValue;
-                  }
+                  rule.inputs.x = newAnswerChoices[0].val;
+                  rule.inputs.y = newAnswerChoices[1].val;
                 } else {
-                  for (key in rule.inputs) {
-                    newInputValue = [];
-                    rule.inputs[key] = newInputValue;
-                  }
+                  rule.inputs.x = newAnswerChoices.map(({val}) => [val]);
                 }
               });
 
@@ -462,6 +465,14 @@ angular.module('oppia').factory('ResponsesService', [
         _saveAnswerGroups(newAnswerGroups);
         _saveDefaultOutcome(defaultOutcome);
         callback(_answerGroupsMemento, _defaultOutcomeMemento);
+      },
+
+      get onAnswerGroupsChanged() {
+        return _answerGroupsChangedEventEmitter;
+      },
+
+      get onInitializeAnswerGroups() {
+        return _initializeAnswerGroupsEventEmitter;
       }
     };
   }

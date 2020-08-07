@@ -247,6 +247,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
     """
+
     def setUp(self):
         """Before each individual test, initialize data."""
         super(ExplorationPretestsUnitTest, self).setUp()
@@ -266,9 +267,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
-        self.save_new_story(
-            story_id, 'user', 'Title', 'Description', 'Notes', topic_id
-        )
+        self.save_new_story(story_id, 'user', topic_id)
         topic_services.add_canonical_story('user', topic_id, story_id)
 
         changelist = [
@@ -320,8 +319,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             json_response_1 = self.get_json(
                 '%s/%s?story_id=%s' % (
                     feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id, story_id))
-        self.assertTrue(json_response_1['pretest_question_dicts'][0]['id'] in
-                        [question_id, question_id_2])
+        self.assertTrue(
+            json_response_1['pretest_question_dicts'][0]['id'] in
+            [question_id, question_id_2])
 
         self.get_json(
             '%s/%s?story_id=%s' % (
@@ -433,8 +433,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
                 feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME),
             skill_ids_for_url, 'true')
         json_response = self.get_json(url)
-        self.assertEqual(len(json_response['question_dicts']),
-                         feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+        self.assertEqual(
+            len(json_response['question_dicts']),
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
@@ -615,10 +616,11 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RecommendationsHandlerTests(test_utils.GenericTestBase):
+class RecommendationsHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for recommended explorations for after an
     exploration is completed.
     """
+
     # Demo explorations.
     EXP_ID_0 = '0'
     EXP_ID_1 = '1'
@@ -1071,7 +1073,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         )
 
 
-class FlagExplorationHandlerTests(test_utils.GenericTestBase):
+class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
     EXP_ID = '0'
@@ -1154,7 +1156,8 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx:
             self.process_and_flush_pending_tasks()
 
-            messages = self.mail_stub.get_sent_messages(to=self.MODERATOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(),
@@ -1507,59 +1510,49 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         playthrough_id = stats_models.PlaythroughModel.create(
             self.exp_id, self.exploration.version, 'EarlyQuit',
             {
-                'state_name': {
-                    'value': 'state_name1'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
+                'state_name': {'value': 'state_name1'},
+                'time_spent_in_exp_in_msecs': {'value': 200}
             },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }])
-        stats_models.ExplorationIssuesModel.create(
-            self.exp_id, 1, [{
-                'issue_type': 'EarlyQuit',
-                'issue_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
+            [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
                     },
-                    'time_spent_in_exp_in_msecs': {
-                        'value': 200
-                    }
-                },
-                'playthrough_ids': [playthrough_id],
-                'schema_version': 1,
-                'is_valid': True
-            }])
+                    'schema_version': 1
+                }
+            ])
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id, 1, [
+                {
+                    'issue_type': 'EarlyQuit',
+                    'issue_customization_args': {
+                        'state_name': {'value': 'state_name1'},
+                        'time_spent_in_exp_in_msecs': {'value': 200}
+                        },
+                    'playthrough_ids': [playthrough_id],
+                    'schema_version': 1,
+                    'is_valid': True
+                }
+            ])
 
         self.playthrough_data = {
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
-                'state_name': {
-                    'value': 'state_name1'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 250
-                }
+                'state_name': {'value': 'state_name1'},
+                'time_spent_in_exp_in_msecs': {'value': 250}
             },
-            'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }]
+            'actions': [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
+                    'schema_version': 1
+                }
+            ]
         }
 
         self.csrf_token = self.get_new_csrf_token()
@@ -1568,13 +1561,11 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a new playthrough gets created and is added to an existing
         issue's list of playthrough IDs.
         """
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+            'playthrough_id': None
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1588,13 +1579,10 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.playthrough_data['issue_customization_args']['state_name'][
             'value'] = 'state_name2'
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1613,15 +1601,17 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }])
+            [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {
+                            'value': 'state_name1'
+                        }
+                    },
+                    'schema_version': 1
+                }
+            ])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
@@ -1646,24 +1636,21 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }],
+            'actions': [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
+                    'schema_version': 1
+                }
+            ],
         }
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1682,15 +1669,17 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
+            [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {
+                            'value': 'state_name1'
+                            }
+                        },
+                    'schema_version': 1
                 },
-                'schema_version': 1
-            }])
+            ])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
@@ -1712,27 +1701,24 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
                 'state_names': {
-                    'value': ['state_name1', 'state_name1', 'state_name2']
+                    'value': ['state_name2', 'state_name1', 'state_name2']
                 },
             },
-            'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }]
+            'actions': [
+                {
+                    'action_type': 'ExplorationStart',
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
+                    'schema_version': 1
+                }
+            ]
         }
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1747,16 +1733,14 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues[0]['playthrough_ids'] = [
-            'id1', 'id2', 'id3', 'id4', 'id5']
+            'id1', 'id2', 'id3', 'id4', 'id5'
+        ]
         model.put()
 
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1767,199 +1751,17 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that passing a payload without schema version raises an
         exception.
         """
-        payload_dict_without_schema_version = {
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
             'playthrough_data': self.playthrough_data,
-            'playthrough_id': None
-        }
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            payload_dict_without_schema_version,
-            csrf_token=self.csrf_token,
-            expected_status_int=400)
+        }, csrf_token=self.csrf_token, expected_status_int=400)
 
     def test_error_on_invalid_playthrough_dict(self):
         """Test that passing an invalid playthrough dict raises an exception."""
         self.playthrough_data['issue_type'] = 'FakeIssueType'
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token,
-            expected_status_int=400)
-
-    def test_playthrough_id_is_returned(self):
-        """Test that playthrough ID is returned when it is stored for the first
-        time and the playthrough is updated from the next time.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 1)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
-        playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
-        self.assertEqual(response['playthrough_id'], playthrough_id)
-        self.assertEqual(response['playthrough_stored'], True)
-
-    def test_playthrough_is_subsequently_updated(self):
-        """Test that a playthrough is updated if the controller is called for
-        the second time.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        playthrough_id = response['playthrough_id']
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_customization_args'][
-            'time_spent_in_exp_in_msecs']['value'] = 150
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': playthrough_id
-            }, csrf_token=self.csrf_token)
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 1)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
-        playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-        self.assertEqual(
-            playthrough.issue_customization_args['time_spent_in_exp_in_msecs'][
-                'value'], 150)
-
-    def test_updating_playthrough_issue(self):
-        """Test that updating an existing playthrough's issue creates a new
-        issue if the issue doesn't exist.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        playthrough_id = response['playthrough_id']
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_type'] = 'CyclicStateTransitions'
-        self.playthrough_data['issue_customization_args'] = {
-            'state_names': {
-                'value': ['state1', 'state2', 'state1']
-            }
-        }
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': playthrough_id
-            }, csrf_token=self.csrf_token)
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 2)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
-        self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
-        playthrough_id = model.unresolved_issues[1]['playthrough_ids'][0]
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-        self.assertEqual(playthrough.issue_type, 'CyclicStateTransitions')
-        self.assertEqual(
-            playthrough.issue_customization_args['state_names'][
-                'value'], ['state1', 'state2', 'state1'])
-
-    def test_cannot_update_playthrough_issue_with_no_playthrough_id(self):
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
-            }, csrf_token=self.csrf_token, expected_status_int=400)
-
-        self.assertEqual(response['error'], 'u\'playthrough_id\'')
-
-    def test_move_playthrough_to_correct_issue(self):
-        playthrough_id = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'MultipleIncorrectSubmissions',
-            {
-                'state_name': {
-                    'value': 'state_name1'
-                },
-                'num_times_answered_incorrectly': {
-                    'value': 7
-                }
-            },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    }
-                },
-                'schema_version': 1
-            }])
-
-        stats_models.ExplorationIssuesModel.create(
-            self.exp_id, 1, [{
-                'issue_type': 'MultipleIncorrectSubmissions',
-                'issue_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    },
-                    'num_times_answered_incorrectly': {
-                        'value': 7
-                    }
-                },
-                'playthrough_ids': [playthrough_id],
-                'schema_version': 1,
-                'is_valid': True
-            }])
-
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': None
-            }, csrf_token=self.csrf_token)
-
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_type'] = 'MultipleIncorrectSubmissions'
-        self.playthrough_data['issue_customization_args'] = {
-            'state_name': {
-                'value': 'state_name1'
-            }
-        }
-
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1,
-                'playthrough_id': response['playthrough_id']
-            }, csrf_token=self.csrf_token)
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-
-        self.assertEqual(playthrough.issue_type, 'MultipleIncorrectSubmissions')
-        self.assertEqual(
-            playthrough.issue_customization_args['state_name'][
-                'value'], 'state_name1')
+        self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {
+            'playthrough_data': self.playthrough_data,
+            'issue_schema_version': 1,
+        }, csrf_token=self.csrf_token, expected_status_int=400)
 
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):

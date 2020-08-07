@@ -114,7 +114,7 @@ class BaseChange(python_utils.OBJECT):
             change_dict: dict. The dict containing cmd name and attributes.
 
         Raises:
-            ValidationError: The given change_dict is not valid.
+            ValidationError. The given change_dict is not valid.
         """
         self.validate_dict(change_dict)
 
@@ -141,7 +141,7 @@ class BaseChange(python_utils.OBJECT):
 
         Args:
             change_dict: dict. A dict of changes with keys as a cmd and the
-            attributes of a command.
+                attributes of a command.
 
         Raises:
             ValidationError. The change dict does not contain the cmd key,
@@ -177,7 +177,7 @@ class BaseChange(python_utils.OBJECT):
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
-            A dict, mapping all fields of BaseChange instance.
+            dict. A dict, mapping all fields of BaseChange instance.
         """
         base_change_dict = {}
         base_change_dict['cmd'] = self.cmd

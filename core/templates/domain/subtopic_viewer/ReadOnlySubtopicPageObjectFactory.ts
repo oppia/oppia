@@ -21,23 +21,40 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ISubtopicPageContentsBackendDict,
+  SubtopicPageContentsBackendDict,
   SubtopicPageContents,
   SubtopicPageContentsObjectFactory
 } from 'domain/topic/SubtopicPageContentsObjectFactory';
+import { SubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
+  'domain/topic/SubtopicObjectFactory';
 
-export interface ISubtopicDataBackendDict {
+export interface SubtopicDataBackendDict {
   'subtopic_title': string;
-  'page_contents': ISubtopicPageContentsBackendDict;
+  'page_contents': SubtopicPageContentsBackendDict;
+  'next_subtopic_dict': SubtopicBackendDict | null,
+  'topic_id': string
 }
 
 export class ReadOnlySubtopicPageData {
+  parentTopicId: string;
   subtopicTitle: string;
   pageContents: SubtopicPageContents;
+  nextSubtopic: Subtopic | null;
 
-  constructor(subtopicTitle: string, pageContents: SubtopicPageContents) {
+  constructor(
+      parentTopicId: string,
+      subtopicTitle: string,
+      pageContents: SubtopicPageContents,
+      nextSubtopic: Subtopic | null
+  ) {
+    this.parentTopicId = parentTopicId;
     this.subtopicTitle = subtopicTitle;
     this.pageContents = pageContents;
+    this.nextSubtopic = nextSubtopic;
+  }
+
+  getParentTopicId(): string {
+    return this.parentTopicId;
   }
 
   getSubtopicTitle(): string {
@@ -47,6 +64,10 @@ export class ReadOnlySubtopicPageData {
   getPageContents(): SubtopicPageContents {
     return this.pageContents;
   }
+
+  getNextSubtopic(): Subtopic | null {
+    return this.nextSubtopic;
+  }
 }
 
 @Injectable({
@@ -54,16 +75,25 @@ export class ReadOnlySubtopicPageData {
 })
 export class ReadOnlySubtopicPageObjectFactory {
   constructor(
-    private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory
+    private subtopicPageContentsObjectFactory:
+      SubtopicPageContentsObjectFactory,
+    private subtopicObjectFactory: SubtopicObjectFactory
   ) {}
 
-  createFromBackendDict(subtopicDataBackendDict: ISubtopicDataBackendDict):
+  createFromBackendDict(subtopicDataBackendDict: SubtopicDataBackendDict):
     ReadOnlySubtopicPageData {
+    let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (
+      this.subtopicObjectFactory
+        .create(subtopicDataBackendDict.next_subtopic_dict, {})
+    ) : null;
+
     return new ReadOnlySubtopicPageData(
+      subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.subtopic_title,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(
         subtopicDataBackendDict.page_contents
-      )
+      ),
+      nextSubtopic
     );
   }
 }
