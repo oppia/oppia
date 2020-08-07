@@ -19,7 +19,6 @@
 import { TestBed } from '@angular/core/testing';
 
 import {
-  FeatureStage,
   PlatformParameterBackendDict,
   PlatformParameterObjectFactory
 } from './PlatformParameterObjectFactory';
@@ -90,75 +89,5 @@ describe('PlatformParameterObjectFactory', () => {
     const instance = factory.createFromBackendDict(backendDict);
 
     expect(instance.createBackendDictsForRules()).toEqual(backendDict.rules);
-  });
-
-  describe('.validate', () => {
-    it('should pass without any issue of valid instance.', () => {
-      const param = factory.createFromBackendDict({
-        name: 'param name',
-        description: 'This is a param for test.',
-        data_type: 'bool',
-        rules: [
-          {
-            filters: [
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev.toString()]]
-              }
-            ],
-            value_when_matched: true
-          },
-        ],
-        is_feature: false,
-        feature_stage: null,
-        rule_schema_version: 1,
-        default_value: false
-      });
-
-      expect(param.validate()).toEqual([]);
-    });
-
-    it('should report issue of rules without server_mode filter.', () => {
-      const param = factory.createFromBackendDict({
-        name: 'param name',
-        description: 'This is a param for test.',
-        data_type: 'bool',
-        rules: [
-          {
-            filters: [
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev.toString()]]
-              },
-              {
-                type: PlatformParameterFilterType.BrowserType,
-                conditions: [['=', 'Chrome']]
-              }
-            ],
-            value_when_matched: true
-          },
-          {
-            filters: [
-              {
-                type: PlatformParameterFilterType.BrowserType,
-                conditions: [['=', 'Chrome']]
-              }
-            ],
-            value_when_matched: true
-          }
-        ],
-        is_feature: true,
-        feature_stage: FeatureStage.PROD,
-        rule_schema_version: 1,
-        default_value: false
-      });
-
-      expect(param.validate()).toEqual(
-        [
-          'All rules must have a server_mode filter, but the 2-th rule ' +
-          'doesn\'t.'
-        ]
-      );
-    });
   });
 });
