@@ -104,6 +104,10 @@ describe('Preview Tab Component', function() {
       ctrl.$onInit();
     }));
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should evaluate ctrl properties after its initialization', function() {
       // Get data from exploration data service.
       $scope.$apply();

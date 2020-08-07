@@ -267,6 +267,8 @@ describe('Editor Navigation Component', function() {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userService = $injector.get('UserService');
       threadDataService = $injector.get('ThreadDataService');
+      stateTutorialFirstTimeService = (
+        $injector.get('StateTutorialFirstTimeService'));
 
       spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
         of(new Event('resize')));
@@ -274,6 +276,10 @@ describe('Editor Navigation Component', function() {
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+
+      spyOnProperty(stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -295,8 +301,7 @@ describe('Editor Navigation Component', function() {
 
     it('should hide post tutorial help popover when resizing page', function() {
       angular.element(window).triggerHandler('resize');
-      $rootScope.$broadcast('openPostTutorialHelpPopover');
-
+      mockOpenPostTutorialHelpPopover.emit();
       expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
     });
   });
