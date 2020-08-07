@@ -147,6 +147,11 @@ _PARSER.add_argument(
     '--community_dashboard_enabled', action='store_true',
     help='Run the test after enabling the community dashboard page.')
 
+_PARSER.add_argument(
+    '--source_maps',
+    help='Build webpack with source maps.',
+    action='store_true')
+
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
@@ -204,15 +209,20 @@ def is_oppia_server_already_running():
     return running
 
 
-def run_webpack_compilation():
+def run_webpack_compilation(source_maps=False):
     """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
         try:
-            subprocess.check_call([
-                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                'webpack.dev.config.ts'])
+            if source_maps:
+                subprocess.check_call([
+                    common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                    'webpack.dev.config.sourcemap.ts'])
+            else:
+                subprocess.check_call([
+                    common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                    'webpack.dev.config.ts'])
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
@@ -261,7 +271,8 @@ def setup_and_install_dependencies(skip_install):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode_setting, deparallelize_terser=False):
+def build_js_files(
+    dev_mode_setting, deparallelize_terser=False, source_maps=False):
     """Build the javascript files.
 
     Args:
@@ -269,16 +280,23 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
             in dev mode.
         deparallelize_terser: bool. Represents whether to use webpack
             compilation config that disables parallelism on terser plugin.
+        soure_maps: bool. Represents whether to use source maps while
+            building webpack.
     """
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
+        build_args = ['--prod_env']
+
         if deparallelize_terser:
-            build.main(args=['--prod_env', '--deparallelize_terser'])
-        else:
-            build.main(args=['--prod_env'])
+            build_args.append('--deparallelize_terser')
+
+        if source_maps:
+            build_args.append('--source_maps')
+
+        build.main(args=build_args)
     else:
         build.main(args=[])
-        run_webpack_compilation()
+        run_webpack_compilation(source_maps=source_maps)
 
 
 @contextlib.contextmanager
@@ -542,7 +560,8 @@ def main(args=None):
         build.modify_constants(prod_env=parsed_args.prod_env)
     else:
         build_js_files(
-            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
+            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser,
+            source_maps=parsed_args.source_maps)
     version = parsed_args.chrome_driver_version or get_chrome_driver_version()
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)

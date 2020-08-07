@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,22 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Development environment config file for Webpack.
+ * @fileoverview Production environment config file for Webpack.
  */
 
 const { merge } = require('webpack-merge');
-const common = require('./webpack.common.config.ts');
-const path = require('path');
+const prod = require('./webpack.prod.config.ts');
 
-module.exports = merge(common, {
-  mode: 'development',
-  output: {
-    filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'webpack_bundles')
-  },
-  devtool: 'eval',
-  watchOptions: {
-    aggregateTimeout: 500,
-    poll: 1000
-  }
+module.exports = merge(prod, {
+  devtool: 'source-map'
 });
