@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of, Subscription } from 'rxjs';
 import { WindowDimensionsService } from
@@ -37,6 +38,8 @@ describe('Editor Navigation Component', function() {
   var threadDataService = null;
   var userService = null;
   var windowDimensionsService = null;
+
+  var mockOpenPostTutorialHelpPopover = new EventEmitter();
 
   var testSubscriptions: Subscription;
 
@@ -85,6 +88,9 @@ describe('Editor Navigation Component', function() {
 
       isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
 
+      spyOnProperty(stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
       $scope = $rootScope.$new();
       ctrl = $componentController('editorNavigation', {
         $scope: $scope,
@@ -237,7 +243,7 @@ describe('Editor Navigation Component', function() {
     it('should toggle post tutorial help popover when resizing page',
       function() {
         angular.element(window).triggerHandler('resize');
-        $rootScope.$broadcast('openPostTutorialHelpPopover');
+        mockOpenPostTutorialHelpPopover.emit();
 
         expect(ctrl.postTutorialHelpPopoverIsShown).toBe(true);
 
