@@ -116,7 +116,7 @@ describe('Classroom page', () => {
       expect(ctrl.classroomDisplayName).toBe('Math');
 
       expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-        'Mock Classroom | Oppia');
+        'Math Classroom | Oppia');
 
       expect(ctrl.classroomData.getName()).toEqual('Math');
       expect($rootScope.$broadcast).toHaveBeenCalledWith(
