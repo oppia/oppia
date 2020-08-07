@@ -39,16 +39,23 @@ export class GuppyConfigurationService {
       return;
     }
 
-    if (
-      this.deviceInfoService.isMobileUserAgent() &&
-      this.deviceInfoService.hasTouchEvents()) {
-      // Use on-screen keyboard for mobile.
-      var osk = new GuppyOSK({
-        goto_tab: 'arithmetic',
-        attach: 'focus'
+    Guppy.remove_global_symbol('*');
+    Guppy.add_global_symbol(
+      '*',
+      {
+        output: {
+          latex: '\\times',
+          asciimath: '*'
+        },
+        keys: ['*'],
+        attrs: {
+          group: 'operations',
+          type: '*'
+        },
+        ast: {
+          type: 'operator'
+        }
       });
-      Guppy.use_osk(osk);
-    }
 
     // Remove symbols since they are not supported.
     for (let symbol of SYMBOLS_TO_REMOVE) {

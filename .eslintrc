@@ -236,6 +236,7 @@
       }
     ],
     "unused-imports/no-unused-imports-ts": "error",
+    "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
     "wrap-iife": [
       "error",

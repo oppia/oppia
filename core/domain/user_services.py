@@ -164,18 +164,20 @@ class UserSettings(python_utils.OBJECT):
         object are valid.
 
         Raises:
-            ValidationError: user_id is not str.
-            ValidationError: gae_id is not str.
-            ValidationError: email is not str.
-            ValidationError: email is invalid.
-            ValidationError: role is not str.
-            ValidationError: Given role does not exist.
+            ValidationError. The user_id is not str.
+            ValidationError. The gae_id is not str.
+            ValidationError. The email is not str.
+            ValidationError. The email is invalid.
+            ValidationError. The role is not str.
+            ValidationError. Given role does not exist.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
@@ -266,12 +268,12 @@ class UserSettings(python_utils.OBJECT):
             username: str. The username to validate.
 
         Raises:
-            ValidationError: An empty username is supplied.
-            ValidationError: The given username exceeds the maximum allowed
+            ValidationError. An empty username is supplied.
+            ValidationError. The given username exceeds the maximum allowed
                 number of characters.
-            ValidationError: The given username contains non-alphanumeric
+            ValidationError. The given username contains non-alphanumeric
                 characters.
-            ValidationError: The given username contains reserved substrings.
+            ValidationError. The given username contains reserved substrings.
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
@@ -294,14 +296,19 @@ class UserSettings(python_utils.OBJECT):
 
 
 def is_user_id_correct(user_id):
-    """Verify that the user ID is in a correct format.
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
 
     Args:
         user_id: str. The user ID to be checked.
 
     Returns:
-        bool. True when the ID is in a correct format, False otherwise.
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
     """
+    if user_id in feconf.SYSTEM_USERS.keys():
+        return True
+
     return all((
         user_id.islower(),
         user_id.startswith('uid_'),
@@ -328,10 +335,10 @@ def get_email_from_user_id(user_id):
         user_id: str. The unique ID of the user.
 
     Returns:
-        str. user_email corresponding to the given user_id.
+        str. The user_email corresponding to the given user_id.
 
     Raises:
-        Exception: The user is not found.
+        Exception. The user is not found.
     """
     user_settings = get_user_settings(user_id)
     return user_settings.email
@@ -492,7 +499,7 @@ def get_user_settings(user_id, strict=False):
         UserSettings domain object.
 
     Raises:
-        Exception: strict is True and given user_id does not exist.
+        Exception. The value of strict is True and given user_id does not exist.
     """
 
     user_settings = get_users_settings([user_id])[0]
@@ -516,7 +523,7 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
         UserSettings domain object.
 
     Raises:
-        Exception: strict is True and given gae_id does not exist.
+        Exception. The value of strict is True and given gae_id does not exist.
     """
     user_settings = _transform_user_settings(
         user_models.UserSettingsModel.get_by_gae_id(gae_id))
@@ -682,7 +689,7 @@ def get_system_user():
     """Returns user object with system committer user id.
 
     Returns:
-        system_user: user object with system committer user id.
+        UserActionsInfo. User object with system committer user id.
     """
     system_user = UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
     return system_user
@@ -692,7 +699,7 @@ def _save_user_settings(user_settings):
     """Commits a user settings object to the datastore.
 
     Args:
-        user_settings: UserSettings domain object.
+        user_settings: UserSettings. The user setting domain object to be saved.
     """
     user_settings.validate()
 
@@ -741,7 +748,7 @@ def _transform_user_settings(user_settings_model):
     """Transform user settings storage model to domain object.
 
     Args:
-        user_settings_model: UserSettingsModel.
+        user_settings_model: UserSettingsModel. The model to be converted.
 
     Returns:
         UserSettings. Domain object for user settings.
@@ -812,7 +819,7 @@ def has_ever_registered(user_id):
     return bool(user_settings.username and user_settings.last_agreed_to_terms)
 
 
-def has_fully_registered(user_id):
+def has_fully_registered_account(user_id):
     """Checks if a user has fully registered.
 
     Args:
@@ -841,7 +848,7 @@ def create_new_user(gae_id, email):
         UserSettings. The newly-created user settings domain object.
 
     Raises:
-        Exception: If a user with the given gae_id already exists.
+        Exception. If a user with the given gae_id already exists.
     """
     user_settings = get_user_settings(gae_id, strict=False)
     if user_settings is not None:
@@ -909,7 +916,7 @@ def set_username(user_id, new_username):
         new_username: str. The new username to set.
 
     Raises:
-        ValidationError: The new_username supplied is already taken.
+        ValidationError. The new_username supplied is already taken.
     """
     user_settings = get_user_settings(user_id, strict=True)
 
@@ -1093,7 +1100,7 @@ def update_user_role(user_id, role):
         role: str. The role to be assigned to user with given id.
 
     Raises:
-        Exception: The given role does not exist.
+        Exception. The given role does not exist.
     """
     if role not in role_services.PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)
@@ -1102,28 +1109,15 @@ def update_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def mark_user_for_deletion(
-        user_id, exploration_ids, collection_ids):
-    """Set deleted of the user with given user_id to True and create
-    PendingDeletionRequestModel for that user.
+def mark_user_for_deletion(user_id):
+    """Set the 'deleted' property of the user with given user_id to True.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
-        exploration_ids: list(str). List of exploration ids that were soft
-            deleted and should be hard deleted later.
-        collection_ids: list(str). List of collection ids that were soft
-            deleted and should be hard deleted later.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-
-    user_models.PendingDeletionRequestModel(
-        id=user_id,
-        email=user_settings.email,
-        exploration_ids=exploration_ids,
-        collection_ids=collection_ids,
-    ).put()
 
 
 def get_human_readable_user_ids(user_ids):
@@ -1140,7 +1134,7 @@ def get_human_readable_user_ids(user_ids):
         list is the user's truncated email address.
 
     Raises:
-        Exception: At least one of the user_ids does not correspond to a valid
+        Exception. At least one of the user_ids does not correspond to a valid
             UserSettingsModel.
     """
     users_settings = get_users_settings(user_ids)
@@ -1453,12 +1447,12 @@ class UserContributions(python_utils.OBJECT):
         domain object are valid.
 
         Raises:
-            ValidationError: user_id is not str.
-            ValidationError: created_exploration_ids is not a list.
-            ValidationError: exploration_id in created_exploration_ids
+            ValidationError. The user_id is not str.
+            ValidationError. The created_exploration_ids is not a list.
+            ValidationError. The exploration_id in created_exploration_ids
                 is not str.
-            ValidationError: edited_exploration_ids is not a list.
-            ValidationError: exploration_id in edited_exploration_ids
+            ValidationError. The edited_exploration_ids is not a list.
+            ValidationError. The exploration_id in edited_exploration_ids
                 is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
@@ -1529,7 +1523,7 @@ def create_user_contributions(
         UserContributionsModel.
 
     Raises:
-        Exception: The UserContributionsModel for the given user_id already
+        Exception. The UserContributionsModel for the given user_id already
             exists.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
@@ -1556,7 +1550,7 @@ def update_user_contributions(
             user has edited.
 
     Raises:
-        Exception: The UserContributionsModel for the given user_id does not
+        Exception. The UserContributionsModel for the given user_id does not
             exist.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
@@ -1630,7 +1624,7 @@ def _migrate_dashboard_stats_to_latest_schema(versioned_dashboard_stats):
             user-specific statistics.
 
     Raises:
-        Exception: If schema_version > CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
+        Exception. If schema_version > CURRENT_DASHBOARD_STATS_SCHEMA_VERSION.
     """
     stats_schema_version = versioned_dashboard_stats.schema_version
     if not (1 <= stats_schema_version
@@ -2002,7 +1996,7 @@ def get_community_reviewer_usernames(review_category, language_code=None):
             review category.
 
     Returns:
-        list(str.) A list of usernames.
+        list(str). A list of usernames.
     """
     reviewer_ids = []
     if review_category == constants.REVIEW_CATEGORY_TRANSLATION:

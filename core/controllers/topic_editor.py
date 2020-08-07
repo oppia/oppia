@@ -24,6 +24,9 @@ import logging
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import fs_services
+from core.domain import image_validation_services
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -90,14 +93,52 @@ class TopicEditorStoryHandler(base.BaseHandler):
         the topic.
         """
         title = self.payload.get('title')
+        description = self.payload.get('description')
+        thumbnail_filename = self.payload.get('filename')
+        thumbnail_bg_color = self.payload.get('thumbnailBgColor')
+        raw_image = self.request.get('image')
+        story_url_fragment = self.payload.get('story_url_fragment')
 
         story_domain.Story.require_valid_title(title)
+        if story_services.does_story_exist_with_url_fragment(
+                story_url_fragment):
+            raise self.InvalidInputException(
+                'Story url fragment is not unique across the site.')
 
         new_story_id = story_services.get_new_story_id()
         story = story_domain.Story.create_default_story(
-            new_story_id, title, topic_id)
+            new_story_id, title, description, topic_id, story_url_fragment)
         story_services.save_new_story(self.user_id, story)
         topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
+
+        try:
+            file_format = image_validation_services.validate_image_and_filename(
+                raw_image, thumbnail_filename)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        entity_id = new_story_id
+        filename_prefix = 'thumbnail'
+
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+        fs_services.save_original_and_compressed_versions_of_image(
+            thumbnail_filename, feconf.ENTITY_TYPE_STORY, entity_id, raw_image,
+            filename_prefix, image_is_compressible)
+
+        story_services.update_story(
+            self.user_id, new_story_id, [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'thumbnail_filename',
+                'old_value': None,
+                'new_value': thumbnail_filename
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'thumbnail_bg_color',
+                'old_value': None,
+                'new_value': thumbnail_bg_color
+            }), ], 'Added story thumbnail.')
+
         self.render_json({
             'storyId': new_story_id
         })
@@ -201,9 +242,16 @@ class EditableTopicDataHandler(base.BaseHandler):
                 summary.to_dict() for summary in skill_summaries]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
+        skill_question_count_dict = {}
+        for skill_id in topic.get_all_skill_ids():
+            skill_question_count_dict[skill_id] = (
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]))
+
         self.values.update({
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
+            'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
             'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })

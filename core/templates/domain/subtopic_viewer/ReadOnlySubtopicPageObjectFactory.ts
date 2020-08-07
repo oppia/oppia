@@ -21,17 +21,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  ISubtopicPageContentsBackendDict,
+  SubtopicPageContentsBackendDict,
   SubtopicPageContents,
   SubtopicPageContentsObjectFactory
 } from 'domain/topic/SubtopicPageContentsObjectFactory';
-import { ISubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
+import { SubtopicBackendDict, Subtopic, SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
 
-export interface ISubtopicDataBackendDict {
+export interface SubtopicDataBackendDict {
   'subtopic_title': string;
-  'page_contents': ISubtopicPageContentsBackendDict;
-  'next_subtopic_dict': ISubtopicBackendDict | null,
+  'page_contents': SubtopicPageContentsBackendDict;
+  'next_subtopic_dict': SubtopicBackendDict | null,
   'topic_id': string
 }
 
@@ -80,7 +80,7 @@ export class ReadOnlySubtopicPageObjectFactory {
     private subtopicObjectFactory: SubtopicObjectFactory
   ) {}
 
-  createFromBackendDict(subtopicDataBackendDict: ISubtopicDataBackendDict):
+  createFromBackendDict(subtopicDataBackendDict: SubtopicDataBackendDict):
     ReadOnlySubtopicPageData {
     let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (
       this.subtopicObjectFactory

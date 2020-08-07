@@ -61,6 +61,10 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
+INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs'))
+INTERACTIONS_SPECS_FILE_PATH = (
+    os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
@@ -206,7 +210,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 34
+CURRENT_STATE_SCHEMA_VERSION = 36
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -227,7 +231,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -242,6 +246,10 @@ CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 # This value should be updated if the schema of LearnerAnswerInfo
 # dict schema changes.
 CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of PlatformParameterRule dict
+# schema changes.
+CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -386,12 +394,10 @@ def get_empty_ratings():
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
-# To use GAE email service.
-EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
 # To use mailgun email service.
 EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
-EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun API key.
 MAILGUN_API_KEY = None
@@ -529,6 +535,14 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # NOTE TO DEVELOPERS: This format should not be changed, since it is used in
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
+
+# We generate images for existing math rich text components in batches. This
+# gives the maximum size for a batch of Math SVGs in bytes.
+MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
+
+# We generate images for existing math rich text components in batches. This
+# gives the maximum number of entities in a batch.
+MAX_NUMBER_OF_ENTITIES_IN_MATH_SVGS_BATCH = 10
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
@@ -671,6 +685,7 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER = '/adminmathsvghandler'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -716,6 +731,7 @@ FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
+IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
@@ -774,6 +790,7 @@ STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 STORY_PROGRESS_URL_PREFIX = '/story_progress_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
+STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
@@ -906,6 +923,7 @@ HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_LEARNER = 'LEARNER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
@@ -1028,5 +1046,8 @@ AVAILABLE_LANDING_PAGES = {
 }
 
 # Classroom page names for generating URLs. These need to be kept in sync with
-# TOPIC_IDS_FOR_CLASSROOM_PAGES property in config_domain.
+# CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
+
+# Authentication method using GAE ID (google sign in)
+AUTH_METHOD_GAE = 'gae'

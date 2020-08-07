@@ -32,6 +32,7 @@ describe('Subtopic editor tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var ContextService = null;
+  var skillSummary = null;
   var ImageUploadHelperService = null;
   var directive = null;
   var TopicEditorStateService = null;
@@ -43,8 +44,11 @@ describe('Subtopic editor tab', function() {
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var QuestionBackendApiService = null;
-  var SkillSummaryObjectFactory = null;
+  var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
+  var MockWindowDimensionsService = {
+    isWindowNarrow: () => false
+  };
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
@@ -58,7 +62,8 @@ describe('Subtopic editor tab', function() {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    ShortSkillSummaryObjectFactory = $injector.get(
+      'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     QuestionBackendApiService = $injector.get('QuestionBackendApiService');
@@ -70,6 +75,10 @@ describe('Subtopic editor tab', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
+    subtopic.setUrlFragment('dummy-url');
+    skillSummary = ShortSkillSummaryObjectFactory.create(
+      'skill_1', 'Description 1');
+    topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
 
@@ -81,9 +90,6 @@ describe('Subtopic editor tab', function() {
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
-    var MockWindowDimensionsService = {
-      isWindowNarrow: () => false
-    };
     ctrl = $componentController('subtopicEditorTab', {
       QuestionBackendApiService: MockQuestionBackendApiService,
       WindowDimensionsService: MockWindowDimensionsService
@@ -107,6 +113,34 @@ describe('Subtopic editor tab', function() {
       var titleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
       ctrl.updateSubtopicTitle('New title');
       expect(titleSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call TopicUpdateService if subtopic url fragment is updated',
+    function() {
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('new-url');
+      expect(urlFragmentSpy).toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService when url fragment has not changed',
+    function() {
+      ctrl.updateSubtopicUrlFragment('subtopic-url');
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('subtopic-url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService if subtopic url fragment is invalid',
+    function() {
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('new url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('New-Url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('new-url-');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('new123url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
     });
 
   it('should call TopicUpdateService if subtopic thumbnail updates',
@@ -156,7 +190,7 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should return if skill is deleted', function() {
-    var skillSummary = SkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummaryObjectFactory.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
@@ -217,13 +251,57 @@ describe('Subtopic editor tab', function() {
       expect(updateSubtopicSpy).toHaveBeenCalled();
     });
 
-  it('should toggle skills list preview', function() {
+  it('should call the TopicUpdateService if skill is removed from subtopic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromSubtopic(0, null);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if skill is removed from topic',
+    function() {
+      var removeSkillSpy = (
+        spyOn(TopicUpdateService, 'removeSkillFromSubtopic'));
+      ctrl.removeSkillFromTopic(skillSummary);
+      expect(removeSkillSpy).toHaveBeenCalled();
+    });
+
+  it('should set skill edit options index', function() {
+    ctrl.showSkillEditOptions(10);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(10);
+    ctrl.showSkillEditOptions(20);
+    expect(ctrl.selectedSkillEditOptionsIndex).toEqual(20);
+  });
+
+  it('should toggle skills list preview only in mobile view', function() {
+    MockWindowDimensionsService.isWindowNarrow = () => true;
     expect(ctrl.skillsListIsShown).toEqual(true);
     ctrl.togglePreviewSkillCard();
     expect(ctrl.skillsListIsShown).toEqual(false);
     ctrl.togglePreviewSkillCard();
     expect(ctrl.skillsListIsShown).toEqual(true);
     ctrl.togglePreviewSkillCard();
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
+    ctrl.skillsListIsShown = true;
+    ctrl.togglePreviewSkillCard();
+    expect(ctrl.skillsListIsShown).toEqual(true);
+  });
+
+  it('should toggle subtopic editor card only in mobile view', function() {
+    MockWindowDimensionsService.isWindowNarrow = () => true;
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(false);
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
+    ctrl.toggleSubtopicEditorCard();
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
+    ctrl.subtopicEditorCardIsShown = true;
+    ctrl.toggleSubtopicEditorCard();
+    expect(ctrl.subtopicEditorCardIsShown).toEqual(true);
   });
 
   it('should toggle subtopic preview', function() {
@@ -233,5 +311,18 @@ describe('Subtopic editor tab', function() {
     ctrl.toggleSubtopicPreview();
     expect(ctrl.subtopicPreviewCardIsShown).toEqual(false);
     ctrl.toggleSubtopicPreview();
+  });
+
+  it('should call TopicEditorRoutingService to navigate To Topic Editor',
+    function() {
+      var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
+      ctrl.navigateToTopicEditor();
+      expect(navigateSpy).toHaveBeenCalled();
+    });
+
+  it('should hide the html data input on canceling', function() {
+    ctrl.schemaEditorIsShown = true;
+    ctrl.cancelHtmlDataChange();
+    expect(ctrl.schemaEditorIsShown).toEqual(false);
   });
 });

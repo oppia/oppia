@@ -77,7 +77,9 @@
               </div>
               <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
                 <i class="fa fa-angle-left topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
-                <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
+                <span class="dashboard-list-pagination-value">
+                  <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
+                </span>
                 <i class="fa fa-angle-right topic-pagination-arrow" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
               </div>
             </div>
@@ -101,6 +103,7 @@
                          items-per-page="$ctrl.itemsPerPage"
                          editable-topic-summaries="$ctrl.editableTopicSummaries"
                          mergeable-skill-summaries="$ctrl.mergeableSkillSummaries"
+                         untriaged-skill-summaries="$ctrl.untriagedSkillSummaries"
                          user-can-create-skill="$ctrl.userCanCreateSkill"
                          user-can-delete-skill="$ctrl.userCanDeleteSkill"
                          skills-categorized-by-topics="$ctrl.skillsCategorizedByTopics">
@@ -440,11 +443,11 @@
     cursor: pointer;
     display: inline-block;
     font-size: 16px;
-    height: 20px;
+    height: 23px;
     outline: none;
     padding: 0 4px;
     text-align: center;
-    width: 20px;
+    width: 23px;
   }
   .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active span {
     color: #FFFFFF;
@@ -528,7 +531,7 @@
   .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
     background-color: #d8f4f2;
     border-bottom: 4px solid #009688;
-    border-radius: 8px 8px 0 0;
+    border-radius: 0;
     color: #009688;
   }
   .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
@@ -562,6 +565,9 @@
   }
 
   @media only screen and (max-width: 830px) {
+    .oppia-topics-and-skills-dashboard {
+      z-index: 10000;
+    }
     .oppia-topics-and-skills-dashboard .dashboard-content {
       padding-top: 0;
       width: 100%;
@@ -576,6 +582,9 @@
       position: static;
       width: 100%;
     }
+    .oppia-topics-and-skills-dashboard .dashboard-tabs {
+      box-shadow: 0 0 5px #333;
+    }
     .oppia-topics-and-skills-dashboard .dashboard-tabs li {
       background-color: #00645C;
       width: 50%;
@@ -583,7 +592,7 @@
     .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
     .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
       background-color: #00645C;
-      border-bottom: 0;
+      border-bottom: 2px solid #FFF;
       border-radius: 0;
       color: #FFFFFF;
     }

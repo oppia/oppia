@@ -18,8 +18,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-
 from constants import constants
+
 from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import base
@@ -69,6 +69,7 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
+
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -101,7 +102,8 @@ class HomePageRedirectPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        if self.user_id and user_services.has_fully_registered(self.user_id):
+        if self.user_id and user_services.has_fully_registered_account(
+                self.user_id):
             user_settings = user_services.get_user_settings(
                 self.user_id)
             default_dashboard = user_settings.default_dashboard
@@ -212,6 +214,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
+    get_redirect_route(
+        r'/adminmathsvghandler', admin.ExplorationsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -298,6 +302,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_url_fragment>' % feconf.STORY_URL_FRAGMENT_HANDLER,
+        story_editor.StoryUrlFragmentHandler),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
@@ -768,6 +775,11 @@ URLS = MAPREDUCE_HANDLERS + [
             feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
             constants.TASK_ENTITY_TYPE_EXPLORATION),
         improvements.ExplorationImprovementsHistoryHandler),
+    get_redirect_route(
+        r'%s/%s/<exploration_id>' % (
+            feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
+            constants.TASK_ENTITY_TYPE_EXPLORATION),
+        improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

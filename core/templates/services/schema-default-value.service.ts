@@ -20,6 +20,13 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
+import { SubtitledHtmlObjectFactory, SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
+
 
 interface BoolSchema {
   type: 'bool';
@@ -50,12 +57,17 @@ interface ListSchema {
   items: Schema | Schema[];
 }
 
-interface DictSchema {
+export interface DictSchema {
   type: 'dict';
   properties: {
     name: string;
     schema: Schema;
   }[];
+}
+
+export interface CustomSchema {
+  'type': 'custom';
+  'obj_type': string;
 }
 
 export type Schema = (
@@ -65,7 +77,8 @@ export type Schema = (
   IntSchema |
   FloatSchema |
   ListSchema |
-  DictSchema
+  DictSchema |
+  CustomSchema
 );
 
 interface DictSchemaDefaultValue {
@@ -76,6 +89,8 @@ type SchemaDefaultValue = (
   string |
   number |
   boolean |
+  SubtitledUnicode |
+  SubtitledHtml |
   SchemaDefaultValue[] |
   DictSchemaDefaultValue);
 
@@ -83,17 +98,39 @@ type SchemaDefaultValue = (
   providedIn: 'root'
 })
 export class SchemaDefaultValueService {
-  constructor(private logger: LoggerService) {}
+  constructor(
+      private logger: LoggerService,
+      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
+      private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
+  ) {}
+
   // TODO(sll): Rewrite this to take validators into account, so that
   // we always start with a valid value.
   getDefaultValue(schema: Schema): SchemaDefaultValue {
+    const schemaIsSubtitledHtml = (
+      schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+      schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
+    const schemaIsSubtitledUnicode = (
+      schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &&
+      schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+    );
+
     if ('choices' in schema) {
       return schema.choices[0];
-    } else if (schema.type === 'bool') {
+    } else if (schemaIsSubtitledHtml) {
+      return this.subtitledHtmlObjectFactory.createFromBackendDict({
+        html: '', content_id: null
+      });
+    } else if (schemaIsSubtitledUnicode) {
+      return this.subtitledUnicodeObjectFactory.createFromBackendDict({
+        unicode_str: '', content_id: null
+      });
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_BOOL) {
       return false;
-    } else if (schema.type === 'unicode' || schema.type === 'html') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_UNICODE ||
+        schema.type === SchemaConstants.SCHEMA_TYPE_HTML) {
       return '';
-    } else if (schema.type === 'list') {
+    } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
       var that = this;
       if (!Array.isArray(schema.items)) {
         return [];
@@ -101,20 +138,18 @@ export class SchemaDefaultValueService {
       return schema.items.map(function(item) {
         return that.getDefaultValue(item);
       });
-    } else if (schema.type === 'dict') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
       var result = {};
       for (var i = 0; i < schema.properties.length; i++) {
         result[schema.properties[i].name] = this.getDefaultValue(
           schema.properties[i].schema);
       }
       return result;
-    } else if (schema.type === 'int' || schema.type === 'float') {
+    } else if (schema.type === SchemaConstants.SCHEMA_TYPE_INT ||
+        schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
     } else {
-      // TS Ignore is used here to log an error in case of a
-      // invalid schema.
-      // @ts-ignore
-      this.logger.error('Invalid schema type: ' + schema.type);
+      this.logger.error('Invalid schema: ' + JSON.stringify(schema));
     }
   }
 }

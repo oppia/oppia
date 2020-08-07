@@ -69,6 +69,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
     def test_is_user_id_correct(self):
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SYSTEM_COMMITTER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertFalse(
             user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
@@ -158,19 +166,38 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gae_id = 'someUser'
         user_id = user_services.create_new_user(
             gae_id, 'user@example.com').user_id
-        bad_usernames = [
-            ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020',
-            'AbcOppiaMigrationBotXyz', 'OppiaMigrATIONBOTXyz',
-            'AbcOppiaSuggestionBotXyz', 'AAAOPPIASuggestionBotBBB',
-            'xyzOppia', 'oppiaXyz', 'abcOppiaXyz']
-        for username in bad_usernames:
-            with self.assertRaises(utils.ValidationError):
+        bad_usernames_with_expected_error_message = [
+            (' bob ', 'Usernames can only have alphanumeric characters.'),
+            ('@', 'Usernames can only have alphanumeric characters.'),
+            ('', 'Empty username supplied.'),
+            ('a' * 100, 'A username can have at most 30 characters.'),
+            ('ADMIN', 'This username is not available.'),
+            ('admin', 'This username is not available.'),
+            ('AdMiN2020', 'This username is not available.'),
+            ('AbcOppiaMigrationBotXyz', 'This username is not available.'),
+            ('OppiaMigrATIONBOTXyz', 'This username is not available.'),
+            ('AbcOppiaSuggestionBotXyz', 'This username is not available.'),
+            ('AAAOPPIASuggestionBotBBB', 'This username is not available.'),
+            ('xyzOppia', 'This username is not available.'),
+            ('oppiaXyz', 'This username is not available.'),
+            ('abcOppiaXyz', 'This username is not available.')]
+        for username, error_msg in bad_usernames_with_expected_error_message:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
     def test_invalid_emails(self):
-        bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
-        for email in bad_email_addresses:
-            with self.assertRaises(utils.ValidationError):
+        bad_email_addresses_with_expected_error_message = [
+            ('@', 'Invalid email address: @'),
+            ('@@', 'Invalid email address: @@'),
+            ('abc', 'Invalid email address: abc'),
+            ('', 'No user email specified.'),
+            (None, 'Expected email to be a string, received None'),
+            (
+                ['a', '@', 'b.com'],
+                r'Expected email to be a string, received '
+                r'\[u\'a\', u\'@\', u\'b.com\'\]')]
+        for email, error_msg in bad_email_addresses_with_expected_error_message:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):
@@ -264,7 +291,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_user_settings_by_gae_id('id_x', strict=True)
 
     def test_fetch_gravatar_success(self):
@@ -531,40 +558,28 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
 
         user_services.update_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(user_services.get_user_role_from_id(user_id),
-                         feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_mark_user_for_deletion(self):
         gae_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
-        exploration_ids = ['exp_id']
-        collection_ids = ['col_id']
 
         user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_services.mark_user_for_deletion(
-            user_id, exploration_ids, collection_ids)
+        user_services.mark_user_for_deletion(user_id)
 
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertTrue(user_settings.deleted)
-
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(user_id))
-        self.assertEqual(
-            pending_deletion_model.email, user_settings.email)
-        self.assertFalse(
-            pending_deletion_model.deletion_complete)
-        self.assertEqual(
-            pending_deletion_model.exploration_ids, exploration_ids)
-        self.assertEqual(
-            pending_deletion_model.collection_ids, collection_ids)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -609,9 +624,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'day': 5
             })
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(
+            ValueError,
+            'time data \'2016-13-01\' does not match format \'%Y-%m-%d\''):
             user_services.parse_date_from_string(test_datetime_strings[2])
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegexp(ValueError, 'unconverted data remains: 2'):
             user_services.parse_date_from_string(test_datetime_strings[3])
 
     def test_record_user_started_state_translation_tutorial(self):
@@ -679,6 +696,19 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(
@@ -702,6 +732,19 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -1253,6 +1296,25 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_user_id(self):
+        self.user_settings.user_id = 'uid_' + 'a' * 31 + 'A'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'uid_' + 'a' * 31
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
+        self.user_settings.user_id = 'a' * 36
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The user ID is in a wrong format.'
+        ):
+            self.user_settings.validate()
+
     def test_validate_non_str_gae_id(self):
         self.user_settings.gae_id = 0
         with self.assertRaisesRegexp(
@@ -1299,7 +1361,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_guest_has_not_fully_registered(self):
-        self.assertFalse(user_services.has_fully_registered(None))
+        self.assertFalse(user_services.has_fully_registered_account(None))
 
     def test_cannot_create_new_user_with_existing_user_id(self):
         with self.assertRaisesRegexp(

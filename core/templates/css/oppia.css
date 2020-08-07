@@ -545,6 +545,11 @@ p:last-child {
   font-size: 1em !important;
 }
 
+.oppia-rte-editor {
+  border: none;
+  outline: none;
+}
+
 .oppia-rte-editor p span {
   font-size: 1em !important;
 }
@@ -1513,7 +1518,7 @@ md-card.oppia-dashboard-tile {
 }
 
 .oppia-placeholder {
-  color: #888;
+  color: #707070;
   font-style: italic;
 }
 
@@ -2737,7 +2742,7 @@ div#ng-curtain {
   width: 0;
 }
 .oppia-editor-warnings-error-color {
-  border-color: transparent transparent rgb(244,244,15) transparent;
+  border-color: transparent transparent #FFCC00 transparent;
   color: #333;
 }
 .oppia-editor-warnings-critical-color {
@@ -4281,12 +4286,37 @@ md-card.preview-conversation-skin-supplemental-card {
 
 }
 
+.oppia-mobile-back-to-parent {
+  display: none;
+}
 @media only screen and (max-width: 768px) {
   .oppia-static-content, .oppia-static-extra-content {
     width: 90%;
   }
   .oppia-about-otter-speech-bubble {
     padding: 10px;
+  }
+  .oppia-mobile-collapsible-card {
+    margin: 40px 0 0;
+    padding: 0;
+  }
+  .oppia-mobile-collapsible-card-header {
+    padding: 18px 15px;
+  }
+  .oppia-mobile-collapsible-card-content {
+    border-top: 1px solid #999999;
+    padding: 20px 26px 15px;
+  }
+  .oppia-mobile-back-to-parent {
+    color: #007bff;
+    display: block;
+    font-size: 18px;
+    margin-left: 3%;
+  }
+  .oppia-mobile-back-to-parent i {
+    color: #007bff;
+    font-size: 18px;
+    margin-left: 3%;
   }
 }
 

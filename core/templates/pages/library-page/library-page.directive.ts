@@ -15,6 +15,7 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
+import 'mousetrap';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -111,7 +112,7 @@ angular.module('oppia').directive('libraryPage', [
             for (var i = 0; i < ctrl.libraryGroups.length; i++) {
               var carouselJQuerySelector = (
                 '.oppia-library-carousel-tiles:eq(n)'.replace(
-                  'n', <string><any>i));
+                  'n', String(i)));
               var carouselScrollPositionPx = $(
                 carouselJQuerySelector).scrollLeft();
               var index = Math.ceil(
@@ -191,6 +192,25 @@ angular.module('oppia').directive('libraryPage', [
                 }, 50);
               });
             }
+          };
+
+          var bindLibraryPageShortcuts = function() {
+            Mousetrap.bind('/', function() {
+              var searchBar = <HTMLElement>document.querySelector(
+                '.protractor-test-search-input');
+              searchBar.focus();
+              return false;
+            });
+
+            Mousetrap.bind('c', function() {
+              document.getElementById('categoryBar').focus();
+              return false;
+            });
+
+            Mousetrap.bind('s', function() {
+              document.getElementById('skipToMainContentId').focus();
+              return false;
+            });
           };
 
           // The following loads explorations belonging to a particular group.
@@ -330,6 +350,7 @@ angular.module('oppia').directive('libraryPage', [
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
                 $timeout(initCarousels, 390);
+                bindLibraryPageShortcuts();
 
 
                 // Check if actual and expected widths are the same.

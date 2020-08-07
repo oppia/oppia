@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface ITypeDefinitionObject {
+interface TypeDefinitionObject {
   'validate': (arg0: Object) => Boolean;
 
   // The default value is typed as Object because it's type could be anything.
@@ -49,7 +49,7 @@ export class ParamType {
    * take.
    */
 
-  constructor(typeDefinitionObject: ITypeDefinitionObject) {
+  constructor(typeDefinitionObject: TypeDefinitionObject) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function');

@@ -36,6 +36,7 @@ describe('Topic editor tab directive', function() {
   var ctrl = null;
   var $rootScope = null;
   var topic = null;
+  var $q = null;
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
@@ -49,15 +50,21 @@ describe('Topic editor tab directive', function() {
   var SkillSummaryObjectFactory = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
+  var SubtopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
   var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
+  var MockWindowDimensionsService = {
+    isWindowNarrow: () => false
+  };
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     ContextService = $injector.get('ContextService');
     $uibModalInstance = $injector.get('$uibModal');
+    $q = $injector.get('$q');
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     directive = $injector.get('topicEditorTabDirective')[0];
@@ -72,15 +79,13 @@ describe('Topic editor tab directive', function() {
           entityType,
           entityId) => (entityType + '/' + entityId + '/' + filename)
     };
-    var MockWindowDimensionsService = {
-      isWindowNarrow: () => false
-    };
     SkillCreationService = $injector.get('SkillCreationService');
     TopicUpdateService = $injector.get('TopicUpdateService');
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     EntityCreationService = $injector.get('EntityCreationService');
+    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     ctrl = $injector.instantiate(directive.controller, {
@@ -97,10 +102,13 @@ describe('Topic editor tab directive', function() {
       TopicEditorStateService: TopicEditorStateService,
       EntityCreationService: EntityCreationService
     });
+    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
     skillSummary = SkillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
+    subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];
+    topic._subtopics = [subtopic];
     story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
     story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
@@ -165,8 +173,6 @@ describe('Topic editor tab directive', function() {
     expect($scope.subtopicEditOptionsAreShown).toEqual(1);
     $scope.showSubtopicEditOptions(2);
     expect($scope.subtopicEditOptionsAreShown).toEqual(2);
-    $scope.showSubtopicEditOptions(1);
-    expect($scope.subtopicEditOptionsAreShown).toEqual(1);
   });
 
   it('should show skill edit options', function() {
@@ -336,7 +342,12 @@ describe('Topic editor tab directive', function() {
     expect($scope.getPreviewFooter()).toEqual('1 Story');
   });
 
-  it('should toggle preview of entity lists', function() {
+  it('should only toggle preview of entity lists in mobile view', function() {
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+    $scope.togglePreviewListCards('topic');
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+
+    MockWindowDimensionsService.isWindowNarrow = () => true;
     expect($scope.subtopicsListIsShown).toEqual(true);
     expect($scope.storiesListIsShown).toEqual(true);
 
@@ -347,5 +358,75 @@ describe('Topic editor tab directive', function() {
     $scope.togglePreviewListCards('story');
     expect($scope.subtopicsListIsShown).toEqual(false);
     expect($scope.storiesListIsShown).toEqual(false);
+
+    expect($scope.mainTopicCardIsShown).toEqual(true);
+    $scope.togglePreviewListCards('topic');
+    expect($scope.mainTopicCardIsShown).toEqual(false);
+
+    MockWindowDimensionsService.isWindowNarrow = () => false;
+  });
+
+  it('should toggle uncategorized skill options', function() {
+    $scope.toggleUncategorizedSkillOptions(10);
+    expect($scope.uncategorizedEditOptionsIndex).toEqual(10);
+    $scope.toggleUncategorizedSkillOptions(20);
+    expect($scope.uncategorizedEditOptionsIndex).toEqual(20);
+  });
+
+  it('should open ChangeSubtopicAssignment modal when change ' +
+      'subtopic assignment is called', function() {
+    var modalSpy = spyOn($uibModalInstance, 'open').and.callThrough();
+    $scope.changeSubtopicAssignment(1, skillSummary);
+    expect(modalSpy).toHaveBeenCalled();
+  });
+
+  it('should open ChangeSubtopicAssignment modal and call TopicUpdateService',
+    function() {
+      var deferred = $q.defer();
+      deferred.resolve(1);
+      spyOn($uibModalInstance, 'open').and.returnValue(
+        {result: deferred.promise});
+      var moveSkillUpdateSpy = spyOn(
+        TopicUpdateService, 'moveSkillToSubtopic');
+      $scope.changeSubtopicAssignment(null, skillSummary);
+      $rootScope.$apply();
+      expect(moveSkillUpdateSpy).toHaveBeenCalled();
+    });
+
+  it('should not call the TopicUpdateService if subtopicIds are same',
+    function() {
+      var deferred = $q.defer();
+      deferred.resolve(1);
+      spyOn($uibModalInstance, 'open').and.returnValue(
+        {result: deferred.promise});
+      var moveSkillSpy = (
+        spyOn(TopicUpdateService, 'moveSkillToSubtopic'));
+      $scope.changeSubtopicAssignment(1, skillSummary);
+      $rootScope.$apply();
+      expect(moveSkillSpy).not.toHaveBeenCalled();
+    });
+
+  it('should record the index of the subtopic being moved', function() {
+    $scope.onRearrangeSubtopicStart(10);
+    expect($scope.fromIndex).toEqual(10);
+    $scope.onRearrangeSubtopicStart(6);
+    expect($scope.fromIndex).toEqual(6);
+  });
+
+  it('should call the TopicUpdateService to rearrange subtopic', function() {
+    $scope.fromIndex = 0;
+    var moveSubtopicSpy = (
+      spyOn(TopicUpdateService, 'rearrangeSubtopic'));
+    $scope.onRearrangeSubtopicEnd(1);
+    expect(moveSubtopicSpy).toHaveBeenCalled();
+  });
+
+  it('should not call the TopicUpdateService to rearrange subtopic if ' +
+      'subtopic is moved to the same position', function() {
+    $scope.fromIndex = 0;
+    var moveSubtopicSpy = (
+      spyOn(TopicUpdateService, 'rearrangeSubtopic'));
+    $scope.onRearrangeSubtopicEnd(0);
+    expect(moveSubtopicSpy).not.toHaveBeenCalled();
   });
 });

@@ -67,11 +67,11 @@ describe('Classroom page functionality', function() {
       var topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
       await adminPage.editConfigProperty(
-        'The set of topic IDs for each classroom page.',
+        'The details for each classroom page.',
         'List',
         async function(elem) {
           elem = await elem.editItem(0, 'Dictionary');
-          elem = await elem.editEntry(1, 'List');
+          elem = await elem.editEntry(3, 'List');
           elem = await elem.addItem('Unicode');
           await elem.setValue(topicId);
         });

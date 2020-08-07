@@ -37,6 +37,7 @@ STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 STORY_PROPERTY_DESCRIPTION = 'description'
 STORY_PROPERTY_NOTES = 'notes'
 STORY_PROPERTY_LANGUAGE_CODE = 'language_code'
+STORY_PROPERTY_URL_FRAGMENT = 'url_fragment'
 
 STORY_NODE_PROPERTY_DESTINATION_NODE_IDS = 'destination_node_ids'
 STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
@@ -50,6 +51,7 @@ STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
 
 INITIAL_NODE_ID = 'initial_node_id'
+NODE = 'node'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -100,7 +102,7 @@ class StoryChange(change_domain.BaseChange):
         STORY_PROPERTY_TITLE, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
         STORY_PROPERTY_THUMBNAIL_FILENAME,
         STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_NOTES,
-        STORY_PROPERTY_LANGUAGE_CODE)
+        STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_URL_FRAGMENT)
 
     # The allowed list of story node properties which can be used in
     # update_story_node_property command.
@@ -113,9 +115,9 @@ class StoryChange(change_domain.BaseChange):
         STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
         STORY_NODE_PROPERTY_THUMBNAIL_FILENAME)
 
-    # The allowed list of story contente properties which can be used in
+    # The allowed list of story content properties which can be used in
     # update_story_contents_property command.
-    STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
+    STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID, NODE, )
 
     ALLOWED_COMMANDS = [{
         'name': CMD_UPDATE_STORY_PROPERTY,
@@ -277,7 +279,7 @@ class StoryNode(python_utils.OBJECT):
         """Returns a dict representing this StoryNode domain object.
 
         Returns:
-            A dict, mapping all fields of StoryNode instance.
+            dict. A dict, mapping all fields of StoryNode instance.
         """
         return {
             'id': self.id,
@@ -334,7 +336,7 @@ class StoryNode(python_utils.OBJECT):
         """Validates various properties of the story node.
 
         Raises:
-            ValidationError: One or more attributes of the story node are
+            ValidationError. One or more attributes of the story node are
                 invalid.
         """
         if self.exploration_id:
@@ -464,7 +466,7 @@ class StoryContents(python_utils.OBJECT):
         """Validates various properties of the story contents object.
 
         Raises:
-            ValidationError: One or more attributes of the story contents are
+            ValidationError. One or more attributes of the story contents are
                 invalid.
         """
         if not isinstance(self.nodes, list):
@@ -486,9 +488,9 @@ class StoryContents(python_utils.OBJECT):
                     node)
             node.validate()
             for destination_node_id in node.destination_node_ids:
-                if python_utils.NEXT(
-                        (node for node in self.nodes
-                         if node.id == destination_node_id), None) is None:
+                if python_utils.NEXT((
+                        node for node in self.nodes
+                        if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
                         'Expected all destination nodes to exist')
             if node.id == self.initial_node_id:
@@ -565,12 +567,6 @@ class StoryContents(python_utils.OBJECT):
                             ' was unlocked.' % node_id)
                     nodes_queue.append(node_id)
 
-            for index, node_visited in enumerate(is_node_visited):
-                if not node_visited:
-                    raise utils.ValidationError(
-                        'The node with id %s is disconnected from the '
-                        'story graph.' % self.nodes[index].id)
-
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
@@ -637,7 +633,7 @@ class StoryContents(python_utils.OBJECT):
         """Returns a dict representing this StoryContents domain object.
 
         Returns:
-            A dict, mapping all fields of StoryContents instance.
+            dict. A dict, mapping all fields of StoryContents instance.
         """
         return {
             'nodes': [
@@ -676,7 +672,7 @@ class Story(python_utils.OBJECT):
             self, story_id, title, thumbnail_filename,
             thumbnail_bg_color, description, notes,
             story_contents, story_contents_schema_version, language_code,
-            corresponding_topic_id, version, created_on=None,
+            corresponding_topic_id, version, url_fragment, created_on=None,
             last_updated=None):
         """Constructs a Story domain object.
 
@@ -703,6 +699,7 @@ class Story(python_utils.OBJECT):
             thumbnail_filename: str|None. The thumbnail filename of the story.
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story.
+            url_fragment: str. The url fragment for the story.
         """
         self.id = story_id
         self.title = title
@@ -717,6 +714,7 @@ class Story(python_utils.OBJECT):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+        self.url_fragment = url_fragment
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -747,7 +745,7 @@ class Story(python_utils.OBJECT):
         """Validates various properties of the story object.
 
         Raises:
-            ValidationError: One or more attributes of story are invalid.
+            ValidationError. One or more attributes of story are invalid.
         """
         self.require_valid_title(self.title)
 
@@ -755,6 +753,11 @@ class Story(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        if self.url_fragment is not None:
+            utils.require_valid_url_fragment(
+                self.url_fragment, 'Story Url Fragment',
+                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
 
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
@@ -860,7 +863,7 @@ class Story(python_utils.OBJECT):
         exploration id.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story,
+            exp_id: str. The ID of the exploration linked to the story.
 
         Returns:
             list(str)|None. The list of prerequisite skill ids for the
@@ -875,7 +878,7 @@ class Story(python_utils.OBJECT):
         """Checks whether an exploration is present in the story.
 
         Args:
-            exp_id: str. The ID of the exploration linked to the story,
+            exp_id: str. The ID of the exploration linked to the story.
 
         Returns:
             bool. Whether the exploration is linked to the story.
@@ -889,7 +892,7 @@ class Story(python_utils.OBJECT):
         """Returns a dict representing this Story domain object.
 
         Returns:
-            A dict, mapping all fields of Story instance.
+            dict. A dict, mapping all fields of Story instance.
         """
         return {
             'id': self.id,
@@ -902,11 +905,14 @@ class Story(python_utils.OBJECT):
             'version': self.version,
             'story_contents': self.story_contents.to_dict(),
             'thumbnail_filename': self.thumbnail_filename,
-            'thumbnail_bg_color': self.thumbnail_bg_color
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'url_fragment': self.url_fragment
         }
 
     @classmethod
-    def create_default_story(cls, story_id, title, corresponding_topic_id):
+    def create_default_story(
+            cls, story_id, title, description, corresponding_topic_id,
+            url_fragment):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
@@ -914,8 +920,10 @@ class Story(python_utils.OBJECT):
         Args:
             story_id: str. The unique id of the story.
             title: str. The title for the newly created story.
+            description: str. The high level description of the story.
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
+            url_fragment: str. The url fragment of the story.
 
         Returns:
             Story. The Story domain object with the default values.
@@ -924,10 +932,11 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title, None, None,
-            feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
-            story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
+            story_id, title, None, None, description,
+            feconf.DEFAULT_STORY_NOTES, story_contents,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
+            url_fragment)
 
     @classmethod
     def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents_dict):
@@ -1055,6 +1064,14 @@ class Story(python_utils.OBJECT):
         """
         self.language_code = language_code
 
+    def update_url_fragment(self, url_fragment):
+        """Updates the url fragment of the story.
+
+        Args:
+            url_fragment: str. The new url fragment of the story.
+        """
+        self.url_fragment = url_fragment
+
     def add_node(self, desired_node_id, node_title):
         """Adds a new default node with the id as story_contents.next_node_id.
 
@@ -1064,7 +1081,7 @@ class Story(python_utils.OBJECT):
             node_title: str. The title for the new story node.
 
         Raises:
-            Exception: The desired_node_id differs from
+            Exception. The desired_node_id differs from
                 story_contents.next_node_id.
         """
         if self.story_contents.next_node_id != desired_node_id:
@@ -1101,7 +1118,7 @@ class Story(python_utils.OBJECT):
             node_id: str. The id of the node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1127,7 +1144,7 @@ class Story(python_utils.OBJECT):
             new_outline: str. The new outline of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1143,7 +1160,7 @@ class Story(python_utils.OBJECT):
             new_title: str. The new title of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1159,7 +1176,7 @@ class Story(python_utils.OBJECT):
             new_description: str. The new description of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1177,7 +1194,7 @@ class Story(python_utils.OBJECT):
                 given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1195,7 +1212,7 @@ class Story(python_utils.OBJECT):
                 color of the given node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1212,7 +1229,7 @@ class Story(python_utils.OBJECT):
             node_id: str. The id of the node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1228,7 +1245,7 @@ class Story(python_utils.OBJECT):
             node_id: str. The id of the node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1245,7 +1262,7 @@ class Story(python_utils.OBJECT):
                 list.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1264,7 +1281,7 @@ class Story(python_utils.OBJECT):
                 skill id list.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1283,7 +1300,7 @@ class Story(python_utils.OBJECT):
                 node id list.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1291,6 +1308,41 @@ class Story(python_utils.OBJECT):
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].destination_node_ids = (
             new_destination_node_ids)
+
+    def rearrange_node_in_story(self, from_index, to_index):
+        """Rearranges or moves a node in the story content.
+
+        Args:
+            from_index: int. The index of the node to move.
+            to_index: int. The index at which to insert the moved node.
+
+        Raises:
+            Exception. Invalid input.
+        """
+        if not isinstance(from_index, int):
+            raise Exception(
+                'Expected from_index value to be a number, '
+                'received %s' % from_index)
+
+        if not isinstance(to_index, int):
+            raise Exception(
+                'Expected to_index value to be a number, '
+                'received %s' % to_index)
+
+        if from_index == to_index:
+            raise Exception(
+                'Expected from_index and to_index values to be different.')
+
+        story_content_nodes = self.story_contents.nodes
+        if from_index >= len(story_content_nodes) or from_index < 0:
+            raise Exception('Expected from_index value to be with-in bounds.')
+
+        if to_index >= len(story_content_nodes) or to_index < 0:
+            raise Exception('Expected to_index value to be with-in bounds.')
+
+        story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
+        del story_content_nodes[from_index]
+        story_content_nodes.insert(to_index, story_node_to_move)
 
     def update_node_exploration_id(
             self, node_id, new_exploration_id):
@@ -1301,7 +1353,7 @@ class Story(python_utils.OBJECT):
             new_exploration_id: str. The updated exploration id for a node.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
@@ -1329,7 +1381,7 @@ class Story(python_utils.OBJECT):
             new_initial_node_id: str. The new starting node id.
 
         Raises:
-            ValueError: The node is not part of the story.
+            ValueError. The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(new_initial_node_id)
         if node_index is None:
@@ -1344,7 +1396,7 @@ class StorySummary(python_utils.OBJECT):
 
     def __init__(
             self, story_id, title, description, language_code, version,
-            node_titles, thumbnail_bg_color, thumbnail_filename,
+            node_titles, thumbnail_bg_color, thumbnail_filename, url_fragment,
             story_model_created_on, story_model_last_updated):
         """Constructs a StorySummary domain object.
 
@@ -1358,6 +1410,7 @@ class StorySummary(python_utils.OBJECT):
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 story.
             thumbnail_filename: str|None. The thumbnail filename of the story.
+            url_fragment: str. The url fragment for the story.
             story_model_created_on: datetime.datetime. Date and time when
                 the story model is created.
             story_model_last_updated: datetime.datetime. Date and time
@@ -1371,6 +1424,7 @@ class StorySummary(python_utils.OBJECT):
         self.node_titles = node_titles
         self.thumbnail_bg_color = thumbnail_bg_color
         self.thumbnail_filename = thumbnail_filename
+        self.url_fragment = url_fragment
         self.story_model_created_on = story_model_created_on
         self.story_model_last_updated = story_model_last_updated
 
@@ -1378,9 +1432,14 @@ class StorySummary(python_utils.OBJECT):
         """Validates various properties of the story summary object.
 
         Raises:
-            ValidationError: One or more attributes of story summary are
+            ValidationError. One or more attributes of story summary are
                 invalid.
         """
+        if self.url_fragment is not None:
+            utils.require_valid_url_fragment(
+                self.url_fragment, 'Story Url Fragment',
+                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
+
         if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
@@ -1443,6 +1502,7 @@ class StorySummary(python_utils.OBJECT):
             'node_titles': self.node_titles,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'url_fragment': self.url_fragment,
             'story_model_created_on': utils.get_time_in_millisecs(
                 self.story_model_created_on),
             'story_model_last_updated': utils.get_time_in_millisecs(

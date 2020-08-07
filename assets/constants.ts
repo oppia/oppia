@@ -5235,6 +5235,16 @@ export = {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  // This represents the maximum number of characters in the URL fragment for
+  // story in the story page URL. E.g.
+  // in /learn/math/fractions/story/bakery/..., 'bakery' is the
+  // 'story URL fragment'.
+  "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
+  // This represents the maximum number of characters in the URL fragment for
+  // subtopic in the revision page URL. E.g.
+  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // 'subtopic URL fragment'.
+  "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5261,6 +5271,7 @@ export = {
       "hints": [],
       "solution": null
     },
+    "next_content_id_index": 0,
     "param_changes": [],
     "recorded_voiceovers": {
       "voiceovers_mapping": {
@@ -5292,6 +5303,9 @@ export = {
     "floor", "if", "log", "or", "pow", "round", "then"
   ],
 
+  // A regular expression for allowed characters in URL fragment fields.
+  "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+
   // Greek letters allowed in math interactions.
   "GREEK_LETTERS": [
     "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
@@ -5305,6 +5319,32 @@ export = {
     "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
     "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
   ],
+
+  "OSK_MAIN_TAB": "mainTab",
+  "OSK_FUNCTIONS_TAB": "functionsTab",
+  "OSK_LETTERS_TAB": "lettersTab",
+
+  // Name to human readable form mapping of the position of terms object.
+  "POSITION_OF_TERMS_MAPPING": [{
+    "name": "lhs",
+    "humanReadableName": "on Left Hand Side"
+  }, {
+    "name": "rhs",
+    "humanReadableName": "on Right Hand Side"
+  }, {
+    "name": "both",
+    "humanReadableName": "on both sides"
+  }, {
+    "name": "irrelevant",
+    "humanReadableName": "with reordering allowed around ="
+  }],
+
+  // Placeholder texts for the math interactions.
+  "MATH_INTERACTION_PLACEHOLDERS": {
+    "AlgebraicExpressionInput": "Type an expression here.",
+    "NumericExpressionInput": "Type an expression here, using only numbers.",
+    "MathEquationInput": "Type an equation here."
+  },
 
   // Unfinished features.
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
