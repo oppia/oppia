@@ -1630,7 +1630,8 @@ tags: []
     def save_new_story(
             self, story_id, owner_id, corresponding_topic_id,
             title='Title', description='Description', notes='Notes',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='title'):
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -1648,16 +1649,18 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The url fragment of the story.
 
         Returns:
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, description, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id, url_fragment)
         story.title = title
         story.description = description
         story.notes = notes
         story.language_code = language_code
+        story.url_fragment = url_fragment
         story_services.save_new_story(owner_id, story)
         return story
 

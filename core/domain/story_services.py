@@ -73,7 +73,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
         story_contents=story.story_contents.to_dict(),
-        corresponding_topic_id=story.corresponding_topic_id
+        corresponding_topic_id=story.corresponding_topic_id,
+        url_fragment=story.url_fragment
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -181,6 +182,9 @@ def apply_change_list(story_id, change_list):
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_LANGUAGE_CODE):
                     story.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_URL_FRAGMENT):
+                    story.update_url_fragment(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
@@ -211,6 +215,19 @@ def apply_change_list(story_id, change_list):
                 e.__class__.__name__, e, story_id, change_list)
         )
         raise
+
+
+def does_story_exist_with_url_fragment(url_fragment):
+    """Checks if the url fragment for the story exists.
+
+    Args:
+        url_fragment: str. The url_fragment of the story.
+
+    Returns:
+        bool. Whether the the url fragment for the story exists or not.
+    """
+    story = story_fetchers.get_story_by_url_fragment(url_fragment)
+    return story is not None
 
 
 def validate_explorations_for_story(exp_ids, raise_error):
@@ -425,6 +442,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.story_contents = story.story_contents.to_dict()
     story_model.corresponding_topic_id = story.corresponding_topic_id
     story_model.version = story.version
+    story_model.url_fragment = story.url_fragment
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
 
@@ -457,9 +475,16 @@ def update_story(
     old_story = story_fetchers.get_story_by_id(story_id)
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
+    if (
+            old_story.url_fragment != new_story.url_fragment and
+            does_story_exist_with_url_fragment(new_story.url_fragment)):
+        raise utils.ValidationError(
+            'Story Url Fragment is not unique across the site.')
     _save_story(committer_id, new_story, commit_message, change_list)
     create_story_summary(new_story.id)
     opportunity_services.update_exploration_opportunities(old_story, new_story)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+        exp_ids_removed_from_story)
 
     exploration_context_models_to_be_deleted = (
         exp_models.ExplorationContextModel.get_multi(
@@ -557,7 +582,8 @@ def compute_summary_of_story(story):
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.description, story.language_code,
         story.version, story_model_node_titles, story.thumbnail_bg_color,
-        story.thumbnail_filename, story.created_on, story.last_updated
+        story.thumbnail_filename, story.url_fragment, story.created_on,
+        story.last_updated
     )
 
     return story_summary
@@ -590,6 +616,7 @@ def save_story_summary(story_summary):
         'node_titles': story_summary.node_titles,
         'thumbnail_bg_color': story_summary.thumbnail_bg_color,
         'thumbnail_filename': story_summary.thumbnail_filename,
+        'url_fragment': story_summary.url_fragment,
         'story_model_last_updated': (
             story_summary.story_model_last_updated),
         'story_model_created_on': (

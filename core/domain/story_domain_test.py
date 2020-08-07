@@ -324,7 +324,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         topic_id = utils.generate_random_string(12)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'Title', 'Description', topic_id)
+            self.STORY_ID, 'Title', 'Description', topic_id, 'title')
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
@@ -341,7 +341,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'corresponding_topic_id': topic_id,
-            'version': 0
+            'version': 0,
+            'url_fragment': 'title'
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
 
@@ -1169,6 +1170,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected to_index value to be with-in bounds.'):
             self.story.rearrange_node_in_story(0, -1)
 
+    def test_update_url_fragment(self):
+        self.assertEqual(self.story.url_fragment, 'title')
+        self.story.update_url_fragment('updated-title')
+        self.assertEqual(self.story.url_fragment, 'updated-title')
+
     def test_rearrange_node_in_story_fail_with_identical_index_values(self):
         with self.assertRaisesRegexp(
             Exception, 'Expected from_index and to_index values to be '
@@ -1309,7 +1315,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         curr_time = datetime.datetime.utcnow()
         story_summary = story_domain.StorySummary(
             'story_id', 'title', 'description', 'en', 1, ['Title 1'], '#F8BF74',
-            'image.svg', curr_time, curr_time)
+            'image.svg', 'title', curr_time, curr_time)
 
         expected_dict = {
             'id': 'story_id',
@@ -1320,6 +1326,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'node_titles': ['Title 1'],
             'thumbnail_bg_color': '#F8BF74',
             'thumbnail_filename': 'image.svg',
+            'url_fragment': 'title',
             'story_model_created_on': utils.get_time_in_millisecs(curr_time),
             'story_model_last_updated': utils.get_time_in_millisecs(curr_time),
         }
@@ -1355,12 +1362,13 @@ class StorySummaryTests(test_utils.GenericTestBase):
             'thumbnail_bg_color': '#F8BF74',
             'thumbnail_filename': 'image.svg',
             'language_code': 'en',
-            'id': 'story_id'
+            'id': 'story_id',
+            'url_fragment': 'title'
         }
 
         self.story_summary = story_domain.StorySummary(
             'story_id', 'title', 'description', 'en', 1, ['Title 1', 'Title 2'],
-            '#F8BF74', 'image.svg', current_time, current_time)
+            '#F8BF74', 'image.svg', 'title', current_time, current_time)
 
     def test_story_summary_gets_created(self):
         self.assertEqual(
@@ -1410,6 +1418,39 @@ class StorySummaryTests(test_utils.GenericTestBase):
         self.story_summary.title = ''
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Title field should not be empty'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_empty_url_fragment(self):
+        self.story_summary.url_fragment = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Story Url Fragment field should not be empty'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_nonstring_url_fragment(self):
+        self.story_summary.url_fragment = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Story Url Fragment field must be a string. Received 0.'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_lengthy_url_fragment(self):
+        self.story_summary.url_fragment = 'abcd' * 10
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Story Url Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
+                self.story_summary.url_fragment)):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_chars_in_url_fragment(self):
+        self.story_summary.url_fragment = 'Abc Def!'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Story Url Fragment field contains invalid characters. '
+            'Only lowercase words separated by hyphens are allowed. '
+            'Received Abc Def!.'):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_description(self):

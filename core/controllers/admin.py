@@ -429,7 +429,7 @@ class AdminHandler(base.BaseHandler):
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1)
+                topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
                 'exp_id': '15',
@@ -614,12 +614,25 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        latex_strings_to_exp_id_mapping = (
-            exp_services.get_batch_of_exps_for_latex_svg_generation())
-        self.render_json({
-            'latex_strings_to_exp_id_mapping': (
-                latex_strings_to_exp_id_mapping)
-        })
+        item_to_fetch = self.request.get('item_to_fetch')
+        if item_to_fetch == 'exp_id_to_latex_mapping':
+            latex_strings_to_exp_id_mapping = (
+                exp_services.get_batch_of_exps_for_latex_svg_generation())
+            self.render_json({
+                'latex_strings_to_exp_id_mapping': (
+                    latex_strings_to_exp_id_mapping)
+            })
+        elif item_to_fetch == 'number_of_explorations_left_to_update':
+            number_of_explorations_left_to_update = (
+                exp_services.
+                get_number_explorations_having_latex_strings_without_svgs())
+            self.render_json({
+                'number_of_explorations_left_to_update': '%d' % (
+                    number_of_explorations_left_to_update)
+            })
+        else:
+            raise self.InvalidInputException(
+                'Please specify a valid type of item to fetch.')
 
     @acl_decorators.can_access_admin_page
     def post(self):

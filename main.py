@@ -215,7 +215,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
-        r'/adminmathsvghandler', admin.ExplorationsLatexSvgHandler),
+        r'/explorationslatexsvghandler', admin.ExplorationsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -302,6 +302,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_url_fragment>' % feconf.STORY_URL_FRAGMENT_HANDLER,
+        story_editor.StoryUrlFragmentHandler),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),

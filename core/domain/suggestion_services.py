@@ -161,8 +161,9 @@ def get_translation_suggestions_with_exp_ids(exp_ids):
 
     Returns:
         list(Suggestion). A list of translation suggestions that
-        correspond to the given exploration ids, up to a maximum of
-        feconf.DEFAULT_QUERY_LIMIT suggestions.
+        correspond to the given exploration ids. Note: it is not
+        guaranteed that the suggestions returned are ordered by the
+        exploration ids in exp_ids.
     """
     if len(exp_ids) == 0:
         return []
