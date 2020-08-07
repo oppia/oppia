@@ -1,13 +1,15 @@
 <div class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
   <div class="oppia-opportunities-details">
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
-      <span class="protractor-test-opportunity-list-item-subheading" ng-show="!$ctrl.opportunityDataIsLoading"><[$ctrl.opportunity.subheading | wrapTextWithEllipsis : 25]></span>
+      <span title="<[$ctrl.opportunity.subheading]>"
+            class="protractor-test-opportunity-list-item-subheading"
+            ng-show="!$ctrl.opportunityDataIsLoading">  <[$ctrl.opportunity.subheading | wrapTextWithEllipsis : 25]>
+      </span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span class="protractor-test-opportunity-list-item-heading"
-            ng-show="!$ctrl.opportunityDataIsLoading">
-        <[$ctrl.opportunity.heading | wrapTextWithEllipsis : 30]>
+      <span class="protractor-test-opportunity-list-item-heading" title="<[$ctrl.opportunity.heading]>" ng-show="!$ctrl.opportunityDataIsLoading">
+        <[$ctrl.opportunity.heading | wrapTextWithEllipsis : $ctrl.opportunityHeadingTruncationLength]>
       </span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>

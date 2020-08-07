@@ -113,7 +113,7 @@
                ng-if="$ctrl.formData.viewCommunityReviewers.filterCriterion===$ctrl.USER_FILTER_CRITERION_ROLE">
             <label for="review-categories-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select id="review-categories-input" ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.viewCommunityReviewers.category" class="form-control  protractor-test-form-review-category-select">
+              <select id="review-categories-input" ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEW_CATEGORIES" ng-model="$ctrl.formData.viewCommunityReviewers.category" class="form-control protractor-test-form-review-category-select">
               </select>
             </div>
           </div>

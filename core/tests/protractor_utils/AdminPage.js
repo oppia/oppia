@@ -24,6 +24,10 @@ var waitFor = require('./waitFor.js');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
+  var REVIEW_CATEGORY_TRANSLATION = 'TRANSLATION';
+  var REVIEW_CATEGORY_VOICEOVER = 'VOICEOVER';
+  var REVIEW_CATEGORY_QUESTION = 'QUESTION';
+
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
   var configProperties = element.all(by.css(
@@ -57,10 +61,6 @@ var AdminPage = function() {
   var userQuestionReviewerCss = by.css('.protractor-test-question-reviewer');
   var viewReviewerMethodInputCss = by.css(
     '.protractor-test-view-reviewer-method');
-
-  var REVIEW_CATEGORY_TRANSLATION = 'TRANSLATION';
-  var REVIEW_CATEGORY_VOICEOVER = 'VOICEOVER';
-  var REVIEW_CATEGORY_QUESTION = 'QUESTION';
 
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
@@ -356,8 +356,9 @@ var AdminPage = function() {
     await action.click('Submit assign reviewer button', submitButton);
 
     await waitFor.textToBePresentInElement(
-      statusMessage, 'Successfully added',
-      'Could not add translation reviewer successfully');
+      statusMessage, 'Successfully added', (
+        'Status message for assigning ' + reviewCategory + ' reviewer takes ' +
+        'too long to appear'));
   };
 
   var _getUserReviewRightsElement = async function(username, reviewCategory) {

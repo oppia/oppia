@@ -90,7 +90,7 @@ describe('Community dashboard page', function() {
       HINDI_LANGUAGE);
   });
 
-  it('should allow users to accept question suggestions', async function() {
+  it('should allow reviewer to accept question suggestions', async function() {
     // Baseline verification.
     await users.login(USER_EMAILS[0]);
     await communityDashboardPage.get();
@@ -148,7 +148,7 @@ describe('Community dashboard page', function() {
       'Question 1', SKILL_DESCRIPTIONS[0], 'Accepted', null);
   });
 
-  it('should allow users to reject question suggestions', async function() {
+  it('should allow reviewer to reject question suggestions', async function() {
     // Baseline verification.
     await users.login(USER_EMAILS[0]);
     await communityDashboardPage.get();
@@ -280,7 +280,6 @@ describe('Admin page community reviewer form', function() {
     await users.logout();
   });
 
-
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
@@ -325,5 +324,9 @@ describe('Translation contribution featured languages', () => {
       .mouseoverFeaturedLanguageTooltip(0);
     await communityDashboardTranslateTextTab
       .expectFeaturedLanguageExplanationToBe('Partnership with ABC');
+  });
+
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
