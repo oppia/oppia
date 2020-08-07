@@ -33,7 +33,7 @@ require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
-    'user-exploration-permissions.service.ts');
+   'user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 
 angular.module('oppia').component('editorNavigation', {
@@ -98,10 +98,6 @@ angular.module('oppia').component('editorNavigation', {
             EditabilityService.isTranslatable();
       };
 
-      $scope.countWarnings = function() {
-        return ExplorationWarningsService.countWarnings();
-      };
-
       $scope.discardChanges = function() {
         ExplorationSaveService.discardChanges();
       };
@@ -115,11 +111,11 @@ angular.module('oppia').component('editorNavigation', {
         return ExplorationSaveService.isExplorationSaveable();
       };
 
-      var showLoadingDots = function() {
+      $scope.showLoadingDots = function() {
         $scope.loadingDotsAreShown = true;
       };
 
-      var hideLoadingDots = function() {
+      $scope.hideLoadingDots = function() {
         $scope.loadingDotsAreShown = false;
       };
 
@@ -128,7 +124,7 @@ angular.module('oppia').component('editorNavigation', {
         $scope.loadingDotsAreShown = true;
 
         ExplorationSaveService.showPublishExplorationModal(
-          showLoadingDots, hideLoadingDots)
+          $scope.showLoadingDots, $scope.hideLoadingDots)
           .then(function() {
             $scope.publishIsInProcess = false;
             $scope.loadingDotsAreShown = false;
@@ -139,7 +135,8 @@ angular.module('oppia').component('editorNavigation', {
         $scope.saveIsInProcess = true;
         $scope.loadingDotsAreShown = true;
 
-        ExplorationSaveService.saveChanges(showLoadingDots, hideLoadingDots)
+        ExplorationSaveService.saveChanges(
+          $scope.showLoadingDots, $scope.hideLoadingDots)
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
