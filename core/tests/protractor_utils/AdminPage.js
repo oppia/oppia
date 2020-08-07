@@ -17,9 +17,11 @@
  * tests.
  */
 
+var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
+var path = require('path');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
@@ -45,6 +47,65 @@ var AdminPage = function() {
     '.protractor-test-unfinished-one-off-jobs-rows'));
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
+
+  var miscTabButton = element(by.css('.protractor-test-misc-tab'));
+  var chooseSimilarityFileInput = element(
+    by.css('.protractor-test-similarities-input'));
+  var similarityFileUploadButton = element(
+    by.css('.protractor-test-similarity-upload-button'));
+  var similarityDownloadButton = element(
+    by.css('.protractor-test-similarity-download-button'));
+  var searchIndexClearButton = element(
+    by.css('.protractor-test-clear-search-index-button'));
+  var flushMigrationBotContributionsButton = element(
+    by.css('.protractor-test-migration-bot-flush-contributions-button'));
+  var extractDataExplorationIdInput = element(
+    by.css('.protractor-test-extract-data-exploration-id'));
+  var extractDataExplorationVersionInput = element(
+    by.css('.protractor-test-extract-data-exploration-version'));
+  var extractDataStateNameInput = element(
+    by.css('.protractor-test-extract-data-state-name'));
+  var extractDataNumAnswersInput = element(
+    by.css('.protractor-test-extract-data-number-of-answers'));
+  var extractDataFormSubmitButton = element(
+    by.css('.protractor-test-extract-data-submit-button'));
+  var regenerateContributionsTopicIdInput = element(
+    by.css('.protractor-test-regen-contributions-topic-id'));
+  var regenerateContributionsSubmitButton = element(
+    by.css('.protractor-test-regen-contributions-form-submit-button'));
+  var sendEmailButton = element(
+    by.css('.protractor-test-send-test-mail-button'));
+  var oldUsernameInput = element(
+    by.css('.protractor-test-old-username-input'));
+  var newUsernameInput = element(
+    by.css('.protractor-test-new-username-input'));
+  var usernameChangeSubmitButton = element(
+    by.css('.protractor-test-username-change-submit-button'));
+  var regenerationMessage = element(
+    by.css('.protractor-test-regeneration-error-message'));
+  var usernameSection = element(
+    by.css('.protractor-test-dropdown-username-section'));
+  var fetchSVGButton = element(
+    by.css('.protractor-test-fetch-svg-button'));
+  var saveSVGButton = element(
+    by.css('.protractor-test-save-svg-button'));
+  // Adding a new community reviewer.
+  var addReviewerName = element(by.css(
+    '.protractor-test-add-reviewer-username'));
+  var selectReviewerRole = element(by.css(
+    '.protractor-test-select-reviewer-role'));
+  var addReviewerFormSubmitButton = element(by.css(
+    '.protractor-test-add-reviewer-form-submit-button'));
+
+  // Viewing community reviewers by role.
+  var reviewerMethodDropdown = element(by.css(
+    '.protractor-test-reviewer-role-method'));
+  var reviewerRoleValueOption = element(by.css(
+    '.protractor-test-reviewer-role-value'));
+  var viewReviewerRoleButton = element(by.css(
+    '.protractor-test-view-reviewer-role-button'));
+  var reviewerUsernamesResult = element(by.css(
+    '.protractor-test-reviewer-roles-result'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
@@ -271,6 +332,223 @@ var AdminPage = function() {
       var name = foundUsersArray[j];
       expect(name).toEqual(expectedUsernamesArray[j]);
     }
+  };
+
+  this.getMiscTab = async function() {
+    await waitFor.elementToBeClickable(miscTabButton,
+      'Misc tab button not clickable');
+    await miscTabButton.click();
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.uploadTopicSimilarities =
+    async function(relativePathToSimilaritiesFile, isValidFile) {
+      var absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
+      await waitFor.visibilityOf(chooseSimilarityFileInput,
+        'Similarity upload form is not visible');
+      await chooseSimilarityFileInput.sendKeys(absPath);
+      await waitFor.elementToBeClickable(similarityFileUploadButton,
+        'Upload button taking too long to be clickable');
+      await similarityFileUploadButton.click();
+      if (isValidFile) {
+        var text = 'Topic similarities uploaded successfully.';
+        await waitFor.visibilityOf(statusMessage,
+          'Status message not visible');
+        await waitFor.textToBePresentInElement(statusMessage, text,
+          'Status message not visible');
+        expect(await statusMessage.getText()).toEqual(text);
+      } else {
+        var text = 'Server error: \'ascii\' codec can\'t encode characters' +
+          ' in position 1024-1025: ordinal not in range(128)';
+        await waitFor.visibilityOf(statusMessage,
+          'Status message not visible');
+        await waitFor.textToBePresentInElement(statusMessage,
+          text, 'Text not showing up in status message');
+        expect(await statusMessage.getText()).toEqual(text);
+      }
+    };
+
+  this.expectSimilaritiesToBeUploaded = async function() {
+    await waitFor.elementToBeClickable(similarityDownloadButton,
+      'Similarity upload failed – download similarities button not clickable.');
+  };
+
+  this.downloadSimilarityFile = async function() {
+    await waitFor.elementToBeClickable(similarityDownloadButton,
+      'Download similarity file button not clickable');
+    await similarityDownloadButton.click();
+  };
+
+  this.clearSearchIndex = async function() {
+    await waitFor.elementToBeClickable(searchIndexClearButton,
+      'Clear search index button not clickable');
+    await searchIndexClearButton.click();
+    await general.acceptAlert();
+  };
+
+  this.expectSearchIndexToBeCleared = async function() {
+    await waitFor.visibilityOf(statusMessage,
+      'Status message not showing up.');
+    await waitFor.textToBePresentInElement(statusMessage,
+      'Index successfully cleared.');
+    expect(statusMessage.getText()).toEqual(
+      'Index successfully cleared.');
+  };
+
+  this.flushMigrationBotContributions = async function() {
+    await waitFor.elementToBeClickable(flushMigrationBotContributionsButton,
+      'Migration bot flush contributions button not clickable');
+    await flushMigrationBotContributionsButton.click();
+    await general.acceptAlert();
+  };
+
+  this.expectMigrationBotContributionsToBeFlushed = async function() {
+    await waitFor.textToBePresentInElement(statusMessage,
+      'Migration bot contributions successfully flushed.',
+      'Migration bot cuntributions not flushing.');
+    return true;
+  };
+
+  this.regenerateContributionsForTopic = async function(topicId) {
+    await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
+      'Regenerate contributions topic ID input not showing up.');
+    await regenerateContributionsTopicIdInput.sendKeys(topicId);
+    await waitFor.elementToBeClickable(regenerateContributionsSubmitButton,
+      'Regenerate conributions form submit button not clickable');
+    await regenerateContributionsSubmitButton.click();
+    await general.acceptAlert();
+    await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
+      'Regenerate contributions topic ID input not showing up.');
+    await regenerateContributionsTopicIdInput.clear();
+  };
+
+  this.expectRegenerationOutcome = async function(isMeantToSucceed,
+      topicId = '0') {
+    if (!isMeantToSucceed) {
+      var text = 'Server error: Entity for class TopicModel with id ' +
+        topicId + ' not found';
+    } else {
+      var text = 'No. of opportunities model created: 0';
+    }
+    await waitFor.visibilityOf(regenerationMessage,
+      'Regeneration message not visible');
+    expect(regenerationMessage.getText()).toEqual(text);
+  };
+
+  this.expectConributionsToBeRegeneratedForTopic = async function() {
+    var text = 'No. of opportunities model created: 0';
+    await waitFor.visibilityOf(regenerationMessage,
+      'Regeneration message not visible');
+    expect(regenerationMessage.getText()).toEqual(text);
+  };
+
+  this.changeUsername = async function(oldUsername, newUsername) {
+    await waitFor.visibilityOf(oldUsernameInput,
+      'Current username input not visible');
+    await oldUsernameInput.sendKeys(oldUsername);
+    await waitFor.visibilityOf(newUsernameInput,
+      'New username input not visible');
+    await newUsernameInput.sendKeys(newUsername);
+    await waitFor.visibilityOf(usernameChangeSubmitButton,
+      'Change username submit button not visible');
+    await waitFor.elementToBeClickable(usernameChangeSubmitButton,
+      'Username change submit button not clickable');
+    await usernameChangeSubmitButton.click();
+    var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
+    await waitFor.textToBePresentInElement(statusMessage, text,
+      'Username was not successfully changed');
+  };
+
+  this.expectUsernameToBeChanged = async function(newUsername) {
+    expect(usernameSection.getText()).toEqual(newUsername);
+  };
+
+  this.fetchSVG = async function() {
+    await action.click('Fetch SVG Button', fetchSVGButton);
+  };
+
+  this.expectSVGToBeFetched = async function() {
+    await waitFor.visibilityOf(
+      statusMessage, 'Status message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, '0 LaTeX strings fetched ' +
+        'from backend for 0 explorations. Generating SVGs.....');
+  };
+
+  this.saveSVG = async function() {
+    await action.click('Save SVG Button', saveSVGButton);
+  };
+
+  this.expectSVGToBeSaved = async function() {
+    await waitFor.visibilityOf(
+      statusMessage, 'Status message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, 'Successfully updated 0 explorations, 0 left');
+  };
+
+  this.extractDataAndExpectExtraction = async function(expID, expVersion,
+      stateName, numberOfAnswers) {
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await action.sendKeys('Extract Data Exploration ID Input',
+      extractDataExplorationIdInput, expID);
+    await action.sendKeys('Extract Data Exploration Version Input',
+      extractDataExplorationVersionInput, expVersion);
+    await action.sendKeys('Extract Data State Name Input',
+      extractDataStateNameInput, stateName);
+    await action.sendKeys('Extract Data Number Of Answers Input',
+      extractDataNumAnswersInput, numberOfAnswers);
+    await action.click('Extract Data Form Submit Button',
+      extractDataFormSubmitButton);
+    var handles = await browser.driver.getAllWindowHandles();
+    await action.click('Extract Data Submit Button',
+      extractDataFormSubmitButton);
+    var newHandles = await browser.driver.getAllWindowHandles();
+    expect(newHandles.length).toEqual(handles.length + 1);
+  };
+
+  this.sendTestEmailToAdmin = async function() {
+    await action.click('Send Email Button', sendEmailButton);
+  };
+
+  this.expectEmailError = async function() {
+    await waitFor.visibilityOf(
+      statusMessage, 'Status message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, 'Server error: This app cannot send emails.',
+      'Text in status message is wrong!');
+  };
+
+  this.addReviewer = async function(name, newRole) {
+    await action.click('Admin Roles Tab', adminRolesTab);
+    // Change values for "add reviewer for community" form, and submit it.
+    await action.sendKeys('Add reviewer name', addReviewerName, name);
+    await action.sendKeys('Select reviewer role', selectReviewerRole, newRole);
+    await action.click('Add Reviewer button', addReviewerFormSubmitButton);
+    await waitFor.visibilityOf(
+      statusMessage, 'Confirmation message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, 'Successfully added ',
+      'Could not add reviewer successfully');
+  };
+
+  this.showReviewersAssignedToRole = async function(role) {
+    await action.sendKeys(
+      'Reviewer method dropdown', reviewerMethodDropdown, 'By Role');
+    await action.sendKeys(
+      'Reviewer role dropdown', reviewerRoleValueOption, role);
+    await action.click('View reviewer role button', viewReviewerRoleButton);
+  };
+
+  this.expectReviewerUsernamesStrToMatch = async function(
+      expectedUsernamesArrayStr) {
+    // The reviewer usernames that are shown after a user views reviewers by
+    // role in the 'view community reviewers' section. The result is displayed
+    // as a 'Usernames: ["username1", "username2"]' string.
+    await waitFor.visibilityOf(
+      reviewerUsernamesResult, 'Reviewer usernames result not visible.');
+    var reviewerUsernamesArrayStr = await reviewerUsernamesResult.getText();
+    expect(reviewerUsernamesArrayStr).toEqual(expectedUsernamesArrayStr);
   };
 };
 

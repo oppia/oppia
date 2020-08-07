@@ -1,6 +1,8 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob')
 var path = require('path')
+var Constants = require('./protractor_utils/ProtractorConstants');
+var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -23,6 +25,10 @@ var suites = {
 
     additionalPlayerFeatures: [
       'protractor_desktop/additionalPlayerFeatures.js'
+    ],
+
+    adminMiscTab:[
+      'protractor_desktop/adminMiscTab.js'
     ],
 
     adminPage: [
@@ -248,7 +254,13 @@ exports.config = {
         '--use-fake-device-for-media-stream',
         '--use-fake-ui-for-media-stream',
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
-      ]
+      ],
+      prefs: {
+        'download': {
+            'prompt_for_download': false,
+            'default_directory': DOWNLOAD_PATH,
+        }
+      }
     },
     prefs: {
       intl: {

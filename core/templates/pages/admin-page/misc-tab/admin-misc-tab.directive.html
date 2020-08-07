@@ -3,20 +3,20 @@
   <div class="oppia-topic-similarities-container">
     Upload a csv file:<br>
     The first line of data should be a list of topic names. The next lines should be a symmetric adjacency matrix of similarities, which are values between 0 and 1.<br>
-    <input type="file" id="topicSimilaritiesFile">
-    <button ng-click="$ctrl.uploadTopicSimilaritiesFile()">Upload</button>
-    <button ng-click="$ctrl.downloadTopicSimilaritiesFile()">Download current topic similarities</button>
+    <input type="file" id="topicSimilaritiesFile" class="protractor-test-similarities-input">
+    <button ng-click="$ctrl.uploadTopicSimilaritiesFile()" class="protractor-test-similarity-upload-button">Upload</button>
+    <button ng-click="$ctrl.downloadTopicSimilaritiesFile()" class="protractor-test-similarity-download-button">Download current topic similarities</button>
   </div>
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
   <h3>Search Index</h3>
-  <button ng-click="$ctrl.clearSearchIndex()">Clear Search Index</button>
+  <button ng-click="$ctrl.clearSearchIndex()" class="protractor-test-clear-search-index-button">Clear Search Index</button>
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
   <h3>Flush migration bot contributions</h3>
-  <button ng-click="$ctrl.flushMigrationBotContributions()">Flush contributions</button>
+  <button ng-click="$ctrl.flushMigrationBotContributions()" class="protractor-test-migration-bot-flush-contributions-button">Flush contributions</button>
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
@@ -24,19 +24,19 @@
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.submitQuery()">
       <div class="form-group row">
-        <label>Exploration ID:</label> <input type="text" ng-model="$ctrl.expId" required="true">
+        <label>Exploration ID:</label> <input type="text" ng-model="$ctrl.expId" required="true" class="protractor-test-extract-data-exploration-id">
       </div>
       <div class="form-group row">
-        <label>Exploration version:</label> <input type="number" min="0" ng-model="$ctrl.expVersion" required="true">
+        <label>Exploration version:</label> <input type="number" min="0" ng-model="$ctrl.expVersion" required="true" class="protractor-test-extract-data-exploration-version">
       </div>
       <div class="form-group row">
-        <label>State name:</label> <input type="text" ng-model="$ctrl.stateName" required="true">
+        <label>State name:</label> <input type="text" ng-model="$ctrl.stateName" required="true" class="protractor-test-extract-data-state-name">
       </div>
       <div class="form-group row">
-        <label>Number of answers:</label> <input type="number" min="0" ng-model="$ctrl.numAnswers" required="true">
+        <label>Number of answers:</label> <input type="number" min="0" ng-model="$ctrl.numAnswers" required="true" class="protractor-test-extract-data-number-of-answers">
       </div>
       <div class="form-group row">
-        <input type="submit" value="submit query">
+        <input type="submit" value="submit query" class="protractor-test-extract-data-submit-button">
         <input type="reset" value="reset">
       </div>
     </form>
@@ -50,14 +50,14 @@
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.regenerateOpportunitiesRelatedToTopic()">
       <div class="form-group row">
-        <label>Topic ID:</label> <input type="text" ng-model="$ctrl.topicIdForRegeneratingOpportunities" required="true">
+        <label>Topic ID:</label> <input type="text" ng-model="$ctrl.topicIdForRegeneratingOpportunities" required="true" class="protractor-test-regen-contributions-topic-id">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Regenerate">
+        <input type="submit" value="Regenerate" class="protractor-test-regen-contributions-form-submit-button">
         <input type="reset" value="reset">
       </div>
     </form>
-    <p ng-if="$ctrl.regenerationMessage"><[$ctrl.regenerationMessage]></p>
+    <p ng-if="$ctrl.regenerationMessage" class="protractor-test-regeneration-error-message"><[$ctrl.regenerationMessage]></p>
   </div>
 </md-card>
 
@@ -66,26 +66,46 @@
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.sendDummyMailToAdmin()">
       <div class="form-group row">
-        <input type="submit" value="Send">
+        <input type="submit" value="Send" class="protractor-test-send-test-mail-button">
       </div>
     </form>
   </div>
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Generate SVGs for exploration</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForExplorations()">
+      <div class="form-group row">
+        <input type="submit" value="Fetch" class="protractor-test-fetch-svg-button">
+      </div>
+    </form>
+
+  </div>
+  <h3>Save the SVGs for exploration</h3>
+  <div class="oppia-query-form">
+    <form class="form" ng-submit="$ctrl.saveSvgsToBackend()">
+      <div class="form-group row">
+        <input type="submit" value="Save" class="protractor-test-save-svg-button">
+      </div>
+    </form>
+  </div>
+
+</md-card>
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Update username</h3>
   <div class="oppia-query-form">
     <form class="form" ng-submit="$ctrl.updateUsername()">
       <div class="form-group row">
         <label>Old username:</label>
-        <input type="text" ng-model="$ctrl.oldUsername" required="true">
+        <input type="text" ng-model="$ctrl.oldUsername" required="true" class="protractor-test-old-username-input">
       </div>
       <div class="form-group row">
         <label>New username:</label>
-        <input type="text" ng-model="$ctrl.newUsername" required="true" maxlength="<[$ctrl.MAX_USERNAME_LENGTH]>">
+        <input type="text" ng-model="$ctrl.newUsername" required="true" maxlength="<[$ctrl.MAX_USERNAME_LENGTH]>" class="protractor-test-new-username-input">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Update">
+        <input type="submit" value="Update" class="protractor-test-username-change-submit-button">
       </div>
     </form>
   </div>

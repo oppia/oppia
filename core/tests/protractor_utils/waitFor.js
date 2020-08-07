@@ -18,6 +18,9 @@
  */
 
 var until = protractor.ExpectedConditions;
+var fs = require('fs');
+var path = require('path');
+var Constants = require('./ProtractorConstants');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
 // server since the mobile tests are run on a real
@@ -79,6 +82,17 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
 };
 
 /**
+ * @param {Object} element - Element is expected to be present on the DOM but
+ *                           This does not mean that the element is visible.
+ * @param {string} errorMessage - Error message when element is not present.
+ */
+var presenceOf = async function(element, errorMessage) {
+  await browser.wait(
+    await until.presenceOf(element),
+    DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
+
+/**
  * @param {Object} element - Element expected to be present in the DOM and has
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
@@ -120,6 +134,26 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
+/**
+ * Check if a file has been downloaded
+ */
+
+var fileToBeDownloaded = async function(filename) {
+  var name = Constants.DOWNLOAD_PATH + '/' + filename;
+  browser.driver.wait(function() {
+    return fs.existsSync(name);
+  }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
+};
+
+/**
+* @param {string} url - URL to redirect
+*/
+var urlRedirection = async function(url) {
+  // Checks that the current URL matches the expected text.
+  await browser.wait(until.urlIs(url), DEFAULT_WAIT_TIME_MSECS,
+    'URL redirection took too long');
+};
+
 var visibilityOfInfoToast = async function(errorMessage) {
   await visibilityOf(toastInfoElement, errorMessage);
 };
@@ -132,14 +166,24 @@ var visibilityOfSuccessToast = async function(errorMessage) {
   await invisibilityOf(toastSuccessElement, errorMessage);
 };
 
+var modalPopupToAppear = async function() {
+  await visibilityOf(
+    element(by.css('.modal-body')), 'Modal taking too long to appear.');
+};
+
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
+exports.presenceOf = presenceOf;
 exports.visibilityOf = visibilityOf;
+exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
+exports.fileToBeDownloaded = fileToBeDownloaded;
+exports.urlRedirection = urlRedirection;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
+exports.modalPopupToAppear = modalPopupToAppear;
