@@ -50,6 +50,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
+              console.log('Emitted: submittedSchemaBasedForm in SBUnicodeEditor');
               SchemaSubmittedService.onSubmittedSchemaBasedForm.emit();
             }
           };

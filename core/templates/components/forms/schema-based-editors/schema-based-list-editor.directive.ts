@@ -32,12 +32,12 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'SchemaDefaultValueService', 'SchemaSubmitedService',
+  'SchemaDefaultValueService', 'SchemaSubmittedService',
   'SchemaUndefinedLastElementService',
   function(
       FocusManagerService, IdGenerationService,
       NestedDirectivesRecursionTimeoutPreventionService,
-      SchemaDefaultValueService, SchemaSubmitedService,
+      SchemaDefaultValueService, SchemaSubmittedService,
       SchemaUndefinedLastElementService) {
     return {
       scope: {
@@ -96,6 +96,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           }
         };
         ctrl.$onInit = function() {
+          console.log('checker');
           $scope.isAddItemButtonPresent = true;
           $scope.addElementText = 'Add element';
           if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
@@ -212,10 +213,13 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               }
               evt.stopPropagation();
             };
-            SchemaSubmitedService;
+            console.log('Subscribed');
             ctrl.directiveSubscriptions.add(
-              SchemaSubmitedService.onSubmittedSchemaBasedForm.subscribe(
-                () => $scope._onChildFormSubmit()
+              SchemaSubmittedService.onSubmittedSchemaBasedForm.subscribe(
+                () => {
+                  console.log('Caught: submittedSchemaBasedForm in SBListEditor');
+                  $scope._onChildFormSubmit;
+                }
               )
             );
 
@@ -235,6 +239,9 @@ angular.module('oppia').directive('schemaBasedListEditor', [
                 $scope.len + ' ' + $scope.localValue);
             }
           }
+        };
+        ctrl.$onDestroy = function() {
+          ctrl.directiveSubscriptions.unsubscribe();
         };
       }]
     };

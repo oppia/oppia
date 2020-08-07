@@ -99,6 +99,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
                 ctrl.isUserCurrentlyTyping = false;
                 FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
               } else {
+                console.log('Emitted: submittedSchemaBasedForm in SBFloatEditor');
                 SchemaSubmittedService.onSubmittedSchemaBasedForm.emit();
               }
             } else {
