@@ -132,10 +132,7 @@ angular.module('oppia').component('statisticsTab', {
         $scope.explorationHasBeenVisited = false;
         this.directiveSubscriptions.add(
           RouterService.onRefreshStatisticsTab.subscribe(
-            () => {
-              refreshExplorationStatistics();
-            }
-          )
+            () => refreshExplorationStatistics())
         );
       };
 
