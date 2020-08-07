@@ -64,7 +64,6 @@ describe('IsUrlFragment Filter', function() {
       expect(filter('special*chars', args)).toBe(false);
       expect(filter('special(chars', args)).toBe(false);
       expect(filter('special)chars', args)).toBe(false);
-      expect(filter('special-chars', args)).toBe(false);
       expect(filter('special_chars', args)).toBe(false);
       expect(filter('special+chars', args)).toBe(false);
       expect(filter('special=chars', args)).toBe(false);
