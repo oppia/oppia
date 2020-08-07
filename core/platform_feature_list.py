@@ -14,16 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Feature flags registry."""
+"""Platform feature list."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import platform_parameters as params
+from core.domain import platform_parameter_list as params
 
 # Names of feature objects defined in domain/platform_parameter_domain.py
 # should be added to one of the following lists, features flags not added
-# here won't be available.
+# here won't be available to be enabled via the admin page.
 
 # Features in dev stage.
 DEV_FEATURES_LIST = [
@@ -38,7 +38,8 @@ TEST_FEATURES_LIST = [
 PROD_FEATURES_LIST = [
 ]
 
-# Names of features that should not be used anyway, e.g. features that are
-# completed and no longer gated.
+# Names of features that should not be used anymore, e.g. features that are
+# completed and no longer gated because their functionality is permanently
+# built into the codebase.
 DEPRECATED_FEATURE_NAMES = [
 ]
