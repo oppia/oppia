@@ -691,7 +691,8 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from 'services/translate.service';
-
+import { LearnerAnswerDetailsDataService } from
+  'pages/exploration-editor-page/services/learner-answer-details-data.service';
 @Component({
   selector: 'oppia-angular-root',
   template: ''
@@ -847,6 +848,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static learnerDashboardActivityIdsObjectFactory: LearnerDashboardActivityIdsObjectFactory;
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   static learnerDashboardIdsBackendApiService: LearnerDashboardIdsBackendApiService;
+  static learnerDetailsDataService: LearnerAnswerDetailsDataService;
   static learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory;
   static learnerParamsService: LearnerParamsService;
   static localStorageService: LocalStorageService;
@@ -1170,6 +1172,7 @@ private learnerAnswerInfoObjectFactory: LearnerAnswerInfoObjectFactory,
 private learnerDashboardActivityIdsObjectFactory: LearnerDashboardActivityIdsObjectFactory,
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
 private learnerDashboardIdsBackendApiService: LearnerDashboardIdsBackendApiService,
+private learnerDetailsDataService:LearnerAnswerDetailsDataService,
 private learnerExplorationSummaryObjectFactory: LearnerExplorationSummaryObjectFactory,
 private learnerParamsService: LearnerParamsService,
 private localStorageService: LocalStorageService,
@@ -1494,6 +1497,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.learnerDashboardActivityIdsObjectFactory = this.learnerDashboardActivityIdsObjectFactory;
     OppiaAngularRootComponent.learnerDashboardBackendApiService = this.learnerDashboardBackendApiService;
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = this.learnerDashboardIdsBackendApiService;
+    OppiaAngularRootComponent.learnerDetailsDataService = this.learnerDetailsDataService;
     OppiaAngularRootComponent.learnerExplorationSummaryObjectFactory = this.learnerExplorationSummaryObjectFactory;
     OppiaAngularRootComponent.learnerParamsService = this.learnerParamsService;
     OppiaAngularRootComponent.localStorageService = this.localStorageService;

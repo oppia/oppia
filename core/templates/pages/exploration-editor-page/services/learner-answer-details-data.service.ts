@@ -17,81 +17,97 @@
  * any learner answer info.
  */
 
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/statistics/LearnerAnswerInfoObjectFactory.ts');
-require('domain/statistics/LearnerAnswerDetailsObjectFactory.ts');
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationDataService } from
+  'pages/exploration-editor-page/services/exploration-data.service';
+import { LearnerAnswerDetails } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfo } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+@Injectable( {
+  providedIn: 'root'
+})
+export class LearnerAnswerDetailsDataService {
+  constructor(
+    private explorationDataService:ExplorationDataService,
+    private http:HttpClient,
+    private urlInterpolationService: UrlInterpolationService,
+  ) {}
+  _expId: string;
+  _data;
+  learnerAnswerInfoData=null;
+  LEARNER_ANSWER_INFO_DATA_URL = (
+    '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
+    '<entity_id>'
+  );
 
-angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
-  '$http', '$q', 'ExplorationDataService', 'LearnerAnswerDetailsObjectFactory',
-  'LearnerAnswerInfoObjectFactory', 'UrlInterpolationService',
-  function(
-      $http, $q, ExplorationDataService, LearnerAnswerDetailsObjectFactory,
-      LearnerAnswerInfoObjectFactory, UrlInterpolationService) {
-    var _expId = ExplorationDataService.explorationId;
-    var _data = [];
-    var learnerAnswerInfoData = null;
-    var LEARNER_ANSWER_INFO_DATA_URL = (
-      '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
-      '<entity_id>');
-
-    var _fetchLearnerAnswerInfoData = function() {
-      var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
-        LEARNER_ANSWER_INFO_DATA_URL, {
+  private _fetchLearnerAnswerInfoData() {
+    const learnerAnswerInfoDataUrl =
+      this.urlInterpolationService.interpolateUrl(
+        this.LEARNER_ANSWER_INFO_DATA_URL, {
           entity_type: 'exploration',
-          entity_id: _expId});
-
-      return $http.get(learnerAnswerInfoDataUrl);
-    };
-
-    var _deleteLearnerAnswerInfo = function(
-        entityId, stateName, learnerAnswerInfoId) {
-      var learnerAnswerInfoDataUrl = UrlInterpolationService.interpolateUrl(
-        LEARNER_ANSWER_INFO_DATA_URL, {
-          entity_type: 'exploration',
-          entity_id: entityId});
-      return $http['delete'](learnerAnswerInfoDataUrl, {
-        params: {
-          state_name: stateName,
-          learner_answer_info_id: learnerAnswerInfoId
-        }
-      });
-    };
-
-    return {
-      getData: function() {
-        return _data;
-      },
-      fetchLearnerAnswerInfoData: function() {
-        return _fetchLearnerAnswerInfoData().then(function(response) {
-          learnerAnswerInfoData =
-            response.data.learner_answer_info_data;
-          for (var i = 0; i < learnerAnswerInfoData.length; i++) {
-            var stateName = learnerAnswerInfoData[i].state_name;
-            var interactionId = learnerAnswerInfoData[i].interaction_id;
-            var customizationArgs = learnerAnswerInfoData[i].customization_args;
-            var learnerAnswerInfoDicts = (
-              learnerAnswerInfoData[i].learner_answer_info_dicts);
-            var learnerAnswerDetails = (
-              // eslint-disable-next-line max-len
-              LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
-                _expId, stateName, interactionId, customizationArgs,
-                learnerAnswerInfoDicts.map(
-                  LearnerAnswerInfoObjectFactory.createFromBackendDict)));
-            _data.push(learnerAnswerDetails);
-          }
-          return response.data;
+          entity_id: this._expId
         });
-      },
-      deleteLearnerAnswerInfo: function(
-          entityId, stateName, learnerAnswerInfoId) {
-        return _deleteLearnerAnswerInfo(
-          entityId, stateName, learnerAnswerInfoId).then(function(response) {
-          return response.status;
-        }, function(errorResponse) {
-          return $q.reject(errorResponse.data);
-        });
-      }
-    };
+    return this.http.get(learnerAnswerInfoDataUrl).toPromise();
   }
-]);
+  private _deleteLearnerAnswerInfo(
+      entityId, stateName, learnerAnswerInfoId) {
+    const learnerAnswerInfoDataUrl =
+      this.urlInterpolationService.interpolateUrl(
+        this.LEARNER_ANSWER_INFO_DATA_URL, {
+          entity_type: 'exploration',
+          entity_id: entityId
+        });
+    return this.http['delete'](learnerAnswerInfoDataUrl, {
+      params: {
+        state_name: stateName,
+        learner_answer_info_id: learnerAnswerInfoId
+      }
+    });
+  }
+  public getData() {
+    return this._data;
+  }
+  public fetchLearnerAnswerInfoData() {
+    return this._fetchLearnerAnswerInfoData().then(
+      (response)=>{
+        this.learnerAnswerInfoData = response.learner_answer_info_data;
+        for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
+          const stateName = this.learnerAnswerInfoData[i].state_name;
+          const interactionId = this.learnerAnswerInfoData[i].interaction_id;
+          const customizationArgs =
+          this.learnerAnswerInfoData[i].customization_args;
+          const learnerAnswerInfoDicts = (
+            this.learnerAnswerInfoData[i].learner_answer_info_dicts
+          );
+          const learnerAnswerDetails = (
+            LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
+              this._expId, stateName, interactionId, customizationArgs,
+              learnerAnswerInfoDicts.map(
+                LearnerAnswerInfo.createFormBackendDict
+              )
+            )
+          );
+          this._data.push(learnerAnswerDetails);
+        }
+        return response;
+      }
+    );
+  }
+  public deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
+    return this._deleteLearnerAnswerInfo(
+      entityId, stateName, learnerAnswerInfoId
+    ).toPromise().then((response)=>{
+      return response.status;
+    },
+    (errorResponse)=>{
+      return Promise.reject(errorResponse.body);
+    });
+  }
+}
+angular.module('oppia').factory('LearnerAnswerDetailsDataService',
+  downgradeInjectable(LearnerAnswerDetailsDataService));

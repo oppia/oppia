@@ -305,6 +305,8 @@ import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import {LearnerAnswerDetailsDataService} from
+  'pages/exploration-editor-page/services/learner-answer-details-data.service';
 import { LearnerExplorationSummaryObjectFactory } from
   'domain/summary/learner-exploration-summary-object.factory';
 import { LearnerParamsService } from
@@ -790,6 +792,12 @@ export class UpgradedServices {
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
+    upgradedServices['LearnerAnswerDetailsService'] =
+      new LearnerAnswerDetailsDataService(
+        upgradedServices['ExplorationDataService'],
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterPolationService']
+      );
     upgradedServices['LearnerExplorationSummaryObjectFactory'] =
       new LearnerExplorationSummaryObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
