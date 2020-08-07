@@ -1,8 +1,0 @@
-<!-- This outer div is needed, otherwise the textarea will overlap the footer of the page. -->
-<div class="ratio-input-container">
-    <!-- This ng-form is needed for submitting answer on hitting enter. -->
-    <form ng-submit="$ctrl.submitAnswer($ctrl.answer)" role="form" class="form-horizontal">
-      <schema-based-editor schema="$ctrl.schema" local-value="$ctrl.answer" label-for-focus-target="$ctrl.labelForFocusTarget">
-      </schema-based-editor>
-    </form>
-  </div>

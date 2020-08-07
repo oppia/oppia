@@ -17,8 +17,8 @@
  */
 
 require(
-  'interactions/RatioInput/directives/' +
+  'interactions/RatioExpressionInput/directives/' +
     'ratio-expression-input-rules.service.ts');
 require(
-  'interactions/RatioInput/directives/' +
+  'interactions/RatioExpressionInput/directives/' +
     'ratio-expression-input-validation.service.ts');

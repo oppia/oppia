@@ -20,7 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from extensions.interactions import base
 
 
-class RatioExpreeesionInput(base.BaseInteraction):
+class RatioExpressionInput(base.BaseInteraction):
     """Interaction for ratio input."""
 
     name = 'Ratio Input'

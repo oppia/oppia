@@ -5130,7 +5130,7 @@ export = {
       "MathEquationInput",
       "MathExpressionInput",
       "NumberWithUnits",
-      "RatioInput"
+      "RatioExpressionInput"
     ]
   }, {
     "name": "Programming",
