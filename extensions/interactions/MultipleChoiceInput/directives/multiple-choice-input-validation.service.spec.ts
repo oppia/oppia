@@ -34,6 +34,7 @@ import { SubtitledHtml } from
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { MultipleChoiceRuleInputs } from 'interactions/rule-input-defs';
 
 describe('MultipleChoiceInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
@@ -91,21 +92,20 @@ describe('MultipleChoiceInputValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [agof.createNew(
-      [{
-        rule_type: 'Equals',
-        inputs: {
-          x: 0
-        }
-      }, {
-        rule_type: 'Equals',
-        inputs: {
-          x: 1
-        }
-      }].map(rof.createFromBackendDict),
-      goodDefaultOutcome,
-      null,
-      null)];
+    const goodAnwerGroup = agof.createNew(
+      {}, goodDefaultOutcome, null, null);
+    goodAnwerGroup.updateRuleInputs([{
+      rule_type: 'Equals',
+      inputs: {
+        x: 0
+      }
+    }, {
+      rule_type: 'Equals',
+      inputs: {
+        x: 1
+      }
+    }].map(rof.createFromBackendDict));
+    goodAnswerGroups = [goodAnwerGroup];
   });
 
   it('should be able to perform basic validation', () => {
@@ -145,7 +145,8 @@ describe('MultipleChoiceInputValidationService', () => {
 
   it('should validate answer group rules refer to valid choices only once',
     () => {
-      goodAnswerGroups[0].rules[0].inputs.x = 2;
+      (<MultipleChoiceRuleInputs>
+        goodAnswerGroups[0].ruleInputs.Equals[0]).x = 2;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -154,7 +155,8 @@ describe('MultipleChoiceInputValidationService', () => {
         message: 'Please ensure rule 1 in group 1 refers to a valid choice.'
       }]);
 
-      goodAnswerGroups[0].rules[0].inputs.x = 1;
+      (<MultipleChoiceRuleInputs>
+        goodAnswerGroups[0].ruleInputs.Equals[0]).x = 1;
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -180,7 +182,7 @@ describe('MultipleChoiceInputValidationService', () => {
 
       // Taking away 1 rule reverts back to the expect validation behavior with
       // default outcome.
-      goodAnswerGroups[0].rules.splice(1, 1);
+      goodAnswerGroups[0].ruleInputs.Equals.splice(1, 1);
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{

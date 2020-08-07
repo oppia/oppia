@@ -640,10 +640,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'Contains': [{'x': 'Test'}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Contains',
+                'inputs': {'x': 'Test'}
+            }],
             'training_data': [],
             'tagged_misconception_id': None
         }
@@ -730,10 +730,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'Contains': [{'x': 'Test'}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Contains',
+                'inputs': {'x': 'Test'}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -837,12 +837,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'HasElementsIn': [{
-                    'x': ['A', 'B', 'C']
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'HasElementsIn',
+                'inputs': {'x': ['A', 'B', 'C']}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -924,12 +922,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'Equals': [{
-                'x': ['A']
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': ['A']}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1018,12 +1014,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'Equals': [{
-                'x': ['A']
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': ['A']}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1120,14 +1114,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'IsMathematicallyEquivalentTo': [{
-                    'x': 'x+y'
-                }, {
-                    'x': 'x=y'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x+y'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x=y'}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1222,14 +1215,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'IsMathematicallyEquivalentTo': [{
-                    'x': 'x+y'
-                }, {
-                    'x': '1.2 + 3'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x+y'}
+            }, {
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': '1.2 + 3'}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1325,12 +1317,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'IsMathematicallyEquivalentTo': [{
-                    'x': '1.2 + 3'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': '1.2 + 3'}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1425,12 +1415,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'IsMathematicallyEquivalentTo': [{
-                'x': 'x+y'
-                }]
-            }
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': 'x+y'}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
@@ -1445,12 +1433,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations_mapping': {},
-            'rule_inputs': {
-                'IsMathematicallyEquivalentTo': [{
-                    'x': '1.2 + 3'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': '1.2 + 3'}
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]

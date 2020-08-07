@@ -157,8 +157,9 @@ angular.module('oppia').directive('stateResponses', [
               // Collect all answers which have been handled by at least one
               // answer group.
               for (var i = 0; i < answerGroups.length; i++) {
-                for (var j = 0; j < answerGroups[i].rules.length; j++) {
-                  handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
+                const rules = answerGroups[i].getRulesAsList();
+                for (var j = 0; j < rules.length; j++) {
+                  handledAnswersArray.push(rules[j].inputs.x);
                 }
               }
               for (var i = 0; i < numChoices; i++) {
@@ -189,7 +190,7 @@ angular.module('oppia').directive('stateResponses', [
                 });
 
                 answerGroups.forEach(function(answerGroup) {
-                  var rules = answerGroup.rules;
+                  var rules = answerGroup.getRulesAsList();
                   rules.forEach(function(rule) {
                     var ruleInputs = rule.inputs.x;
                     ruleInputs.forEach(function(ruleInput) {
@@ -318,9 +319,11 @@ angular.module('oppia').directive('stateResponses', [
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
-              $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-                [result.tmpRule], result.tmpOutcome, [],
-                result.tmpTaggedSkillMisconceptionId));
+              const newAnswerGroup = AnswerGroupObjectFactory.createNew(
+                {}, result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId);
+              newAnswerGroup.addRule(result.tmpRule);
+              $scope.answerGroups.push(newAnswerGroup);
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {
@@ -455,10 +458,11 @@ angular.module('oppia').directive('stateResponses', [
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
 
-            if (answerGroup.rules) {
+            if (answerGroup.ruleInputs) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(
-                  answerGroup.rules[0], interactionId, answerChoices));
+                  answerGroup.getRulesAsList()[0],
+                  interactionId, answerChoices));
               summary = 'Answer ' + firstRule;
 
               if (hasFeedback && shortenRule) {

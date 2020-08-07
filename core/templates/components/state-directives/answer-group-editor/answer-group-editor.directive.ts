@@ -61,7 +61,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         onSaveTaggedMisconception: '=',
         outcome: '=',
-        rules: '=',
+        getRules: '&rules',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
@@ -298,6 +298,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               $scope.$broadcast('updateAnswerGroupInteractionId');
               ctrl.answerChoices = ctrl.getAnswerChoices();
             });
+            ctrl.rules = ctrl.getRules();
             ctrl.rulesMemento = null;
             ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
             ctrl.editAnswerGroupForm = {};

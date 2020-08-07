@@ -120,7 +120,7 @@ export class DragAndDropSortInputValidationService {
     };
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var inputs = rules[j].inputs;
         var rule = rules[j];
@@ -254,7 +254,7 @@ export class DragAndDropSortInputValidationService {
 
         for (var k = 0; k < ranges.length; k++) {
           var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
-            rules[ranges[k].ruleIndex - 1];
+            getRulesAsList()[ranges[k].ruleIndex - 1];
           if (earlierRule.type ===
             'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
             rule.type === 'IsEqualToOrdering') {

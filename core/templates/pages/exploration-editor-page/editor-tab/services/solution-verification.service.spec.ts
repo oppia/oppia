@@ -111,10 +111,14 @@ describe('Solution Verification Service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {x: 'abc'},
-              rule_type: 'Contains'
-            }]
+            rule_input_translations_mapping: {},
+            rule_inputs: {
+              Contains: [
+                {
+                  x: 'abc'
+                }
+              ]
+            },
           }],
           customization_args: {
             placeholder: {
@@ -174,7 +178,8 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_specs: [],
+            rule_input_translations_mapping: {},
+            rule_inputs: {},
             outcome: {
               dest: 'default',
               feedback: {

@@ -69,7 +69,7 @@ describe('LogicProofValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew({}, goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {

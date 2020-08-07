@@ -78,14 +78,18 @@ describe('SetInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew({}, goodDefaultOutcome, null, null)];
 
-    createAnswerGroupByRules = (rules) => agof.createNew(
-      rules,
-      goodDefaultOutcome,
-      null,
-      null
-    );
+    createAnswerGroupByRules = (rules) => {
+      const answerGroup = agof.createNew(
+        {},
+        goodDefaultOutcome,
+        null,
+        null
+      );
+      answerGroup.updateRuleInputs(rules);
+      return answerGroup;
+    };
   });
 
   describe('.getCustomizationArgsWarnings', () => {

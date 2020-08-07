@@ -90,7 +90,7 @@ export class NumericInputValidationService {
       });
     };
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
@@ -138,7 +138,9 @@ export class NumericInputValidationService {
           default:
         }
         for (var k = 0; k < ranges.length; k++) {
-          if (isEnclosedBy(range, ranges[k])) {
+          if (isEnclosedBy(range, ranges[k]) ||
+            isEnclosedBy(ranges[k], range)
+          ) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (

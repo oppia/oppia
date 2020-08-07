@@ -27,12 +27,12 @@ import { GraphInputValidationService } from
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { GraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
+import { GraphIsomorphicRuleInputs } from 'interactions/rule-input-defs';
 
 describe('GraphInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
@@ -100,6 +100,12 @@ describe('GraphInputValidationService', () => {
     };
 
     var answerGroup = agof.createNew(
+      {},
+      goodDefaultOutcome,
+      null,
+      null
+    );
+    answerGroup.updateRuleInputs(
       [rof.createFromBackendDict({
         inputs: {
           g: {
@@ -114,10 +120,7 @@ describe('GraphInputValidationService', () => {
           }
         },
         rule_type: 'IsIsomorphicTo'
-      })],
-      goodDefaultOutcome,
-      null,
-      null
+      })]
     );
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
   });
@@ -160,12 +163,12 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    (<GraphAnswer>
-      answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
-    (<GraphAnswer>
-      answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
-    (<GraphAnswer>
-      answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
+    (<GraphIsomorphicRuleInputs>
+      answerGroups[0].ruleInputs.IsIsomorphicTo[0]).g.vertices = new Array(11);
+    (<GraphIsomorphicRuleInputs>
+      answerGroups[0].ruleInputs.IsIsomorphicTo[1]).g.vertices = new Array(11);
+    (<GraphIsomorphicRuleInputs>
+      answerGroups[1].ruleInputs.IsIsomorphicTo[0]).g.vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);

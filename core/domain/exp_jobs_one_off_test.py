@@ -190,6 +190,17 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
                     'x': []
                 }]
             },
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
@@ -259,16 +270,22 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
             .get_output(job_id))
-        expected_output = [(
-            u'[u\'exp_id0\', [u"[u\'State name: State2, AnswerGroup: 0, Rule '
-            'input x in rule with index 0 is empty. \', u\'State name: State2,'
-            ' AnswerGroup: 0, Rule input y in rule with index 2 is empty. \', '
-            'u\'State name: State2, AnswerGroup: 0, Rule input x in rule with '
-            'index 2 is empty. \', u\'State name: State2, AnswerGroup: 0, Rule'
-            ' input x in rule with index 3 is empty. \', u\'State name: State2'
-            ', AnswerGroup: 1, Rule input x in rule with index 0 is empty. \']'
-            '"]]'
-        )]
+        expected_output = [
+            u'[u\'exp_id0\', [u\'[u"State name: State2, AnswerGroup: 0, Rule in'
+            'put {u\\\'x\\\': []} in rule with rule type IsEqualToOrderingWithO'
+            'neItemAtIncorrectPosition and rule input index 0 is empty. ", u"St'
+            'ate name: State2, AnswerGroup: 0, Rule input {u\\\'y\\\': u\\\'\\'
+            '\', u\\\'x\\\': u\\\'\\\'} in rule with rule type HasElementXBefor'
+            'eElementY and rule input index 0 is empty. ", u"State name: State2'
+            ', AnswerGroup: 0, Rule input {u\\\'y\\\': u\\\'\\\', u\\\'x\\\': u'
+            '\\\'\\\'} in rule with rule type HasElementXBeforeElementY and rul'
+            'e input index 0 is empty. ", u"State name: State2, AnswerGroup: 0,'
+            ' Rule input {u\\\'x\\\': []} in rule with rule type IsEqualToOrder'
+            'ing and rule input index 1 is empty. ", u"State name: State2, Answ'
+            'erGroup: 1, Rule input {u\\\'y\\\': 1, u\\\'x\\\': u\\\'\\\'} in r'
+            'ule with rule type HasElementXAtPositionY and rule input index 0 i'
+            's empty. "]\']]'
+        ]
         self.assertEqual(actual_output, expected_output)
 
         rights_manager.unpublish_exploration(self.admin, self.VALID_EXP_ID)
@@ -480,11 +497,10 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.get_output(
                 job_id))
-        expected_output = [(
-            u'[u\'exp_id0\', '
-            u'[u\'State name: State2, AnswerGroup: 0, Rule: 1 is invalid.' +
-            '(Indices here are 0-indexed.)\']]'
-        )]
+        expected_output = [
+            u'[u\'exp_id0\', [u\'State name: State2, AnswerGroup: 0, Rule with '
+            '(rule type: Equals, rule input index: 1) is invalid.\']]'
+        ]
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):

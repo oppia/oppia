@@ -241,12 +241,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations_mapping: {},
+            rule_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
           }],
           default_outcome: {
             dest: 'second state',
@@ -295,12 +297,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations_mapping: {},
+            rule_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
           }],
           default_outcome: {
             dest: 'first state',
@@ -406,12 +410,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 20
-              },
-              rule_type: 'Equals'
-            }]
+            rule_input_translations_mapping: {},
+            rule_inputs: {
+              Equals: [
+                {
+                  x: 20
+                }
+              ]
+            }
           }],
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -583,12 +589,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations_mapping: {},
+            rule_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            }
           }],
           default_outcome: {
             dest: 'third state',

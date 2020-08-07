@@ -207,7 +207,8 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {},
               training_data: []
             }],
             default_outcome: {
@@ -289,7 +290,8 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {},
               training_data: []
             }, {
               outcome: {
@@ -299,7 +301,8 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {},
               training_data: []
             }],
             default_outcome: {
@@ -386,7 +389,8 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {},
               training_data: []
             }],
             default_outcome: {
@@ -466,7 +470,8 @@ describe('Exploration Warnings Service', function() {
                     html: ''
                   },
                 },
-                rule_specs: [],
+                rule_input_translations_mapping: {},
+                rule_inputs: {},
                 training_data: []
               }],
               default_outcome: {
@@ -558,7 +563,8 @@ describe('Exploration Warnings Service', function() {
                     html: ''
                   },
                 },
-                rule_specs: [],
+                rule_input_translations_mapping: {},
+                rule_inputs: {},
                 training_data: []
               }],
               default_outcome: {
@@ -660,7 +666,8 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {},
               training_data: []
             }],
             default_outcome: {
@@ -748,7 +755,8 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {},
               training_data: []
             }],
             default_outcome: {
@@ -801,7 +809,8 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {},
               training_data: []
             }],
             default_outcome: {
@@ -910,12 +919,14 @@ describe('Exploration Warnings Service', function() {
                   html: ''
                 },
               },
-              rule_specs: [{
-                inputs: {
-                  x: 10
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations_mapping: {},
+              rule_inputs: {
+                Equals: [
+                  {
+                    x: 10
+                  }
+                ]
+              },
               training_data: ['1']
             }],
             default_outcome: {

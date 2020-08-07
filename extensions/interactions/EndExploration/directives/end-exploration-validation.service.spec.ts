@@ -70,7 +70,7 @@ describe('EndExplorationValidationService', () => {
     };
 
     goodAnswerGroups = [agof.createNew(
-      [],
+      {},
       oof.createFromBackendDict({
         dest: 'Second State',
         feedback: {

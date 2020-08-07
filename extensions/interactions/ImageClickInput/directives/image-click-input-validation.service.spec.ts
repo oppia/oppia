@@ -32,6 +32,7 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
 import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { ImageClickRuleInputs } from 'interactions/rule-input-defs';
 
 describe('ImageClickInputValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
@@ -98,21 +99,20 @@ describe('ImageClickInputValidationService', () => {
         }
       }
     };
-    goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
-        rule_type: 'IsInRegion',
-        inputs: {
-          x: 'SecondLabel'
-        }
-      })],
-      goodDefaultOutcome,
-      null,
-      null)];
+
+    const goodAnswerGroup = agof.createNew({}, goodDefaultOutcome, null, null);
+    goodAnswerGroup.updateRuleInputs([rof.createFromBackendDict({
+      rule_type: 'IsInRegion',
+      inputs: {
+        x: 'SecondLabel'
+      }
+    })]);
+    goodAnswerGroups = [goodAnswerGroup];
   });
 
   it('should expect a customization argument for image and regions',
     () => {
-      goodAnswerGroups[0].rules = [];
+      goodAnswerGroups[0].updateRuleInputs([]);
       expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
@@ -168,7 +168,7 @@ describe('ImageClickInputValidationService', () => {
     }]);
 
     customizationArguments.imageAndRegions.value.labeledRegions = [];
-    goodAnswerGroups[0].rules = [];
+    goodAnswerGroups[0].updateRuleInputs([]);
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -179,7 +179,8 @@ describe('ImageClickInputValidationService', () => {
   });
 
   it('should expect rule types to reference valid region labels', () => {
-    goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';
+    (<ImageClickRuleInputs>
+      goodAnswerGroups[0].ruleInputs.IsInRegion[0]).x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

@@ -86,7 +86,7 @@ describe('MathEquationInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew({}, goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -97,7 +97,7 @@ describe('MathEquationInputValidationService', () => {
 
   it('should catch redundancy of rules with matching inputs', () => {
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
+    answerGroups[0].updateRuleInputs([isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -122,7 +122,7 @@ describe('MathEquationInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
+    answerGroups[0].updateRuleInputs([isEquivalentTo1, isEquivalentTo2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -149,7 +149,8 @@ describe('MathEquationInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
+    answerGroups[0].updateRuleInputs(
+      [matchesExactlyWith1, matchesExactlyWith2]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
@@ -161,13 +162,6 @@ describe('MathEquationInputValidationService', () => {
   });
 
   it('should not catch redundancy of rules with non-matching inputs', () => {
-    answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
-
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
-
-
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
@@ -182,7 +176,7 @@ describe('MathEquationInputValidationService', () => {
       }
     });
 
-    answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
+    answerGroups[0].updateRuleInputs([isEquivalentTo, matchesExactlyWith]);
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);

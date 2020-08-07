@@ -20,7 +20,7 @@ import { EventEmitter } from '@angular/core';
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Responses Service', function() {
+fdescribe('Responses Service', function() {
   var ResponsesService = null;
   var InteractionObjectFactory = null;
   var OutcomeObjectFactory = null;
@@ -68,7 +68,8 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_specs: [],
+        rule_input_translations_mapping: {},
+        rule_inputs: {},
       }],
       default_outcome: {
         dest: 'Hola',
@@ -98,13 +99,15 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_specs: [{
-          type: '',
-          inputs: {
-            x: ['c', 'd', 'e'],
-            y: ['a', 'b', 'c']
-          }
-        }],
+        rule_input_translations_mapping: {},
+        rule_inputs: {
+          '': [
+            {
+              x: ['c', 'd', 'e'],
+              y: ['a', 'b', 'c']
+            }
+          ]
+        }
       }],
       default_outcome: {
         dest: 'Hola',

@@ -59,7 +59,7 @@ export class MathEquationInputValidationService {
     let seenRules = [];
 
     for (let i = 0; i < answerGroups.length; i++) {
-      let rules = answerGroups[i].rules;
+      let rules = answerGroups[i].getRulesAsList();
       for (let j = 0; j < rules.length; j++) {
         let currentInput = <string> rules[j].inputs.x;
         let currentPositionOfTerms = <string> rules[j].inputs.y;

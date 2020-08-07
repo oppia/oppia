@@ -232,12 +232,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Second'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations_mapping: {},
+              rule_inputs: {
+                Equals: [
+                  {
+                    x: 0
+                  }
+                ]
+              },
               training_data: []
             },
             {
@@ -253,12 +255,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'First'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 1
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations_mapping: {},
+              rule_inputs: {
+                Equals: [
+                  {
+                    x: 1
+                  }
+                ]
+              },
               training_data: []
             }],
             solution: null,
@@ -320,12 +324,14 @@ describe('Translation status service', function() {
                 missing_prerequisite_skill_id: null,
                 dest: 'Third'
               },
-              rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
-              }],
+              rule_input_translations_mapping: {},
+              rule_inputs: {
+                Equals: [
+                  {
+                    x: 0
+                  }
+                ]
+              },
               training_data: []
             }],
             solution: null,

@@ -109,8 +109,9 @@ export class FractionInputValidationService {
     var ranges = [];
     var matchedDenominators = [];
 
+    // Note: rules do not have a set order.
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
@@ -257,21 +258,26 @@ export class FractionInputValidationService {
           default:
             break;
         }
+
         for (var k = 0; k < ranges.length; k++) {
-          if (isEnclosedBy(range, ranges[k])) {
-            var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
-              .rules[ranges[k].ruleIndex - 1];
-            if (shouldCheckRangeCriteria(earlierRule, rule)) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
-                  '.')
-              });
-            }
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
+            .getRulesAsList()[ranges[k].ruleIndex - 1];
+          const earlierEnclosed = (
+            isEnclosedBy(range, ranges[k]) &&
+            shouldCheckRangeCriteria(earlierRule, rule));
+          const currentEnclosed = (
+            isEnclosedBy(ranges[k], range) &&
+            shouldCheckRangeCriteria(rule, earlierRule));
+          if (earlierEnclosed || currentEnclosed) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                'Rule ' + (j + 1) + ' from answer group ' +
+                (i + 1) + ' will never be matched because it ' +
+                'is made redundant by rule ' + ranges[k].ruleIndex +
+                ' from answer group ' + ranges[k].answerGroupIndex +
+                '.')
+            });
           }
         }
 

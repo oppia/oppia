@@ -58,7 +58,8 @@ describe('Statistics Tab Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_specs: [],
+        rule_input_translations_mapping: {},
+        rule_inputs: {},
         tagged_skill_misconception_id: ''
       }, {
         outcome: {
@@ -71,7 +72,8 @@ describe('Statistics Tab Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_specs: [],
+        rule_input_translations_mapping: {},
+        rule_inputs: {},
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,

@@ -79,12 +79,14 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_specs: [{
-            inputs: {
-              x: 10
-            },
-            rule_type: 'Equals'
-          }]
+          rule_input_translations_mapping: {},
+          rule_inputs: {
+            Equals: [
+              {
+                x: 10
+              }
+            ]
+          }
         }, {
           outcome: {
             dest: 'outcome 2',
@@ -97,22 +99,22 @@ describe('Learner answer info service', function() {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_specs: [{
-            inputs: {
-              x: 5
-            },
-            rule_type: 'Equals'
-          }, {
-            inputs: {
-              x: 7
-            },
-            rule_type: 'NotEquals'
-          }, {
-            inputs: {
-              x: 6
-            },
-            rule_type: 'Equals'
-          }]
+          rule_input_translations_mapping: {},
+          rule_inputs: {
+            Equals: [
+              {
+                x: 5
+              },
+              {
+                x: 6
+              }
+            ],
+            NotEquals: [
+              {
+                x: 7
+              }
+            ]
+          }
         }],
         default_outcome: {
           dest: 'default',

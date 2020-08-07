@@ -102,7 +102,8 @@ describe('Question Editor Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {}
             }],
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -449,7 +450,8 @@ describe('Question Editor Modal Controller', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [],
+              rule_input_translations_mapping: {},
+              rule_inputs: {}
             }],
             confirmed_unclassified_answers: [],
             customization_args: {

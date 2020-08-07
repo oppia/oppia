@@ -77,12 +77,14 @@ describe('Question Validation Service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations_mapping: {},
+            rule_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
             tagged_skill_misconception_id: null
           }, {
             outcome: {
@@ -95,12 +97,14 @@ describe('Question Validation Service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations_mapping: {},
+            rule_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
             tagged_skill_misconception_id: 'abc-1'
           }],
           confirmed_unclassified_answers: [],

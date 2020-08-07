@@ -71,8 +71,9 @@ export class AnswerClassificationService {
     // TODO(bhenning): Implement training data classification.
     for (var i = 0; i < answerGroups.length; ++i) {
       const answerGroup = answerGroups[i];
-      for (var j = 0; j < answerGroup.rules.length; ++j) {
-        const rule = answerGroup.rules[j];
+      const rules = answerGroup.getRulesAsList();
+      for (var j = 0; j < rules.length; ++j) {
+        const rule = rules[j];
         if (interactionRulesService[rule.type](answer, rule.inputs)) {
           return this.answerClassificationResultObjectFactory.createNew(
             answerGroup.outcome, i, j,

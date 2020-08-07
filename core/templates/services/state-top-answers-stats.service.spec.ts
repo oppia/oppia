@@ -64,9 +64,10 @@ describe('StateTopAnswersStatsService', () => {
     param_changes: [],
     interaction: {
       answer_groups: [{
-        rule_specs: [
-          {rule_type: 'Contains', inputs: {x: 'hola'}},
-        ],
+        rule_input_translations_mapping: {},
+        rule_inputs: {
+          Contains: [{x: 'hola'}]
+        },
         outcome: {
           dest: 'Me Llamo',
           feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
@@ -290,7 +291,7 @@ describe('StateTopAnswersStatsService', () => {
       .toContain(joC({answer: 'adios'}));
 
     const updatedState = states.getState('Hola');
-    updatedState.interaction.answerGroups[0].rules.push(
+    updatedState.interaction.answerGroups[0].addRule(
       ruleObjectFactory.createNew('Contains', {x: 'adios'}));
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
@@ -311,9 +312,9 @@ describe('StateTopAnswersStatsService', () => {
       .not.toContain(joC({answer: 'hola'}));
 
     const updatedState = states.getState('Hola');
-    updatedState.interaction.answerGroups[0].rules = [
+    updatedState.interaction.answerGroups[0].updateRuleInputs([
       ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
-    ];
+    ]);
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))

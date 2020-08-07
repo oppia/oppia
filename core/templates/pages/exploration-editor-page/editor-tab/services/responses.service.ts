@@ -129,7 +129,7 @@ angular.module('oppia').factory('ResponsesService', [
 
       if (answerGroup) {
         if (updates.hasOwnProperty('rules')) {
-          answerGroup.rules = updates.rules;
+          answerGroup.updateRuleInputs(updates.rules);
         }
         if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
           answerGroup.taggedSkillMisconceptionId =
