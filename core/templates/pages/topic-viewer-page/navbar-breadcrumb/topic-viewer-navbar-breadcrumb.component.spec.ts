@@ -88,11 +88,11 @@ describe('Topic viewer navbar breadcrumb component', () => {
       })));
   }));
 
-  it('should evaluate data get from backend, set page title and init' +
-    ' translation', function() {
-    ctrl.$onInit();
-    $scope.$apply();
+  it('should set topic name using the data retrieved from the backend',
+    function() {
+      ctrl.$onInit();
+      $scope.$apply();
 
-    expect($scope.topicName).toBe('Topic Name 1');
-  });
+      expect($scope.topicName).toBe('Topic Name 1');
+    });
 });
