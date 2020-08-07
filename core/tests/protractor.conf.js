@@ -41,8 +41,8 @@ var suites = {
       'protractor_desktop/collections.js'
     ],
 
-    communityDashboard: [
-      'protractor_desktop/communityDashboard.js'
+    contributorDashboard: [
+      'protractor_desktop/contributorDashboard.js'
     ],
 
     coreEditorAndPlayerFeatures: [
