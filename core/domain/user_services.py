@@ -295,6 +295,74 @@ class UserSettings(python_utils.OBJECT):
                         'This username is not available.')
 
 
+class UserAuth(python_utils.OBJECT):
+    """Value object representing a user's authentication information.
+
+    Attributes:
+        user_id: str. The unique ID of the user.
+        gae_id: str. The ID of the user retrieved from GAE.
+        pin: str or None. The PIN of the user's profile for android.
+        parent_user_id: str or None. User id of the full user to which a
+            profile user is associated with. None for full users.
+    """
+
+    def __init__(
+        self, user_id, gae_id, pin=None, parent_user_id=None, deleted=False):
+        """Constructs a UserAuth domain object.
+
+        Args:
+            user_id: str. The unique ID of the user.
+            gae_id: str. The ID of the user retrieved from GAE.
+            pin: str or None. The PIN of the user's profile for android.
+            parent_user_id: str or None. User id of the full user to which a
+                profile user is associated with. None for full users.
+            deleted: bool. Whether the user has requested removal of their
+                account.
+        """
+        self.user_id = user_id
+        self.gae_id = gae_id
+        self.pin = pin
+        self.parent_user_id = parent_user_id
+        self.deleted = deleted
+
+    def validate(self):
+        """Checks that user_id, gae_id and email fields of this UserAuth domain
+        object are valid.
+
+        Raises:
+            ValidationError. The user_id is not str.
+            ValidationError. The gae_id is not str.
+            ValidationError. The pin is not str.
+            ValidationError. The parent_user_id is not str.
+        """
+        if not isinstance(self.user_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+        if not is_user_id_correct(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
+
+        if (self.gae_id is not None and
+                not isinstance(self.gae_id, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected gae_id to be a string, received %s' %
+                self.gae_id
+            )
+
+        if (self.pin is not None and
+                not isinstance(self.gae_id, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected PIN to be a string, received %s' %
+                self.pin
+            )
+
+        if (self.parent_user_id is not None and
+                not is_user_id_correct(self.parent_user_id)):
+            raise utils.ValidationError(
+                'The parent user ID is in a wrong format.')
+
+
 def is_user_id_correct(user_id):
     """Verify that the user ID is in a correct format or that it belongs to
     a system user.
@@ -850,17 +918,67 @@ def create_new_user(gae_id, email):
     Raises:
         Exception. If a user with the given gae_id already exists.
     """
-    user_settings = get_user_settings(gae_id, strict=False)
+    user_settings = get_user_settings_by_gae_id(gae_id, strict=False)
     if user_settings is not None:
-        raise Exception('User %s already exists.' % gae_id)
+        raise Exception(
+            'User %s already exists for gae_id %s.'
+            % (user_settings.user_id, gae_id))
 
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
+    user_auth = UserAuth(user_id, gae_id)
+    _save_user_auth_details(user_auth)
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings
+
+
+def _save_user_auth_details(user_auth):
+    """Commits a user auth object to the datastore.
+
+    Args:
+        user_auth: UserAuth. The user auth domain object to be saved.
+    """
+    user_auth.validate()
+
+    user_auth_dict = {
+        'gae_id': user_auth.gae_id,
+        'pin': user_auth.pin,
+        'parent_user_id': user_auth.parent_user_id,
+        'deleted': user_auth.deleted
+    }
+
+    # If user auth entry with the given user_id does not exist, create a new
+    # one.
+    user_auth_model = user_models.UserAuthModel.get_by_id(user_auth.user_id)
+    if user_auth_model is not None:
+        user_auth_model.populate(**user_auth_dict)
+        user_auth_model.put()
+    else:
+        user_auth_dict['id'] = user_auth.user_id
+        user_models.UserAuthModel(**user_auth_dict).put()
+
+
+def _get_user_auth_from_model(user_auth_model):
+    """Transform user auth storage model to domain object.
+    Args:
+        user_auth_model: UserAuthModel or None. The model to be converted or
+            a None object
+    Returns:
+        UserAuth. Domain object for user auth or None.
+    """
+    if user_auth_model:
+        return UserAuth(
+            user_id=user_auth_model.id,
+            gae_id=user_auth_model.gae_id,
+            pin=user_auth_model.pin,
+            parent_user_id=user_auth_model.parent_user_id,
+            deleted=user_auth_model.deleted
+        )
+    else:
+        return None
 
 
 def get_username(user_id):
@@ -1118,6 +1236,11 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
+    user_auth = _get_user_auth_from_model(
+        user_models.UserAuthModel.get_by_id(user_id))
+    if user_auth is not None:
+        user_auth.deleted = True
+        _save_user_auth_details(user_auth)
 
 
 def get_human_readable_user_ids(user_ids):
