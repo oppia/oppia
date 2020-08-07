@@ -19,6 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { EventEmitter } from '@angular/core';
 
 describe('Preview Tab Component', function() {
   var ctrl = null;
@@ -38,6 +39,7 @@ describe('Preview Tab Component', function() {
   var stateEditorService = null;
   var paramChangeObjectFactory = null;
   var parameterMetadataService = null;
+  var mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var stateName = 'State1';
@@ -85,14 +87,15 @@ describe('Preview Tab Component', function() {
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
       stateEditorService = $injector.get('StateEditorService');
-
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo').and
         .returnValue(parameters);
       spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExploration')
         .and.returnValue($q.resolve(exploration));
-
+      spyOnProperty(explorationEngineService,
+        'onUpdateActiveStateIfInEditor').and.returnValue(
+        mockUpdateActiveStateIfInEditorEventEmitter);
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
         $scope: $scope,
@@ -112,7 +115,8 @@ describe('Preview Tab Component', function() {
     it('should set active state name when broadcasting' +
       ' updateActiveStateIfInEditor', function() {
       spyOn(stateEditorService, 'setActiveStateName');
-      $rootScope.$broadcast('updateActiveStateIfInEditor', 'State2');
+
+      mockUpdateActiveStateIfInEditorEventEmitter.emit('State2');
 
       expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
         'State2');

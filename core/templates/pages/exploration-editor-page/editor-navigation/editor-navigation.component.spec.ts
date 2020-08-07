@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -31,7 +31,14 @@ describe('Editor Navigation Component', function() {
   var ExplorationImprovementsService = null;
   var ExplorationWarningsService = null;
   var ThreadDataService = null;
+  var StateTutorialFirstTimeService = null;
   var UserService = null;
+
+  var testSubscriptions: Subscription;
+
+  const openEditorTutorialSpy = jasmine.createSpy('openEditorTutorial');
+  const openTranslationTutorialSpy = (
+    jasmine.createSpy('openTranslationTutorial'));
 
   var explorationId = 'exp1';
   var userInfo = {
@@ -65,6 +72,8 @@ describe('Editor Navigation Component', function() {
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
     UserService = $injector.get('UserService');
     ThreadDataService = $injector.get('ThreadDataService');
+    StateTutorialFirstTimeService = (
+      $injector.get('StateTutorialFirstTimeService'));
 
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(UserService, 'getUserInfoAsync').and.returnValue(userInfo);
@@ -84,7 +93,18 @@ describe('Editor Navigation Component', function() {
     $scope.$apply();
   }));
 
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
+        openTranslationTutorialSpy));
+    testSubscriptions.add(
+      StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+        openEditorTutorialSpy));
+  });
+
   afterEach(function() {
+    testSubscriptions.unsubscribe();
     ctrl.$onDestroy();
   });
 
@@ -123,28 +143,24 @@ describe('Editor Navigation Component', function() {
 
   it('should open editor tutorial after closing user help modal with mode' +
     'editor', function() {
-    spyOn($rootScope, '$broadcast');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve('editor')
     });
     $scope.showUserHelpModal();
     $scope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'openEditorTutorial');
+    expect(openEditorTutorialSpy).toHaveBeenCalled();
   });
 
   it('should open editor tutorial after closing user help modal with mode' +
     'translation', function() {
-    spyOn($rootScope, '$broadcast');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve('translation')
     });
     $scope.showUserHelpModal();
     $scope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'openTranslationTutorial');
+    expect(openTranslationTutorialSpy).toHaveBeenCalled();
   });
 
   it('should not open any tutorial after dismissing user help modal',
