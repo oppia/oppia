@@ -187,7 +187,7 @@ def get_variables(expression):
 
     Returns:
         list(str). A list containing all the variables present in the given
-            expression.
+        expression.
     """
     if '=' in expression:
         lhs, rhs = expression.split('=')
