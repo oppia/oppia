@@ -306,28 +306,21 @@ class UserAuth(python_utils.OBJECT):
         user_id: str. The unique ID of the user.
         gae_id: str. The ID of the user retrieved from GAE.
         pin: str or None. The PIN of the user's profile for android.
-        parent_user_id: str or None. The user_id of the full user with which
-            a profile user is linked to. None for full users.
     """
 
-    def __init__(
-            self, user_id, gae_id, pin=None, parent_user_id=None,
-            deleted=False):
+    def __init__(self, user_id, gae_id, pin=None, deleted=False):
         """Constructs a UserAuth domain object.
 
         Args:
             user_id: str. The unique ID of the user.
             gae_id: str. The ID of the user retrieved from GAE.
             pin: str or None. The PIN of the user's profile for android.
-            parent_user_id: str or None. The user_id of the full user with which
-                a profile user is linked to. None for full users.
             deleted: bool. Whether the user has requested removal of their
                 account.
         """
         self.user_id = user_id
         self.gae_id = gae_id
         self.pin = pin
-        self.parent_user_id = parent_user_id
         self.deleted = deleted
 
     def validate(self):
@@ -338,7 +331,6 @@ class UserAuth(python_utils.OBJECT):
             ValidationError. The user_id is not str.
             ValidationError. The gae_id is not str.
             ValidationError. The pin is not str.
-            ValidationError. The parent_user_id is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -361,15 +353,6 @@ class UserAuth(python_utils.OBJECT):
                 'Expected PIN to be a string, received %s' %
                 self.pin
             )
-
-        if self.parent_user_id is not None:
-            if not isinstance(self.user_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected parent_user_id to be a string, received %s'
-                    % self.parent_user_id)
-            if not is_user_id_correct(self.parent_user_id):
-                raise utils.ValidationError(
-                    'The parent user ID is in a wrong format.')
 
 
 def is_user_id_correct(user_id):
@@ -621,6 +604,106 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     return user_settings
 
 
+def get_user_auth(user_id, strict=False):
+    """Return the user auth for a single user.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to False.
+
+    Returns:
+        UserAuth or None. If the given user_id does not exist and strict
+        is False, returns None. Otherwise, returns the corresponding
+        UserAuth domain object.
+
+    Raises:
+        Exception. The value of strict is True and given user_id does not exist.
+    """
+    if feconf.ENABLE_USER_AUTH_MODEL is True:
+        user_auth = get_users_auth([user_id])[0]
+        if strict and user_auth is None:
+            logging.error('Could not find user with id %s' % user_id)
+            raise Exception('User not found.')
+        return user_auth
+    return None
+
+
+def get_users_auth(user_ids):
+    """Gets domain objects representing the auth information for the given
+    user_ids.
+
+    Args:
+        user_ids: list(str). The list of user_ids to get UserAuth
+            domain objects for.
+
+    Returns:
+        list(UserAuth|None). The UserAuth domain objects corresponding
+        to the given user ids. If the given user_id does not exist, the
+        corresponding entry in the returned list is None.
+    """
+    result = []
+    if feconf.ENABLE_USER_AUTH_MODEL is True:
+        user_auth_models = user_models.UserAuthModel.get_multi(user_ids)
+        for i, model in enumerate(user_auth_models):
+            if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
+                result.append(UserAuth(
+                    user_id=feconf.SYSTEM_COMMITTER_ID,
+                    gae_id=feconf.SYSTEM_COMMITTER_ID,
+                ))
+            else:
+                result.append(_transform_user_auth(model))
+    return result
+
+
+def get_user_auth_by_gae_id(gae_id, strict=False):
+    """Return the user auth for a single user.
+
+    Args:
+        gae_id: str. The GAE ID of the user.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to False.
+
+    Returns:
+        UserAuth or None. If the given gae_id does not exist and strict
+        is False, returns None. Otherwise, returns the corresponding
+        UserAuth domain object.
+
+    Raises:
+        Exception. The value of strict is True and given gae_id does not exist.
+    """
+    if feconf.ENABLE_USER_AUTH_MODEL is True:
+        user_auth_model = user_models.UserAuthModel.get_by_auth_id(
+            feconf.AUTH_METHOD_GAE, gae_id)
+        user_auth = _transform_user_auth(user_auth_model)
+        if strict and user_auth is None:
+            logging.error('Could not find user with id %s' % gae_id)
+            raise Exception('User not found.')
+        return user_auth
+
+    return None
+
+
+def _transform_user_auth(user_auth_model):
+    """Transform user auth storage model to domain object.
+
+    Args:
+        user_auth_model: UserAuthModel. The model to be converted.
+
+    Returns:
+        UserAuth. Domain object for user auth.
+    """
+    if user_auth_model:
+        return UserAuth(
+            user_id=user_auth_model.id,
+            gae_id=user_auth_model.gae_id,
+            pin=user_auth_model.pin,
+            deleted=user_auth_model.deleted
+        )
+    else:
+        return None
+
+
 def get_user_role_from_id(user_id):
     """Returns role of the user with given user_id.
 
@@ -834,6 +917,31 @@ def _save_user_settings(user_settings):
         user_models.UserSettingsModel(**user_settings_dict).put()
 
 
+def _save_user_auth_details(user_auth):
+    """Commits a user auth object to the datastore.
+
+    Args:
+        user_auth: UserAuth. The user auth domain object to be saved.
+    """
+    if feconf.ENABLE_USER_AUTH_MODEL is True:
+        user_auth.validate()
+
+        user_auth_dict = {
+            'gae_id': user_auth.gae_id,
+            'pin': user_auth.pin
+        }
+
+        # If user auth entry with the given user_id already exists, update it
+        # with the given user auth object, otherwise, create a new one.
+        user_auth_model = user_models.UserAuthModel.get_by_id(user_auth.user_id)
+        if user_auth_model is not None:
+            user_auth_model.populate(**user_auth_dict)
+            user_auth_model.put()
+        else:
+            user_auth_dict['id'] = user_auth.user_id
+            user_models.UserAuthModel(**user_auth_dict).put()
+
+
 def _transform_user_settings(user_settings_model):
     """Transform user settings storage model to domain object.
 
@@ -942,17 +1050,39 @@ def create_new_user(gae_id, email):
     Raises:
         Exception. If a user with the given gae_id already exists.
     """
-    user_settings = get_user_settings(gae_id, strict=False)
+    user_settings = get_user_settings_by_gae_id(gae_id, strict=False)
     if user_settings is not None:
-        raise Exception('User %s already exists.' % gae_id)
+        raise Exception(
+            'User %s already exists for gae_id %s.'
+            % (user_settings.user_id, gae_id))
 
     user_id = user_models.UserSettingsModel.get_new_id('')
+    # TODO(#10178): Remove gae_id attribute from UserSettings below
+    # when feconf.ENABLE_USER_AUTH_MODEL flag has been set True.
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
+
+    if feconf.ENABLE_USER_AUTH_MODEL is True:
+        user_auth = UserAuth(user_id, gae_id)
+        _save_user_auth_details(user_auth)
+
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings
+
+
+def update_user_pin(user_id, new_pin):
+    """Updates pin of user with given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        new_pin: str. New PIN to be set.
+    """
+    if feconf.ENABLE_USER_AUTH_MODEL is True:
+        user_auth = get_user_auth(user_id, strict=True)
+        user_auth.pin = new_pin
+        _save_user_auth_details(user_auth)
 
 
 def get_username(user_id):

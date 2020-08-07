@@ -88,7 +88,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(gae_id, username)
-
         user_settings = user_services.create_new_user(
             gae_id, 'user@example.com')
 
@@ -1379,6 +1378,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    # TODO(#10178): Remove gae_id attribute check below as it will be
+    # deprecated for UserSettings when feconf.ENABLE_USER_AUTH_MODEL
+    # flag has been set to True.
     def test_validate_non_str_gae_id(self):
         self.user_settings.gae_id = 0
         with self.assertRaisesRegexp(
@@ -1427,11 +1429,102 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_guest_has_not_fully_registered(self):
         self.assertFalse(user_services.has_fully_registered_account(None))
 
-    def test_cannot_create_new_user_with_existing_user_id(self):
-        with self.assertRaisesRegexp(
-            Exception, 'User %s already exists.' % self.owner_id
-        ):
-            user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+    def test_save_user_auth_for_user_auth_enabled_creates_new_auth_entry(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', True):
+            new_user_id = user_models.UserSettingsModel.get_new_id('')
+            new_gae_id = 'new_gae_id'
+            new_user_pin = '123'
+            user_auth = user_services.UserAuth(
+                user_id=new_user_id,
+                gae_id=new_gae_id,
+                pin=new_user_pin
+            )
+            user_services._save_user_auth_details(user_auth) # pylint: disable=protected-access
+            fetched_user_auth_model = user_models.UserAuthModel.get_by_id(
+                new_user_id)
+            self.assertEqual(
+                fetched_user_auth_model.gae_id, user_auth.gae_id)
+            self.assertEqual(fetched_user_auth_model.pin, user_auth.pin)
+
+    def test_save_user_auth_user_auth_disabled_does_not_create_new_entry(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
+            new_user_id = user_models.UserSettingsModel.get_new_id('')
+            new_gae_id = 'new_gae_id'
+            new_user_pin = '123'
+            user_auth = user_services.UserAuth(
+                user_id=new_user_id,
+                gae_id=new_gae_id,
+                pin=new_user_pin
+            )
+            user_services._save_user_auth_details(user_auth) # pylint: disable=protected-access
+            fetched_user_auth_model = user_models.UserAuthModel.get_by_id(
+                new_user_id)
+            self.assertIsNone(fetched_user_auth_model)
+
+    def test_create_new_user_for_new_gae_id_user_auth_enabled_is_correct(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', True):
+            new_gae_id = 'new_gae_id'
+            new_email = 'new@example.com'
+            user_services.create_new_user(new_gae_id, new_email)
+            user_settings = user_services.get_user_settings_by_gae_id(
+                new_gae_id)
+            user_auth = user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, new_gae_id)
+
+            # TODO(#10178): Remove check for gae_id below because it will be
+            # deprecated for UserSettings when feconf.ENABLE_USER_AUTH_MODEL
+            # flag has been set True.
+            self.assertEqual(user_settings.gae_id, new_gae_id)
+
+            self.assertEqual(user_settings.email, new_email)
+            self.assertEqual(user_auth.id, user_settings.user_id)
+            self.assertEqual(user_auth.gae_id, new_gae_id)
+
+    def test_create_new_user_for_new_gae_id_user_auth_disabled_is_correct(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
+            new_gae_id = 'new_gae_id'
+            new_email = 'new@example.com'
+            user_services.create_new_user(new_gae_id, new_email)
+            user_settings = user_services.get_user_settings_by_gae_id(
+                new_gae_id)
+            user_auth = user_models.UserAuthModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, new_gae_id)
+
+            # TODO(#10178): Remove check for gae_id below because it will be
+            # deprecated for UserSettings when feconf.ENABLE_USER_AUTH_MODEL
+            # flag has been set True.
+            self.assertEqual(user_settings.gae_id, new_gae_id)
+
+            self.assertEqual(user_settings.email, new_email)
+            self.assertIsNone(user_auth)
+
+    def test_create_new_user_same_gae_id_user_auth_disabled_raises_error(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', False):
+            user_gae_id = 'new_gae_id'
+            user_email = 'new@example.com'
+            user_services.create_new_user(user_gae_id, user_email)
+            user_id = user_services.get_user_settings_by_gae_id(
+                user_gae_id).user_id
+            with self.assertRaisesRegexp(
+                Exception, 'User %s already exists for gae_id %s.'
+                % (user_id, user_gae_id)
+            ):
+                user_services.create_new_user(
+                    user_gae_id, user_email)
+
+    def test_create_new_user_same_gae_id_user_auth_enabled_raises_error(self):
+        with self.swap(feconf, 'ENABLE_USER_AUTH_MODEL', True):
+            user_gae_id = 'new_gae_id'
+            user_email = 'new@example.com'
+            user_services.create_new_user(user_gae_id, user_email)
+            user_id = user_services.get_user_settings_by_gae_id(
+                user_gae_id).user_id
+            with self.assertRaisesRegexp(
+                Exception, 'User %s already exists for gae_id %s.'
+                % (user_id, user_gae_id)
+            ):
+                user_services.create_new_user(
+                    user_gae_id, user_email)
 
     def test_cannot_set_existing_username(self):
         with self.assertRaisesRegexp(
