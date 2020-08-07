@@ -996,15 +996,60 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             multiple_explorations_math_rich_text_info)
 
         response_dict = self.get_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER)
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'exp_id_to_latex_mapping'})
         expected_response = {
             'exp_id1': ['abc1', 'xyz1'],
-            'exp_id2': ['abc2', 'xyz2'],
-            'exp_id3': ['abc3', 'xyz3']
+            'exp_id2': ['abc2', 'xyz2']
         }
         self.assertEqual(
             response_dict,
             {'latex_strings_to_exp_id_mapping': expected_response})
+
+    def test_get_when_invalid_item_to_fetch_item_given(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'invalid'},
+            expected_status_int=400)
+
+        self.assertIn(
+            'Please specify a valid type of item to fetch.',
+            response_dict['error'])
+
+    def test_get_number_explorations_left_to_update(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        multiple_explorations_math_rich_text_info = []
+
+        math_rich_text_info1 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id1', True, ['abc1', 'xyz1']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
+        math_rich_text_info2 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id2', True, ['abc2', 'xyz2']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
+        math_rich_text_info3 = (
+            exp_domain.ExplorationMathRichTextInfo(
+                'exp_id3', True, ['abc3', 'xyz3']))
+        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
+
+        exp_services.save_multi_exploration_math_rich_text_info_model(
+            multiple_explorations_math_rich_text_info)
+
+        response_dict = self.get_json(
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
+            params={'item_to_fetch': 'number_of_explorations_left_to_update'})
+        self.assertEqual(
+            response_dict,
+            {'number_of_explorations_left_to_update': '3'})
 
     def test_post_svgs_when_all_values_are_valid(self):
         user_email = 'user1@example.com'
@@ -1067,7 +1112,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
             estimated_max_size_of_images_in_bytes=20000).put()
 
         response_dict = self.post_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             {'latexMapping': post_data},
             csrf_token=csrf_token,
             upload_files=(
@@ -1127,7 +1172,7 @@ class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(editor_id, exploration1)
         response_dict = self.post_json(
-            feconf.ADMIN_MATH_SVG_IMAGE_GENERATION_HANDLER,
+            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
             {'latexMapping': post_data},
             csrf_token=csrf_token,
             upload_files=(

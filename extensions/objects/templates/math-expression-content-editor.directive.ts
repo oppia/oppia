@@ -40,6 +40,9 @@ angular.module('oppia').directive('mathExpressionContentEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        // TODO(#10197): Upgrade to MathJax 3, after proper investigation
+        // and testing. MathJax 3 provides a faster and more cleaner way to
+        // convert a LaTeX string to an SVG.
         var convertLatexStringToSvg = function(inputLatexString) {
           var emptyDiv = document.createElement('div');
           var outputElement = angular.element(emptyDiv);
