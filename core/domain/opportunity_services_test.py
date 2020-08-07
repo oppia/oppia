@@ -312,11 +312,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        # content_count is 0 since the exploration state translation mappings
-        # contents are empty:
-        # {u'translations_mapping': {u'content': {}, u'default_outcome': {}}}
-        # {u'translations_mapping': {u'content': {}}}
-        self.assertEqual(translation_opportunities[0].content_count, 0)
+        self.assertEqual(translation_opportunities[0].content_count, 2)
 
         answer_group_dict = {
             'outcome': {
@@ -387,8 +383,70 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 })], 'Add state name')
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
-        # Translation opportunity gets deleted upon update as translation count
-        # >= content_count.
+        self.assertEqual(len(translation_opportunities), 1)
+        self.assertEqual(translation_opportunities[0].content_count, 5)
+
+    def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
+            self):
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': '0'
+            })], 'Changes.')
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
+        self.assertEqual(len(translation_opportunities), 1)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content',
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'End State',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content',
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'state_name': 'End State',
+                'content_id': 'content',
+                'language_code': 'hi',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>'
+            }),
+        ]
+        exp_services.update_exploration(
+            self.owner_id, '0', change_list, 'commit message')
+
+        # get_translation_opportunities should no longer return the opportunity
+        # after translation completion.
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 0)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):
@@ -492,20 +550,6 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = skill_opportunities[0]
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity.question_count, 1)
-
-    def test_complete_skill_opportunity_deletes_opportunity(self):
-        opportunity_services.create_skill_opportunity(
-            self.SKILL_ID, 'description')
-
-        # Set max number of questions per skill opportunity to 1.
-        with self.swap(constants, 'MAX_QUESTIONS_PER_SKILL', 1):
-            self.save_new_question(
-                self.QUESTION_ID, self.USER_ID,
-                self._create_valid_question_data('ABC'), [self.SKILL_ID])
-
-        skill_opportunities, _, _ = (
-            opportunity_services.get_skill_opportunities(None))
-        self.assertEqual(len(skill_opportunities), 0)
 
     def test_create_question_skill_link_increments_question_count(self):
         opportunity_services.create_skill_opportunity(
