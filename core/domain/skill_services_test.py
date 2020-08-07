@@ -464,8 +464,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             subtopics=[], next_subtopic_id=1)
 
         config_services.set_property(
-            self.user_id_admin, 'topic_ids_for_classroom_pages', [{
-                'name': 'math', 'topic_ids': [topic_id]}])
+            self.user_id_admin, 'classroom_pages_data', [{
+                'name': 'math',
+                'topic_ids': [topic_id],
+                'topic_list_intro': 'Topics Covered',
+                'course_details': 'Course Details'
+            }]
+        )
 
         augmented_skill_summaries, next_cursor, more = (
             skill_services.get_filtered_skill_summaries(
@@ -1219,11 +1224,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': '',
+                        'data_format': 'html',
+                        'translation': '',
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 }
@@ -1233,11 +1240,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content1': {
                     'en': {
-                        'html': expected_html_content,
+                        'data_format': 'html',
+                        'translation': expected_html_content,
                         'needs_update': True
                     },
                     'hi': {
-                        'html': 'Hey!',
+                        'data_format': 'html',
+                        'translation': 'Hey!',
                         'needs_update': False
                     }
                 }
@@ -1277,8 +1286,8 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 written_translations_dict))
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_dict['explanation']['html'] = html_content
-        skill_contents_dict['written_translations'][
-            'translations_mapping']['content1']['en']['html'] = html_content
+        skill_contents_dict['written_translations']['translations_mapping'][
+            'content1']['en']['translation'] = html_content
         skill_contents_dict['worked_examples'][0]['question']['html'] = (
             html_content)
         skill_contents_dict['worked_examples'][0]['explanation']['html'] = (

@@ -1160,13 +1160,27 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'uncategorized_skill_count': 1,
             'subtopic_count': 1,
             'total_skill_count': 1,
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
             'topic_model_last_updated': time_in_millisecs
         }
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, current_time, current_time)
+            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', current_time,
+            current_time)
+
+    def _assert_validation_error(self, expected_error_substring):
+        """Checks that the topic summary passes validation.
+
+        Args:
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.topic_summary.validate()
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(
@@ -1177,133 +1191,115 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_invalid_name(self):
         self.topic_summary.name = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Name should be a string.'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Name should be a string.')
+
+    def test_thumbnail_filename_validation(self):
+        self.topic_summary.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string')
+
+    def test_thumbnail_bg_validation(self):
+        self.topic_summary.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Topic thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.topic_summary.thumbnail_bg_color = '#C6DCDA'
+        self.topic_summary.thumbnail_filename = None
+        self._assert_validation_error(
+            'Topic thumbnail image is not provided.')
+        self.topic_summary.thumbnail_bg_color = None
+        self.topic_summary.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Topic thumbnail background color is not specified.')
 
     def test_validation_fails_with_empty_name(self):
         self.topic_summary.name = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Name field should not be empty'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Name field should not be empty')
 
     def test_validation_fails_with_invalid_description(self):
         self.topic_summary.description = 3
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected description to be a string, received 3'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected description to be a string, received 3')
 
     def test_validation_fails_with_invalid_canonical_name(self):
         self.topic_summary.canonical_name = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Canonical name should be a string.'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Canonical name should be a string.')
 
     def test_validation_fails_with_empty_canonical_name(self):
         self.topic_summary.canonical_name = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Canonical name field should not be empty'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Canonical name field should not be empty')
 
     def test_validation_fails_with_invalid_language_code(self):
         self.topic_summary.language_code = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected language code to be a string, received 0'):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected language code to be a string, received 0')
 
     def test_validation_fails_with_unallowed_language_code(self):
         self.topic_summary.language_code = 'invalid'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid language code: invalid'):
-            self.topic_summary.validate()
+        self._assert_validation_error('Invalid language code: invalid')
 
     def test_validation_fails_with_invalid_canonical_story_count(self):
         self.topic_summary.canonical_story_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected canonical story count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected canonical story count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_canonical_story_count(self):
         self.topic_summary.canonical_story_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected canonical_story_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected canonical_story_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_additional_story_count(self):
         self.topic_summary.additional_story_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected additional story count to be an '
-                'integer, received \'10\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected additional story count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_additional_story_count(self):
         self.topic_summary.additional_story_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected additional_story_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected additional_story_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_uncategorized_skill_count(self):
         self.topic_summary.uncategorized_skill_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected uncategorized skill count to be an integer, '
-                'received \'10\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected uncategorized skill count to be an integer, '
+            'received \'10\'')
 
     def test_validation_fails_with_negative_uncategorized_skill_count(self):
         self.topic_summary.uncategorized_skill_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected uncategorized_skill_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected uncategorized_skill_count to be non-negative, '
+            'received \'-1\'')
 
     def test_validation_fails_with_invalid_total_skill_count(self):
         self.topic_summary.total_skill_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected total skill count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total skill count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_total_skill_count(self):
         self.topic_summary.total_skill_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected total_skill_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total_skill_count to be non-negative, received \'-1\'')
 
     def test_validation_fails_with_invalid_total_skill_count_value(self):
         self.topic_summary.total_skill_count = 5
         self.topic_summary.uncategorized_skill_count = 10
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected total_skill_count to be greater than or equal to '
-                'uncategorized_skill_count 10, received \'5\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected total_skill_count to be greater than or equal to '
+            'uncategorized_skill_count 10, received \'5\'')
 
     def test_validation_fails_with_invalid_subtopic_count(self):
         self.topic_summary.subtopic_count = '10'
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected subtopic count to be an integer, received \'10\''):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected subtopic count to be an integer, received \'10\'')
 
     def test_validation_fails_with_negative_subtopic_count(self):
         self.topic_summary.subtopic_count = -1
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Expected subtopic_count to be non-negative, '
-                'received \'-1\'')):
-            self.topic_summary.validate()
+        self._assert_validation_error(
+            'Expected subtopic_count to be non-negative, received \'-1\'')
 
 
 class TopicRightsTests(test_utils.GenericTestBase):

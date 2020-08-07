@@ -110,6 +110,8 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.uncategorized_skill_count,
         topic_summary_model.subtopic_count,
         topic_summary_model.total_skill_count,
+        topic_summary_model.thumbnail_filename,
+        topic_summary_model.thumbnail_bg_color,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -341,10 +343,12 @@ def apply_change_list(topic_id, change_list):
                 if (change.property_name ==
                         subtopic_page_domain.
                         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
+                    page_contents = state_domain.SubtitledHtml.from_dict(
+                        change.new_value)
+                    page_contents.validate()
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
-                            state_domain.SubtitledHtml.from_dict(
-                                change.new_value))
+                            page_contents)
 
                 elif (change.property_name ==
                       subtopic_page_domain.
@@ -812,7 +816,8 @@ def compute_summary_of_topic(topic):
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, topic.created_on, topic.last_updated
+        total_skill_count, topic.thumbnail_filename, topic.thumbnail_bg_color,
+        topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -837,6 +842,8 @@ def save_topic_summary(topic_summary):
         'uncategorized_skill_count': topic_summary.uncategorized_skill_count,
         'subtopic_count': topic_summary.subtopic_count,
         'total_skill_count': topic_summary.total_skill_count,
+        'thumbnail_filename': topic_summary.thumbnail_filename,
+        'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on
     }
