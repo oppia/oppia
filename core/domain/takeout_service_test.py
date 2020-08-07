@@ -371,7 +371,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             content='<p>Some content</p>',
             rejection_message=None).put()
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
@@ -558,7 +558,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_voiceover_application_data = {}
         expected_contrib_score_data = {}
-        expected_community_rights_data = {}
+        expected_contribution_rights_data = {}
         expected_collection_rights_sm = {}
         expected_collection_sm = {}
         expected_skill_sm = {}
@@ -598,7 +598,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_scoring': expected_contrib_score_data,
-            'user_community_rights': expected_community_rights_data,
+            'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata':
@@ -857,7 +857,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        expected_community_rights_data = {
+        expected_contribution_rights_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
             'can_review_voiceover_for_language_codes': ['hi'],
             'can_review_questions': True
@@ -1007,7 +1007,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_scoring': expected_contrib_score_data,
-            'user_community_rights': expected_community_rights_data,
+            'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata':

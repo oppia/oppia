@@ -58,13 +58,13 @@ class OldNotificationsDashboardRedirectPage(base.BaseHandler):
         self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
 
 
-class OldCommunityDashboardRedirectPage(base.BaseHandler):
-    """Redirects the old community dashboard URL to the new one."""
+class OldContributorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old contributor dashboard URL to the new one."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/community-dashboard', permanent=True)
+        self.redirect('/contributor-dashboard', permanent=True)
 
 
 class NotificationsDashboardPage(base.BaseHandler):

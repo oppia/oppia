@@ -120,13 +120,13 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitAddCommunityReviewerForm = function(formResponse) {
+        ctrl.submitAddContributionReviewerForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
-          $http.post('/addcommunityreviewerhandler', {
+          $http.post('/addcontributionreviewerhandler', {
             review_category: formResponse.category,
             username: formResponse.username,
             language_code: formResponse.languageCode
@@ -139,7 +139,7 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitViewCommunityReviewersForm = function(formResponse) {
+        ctrl.submitViewContributionReviewersForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -147,21 +147,21 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.startTask();
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             $http.get(
-              '/getcommunityreviewershandler', {
+              '/getcontributionreviewershandler', {
                 params: {
                   review_category: formResponse.category,
                   language_code: formResponse.languageCode
                 }
               }).then(function(response) {
               ctrl.result.usernames = response.data.usernames;
-              ctrl.communityReviewersDataFetched = true;
+              ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
             }, handleErrorResponse);
           } else {
             var translationLanguages = [];
             var voiceoverLanguages = [];
             $http.get(
-              '/communityreviewerrightsdatahandler', {
+              '/contributionreviewerrightsdatahandler', {
                 params: {
                   username: formResponse.username
                 }
@@ -175,21 +175,21 @@ angular.module('oppia').directive('adminRolesTab', [
                 voiceoverLanguages: voiceoverLanguages,
                 questions: response.data.can_review_questions
               };
-              ctrl.communityReviewersDataFetched = true;
+              ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
             }, handleErrorResponse);
           }
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitRemoveCommunityReviewerForm = function(formResponse) {
+        ctrl.submitRemoveContributionReviewerForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
           $http.put(
-            '/removecommunityreviewerhandler', {
+            '/removecontributionreviewerhandler', {
               username: formResponse.username,
               removal_type: formResponse.method,
               review_category: formResponse.category,
@@ -230,7 +230,7 @@ angular.module('oppia').directive('adminRolesTab', [
                 return false;
               }
             },
-            viewCommunityReviewers: {
+            viewContributionReviewers: {
               filterCriterion: USER_FILTER_CRITERION_ROLE,
               username: '',
               category: null,
@@ -251,7 +251,7 @@ angular.module('oppia').directive('adminRolesTab', [
                 }
               }
             },
-            addCommunityReviewer: {
+            addContributionReviewer: {
               username: '',
               category: null,
               languageCode: null,
@@ -268,7 +268,7 @@ angular.module('oppia').directive('adminRolesTab', [
                 return true;
               }
             },
-            removeCommunityReviewer: {
+            removeContributionReviewer: {
               username: '',
               method: ACTION_REMOVE_ALL_REVIEW_RIGHTS,
               category: null,
@@ -309,7 +309,7 @@ angular.module('oppia').directive('adminRolesTab', [
           };
           refreshFormData();
           ctrl.resultRolesVisible = false;
-          ctrl.communityReviewersDataFetched = false;
+          ctrl.contributionReviewersDataFetched = false;
           ctrl.result = {};
           ctrl.setStatusMessage('');
 
