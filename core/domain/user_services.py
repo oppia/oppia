@@ -309,7 +309,8 @@ class UserAuth(python_utils.OBJECT):
     """
 
     def __init__(
-        self, user_id, gae_id, pin=None, parent_user_id=None, deleted=False):
+            self, user_id, gae_id, pin=None, parent_user_id=None,
+            deleted=False):
         """Constructs a UserAuth domain object.
 
         Args:
@@ -965,9 +966,11 @@ def _save_user_auth_details(user_auth):
 
 def _get_user_auth_from_model(user_auth_model):
     """Transform user auth storage model to domain object.
+
     Args:
         user_auth_model: UserAuthModel or None. The model to be converted or
-            a None object
+            a None object.
+
     Returns:
         UserAuth. Domain object for user auth or None.
     """

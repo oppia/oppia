@@ -1479,7 +1479,8 @@ class UserAuthTests(test_utils.GenericTestBase):
         super(UserAuthTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_auth_model = user_models.UserAuthModel.get_by_id(self.owner_id)
+        self.user_auth_model = user_models.UserAuthModel.get_by_id(
+            self.owner_id)
         self.user_auth = user_services.UserAuth(
             self.user_auth_model.id, self.user_auth_model.gae_id)
         self.user_auth.validate()
