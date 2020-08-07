@@ -25,7 +25,7 @@ var waitFor = require(
 var customizeInteraction = async function(elem, customLetters) {
   await waitFor.presenceOf(elem.element(by.css(
     '.protractor-test-custom-letters-div')),
-    'The custom letters div took too long to load.');
+  'The custom letters div took too long to load.');
   for (let letter of customLetters) {
     await action.click('Math OSK Tab', elem.element(by.buttonText('abc')));
     let letterIsPresent = true;
