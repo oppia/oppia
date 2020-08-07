@@ -34,6 +34,14 @@ export interface PlatformParameterRuleBackendDict {
     'value_when_matched': PlatformParameterValue;
 }
 
+/**
+ * Frontend domain object representation of platform parameter rules, which
+ * are used to define scenarios in which a platform parameter should have
+ * a specified value.
+ *
+ * On the frontend side, this class is used to reflect the edit made to
+ * platform parameter rules in the admin page.
+ */
 export class PlatformParameterRule {
   filters: PlatformParameterFilter[];
   valueWhenMatched: PlatformParameterValue;
@@ -56,15 +64,6 @@ export class PlatformParameterRule {
       filters: this.filters.map(filter => filter.toBackendDict()),
       value_when_matched: this.valueWhenMatched
     };
-  }
-
-  /**
-   * Validates the PlatformParameterRule instance.
-   *
-   * @returns {string[]} - The issue messages found during validation, if any.
-   */
-  validate(): string[] {
-    return [];
   }
 
   /**

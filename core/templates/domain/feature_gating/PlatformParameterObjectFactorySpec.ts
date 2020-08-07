@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import {
-  FeatureFlagStage,
+  FeatureStage,
   PlatformParameterBackendDict,
   PlatformParameterObjectFactory
 } from './PlatformParameterObjectFactory';
@@ -148,7 +148,7 @@ describe('PlatformParameterObjectFactory', () => {
           }
         ],
         is_feature: true,
-        feature_stage: FeatureFlagStage.PROD,
+        feature_stage: FeatureStage.PROD,
         rule_schema_version: 1,
         default_value: false
       });
@@ -157,123 +157,6 @@ describe('PlatformParameterObjectFactory', () => {
         [
           'All rules must have a server_mode filter, but the 2-th rule ' +
           'doesn\'t.'
-        ]
-      );
-    });
-
-    it('should report issue of dev feature flag enabled for test.', () => {
-      const param = factory.createFromBackendDict({
-        name: 'param name',
-        description: 'This is a param for test.',
-        data_type: 'bool',
-        rules: [
-          {
-            filters: [
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Test.toString()]]
-              },
-              {
-                type: PlatformParameterFilterType.BrowserType,
-                conditions: [['=', 'Chrome']]
-              }
-            ],
-            value_when_matched: true
-          },
-          {
-            filters: [
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Dev.toString()]]
-              },
-              {
-                type: PlatformParameterFilterType.ClientType,
-                conditions: [['=', 'Android']]
-              }
-            ],
-            value_when_matched: false
-          }
-        ],
-        is_feature: true,
-        feature_stage: FeatureFlagStage.DEV,
-        rule_schema_version: 1,
-        default_value: false
-      });
-
-      expect(param.validate()).toEqual(
-        [
-          'Feature in dev stage cannot be enabled in test or ' +
-          'production environment, violated by the 1-th filter of the 1-th' +
-          ' rule.'
-        ]
-      );
-    });
-
-    it('should report issue of dev feature flag enabled for prod.', () => {
-      const param = factory.createFromBackendDict({
-        name: 'param name',
-        description: 'This is a param for test.',
-        data_type: 'bool',
-        rules: [
-          {
-            filters: [
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Prod.toString()]]
-              },
-              {
-                type: PlatformParameterFilterType.BrowserType,
-                conditions: [['=', 'Chrome']]
-              }
-            ],
-            value_when_matched: true
-          }
-        ],
-        is_feature: true,
-        feature_stage: FeatureFlagStage.DEV,
-        rule_schema_version: 1,
-        default_value: false
-      });
-
-      expect(param.validate()).toEqual(
-        [
-          'Feature in dev stage cannot be enabled in test or ' +
-          'production environment, violated by the 1-th filter of the 1-th' +
-          ' rule.'
-        ]
-      );
-    });
-
-    it('should report issue of test feature flag enabled for prod.', () => {
-      const param = factory.createFromBackendDict({
-        name: 'param name',
-        description: 'This is a param for test.',
-        data_type: 'bool',
-        rules: [
-          {
-            filters: [
-              {
-                type: PlatformParameterFilterType.ServerMode,
-                conditions: [['=', ServerMode.Prod.toString()]]
-              },
-              {
-                type: PlatformParameterFilterType.BrowserType,
-                conditions: [['=', 'Chrome']]
-              }
-            ],
-            value_when_matched: true
-          }
-        ],
-        is_feature: true,
-        feature_stage: FeatureFlagStage.TEST,
-        rule_schema_version: 1,
-        default_value: false
-      });
-
-      expect(param.validate()).toEqual(
-        [
-          'Feature in test stage cannot be enabled in production ' +
-          'environment, violated by the 1-th filter of the 1-th rule.'
         ]
       );
     });
