@@ -24,14 +24,16 @@ var waitFor = require(
 
 var customizeInteraction = async function(elem, customLetters) {
   await waitFor.presenceOf(elem.element(by.css(
-    '.protractor-test-custom-letters-div')), 'Element took too long to load.');
+    '.protractor-test-custom-letters-div')),
+    'The custom letters div took too long to load.');
   for (let letter of customLetters) {
     await action.click('Math OSK Tab', elem.element(by.buttonText('abc')));
     let letterIsPresent = true;
     try {
       await browser.wait(
         await waitFor.until.presenceOf(elem.element(by.buttonText(letter))),
-        waitFor.DEFAULT_WAIT_TIME_MSECS, 'Element took too long to load.');
+        waitFor.DEFAULT_WAIT_TIME_MSECS,
+        'Button for ' + letter + ' took too long to load.');
     } catch (e) {
       letterIsPresent = false;
     }
