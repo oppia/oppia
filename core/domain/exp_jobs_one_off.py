@@ -255,7 +255,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
 class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusbale one-off job for testing exploration migration from the
     previous exploration schema version to the latest. This job runs the state
-    migration, but does not commit the new exploration to the store.
+    migration, but does not commit the new exploration to the datastore.
     """
 
     @classmethod
@@ -289,7 +289,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 error_message = (
                     'Exploration %s failed migration to v%s: %s' %
                     (item.id, current_exp_schema_version, e))
-                logging.error(error_message)
+                logging.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
         else:
             error_message = (
