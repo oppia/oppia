@@ -45,16 +45,16 @@ interface AlgebraicExpressionInputCustomizationArgsBackendDict { }
 
 
 interface CodeReplCustomizationArgsBackendDict {
-  language?: {
+  language: {
     value: string;
   };
-  placeholder?: {
+  placeholder: {
     value: string;
   };
-  preCode?: {
+  preCode: {
     value: string;
   };
-  postCode?: {
+  postCode: {
     value: string;
   };
 }
@@ -75,19 +75,19 @@ export interface CodeReplCustomizationArgs {
 
 
 export interface ContinueCustomizationArgsBackendDict {
-  buttonText?: {
+  buttonText: {
     value: SubtitledUnicodeBackendDict;
   };
 }
 export interface ContinueCustomizationArgs {
-  buttonText?: {
+  buttonText: {
     value: SubtitledUnicode;
   };
 }
 
 
 export interface DragAndDropSortInputCustomizationArgsBackendDict {
-  choices?: {
+  choices: {
     value: SubtitledHtmlBackendDict[];
   };
   allowMultipleItemsInSamePosition: {
@@ -95,7 +95,7 @@ export interface DragAndDropSortInputCustomizationArgsBackendDict {
   }
 }
 export interface DragAndDropSortInputCustomizationArgs {
-  choices?: {
+  choices: {
     value: SubtitledHtml[];
   };
   allowMultipleItemsInSamePosition: {
@@ -105,7 +105,7 @@ export interface DragAndDropSortInputCustomizationArgs {
 
 
 interface EndExplorationCustomizationArgsBackendDict {
-  recommendedExplorationIds?: {
+  recommendedExplorationIds: {
     value: string[];
   };
 }
@@ -117,7 +117,7 @@ export interface EndExplorationCustomizationArgs {
 
 
 export interface FractionInputCustomizationArgsBackendDict {
-  requireSimplestForm?: {
+  requireSimplestForm: {
     value: string;
   };
   allowImproperFraction: {
@@ -126,28 +126,28 @@ export interface FractionInputCustomizationArgsBackendDict {
   allowNonzeroIntegerPart: {
     value: string;
   };
-  customPlaceholder?: {
+  customPlaceholder: {
     value: SubtitledUnicodeBackendDict;
   };
 }
 export interface FractionInputCustomizationArgs {
-  requireSimplestForm?: {
+  requireSimplestForm: {
     value: string;
   };
-  allowImproperFraction?: {
+  allowImproperFraction: {
     value: string;
   };
-  allowNonzeroIntegerPart?: {
+  allowNonzeroIntegerPart: {
     value: string;
   };
-  customPlaceholder?: {
+  customPlaceholder: {
     value: SubtitledUnicode;
   };
 }
 
 
 interface GraphInputCustomizationArgsBackendDict {
-  graph?: {
+  graph: {
     value: GraphAnswer;
   };
   canAddVertex: {
@@ -201,10 +201,10 @@ export interface GraphInputCustomizationArgs {
 
 
 interface ImageClickInputCustomizationArgsBackendDict {
-  imageAndRegions?: {
+  imageAndRegions: {
     value: ImageWithRegions;
   };
-  highlightRegionsOnHover?: {
+  highlightRegionsOnHover: {
     value: string;
   };
 }
@@ -219,13 +219,13 @@ export interface ImageClickInputCustomizationArgs {
 
 
 interface InteractiveMapCustomizationArgsBackendDict {
-  latitude?: {
+  latitude: {
     value: number;
   };
-  longitude?: {
+  longitude: {
     value: number;
   };
-  zoom?: {
+  zoom: {
     value: string;
   };
 }
@@ -243,18 +243,18 @@ export interface InteractiveMapCustomizationArgs {
 
 
 export interface ItemSelectionInputCustomizationArgsBackendDict {
-  choices?: {
+  choices: {
     value: SubtitledHtmlBackendDict[];
   };
-  maxAllowableSelectionCount?: {
+  maxAllowableSelectionCount: {
     value: number;
   };
-  minAllowableSelectionCount?: {
+  minAllowableSelectionCount: {
     value: number;
   };
 }
 export interface ItemSelectionInputCustomizationArgs {
-  choices?: {
+  choices: {
     value: SubtitledHtml[];
   };
   maxAllowableSelectionCount: {
@@ -267,12 +267,12 @@ export interface ItemSelectionInputCustomizationArgs {
 
 
 interface LogicProofCustomizationArgsBackendDict {
-  question?: {
+  question: {
     value: Object;
   };
 }
 export interface LogicProofCustomizationArgs {
-  question?: {
+  question: {
     value: Object;
   };
 }
@@ -283,10 +283,10 @@ export interface MathEquationInputCustomizationArgs { }
 
 
 export interface MultipleChoiceInputCustomizationArgsBackendDict {
-  showChoicesInShuffledOrder?: {
-    value: string;
+  showChoicesInShuffledOrder: {
+    value: boolean;
   };
-  choices?: {
+  choices: {
     value: SubtitledHtmlBackendDict[];
   };
 }
@@ -294,17 +294,17 @@ export interface MultipleChoiceInputCustomizationArgs {
   showChoicesInShuffledOrder: {
     value: boolean;
   };
-  choices?: {
+  choices: {
     value: SubtitledHtml[];
   };
 }
 
 
 interface MusicNotesInputCustomizationArgsBackendDict {
-  sequenceToGuess?: {
+  sequenceToGuess: {
     value: ReadableMusicNote[];
   };
-  initialSequence?: {
+  initialSequence: {
     value: ReadableMusicNote[];
   };
 }
@@ -319,39 +319,39 @@ export interface MusicNotesInputCustomizationArgs {
 
 
 interface PencilCodeEditorCustomizationArgsBackendDict {
-  initialCode?: {
+  initialCode: {
     value: string;
   };
 }
 export interface PencilCodeEditorCustomizationArgs {
-  initialCode?: {
+  initialCode: {
     value: string;
   };
 }
 
 
 export interface SetInputCustomizationArgsBackendDict {
-  buttonText?: {
+  buttonText: {
     value: SubtitledUnicodeBackendDict;
   };
 }
 export interface SetInputCustomizationArgs {
-  buttonText?: {
+  buttonText: {
     value: SubtitledUnicode;
   };
 }
 
 
 export interface TextInputCustomizationArgsBackendDict {
-  placeholder?: {
+  placeholder: {
     value: SubtitledUnicodeBackendDict;
   };
-  rows?: {
+  rows: {
     value: number;
   };
 }
 export interface TextInputCustomizationArgs {
-  placeholder?: {
+  placeholder: {
     value: SubtitledUnicode;
   };
   rows: {

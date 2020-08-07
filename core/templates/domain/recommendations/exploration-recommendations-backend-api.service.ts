@@ -29,7 +29,7 @@ import {
 // This is the type used for params that are sent to the backend.
 // This type has optional properties because they may not be present in the URL.
 // If we send these params always, the request URL would have something like
-// '?collection_id=null' and backend would start looking for a collection
+// '?collection_id=null' and the backend would start looking for a collection
 // with id "null" which is not correct.
 type RecommendationsUrlParams = {
   'stringified_author_recommended_ids': string;

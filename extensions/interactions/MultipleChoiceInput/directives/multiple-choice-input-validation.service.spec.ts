@@ -88,6 +88,9 @@ describe('MultipleChoiceInputValidationService', () => {
           new SubtitledHtml('Option 1', ''),
           new SubtitledHtml('Option 2', '')
         ]
+      },
+      showChoicesInShuffledOrder: {
+        value: true
       }
     };
 

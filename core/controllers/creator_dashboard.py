@@ -326,7 +326,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             })
         else:
             self.values.update({
-                'topic_summary_dicts': None
+                'topic_summary_dicts': []
             })
 
         self.render_json(self.values)

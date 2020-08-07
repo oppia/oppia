@@ -58,7 +58,7 @@ export class EmailDashboardBackendApiService {
     // Here 'cursor' property is optional because it is present only if this
     // function is called with a non-null value to 'cursor' arg.
     // If we send a null value of 'cursor' the request URL would have
-    // something like '?cursor=null' and backend would start looking for
+    // something like '?cursor=null' and the backend would start looking for
     // cursor with value 'null' which is not correct.
     let params: {'cursor'?: string; 'num_queries_to_fetch': string;} = {
       num_queries_to_fetch: String(pageSize)
