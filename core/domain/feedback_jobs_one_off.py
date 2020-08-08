@@ -106,7 +106,7 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to populate message data cache of threads."""
+    """One-off job to regenerate new id for the GeneralFeedbackThreadModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -116,8 +116,17 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(thread_model):
         """Implements the map function for this job."""
+
+        # This job creates new models and the models on which this job maps over
+        # belongs to the same class. We have added a check to validate the model
+        # id to avoid running this job on new models.
+        # The old models have the following pattern:
+        # <entity_type>.<entity_id>.<date-time>.<random-string>
+        # The new models will have the following pattern:
+        # <entity_type>.<entity_id>.<random-string>
         if len(thread_model.id.split('.')) < 4:
             return
+
         old_thread_id = thread_model.id
         new_thread_id = (
             feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(
@@ -168,6 +177,8 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         models_to_delete.extend(feedback_message_models)
 
         for feedback_message_model in feedback_message_models:
+            # The id of the GeneralFeedbackMessageModel follows the following
+            # pattern: <thread_id>.<message_id>
             new_model = feedback_models.GeneralFeedbackMessageModel.create(
                 new_thread_id, feedback_message_model.message_id)
             new_model.thread_id = new_thread_id
@@ -189,6 +200,8 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if feedback_email_reply_to_id_models:
             models_to_delete.extend(feedback_email_reply_to_id_models)
             for model in feedback_email_reply_to_id_models:
+                # The id of the GeneralFeedbackEmailReplyToIdModel follows the
+                # following pattern: <user_id>.<thread_id>
                 new_model = email_models.GeneralFeedbackEmailReplyToIdModel(
                     id=('.'.join([model.user_id, new_thread_id])),
                     user_id=model.user_id,
@@ -203,6 +216,8 @@ class FeedbackThreadIdRegenerateOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             .get_subscription_models_for_thread_id(old_thread_id))
         if subscription_models:
             for model in subscription_models:
+                # The UserSubscriptionsModel.general_feedback_thread_ids is a
+                # list of feedback thread ids to which the user is subscribed.
                 model.general_feedback_thread_ids = [
                     new_thread_id if thread_id == old_thread_id else thread_id
                     for thread_id in model.general_feedback_thread_ids]

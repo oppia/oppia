@@ -475,7 +475,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         to the given thread id.
 
         Args:
-            thread_id: str. The thread id.
+            thread_id: str. The ID of the thread.
 
         Returns:
             list(FeedbackEmailReplyToIdModel). A list of instance corresponding

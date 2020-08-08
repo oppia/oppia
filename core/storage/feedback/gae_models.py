@@ -53,7 +53,10 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     """Threads for each entity.
 
     The id of instances of this class has the form
-        [entity_type].[entity_id].[generated_string]
+        [entity_type].[entity_id].[random_string_of_fixed_length]
+
+    Note: The entity_type in the ID is truncated to a fixed length
+    THREAD_ID_PREFIX_MAX_LEN.
     """
 
     # The type of entity the thread is linked to.
@@ -422,7 +425,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         messages returned is capped by feconf.DEFAULT_QUERY_LIMIT.
 
         Args:
-            thread_id: str. ID of the thread.
+            thread_id: str. The ID of the thread.
 
         Returns:
             list(GeneralFeedbackMessageModel). A list of messages in the
