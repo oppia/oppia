@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.platform import models
@@ -29,7 +30,6 @@ import utils
 
 (config_models,) = models.Registry.import_models(
     [models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
 
 DATA_TYPES = parameter_domain.DATA_TYPES # pylint: disable=invalid-name
 FEATURE_STAGES = parameter_domain.FEATURE_STAGES # pylint: disable=invalid-name
@@ -46,10 +46,8 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
 
         # Parameter names that might be used in following tests.
         parameter_names = ('parameter_a', 'parameter_b')
-        memcache_keys = [
-            parameter_domain.PlatformParameter.get_memcache_key(name)
-            for name in parameter_names]
-        memcache_services.delete_multi(memcache_keys)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM, None, parameter_names)
 
     def tearDown(self):
         super(PlatformParameterRegistryTests, self).tearDown()

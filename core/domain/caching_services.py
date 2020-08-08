@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import collection_domain
 from core.domain import exp_domain
+from core.domain import platform_parameter_domain
 from core.domain import skill_domain
 from core.domain import story_domain
 from core.domain import topic_domain
@@ -36,42 +37,37 @@ memory_cache_services = models.Registry.import_cache_services()
 # version number of the explorations within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of an
 # Exploration. There is also a special sub-namespace represented by the empty
-# string; this sub-namespace handles the explorations where only one version is
-# stored in the cache at a time (a sub-namespace is not required to
-# differentiate them).
+# string; this sub-namespace stores the latest version of the exploration.
 CACHE_NAMESPACE_EXPLORATION = 'exploration'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the collections within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Collection. There is also a special sub-namespace represented by the empty
-# string; this sub-namespace handles the collections where only one version is
-# stored in the cache at a time (a sub-namespace is not required to
-# differentiate them).
+# string; this sub-namespace stores the latest version of the collection.
 CACHE_NAMESPACE_COLLECTION = 'collection'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the skills within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Skill. There is also a special sub-namespace represented by the empty
-# string; this sub-namespace handles the skills where only one version is
-# stored in the cache at a time (a sub-namespace is not required to
-# differentiate them).
+# string; this sub-namespace stores the latest version of the skill.
 CACHE_NAMESPACE_SKILL = 'skill'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the stories within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Story. There is also a special sub-namespace represented by the empty
-# string; this sub-namespace handles the stories where only one version is
-# stored in the cache at a time (a sub-namespace is not required to
-# differentiate them).
+# string; this sub-namespace stores the latest version of the story.
 CACHE_NAMESPACE_STORY = 'story'
 # This namespace supports sub-namespaces which are identified by the stringified
 # version number of the topics within the sub-namespace. The value for
 # each key in this namespace should be a serialized representation of a
 # Topic. There is also a special sub-namespace represented by the empty
-# string; this sub-namespace handles the topics where only one version is
-# stored in the cache at a time (a sub-namespace is not required to
-# differentiate them).
+# string; this sub-namespace stores the latest version of the topic.
 CACHE_NAMESPACE_TOPIC = 'topic'
+# This namespace supports sub-namespaces which are identified by the stringified
+# version number of the topics within the sub-namespace. The value for
+# each key in this namespace should be a serialized representation of a
+# Platform Parameter. This namespace does not support sub-namespaces.
+CACHE_NAMESPACE_PLATFORM = 'platform'
 # The value for each key in this namespace should be a serialized representation
 # of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
 # object). This namespace does not support sub-namespaces.
@@ -87,6 +83,8 @@ DESERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_SKILL: skill_domain.Skill.deserialize,
     CACHE_NAMESPACE_STORY: story_domain.Story.deserialize,
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
+    CACHE_NAMESPACE_PLATFORM: (
+        platform_parameter_domain.PlatformParameter.deserialize),
     CACHE_NAMESPACE_CONFIG: lambda x: x,
     CACHE_NAMESPACE_DEFAULT: lambda x: x
 }
@@ -97,6 +95,7 @@ SERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_SKILL: lambda x: x.serialize(),
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
+    CACHE_NAMESPACE_PLATFORM: lambda x: x.serialize(),
     CACHE_NAMESPACE_CONFIG: lambda x: x,
     CACHE_NAMESPACE_DEFAULT: lambda x: x
 }
@@ -178,7 +177,6 @@ def get_multi(namespace, sub_namespace, obj_ids):
     for obj_id, value in python_utils.ZIP(obj_ids, values):
         if value:
             result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value)
-
     return result_dict
 
 
