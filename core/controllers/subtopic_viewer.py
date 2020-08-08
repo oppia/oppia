@@ -79,6 +79,7 @@ class SubtopicPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'topic_id': topic.id,
+            'topic_name': topic.name,
             'page_contents': subtopic_page_contents_dict,
             'subtopic_title': subtopic_title,
             'next_subtopic_dict': next_subtopic_dict

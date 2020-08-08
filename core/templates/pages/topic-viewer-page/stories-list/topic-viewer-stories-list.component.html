@@ -3,7 +3,10 @@
     <mat-card class="oppia-page-card oppia-long-text">
       <h2 class="tab-title" [innerHTML]="'I18N_TOPIC_VIEWER_LESSONS' | translate"></h2>
       <div *ngFor="let storySummary of canonicalStorySummaries" class="story-info-container">
-        <story-summary-tile [storySummary]="storySummary"></story-summary-tile>
+        <story-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+                            [storySummary]="storySummary"
+                            [topicUrlFragment]="topicUrlFragment">
+        </story-summary-tile>
       </div>
     </mat-card>
   </div>

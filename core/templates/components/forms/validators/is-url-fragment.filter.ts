@@ -13,17 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the collection editor page.
+ * @fileoverview Validator to check if input is a valid URL fragment.
  */
 
-// TODO(bhenning): These constants should be provided by the backend.
+import { AppConstants } from 'app.constants';
 
-export class CollectionEditorPageConstants {
-  public static EDITABLE_COLLECTION_DATA_URL_TEMPLATE =
-    '/collection_editor_handler/data/<collection_id>';
-  public static COLLECTION_RIGHTS_URL_TEMPLATE =
-    '/collection_editor_handler/rights/<collection_id>';
-
-  public static COLLECTION_TITLE_INPUT_FOCUS_LABEL =
-    'collectionTitleInputFocusLabel';
-}
+angular.module('oppia').filter('isUrlFragment', [function() {
+  const VALID_URL_FRAGMENT_REGEX = new RegExp(
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    // eslint-disable-next-line dot-notation
+    AppConstants['VALID_URL_FRAGMENT_REGEX']);
+  return function(input, args) {
+    return (
+      VALID_URL_FRAGMENT_REGEX.test(input) &&
+      input.length <= args.charLimit);
+  };
+}]);

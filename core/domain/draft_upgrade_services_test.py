@@ -363,8 +363,90 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v37_dict_to_v38_dict(self):
+        draft_change_list_v37 = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'rule_specs': [{
+                        'rule_type': 'CaseSensitiveEquals',
+                        'inputs': {
+                            'x': 'test'
+                        }
+                    }],
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Content</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            })
+        ]
+        draft_change_list_v38 = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
+                'property_name': 'answer_groups',
+                'new_value': [{
+                    'rule_input_translations_mapping': {},
+                    'rule_inputs': {
+                        'CaseSensitiveEquals': [{
+                            'x': 'test'
+                        }]
+                    },
+                    'outcome': {
+                        'dest': 'Introduction',
+                        'feedback': {
+                            'content_id': 'feedback',
+                            'html': '<p>Content</p>'
+                        },
+                        'param_changes': [],
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            })
+        ]
+
+        # Migrate exploration to state schema version 37.
+        self.create_and_migrate_new_exploration('37', '38')
+        migrated_draft_change_list_v38 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v37, 1, 2, self.EXP_ID))
+
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v38_dict_list = [
+            change.to_dict() for change in draft_change_list_v38
+        ]
+        migrated_draft_change_list_v38_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v38
+        ]
+        self.assertEqual(
+            draft_change_list_v38_dict_list,
+            migrated_draft_change_list_v38_dict_list)
+
     def test_convert_states_v36_dict_to_v37_dict(self):
         draft_change_list_v36 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
             exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': 'Intro',
@@ -396,14 +478,20 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Intro',
                 'property_name': 'answer_groups',
                 'new_value': [{
-                    'rule_input_translations_mapping': {},
-                    'rule_inputs': {
-                        'CaseSensitiveEquals': [{
+                    'rule_specs': [{
+                        'rule_type': 'Equals',
+                        'inputs': {
                             'x': 'test'
-                        }]
-                    },
+                        }
+                    }],
                     'outcome': {
                         'dest': 'Introduction',
                         'feedback': {

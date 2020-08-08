@@ -265,7 +265,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """A reusbale one-off job for testing exploration migration from the
+    """A reusable one-off job for testing exploration migration from the
     previous exploration schema version to the latest. This job runs the state
     migration, but does not commit the new exploration to the store.
     """
