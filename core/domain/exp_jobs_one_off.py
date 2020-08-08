@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import copy
 import itertools
 import logging
 import re
@@ -273,36 +274,34 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        current_exp_schema_version = (
+                exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
+
+        exploration_dict = item.to_dict()
+        states_schema_version = exploration_dict['states_schema_version']
+        versioned_exploration_states = {
+            'states_schema_version': states_schema_version,
+            'states': exploration_dict['states']
+        }
         # Upgrading older explorations to current version - 1 before running the
         # audit job.
-        if item.states_schema_version < current_state_schema_version - 1:
-            feconf.CURRENT_STATE_SCHEMA_VERSION -= 1
+        while states_schema_version < current_state_schema_version - 1:
+            exp_domain.Exploration.update_states_from_model(
+                versioned_exploration_states, states_schema_version,
+                item.id)
+            states_schema_version += 1
 
-            commit_cmds = [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': python_utils.UNICODE(
-                    item.states_schema_version),
-                'to_version': python_utils.UNICODE(
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
-            })]
-            exp_services.update_exploration(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update exploration states from schema version %d to %d.' % (
-                    item.states_schema_version,
-                    feconf.CURRENT_STATE_SCHEMA_VERSION))
-
-            feconf.CURRENT_STATE_SCHEMA_VERSION += 1
+        exploration_dict['states'] = versioned_exploration_states['states']
+        exploration_dict['states_schema_version'] = states_schema_version
 
         try:
-            current_exp_schema_version = (
-                exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
             conversion_fn = getattr(
                 exp_domain.Exploration,
                 '_convert_v%i_dict_to_v%i_dict' % (
                     current_exp_schema_version - 1,
                     current_exp_schema_version)
             )
-            converted_dict = conversion_fn(item.to_dict())
+            converted_dict = conversion_fn(exploration_dict)
 
             # TODO(iamprayush): Revert these changes (special-casing the
             # SUCCESS output for math interactions) after the migration job
