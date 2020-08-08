@@ -16,65 +16,41 @@
  * @fileoverview Unit tests for classroom page component.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlService } from 'services/contextual/url.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-
-require('pages/topic-viewer-page/navbar-breadcrumb/' +
-  'topic-viewer-navbar-breadcrumb.component');
+import { TopicViewerNavbarBreadcrumbComponent } from
+  // eslint-disable-next-line max-len
+  'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
 
 describe('Topic viewer navbar breadcrumb component', () => {
-  var ctrl = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var readOnlyTopicObjectFactory = null;
-  var topicViewerBackendApiService = null;
-  var urlService = null;
+  let component: TopicViewerNavbarBreadcrumbComponent;
+  let fixture: ComponentFixture<TopicViewerNavbarBreadcrumbComponent>;
+  let readOnlyTopicObjectFactory = null;
+  let topicViewerBackendApiService = null;
+  let urlService = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(function() {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+      imports: [HttpClientTestingModule],
+      declarations: [TopicViewerNavbarBreadcrumbComponent],
+    }).compileComponents();
 
     readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
     urlService = TestBed.get(UrlService);
-  });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic1');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'classroom1');
 
-    spyOn(urlService, 'getTopicNameFromLearnerUrl').and.returnValue('topic1');
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('topicViewerNavbarBreadcrumb', {
-      $rootScope: $rootScope,
-      $scope: $scope,
-      UrlService: urlService
-    });
-
-    // This approach was choosen because spyOn() doesn't work on properties
-    // that doesn't have a get access type.
-    // Without this approach the test will fail because it'll throw
-    // 'Property topicViewerBackendApiService does not have access type get'
-    // or 'Property topicViewerBackendApiService does not have access type set'
-    // error.
-    Object.defineProperty(ctrl, 'topicViewerBackendApiService', {
-      get: () => undefined,
-      set: () => {}
-    });
-    spyOnProperty(ctrl, 'topicViewerBackendApiService').and.returnValue(
-      topicViewerBackendApiService);
-    spyOn(topicViewerBackendApiService, 'fetchTopicData').and.returnValue(
-      $q.resolve(readOnlyTopicObjectFactory.createFromBackendDict({
+    spyOn(topicViewerBackendApiService, 'fetchTopicData').and.resolveTo(
+      readOnlyTopicObjectFactory.createFromBackendDict({
         subtopics: [],
         skill_descriptions: {},
         uncategorized_skill_ids: [],
@@ -85,14 +61,21 @@ describe('Topic viewer navbar breadcrumb component', () => {
         topic_id: 'topic1',
         topic_description: 'Description',
         train_tab_should_be_displayed: false
-      })));
+      }));
   }));
 
-  it('should set topic name using the data retrieved from the backend',
-    function() {
-      ctrl.$onInit();
-      $scope.$apply();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicViewerNavbarBreadcrumbComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-      expect($scope.topicName).toBe('Topic Name 1');
-    });
+  it('should set topic name using the data retrieved from the backend',
+    async(() => {
+      component.ngOnInit();
+      fixture.whenStable().then(() => {
+        fixture.detectChanges();
+        expect(component.topicName).toBe('Topic Name 1');
+      });
+    }));
 });
