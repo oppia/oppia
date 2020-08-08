@@ -36,6 +36,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
@@ -48,6 +50,7 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain.proto import text_classifier_pb2
 from core.platform import models
 import feconf
 import main
@@ -865,14 +868,13 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_blob(self, url, payload, csrf_token=None, expected_status_int=200):
+    def post_blob(self, url, payload, expected_status_int=200):
         """Post a BLOB object to the server; return the received object.
 
         Args:
             url: str. The URL to which BLOB object in payload should be sent
                 through a post request.
             payload: bytes. Binary data which needs to be sent.
-            csrf_token: str. CSRF token.
             expected_status_int: int. The status expected as a response of post
                 request.
 
@@ -2718,6 +2720,38 @@ class GenericEmailTestBase(GenericTestBase):
 
 
 EmailTestBase = GenericEmailTestBase
+
+
+class ClassifierTestBase(GenericEmailTestBase):
+    """Base class for classifier test classes that need common function
+    for reading classifier data from GCS.
+
+    This class is derived from GenericEmailTestBase because the
+    TrainedClassifierHandlerTests test suite requires email services test
+    functions in addition to classifier function defined below.
+    """
+
+    def _get_classifier_data_from_classifier_training_job(
+            self, classifier_training_job):
+        """Retrieves classifier training job from GCS using metadata stored in
+        classifier_training_job.
+
+        Args:
+            classifier_training_job: ClassifierTrainingJob. Domain object
+                containing metadata of the training job which is used to
+                retrieve the trained model.
+
+        Returns:
+            FrozenModel. Protobuf object containing classifier data.
+        """
+        filename = classifier_training_job.classifier_data_file_name
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        classifier_data = utils.decompress_from_zlib(fs.get(filename))
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.ParseFromString(classifier_data)
+        return classifier_data_proto
 
 
 class FunctionWrapper(python_utils.OBJECT):

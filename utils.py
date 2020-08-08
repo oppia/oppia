@@ -790,7 +790,7 @@ def compress_to_zlib(data):
         data: str. Data to be copressed.
 
     Returns:
-        Compressed data string.
+        str. Compressed data string.
     """
     return zlib.compress(data)
 
@@ -802,7 +802,7 @@ def decompress_from_zlib(data):
         data: str. Data to be decopressed.
 
     Returns:
-        Decompressed data string.
+        str. Decompressed data string.
     """
     return zlib.decompress(data)
 

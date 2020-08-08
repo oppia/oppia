@@ -436,8 +436,8 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
         """Returns the algorithm_ids_to_job_ids of the training jobs.
 
         Returns:
-            dict(str, str). Mapping of algorithm IDs to corresponding unique training
-            job IDs.
+            dict(str, str). Mapping of algorithm IDs to corresponding unique
+            training job IDs.
         """
         return self._algorithm_ids_to_job_ids
 
@@ -446,7 +446,7 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
         domain object.
 
         Returns:
-            A dict representation of StateTrainingJobsMapping domain
+            dict. A dict representation of StateTrainingJobsMapping domain
             object.
         """
 
@@ -473,8 +473,6 @@ class StateTrainingJobsMapping(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected state_name to be a string, received %s' % (
                     self.state_name))
-
-        self._algorithm_ids_to_job_ids.validate()
 
         if not isinstance(self.algorithm_ids_to_job_ids, dict):
             raise utils.ValidationError(

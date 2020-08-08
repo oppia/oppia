@@ -103,7 +103,8 @@ class TrainedClassifierHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""
-        payload_proto = training_job_response_payload_pb2.TrainingJobResponsePayload()
+        payload_proto = (
+            training_job_response_payload_pb2.TrainingJobResponsePayload())
         payload_proto.ParseFromString(self.request.body)
         signature = payload_proto.signature
         vm_id = payload_proto.vm_id
@@ -178,12 +179,14 @@ class TrainedClassifierHandler(base.BaseHandler):
             raise self.InvalidInputException
 
         if not (
-            algorithm_id in state_training_jobs_mapping.
-            algorithm_ids_to_job_ids):
+                algorithm_id in state_training_jobs_mapping.
+                algorithm_ids_to_job_ids):
             classifier_services.migrate_state_training_jobs(
                 state_training_jobs_mapping)
             # Since the required training job doesn't exist and old job has to
             # be migrated, a PageNotFound exception is raised.
+            # Once jobs are migrated and trained they can be sent to the client
+            # upon further requests.
             raise self.PageNotFoundException
 
         training_job = classifier_services.get_classifier_training_job_by_id(
@@ -198,6 +201,8 @@ class TrainedClassifierHandler(base.BaseHandler):
                 state_training_jobs_mapping)
             # Since the required training job doesn't exist and old job has to
             # be migrated, a PageNotFound exception is raised.
+            # Once jobs are migrated and trained they can be sent to the client
+            # upon further requests.
             raise self.PageNotFoundException
 
         return self.render_json({

@@ -95,7 +95,14 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions',
     'html_field_types_to_rule_specs.json')
+
 # A mapping of interaction ids to classifier properties.
+# As of now we support only one interaction per interaction however, we do have
+# necessary storage infrastructure to support multiple algorithms per
+# interaction. Hence, whenever we find a secondary algorithm candidate for any
+# of the supported interactions, the logical functions to support multiple
+# algorithms needs to be implemented.
+# TODO(@prasanna08): More info: https://github.com/oppia/oppia/issues/10217
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',

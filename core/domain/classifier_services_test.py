@@ -28,7 +28,6 @@ from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain.proto import text_classifier_pb2
 from core.platform import models
@@ -40,7 +39,7 @@ import utils
     [models.NAMES.classifier])
 
 
-class ClassifierServicesTests(test_utils.GenericTestBase):
+class ClassifierServicesTests(test_utils.ClassifierTestBase):
     """Test "classify" using the sample explorations.
 
     Since the end to end tests cover correct classification, and frontend tests
@@ -84,28 +83,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_data_proto.model_json = json.dumps(classifier_data)
         fs_services.save_classifier_data(exp_id, job_id, classifier_data_proto)
         return job_id
-
-    def _get_classifier_data_from_classifier_training_job(
-            self, classifier_training_job):
-        """Retrieves classifier training job from GCS using metadata stored in
-        classifier_training_job.
-
-        Args:
-            classifier_training_job: ClassifierTrainingJob. Domain object
-                containing metadata of the training job which is used to
-                retrieve the trained model.
-
-        Returns:
-            FronzeModel. Protobuf object containing classifier data.
-        """
-        filename = classifier_training_job.classifier_data_file_name
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
-        classifier_data = utils.decompress_from_zlib(fs.get(filename))
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.ParseFromString(classifier_data)
-        return classifier_data_proto
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the handle_trainable_states method and

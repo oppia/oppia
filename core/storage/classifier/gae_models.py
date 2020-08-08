@@ -349,8 +349,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
                 exp_version=state_training_job_mapping.exp_version,
                 state_name=state_training_job_mapping.state_name,
                 algorithm_ids_to_job_ids=(
-                    state_training_job_mapping.algorithm_ids_to_job_ids.
-                    to_dict()
+                    state_training_job_mapping.algorithm_ids_to_job_ids
                 ))
 
             mapping_models.append(mapping_instance)

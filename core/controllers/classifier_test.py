@@ -31,7 +31,6 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain.proto import text_classifier_pb2
 from core.domain.proto import training_job_response_payload_pb2
@@ -39,35 +38,12 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
-class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
+class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
     """Test the handler for storing job result of training job."""
-
-    def _get_classifier_data_from_classifier_training_job(
-            self, classifier_training_job):
-        """Retrieves classifier training job from GCS using metadata stored in
-        classifier_training_job.
-
-        Args:
-            classifier_training_job: ClassifierTrainingJob. Domain object
-                containing metadata of the training job which is used to
-                retrieve the trained model.
-
-        Returns:
-            FrozenModel. Protobuf object containing classifier data.
-        """
-        filename = classifier_training_job.classifier_data_file_name
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
-        classifier_data = utils.decompress_from_zlib(fs.get(filename))
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.ParseFromString(classifier_data)
-        return classifier_data_proto
 
     def setUp(self):
         super(TrainedClassifierHandlerTests, self).setUp()
@@ -148,20 +124,22 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             self.payload_proto.job_result.SerializeToString(),
             self.payload_proto.vm_id)
 
-        self.fetch_next_job_payload = {}
-        self.fetch_next_job_payload['vm_id'] = feconf.DEFAULT_VM_ID
+        self.payload_for_fetching_next_job_request = {
+            'vm_id': feconf.DEFAULT_VM_ID,
+            'message': json.dumps({})
+        }
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.fetch_next_job_payload['message'] = json.dumps({})
-        self.fetch_next_job_payload['signature'] = classifier.generate_signature(
-            python_utils.convert_to_bytes(secret),
-            self.fetch_next_job_payload['message'],
-            self.fetch_next_job_payload['vm_id'])
+        self.payload_for_fetching_next_job_request['signature'] = (
+            classifier.generate_signature(
+                python_utils.convert_to_bytes(secret),
+                self.payload_for_fetching_next_job_request['message'],
+                self.payload_for_fetching_next_job_request['vm_id']))
 
     def test_trained_classifier_handler(self):
         # Normal end-to-end test.
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=200)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=200)
         classifier_training_job = (
             classifier_services.get_classifier_training_job(
                 self.exp_id, self.exploration.version, 'Home',
@@ -226,8 +204,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
                 # Post ML Job.
                 self.post_blob(
                     '/ml/trainedclassifierhandler',
-                    self.payload.SerializeToString(), expected_status_int=500)
-
+                    self.payload_proto.SerializeToString(),
+                    expected_status_int=500)
                 # Check that there are now emails sent.
                 messages = self._get_sent_email_messages(
                     feconf.ADMIN_EMAIL_ADDRESS)
@@ -244,21 +222,21 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             self.post_blob(
                 '/ml/trainedclassifierhandler',
-                self.payload.SerializeToString(), expected_status_int=401)
+                self.payload_proto.SerializeToString(), expected_status_int=401)
 
     def test_error_on_different_signatures(self):
         # Altering data to result in different signatures.
-        self.payload.job_result.job_id = 'different_job_id'
+        self.payload_proto.job_result.job_id = 'different_job_id'
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=401)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=401)
 
     def test_error_on_invalid_classifier_data_in_message(self):
         # Altering message dict to result in invalid dict.
-        self.payload.job_result.ClearField('classifier_frozen_model')
+        self.payload_proto.job_result.ClearField('classifier_frozen_model')
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=400)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=400)
 
     def test_error_on_failed_training_job_status(self):
         classifier_training_job_model = (
@@ -269,8 +247,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         classifier_training_job_model.put()
 
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=500)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=500)
 
     def test_error_on_exception_in_store_classifier_data(self):
         classifier_training_job_model = (
@@ -280,13 +258,13 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         classifier_training_job_model.put()
 
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=500)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=500)
 
     def test_get_trained_classifier_handler(self):
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=200)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=200)
         classifier_training_job = (
             classifier_services.get_classifier_training_job(
                 self.exp_id, self.exploration.version, 'Home',
@@ -306,8 +284,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
     def test_error_on_incorrect_exploration_id_for_retrieving_model(self):
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=200)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': 'fake_exp',
@@ -320,8 +298,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
     def test_error_on_incorrect_state_name_for_retrieving_model(self):
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=200)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': self.exp_id,
@@ -334,8 +312,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
     def test_error_on_incorrect_exp_version_for_retrieving_model(self):
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=200)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': self.exp_id,
@@ -361,12 +339,28 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
         new_exp = self.save_new_default_exploration(
             new_exp_id, feconf.SYSTEM_COMMITTER_ID, title='New title')
 
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': new_exp.init_state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        })]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': new_exp.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'state_name': new_exp.init_state_name,
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                }
+            })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
@@ -440,7 +434,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             json_response = self.post_json(
-                '/ml/nextjobhandler', self.fetch_next_job_payload,
+                '/ml/nextjobhandler',
+                self.payload_for_fetching_next_job_request,
                 expected_status_int=200)
 
         self.assertEqual(
@@ -453,8 +448,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
 
     def test_training_job_migration_on_algorithm_version_change(self):
         self.post_blob(
-            '/ml/trainedclassifierhandler', self.payload.SerializeToString(),
-            expected_status_int=200)
+            '/ml/trainedclassifierhandler',
+            self.payload_proto.SerializeToString(), expected_status_int=200)
 
         params = {
             'exploration_id': self.exp_id,
@@ -486,7 +481,8 @@ class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
             feconf, 'INTERACTION_CLASSIFIER_MAPPING',
             interaction_classifier_mapping):
             json_response = self.post_json(
-                '/ml/nextjobhandler', self.fetch_next_job_payload,
+                '/ml/nextjobhandler',
+                self.payload_for_fetching_next_job_request,
                 expected_status_int=200)
 
         self.assertEqual(

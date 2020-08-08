@@ -387,7 +387,8 @@ def get_classifier_training_job(exp_id, exp_version, state_name, algorithm_id):
             job is to be retrieved.
 
     Returns:
-        ClassifierTrainingJob|None instance for the classifier training job.
+        ClassifierTrainingJob|None. An instance for the classifier training job
+        or None if no such instance is found.
     """
     state_training_jobs_mapping_model = (
         classifier_models.StateTrainingJobsMappingModel.get_model(
@@ -474,14 +475,14 @@ def migrate_state_training_jobs(state_training_jobs_mapping):
     possible_algorithm_ids = [algorithm_id]
 
     algorithm_ids_to_add = set(possible_algorithm_ids).difference(
-        set(state_training_jobs_mapping.get_all_algorithm_ids()))
+        set(state_training_jobs_mapping.algorithm_ids_to_job_ids.keys()))
 
     algorithm_ids_to_remove = set(
-        state_training_jobs_mapping.get_all_algorithm_ids()).difference(
+        state_training_jobs_mapping.algorithm_ids_to_job_ids.keys()).difference(
             set(possible_algorithm_ids))
 
     algorithm_ids_to_upgrade = set(possible_algorithm_ids).intersection(
-        set(state_training_jobs_mapping.get_all_algorithm_ids()))
+        set(state_training_jobs_mapping.algorithm_ids_to_job_ids.keys()))
 
     if len(algorithm_ids_to_add) > 0:
         job_dicts = []
@@ -575,7 +576,7 @@ def get_classifier_training_job_maps(exp_id, exp_version, state_names):
     job_ids = [
         job_id for algorithm_ids_to_job_ids in (
             state_to_algorithm_id_job_id_map.values())
-        for job_id in algorithm_ids_to_job_ids]
+        for job_id in algorithm_ids_to_job_ids.values()]
 
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
@@ -592,7 +593,7 @@ def get_classifier_training_job_maps(exp_id, exp_version, state_names):
         algorithm_ids_to_job_ids = state_to_algorithm_id_job_id_map[state_name]
         algorithm_id_to_training_job_maps.append({
             algorithm_id: job_id_to_model[job_id]
-            for algorithm_id, job_id in algorithm_ids_to_job_ids
+            for algorithm_id, job_id in algorithm_ids_to_job_ids.items()
         })
 
     return algorithm_id_to_training_job_maps
