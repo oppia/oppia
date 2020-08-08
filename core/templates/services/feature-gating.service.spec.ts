@@ -51,7 +51,6 @@ describe('FeatureGatingService', () => {
     i18n = TestBed.get(I18nLanguageCodeService);
     resultFactory = TestBed.get(FeatureFlagResultsObjectFactory);
     apiService = TestBed.get(FeatureGatingBackendApiService);
-    featureGatingService = TestBed.get(FeatureGatingService);
 
     const store = {};
     let cookie = '';
@@ -79,7 +78,7 @@ describe('FeatureGatingService', () => {
     mockCookie = (cookieStr: string) => cookie = cookieStr;
     mockUserAgent = ua => userAgent = ua;
 
-    spyOn(i18n, 'getCurrentI18nLanguageCode').and.returnValue('TODO');
+    spyOn(i18n, 'getCurrentI18nLanguageCode').and.returnValue('en');
     apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
       resultFactory.createFromBackendDict({
         feature_name_a: true,
@@ -95,13 +94,14 @@ describe('FeatureGatingService', () => {
     // test, so we need to manually clear the state of FeatureGatingService.
     FeatureGatingService.featureFlagResults = null;
     FeatureGatingService._initializedWithError = false;
+    FeatureGatingService.initializationPromise = null;
   });
 
   describe('.initialize', () => {
     it('should load from server when storage is clean.', fakeAsync(() => {
-      featureGatingService = TestBed.get(FeatureGatingService);
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
+      featureGatingService = TestBed.get(FeatureGatingService);
       featureGatingService.initialize()
         .then(successHandler, failHandler);
 
@@ -116,9 +116,9 @@ describe('FeatureGatingService', () => {
     it('should save results in sessionStorage after loading.', fakeAsync(() => {
       const sessionId = 'session_id';
       mockCookie(`SACSID=${sessionId}`);
+      featureGatingService = TestBed.get(FeatureGatingService);
 
       const timestamp = Date.now();
-      featureGatingService.initialize();
 
       flushMicrotasks();
 
@@ -146,7 +146,7 @@ describe('FeatureGatingService', () => {
         const sessionId = 'session_id';
         mockCookie(`SACSID=${sessionId}; dev_appserver_login=should_not_use`);
 
-        featureGatingService.initialize();
+        featureGatingService = TestBed.get(FeatureGatingService);
 
         flushMicrotasks();
 
@@ -164,7 +164,7 @@ describe('FeatureGatingService', () => {
         const sessionId = 'session_id';
         mockCookie(`dev_appserver_login=${sessionId}`);
 
-        featureGatingService.initialize();
+        featureGatingService = TestBed.get(FeatureGatingService);
 
         flushMicrotasks();
 
@@ -192,7 +192,7 @@ describe('FeatureGatingService', () => {
         });
 
         tick(60 * 1000);
-        featureGatingService.initialize();
+        featureGatingService = TestBed.get(FeatureGatingService);
 
         flushMicrotasks();
 
@@ -217,7 +217,7 @@ describe('FeatureGatingService', () => {
         });
 
         tick(13 * 3600 * 1000); // 13 hours later.
-        featureGatingService.initialize();
+        featureGatingService = TestBed.get(FeatureGatingService);
 
         flushMicrotasks();
 
@@ -227,7 +227,7 @@ describe('FeatureGatingService', () => {
     );
 
     it(
-      'should load from server if sessionId of saved result does not match',
+      'should load from server if sessionId of saved result does not match.',
       fakeAsync(() => {
         const sessionId = 'session_id';
         mockCookie(`SACSID=${sessionId}`);
@@ -242,7 +242,7 @@ describe('FeatureGatingService', () => {
           })
         });
 
-        featureGatingService.initialize();
+        featureGatingService = TestBed.get(FeatureGatingService);
 
         flushMicrotasks();
 
@@ -256,9 +256,23 @@ describe('FeatureGatingService', () => {
       })
     );
 
+    it('should request only once if there are more than one calls to ' +
+      '.initialize.', fakeAsync(() => {
+      featureGatingService = TestBed.get(FeatureGatingService);
+
+      featureGatingService.initialize();
+      featureGatingService.initialize();
+
+      flushMicrotasks();
+
+      expect(apiService.fetchFeatureFlags).toHaveBeenCalledTimes(1);
+      expect(featureGatingService.initialzedWithError).toBeFalse();
+    }));
+
     it('should disable all features when loading fails.', fakeAsync(() => {
       apiSpy.and.throwError('mock error');
-      featureGatingService.initialize();
+
+      featureGatingService = TestBed.get(FeatureGatingService);
 
       flushMicrotasks();
 
@@ -272,6 +286,10 @@ describe('FeatureGatingService', () => {
     }));
 
     describe('.detectBrowserType', () => {
+      beforeEach(() => {
+        featureGatingService = TestBed.get(FeatureGatingService);
+      });
+
       it('should correctly detect Edge browser.', () => {
         mockUserAgent(
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
@@ -308,7 +326,7 @@ describe('FeatureGatingService', () => {
 
   describe('.isFeatureEnabled', () => {
     it('should return correct values of feature flags', fakeAsync(() => {
-      featureGatingService.initialize();
+      featureGatingService = TestBed.get(FeatureGatingService);
 
       flushMicrotasks();
 
@@ -321,10 +339,13 @@ describe('FeatureGatingService', () => {
       expect(featureGatingService.initialzedWithError).toBeFalse();
     }));
 
-    it('should throw error when accessed before initialization.', () => {
-      expect(
-        () => featureGatingService.isFeatureEnabled(<FeatureNames>'name')
-      ).toThrowError('The feature gating service has not been initialized.');
-    });
+    it('should throw error when accessed before initialization.', fakeAsync(
+      () => {
+        featureGatingService = TestBed.get(FeatureGatingService);
+        expect(
+          () => featureGatingService.isFeatureEnabled(<FeatureNames>'name')
+        ).toThrowError('The feature gating service has not been initialized.');
+      })
+    );
   });
 });
