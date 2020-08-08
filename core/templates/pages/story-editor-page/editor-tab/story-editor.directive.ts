@@ -144,7 +144,7 @@ angular.module('oppia').directive('storyEditor', [
             }).result.then(function() {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
               _initEditor();
-              $scope.$broadcast('recalculateAvailableNodes');
+              StoryEditorStateService.onRecalculateAvailableNodes.emit();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -173,7 +173,7 @@ angular.module('oppia').directive('storyEditor', [
                 $scope.setNodeToEdit(
                   $scope.story.getStoryContents().getInitialNodeId());
               }
-              $scope.$broadcast('recalculateAvailableNodes');
+              StoryEditorStateService.onRecalculateAvailableNodes.emit();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
