@@ -1951,8 +1951,11 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-interaction-preview {
+  height: 100%;
   opacity: 0.5;
   padding: 4px;
+  position: absolute;
+  width: 100%;
 }
 
 .oppia-editable-section:hover .oppia-interaction-preview {

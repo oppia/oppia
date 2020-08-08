@@ -35,7 +35,7 @@
             ui-sortable documentation for more details. -->
             <!-- Note that adding "track by $index" here seems to mess up the final
             index in the stop() event handler. -->
-            <li ng-repeat="answerGroup in answerGroups" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection" style="margin-top: 0;">
+            <li ng-repeat="answerGroup in answerGroups" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection">
               <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1" ng-mousedown="changeActiveAnswerGroupIndex(-1)">
                 <picture ng-if="EditabilityService.isEditable()">
                   <source type="image/webp" ng-srcset="<[getStaticImageUrl('/general/drag_dots.webp')]>">
@@ -156,7 +156,7 @@
     padding: 15px 30px;
   }
   state-responses .oppia-add-response-button-container {
-    margin: 10px 0;
+    margin: 15px 0;
   }
   state-responses .state-responses-header i {
     display: none;

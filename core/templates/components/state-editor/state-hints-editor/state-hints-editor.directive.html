@@ -3,7 +3,7 @@
     <md-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
       <div class="oppia-editor-card-body">
         <div class="state-hints-header-container oppia-mobile-collapsible-card-header" ng-click="toggleHintCard()">
-          <div class="state-hints-header" ng-if="StateHintsService.displayed.length > 0 || canEdit">
+          <div class="state-hints-header" ng-if="EditabilityService.isEditableOutsideTutorialMode()">
             <h3 class="oppia-exp-hints-card-header">Hints</h3>
             <i class="fa fa-caret-down"
                ng-if="!hintCardIsShown"
@@ -37,8 +37,7 @@
               index in the stop() event handler. -->
               <li ng-repeat="hint in StateHintsService.displayed"
                   ng-class="{'active': StateHintsService.getActiveHintIndex() === $index}"
-                  class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
-                  style="margin-top: 0;">
+                  class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection">
                 <span class="oppia-hint-sort-handle"
                       ng-if="StateHintsService.displayed.length > 1"
                       ng-mousedown="changeActiveHintIndex(null)">
