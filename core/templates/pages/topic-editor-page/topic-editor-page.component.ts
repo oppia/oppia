@@ -101,11 +101,14 @@ angular.module('oppia').directive('topicEditorPage', [
                     'with the changes', 2000);
                 return;
               }
-              var topicName = ctrl.topic.getName();
+              var topicUrlFragment = ctrl.topic.getUrlFragment();
+              var classroomUrlFragment = (
+                TopicEditorStateService.getClassroomUrlFragment());
               var newTab = $window.open();
               newTab.location.href = UrlInterpolationService.interpolateUrl(
                 TOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_name: topicName
+                  topic_url_fragment: topicUrlFragment,
+                  classroom_url_fragment: classroomUrlFragment
                 });
             } else {
               var subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
@@ -151,6 +154,14 @@ angular.module('oppia').directive('topicEditorPage', [
           };
           ctrl._validateTopic = function() {
             ctrl.validationIssues = ctrl.topic.validate();
+            if (TopicEditorStateService.getTopicWithNameExists()) {
+              ctrl.validationIssues.push(
+                'A topic with this name already exists.');
+            }
+            if (TopicEditorStateService.getTopicWithUrlFragmentExists()) {
+              ctrl.validationIssues.push(
+                'Topic URL fragment already exists.');
+            }
             var prepublishTopicValidationIssues = (
               ctrl.topic.prepublishValidate());
             var subtopicPrepublishValidationIssues = (

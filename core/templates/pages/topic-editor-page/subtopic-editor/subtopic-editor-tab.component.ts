@@ -89,6 +89,7 @@ angular.module('oppia').component('subtopicEditorTab', {
           ctrl.editableThumbnailBgColor = (
             ctrl.subtopic.getThumbnailBgColor());
           ctrl.editableUrlFragment = ctrl.subtopic.getUrlFragment();
+          ctrl.initialSubtopicUrlFragment = ctrl.subtopic.getUrlFragment();
           ctrl.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           ctrl.allowedBgColors = (
@@ -123,7 +124,7 @@ angular.module('oppia').component('subtopicEditorTab', {
       ctrl.updateSubtopicUrlFragment = function(urlFragment) {
         ctrl.subtopicUrlFragmentIsValid = (
           SubtopicValidationService.isUrlFragmentValid(urlFragment));
-        if (urlFragment === ctrl.subtopic.getUrlFragment()) {
+        if (urlFragment === ctrl.initialSubtopicUrlFragment) {
           ctrl.subtopicUrlFragmentExists = false;
           return;
         }

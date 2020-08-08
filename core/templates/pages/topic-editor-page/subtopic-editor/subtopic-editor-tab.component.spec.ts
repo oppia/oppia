@@ -147,6 +147,7 @@ describe('Subtopic editor tab', function() {
   it('should not call TopicUpdateService when url fragment has not changed',
     function() {
       ctrl.updateSubtopicUrlFragment('subtopic-url');
+      ctrl.initialSubtopicUrlFragment = 'subtopic-url';
       var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
       ctrl.updateSubtopicUrlFragment('subtopic-url');
       expect(urlFragmentSpy).not.toHaveBeenCalled();
