@@ -47,8 +47,8 @@ describe('Skill Difficulty object factory', () => {
     });
 
     it('should set the description of the skill difficulty instance', () => {
-      var skillDifficulty =
-        skillDifficultyObjectFactory.create('1', 'test skill', 0.3);
+      var skillDifficulty = skillDifficultyObjectFactory.create(
+        '1', 'test skill', 0.3);
       skillDifficulty.setDescription('new test skill');
       expect(skillDifficulty.getDescription()).toEqual('new test skill');
     });
