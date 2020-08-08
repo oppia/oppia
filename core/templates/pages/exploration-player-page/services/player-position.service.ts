@@ -41,24 +41,20 @@ export class PlayerPositionService {
     this.onChangeCallback = callback;
   }
 
+  /**
+   * This function is used to find the name of the current state.
+   * @return {string} a string that shows the name of current state.
+   */
   getCurrentStateName(): string {
-    try {
-      return (
-        this.playerTranscriptService.getCard(
-          this.displayedCardIndex).getStateName());
-    } catch (e) {
-      let additionalInfo = ('\nUndefined card error debug logs:' +
-          '\nRequested card index: ' + this.displayedCardIndex +
-          '\nExploration ID: ' + this.contextService.getExplorationId() +
-          '\nTotal cards: ' + this.playerTranscriptService.getNumCards() +
-          '\nLast state name: ' +
-          this.playerTranscriptService.getLastStateName()
-      );
-      e.message += additionalInfo;
-      throw e;
-    }
+    return (
+      this.playerTranscriptService.getCard(
+        this.displayedCardIndex).getStateName());
   }
 
+  /**
+   * This function is used to set the index of the displayed card.
+   * @param {number} index - The new index of the card.
+   */
   setDisplayedCardIndex(index: number): void {
     let oldIndex = this.displayedCardIndex;
     this.displayedCardIndex = index;
@@ -68,18 +64,34 @@ export class PlayerPositionService {
     }
   }
 
+  /**
+   * This function is used to find the index of the displayed card.
+   * @return {number} The index of the displayed card.
+   */
   getDisplayedCardIndex(): number {
     return this.displayedCardIndex;
   }
 
+  /**
+   * This function is used to record that the user has submitted an answer.
+   */
   recordAnswerSubmission(): void {
     this.learnerJustSubmittedAnAnswer = true;
   }
 
+  /**
+   * This function is used to record that the user has clicked
+   * on the navigation button.
+   */
   recordNavigationButtonClick(): void {
     this.learnerJustSubmittedAnAnswer = false;
   }
 
+  /**
+   * This function is used to get whether the learner has just
+   * submitted an answer.
+   * @return {boolean} Whether the learner has just submitted an answer.
+   */
   hasLearnerJustSubmittedAnAnswer(): boolean {
     return this.learnerJustSubmittedAnAnswer;
   }

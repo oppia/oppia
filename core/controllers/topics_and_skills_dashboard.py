@@ -82,7 +82,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
-        all_classrooms_dict = config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value
+        all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
         all_classroom_names = [
             classroom['name'] for classroom in all_classrooms_dict]
 
@@ -318,7 +318,9 @@ class NewSkillHandler(base.BaseHandler):
                 'Explanation should be a dict.')
 
         try:
-            state_domain.SubtitledHtml.from_dict(explanation_dict)
+            subtitled_html = (
+                state_domain.SubtitledHtml.from_dict(explanation_dict))
+            subtitled_html.validate()
         except:
             raise self.InvalidInputException(
                 'Explanation should be a valid SubtitledHtml dict.')

@@ -42,6 +42,9 @@ require(
   'state-customization-args.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-next-content-id-index.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -73,6 +76,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
       scope: {
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionId: '=',
+        onSaveNextContentIdIndex: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
         recomputeGraph: '='
@@ -84,7 +88,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService', 'StateEditorService',
         'INTERACTION_SPECS', 'StateInteractionIdService',
-        'StateCustomizationArgsService', 'EditabilityService',
+        'StateCustomizationArgsService', 'StateNextContentIdIndexService',
+        'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'ExplorationHtmlFormatterService', 'ResponsesService',
         'SubtitledHtmlObjectFactory', 'StateSolutionService',
@@ -92,7 +97,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
             AlertsService, HtmlEscaperService, StateEditorService,
             INTERACTION_SPECS, StateInteractionIdService,
-            StateCustomizationArgsService, EditabilityService,
+            StateCustomizationArgsService, StateNextContentIdIndexService,
+            EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             ExplorationHtmlFormatterService, ResponsesService,
             SubtitledHtmlObjectFactory, StateSolutionService,
@@ -166,6 +172,15 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.onCustomizationModalSavePostHook = function() {
+            let nextContentIdIndexHasChanged = (
+              StateNextContentIdIndexService.displayed !==
+              StateNextContentIdIndexService.savedMemento);
+            if (nextContentIdIndexHasChanged) {
+              StateNextContentIdIndexService.saveDisplayedValue();
+              $scope.onSaveNextContentIdIndex(
+                StateNextContentIdIndexService.displayed);
+            }
+
             var hasInteractionIdChanged = (
               StateInteractionIdService.displayed !==
               StateInteractionIdService.savedMemento);
@@ -190,9 +205,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
             // This must be called here so that the rules are updated before the
             // state graph is recomputed.
             if (hasInteractionIdChanged) {
-              $rootScope.$broadcast(
-                'onInteractionIdChanged',
-                StateInteractionIdService.savedMemento);
+              StateInteractionIdService.onInteractionIdChanged.emit(
+                StateInteractionIdService.savedMemento
+              );
             }
 
             $scope.recomputeGraph();
@@ -218,6 +233,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 $scope.onCustomizationModalSavePostHook, function() {
                   StateInteractionIdService.restoreFromMemento();
                   StateCustomizationArgsService.restoreFromMemento();
+                  StateNextContentIdIndexService.restoreFromMemento();
                 });
             }
           };
@@ -247,9 +263,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
 
-              $rootScope.$broadcast(
-                'onInteractionIdChanged',
-                StateInteractionIdService.savedMemento);
+              StateInteractionIdService.onInteractionIdChanged.emit(
+                StateInteractionIdService.savedMemento
+              );
               $scope.recomputeGraph();
               _updateInteractionPreview();
               _updateAnswerChoices();
