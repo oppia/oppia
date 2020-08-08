@@ -85,13 +85,13 @@
 /core/templates/pages/collection-player-page/ @kevintab95
 
 
-# Community contribution project
-/core/controllers/community_dashboard*.py @sagangwee
+# Contributor Dashboard project
+/core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
 /core/domain/voiceover_services*.py @sagangwee
 /core/storage/opportunity/ @sagangwee
 /core/templates/domain/opportunity/ @sagangwee
-/core/templates/pages/community-dashboard-page/ @sagangwee
+/core/templates/pages/contributor-dashboard-page/ @sagangwee
 
 
 # Core documentation
@@ -105,7 +105,7 @@
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
 /core/templates/pages/terms-page/ @DubeySandeep
-/core/templates/pages/terms-page/terms-page.mainpage.html @seanlip
+/core/templates/pages/terms-page/terms-page.component.html @seanlip
 
 
 # Dashboard pages.
@@ -537,7 +537,6 @@
 /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
-/core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek

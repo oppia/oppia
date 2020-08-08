@@ -14657,7 +14657,7 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
 
-class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionRightsModelValidatorTests(test_utils.GenericTestBase):
 
     TRANSLATOR_EMAIL = 'translator@community.org'
     TRANSLATOR_USERNAME = 'translator'
@@ -14666,7 +14666,7 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
     VOICE_ARTIST_USERNAME = 'voiceartist'
 
     def setUp(self):
-        super(UserCommunityRightsModelValidatorTests, self).setUp()
+        super(UserContributionRightsModelValidatorTests, self).setUp()
 
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
@@ -14680,17 +14680,19 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
             self.voice_artist_id, 'hi')
 
         self.translator_model_instance = (
-            user_models.UserCommunityRightsModel.get_by_id(self.translator_id))
+            user_models.UserContributionRightsModel.get_by_id(
+                self.translator_id))
         self.voice_artist_model_instance = (
-            user_models.UserCommunityRightsModel.get_by_id(
+            user_models.UserContributionRightsModel.get_by_id(
                 self.voice_artist_id))
 
         self.job_class = (
-            prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob)
+            prod_validation_jobs_one_off
+            .UserContributionRightsModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated UserCommunityRightsModel\', 2]']
+            u'[u\'fully-validated UserContributionRightsModel\', 2]']
         run_job_and_check_output(self, expected_output)
 
     def test_get_external_id_relationship_failure(self):
@@ -14699,11 +14701,11 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids field '
-                'check of UserCommunityRightsModel\', [u"Entity id %s: based '
-                'on field user_settings_ids having value %s, expect model '
-                'UserSettingsModel with id %s but it doesn\'t exist"]]'
+                'check of UserContributionRightsModel\', [u"Entity id %s: '
+                'based on field user_settings_ids having value %s, expect '
+                'model UserSettingsModel with id %s but it doesn\'t exist"]]'
             ) % (self.translator_id, self.translator_id, self.translator_id),
-            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+            u'[u\'fully-validated UserContributionRightsModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_object_validation_failure(self):
@@ -14715,11 +14717,11 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for domain object check of '
-                'UserCommunityRightsModel\', [u\'Entity id %s: Entity fails '
+                'UserContributionRightsModel\', [u\'Entity id %s: Entity fails '
                 'domain validation with the error Invalid language_code: '
                 'invalid_lang_code\']]'
             ) % self.translator_id,
-            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+            u'[u\'fully-validated UserContributionRightsModel\', 1]']
 
         run_job_and_check_output(self, expected_output, sort=True)
 
