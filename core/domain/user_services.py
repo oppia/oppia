@@ -504,8 +504,8 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
-            result.append(_transform_user_settings(model) if model is not
-                None else None)
+            result.append(
+                _transform_user_settings(model) if model is not None else None)
     return result
 
 
