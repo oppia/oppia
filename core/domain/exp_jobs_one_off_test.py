@@ -1139,11 +1139,11 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
             {'Introduction': states_dict}
         )
 
-        swap_states_schema_ver = self.swap(
+        swap_states_schema_version = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
-        swap_exp_schema_ver = self.swap(
+        swap_exp_schema_version = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
-        with swap_states_schema_ver, swap_exp_schema_ver:
+        with swap_states_schema_version, swap_exp_schema_version:
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
@@ -1233,16 +1233,16 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
         mock_conversion = classmethod(
             lambda cls, exploration_dict: exploration_dict['property_that_dne'])
 
-        swap_conversion = self.swap(
-            exp_domain.Exploration,
-            '_convert_v41_dict_to_v42_dict',
-            mock_conversion)
-        swap_states_schema_ver = self.swap(
+        swap_states_schema_version = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 37)
-        swap_exp_schema_ver = self.swap(
+        swap_exp_schema_version = self.swap(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 42)
 
-        with swap_conversion, swap_states_schema_ver, swap_exp_schema_ver:
+        with swap_states_schema_version, swap_exp_schema_version, self.swap(
+            exp_domain.Exploration,
+            '_convert_v41_dict_to_v42_dict',
+            mock_conversion
+        ):
             job_id = exp_jobs_one_off.ExplorationMigrationAuditJob.create_new()
             exp_jobs_one_off.ExplorationMigrationAuditJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
