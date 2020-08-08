@@ -208,9 +208,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
             // This must be called here so that the rules are updated before the
             // state graph is recomputed.
             if (hasInteractionIdChanged) {
-              $rootScope.$broadcast(
-                'onInteractionIdChanged',
-                StateInteractionIdService.savedMemento);
+              StateInteractionIdService.onInteractionIdChanged.emit(
+                StateInteractionIdService.savedMemento
+              );
             }
 
             $scope.recomputeGraph();
@@ -266,9 +266,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
 
-              $rootScope.$broadcast(
-                'onInteractionIdChanged',
-                StateInteractionIdService.savedMemento);
+              StateInteractionIdService.onInteractionIdChanged.emit(
+                StateInteractionIdService.savedMemento
+              );
               $scope.recomputeGraph();
               _updateInteractionPreview();
               _updateAnswerChoices();
