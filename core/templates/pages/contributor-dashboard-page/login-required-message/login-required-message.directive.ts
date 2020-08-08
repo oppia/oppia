@@ -34,10 +34,10 @@ angular.module('oppia').directive('loginRequiredMessage', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$window', 'SiteAnalyticsService', 'UserService',
-        'OPPIA_AVATAR_IMAGE_LINK',
+        'OPPIA_AVATAR_LINK_URL',
         function(
             $scope, $window, SiteAnalyticsService, UserService,
-            OPPIA_AVATAR_IMAGE_LINK) {
+            OPPIA_AVATAR_LINK_URL) {
           var ctrl = this;
           ctrl.onLoginButtonClicked = function() {
             UserService.getLoginUrlAsync().then(
@@ -54,7 +54,7 @@ angular.module('oppia').directive('loginRequiredMessage', [
             );
           };
           ctrl.$onInit = function() {
-            ctrl.OPPIA_AVATAR_IMAGE_LINK = OPPIA_AVATAR_IMAGE_LINK;
+            ctrl.OPPIA_AVATAR_LINK_URL = OPPIA_AVATAR_LINK_URL;
             ctrl.OPPIA_AVATAR_IMAGE_URL = (
               UrlInterpolationService.getStaticImageUrl(
                 '/avatar/oppia_avatar_100px.svg'));

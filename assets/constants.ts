@@ -5367,7 +5367,7 @@ export = {
   "ENABLE_ACCOUNT_EXPORT": false,
 
   // Link to open when the Oppia avatar is clicked on any page.
-  "OPPIA_AVATAR_IMAGE_LINK": null,
+  "OPPIA_AVATAR_LINK_URL": null,
 
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,

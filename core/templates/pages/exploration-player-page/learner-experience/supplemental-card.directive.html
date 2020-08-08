@@ -1,8 +1,8 @@
 <div class="conversation-skin-supplemental-card">
   <div ng-if="helpCardHtml" class="conversation-skin-help-card help-card-standard"
        ng-style="!isHelpCardTall() ? {'top': getHelpCardBottomPosition()} : {}">
-    <a ng-class="{'oppia-disabled-image-link': (OPPIA_AVATAR_IMAGE_LINK === null)}"
-       ng-href="<[OPPIA_AVATAR_IMAGE_LINK]>"
+    <a ng-class="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+       ng-href="<[OPPIA_AVATAR_LINK_URL]>"
        target="_blank"
        rel="noopener">
       <img class="conversation-skin-oppia-avatar"
