@@ -169,6 +169,48 @@ class RemoveDeletedSkillsFromTopicOneOffJob(
             yield (key, values)
 
 
+class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to regenerate topic summaries."""
+
+    _DELETED_KEY = 'topic_deleted'
+    _PROCESSED_KEY = 'topic_processed'
+    _ERROR_KEY = 'topic_errored'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (RegenerateTopicSummaryOneOffJob._DELETED_KEY, 1)
+            return
+
+        try:
+            topic_services.generate_topic_summary(item.id)
+        except Exception as e:
+            error_message = (
+                'Failed to create topic summary %s: %s' % (item.id, e))
+            logging.exception(error_message)
+            yield (
+                RegenerateTopicSummaryOneOffJob._ERROR_KEY,
+                error_message.encode('utf-8'))
+            return
+
+        yield (RegenerateTopicSummaryOneOffJob._PROCESSED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == RegenerateTopicSummaryOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted topics.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == RegenerateTopicSummaryOneOffJob._PROCESSED_KEY:
+            yield (key, ['Successfully processed %d topics.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)
+
+
 class SubTopicPageMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks for existence of math components in the SubTopicPage."""
 

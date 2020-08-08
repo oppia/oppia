@@ -257,6 +257,7 @@
 
 # Global stylesheet.
 /core/templates/css/oppia.css @ankita240796
+/core/templates/css/oppia-material.css @srijanreddy98 @bansalnitish
 
 
 # Interaction project.
@@ -353,6 +354,7 @@
 
 # Readme
 /core/README.md @ankita240796
+/core/templates/css/README.md @srijanreddy98 @bansalnitish
 /extensions/README.md @ankita240796
 /scripts/README.md @ankita240796
 
@@ -571,7 +573,7 @@
 
 # Dynamic Feature Gating project
 /core/storage/config/ @BenHenning @vinitamurthi
-/core/domain/platform_parameter_domain*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
 
 
 # Frontend unit tests

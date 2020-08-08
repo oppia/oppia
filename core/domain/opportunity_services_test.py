@@ -97,7 +97,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'description', self.TOPIC_ID,
+            'story-one')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
@@ -683,7 +684,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID)
+            self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
+            'story-two')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)

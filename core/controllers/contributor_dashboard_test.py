@@ -99,7 +99,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(2)]
 
         for index, story in enumerate(stories):
@@ -351,7 +352,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             '%s' % i,
             'title %d' % i,
             'description %d' % i,
-            '0'
+            '0',
+            'title-%s' % chr(97 + i)
         ) for i in python_utils.RANGE(2)]
 
         for index, story in enumerate(stories):
