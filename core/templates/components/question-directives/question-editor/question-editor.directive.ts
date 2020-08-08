@@ -63,13 +63,15 @@ angular.module('oppia').directive('questionEditor', [
         'AlertsService', 'EditabilityService',
         'EditableQuestionBackendApiService', 'LoaderService',
         'QuestionObjectFactory', 'QuestionUpdateService', 'ResponsesService',
-        'SolutionValidityService', 'StateEditorService', 'INTERACTION_SPECS',
+        'SolutionValidityService', 'StateInteractionIdService',
+        'StateEditorService', 'INTERACTION_SPECS',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, EditabilityService,
             EditableQuestionBackendApiService, LoaderService,
             QuestionObjectFactory, QuestionUpdateService, ResponsesService,
-            SolutionValidityService, StateEditorService, INTERACTION_SPECS) {
+            SolutionValidityService, StateInteractionIdService,
+            StateEditorService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getStateContentPlaceholder = function() {
@@ -160,6 +162,13 @@ angular.module('oppia').directive('questionEditor', [
             });
           };
 
+          ctrl.saveNextContentIdIndex = function(displayedValue) {
+            _updateQuestion(function() {
+              var stateData = ctrl.question.getStateData();
+              stateData.nextContentIdIndex = angular.copy(displayedValue);
+            });
+          };
+
           ctrl.saveSolution = function(displayedValue) {
             _updateQuestion(function() {
               StateEditorService.setInteractionSolution(
@@ -207,14 +216,17 @@ angular.module('oppia').directive('questionEditor', [
                 () => _init()
               )
             );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onInteractionEditorInitialized.subscribe(
+                () => _init()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => _init()
+              )
+            );
 
-            $scope.$on('interactionEditorInitialized', function(evt) {
-              _init();
-            });
-
-            $scope.$on('onInteractionIdChanged', function(evt) {
-              _init();
-            });
             if (ctrl.canEditQuestion()) {
               EditabilityService.markEditable();
             } else {
