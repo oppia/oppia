@@ -252,10 +252,7 @@
   },
   "TextInput": {
     "Equals": {
-      "description": "is equal to {{x|NormalizedString}}"
-    },
-    "CaseSensitiveEquals": {
-      "description": "is equal to {{x|NormalizedString}}, taking case into account"
+      "description": "is equal to {{x|NormalizedString}}, without taking case into account"
     },
     "StartsWith": {
       "description": "starts with {{x|NormalizedString}}"

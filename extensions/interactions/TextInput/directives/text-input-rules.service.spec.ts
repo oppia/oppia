@@ -61,15 +61,6 @@ describe('Text Input rules service', () => {
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'case sensitive equals\' rule', () => {
-    expect(tirs.CaseSensitiveEquals('abc def', RULE_INPUT)).toBe(true);
-    expect(tirs.CaseSensitiveEquals('abc   def ', RULE_INPUT)).toBe(true);
-    expect(tirs.CaseSensitiveEquals('ABC def', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('abc DeF', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('abc', RULE_INPUT)).toBe(false);
-  });
-
   it('should have a correct \'starts with\' rule', () => {
     expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc defghi', RULE_INPUT)).toBe(true);
