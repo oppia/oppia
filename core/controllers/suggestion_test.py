@@ -1071,8 +1071,10 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
-
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
         self.EXP_ID = 'exp1'
@@ -1086,13 +1088,18 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-a')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -1242,7 +1249,13 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
@@ -1258,13 +1271,18 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-b')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -1281,14 +1299,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_skill(
             self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-
-        self.set_admins([self.ADMIN_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(

@@ -49,9 +49,13 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def setUp(self):
         super(
             ExplorationOpportunitySummaryModelRegenerationJobTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.topic_id_1 = 'topic1'
         self.topic_id_2 = 'topic2'
@@ -71,11 +75,17 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         topic_1 = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'topic', 'abbrev', 'description')
+        topic_1.thumbnail_filename = 'thumbnail.svg'
+        topic_1.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic_1)
+        topic_services.publish_topic(self.topic_id_1, self.admin_id)
 
         topic_2 = topic_domain.Topic.create_default_topic(
             self.topic_id_2, 'topic2', 'abbrev', 'description')
+        topic_2.thumbnail_filename = 'thumbnail.svg'
+        topic_2.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic_2)
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
 
         story_1 = story_domain.Story.create_default_story(
             story_id_1, 'A story', 'description', self.topic_id_1,
@@ -88,8 +98,10 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         story_services.save_new_story(self.owner_id, story_2)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_1, story_id_1)
+        topic_services.publish_story(self.topic_id_1, story_id_1, self.admin_id)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_2, story_id_2)
+        topic_services.publish_story(self.topic_id_2, story_id_2, self.admin_id)
         story_services.update_story(
             self.owner_id, story_id_1, [story_domain.StoryChange({
                 'cmd': 'add_story_node',

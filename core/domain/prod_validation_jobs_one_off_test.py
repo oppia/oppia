@@ -2330,8 +2330,12 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             prod_validation_jobs_one_off
             .ExplorationOpportunitySummaryModelAuditOneOffJob)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -2347,7 +2351,10 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
@@ -2355,6 +2362,8 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         story_change_list = [story_domain.StoryChange({
             'cmd': 'add_story_node',
