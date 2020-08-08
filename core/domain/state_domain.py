@@ -44,6 +44,7 @@ class AnswerGroup(python_utils.OBJECT):
     that involve soft matching of answers to a set of training data and/or
     example answers dictated by the creator.
     """
+
     def __init__(
             self, outcome, rule_inputs, rule_input_translations_mapping,
             training_data, tagged_skill_misconception_id):
@@ -145,9 +146,9 @@ class AnswerGroup(python_utils.OBJECT):
                     'to be <skill_id>-<misconception_id>, received %s'
                     % self.tagged_skill_misconception_id)
 
-        nRules = 0
+        numOfRules = 0
         for rule_type in self.rule_inputs:
-            nRules += len(self.rule_inputs[rule_type])
+            numOfRules += len(self.rule_inputs[rule_type])
 
             if rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
@@ -162,7 +163,7 @@ class AnswerGroup(python_utils.OBJECT):
                     exp_param_specs_dict
                 )
 
-        if nRules == 0 and len(self.training_data) == 0:
+        if numOfRules == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
                 'There must be at least one rule or training data for each'
                 ' answer group.')
@@ -295,7 +296,7 @@ class AnswerGroup(python_utils.OBJECT):
                                     html_list = html_list + [
                                         rule_input_variable]
                                 elif (html_type_format ==
-                                    feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                                      feconf.HTML_RULE_VARIABLE_FORMAT_SET):
                                     # Here we are checking the type of the
                                     # rule_input because the rule type
                                     # 'Equals' is used by other interactions as
@@ -308,8 +309,8 @@ class AnswerGroup(python_utils.OBJECT):
                                                     python_utils.BASESTRING):
                                                 html_list = html_list + [value]
                                 elif (html_type_format ==
-                                    feconf.
-                                    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                                      feconf.
+                                      HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                                     for rule_spec_html in rule_input_variable:
                                         html_list = html_list + rule_spec_html
                                 else:
@@ -357,10 +358,10 @@ class AnswerGroup(python_utils.OBJECT):
                 for rule_input_index, rule_input in enumerate(
                         answer_group_dict['rule_inputs'][rule_type]):
                     answer_group_dict['rule_inputs'][
-                            rule_type][rule_input_index] = (
-                        AnswerGroup.convert_html_in_rule_input(
-                            rule_input, rule_type, conversion_fn)
-                    )
+                        rule_type][rule_input_index] = (
+                            AnswerGroup.convert_html_in_rule_input(
+                                rule_input, rule_type, conversion_fn)
+                        )
 
         return answer_group_dict
 
@@ -370,7 +371,9 @@ class AnswerGroup(python_utils.OBJECT):
         to the conversion function.
 
         Args:
-            rule_spec_dict: dict. The Rule Spec dict.
+            rule_input: dict. The values of the parameters needed in order to
+                fully specify the rule.
+            rule_type: str. The rule type, e.g. "CodeContains" or "Equals".
             conversion_fn: function. The function to be used for converting the
                 HTML.
 
@@ -411,7 +414,7 @@ class AnswerGroup(python_utils.OBJECT):
                                 conversion_fn(
                                     rule_input[input_variable]))
                         elif (html_type_format ==
-                            feconf.HTML_RULE_VARIABLE_FORMAT_SET):
+                              feconf.HTML_RULE_VARIABLE_FORMAT_SET):
                             # Here we are checking the type of the
                             # rule_specs.inputs because the rule type
                             # 'Equals' is used by other interactions as
@@ -426,7 +429,7 @@ class AnswerGroup(python_utils.OBJECT):
                                             input_variable][value_index] = (
                                                 conversion_fn(value))
                         elif (html_type_format ==
-                            feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
+                              feconf.HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                             for list_index, html_list in enumerate(
                                     rule_input[input_variable]):
                                 for rule_html_index, rule_html in enumerate(
@@ -2676,16 +2679,17 @@ class State(python_utils.OBJECT):
 
                         if (isinstance(value, python_utils.BASESTRING) and
                                 '{{' in value and '}}' in value):
-                            # TODO(jacobdavis11): Create checks that all parameters
-                            # referred to exist and have the correct types.
+                            # TODO(jacobdavis11): Create checks that all =
+                            # parameters referred to exist and have the correct
+                            # types.
                             normalized_param = value
                         else:
                             try:
                                 normalized_param = param_type.normalize(value)
                             except Exception:
                                 raise Exception(
-                                    '%s has the wrong type. It should be a %s.' %
-                                    (value, param_type.__name__))
+                                    '%s has the wrong type. It should '
+                                    'be a %s.' & (value, param_type.__name__))
                         answer_group_dict['rule_inputs'][rule_type][
                             rule_input_index][param_name] = normalized_param
 
@@ -2993,7 +2997,7 @@ class State(python_utils.OBJECT):
                     answer_group,
                     conversion_fn,
                     state_uses_old_rule_spec_schema=
-                        state_uses_old_rule_spec_schema
+                    state_uses_old_rule_spec_schema
                 )
             )
 
