@@ -132,7 +132,7 @@ interface MIDI {
     onerror: Function) => void;
   setController: (
     channelId: number, type: Object, value: Object, delay: number) => void;
-  setDefaultPlugin: (midi: Obejct) => void;
+  setDefaultPlugin: (midi: Object) => void;
   setEffects: (list: Object[]) => void;
   setInstrument: (
     channelId: number, program: Object, dealy: number) => NodeJS.Timeout;
