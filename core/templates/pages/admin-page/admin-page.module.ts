@@ -19,6 +19,8 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
+import 'third-party-imports/angular-js.import';
+import 'third-party-imports/headroom.import';
 import 'third-party-imports/ng-animate.import';
 import 'third-party-imports/ng-aria.import';
 import 'third-party-imports/ng-material.import';
