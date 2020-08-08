@@ -33,10 +33,3 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
   CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-
-angular.module('oppia').constant(
-  'EVENT_COLLECTION_INITIALIZED',
-  CollectionEditorPageConstants.EVENT_COLLECTION_INITIALIZED);
-angular.module('oppia').constant(
-  'EVENT_COLLECTION_REINITIALIZED',
-  CollectionEditorPageConstants.EVENT_COLLECTION_REINITIALIZED);

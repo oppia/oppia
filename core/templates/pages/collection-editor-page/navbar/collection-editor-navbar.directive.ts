@@ -16,6 +16,8 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
+import { Subscription } from 'rxjs';
+
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
@@ -56,7 +58,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'CollectionValidationService',
         'CollectionRightsBackendApiService',
         'EditableCollectionBackendApiService', 'UrlService',
-        'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService, RouterService,
@@ -64,9 +65,9 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             CollectionValidationService,
             CollectionRightsBackendApiService,
             EditableCollectionBackendApiService, UrlService,
-            EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _validateCollection = function() {
             if (ctrl.collectionRights.isPrivate()) {
               ctrl.validationIssues = (
@@ -209,9 +210,11 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             RouterService.navigateToHistoryTab();
           };
           ctrl.$onInit = function() {
-            $scope.$on(
-              EVENT_COLLECTION_INITIALIZED, _validateCollection);
-            $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
+            ctrl.directiveSubscriptions.add(
+              CollectionEditorStateService.onCollectionInitialized.subscribe(
+                () => _validateCollection()
+              )
+            );
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
             ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
@@ -220,6 +223,9 @@ angular.module('oppia').directive('collectionEditorNavbar', [
               CollectionEditorStateService.getCollectionRights());
 
             ctrl.validationIssues = [];
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

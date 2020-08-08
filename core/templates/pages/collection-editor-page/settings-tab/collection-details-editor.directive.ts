@@ -29,6 +29,8 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/alerts.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('collectionDetailsEditor', [
   function() {
     return {
@@ -41,15 +43,14 @@ angular.module('oppia').directive('collectionDetailsEditor', [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',
         'SUPPORTED_CONTENT_LANGUAGES', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
-        'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'TAG_REGEX',
         function(
             $scope, CollectionEditorStateService, CollectionUpdateService,
             CollectionValidationService, AlertsService, ALL_CATEGORIES,
             SUPPORTED_CONTENT_LANGUAGES, COLLECTION_TITLE_INPUT_FOCUS_LABEL,
-            EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             TAG_REGEX) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var refreshSettingsTab = function() {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();
             ctrl.displayedCollectionObjective = (
@@ -122,8 +123,11 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             return CollectionEditorStateService.hasLoadedCollection();
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
-            $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
+            ctrl.directiveSubscriptions.add(
+              CollectionEditorStateService.onCollectionInitialized.subscribe(
+                () => refreshSettingsTab()
+              )
+            );
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
               COLLECTION_TITLE_INPUT_FOCUS_LABEL);
@@ -137,6 +141,9 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             );
             ctrl.languageListForSelect = SUPPORTED_CONTENT_LANGUAGES;
             ctrl.TAG_REGEX = TAG_REGEX;
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
