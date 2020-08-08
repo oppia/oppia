@@ -96,7 +96,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomData(
+  async fetchClassroomDataAsync(
       classroomUrlFragment: string
   ): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
@@ -104,7 +104,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomPageIsShownStatus(): Promise<boolean> {
+  async fetchClassroomPageIsShownStatusAsync(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomPageIsShownStatus(resolve, reject);
     });

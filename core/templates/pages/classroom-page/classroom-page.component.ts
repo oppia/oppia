@@ -62,7 +62,7 @@ angular.module('oppia').component('classroomPage', {
           '/splash/books.svg');
 
         LoaderService.showLoadingScreen('Loading');
-        ctrl.classroomBackendApiService.fetchClassroomData(
+        ctrl.classroomBackendApiService.fetchClassroomDataAsync(
           ctrl.classroomUrlFragment).then(function(classroomData) {
           ctrl.classroomData = classroomData;
           ctrl.classroomDisplayName = (

@@ -111,8 +111,9 @@ describe('Classroom page', () => {
       classroomData = ClassroomDataObjectFactory.createFromBackendData(
         'Math', [], 'Course details', 'Topics covered'
       );
-      spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
-        $q.resolve(classroomData));
+      spyOn(
+        ClassroomBackendApiService,
+        'fetchClassroomDataAsync').and.returnValue($q.resolve(classroomData));
       spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(PageTitleService, 'setPageTitle').and.callThrough();
       spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
@@ -142,7 +143,9 @@ describe('Classroom page', () => {
     beforeEach(function() {
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         ClassroomBackendApiService);
-      spyOn(ClassroomBackendApiService, 'fetchClassroomData').and.returnValue(
+      spyOn(
+        ClassroomBackendApiService,
+        'fetchClassroomDataAsync').and.returnValue(
         $q.reject({
           status: 404
         }));
