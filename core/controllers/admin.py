@@ -257,7 +257,7 @@ class AdminHandler(base.BaseHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            Exception: Cannot reload an exploration in production.
+            Exception. Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -287,11 +287,24 @@ class AdminHandler(base.BaseHandler):
         state = state_domain.State.create_default_state(
             'ABC', is_initial_state=True)
         state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        })
+
+        state.update_next_content_id_index(1)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
+        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
         recorded_voiceovers.add_content_id_for_voiceover('1')
         recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+        written_translations.add_content_id_for_translation('ca_placeholder_0')
         written_translations.add_content_id_for_translation('1')
         written_translations.add_content_id_for_translation('default_outcome')
 
@@ -308,10 +321,6 @@ class AdminHandler(base.BaseHandler):
 
         state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.update_interaction_customization_args({
-            'placeholder': 'Enter text here',
-            'rows': 1
-        })
         state.update_interaction_default_outcome(
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
@@ -354,8 +363,8 @@ class AdminHandler(base.BaseHandler):
         attached to each skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -419,7 +428,7 @@ class AdminHandler(base.BaseHandler):
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1)
+                topic_id_1, 'help-jamie-win-arcade')
 
             story_node_dicts = [{
                 'exp_id': '15',
@@ -501,8 +510,8 @@ class AdminHandler(base.BaseHandler):
         linked to the skill.
 
         Raises:
-            Exception: Cannot load new structures data in production mode.
-            Exception: User does not have enough rights to generate data.
+            Exception. Cannot load new structures data in production mode.
+            Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
             if self.user.role != feconf.ROLE_ID_ADMIN:
@@ -537,7 +546,7 @@ class AdminHandler(base.BaseHandler):
             collection_id: str. The collection id.
 
         Raises:
-            Exception: Cannot reload a collection in production.
+            Exception. Cannot reload a collection in production.
         """
         if constants.DEV_MODE:
             logging.info(
@@ -562,7 +571,7 @@ class AdminHandler(base.BaseHandler):
                 be published.
 
         Raises:
-            Exception: Environment is not DEVMODE.
+            Exception. Environment is not DEVMODE.
         """
 
         if constants.DEV_MODE:
@@ -604,12 +613,25 @@ class ExplorationsLatexSvgHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        latex_strings_to_exp_id_mapping = (
-            exp_services.get_batch_of_exps_for_latex_svg_generation())
-        self.render_json({
-            'latex_strings_to_exp_id_mapping': (
-                latex_strings_to_exp_id_mapping)
-        })
+        item_to_fetch = self.request.get('item_to_fetch')
+        if item_to_fetch == 'exp_id_to_latex_mapping':
+            latex_strings_to_exp_id_mapping = (
+                exp_services.get_batch_of_exps_for_latex_svg_generation())
+            self.render_json({
+                'latex_strings_to_exp_id_mapping': (
+                    latex_strings_to_exp_id_mapping)
+            })
+        elif item_to_fetch == 'number_of_explorations_left_to_update':
+            number_of_explorations_left_to_update = (
+                exp_services.
+                get_number_explorations_having_latex_strings_without_svgs())
+            self.render_json({
+                'number_of_explorations_left_to_update': '%d' % (
+                    number_of_explorations_left_to_update)
+            })
+        else:
+            raise self.InvalidInputException(
+                'Please specify a valid type of item to fetch.')
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -781,8 +803,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddCommunityReviewerHandler(base.BaseHandler):
-    """Handles adding reviewer for community dashboard page."""
+class AddContributionReviewerHandler(base.BaseHandler):
+    """Handles adding reviewer for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -834,13 +856,13 @@ class AddCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
 
-        email_manager.send_email_to_new_community_reviewer(
+        email_manager.send_email_to_new_contribution_reviewer(
             new_reviewer_user_id, review_category, language_code=language_code)
         self.render_json({})
 
 
-class RemoveCommunityReviewerHandler(base.BaseHandler):
-    """Handles removing reviewer for community dashboard."""
+class RemoveContributionReviewerHandler(base.BaseHandler):
+    """Handles removing reviewer for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -863,7 +885,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 'Invalid language_code: %s' % language_code)
 
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
-            user_services.remove_community_reviewer(user_id)
+            user_services.remove_contribution_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
             review_category = self.payload.get('review_category')
             if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
@@ -892,7 +914,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid review_category: %s' % review_category)
 
-            email_manager.send_email_to_removed_community_reviewer(
+            email_manager.send_email_to_removed_contribution_reviewer(
                 user_id, review_category, language_code=language_code)
         else:
             raise self.InvalidInputException(
@@ -901,7 +923,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
         self.render_json({})
 
 
-class CommunityReviewersListHandler(base.BaseHandler):
+class ContributionReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -920,12 +942,12 @@ class CommunityReviewersListHandler(base.BaseHandler):
                 constants.REVIEW_CATEGORY_QUESTION]:
             raise self.InvalidInputException(
                 'Invalid review_category: %s' % review_category)
-        usernames = user_services.get_community_reviewer_usernames(
+        usernames = user_services.get_contribution_reviewer_usernames(
             review_category, language_code=language_code)
         self.render_json({'usernames': usernames})
 
 
-class CommunityReviewerRightsDataHandler(base.BaseHandler):
+class ContributionReviewerRightsDataHandler(base.BaseHandler):
     """Handler to show the review rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -940,7 +962,7 @@ class CommunityReviewerRightsDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
         user_rights = (
-            user_services.get_user_community_rights(user_id))
+            user_services.get_user_contribution_rights(user_id))
         self.render_json({
             'can_review_translation_for_language_codes': (
                 user_rights.can_review_translation_for_language_codes),

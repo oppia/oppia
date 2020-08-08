@@ -80,6 +80,7 @@ describe('Subtopic editor tab', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
+    subtopic.setUrlFragment('dummy-url');
     skillSummary = ShortSkillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
     topic._uncategorizedSkillSummaries = [skillSummary];
@@ -134,6 +135,34 @@ describe('Subtopic editor tab', function() {
       var titleSpy = spyOn(TopicUpdateService, 'setSubtopicTitle');
       ctrl.updateSubtopicTitle('New title');
       expect(titleSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call TopicUpdateService if subtopic url fragment is updated',
+    function() {
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('new-url');
+      expect(urlFragmentSpy).toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService when url fragment has not changed',
+    function() {
+      ctrl.updateSubtopicUrlFragment('subtopic-url');
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('subtopic-url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+    });
+
+  it('should not call TopicUpdateService if subtopic url fragment is invalid',
+    function() {
+      var urlFragmentSpy = spyOn(TopicUpdateService, 'setSubtopicUrlFragment');
+      ctrl.updateSubtopicUrlFragment('new url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('New-Url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('new-url-');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
+      ctrl.updateSubtopicUrlFragment('new123url');
+      expect(urlFragmentSpy).not.toHaveBeenCalled();
     });
 
   it('should call TopicUpdateService if subtopic thumbnail updates',

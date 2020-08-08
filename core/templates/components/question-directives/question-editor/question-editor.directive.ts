@@ -39,6 +39,8 @@ require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -61,14 +63,17 @@ angular.module('oppia').directive('questionEditor', [
         'AlertsService', 'EditabilityService',
         'EditableQuestionBackendApiService', 'LoaderService',
         'QuestionObjectFactory', 'QuestionUpdateService', 'ResponsesService',
-        'SolutionValidityService', 'StateEditorService', 'INTERACTION_SPECS',
+        'SolutionValidityService', 'StateInteractionIdService',
+        'StateEditorService', 'INTERACTION_SPECS',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, EditabilityService,
             EditableQuestionBackendApiService, LoaderService,
             QuestionObjectFactory, QuestionUpdateService, ResponsesService,
-            SolutionValidityService, StateEditorService, INTERACTION_SPECS) {
+            SolutionValidityService, StateInteractionIdService,
+            StateEditorService, INTERACTION_SPECS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.getStateContentPlaceholder = function() {
             return 'Type your question here.';
           };
@@ -101,7 +106,7 @@ angular.module('oppia').directive('questionEditor', [
             var stateData = ctrl.questionStateData;
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
+              StateEditorService.onStateEditorInitialized.emit(stateData);
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
                 ctrl.interactionIsShown = true;
@@ -157,6 +162,13 @@ angular.module('oppia').directive('questionEditor', [
             });
           };
 
+          ctrl.saveNextContentIdIndex = function(displayedValue) {
+            _updateQuestion(function() {
+              var stateData = ctrl.question.getStateData();
+              stateData.nextContentIdIndex = angular.copy(displayedValue);
+            });
+          };
+
           ctrl.saveSolution = function(displayedValue) {
             _updateQuestion(function() {
               StateEditorService.setInteractionSolution(
@@ -199,17 +211,22 @@ angular.module('oppia').directive('questionEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-              _init();
-            });
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onStateEditorDirectiveInitialized.subscribe(
+                () => _init()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onInteractionEditorInitialized.subscribe(
+                () => _init()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => _init()
+              )
+            );
 
-            $scope.$on('interactionEditorInitialized', function(evt) {
-              _init();
-            });
-
-            $scope.$on('onInteractionIdChanged', function(evt) {
-              _init();
-            });
             if (ctrl.canEditQuestion()) {
               EditabilityService.markEditable();
             } else {
@@ -227,6 +244,9 @@ angular.module('oppia').directive('questionEditor', [
             // The _init function is written separately since it is also called
             // in $scope.$on when some external events are triggered.
             _init();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

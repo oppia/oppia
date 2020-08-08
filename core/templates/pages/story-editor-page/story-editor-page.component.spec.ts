@@ -19,6 +19,9 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+
+import { EventEmitter } from '@angular/core';
+
 // ^^^ This block is to be removed.
 
 require('pages/story-editor-page/story-editor-page.component.ts');
@@ -136,16 +139,27 @@ describe('Story editor page', function() {
 
   it('should load story based on its id on url when component is initialized' +
     ' and set page title', function() {
-    spyOn(StoryEditorStateService, 'loadStory').and.stub();
+    let storyInitializedEventEmitter = new EventEmitter();
+    let storyReinitializedEventEmitter = new EventEmitter();
+    spyOn(StoryEditorStateService, 'loadStory').and.callFake(function() {
+      storyInitializedEventEmitter.emit();
+      storyReinitializedEventEmitter.emit();
+    });
+    spyOnProperty(StoryEditorStateService,
+      'onStoryInitialized').and.returnValue(
+      storyInitializedEventEmitter);
+    spyOnProperty(StoryEditorStateService,
+      'onStoryReinitialized').and.returnValue(
+      storyReinitializedEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
     MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () => true;
     ctrl.$onInit();
-    $scope.$broadcast('storyInitialized');
-    $scope.$broadcast('storyReinitialized');
 
     expect(StoryEditorStateService.loadStory).toHaveBeenCalledWith('story_1');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+
+    ctrl.$onDestroy();
   });
 
   it('should return to topic editor page when closing confirmation modal',

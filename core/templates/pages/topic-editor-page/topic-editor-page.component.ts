@@ -23,7 +23,7 @@ require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
-require('domain/bottom_navbar/bottom-navbar-status.service.ts');
+require('services/bottom-navbar-status.service.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
 require('pages/topic-editor-page/subtopic-editor/' +
     'subtopic-preview-tab.component.ts');

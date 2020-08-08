@@ -907,11 +907,10 @@ class BaseUserModelValidator(BaseModelValidator):
             unused_item: ndb.Model. BaseUserModel to validate.
 
         Returns:
-            list(tuple(str, str, list, str, list).
-            A list of tuple which consists of External model name,
-            property name in model, list of property value in model,
-            property name in external model, list of property value
-            in external model.
+            list(tuple(str, str, list, str, list)). A list of tuple which
+            consists of External model name, property name in model, list of
+            property value in model, property name in external model, list of
+            property value in external model.
         """
         return []
 
@@ -5945,12 +5944,12 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
         return [cls._validate_score]
 
 
-class UserCommunityRightsModelValidator(BaseUserModelValidator):
-    """Class for validating UserCommunityRightsModel."""
+class UserContributionRightsModelValidator(BaseUserModelValidator):
+    """Class for validating UserContributionRightsModel."""
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return user_domain.UserCommunityRights(
+        return user_domain.UserContributionRights(
             item.id, item.can_review_translation_for_language_codes,
             item.can_review_voiceover_for_language_codes,
             item.can_review_questions)
@@ -6058,7 +6057,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         """Validates the composite_entity_id field of the given item.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The TaskEntry model
+                object to get the composite entity id.
         """
         expected_composite_entity_id = (
             improvements_models.TaskEntryModel.generate_composite_entity_id(
@@ -6076,7 +6076,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         """Validates the fields of the item relating to the status field.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The item to check the
+                status for.
         """
         if item.status == improvements_models.TASK_STATUS_OPEN:
             if item.resolver_id:
@@ -6107,7 +6108,8 @@ class TaskEntryModelValidator(BaseModelValidator):
         name.
 
         Args:
-            item: improvements_models.TaskEntryModel.
+            item: improvements_models.TaskEntryModel. The item to fetch and
+                check the target id.
         """
         try:
             exp_model = exp_models.ExplorationModel.get(
@@ -6557,7 +6559,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
         UserContributionScoringModelValidator),
-    user_models.UserCommunityRightsModel: UserCommunityRightsModelValidator,
+    user_models.UserContributionRightsModel: (
+        UserContributionRightsModelValidator),
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator),
     stats_models.PlaythroughModel: PlaythroughModelValidator,
@@ -7397,12 +7400,12 @@ class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserContributionScoringModel]
 
 
-class UserCommunityRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserCommunityRightsModel."""
+class UserContributionRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserContributionRightsModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserCommunityRightsModel]
+        return [user_models.UserContributionRightsModel]
 
 
 class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):

@@ -34,7 +34,7 @@ require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
+require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -47,22 +47,28 @@ angular.module('oppia').component('subtopicEditorTab', {
     'UndoRedoService',
     'UrlInterpolationService', 'WindowDimensionsService',
     'EVENT_SUBTOPIC_PAGE_LOADED', 'MAX_CHARS_IN_SUBTOPIC_TITLE',
+    'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
         $scope, EntityCreationService, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorStateService,
         TopicEditorRoutingService, TopicUpdateService,
         UndoRedoService,
         UrlInterpolationService, WindowDimensionsService,
-        EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE) {
+        EVENT_SUBTOPIC_PAGE_LOADED, MAX_CHARS_IN_SUBTOPIC_TITLE,
+        MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
       var ctrl = this;
       var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE = MAX_CHARS_IN_SUBTOPIC_TITLE;
+      ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
+        MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
       ctrl.initEditor = function() {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
         ctrl.errorMsg = null;
+        ctrl.subtopicUrlFragmentExists = false;
+        ctrl.subtopicUrlFragmentIsValid = false;
         if (ctrl.topic.getId() && ctrl.subtopic) {
           TopicEditorStateService.loadSubtopicPage(
             ctrl.topic.getId(), ctrl.subtopicId);
@@ -82,6 +88,7 @@ angular.module('oppia').component('subtopicEditorTab', {
             ctrl.subtopic.getThumbnailFilename());
           ctrl.editableThumbnailBgColor = (
             ctrl.subtopic.getThumbnailBgColor());
+          ctrl.editableUrlFragment = ctrl.subtopic.getUrlFragment();
           ctrl.subtopicPage = (
             TopicEditorStateService.getSubtopicPage());
           ctrl.allowedBgColors = (
@@ -92,6 +99,9 @@ angular.module('oppia').component('subtopicEditorTab', {
           }
           ctrl.uncategorizedSkillSummaries = (
             ctrl.topic.getUncategorizedSkillSummaries());
+          ctrl.subtopicUrlFragmentIsValid = (
+            SubtopicValidationService.isUrlFragmentValid(
+              ctrl.editableUrlFragment));
         }
       };
 
@@ -108,6 +118,28 @@ angular.module('oppia').component('subtopicEditorTab', {
         TopicUpdateService.setSubtopicTitle(
           ctrl.topic, ctrl.subtopic.getId(), title);
         ctrl.editableTitle = title;
+      };
+
+      ctrl.updateSubtopicUrlFragment = function(urlFragment) {
+        ctrl.subtopicUrlFragmentIsValid = (
+          SubtopicValidationService.isUrlFragmentValid(urlFragment));
+        if (urlFragment === ctrl.subtopic.getUrlFragment()) {
+          ctrl.subtopicUrlFragmentExists = false;
+          return;
+        }
+
+        ctrl.subtopicUrlFragmentExists = (
+          SubtopicValidationService.doesSubtopicWithUrlFragmentExist(
+            urlFragment));
+        if (
+          !ctrl.subtopicUrlFragmentIsValid ||
+          ctrl.subtopicUrlFragmentExists) {
+          return;
+        }
+
+        TopicUpdateService.setSubtopicUrlFragment(
+          ctrl.topic, ctrl.subtopic.getId(), urlFragment);
+        ctrl.editableUrlFragment = urlFragment;
       };
 
       ctrl.updateSubtopicThumbnailFilename = function(
