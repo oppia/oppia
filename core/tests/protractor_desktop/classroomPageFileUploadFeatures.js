@@ -71,7 +71,7 @@ describe('Classroom page functionality', function() {
         'List',
         async function(elem) {
           elem = await elem.editItem(0, 'Dictionary');
-          elem = await elem.editEntry(3, 'List');
+          elem = await elem.editEntry(4, 'List');
           elem = await elem.addItem('Unicode');
           await elem.setValue(topicId);
         });
