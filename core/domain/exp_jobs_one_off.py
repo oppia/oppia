@@ -253,8 +253,8 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """A reusbale one-off job for testing exploration migration from the
-    previous exploration schema version to the latest. This job runs the state
+    """A reusbale one-off job for testing exploration migration from any
+    exploration schema version to the latest. This job runs the state
     migration, but does not commit the new exploration to the store.
     """
 
@@ -273,62 +273,72 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         current_state_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        if item.states_schema_version == current_state_schema_version - 1:
-            try:
-                current_exp_schema_version = (
-                    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
-                conversion_fn = getattr(
-                    exp_domain.Exploration,
-                    '_convert_v%i_dict_to_v%i_dict' % (
-                        current_exp_schema_version - 1,
-                        current_exp_schema_version)
-                )
-                converted_dict = conversion_fn(item.to_dict())
+        # Upgrading older explorations to current version - 1 before running the
+        # audit job.
+        if item.states_schema_version < current_state_schema_version - 1:
+            feconf.CURRENT_STATE_SCHEMA_VERSION -= 1
 
-                # TODO(iamprayush): Revert these changes (special-casing the
-                # SUCCESS output for math interactions) after the migration job
-                # for math interactions has been successfully run.
-                extracted_variables_output = []
-                for state_name, state_dict in converted_dict['states'].items():
-                    if state_dict['interaction']['id'] in (
-                            'AlgebraicExpressionInput', 'MathEquationInput'):
-                        rule_inputs = []
-                        for group in state_dict['interaction']['answer_groups']:
-                            for rule_spec in group['rule_specs']:
-                                rule_inputs.append(rule_spec['inputs']['x'])
-                        customization_args = state_dict['interaction'][
-                            'customization_args']['customOskLetters']['value']
-                        extracted_variables_output.append(
-                            'State Name: %s, Rule Inputs: %s, Variables: %s' %
-                            (state_name, ', '.join(rule_inputs), ', '.join(
-                                customization_args)))
+            commit_cmds = [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': python_utils.UNICODE(
+                    item.states_schema_version),
+                'to_version': python_utils.UNICODE(
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            })]
+            exp_services.update_exploration(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                'Update exploration states from schema version %d to %d.' % (
+                    item.states_schema_version,
+                    feconf.CURRENT_STATE_SCHEMA_VERSION))
 
-                if len(extracted_variables_output):
-                    output_values = 'Exp ID: %s: %s' % (
-                        item.id, extracted_variables_output)
-                    yield ('SUCCESS', output_values.encode('utf-8'))
-                else:
-                    yield ('SUCCESS', None)
-            except Exception as e:
-                error_message = (
-                    'Exploration %s failed migration to v%s: %s' %
-                    (item.id, current_exp_schema_version, e))
-                logging.error(error_message)
-                yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
-        else:
+            feconf.CURRENT_STATE_SCHEMA_VERSION += 1
+
+        try:
+            current_exp_schema_version = (
+                exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
+            conversion_fn = getattr(
+                exp_domain.Exploration,
+                '_convert_v%i_dict_to_v%i_dict' % (
+                    current_exp_schema_version - 1,
+                    current_exp_schema_version)
+            )
+            converted_dict = conversion_fn(item.to_dict())
+
+            # TODO(iamprayush): Revert these changes (special-casing the
+            # SUCCESS output for math interactions) after the migration job
+            # for math interactions has been successfully run.
+            extracted_variables_output = []
+            for state_name, state_dict in converted_dict['states'].items():
+                if state_dict['interaction']['id'] in (
+                        'AlgebraicExpressionInput', 'MathEquationInput'):
+                    rule_inputs = []
+                    for group in state_dict['interaction']['answer_groups']:
+                        for rule_spec in group['rule_specs']:
+                            rule_inputs.append(rule_spec['inputs']['x'])
+                    customization_args = state_dict['interaction'][
+                        'customization_args']['customOskLetters']['value']
+                    extracted_variables_output.append(
+                        'State Name: %s, Rule Inputs: %s, Variables: %s' %
+                        (state_name, ', '.join(rule_inputs), ', '.join(
+                            customization_args)))
+
+            if len(extracted_variables_output):
+                output_values = 'Exp ID: %s: %s' % (
+                    item.id, extracted_variables_output)
+                yield ('SUCCESS_WITH_OUTPUT', output_values.encode('utf-8'))
+            else:
+                yield ('SUCCESS', None)
+        except Exception as e:
             error_message = (
-                'Exploration %s was not migrated because its states '
-                'schema verison is %i' %
-                (item.id, item.states_schema_version))
-            yield ('WRONG_STATE_VERSION', error_message.encode('utf-8'))
+                'Exploration %s failed migration to v%s: %s' %
+                (item.id, current_exp_schema_version, e))
+            logging.error(error_message)
+            yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
 
     @staticmethod
     def reduce(key, values):
         if key == 'SUCCESS':
-            if values[0] == 'None':
-                yield (key, len(values))
-            else:
-                yield (key, values[:VALID_MATH_INPUTS_YIELD_LIMIT])
+            yield (key, len(values))
         else:
             yield (key, values)
 
