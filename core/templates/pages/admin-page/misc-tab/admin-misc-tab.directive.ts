@@ -371,7 +371,7 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.setStatusMessage(
             'SVGs generated for ' + countOfSvgsGenerated.toString() +
             ' LaTeX strings .');
-          $rootScope.$apply();
+          $scope.$apply();
         };
 
         // TODO(#10045): Remove this function once all the math-rich text
@@ -409,11 +409,11 @@ angular.module('oppia').directive('adminMiscTab', [
               ctrl.setStatusMessage(
                 'Successfully updated ' + numberOfSuggestionsUpdated +
                 ' suggestions');
-              $rootScope.$apply();
+              $scope.$apply();
             }, function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error:' + errorResponse.data.error);
-              $rootScope.$apply();
+              $scope.$apply();
             });
         };
 
