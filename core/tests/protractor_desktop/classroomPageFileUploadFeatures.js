@@ -59,8 +59,8 @@ describe('Classroom page functionality', function() {
     async function() {
       var handle = await browser.getWindowHandle();
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic('Topic 1',
-        'Description', false);
+      await topicsAndSkillsDashboardPage.createTopic(
+        'Topic 1', 'topic-one', 'Description', false);
       await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
       await topicEditorPage.saveTopic('Added thumbnail.');
       var url = await browser.getCurrentUrl();
@@ -71,7 +71,7 @@ describe('Classroom page functionality', function() {
         'List',
         async function(elem) {
           elem = await elem.editItem(0, 'Dictionary');
-          elem = await elem.editEntry(3, 'List');
+          elem = await elem.editEntry(4, 'List');
           elem = await elem.addItem('Unicode');
           await elem.setValue(topicId);
         });

@@ -57,19 +57,32 @@ angular.module('oppia').directive('reviewTestPage', [
         ) {
           var ctrl = this;
           var _fetchSkillDetails = function() {
+            var topicUrlFragment = (
+              UrlService.getTopicUrlFragmentFromLearnerUrl());
+            var storyUrlFragment = (
+              UrlService.getStoryUrlFragmentFromLearnerUrl());
+            var classroomUrlFragment = (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl());
             var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
               REVIEW_TEST_DATA_URL, {
-                story_id: ctrl.storyId
+                topic_url_fragment: topicUrlFragment,
+                classroom_url_fragment: classroomUrlFragment,
+                story_url_fragment: storyUrlFragment
               });
             var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
               REVIEW_TESTS_URL, {
-                story_id: ctrl.storyId
+                topic_url_fragment: topicUrlFragment,
+                classroom_url_fragment: classroomUrlFragment,
+                story_url_fragment: storyUrlFragment
               });
             var storyViewerUrl = UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_PAGE, {
-                story_id: ctrl.storyId
+                topic_url_fragment: topicUrlFragment,
+                classroom_url_fragment: classroomUrlFragment,
+                story_url_fragment: storyUrlFragment
               });
-            ReviewTestBackendApiService.fetchReviewTestData(ctrl.storyId).then(
+            ReviewTestBackendApiService.fetchReviewTestData(
+              storyUrlFragment).then(
               function(result) {
                 var skillIdList = [];
                 var skillDescriptions = [];
@@ -111,7 +124,6 @@ angular.module('oppia').directive('reviewTestPage', [
               });
           };
           ctrl.$onInit = function() {
-            ctrl.storyId = UrlService.getStoryIdFromUrl();
             ctrl.questionPlayerConfig = null;
             _fetchSkillDetails();
           };

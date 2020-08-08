@@ -55,8 +55,8 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic('Topic 1',
-      'Description', false);
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic 1', 'unique-topic', 'Description', false);
     var url = await browser.getCurrentUrl();
     topicId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -165,10 +165,11 @@ describe('Topic editor functionality', function() {
         topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
           'Skill 3', 'Concept card explanation', true));
       var TOPIC_NAME = 'TASE2';
+      var TOPIC_URL_FRAGMENT_NAME = 'tase-two';
       var TOPIC_DESCRIPTION = 'TASE2 description';
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
-        TOPIC_DESCRIPTION, false);
+      await topicsAndSkillsDashboardPage.createTopic(
+        TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
@@ -234,6 +235,7 @@ describe('Chapter editor functionality', function() {
   var dummySkills = [];
   var allowedErrors = [];
   var topicName = 'Topic 0';
+  var topicUrlFragment = 'topic-zero';
   var userEmail = 'creator@chapterTest.com';
 
   var createDummyExplorations = async function(numExplorations) {
@@ -274,8 +276,8 @@ describe('Chapter editor functionality', function() {
     var handle = await browser.getWindowHandle();
     dummyExplorationIds = await createDummyExplorations(3);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(topicName,
-      'Description', false);
+    await topicsAndSkillsDashboardPage.createTopic(
+      topicName, topicUrlFragment, 'Description', false);
     await topicEditorPage.createStory(
       'Story 0', 'topic-and-story-editor-two', 'Story description',
       Constants.TEST_SVG_PATH);

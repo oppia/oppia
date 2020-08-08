@@ -17,8 +17,15 @@
  */
 
 export class TopicViewerDomainConstants {
-  public static TOPIC_DATA_URL_TEMPLATE = '/topic_data_handler/<topic_name>';
-  public static STORY_VIEWER_URL_TEMPLATE = '/story/<story_id>';
-  public static SUBTOPIC_VIEWER_URL_TEMPLATE =
-    '/subtopic/<topic_name>/<subtopic_id>';
+  public static TOPIC_DATA_URL_TEMPLATE = (
+    '/topic_data_handler/<classroom_url_fragment>/<topic_url_fragment>');
+  public static STORY_VIEWER_URL_TEMPLATE = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/story/' +
+    '<story_url_fragment>');
+  public static SUBTOPIC_VIEWER_URL_TEMPLATE = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/' +
+    '<subtopic_url_fragment>');
+  public static REVIEW_TESTS_URL_TEMPLATE = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/review-test/' +
+    '<story_url_fragment>');
 }

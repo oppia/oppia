@@ -40,6 +40,7 @@ export interface TopicSummaryBackendDict {
   'can_edit_topic'?: boolean;
   'is_published'?: boolean;
   'classroom'?: string;
+  'url_fragment': string;
 }
 
 export class TopicSummary {
@@ -60,7 +61,8 @@ export class TopicSummary {
       public isPublished: boolean,
       public classroom: string,
       public thumbnailFilename: string,
-      public thumbnailBgColor: string) { }
+      public thumbnailBgColor: string,
+      public urlFragment: string) { }
 
   getId(): string {
     return this.id;
@@ -110,6 +112,14 @@ export class TopicSummary {
     return this.topicModelLastUpdated;
   }
 
+  getClassroom(): string {
+    return this.classroom;
+  }
+
+  getUrlFragment(): string {
+    return this.urlFragment;
+  }
+
   getThumbnailFilename(): string {
     return this.thumbnailFilename;
   }
@@ -142,7 +152,8 @@ export class TopicSummaryObjectFactory {
       topicSummaryBackendDict.is_published,
       topicSummaryBackendDict.classroom,
       topicSummaryBackendDict.thumbnail_filename,
-      topicSummaryBackendDict.thumbnail_bg_color);
+      topicSummaryBackendDict.thumbnail_bg_color,
+      topicSummaryBackendDict.url_fragment);
   }
 }
 

@@ -19,21 +19,24 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 const topicPropertiesConstants = require('constants.ts');
 
 angular.module('oppia').controller('CreateNewTopicModalController', [
-  '$controller', '$scope', '$uibModalInstance',
+  '$controller', '$rootScope', '$scope', '$uibModalInstance',
   'ContextService', 'ImageLocalStorageService',
-  'NewlyCreatedTopicObjectFactory', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-  'MAX_CHARS_IN_TOPIC_NAME',
+  'NewlyCreatedTopicObjectFactory', 'TopicEditorStateService',
+  'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+  'MAX_CHARS_IN_TOPIC_URL_FRAGMENT',
   function(
-      $controller, $scope, $uibModalInstance,
+      $controller, $rootScope, $scope, $uibModalInstance,
       ContextService, ImageLocalStorageService,
-      NewlyCreatedTopicObjectFactory, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-      MAX_CHARS_IN_TOPIC_NAME) {
+      NewlyCreatedTopicObjectFactory, TopicEditorStateService,
+      MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
+      MAX_CHARS_IN_TOPIC_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -52,6 +55,33 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
     $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
     $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
       MAX_CHARS_IN_TOPIC_DESCRIPTION);
+    $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
+
+    $scope.topicUrlFragmentExists = false;
+    $scope.topicNameExists = false;
+    $scope.onTopicUrlFragmentChange = function() {
+      if (!$scope.newlyCreatedTopic.urlFragment) {
+        return;
+      }
+      TopicEditorStateService.updateExistenceOfTopicUrlFragment(
+        $scope.newlyCreatedTopic.urlFragment, function() {
+          $scope.topicUrlFragmentExists = (
+            TopicEditorStateService.getTopicWithUrlFragmentExists());
+          $rootScope.$applyAsync();
+        });
+    };
+
+    $scope.onTopicNameChange = function() {
+      if (!$scope.newlyCreatedTopic.name) {
+        return;
+      }
+      TopicEditorStateService.updateExistenceOfTopicName(
+        $scope.newlyCreatedTopic.name, function() {
+          $scope.topicNameExists = (
+            TopicEditorStateService.getTopicWithNameExists());
+          $rootScope.$applyAsync();
+        });
+    };
 
     $scope.save = function() {
       $uibModalInstance.close($scope.newlyCreatedTopic);

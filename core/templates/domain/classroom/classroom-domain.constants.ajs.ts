@@ -28,3 +28,11 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_VIEWER_URL_TEMPLATE',
   ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'TOPIC_VIEWER_REVISION_URL_TEMPLATE',
+  ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'TOPIC_VIEWER_STORY_URL_TEMPLATE',
+  ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE);

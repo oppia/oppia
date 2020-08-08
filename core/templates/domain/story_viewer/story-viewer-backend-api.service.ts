@@ -59,12 +59,17 @@ export class StoryViewerBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  _fetchStoryData(storyId: string,
+  _fetchStoryData(
+      topicUrlFragment: string,
+      classroomUrlFragment: string,
+      storyUrlFragment: string,
       successCallback: (value: StoryPlaythrough) => void,
       errorCallback: (reason: string) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
-        story_id: storyId
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
+        story_url_fragment: storyUrlFragment
       });
 
     this.http.get<StoryPlaythroughBackendDict>(
@@ -81,12 +86,16 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  _recordChapterCompletion(storyId: string, nodeId: string,
+  _recordChapterCompletion(
+      topicUrlFragment: string, classroomUrlFragment: string,
+      storyUrlFragment: string, nodeId: string,
       successCallback: (value: StoryChapterCompletionResponse) => void,
       errorCallback: (reason: string) => void): void {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
-        story_id: storyId,
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
+        story_url_fragment: storyUrlFragment,
         node_id: nodeId
       });
     this.http.post<StoryChapterCompletionBackendResponse>(
@@ -103,17 +112,26 @@ export class StoryViewerBackendApiService {
     });
   }
 
-  fetchStoryData(storyId: string): Promise<StoryPlaythrough> {
+  fetchStoryData(
+      topicUrlFragment:string,
+      classroomUrlFragment: string,
+      storyUrlFragment: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
-      this._fetchStoryData(storyId, resolve, reject);
+      this._fetchStoryData(
+        topicUrlFragment, classroomUrlFragment, storyUrlFragment,
+        resolve, reject);
     });
   }
 
   recordChapterCompletion(
-      storyId: string,
+      topicUrlFragment: string,
+      classroomUrlFragment: string,
+      storyUrlFragment: string,
       nodeId: string): Promise<StoryChapterCompletionResponse> {
     return new Promise((resolve, reject) => {
-      this._recordChapterCompletion(storyId, nodeId, resolve, reject);
+      this._recordChapterCompletion(
+        topicUrlFragment, classroomUrlFragment, storyUrlFragment,
+        nodeId, resolve, reject);
     });
   }
 }

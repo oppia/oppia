@@ -9,9 +9,10 @@
       </div>
       <div class="subtopics-container">
         <div *ngFor="let subtopic of subtopicsList">
-          <subtopic-summary-tile [subtopic]="subtopic"
+          <subtopic-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+                                 [subtopic]="subtopic"
                                  [topicId]="topicId"
-                                 [topicName]="topicName">
+                                 [topicUrlFragment]="topicUrlFragment">
           </subtopic-summary-tile>
         </div>
       </div>

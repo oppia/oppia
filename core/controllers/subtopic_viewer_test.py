@@ -75,18 +75,22 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')
         subtopic.skill_ids = ['skill_id_1']
+        subtopic.url_fragment = 'sub-url-frag-one'
         subtopic2 = topic_domain.Subtopic.create_default_subtopic(
             2, 'Subtopic Title 2')
         subtopic2.skill_ids = ['skill_id_2']
+        subtopic2.url_fragment = 'sub-url-frag-two'
 
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic, subtopic2], next_subtopic_id=3)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_topic(
             'topic_id_2', self.admin_id, name='Private_Name',
+            abbreviated_name='pvttopic', url_fragment='pvttopic',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
@@ -151,27 +155,28 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
     def test_any_user_can_access_subtopic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Name', '1'))
+                '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'))
 
 
     def test_accessibility_of_subtopic_viewer_page_of_unpublished_topic(
             self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Private_Name', '1'),
-                expected_status_int=404)
+                '/learn/staging/%s/revision/%s'
+                % ('pvttopic', 'sub-url-frag-one'),
+                expected_status_int=302)
             self.login(self.ADMIN_EMAIL)
             self.get_html_response(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Private_Name', '1'))
+                '/learn/staging/%s/revision/%s'
+                % ('pvttopic', 'sub-url-frag-one'))
             self.logout()
 
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response(
-                '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Name', '1'),
+                '/learn/staging/%s/revision/%s'
+                % ('name', 'sub-url-frag-one'),
                 expected_status_int=404)
 
 
@@ -179,8 +184,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_first_subtopic_in_topic(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1))
+                '%s/staging/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'))
             expected_page_contents_dict = {
                 'recorded_voiceovers': self.recorded_voiceovers_dict,
                 'subtitled_html': {
@@ -195,7 +200,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'id': 2,
                 'thumbnail_filename': None,
                 'title': 'Subtopic Title 2',
-                'url_fragment': ''
+                'url_fragment': 'sub-url-frag-two'
             }
 
             expected_dict = {
@@ -209,8 +214,8 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_last_subtopic_in_topic(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 2))
+                '%s/staging/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two'))
             expected_page_contents_dict = {
                 'recorded_voiceovers': self.recorded_voiceovers_dict,
                 'subtitled_html': {
@@ -225,7 +230,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 'id': 1,
                 'thumbnail_filename': None,
                 'title': 'Subtopic Title',
-                'url_fragment': ''
+                'url_fragment': 'sub-url-frag-one'
             }
 
             expected_dict = {
@@ -240,22 +245,23 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         topic_services.unpublish_topic(self.topic_id, self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
+                '%s/staging/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
                 expected_status_int=404)
 
     def test_cannot_get_with_invalid_topic_name(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name', 1),
+                '%s/staging/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name',
+                    'sub-url-frag-one'),
                 expected_status_int=404)
 
     def test_cannot_get_with_invalid_subtopic_id(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 5),
+                '%s/staging/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-zero'),
                 expected_status_int=404)
 
     def test_cannot_get_with_deleted_subtopic_page(self):
@@ -263,13 +269,13 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             self.admin_id, self.topic_id, 1)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
+                '%s/staging/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
                 expected_status_int=404)
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Name', 1),
+                '%s/staging/%s/%s' % (
+                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
                 expected_status_int=404)

@@ -56,7 +56,7 @@ describe('Topics and skills dashboard functionality', function() {
   it('should assign, unassign, create and delete a skill', async function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic1 TASD', 'Topic 1 description', true);
+      'Topic1 TASD', 'topic-tasd-one', 'Topic 1 description', true);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
@@ -99,10 +99,10 @@ describe('Topics and skills dashboard functionality', function() {
   it('should filter the topics', async function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
-      'Alpha TASD', 'Alpha description', true);
+      'Alpha TASD', 'alpha-tasd', 'Alpha description', true);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Beta TASD', 'Beta description', true);
+      'Beta TASD', 'beta-tasd', 'Beta description', true);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);

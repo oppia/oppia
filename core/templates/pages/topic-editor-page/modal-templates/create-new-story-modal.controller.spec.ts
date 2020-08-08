@@ -62,7 +62,7 @@ describe('Create New Story Modal Controller', function() {
   it('should check if url fragment already exists', function() {
     spyOn(
       StoryEditorStateService,
-      'changeStoryWithUrlFragmentExists').and.callFake(
+      'updateExistenceOfStoryUrlFragment').and.callFake(
       (urlFragment, callback) => callback());
     spyOn(
       StoryEditorStateService,
@@ -72,6 +72,16 @@ describe('Create New Story Modal Controller', function() {
     $scope.onStoryUrlFragmentChange();
     expect($scope.storyUrlFragmentExists).toBeTrue();
   });
+
+  it('should not update story url fragment existence for empty url fragment',
+    function() {
+      spyOn(StoryEditorStateService, 'updateExistenceOfStoryUrlFragment');
+      $scope.story.urlFragment = '';
+      $scope.onStoryUrlFragmentChange();
+      expect(
+        StoryEditorStateService.updateExistenceOfStoryUrlFragment
+      ).not.toHaveBeenCalled();
+    });
 
   it('should check if the story is valid', function() {
     expect($scope.isValid()).toBe(false);

@@ -25,6 +25,14 @@ angular.module('oppia').constant(
   TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE);
 
 angular.module('oppia').constant(
+  'TOPIC_NAME_HANDLER_URL_TEMPLATE',
+  TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
+  'TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
+  TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE);
+
+angular.module('oppia').constant(
   'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
   TopicDomainConstants.TOPIC_EDITOR_QUESTION_URL_TEMPLATE);
 
@@ -79,6 +87,10 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_ABBREVIATED_NAME',
   TopicDomainConstants.TOPIC_PROPERTY_ABBREVIATED_NAME);
+
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_URL_FRAGMENT',
+  TopicDomainConstants.TOPIC_PROPERTY_URL_FRAGMENT);
 
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_THUMBNAIL_FILENAME',

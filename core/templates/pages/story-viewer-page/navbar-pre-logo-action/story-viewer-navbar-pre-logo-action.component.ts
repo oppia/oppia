@@ -25,14 +25,17 @@ angular.module('oppia').component('storyViewerNavbarPreLogoAction', {
   template: require('./story-viewer-navbar-pre-logo-action.component.html'),
   controller: [
     '$rootScope', 'UrlInterpolationService', 'UrlService',
-    'TOPIC_VIEWER_URL_TEMPLATE', function(
+    'TOPIC_VIEWER_STORY_URL_TEMPLATE', function(
         $rootScope, UrlInterpolationService, UrlService,
-        TOPIC_VIEWER_URL_TEMPLATE) {
+        TOPIC_VIEWER_STORY_URL_TEMPLATE) {
       var ctrl = this;
       ctrl.getTopicUrl = function() {
         return UrlInterpolationService.interpolateUrl(
-          TOPIC_VIEWER_URL_TEMPLATE, {
-            topic_name: ctrl.topicName
+          TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+            topic_url_fragment: (
+              UrlService.getTopicUrlFragmentFromLearnerUrl()),
+            classroom_url_fragment: (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl())
           });
       };
 

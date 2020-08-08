@@ -41,6 +41,7 @@ describe('Subtopic data object factory', () => {
 
       var sampleSubtopicDataBackendDict = {
         topic_id: 'topic_id',
+        topic_name: 'topic',
         next_subtopic_dict: null,
         subtopic_title: 'sample_title',
         page_contents: {
@@ -69,6 +70,7 @@ describe('Subtopic data object factory', () => {
 
     it('should be able to get all the values', function() {
       expect(_sampleSubtopicData.getParentTopicId()).toEqual('topic_id');
+      expect(_sampleSubtopicData.getParentTopicName()).toEqual('topic');
       expect(_sampleSubtopicData.getNextSubtopic()).toEqual(null);
       expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
       expect(_sampleSubtopicData.getPageContents()).toEqual(

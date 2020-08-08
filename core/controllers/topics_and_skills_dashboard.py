@@ -251,7 +251,7 @@ class NewTopicHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         name = self.payload.get('name')
-        abbreviated_name = self.payload.get('abbreviated_name')
+        url_fragment = self.payload.get('url_fragment')
         description = self.payload.get('description')
         thumbnail_filename = self.payload.get('filename')
         thumbnail_bg_color = self.payload.get('thumbnailBgColor')
@@ -264,7 +264,7 @@ class NewTopicHandler(base.BaseHandler):
                 'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name, abbreviated_name, description)
+            new_topic_id, name, url_fragment, description)
         topic_services.save_new_topic(self.user_id, topic)
 
         try:

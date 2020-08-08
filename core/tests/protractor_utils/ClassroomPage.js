@@ -25,7 +25,7 @@ var ClassroomPage = function() {
     by.css('.protractor-test-topic-summary-tile'));
 
   this.get = async function(classroomName) {
-    await browser.get('/' + classroomName);
+    await browser.get('/learn/' + classroomName);
     await waitFor.pageToFullyLoad();
   };
 

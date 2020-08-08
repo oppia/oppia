@@ -234,7 +234,10 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
 
-            ClassroomBackendApiService.fetchClassroomPageIsShownStatus().then(
+            var classroomPageIsShownPromise = (
+              ClassroomBackendApiService.fetchClassroomPageIsShownStatusAsync()
+            );
+            classroomPageIsShownPromise.then(
               function(classroomIsShown) {
                 ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
               });

@@ -240,11 +240,22 @@ angular.module('oppia').factory('StoryEditorStateService', [
         return _storyReinitializedEventEmitter;
       },
 
+      /**
+       * Returns whether the story URL fragment already exists on the server.
+       */
       getStoryWithUrlFragmentExists: function() {
         return _storyWithUrlFragmentExists;
       },
 
-      changeStoryWithUrlFragmentExists: function(
+      /**
+       * Attempts to set the boolean variable _storyWithUrlFragmentExists based
+       * on the value returned by doesStoryWithUrlFragmentExistAsync and
+       * executes the success callback provided. No arguments are passed to the
+       * success callback. Execution of the success callback indicates that the
+       * async backend call was successful and that _storyWithUrlFragmentExists
+       * has been successfully updated.
+       */
+      updateExistenceOfStoryUrlFragment: function(
           storyUrlFragment, successCallback) {
         EditableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
           storyUrlFragment).then(

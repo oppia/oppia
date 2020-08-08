@@ -27,9 +27,10 @@ import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
   styleUrls: []
 })
 export class SubtopicsListComponent {
+  @Input() classroomUrlFragment: string;
   @Input() subtopicsList: Subtopic[];
   @Input() topicId: string;
-  @Input() topicName: string;
+  @Input() topicUrlFragment: string;
   constructor() {}
 }
 

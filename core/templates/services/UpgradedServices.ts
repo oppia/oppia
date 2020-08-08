@@ -1414,7 +1414,8 @@ export class UpgradedServices {
       new ReviewTestBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['ReviewTestObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['UrlService']);
     upgradedServices['SearchExplorationsBackendApiService'] =
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],

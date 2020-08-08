@@ -86,6 +86,7 @@ describe('Editable topic backend API service', function() {
       skill_id_to_rubrics_dict: {
         skill_id_1: []
       },
+      classroom_url_fragment: 'math',
       skill_question_count_dict: {},
       subtopic_page: {
         id: 'topicId-1',
@@ -128,7 +129,8 @@ describe('Editable topic backend API service', function() {
           sampleDataResults.skill_id_to_description_dict,
         groupedSkillSummaries: sampleDataResults.grouped_skill_summary_dicts,
         skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict,
-        skillQuestionCountDict: sampleDataResults.skill_question_count_dict
+        skillQuestionCountDict: sampleDataResults.skill_question_count_dict,
+        classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -245,6 +247,64 @@ describe('Editable topic backend API service', function() {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Topic with given id doesn\'t exist.');
+    }
+  );
+
+  it('should check if a topic name already exists',
+    function() {
+      $httpBackend.expect('GET', '/topic_name_handler/topic-name').respond({
+        topic_name_exists: true
+      });
+
+      EditableTopicBackendApiService.doesTopicWithNameExistAsync(
+        'topic-name').then(topicNameExists => {
+        expect(topicNameExists).toBeTrue();
+      });
+      $httpBackend.flush();
+    }
+  );
+
+  it('should use the rejection handler if the topic name already exists',
+    function() {
+      $httpBackend.expect(
+        'GET', '/topic_name_handler/topic-name').respond(
+        500, 'Error: Failed to check topic name.');
+
+      EditableTopicBackendApiService.doesTopicWithNameExistAsync(
+        'topic-name').then(() => {}, error => {
+        expect(error).toEqual('Error: Failed to check topic name.');
+      });
+      $httpBackend.flush();
+    }
+  );
+
+  it('should check if a topic url fragment already exists',
+    function() {
+      $httpBackend.expect(
+        'GET',
+        '/topic_url_fragment_handler/topic-url-fragment').respond({
+        topic_url_fragment_exists: true
+      });
+
+      EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
+        'topic-url-fragment').then(topicUrlFragmentExists => {
+        expect(topicUrlFragmentExists).toBeTrue();
+      });
+      $httpBackend.flush();
+    }
+  );
+
+  it('should use the rejection handler if the url fragment already exists',
+    function() {
+      $httpBackend.expect(
+        'GET', '/topic_url_fragment_handler/topic-url-fragment').respond(
+        500, 'Error: Failed to check topic url fragment.');
+
+      EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
+        'topic-url-fragment').then(() => {}, error => {
+        expect(error).toEqual('Error: Failed to check topic url fragment.');
+      });
+      $httpBackend.flush();
     }
   );
 
