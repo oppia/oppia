@@ -80,6 +80,8 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     edited_exploration_ids))
 
 
+# TODO(#10178): Remove the following migration job once we have verified
+# that UserAuthModels exists for every user.
 class PopulateUserAuthModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserAuthModel for
     all registered users.
