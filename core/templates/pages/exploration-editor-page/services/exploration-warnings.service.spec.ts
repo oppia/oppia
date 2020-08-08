@@ -16,12 +16,6 @@
  * @fileoverview Unit tests for ExplorationWarningsService.
  */
 
-import { fakeAsync } from '@angular/core/testing';
-
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import { StateTopAnswersStats } from
-  'domain/statistics/state-top-answers-stats-object.factory';
-
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
